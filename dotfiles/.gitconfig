@@ -1,0 +1,5 @@
+[user]
+	email = user@example.invalid
+	name = example-user Mok
+[color]
+	ui = auto
