@@ -1,6 +1,8 @@
 # sys {{{ *
 
 bg /home/example/Pictures/Backgrounds
+co /home/example/.config
+lc /home/example/linux-config/
 d  /home/example/Downloads
 D  /home/example/Documents
 ho /home/example/
