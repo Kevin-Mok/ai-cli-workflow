@@ -1,0 +1,6 @@
+/home/example/.cache/spotify/Storage
+/lost+found
+/mnt
+/proc
+/run
+/sys
