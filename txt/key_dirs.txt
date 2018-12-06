@@ -1,7 +1,7 @@
 # sys {{{ *
 
 bg /home/example/Pictures/Backgrounds
-cn /home/example/.config
+co /home/example/.config
 lc /home/example/linux-config/
 d  /home/example/Downloads
 D  /home/example/Documents
@@ -14,7 +14,7 @@ o /
 
 # cdn {{{ *
 
-co /home/example/coding
+cn /home/example/coding
 j /home/example/Documents/journal
 ib /home/example/linux-config/configs/i3blocks-scripts
 ra /home/example/linux-config/configs/ranger
