@@ -9,6 +9,7 @@ k /home/example/
 lc /home/example/linux-config/
 m /run/media
 o /
+p /home/example/.password-store
 
 # }}} sys *
 
