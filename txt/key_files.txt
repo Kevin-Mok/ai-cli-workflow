@@ -20,6 +20,7 @@ z /home/example/linux-config/aliases/zsh_aliases
 hlg /home/example/coding/spotify-lib-vis/src/api/management/commands/update-history.log
 jn /home/example/Documents/journal/todo/12.md
 jt /home/example/Documents/journal/todo/todo.md
+lh /home/example/Documents/listening-history/polarbier.csv
 no ./.gitignore
 ne /home/example/linux-config/configs/neofetch/config.conf
 tm /home/example/.vim/plugged/vim-snippets/UltiSnips/texmath.snippets

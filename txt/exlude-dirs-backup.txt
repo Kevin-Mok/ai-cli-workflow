@@ -1,4 +1,4 @@
-/home/example/.cache/spotify/Storage
+/home/example/.cache
 /lost+found
 /mnt
 /proc

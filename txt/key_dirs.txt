@@ -16,8 +16,9 @@ p /home/example/.password-store
 # cdn {{{ *
 
 cn /home/example/coding
-j /home/example/Documents/journal
 ib /home/example/linux-config/configs/i3blocks-scripts
+j /home/example/Documents/journal
+lh /home/example/Documents/listening-history
 ra /home/example/linux-config/configs/ranger
 snp /home/example/.vim/plugged/vim-snippets/UltiSnips
 sv /home/example/coding/spotify-lib-vis/src
