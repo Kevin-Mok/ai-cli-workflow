@@ -1,7 +1,14 @@
 #!/bin/bash
 
 # Backup destination
-backup_dest="/run/media/example-user/pc-backup/backups/nzxt"
+case $1 in
+	nzxt )
+		backup_dest="/run/media/example-user/nzxt-backup/"
+		;;
+	x1 )
+		backup_dest="/run/media/example-user/laptop-backup"
+		;;
+esac
 exclude_dirs_list="/home/example/linux-config/txt/exlude-dirs-backup.txt"
 
 # Labels for backup name
