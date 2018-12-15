@@ -1,4 +1,5 @@
 /home/example/.cache
+/home/example/.local/share/Steam
 /lost+found
 /mnt
 /proc
