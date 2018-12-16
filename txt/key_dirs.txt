@@ -33,5 +33,6 @@ wo /home/example/Documents/workout-logs/11
 sc /home/example/school
 st /home/example/school/sta
 2 /home/example/school/236
+lt /home/example/school/latex-notes
 
 # }}} sch *
