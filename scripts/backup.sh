@@ -3,13 +3,13 @@
 # Backup destination
 case $1 in
 	nzxt )
-		backup_dest="/run/media/example-user/nzxt-backup/"
+		backup_dest="/run/media/example-user/backup-hd/nzxt"
 		;;
 	x1 )
 		backup_dest="/run/media/example-user/laptop-backup"
 		;;
 esac
-exclude_dirs_list="/home/example/linux-config/txt/exlude-dirs-backup.txt"
+exclude_dirs_list="/home/example/linux-config/txt/exclude-dirs-backup.txt"
 
 # Labels for backup name
 distro="arch"

@@ -1,7 +1,7 @@
 # sys {{{ *
 
 bg /home/example/Pictures/Backgrounds
-co /home/example/.config
+cf /home/example/.config
 lc /home/example/linux-config/
 d  /home/example/Downloads
 D  /home/example/Documents
@@ -10,6 +10,7 @@ lc /home/example/linux-config/
 m /run/media/example-user
 o /
 p /home/example/.password-store
+P /home/example/Pictures
 
 # }}} sys *
 
@@ -24,6 +25,7 @@ sr /home/example/linux-config/scripts
 snp /home/example/.vim/plugged/vim-snippets/UltiSnips
 sv /home/example/coding/spotify-lib-vis/src
 swa /home/example/.local/share/nvim/swap
+tt /home/example/linux-config/txt
 wo /home/example/Documents/workout-logs/11
 
 # }}} cdn *
@@ -31,7 +33,6 @@ wo /home/example/Documents/workout-logs/11
 # sch {{{ *
 
 sc /home/example/school
-st /home/example/school/sta
 2 /home/example/school/236
 lt /home/example/school/latex-notes
 
