@@ -1,19 +1,31 @@
 #!/bin/bash
 
+mount_dir="/run/media/example-user"
 # Backup destination
 case $1 in
 	nzxt )
-		backup_dest="/run/media/example-user/backup-hd/nzxt"
+		backup_dest="$mount_dir/backup-hd/nzxt"
+		# backup_dest="$mount_dir/backup-usb/nzxt"
 		;;
 	x1 )
-		backup_dest="/run/media/example-user/laptop-backup"
+		backup_dest="$mount_dir/laptop-backup"
 		;;
 esac
 exclude_dirs_list="/home/example/linux-config/txt/exclude-dirs-backup.txt"
+exclude_dirs_list_full="/home/example/linux-config/txt/exclude-dirs-backup-full.txt"
 
-# Labels for backup name
-distro="arch"
-datetime=$(date "+%m.%d-%H.%M")
-backup_file="$backup_dest/$datetime-$distro.tar.gz"
+case $2 in
+	tar )
+		# Labels for backup name
+		distro="arch"
+		datetime=$(date "+%m.%d-%H.%M")
+		backup_file="$backup_dest/tar/$datetime-$distro.tar.gz"
 
-sudo tar -czpvf "$backup_file" --exclude-from="$exclude_dirs_list" /
+		sudo tar -czpvf "$backup_file" --exclude-from="$exclude_dirs_list" /
+		;;
+	full )
+		sudo rsync -PraAX --exclude-from="$exclude_dirs_list_full" / "$backup_dest/full"
+		sudo rsync -PraAX /home "$backup_dest/full/home"
+		# echo rsync -PraAX --exclude-from="$exclude_dirs_list_full" / "$backup_dest/full"
+		# echo rsync -PraAX /home "$backup_dest/full/home"
+esac
