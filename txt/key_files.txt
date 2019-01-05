@@ -25,7 +25,6 @@ lh /home/example/Documents/listening-history/polarbier.csv
 no ./.gitignore
 ne /home/example/linux-config/configs/neofetch/config.conf
 tm /home/example/.vim/plugged/vim-snippets/UltiSnips/texmath.snippets
-tr /home/example/linux-config/txt/pacman-pkgs/aur-pkgs.txt
 
 # }}} cdn *
 
