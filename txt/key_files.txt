@@ -19,7 +19,7 @@ z /home/example/linux-config/aliases/zsh_aliases
 
 hlg /home/example/coding/spotify-lib-vis/src/api/management/commands/update-history.log
 id /home/example/coding/project-ideas/ideas.md
-jn /home/example/Documents/journal/todo/12.md
+jn /home/example/Documents/journal/todo/1.md
 jt /home/example/Documents/journal/todo/todo.md
 lh /home/example/Documents/listening-history/polarbier.csv
 no ./.gitignore
