@@ -7,7 +7,7 @@ d  /home/example/Downloads
 D  /home/example/Documents
 k /home/example/
 lc /home/example/linux-config/
-m /run/media/example-user
+me /run/media/example-user
 o /
 p /home/example/.password-store
 P /home/example/Pictures
@@ -20,12 +20,14 @@ cn /home/example/coding
 ib /home/example/linux-config/configs/i3blocks-scripts
 j /home/example/Documents/journal
 lh /home/example/Documents/listening-history
+ms /home/example/coding/best-mf-site-personal
 ra /home/example/linux-config/configs/ranger
 sr /home/example/linux-config/scripts
 snp /home/example/.vim/plugged/vim-snippets/UltiSnips
 sv /home/example/coding/spotify-lib-vis/src
 swa /home/example/.local/share/nvim/swap
 tx /home/example/linux-config/txt
+wa /home/example/.config/watson
 wo /home/example/Documents/workout-logs/11
 
 # }}} cdn *

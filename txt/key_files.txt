@@ -25,6 +25,7 @@ jn /home/example/Documents/journal/todo/1.md
 jt /home/example/Documents/journal/todo/todo.md
 lh /home/example/Documents/listening-history/polarbier.csv
 ne /home/example/linux-config/configs/neofetch/config.conf
+re README.md
 tm /home/example/.vim/plugged/vim-snippets/UltiSnips/texmath.snippets
 
 # }}} cdn *
