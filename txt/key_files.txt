@@ -11,7 +11,7 @@ sr /home/example/linux-config/configs/ranger/shortcuts.conf
 ss /home/example/.shortcuts
 u /home/example/.Xresources
 v /home/example/.vimrc
-y /home/example/.zshrc
+# y /home/example/.zshrc
 z /home/example/linux-config/aliases/zsh_aliases
 
 # }}} sys *
