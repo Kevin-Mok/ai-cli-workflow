@@ -22,7 +22,7 @@ ib /home/example/linux-config/configs/i3blocks-scripts
 j /home/example/Documents/journal
 lh /home/example/Documents/listening-history
 ms /home/example/coding/best-mf-site-personal
-ra /home/example/linux-config/configs/ranger
+ra /home/example/.config/ranger
 sr /home/example/linux-config/scripts
 snp /home/example/.vim/plugged/vim-snippets/UltiSnips
 sv /home/example/coding/spotify-lib-vis/src
