@@ -1,7 +1,9 @@
 /home/example/.cache
 /home/example/.local/share/Steam
+/home/example/VirtualBox VMs
 /lost+found
 /mnt
 /proc
 /run
 /sys
+/var/lib/systemd/coredump

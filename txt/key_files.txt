@@ -1,6 +1,7 @@
 # sys {{{ *
 
 3 /home/example/.config/i3/config
+a /home/example/linux-config/aliases/key_aliases
 d /home/example/linux-config/txt/key_dirs.txt
 f /home/example/linux-config/txt/key_files.txt
 i /home/example/.config/i3blocks/i3blocks.conf

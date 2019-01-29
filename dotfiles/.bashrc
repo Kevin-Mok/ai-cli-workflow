@@ -206,4 +206,4 @@ fi
 # Both PC/Laptop }}}
 
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
-source /home/example/.aliases
+source /home/example/.key_aliases
