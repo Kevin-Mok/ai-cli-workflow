@@ -5,7 +5,8 @@ cf /home/example/.config
 lc /home/example/linux-config/
 d  /home/example/Downloads
 D  /home/example/Documents
-fs /home/example/.config/fish
+ff /home/example/.config/fish
+fs /home/example/linux-config/fish/.config/fish
 k /home/example/
 lc /home/example/linux-config/
 me /run/media/example-user

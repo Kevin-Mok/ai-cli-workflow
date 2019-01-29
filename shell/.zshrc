@@ -171,7 +171,6 @@ fi
 
 # #  }}} autoreload zsh aliases #
 
-source /home/example/.shortcuts
 source /home/example/coding/spotify-lib-vis/src/api-keys.sh
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
@@ -179,4 +178,4 @@ export GPG_TTY=$(tty)
 export PASSWORD_STORE_CLIP_TIME=120
 source /home/example/.key_aliases
 
-exec fish
+#exec fish
