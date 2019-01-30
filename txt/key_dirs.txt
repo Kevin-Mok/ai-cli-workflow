@@ -5,7 +5,8 @@ cf /home/example/.config
 lc /home/example/linux-config/
 d  /home/example/Downloads
 D  /home/example/Documents
-ff /home/example/.config/fish
+fc /home/example/.config/fish
+ff /home/example/linux-config/fish/.config/fish/functions
 fs /home/example/linux-config/fish/.config/fish
 k /home/example/
 lc /home/example/linux-config/
@@ -29,7 +30,7 @@ snp /home/example/.vim/plugged/vim-snippets/UltiSnips
 sv /home/example/coding/spotify-lib-vis/src
 swa /home/example/.local/share/nvim/swap
 tx /home/example/linux-config/txt
-wa /home/example/.config/watson
+wd /home/example/.config/watson
 wo /home/example/Documents/workout-logs/11
 
 # }}} cdn *
@@ -42,7 +43,6 @@ e1 /home/example/school/309/e1
 6 /home/example/school/369
 a1 /home/example/school/369/a1/
 hp /home/example/school/hps
-ph /home/example/school/phl
 lt /home/example/school/latex-notes
 
 # }}} sch *
