@@ -19,10 +19,12 @@ P /home/example/Pictures
 
 # cdn {{{ *
 
+b1 /home/example/coding/mf-site/themes/base16
 cn /home/example/coding
 ib /home/example/linux-config/configs/i3blocks-scripts
 j /home/example/Documents/journal
 lh /home/example/Documents/listening-history
+mh /home/example/coding/mf-site
 ms /home/example/coding/best-mf-site-personal
 ra /home/example/.config/ranger
 sr /home/example/linux-config/scripts
@@ -41,7 +43,7 @@ sc /home/example/school
 0 /home/example/school/309
 e1 /home/example/school/309/e1
 6 /home/example/school/369
-a1 /home/example/school/369/a1/
+a2 /home/example/school/369/a2/a2
 hp /home/example/school/hps
 lt /home/example/school/latex-notes
 
