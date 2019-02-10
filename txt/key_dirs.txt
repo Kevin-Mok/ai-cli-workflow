@@ -5,7 +5,7 @@ cf /home/example/.config
 lc /home/example/linux-config/
 d  /home/example/Downloads
 D  /home/example/Documents
-fc /home/example/.config/fish
+fo /home/example/.config/fish
 ff /home/example/linux-config/fish/.config/fish/functions
 fs /home/example/linux-config/fish/.config/fish
 k /home/example/
@@ -14,6 +14,7 @@ me /run/media/example-user
 o /
 p /home/example/.password-store
 P /home/example/Pictures
+t /tmp
 
 # }}} sys *
 
@@ -24,8 +25,9 @@ cn /home/example/coding
 ib /home/example/linux-config/configs/i3blocks-scripts
 j /home/example/Documents/journal
 lh /home/example/Documents/listening-history
-mh /home/example/coding/mf-site
-ms /home/example/coding/best-mf-site-personal
+ms /home/example/coding/mf-site
+mh /home/example/coding/mf-site/layouts
+# mg /home/example/coding/best-mf-site-personal
 ra /home/example/.config/ranger
 sr /home/example/linux-config/scripts
 snp /home/example/.vim/plugged/vim-snippets/UltiSnips
@@ -41,7 +43,7 @@ wo /home/example/Documents/workout-logs/11
 
 sc /home/example/school
 0 /home/example/school/309
-e1 /home/example/school/309/e1
+e2 /home/example/school/309/e2
 6 /home/example/school/369
 a2 /home/example/school/369/a2/a2
 hp /home/example/school/hps
