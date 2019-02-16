@@ -30,6 +30,7 @@ mc /home/example/coding/mf-site/assets/sass/main.scss
 mi /home/example/coding/mf-site/ideas.md
 ne /home/example/linux-config/configs/neofetch/config.conf
 re README.md
+td todo.md
 tm /home/example/.vim/plugged/vim-snippets/UltiSnips/texmath.snippets
 wt /home/example/.config/watson/state.tmp
 
