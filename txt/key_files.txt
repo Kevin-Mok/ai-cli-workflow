@@ -35,3 +35,12 @@ tm /home/example/.vim/plugged/vim-snippets/UltiSnips/texmath.snippets
 wt /home/example/.config/watson/state.tmp
 
 # }}} cdn *
+
+# sch {{{ *
+
+0c /home/example/school/309-proj/main.scss
+0h /home/example/school/309-proj/index.html
+0j /home/example/school/309-proj/main.js
+0k /home/example/school/309-proj/txt/example-user.md
+
+# }}} sch *
