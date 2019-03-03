@@ -42,6 +42,7 @@ wo /home/example/Documents/workout-logs/11
 # sch {{{ *
 
 sc /home/example/school
+0c /home/example/school/309-proj/css
 0d /home/example/school/309
 0p /home/example/school/309-proj
 e2 /home/example/school/309/e2

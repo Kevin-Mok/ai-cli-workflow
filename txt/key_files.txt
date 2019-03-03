@@ -32,15 +32,17 @@ ne /home/example/linux-config/configs/neofetch/config.conf
 re README.md
 td todo.md
 tm /home/example/.vim/plugged/vim-snippets/UltiSnips/texmath.snippets
+wh /home/example/Documents/journal/work-habit.md
 wt /home/example/.config/watson/state.tmp
 
 # }}} cdn *
 
 # sch {{{ *
 
-0c /home/example/school/309-proj/main.scss
 0h /home/example/school/309-proj/index.html
-0j /home/example/school/309-proj/main.js
+0m /home/example/school/309-proj/js/main.js
+0f /home/example/school/309-proj/js/food.js
+0s /home/example/school/309-proj/js/stores.js
 0k /home/example/school/309-proj/txt/example-user.md
 
 # }}} sch *
