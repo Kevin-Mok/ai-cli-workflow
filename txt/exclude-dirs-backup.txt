@@ -1,7 +1,5 @@
 /home/example/.cache
 /home/example/.local/share/Steam
-/home/example/coding/linux-*
-/home/example/VirtualBox VMs
 /lost+found
 /mnt
 /proc
