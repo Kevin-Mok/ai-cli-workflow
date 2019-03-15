@@ -357,6 +357,8 @@ he "hugo serve -D --disableFastRender"
 ss "ssh example-user@192.0.2.10"
 ssb "ssh-bandit"
 
+rt "python ~/coding/rt-scraper/rt-scraper.py"
+
 #  }}} coding projs # 
 
 #  school {{{ # 
