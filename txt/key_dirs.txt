@@ -1,4 +1,5 @@
 # sys {{{ *
+# vim: fdm=marker
 
 bg /home/example/Pictures/Backgrounds
 cf /home/example/.config
@@ -46,13 +47,14 @@ wo /home/example/Documents/workout-logs/11
 sc /home/example/school
 0c /home/example/school/309-proj/css
 0d /home/example/school/309
+0l /home/example/school/309/l
 0p /home/example/school/309-proj
-e2 /home/example/school/309/e2
+e3 /home/example/school/309/e3
 
 # 369
 6 /home/example/school/369
+6f /home/example/linux-config/fish/.config/fish/functions/369/a3
 a3 /home/example/school/369/a3/a3
-a3f /home/example/linux-config/fish/.config/fish/functions/369/a3
 
 hp /home/example/school/hps
 lt /home/example/school/latex-notes
