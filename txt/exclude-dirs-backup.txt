@@ -1,3 +1,6 @@
+/home/example/.android
+/home/example/.AndroidStudio3.3
+/home/example/Android
 /home/example/.cache
 /home/example/.local/share/Steam
 /lost+found
