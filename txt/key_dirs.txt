@@ -24,7 +24,7 @@ lfv /mnt/linux-files/Videos
 
 b1 /home/example/coding/mf-site/themes/base16
 cn /home/example/coding
-ib /home/example/linux-config/configs/i3blocks-scripts
+ib /home/example/linux-config/i3blocks/.config/i3blocks/scripts
 j /home/example/Documents/journal
 lh /home/example/Documents/listening-history
 ms /home/example/coding/mf-site
@@ -43,15 +43,18 @@ wo /home/example/Documents/workout-logs/11
 
 # sch {{{ *
 
-# 309
+lt /home/example/school/latex-notes
+
+# 309{{{
 sc /home/example/school
 0c /home/example/school/309-proj/css
 0d /home/example/school/309
 0l /home/example/school/309/l
 0p /home/example/school/309-proj
-e3 /home/example/school/309/e3
+e4 /home/example/school/309/e4
+# }}}
 
-# 369
+# 369{{{
 6 /home/example/school/369
 6l /home/example/school/369/notes/lectures
 6m /mnt/369-a4
@@ -59,8 +62,9 @@ e3 /home/example/school/309/e3
 6f /home/example/linux-config/fish/.config/fish/functions/369/a3
 a4d /home/example/school/369/a4/a4
 a43 /home/example/school/369/a4-3/fs3
+#}}}
 
 hp /home/example/school/hps
-lt /home/example/school/latex-notes
+hpe /home/example/school/latex-notes/hps
 
 # }}} sch *
