@@ -35,6 +35,7 @@ bindsym Mod4+a exec studio
 # bindsym $mod+control+Return exec $def_term
 bindsym control+Return exec $def_term
 bindsym Mod4+c exec $browser
+bindsym Mod4+e exec notify-send "HPS Word Count" "$(pdftotext /home/example/school/latex-notes/hps/essay.pdf - | wc -w)"
 bindsym Mod4+f exec firefox
 bindsym Mod4+$mod+f exec echo user@example.invalid' | xclip -selection clipboard
 bindsym Mod4+h exec echo user@example.invalid' | xclip -selection clipboard

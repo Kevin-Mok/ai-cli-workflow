@@ -20,6 +20,7 @@ z /home/example/linux-config/aliases/zsh_aliases
 # cdn {{{ *
 
 cm /tmp/commit-msg.txt
+cmd ./commit-msg.txt
 hlg /home/example/coding/spotify-lib-vis/src/api/management/commands/update-history.log
 id /home/example/coding/project-ideas/ideas.md
 ig ./.gitignore
@@ -40,10 +41,10 @@ wt /home/example/.config/watson/state.tmp
 # sch {{{ *
 
 0c /home/example/school/309-proj/sass/main.scss
-0h /home/example/school/309-proj/index.html
-0m /home/example/school/309-proj/js/main.js
-0f /home/example/school/309-proj/js/food.js
-0s /home/example/school/309-proj/js/stores.js
+0h /home/example/school/309-proj/public/index.html
+0m /home/example/school/309-proj/public/js/main.js
+0f /home/example/school/309-proj/public/js/food.js
+0s /home/example/school/309-proj/public/js/stores.js
 0k /home/example/school/309-proj/json/example-user.md
 
 # }}} sch *
