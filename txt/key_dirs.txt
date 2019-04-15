@@ -39,6 +39,7 @@ swa /home/example/.local/share/nvim/swap
 tx /home/example/linux-config/txt
 wd /home/example/.config/watson
 wo /home/example/Documents/workout-logs/11
+zd /home/example/chezmoi
 
 # }}} cdn *
 
