@@ -40,11 +40,17 @@ wt /home/example/.config/watson/state.tmp
 
 # sch {{{ *
 
+# 309 {{{ *
+
 0c /home/example/school/309-proj/sass/main.scss
-0h /home/example/school/309-proj/public/index.html
+0h /home/example/school/309-proj/public/js/helpers.js
+0i /home/example/school/309-proj/public/index.html
 0m /home/example/school/309-proj/public/js/main.js
 0f /home/example/school/309-proj/public/js/food.js
-0s /home/example/school/309-proj/public/js/stores.js
+0s /home/example/school/309-proj/server.js
+0t /home/example/school/309-proj/public/js/stores.js
 0k /home/example/school/309-proj/json/example-user.md
+
+# }}} 309 *
 
 # }}} sch *
