@@ -23,8 +23,8 @@ bind \cr forward-word
 chezmoi apply
 /home/example/scripts/sync-shortcuts
 source /home/example/.config/fish/key_abbr.fish
-# set -U fish_fxn_dir "/home/example/linux-config/fish/.config/fish/functions"
-set -U fish_fxn_dir "/home/example/.config/fish/functions"
+set -U fish_fxn_dir "/home/example/linux-config/dot_config/private_fish/private_functions"
+# set -U fish_fxn_dir "/home/example/.config/fish/functions"
 abbr ff "cd $fish_fxn_dir"
 for fxn in (find $fish_fxn_dir -name '*.fish')
 	source $fxn
@@ -45,6 +45,9 @@ set -U spv_dir "/home/example/coding/spotify-lib-vis"
 set -U mfs_dir "/home/example/coding/mf-site"
 
 set -x PATH $PATH /home/example/scripts /home/example/scripts/colors /home/example/go/bin
+set -x LD_LIBRARY_PATH $LD_LIBRARY_PATH /usr/local/lib /usr/local/lib64
+set -x PKG_CONFIG_PATH $PKG_CONFIG_PATH /usr/lib/pkgconfig
+
 set -x PASSWORD_STORE_CLIP_TIME 120
 set -xU XSET_RATE 90
 set -xU XSET_DELAY 200
