@@ -12,7 +12,7 @@ imwheel &
 numlockx on &
 start-pulseaudio-x11 &
 
-wal -i $(/home/example/scripts/shuffler "$HOME/Pictures/Backgrounds/dim/non-editing") && /home/example/st/make-st.sh &
+wal -i "$(/home/example/scripts/shuffler \"$HOME/Pictures/Backgrounds/dim/non-editing\")" && /home/example/st/make-st.sh &
 exec i3
 
 # # Statusbar loop

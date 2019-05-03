@@ -1,18 +1,18 @@
 #!/bin/bash
 
-mount_dir="/run/media/example-user"
+mount_dir="/run/media/example-user/backup-hd"
 # Backup destination
 case $1 in
 	nzxt )
-		backup_dest="$mount_dir/backup-hd/nzxt"
+		backup_dest="$mount_dir/nzxt"
 		# backup_dest="$mount_dir/backup-usb/nzxt"
 		;;
 	x1 )
-		backup_dest="$mount_dir/laptop-backup"
+		backup_dest="$mount_dir/laptop"
 		;;
 esac
-exclude_dirs_list="/home/example/linux-config/txt/exclude-dirs-backup.txt"
-exclude_dirs_list_full="/home/example/linux-config/txt/exclude-dirs-backup-full.txt"
+exclude_dirs_list="/home/example/txt/exclude-dirs-backup.txt"
+exclude_dirs_list_full="/home/example/txt/exclude-dirs-backup-full.txt"
 
 case $2 in
 	tar )
