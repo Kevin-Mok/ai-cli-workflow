@@ -31,6 +31,7 @@ device-mapper
 dhcpcd
 dialog
 diffutils
+discord
 dmenu
 doxygen
 dunst
@@ -80,6 +81,7 @@ irrlicht
 jfsutils
 jp2a
 junit
+kitty
 less
 lib32-nvidia-utils
 libreoffice-still
@@ -176,6 +178,7 @@ qt5-xmlpatterns
 ranger
 redshift
 reiserfsprogs
+riot-desktop
 ripgrep
 rsync
 s-nail
@@ -193,6 +196,7 @@ sshpass
 steam
 steam-native-runtime
 stow
+subtitleeditor
 sudo
 surf
 sxiv
