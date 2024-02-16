@@ -21,7 +21,7 @@ abbr da "cd /mnt/ipad/DCIM/102APPLE"
 # ]]] dirs #
 
 abbr ncy "nvim ~/Documents/journal/hobbies/courtyard-drop.md"
-abbr njt "nvim ~/Documents/journal/todo/24/1.md"
+abbr njt "nvim ~/Documents/journal/todo/24/2.md"
 
 abbr rsn "rsync -e 'ssh -p 399' -r . 192.0.2.10:/home/example/hevin/art -acvv"
 
@@ -30,7 +30,8 @@ abbr rsn "rsync -e 'ssh -p 399' -r . 192.0.2.10:/home/example/hevin/art -acvv"
 # school [[[ #
 
 abbr js "cd ~/Documents/job-search"
-abbr ssa "ssh -i ~/coding/aws.pem user@example.invalid"
+abbr ssad "ssh -i ~/coding/aws.pem user@example.invalid"
+abbr ssa "ssh user@example.invalid"
 
 # ]]] school #
 
@@ -40,14 +41,14 @@ abbr nej "nvim ~/Documents/emojis.md"
 
 # login to X [[[ #
 
-{{ if eq .chezmoi.username "example-user" }}
-if status is-login
-    if test -z "$DISPLAY" -a $XDG_VTNR = 1
-        exec startx -- -keeptty
-    end
-end
-set -x GPG_TTY (tty)
-{{ end }}
+# {{ if eq .chezmoi.username "example-user" }}
+# if status is-login
+    # if test -z "$DISPLAY" -a $XDG_VTNR = 1
+        # exec startx -- -keeptty
+    # end
+# end
+# set -x GPG_TTY (tty)
+# {{ end }}
 
 # ]]] login to X #
 
