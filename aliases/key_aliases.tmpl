@@ -126,7 +126,8 @@ ssl "mosh --ssh='ssh -p 399' example-user@$LAPTOP_IP"
 
 # vultr
 # ssa "mosh atxadmin@192.0.2.10"
-ssa "ssh -t example-user@192.0.2.10 tmux a"
+ssa "ssh -i ~/.ssh/ai16z-test.pem ai16z@192.0.2.10"
+ssaw "ssh -t example-user@192.0.2.10 tmux a"
 # ssv "mosh example-user@192.0.2.10"
 
 # test server sites
@@ -359,6 +360,7 @@ am "antimicro"
 a "task"
 aa "task add"
 aal "task add proj:lnx"
+aan "task add proj:anp"
 aap "task add proj:"
 aas "task add proj:sch"
 # aam "task add proj:ms"
@@ -446,7 +448,8 @@ it "sxiv -t *"
 kill "kill -9"
 #kal "killall"
 ka "killall"
-kc "killall chromium"
+#kc "killall chromium"
+kc "killall chrome"
 kcm "killall compton"
 kd "killall Discord && killall Discord"
 ke "killall electron"
@@ -1266,3 +1269,4 @@ vpt "nordvpn status"
 # ]]] vpn #
 
 ft "dexscreener ethereum 0x983b92EA1F0A20844466f3E4BB988c1dE145293E"
+
