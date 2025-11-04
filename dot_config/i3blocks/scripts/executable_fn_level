@@ -1,0 +1,4 @@
+#!/bin/bash
+
+. "/home/example/.cache/wal/colors.sh"
+printf "example-user\n\n%s\n" "$color7"
