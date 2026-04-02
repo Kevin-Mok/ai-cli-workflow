@@ -1,0 +1,232 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+WINDOW_MARK="chatgpt_dictation_sequenced"
+WINDOW_WIDTH=1100
+WINDOW_HEIGHT=720
+LAUNCH_URL="https://chatgpt.com/"
+CHROME_PROFILE="Default"
+STATE_DIR="${XDG_RUNTIME_DIR:-/tmp}/chatgpt-dictation-sequenced"
+MODE_FILE="${STATE_DIR}/mode"
+WINDOW_ID_FILE="${STATE_DIR}/window-id"
+DEBUG_LOG_FILE="${STATE_DIR}/debug.log"
+
+CHROME_BIN="${CHATGPT_DICTATION_CHROME:-google-chrome}"
+I3MSG_BIN="${CHATGPT_DICTATION_I3MSG:-i3-msg}"
+XDOTOOL_BIN="${CHATGPT_DICTATION_XDOTOOL:-xdotool}"
+NOTIFY_BIN="${CHATGPT_DICTATION_NOTIFY_SEND:-notify-send}"
+
+ensure_state_dir() {
+  mkdir -p "$STATE_DIR"
+}
+
+log_debug() {
+  ensure_state_dir
+  printf '%s %s\n' "$(date '+%Y-%m-%dT%H:%M:%S%z')" "$1" >> "$DEBUG_LOG_FILE"
+}
+
+set_mode() {
+  ensure_state_dir
+  printf '%s\n' "$1" > "$MODE_FILE"
+  log_debug "set_mode: $1"
+}
+
+get_mode() {
+  if [ -r "$MODE_FILE" ]; then
+    head -n 1 "$MODE_FILE"
+    return 0
+  fi
+  printf 'idle\n'
+}
+
+notify_user() {
+  if command -v "$NOTIFY_BIN" >/dev/null 2>&1; then
+    "$NOTIFY_BIN" "ChatGPT dictation" "$1" >/dev/null 2>&1 || true
+  fi
+}
+
+read_tree() {
+  "$I3MSG_BIN" -t get_tree
+}
+
+get_marked_window_id() {
+  read_tree | jq -r --arg mark "$WINDOW_MARK" '
+    first(
+      .. | objects
+      | select(((.marks // []) | index($mark)) != null)
+      | .id
+    ) // empty
+  '
+}
+
+get_candidate_window_id() {
+  read_tree | jq -r '
+    first(
+      .. | objects
+      | select((.window_properties.class // "") == "Google-chrome")
+      | select((.name // "") | test("ChatGPT"; "i"))
+      | .id
+    ) // empty
+  '
+}
+
+window_exists() {
+  local window_id="$1"
+  [ -n "$window_id" ] || return 1
+  read_tree | jq -e --argjson id "$window_id" '
+    any(.. | objects; (.id? // -1) == $id)
+  ' >/dev/null
+}
+
+cache_window_id() {
+  ensure_state_dir
+  printf '%s\n' "$1" > "$WINDOW_ID_FILE"
+}
+
+mark_window() {
+  local window_id="$1"
+  "$I3MSG_BIN" "[con_id=${window_id}] mark --add ${WINDOW_MARK}" >/dev/null
+  cache_window_id "$window_id"
+  log_debug "mark_window: window_id=${window_id}"
+}
+
+normalize_window() {
+  local window_id="$1"
+  log_debug "normalize_window: window_id=${window_id} size=${WINDOW_WIDTH}x${WINDOW_HEIGHT}"
+  "$I3MSG_BIN" "[con_id=${window_id}] floating enable" >/dev/null
+  "$I3MSG_BIN" "[con_id=${window_id}] resize set ${WINDOW_WIDTH} px ${WINDOW_HEIGHT} px" >/dev/null
+  "$I3MSG_BIN" "[con_id=${window_id}] move position center" >/dev/null
+  "$I3MSG_BIN" "[con_id=${window_id}] focus" >/dev/null
+  "$XDOTOOL_BIN" windowactivate "$window_id" >/dev/null 2>&1 || true
+}
+
+find_window_id() {
+  local window_id
+  window_id="$(get_marked_window_id)"
+  if [ -n "$window_id" ] && window_exists "$window_id"; then
+    printf '%s\n' "$window_id"
+    return 0
+  fi
+
+  window_id="$(get_candidate_window_id)"
+  if [ -n "$window_id" ] && window_exists "$window_id"; then
+    mark_window "$window_id"
+    printf '%s\n' "$window_id"
+    return 0
+  fi
+
+  return 1
+}
+
+wait_for_window() {
+  local attempts=0
+  local window_id=""
+
+  while [ "$attempts" -lt 20 ]; do
+    if window_id="$(find_window_id)"; then
+      printf '%s\n' "$window_id"
+      return 0
+    fi
+    attempts=$((attempts + 1))
+    sleep 0.2
+  done
+
+  return 1
+}
+
+launch_window() {
+  "$CHROME_BIN" "--profile-directory=${CHROME_PROFILE}" "--app=${LAUNCH_URL}" >/dev/null 2>&1 &
+
+  if wait_for_window; then
+    return 0
+  fi
+
+  "$CHROME_BIN" "--profile-directory=${CHROME_PROFILE}" --new-window "${LAUNCH_URL}" >/dev/null 2>&1 &
+  wait_for_window
+}
+
+ensure_window() {
+  local window_id=""
+  if window_id="$(find_window_id)"; then
+    normalize_window "$window_id"
+    printf '%s\n' "$window_id"
+    return 0
+  fi
+
+  window_id="$(launch_window)"
+  mark_window "$window_id"
+  normalize_window "$window_id"
+  printf '%s\n' "$window_id"
+}
+
+close_window() {
+  local window_id="$1"
+  log_debug "close_window: window_id=${window_id}"
+  "$I3MSG_BIN" "[con_id=${window_id}] kill" >/dev/null
+}
+
+prepare_window() {
+  local window_id="$1"
+  log_debug "prepare_window: window_id=${window_id}"
+  "$XDOTOOL_BIN" key --clearmodifiers ctrl+r >/dev/null 2>&1 || \
+    "$XDOTOOL_BIN" key --clearmodifiers ctrl+r
+  log_debug "prepare_window: refreshed_window=${window_id}"
+  "$XDOTOOL_BIN" key --clearmodifiers ctrl+a BackSpace >/dev/null 2>&1 || \
+    "$XDOTOOL_BIN" key --clearmodifiers ctrl+a BackSpace
+  log_debug "prepare_window: cleared_composer=${window_id}"
+  set_mode "ready"
+  notify_user "ChatGPT ready."
+}
+
+cut_transcript() {
+  local window_id="$1"
+  log_debug "cut_transcript: window_id=${window_id}"
+  "$XDOTOOL_BIN" key --clearmodifiers ctrl+a >/dev/null 2>&1 || \
+    "$XDOTOOL_BIN" key --clearmodifiers ctrl+a
+  sleep 0.12
+  log_debug "cut_transcript: waited_after_select=0.12"
+  "$XDOTOOL_BIN" key --clearmodifiers ctrl+x >/dev/null 2>&1 || \
+    "$XDOTOOL_BIN" key --clearmodifiers ctrl+x
+  sleep 0.18
+  log_debug "cut_transcript: waited_after_cut=0.18"
+  close_window "$window_id"
+  set_mode "idle"
+  notify_user "Cut transcript and closed ChatGPT."
+}
+
+main() {
+  local current_mode window_id window_missing
+
+  window_missing=0
+  if ! find_window_id >/dev/null 2>&1; then
+    window_missing=1
+  fi
+
+  current_mode="$(get_mode)"
+  log_debug "main: initial_mode=${current_mode} window_missing=${window_missing}"
+  if [ "$window_missing" -eq 1 ]; then
+    current_mode="idle"
+    set_mode "idle"
+  fi
+
+  window_id="$(ensure_window)"
+  log_debug "main: resolved_window_id=${window_id}"
+  case "$current_mode" in
+    idle)
+      log_debug "main: action=prepare_window"
+      prepare_window "$window_id"
+      ;;
+    ready)
+      log_debug "main: action=cut_transcript"
+      cut_transcript "$window_id"
+      ;;
+    *)
+      log_debug "main: action=reset_unknown_mode value=${current_mode}"
+      set_mode "ready"
+      notify_user "Resetting dictation state."
+      ;;
+  esac
+}
+
+main "$@"
