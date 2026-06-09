@@ -14,3 +14,8 @@ if ! rg -F 'exec --no-startup-id /home/example/scripts/speechnotes-dictation --p
   printf 'expected i3 startup to prewarm Speechnotes in %s\n' "$config_path" >&2
   exit 1
 fi
+
+if ! rg -F 'exec --no-startup-id /home/example/scripts/ubuntu-start' "$config_path" >/dev/null; then
+  printf 'expected i3 startup to run ubuntu-start in %s\n' "$config_path" >&2
+  exit 1
+fi
