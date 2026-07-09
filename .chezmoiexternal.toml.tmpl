@@ -1,6 +1,5 @@
 [".codex/superpowers"]
-    type = "git-repo"
-    url = "https://github.com/obra/superpowers.git"
-
-    [".codex/superpowers".pull]
-        args = ["--ff-only"]
+    type = "archive"
+    url = {{ (gitHubLatestRelease "obra/superpowers").TarballURL | quote }}
+    exact = true
+    stripComponents = 1

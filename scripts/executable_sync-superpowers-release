@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  cat <<'USAGE'
+Usage: sync-superpowers-release [--dry-run]
+
+Refresh the chezmoi-managed obra/superpowers install from the latest GitHub
+release archive and keep ~/.agents/skills/superpowers wired to its skills/
+directory.
+
+Options:
+  --dry-run, -n   Preview the refresh without writing files.
+  --help, -h      Show this help.
+USAGE
+}
+
+dry_run=0
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --dry-run|-n)
+      dry_run=1
+      shift
+      ;;
+    --help|-h)
+      usage
+      exit 0
+      ;;
+    *)
+      echo "sync-superpowers-release: unknown option: $1" >&2
+      usage >&2
+      exit 2
+      ;;
+  esac
+done
+
+source_dir="${LINUX_CONFIG_SOURCE:-$HOME/linux-config}"
+
+if [[ ! -d "$source_dir" ]]; then
+  echo "sync-superpowers-release: source directory not found: $source_dir" >&2
+  echo "Set LINUX_CONFIG_SOURCE to this repo checkout if it lives elsewhere." >&2
+  exit 1
+fi
+
+apply_args=(
+  -S "$source_dir"
+  apply
+  --refresh-externals
+  -v
+)
+
+if [[ "$dry_run" -eq 1 ]]; then
+  apply_args+=(-n)
+fi
+
+apply_args+=(
+  "$HOME/.codex/superpowers"
+  "$HOME/.agents/skills/superpowers"
+)
+
+chezmoi "${apply_args[@]}"
+
+if [[ "$dry_run" -eq 0 ]]; then
+  echo
+  echo "Superpowers release refreshed. Restart Codex sessions to load updated skills."
+fi

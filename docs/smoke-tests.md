@@ -36,6 +36,11 @@ of stacking duplicates.
   install.
   Expected: The installed skill copy matches the repo-tracked source so
   future sessions see the same instructions and metadata.
+- Action: sync-superpowers-release --dry-run
+  Expected: The helper runs `chezmoi apply --refresh-externals` in dry-run
+  mode for `~/.codex/superpowers` and
+  `~/.agents/skills/superpowers`, rendering the latest
+  `obra/superpowers` release archive without writing files.
 
 ## Repo Instructions
 

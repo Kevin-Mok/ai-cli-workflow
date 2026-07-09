@@ -8,14 +8,14 @@ straight to the source file.
 
 The live Codex install also mounts the external
 [`obra/superpowers`](https://github.com/obra/superpowers) bundle at
-`~/.agents/skills/superpowers` by cloning it into `~/.codex/superpowers`
-and symlinking its `skills/` directory. This catalog still focuses on
-repo-tracked skill sources that live under `dot_agents/skills/`, but it
-includes one dedicated section for the externally managed superpowers
-bundle because that workflow meaningfully changes how the broader skill
-surface is supposed to be used in this environment. The legacy
-`push-dirty/` directory is omitted because it does not currently define
-a live skill.
+`~/.agents/skills/superpowers` by installing its latest release archive
+into `~/.codex/superpowers` and symlinking the archive's `skills/`
+directory. This catalog still focuses on repo-tracked skill sources that
+live under `dot_agents/skills/`, but it includes one dedicated section
+for the externally managed superpowers bundle because that workflow
+meaningfully changes how the broader skill surface is supposed to be
+used in this environment. The legacy `push-dirty/` directory is omitted
+because it does not currently define a live skill.
 
 Many of the design skills are composable rather than mutually
 exclusive: `teach-impeccable` captures persistent design context,
@@ -116,10 +116,11 @@ skills tighten one specific aspect of an existing interface.
 ## External Superpowers Skills
 
 These skills are mounted from the chezmoi-managed
-`~/.codex/superpowers` checkout into
+`~/.codex/superpowers` release archive into
 `~/.agents/skills/superpowers/<skill>/SKILL.md`. They are not
 repo-tracked under `dot_agents/skills/`, but they are part of the live
-Codex skill surface on this machine.
+Codex skill surface on this machine. Run `sync-superpowers-release` to
+refresh that external bundle from the latest upstream release.
 
 - [`brainstorming`](https://github.com/obra/superpowers/blob/main/skills/brainstorming/SKILL.md):
   Turns a rough idea into an approved design or spec before any

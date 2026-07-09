@@ -386,8 +386,9 @@ chezmoi -S "$PWD" apply
 
 That apply path also follows the native-discovery install flow for
 [`obra/superpowers`](https://github.com/obra/superpowers): `chezmoi`
-clones it to `~/.codex/superpowers` and writes
-`~/.agents/skills/superpowers` as a symlink to its `skills/` directory.
+installs the latest release archive into `~/.codex/superpowers` and
+writes `~/.agents/skills/superpowers` as a symlink to its `skills/`
+directory.
 
 To use the AI layer after the dotfiles are in place, run the
 repo-managed wrapper directly, or make sure it is the `codex` command
@@ -420,10 +421,12 @@ Codex config back into the repo before running `chezmoi apply`.
    one step.
 4. Apply changes with `chezmoi -S "$PWD" apply` when you want the direct
    chezmoi path instead of the higher-level refresh helper.
-5. Run the repo-managed `codex` wrapper from the repo root when you want
+5. Run `sync-superpowers-release` when you want chezmoi to refresh the
+   external `obra/superpowers` bundle from the latest GitHub release.
+6. Run the repo-managed `codex` wrapper from the repo root when you want
    the tracked AGENTS chain, Codex config, local skills, and plans to
    shape the session.
-6. Keep the root `README.md` aligned whenever the repo's public workflow
+7. Keep the root `README.md` aligned whenever the repo's public workflow
    changes, especially for install steps, usage, command flags, the
    repo-based tech stack section, and recruiter-facing positioning.
 
@@ -439,6 +442,7 @@ source in this repo.
 | `chezmoi -S "$PWD" apply -n -v` | Dry-run an apply with extra detail before touching files in `$HOME`. | `-S` / `--source` uses this repo as the source state. `-n` / `--dry-run` previews changes without writing them. `-v` / `--verbose` prints more detail. |
 | `chezmoi -S "$PWD" apply` | Apply the tracked source state from this clone into `$HOME`. | `-S` / `--source` uses this repo as the source state. `-P` / `--parent-dirs` is useful when you apply a nested target and also want its parent directories handled. |
 | `refresh-config` | Snapshot the live Codex config into the repo, then reapply the chezmoi-managed environment layer. | No user-facing flags. It copies `~/.codex/config.toml` into `dot_codex/config.toml`, runs `chezmoi apply`, syncs shortcuts, and reloads fish. |
+| `sync-superpowers-release` | Refresh the externally managed `obra/superpowers` skill bundle from the latest GitHub release archive through chezmoi. | `--dry-run` previews the release refresh without writing files. `LINUX_CONFIG_SOURCE` points the helper at this repo when it is not checked out at `$HOME/linux-config`. |
 | `./scripts/executable_apply-pywal-theme <wallpaper>` | Regenerate the active `pywal` theme through the repo-owned wrapper so wallpaper changes also refresh kitty and the i3 color resources this repo depends on. | Pass an image path directly, or pass raw `wal` flags when you need that lower-level control. The wrapper runs `wal --saturate 0.8 -e`, reloads Xresources, refreshes running kitty windows when the socket is available, and regenerates the derived i3 palette file. |
 | `./scripts/executable_screenshot-all-monitors` | Save one combined `scrot` capture of the full X virtual desktop, covering every active monitor in one image. | No flags. Saves to `/home/example/Pictures/screenshots/desktop/unsorted/screenshot-YYYY-MM-DD_HH:MM:SS.png`. `SCREENSHOT_ALL_MONITORS_DIR`, `SCREENSHOT_ALL_MONITORS_SCROT`, and `SCREENSHOT_ALL_MONITORS_DATE` override the destination, capture binary, and timestamp binary for tests or alternate hosts. |
 | `./scripts/executable_setup-st.sh` | Render the tracked `st` config, sync it into your `st` source checkout, and install the compiled terminal you actually want to use. | `--source-dir` points the script at a non-default `st` checkout path. `--skip-install` only refreshes `~/.config/st/config.def.h` plus the source-tree `config.def.h` and prints the exact `sudo make -C ... install` command instead of running it. `--clone-if-missing` clones the official upstream source from `https://git.suckless.org/st` into the target checkout path before syncing and building. |
