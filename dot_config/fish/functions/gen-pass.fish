@@ -4,5 +4,7 @@ function gen-pass
     else
         set chars 25
     end
-    base64 /dev/urandom | head -c $chars
+    set password (tr -dc '[:alnum:][:punct:]' </dev/urandom | head -c $chars)
+    printf '%s' "$password" | xclip -selection clipboard
+    echo $password
 end
