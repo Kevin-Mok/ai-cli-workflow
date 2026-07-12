@@ -137,6 +137,11 @@ of stacking duplicates.
 - Action: With the Markdown preview already open in Vim, press `<F9>`.
   Expected: The preview stops and restarts cleanly on the same file without falling back to the old `InstantMarkdownPreview` commands.
 
+## Audio
+
+- Action: With PipeWire audio playing but silent through the AUX speakers, run `./scripts/executable_fix-aux-speaker-audio --fix`.
+  Expected: The current default analog sink is unmuted and active playback streams remain routed to it; `--diagnose` reports the selected sink and service state.
+
 ## Terminal
 
 - Action: Run `/home/example/scripts/apply-desktop-display-layout`, reload i3, and inspect `xrandr --query`.

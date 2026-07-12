@@ -1,0 +1,104 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+usage() {
+  cat <<'EOF'
+Usage: executable_fix-aux-speaker-audio [--diagnose | --fix | --restart] [--sink SINK_NAME]
+
+Diagnose or repair PipeWire/PulseAudio playback for AUX speakers.
+
+Options:
+  --diagnose          Print audio-service and default-output information only.
+  --fix               Unmute the selected output and move current playback to it.
+  --restart           Restart user audio services, then perform --fix.
+  --sink SINK_NAME    Make this PulseAudio sink the selected output before fixing.
+  --help              Show this help text.
+
+Without --sink, --fix uses the current default output. On this machine that
+is the analog AUX speaker sink: alsa_output.pci-0000_30_00.6.analog-stereo.
+EOF
+}
+
+mode="diagnose"
+selected_sink=""
+
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --diagnose) mode="diagnose"; shift ;;
+    --fix) mode="fix"; shift ;;
+    --restart) mode="restart"; shift ;;
+    --sink)
+      [ "$#" -ge 2 ] || { printf '%s\n' 'missing value for --sink' >&2; exit 2; }
+      selected_sink="$2"
+      shift 2
+      ;;
+    --help) usage; exit 0 ;;
+    *)
+      printf 'unknown option: %s\n' "$1" >&2
+      usage >&2
+      exit 2
+      ;;
+  esac
+done
+
+command -v pactl >/dev/null 2>&1 || {
+  printf '%s\n' 'pactl is required; install or enable PipeWire PulseAudio support first.' >&2
+  exit 1
+}
+
+default_sink() {
+  pactl info | awk -F ': ' '$1 == "Default Sink" { print $2; exit }'
+}
+
+diagnose() {
+  printf '%s\n' 'Audio service status:'
+  if command -v systemctl >/dev/null 2>&1; then
+    systemctl --user --no-pager --full is-active pipewire pipewire-pulse wireplumber 2>&1 || true
+  fi
+
+  printf '\n%s\n' 'PulseAudio/PipeWire defaults:'
+  pactl info | awk -F ': ' '$1 == "Server Name" || $1 == "Default Sink" || $1 == "Default Source" { print }'
+
+  if command -v wpctl >/dev/null 2>&1; then
+    printf '\n%s\n' 'PipeWire output status:'
+    wpctl status | sed -n '/Audio/,/Video/p'
+  fi
+}
+
+repair() {
+  local sink sink_input_id unused
+
+  sink="$selected_sink"
+  if [ -n "$sink" ]; then
+    pactl set-default-sink "$sink"
+  else
+    sink="$(default_sink)"
+  fi
+
+  if [ -z "$sink" ]; then
+    printf '%s\n' 'No default audio output was reported by pactl.' >&2
+    exit 1
+  fi
+
+  pactl set-sink-mute @DEFAULT_SINK@ 0
+  while IFS=$'\t' read -r sink_input_id unused; do
+    [ -n "$sink_input_id" ] || continue
+    pactl move-sink-input "$sink_input_id" "$sink"
+  done < <(pactl list short sink-inputs)
+
+  printf 'Playback is unmuted and routed to: %s\n' "$sink"
+}
+
+case "$mode" in
+  diagnose) diagnose ;;
+  fix) repair ;;
+  restart)
+    command -v systemctl >/dev/null 2>&1 || {
+      printf '%s\n' 'systemctl is required for --restart.' >&2
+      exit 1
+    }
+    systemctl --user restart pipewire pipewire-pulse wireplumber
+    repair
+    ;;
+esac
