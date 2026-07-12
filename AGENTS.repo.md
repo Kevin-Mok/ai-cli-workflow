@@ -6,6 +6,13 @@ After reading the shared baseline in `AGENTS.md`, read and follow `dot_codex/AGE
 
 `dot_codex/AGENTS.md` is the source of truth for Codex behavior here. If overlapping guidance appears in `AGENTS.md`, this file, or older generated material, prefer `dot_codex/AGENTS.md` unless a higher-precedence active-session instruction says otherwise.
 
+## Fix Postmortems
+
+When a bug fix or incident repair is completed, add a concise postmortem under
+`docs/postmortem/` in the same change. Include the symptom, impact, evidence,
+root cause, resolution, verification, and prevention or follow-up notes. Link
+the postmortem to the fixing commit when that commit exists.
+
 ## README Sync And Commit Gate
 
 When you update the repo's AI operating surface or any repo behavior

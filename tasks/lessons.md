@@ -59,3 +59,4 @@
 
 - 2026-04-16: Fixed `readme-recruiter-sync` to resolve metadata repo-agnostically (`dot_agents/` first, then repo `.agents`, then `$HOME/.agents`, plus optional `READMERECRUITERSYNC_SKILL_DIR`) and derive repo root by walking up to nearest README. This prevents terminal-specific false failures in repos without local skill copy.
 - 2026-04-27: When Graphiti MCP needs to be available on login, mount `/dev/sdc1` to `/mnt/linux-files-3` only when the device exists and start `docker compose -f ~/coding/graphiti/mcp_server/docker/docker-compose-neo4j.yml up -d`; skip startup cleanly if host port 8000 is already bound so startup can continue.
+- 2026-07-12: When completing a bug fix or incident repair in `/home/example/linux-config`, add a concise linked postmortem under `docs/postmortem/` covering symptom, impact, evidence, root cause, resolution, verification, and follow-up.
