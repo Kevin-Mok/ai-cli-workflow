@@ -44,9 +44,12 @@ of stacking duplicates.
 
 ## Repo Instructions
 
+- Action: Start a fresh Codex or Claude Code session in this repo and ask it to describe the canonical instruction file and delivery cadence without creating or pushing commits.
+  Expected: It identifies `dot_codex/AGENTS.md` as the single policy body, treats the root AGENTS files as routing layers, and explains that a verified single-commit workflow pushes once while multi-commit work waits until the complete verified series; no Git write occurs.
 - Action: Add or change a standing workflow rule in `dot_codex/AGENTS.md`.
-  Expected: The corresponding public docs and reusable verification
-  guidance stay in sync with that rule in the same change.
+  Expected: The corresponding public docs and reusable verification guidance stay in sync with that rule in the same change.
+- Action: Start non-trivial work from a plan under `plans/`, then inspect the plan before the related commit is prepared.
+  Expected: The plan follows `.agent/PLANS.md` with assumptions, checkboxes, verification evidence, review notes, and progress updates intended for the same commit as the work they describe.
 
 ## Keyboard And Input
 

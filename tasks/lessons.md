@@ -28,7 +28,7 @@
 - When a user asks to ship only the current Codex session, leave unrelated dirty changes from other sessions uncommitted instead of bundling them into the same commit.
 - When `commit-session` has strong direct file attribution but the original session missed its pre-write `git status --short`, do not fail the whole workflow; ship the directly observed touched files and leave unattributed dirties out.
 - When a user explicitly asks to commit the current dirty work as one commit, collapse any earlier split-commit plan and ship the remaining changes together.
-- When a workflow in this repo creates one or more commits, default to pushing the active branch after each successful commit unless the user explicitly says not to.
+- Apply the newest delivery-cadence preference from the canonical feedback log.
 - When a workflow will require the user to run commands manually, proactively package it in a script in the first response instead of listing raw commands, and include the exact `sudo` invocation when elevation is required.
 - Do not wait for the user to remind you to script manual command workflows; treat that requirement as automatic.
 - When validating or repairing symlinks in a script, resolve relative targets from the symlink's directory, not from the current working directory.
@@ -61,3 +61,4 @@
 - 2026-04-16: Fixed `readme-recruiter-sync` to resolve metadata repo-agnostically (`dot_agents/` first, then repo `.agents`, then `$HOME/.agents`, plus optional `READMERECRUITERSYNC_SKILL_DIR`) and derive repo root by walking up to nearest README. This prevents terminal-specific false failures in repos without local skill copy.
 - 2026-04-27: When Graphiti MCP needs to be available on login, mount `/dev/sdc1` to `/mnt/linux-files-3` only when the device exists and start `docker compose -f ~/coding/graphiti/mcp_server/docker/docker-compose-neo4j.yml up -d`; skip startup cleanly if host port 8000 is already bound so startup can continue.
 - 2026-07-12: When completing a bug fix or incident repair in `/home/example/linux-config`, add a concise linked postmortem under `docs/postmortem/` covering symptom, impact, evidence, root cause, resolution, verification, and follow-up.
+- When compacting always-loaded instructions, validate the active plan against its contract and move conditional invariants into the named lazy reference instead of dropping them.

@@ -1,531 +1,166 @@
-# AGENTS.md
+# Canonical Codex Instructions
 
-Canonical Codex instruction document for this repo.
+This is the canonical Codex instruction document for
+`/home/example/linux-config`. Root-level AGENTS files are routing shims; they
+must not duplicate or weaken this policy. Historical merge provenance lives in
+`docs/ai-workflow-optimization.md`.
 
-This file is the source of truth for Codex behavior in `/home/example/linux-config`. It merges the shared baseline, the repo-local addendum, and the additive repo-agnostic guidance extracted from the 10 latest `/home/example/coding` directories that contain `AGENTS.md` or `agent.md`.
+## Authority And Required Context
 
-Project-specific rules, commands, paths, and feature guidance were excluded from the merged source material. Future regenerations must preserve this canonical structure: merge new guidance into the relevant section, keep provenance current, and do not append full per-source dumps.
+Apply guidance in this order:
 
----
+1. Active user and developer instructions.
+2. This file.
+3. Nested `AGENTS.md` files that add stricter local constraints.
+4. Untracked `AGENTS.override.local.md` strict additions.
 
-## Required Reading and Precedence
+Lower layers may specialize but never relax higher-layer safety or quality.
+Before changing files, read the relevant source, active plan, roadmap or docs,
+the canonical `feedback.log` when durable preferences may apply, and relevant
+`tasks/lessons.md` entries. Follow existing patterns rather than assumptions.
 
-Apply instruction layers in this order when working in this repo:
+### System Design Routing
 
-1. Explicit user/developer instructions in the active session.
-2. `dot_codex/AGENTS.md` (this file, the canonical Codex source of truth for the repo).
-3. `AGENTS.md` (shared repo baseline; it still applies, but this file wins on overlap because it is the merged canonical document for Codex in this repo).
-4. `AGENTS.repo.md` (repo-local pointer and clarification layer; this file wins on overlap).
-5. Nested `AGENTS.md` files in subdirectories, which may only add stricter local constraints and never relax parent rules. [Sources: stb-mkt-all/prod-fix, stb-mkt-all/production, stb-mkt-all/history]
-6. `AGENTS.override.local.md` (optional local strict additions; untracked).
+For ExampleProject-style product, platform, UI, AI-workflow, source-lineage, or
+education work:
 
-Precedence rules:
-
-- Lower layers may only add stricter constraints or local specialization.
-- Lower layers must never relax safety or quality requirements from higher layers.
-- Explicit user/developer instructions in the active session take precedence.
-
-For non-trivial tasks (3+ steps, multi-file changes, or architecture decisions):
-
-- Use Plan Mode when available.
-- Create and maintain an ExecPlan per `.agent/PLANS.md` (or `PLANS.md` where that is canonical).
-- Store ExecPlans at `plans/<task-slug>.md` unless instructed otherwise.
-
-## Repo-Local Addendum
-
-These repo-local instructions apply in addition to the merged guidance below.
-
-### Bug Reports
-
-- Start bug work by reproducing the issue with a failing test or other executable reproducer.
-- Do not implement a fix until the reproducer fails for the expected reason.
-- If an automated test is not practical, explain why and create the closest reliable reproducer.
-- For non-trivial bugs, use subagents to investigate root cause or try candidate fixes in parallel.
-- Do not consider the bug fixed until the reproducer passes and relevant regression checks remain green.
-
-### Prompt Requests
-
-- When the user asks Codex to create a prompt, write it to a Markdown file in `prompts/` instead of returning only inline prompt text.
-- Use a concise kebab-case filename that matches the prompt purpose unless the user specifies a filename.
-
-### README Sync
-
-- Treat the root `README.md` as part of the repo's public operating surface, not optional marketing copy.
-- When repo behavior, onboarding steps, command usage, skills, plans, AGENTS guidance, or Codex config changes, verify that the root `README.md` still matches the repository.
-- Before staging or finalizing any commit or push flow in this repo, run
-  `readme-recruiter-sync` via the repo-local skill path. If you are invoking this
-  from a plain shell, run `./scripts/executable_readme-recruiter-sync`.
-- When a workflow in this repo creates one or more commits, push the active remote/branch after each successful commit by default unless the user explicitly says not to.
-- The README gate only passes when the root `README.md` accurately covers install or bootstrap, day-to-day use, core command flags for README-documented entrypoints, a repo-based "Tech Stack And Why Chosen" section, and why the repo is impressive to recruiters.
-- If the README gate would require mixing unrelated dirty work, stop and surface the conflict instead of bypassing the gate.
-
-### Smoke Tests
-
-- When work reveals a concrete manual verification step or an obvious smoke-coverage gap, update `docs/smoke-tests.md` in the same change.
-- Keep smoke-test entries grouped by area and written as an `Action` plus `Expected` result.
-- Update or replace stale smoke-test entries instead of appending duplicates or one-off debugging notes.
-
-### System Design References
-
-Use `~/.agents/system-design/` as the shared domain reference pack for
-ExampleProject-style product, platform, UI, AI workflow, source-lineage, or
-education-system design tasks. These docs are contextual references; they do
-not override active-session instructions or the AGENTS precedence chain.
-
-- Read `~/.agents/system-design/architecture.md` for platform
-  architecture, hosting, tenancy, data flow, AI validation, source library,
-  assignments, analytics, security, observability, or CI/CD work.
-- Read `~/.agents/system-design/coding-standards.md` before
-  implementing ExampleProject-style app, API, database, frontend, AI workflow,
-  testing, security, review, or documentation changes.
+- Read `~/.agents/system-design/architecture.md` for platform architecture,
+  hosting, tenancy, data flow, AI validation, sources, assignments, analytics,
+  security, observability, or CI/CD.
+- Read `~/.agents/system-design/coding-standards.md` before implementing
+  apps, APIs, databases, frontends, AI workflows, tests, security, reviews, or
+  documentation.
 - Read `~/.agents/system-design/ui-design.md` before all UI work.
-- Read the narrower references when tasks mention their topic:
-  `knowledge-base.md`, `student-practice-packages.md`,
-  `trusted-sources.md`, or `business-strategy.md`.
-
-## Source Order
-
-1. `upwork`
-2. `zoo-blog`
-3. `example-user`
-4. `spotify-library-intelligence-dashboard`
-5. `portfolio-site`
-6. `quit-weed`
-7. `nomar-stocks`
-8. `stb-mkt-all/prod-fix`
-9. `stb-mkt-all/production`
-10. `stb-mkt-all/history`
-
----
-
-## 0) Prime Directive
-
-- **Do not break production behavior** unless explicitly asked.
-- Prefer **small, safe, reversible** changes.
-- Default to minimal diffs - avoid "drive-by refactors" in feature commits.
-- **Surgical precision** - touch only what is needed. Don't remove comments you don't understand, don't clean up orthogonal code, and don't delete things that seem unused without asking.
-
----
-
-## 1) Workflow Orchestration
-
-### 1.1 Plan Mode Default
-
-- Enter plan mode for ANY non-trivial task (3+ steps or architectural decisions).
-- If something goes sideways, STOP and re-plan immediately - don't keep pushing.
-- Use plan mode for verification steps, not just building.
-- Write detailed specs upfront to reduce ambiguity.
-
-### 1.2 Subagent Strategy
-
-- Use subagents liberally to keep main context window clean.
-- Offload research, exploration, and parallel analysis to subagents.
-- For complex problems, throw more compute at it via subagents.
-- One task per subagent for focused execution.
-
-### 1.3 Self-Improvement Loop
-
-- After ANY correction from the user: update `tasks/lessons.md` with the pattern.
-- If `tasks/lessons.md` does not exist in the repo, create it before recording the lesson.
-- Write rules for yourself that prevent the same mistake.
-- Ruthlessly iterate on these lessons until mistake rate drops.
-- Review lessons at session start for relevant project.
-
-### 1.4 Verification Before Done
-
-- Never mark a task complete without proving it works.
-- Diff behavior between main and your changes when relevant.
-- Ask yourself: "Would a staff engineer approve this?"
-- Run tests, check logs, and demonstrate correctness.
-
-### 1.5 Demand Elegance (Balanced)
-
-- For non-trivial changes: pause and ask "is there a more elegant way?"
-- If a fix feels hacky: "Knowing everything I know now, implement the elegant solution."
-- Skip this for simple, obvious fixes - don't over-engineer.
-- Challenge your own work before presenting it.
-
-### 1.6 Autonomous Bug Fixing
-
-- When given a bug report: just fix it. Don't ask for hand-holding.
-- Point at logs, errors, failing tests - then resolve them.
-- Zero context switching required from the user.
-- Go fix failing CI tests without being told how.
-
----
-
-## 2) Task Management
-
-1. **Plan First**: Write a plan with checkable items in the active ExecPlan (`plans/<task-slug>.md`) or inline for small tasks.
-2. **Verify Plan**: Check in before starting implementation.
-3. **Track Progress**: Mark items complete as you go.
-4. **Explain Changes**: High-level summary at each step.
-5. **Document Results**: Add a review section to the active ExecPlan or final task summary.
-6. **Capture Lessons**: After corrections, update `tasks/lessons.md`; create it first if it does not exist.
-
-> **Note:** These are guidelines - adapt to project structure and active repository conventions.
-
----
-
-## 3) Problem-Solving Approach
-
-For non-trivial tasks, use recursive decomposition.
-
-### 3.1 Assumption Surfacing
-
-Before implementation, explicitly state assumptions:
-
-```text
-My assumptions:
-1. [Assumption about requirements]
-2. [Assumption about existing behavior]
-3. [Assumption about scope]
-
-Proceeding with implementation. Let me know if any assumptions are wrong.
-```
-
-### 3.2 Confusion Management
-
-When encountering inconsistencies or unclear requirements:
-
-1. **STOP** - don't push through confusion.
-2. **Name it** - "I'm confused because X says Y but Z suggests W."
-3. **Wait** - ask for clarification before proceeding.
-4. **Never assume** - guessing leads to wasted work and bugs.
-
-### 3.3 Push Back When Warranted
-
-You are not a yes-machine. When you see problems:
-
-- Point out issues directly: "This approach has a problem: [specific issue]."
-- Propose alternatives: "Instead, we could [alternative], which avoids [issue]."
-- Accept override: if the user insists, proceed with their choice.
-- Don't be sycophantic - "Of course!" to bad ideas helps no one.
-
-### Process (Recursive Decomposition)
-
-1. **Decompose** - break the problem into independent subcomponents. Identify top-level structure first.
-2. **Process separately** - address each subcomponent as if invoking a specialized expert.
-3. **Recurse if needed** - if a part is still too complex, break it further and re-process.
-4. **Preserve intermediate work** - reference partial conclusions and refinements.
-5. **Integrate** - synthesize all parts into a unified solution. Avoid unsubstantiated leaps.
-
-### Strict Rules
-
-- Do NOT attempt single-pass answers for complex tasks.
-- Pause and refine ambiguous/incomplete parts before advancing.
-- Prioritize structure and verification over speed.
-- For integration decisions, consider multiple perspectives (user experience, code maintainability, existing patterns).
-
-### Core Principles
-
-- **Simplicity First**: make every change as simple as possible. Impact minimal code.
-- **No Laziness**: find root causes. No temporary fixes. Senior developer standards.
-- **Minimal Impact**: changes should only touch what's necessary. Avoid introducing bugs.
-
-### Atomic Reasoning Structure
-
-For tasks requiring precise, verifiable outputs, use atomic decomposition:
-
-```text
-<atomic_context>
-[Role/persona + background knowledge + persistent rules]
-</atomic_context>
-
-<atomic_task>
-[Single, clear objective. One focused goal only.]
-</atomic_task>
-
-<atomic_constraints>
-- [Hard limits, formats, verification rules]
-- [e.g., No hallucinations; max length X; must match existing patterns]
-</atomic_constraints>
-
-<atomic_variables>
-{{variable1}}: [description or value]
-{{variable2}}: [etc.]
-</atomic_variables>
-
-<atomic_process>
-1. Decompose into 3-8 atomic sub-questions/steps (independent where possible)
-2. Solve each atom individually with high accuracy
-3. Verify each atom's output against constraints
-4. Integrate into unified solution (resolve dependencies, synthesize)
-5. Recurse on any unresolved atom if needed
-</atomic_process>
-```
-
-Output format:
-
-- Atomic decomposition list (brief bullets)
-- Solved atoms (numbered)
-- Final synthesized solution
-
----
-
-## 4) Workflow Principles
-
-### 4.1 Read Before You Write
-
-- Read relevant files before modifying (use Read tool, not assumptions).
-- Check project roadmap, active plans, and relevant docs for current priorities.
-- Infer patterns from existing code before introducing new ones.
-
-### 4.2 Make Changes in Small Commits
-
-- Keep commits focused (one feature, one intent).
-- If unrelated changes exist, split them into individual commits by concern; never bundle unrelated work in a single commit. [Sources: zoo-blog]
-- Use [Conventional Commits](https://www.conventionalcommits.org/) format.
-- Prefer a follow-up refactor commit after behavior is stable.
-- If the task includes commits, push the active remote/branch after each successful commit by default unless the user explicitly says not to. [Sources: upwork, zoo-blog]
-
-### 4.3 Update Docs with Changes
-
-- Documentation updates are **required** after feature implementation.
-- If behavior changes, docs must change in the same PR.
-- If new commands or admin flows are added, document setup, how to run, how to test, and known gotchas or risks. Keep docs short but precise. [Sources: stb-mkt-all/prod-fix, stb-mkt-all/production, stb-mkt-all/history]
-
-### 4.4 Test-First Leverage
-
-- Write the test that defines success first.
-- Implement until the test passes.
-- The test is your specification - if you can't write it, requirements are unclear.
-
-### 4.5 Naive Then Optimize
-
-- Get a correct, naive version working first.
-- Optimize only after behavior is verified.
-- Preserve behavior during optimization (tests should still pass).
-
-### 4.6 Inline Planning For Small Tasks
-
-For tasks too small for full plan mode but non-trivial:
-
-```text
-Plan:
-1. [Step one]
-2. [Step two]
-3. [Verify by...]
-
-Executing...
-```
-
-This keeps you on track without heavyweight ceremony.
-
-### 4.7 Script Manual Commands
-
-- Whenever the user needs to run commands manually, create a script for that workflow instead of replying with raw commands alone.
-- If the script needs `sudo`, say so explicitly.
-- Include the exact `sudo` invocation in the output the user should run when elevation is required.
-
----
-
-## 5) Code Principles
-
-### 5.1 Keep It Simple
-
-- **Actively resist overcomplication** - simpler is almost always better.
-- Avoid over-engineering - only add what's directly needed.
-- Don't add comments to code you didn't change.
-- Three similar lines beat premature abstraction.
-- Don't design for hypothetical future requirements.
-
-Self-check questions:
-
-- "Would a new team member understand this immediately?"
-- "Am I adding this because it's needed or because it's proper?"
-- "Can I delete anything here and still meet requirements?"
-
-### 5.2 Follow Existing Patterns
-
-- Match the style of surrounding code.
-- Use established project conventions before introducing new ones.
-- When in doubt, find a similar feature and mirror its structure.
-- Prefer readable, explicit code over cleverness. [Sources: stb-mkt-all/prod-fix, stb-mkt-all/production, stb-mkt-all/history]
-- Avoid ambiguous abbreviations unless already established in code. [Sources: stb-mkt-all/prod-fix, stb-mkt-all/production, stb-mkt-all/history]
-
-### 5.3 Type Safety (for typed languages)
-
-- Define types/interfaces in the project's designated location.
-- Run type checking before commits.
-- Prefer explicit types over `any` or implicit inference for public APIs.
-- Use type hints and docstrings where the language and project conventions expect them. [Sources: stb-mkt-all/prod-fix, stb-mkt-all/production, stb-mkt-all/history]
-
-### 5.4 Dead Code Hygiene
-
-After refactoring or removing features:
-
-- Explicitly list code that appears unused.
-- Ask before removing: "These appear unused after this change: [list]. Should I remove them?"
-- Don't silently delete things that might have external callers or tests.
-
-### 5.5 Persistence, Logging, And File Size
-
-- Any stored state must be versioned or resilient to schema drift. Validate config or persisted data on load and fail loudly with clear error messages. [Sources: stb-mkt-all/prod-fix, stb-mkt-all/production, stb-mkt-all/history]
-- Handle errors defensively with actionable logs. [Sources: stb-mkt-all/prod-fix, stb-mkt-all/production, stb-mkt-all/history]
-- Support a verbose logging mode that writes to `log/` (gitignored), while default logging still captures critical errors. [Sources: stb-mkt-all/prod-fix, stb-mkt-all/production, stb-mkt-all/history]
-- Prefer multiple cohesive modules over a single "god file". [Sources: stb-mkt-all/prod-fix, stb-mkt-all/production, stb-mkt-all/history]
-- Keep most Python files under roughly 800 lines when practical. If a file crosses roughly 1000 lines or spans multiple concerns, split it. [Sources: stb-mkt-all/prod-fix, stb-mkt-all/production, stb-mkt-all/history]
-- Do not add new features to a file that is already over roughly 1000 lines unless the same change also splits or organizes it. [Sources: stb-mkt-all/prod-fix, stb-mkt-all/production, stb-mkt-all/history]
-
----
-
-## 6) PR Checklist
-
-Before merging:
-
-- [ ] Type checking passes (if applicable)
-- [ ] Documentation updated
-- [ ] Tested manually or via automated tests
-- [ ] Conventional commit message used
-- [ ] Commit pushed to remote [Sources: zoo-blog]
-- [ ] No unnecessary churn or drive-by refactors
-
-PR sections to include in output:
-
-- Summary
-- Why
-- What changed
-- Risks / edge cases
-- How to test
-- Rollback plan
-
----
-
-## 7) What "Done" Looks Like
-
-A feature is complete when:
-
-1. **Implementation** - feature works as specified.
-2. **Types** - interfaces/types added if applicable.
-3. **Docs Updated** - relevant documentation reflects the change.
-4. **Ready to Test** - another developer can verify it works.
-
----
-
-## 8) Communication Standards
-
-### 8.1 Be Direct About Problems
-
-- State issues clearly: "This will cause X problem because Y."
-- Don't soften bad news - clarity helps decisions.
-- Quantify when possible: "~200ms latency" not "might be slower".
-
-### 8.2 When Stuck, Say So
-
-- "I'm stuck on X. I've tried A, B, C. None worked because [reasons]."
-- Don't spin - surface blockers early.
-- Propose next steps or ask for help.
-
-### 8.3 Change Summary Format
-
-After making changes, summarize clearly:
-
-```text
-CHANGES MADE:
-- [What was added/modified]
-- [Files affected]
-
-DIDN'T TOUCH:
-- [Related code left unchanged and why]
-
-CONCERNS:
-- [Any issues, risks, or follow-up items]
-```
-
----
-
-## 9) Failure Modes to Avoid
-
-Quick reference - common mistakes of a hasty junior developer:
-
-1. **Making wrong assumptions** without reading code or asking.
-2. **Not managing confusion** and pushing through unclear requirements.
-3. **Not seeking clarifications** and guessing instead.
-4. **Not surfacing inconsistencies** when information conflicts.
-5. **Not presenting tradeoffs** and hiding complexity from the user.
-6. **Not pushing back** and agreeing to bad ideas to avoid friction.
-7. **Sycophancy** such as "Of course!" to poor suggestions.
-8. **Overcomplicating** with unnecessary abstraction.
-9. **Bloating abstractions** by over-configuring for a hypothetical future.
-10. **Not cleaning up** dead code after refactoring.
-11. **Modifying orthogonal code** while fixing a focused bug.
-12. **Removing without understanding** code that only appears unused.
-
----
-
-## 10) Local Override Mechanism
-
-Use optional local overrides only for stricter personal or machine-specific constraints.
-
-- Template file: `AGENTS.override.template.md`
-- Local file: `AGENTS.override.local.md`
-
-`AGENTS.override.local.md` must remain untracked and must not weaken shared or repo rules.
-
----
-
-## 11) Done Output Format For Agents
-
-For coding tasks, return:
-
-1. Atomic plan
-2. Cursor prompt
-3. Test plan (exact commands + manual checks)
-4. Docs updates (when relevant)
-5. Conventional commit suggestion
-6. Additional validation notes (if any)
-
----
-
-## Provenance
-
-### Source: `upwork`
-
-- Source file: `/home/example/coding/upwork/AGENTS.md`
-- Selection note: Excluded the user-specific workflow preferences subsection.
-
-### Source: `zoo-blog`
-
-- Source file: `/home/example/coding/zoo-blog/AGENTS.md`
-- Selection note: Retained the full shared baseline file.
-
-### Source: `example-user`
-
-- Source file: `/home/example/coding/example-user/AGENTS.md`
-- Selection note: Retained the full shared baseline file.
-
-### Source: `spotify-library-intelligence-dashboard`
-
-- Source file: `/home/example/coding/spotify-library-intelligence-dashboard/AGENTS.md`
-- Selection note: Retained the full shared baseline file.
-
-### Source: `portfolio-site`
-
-- Source file: `/home/example/coding/portfolio-site/AGENTS.md`
-- Selection note: Retained the full shared baseline file.
-
-### Source: `quit-weed`
-
-- Source file: `/home/example/coding/quit-weed/AGENTS-BASE.md`
-- Selection note: Included the referenced generic base file and omitted the project-specific AGENTS.md companion.
-
-### Source: `nomar-stocks`
-
-- Source file: `/home/example/coding/nomar-stocks/AGENTS.md`
-- Selection note: Excluded the project launch checklist section.
-
-### Source: `stb-mkt-all/prod-fix`
-
-- Source file: `/home/example/coding/stb-mkt-all/prod-fix/AGENTS.md`
-- Selection note: Kept only the repo-agnostic sections from the mixed project-specific file.
-
-### Source: `stb-mkt-all/production`
-
-- Source file: `/home/example/coding/stb-mkt-all/production/AGENTS.md`
-- Selection note: Kept only the repo-agnostic sections from the mixed project-specific file.
-
-### Source: `stb-mkt-all/history`
-
-- Source file: `/home/example/coding/stb-mkt-all/history/AGENTS.md`
-- Selection note: Kept only the repo-agnostic sections from the mixed project-specific file.
+- When the topic applies, read `~/.agents/system-design/knowledge-base.md`,
+  `~/.agents/system-design/student-practice-packages.md`,
+  `~/.agents/system-design/trusted-sources.md`, or
+  `~/.agents/system-design/business-strategy.md`.
+
+## Scope, Safety, And Clarity
+
+- Do not break production behavior unless explicitly asked. Prefer small, safe, reversible changes and minimal diffs.
+- Preserve pre-existing user work. Before the first modifying command in a Git
+  repo, capture `git status --short`. Never discard, overwrite, stage, or
+  bundle unrelated changes.
+- Touch only what the task needs. Do not remove comments, files, or apparently
+  dead code without understanding ownership and external callers; ask before
+  deleting ambiguous leftovers.
+- Never stage secrets, credentials, caches, generated output, or machine-local
+  files unless they clearly belong in version control.
+- Surface assumptions before implementation. If conflicting evidence or a
+  missing choice could materially change the result, stop, name the conflict,
+  and ask. Push back directly on unsafe or unsound approaches and propose a
+  concrete alternative.
+- Do not suggest, create, or use a Git worktree unless the user explicitly asks for one. When requested, create it under the repository's `.worktrees/`
+  directory and switch into its branch before continuing.
+
+## Planning And Coordination
+
+- Use Plan Mode for non-trivial work: three or more steps, multiple files, or an
+  architecture decision. Create and maintain `plans/<task-slug>.md` according
+  to `.agent/PLANS.md`.
+- Make plans decision-complete: record scope, assumptions, checkboxes, risks,
+  verification evidence, and review notes. Keep progress current while working.
+  Commit matching plan updates in the same change as the work they describe.
+- A small task may use a short inline plan. If evidence invalidates any plan,
+  stop and revise it before continuing.
+- Use focused subagents when two or more independent tasks can proceed in
+  parallel or a non-trivial bug benefits from separate root-cause analysis.
+  Give each agent one bounded task and independently verify its report.
+
+## Bugs, Tests, And Implementation
+
+- Start every bug fix with a failing test or executable reproducer. Confirm it
+  fails for the expected reason before implementing. If automation is
+  impractical, explain why and create the closest reliable reproducer.
+- For non-trivial bugs, use subagents for independent investigation or candidate
+  fixes when useful. A bug is fixed only when the reproducer passes and relevant
+  regression checks remain green.
+- For features, fixes, and behavior changes, write the defining test first,
+  observe RED, implement the minimum GREEN change, then refactor without losing
+  coverage. Tests are the specification; do not weaken them to fit an
+  implementation.
+- Prefer the simplest correct implementation. Optimize only after correctness is
+  demonstrated. Match surrounding conventions, favor readable explicit code,
+  and avoid hypothetical abstractions.
+- In typed code, define public types in the established location, avoid
+  unbounded `any`, and run the type checker. Validate persisted data on load,
+  handle schema drift, and fail with actionable errors and logs.
+- Keep modules cohesive. Split files that cross multiple concerns or grow beyond
+  roughly 1,000 lines; avoid adding features to an already oversized file
+  without organizing it.
+- When a user must run commands manually, create a reusable script instead of a
+  chat-only command list. State when it requires `sudo` and provide the exact
+  invocation.
+
+## Documentation And Repo Surfaces
+
+- Documentation is part of the implementation. Update behavior, setup, usage,
+  test instructions, known risks, and relevant plans in the same change.
+- Treat root `README.md` as the public operating surface. When instructions,
+  config, skills, plans, onboarding, or documented commands change, keep it
+  accurate. Preserve its technical-deep order: recruiter hook, hero, stack
+  rationale, navigation, AI proof, then setup and broader dotfiles detail.
+- Before staging or finalizing any commit or push workflow, run the
+  `readme-recruiter-sync` skill (or
+  `./scripts/executable_readme-recruiter-sync`). The gate requires truthful
+  install/bootstrap, day-to-day use, documented command options, repo-grounded
+  tech-stack rationale, and recruiter value. Stop if satisfying it would mix
+  unrelated dirty README work.
+- When a reusable manual check appears or changes, update
+  `docs/smoke-tests.md` in the same change. Use grouped `Action` and
+  `Expected` entries; update stale checks rather than duplicating them.
+- For a completed bug fix or incident repair, add a concise linked postmortem
+  under `docs/postmortem/` in the same change: symptom, impact, evidence, root
+  cause, resolution, verification, and follow-up.
+- When asked to create a prompt, write it to a concise kebab-case Markdown file
+  under `prompts/`, not only in chat.
+- When tracked configuration or environment behavior changes, run
+  `refresh-config` before completion unless explicitly told not to. The helper
+  snapshots live `~/.codex/config.toml` into tracked
+  `dot_codex/config.toml`, applies chezmoi, regenerates shortcuts, and reloads
+  fish; do not describe it as repo-to-home-only sync.
+
+## Feedback And Lessons
+
+- Use `dot_agents/skills/feedback-memory/feedback.log` as the canonical
+  append-only log for durable cross-task user preferences. Never rewrite,
+  reorder, deduplicate, or reconcile old entries.
+- Record a repo-specific failure pattern or correction in
+  `tasks/lessons.md`; create it if missing. Do not copy the same note into both
+  files: durable user preference belongs in `feedback.log`, while a local
+  engineering lesson belongs in `tasks/lessons.md`.
+- Apply the newest applicable durable preference when an older historical entry
+  conflicts with it.
+
+## Git And Delivery
+
+- Keep commits focused and chronologically ordered from oldest prerequisite to
+  newest follow-up. Use concise Conventional Commit subjects and minimal bodies
+  with only concrete bullets.
+- Keep relevant documentation and ExecPlan updates in the same commit as their
+  implementation. Stage only intended files or hunks and inspect the staged diff
+  before committing.
+- Single-commit workflows push after the commit passes verification; multi-commit workflows push once after the complete verified series, unless the user explicitly requests another cadence.
+- Push the configured upstream only when the target is clear. Do not amend,
+  rebase, squash, reset, force-push, or rewrite history unless explicitly asked.
+- If an explicitly requested worktree is merged, push `main` after the merge
+  succeeds.
+
+## Verification And Completion
+
+- Evidence precedes every completion claim. Identify the command or observable
+  result that proves each requirement, run it fresh, read the complete output
+  and exit status, and report the actual result.
+- Run the focused regression test plus relevant broader tests, type checks,
+  builds, linters, logs, diffs, and manual/runtime checks in proportion to risk.
+  A passing partial check does not prove an untested surface.
+- Compare behavior before and after when relevant. Confirm documentation and
+  plans match the final implementation, and record exact verification evidence
+  and unresolved risks.
+- Before committing, check that another engineer can reproduce the result,
+  review the rollback path, and ask whether the solution remains the simplest
+  robust option.
+- For coding-task handoff, include the atomic plan, a paste-ready Cursor prompt,
+  exact automated and manual test plan, docs updates, a Conventional Commit
+  suggestion, and any additional validation notes.

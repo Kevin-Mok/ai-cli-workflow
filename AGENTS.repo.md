@@ -1,116 +1,13 @@
 # AGENTS.repo.md
 
-Repository-specific Codex guidance for this repo.
+Repository-specific Codex policy is canonical in
+[`dot_codex/AGENTS.md`](dot_codex/AGENTS.md). This compatibility layer exists
+for tools that expect a root addendum; it does not add a second instruction
+body.
 
-After reading the shared baseline in `AGENTS.md`, read and follow `dot_codex/AGENTS.md` as the authoritative Codex instruction document for this repository.
+Read the canonical document before working. Active-session instructions still
+win, while nested `AGENTS.md` and untracked `AGENTS.override.local.md` files
+may only add stricter local constraints.
 
-`dot_codex/AGENTS.md` is the source of truth for Codex behavior here. If overlapping guidance appears in `AGENTS.md`, this file, or older generated material, prefer `dot_codex/AGENTS.md` unless a higher-precedence active-session instruction says otherwise.
-
-## Fix Postmortems
-
-When a bug fix or incident repair is completed, add a concise postmortem under
-`docs/postmortem/` in the same change. Include the symptom, impact, evidence,
-root cause, resolution, verification, and prevention or follow-up notes. Link
-the postmortem to the fixing commit when that commit exists.
-
-## README Sync And Commit Gate
-
-When you update the repo's AI operating surface or any repo behavior
-that the root `README.md` claims, update `README.md` in the same change
-so the visible documentation keeps pace with the actual workflow.
-
-Treat these paths as the core AI operating surface for README sync:
-
-- `AGENTS.md`
-- `AGENTS.repo.md`
-- `dot_codex/`
-- `dot_agents/`
-- `plans/`
-
-When those files or directories gain meaningful new instructions,
-skills, config, or planning workflow, refresh the README to call out
-the addition and explain why it matters.
-
-When refreshing the root `README.md` by default, preserve the current
-technical-deep narrative shape instead of collapsing it into a short
-landing page.
-
-Unless the user explicitly asks for a different structure, prefer this
-order:
-
-1. Title plus a two-paragraph recruiter-facing hook
-2. The hero workflow image near the top
-3. `Tech Stack And Why Chosen`
-4. A table of contents once the README is long enough to need one
-5. Early proof sections before setup, typically:
-   - `Workflow At A Glance`
-   - `AI Layer Highlights`
-   - `Core Components`
-   - `Graphiti Memory Layer`
-6. Setup and operator sections later:
-   - `Install And Bootstrap`
-   - `How To Use It`
-   - `Core Command Reference`
-7. Broader supporting proof later, typically:
-   - `Reproducibility Through Chezmoi`
-   - `Rest Of Repo`
-8. A single `License` section at the end
-
-Treat the gate as failed if a rewrite strips the README down so far that
-it no longer feels technically substantial to an engineer skimming it.
-The goal is a catchy opening plus real technical depth, not a short
-landing page.
-
-Keep the README AI-layer-first:
-
-- restore depth around the AGENTS chain, tracked Codex config, local
-  skills, ExecPlans, Graphiti, and the four-Codex workflow before setup
-  instructions
-- keep the broader Linux environment grouped and representative rather
-  than exhaustive
-- summarize skill categories with representative examples instead of
-  inventorying every skill
-- prefer inline relative links over a large footnote-link block unless a
-  user explicitly asks for another link style
-- when the README tells readers to use a repo-wrapped external tool such
-  as `codex`, document both the repo-specific wrapper behavior and how
-  the underlying tool is obtained
-
-When the root `README.md` covers `dot_agents/skills/`, summarize
-highlights from each skill category instead of trying to inventory every
-individual skill. Keep the exhaustive catalog in
-`dot_agents/skills/README.md` and use the root README for representative
-examples plus why the categories matter.
-
-Before any commit or push workflow finalizes work in this repo, run the
-`readme-recruiter-sync` skill against the root `README.md`. If a shell-only
-path is needed, run `./scripts/executable_readme-recruiter-sync`.
-
-When a workflow in this repo creates one or more commits, push the
-active branch after each successful commit by default unless the user
-explicitly says not to.
-
-Treat the gate as failed until the root `README.md` is both aligned with
-the repository and explicitly covers:
-
-- how to install or bootstrap this repo from the checked-out source
-- how to use it day to day
-- core command-line flags or options for the commands the README tells readers to run
-- a repo-based "Tech Stack And Why Chosen" section centered on `chezmoi`, Codex CLI/config, the AGENTS instruction chain, local skills, Graphiti MCP with Neo4j, shell or terminal tooling, and Python or Bash automation
-- why the repo is impressive to recruiters
-
-Never invent commands, flags, setup steps, or stack claims to satisfy
-the gate. If the README cannot be updated safely in the same change,
-stop the commit workflow instead of hand-waving past the mismatch.
-
-## Post-Change Refresh
-
-When you change this repository's configuration files or other tracked
-environment behavior, run `refresh-config` before declaring the work
-done unless the user explicitly says not to.
-
-Treat `refresh-config` as the canonical sync step because it copies the
-live `~/.codex/config.toml` into the tracked
-[`dot_codex/config.toml`](dot_codex/config.toml), runs `chezmoi apply`,
-regenerates shortcuts with `sync-shortcuts`, and reloads the active
-fish shell state.
+Non-trivial work follows [`.agent/PLANS.md`](.agent/PLANS.md), with live plans
+stored under [`plans/`](plans/) and committed alongside the related work.

@@ -170,19 +170,17 @@ refresh that external bundle from the latest upstream release.
 
 - [`commit-plan`](commit-plan/SKILL.md): Plans safe commit boundaries for
   all dirty git changes without staging, committing, or pushing, while
-  assuming later execution will push after each successful commit by
-  default unless the user says otherwise.
+  documenting one push after a verified single commit or one push after
+  the complete verified multi-commit series.
 - [`commit-dirty`](commit-dirty/SKILL.md): Verifies scope, runs the
   minimum relevant checks, then stages, commits, and pushes the
   intended dirty worktree in the current repository, including explicit
-  `commit dirty` and `commit all dirty` requests, immediately after each
-  successful commit unless the user says otherwise.
+  `commit dirty` and `commit all dirty` requests, after verification.
 - [`commit-session`](commit-session/SKILL.md): Ships only the files
   dirtied during the current Codex session by combining a pre-write git
   baseline with direct session-touch evidence, including an
   observed-touch-only fallback when the baseline is missing, then pushes
-  each successful scoped commit by default unless the user says
-  otherwise.
+  the verified scoped commit unless the user requests another cadence.
 - [`open-pr`](open-pr/SKILL.md): Drafts or publishes pull request
   titles and bodies from branch-vs-base evidence, keeps `docs/pr/`
   handoff docs aligned when a repo uses them, and preserves ExampleProject

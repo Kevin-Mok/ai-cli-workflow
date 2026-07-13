@@ -34,7 +34,7 @@ Use this skill for explicit write requests that should ship only the files dirti
    - Add a body with around 5 to 10 concrete bullet points describing the actual changes.
 10. Create the commit.
 11. Push to the configured upstream.
-    - Push immediately after each successful scoped commit by default.
+    - Single-commit workflows push after the commit passes verification; multi-commit workflows push once after the complete verified series, unless the user explicitly requests another cadence.
     - If no upstream exists or the push target is unclear, stop and ask instead of guessing.
     - Do not amend, rebase, squash, or force-push unless the user explicitly asks.
 12. Report the result with the validation performed, commit SHA, push target, skipped files, and remaining worktree state.
@@ -45,7 +45,7 @@ Use this skill for explicit write requests that should ship only the files dirti
 - Never stage files listed under `skipped_unknown`.
 - Never bypass `readme-recruiter-sync` because the scoped diff looks small.
 - Never invent README claims, flags, install steps, or recruiter copy that the repo does not support.
-- Never leave a newly created session-scoped commit unpushed by default unless the user explicitly told you not to push.
+- Never leave a verified single-commit session workflow unpushed unless the user explicitly requests another cadence.
 - If the helper cannot find a pre-write `git status --short` baseline for the session, only directly observed touched files are eligible; leave every other dirty file out of scope instead of reconstructing ownership from timestamps or memory.
 - If a file was already dirty at the session baseline and the current session did not directly touch it, leave the file uncommitted unless the user explicitly asks for a manual split.
 - Review newly eligible generated or companion files before staging them; baseline-delta scoping is intentionally permissive, not blind.

@@ -1,7 +1,7 @@
 interface:
   display_name: "Commit Dirty"
   short_description: "Verify, commit, and push the intended dirty git worktree"
-  default_prompt: "Use $commit-dirty to verify the current repo changes, create a clean commit, and push the active branch immediately after the successful commit unless the user explicitly says not to."
+  default_prompt: "Use $commit-dirty to verify the current repo changes and create a clean commit. Single-commit workflows push after the commit passes verification; multi-commit workflows push once after the complete verified series, unless the user explicitly requests another cadence."
 
 policy:
   allow_implicit_invocation: false

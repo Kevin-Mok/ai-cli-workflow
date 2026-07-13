@@ -66,6 +66,18 @@ Treat these as hard failures:
 - repo stack rationale hidden below setup and bootstrap,
 - a browse/features section pretending to be a hook.
 
+## Repository Narrative Invariants
+
+Unless the user explicitly requests another structure:
+
+- Preserve the hero workflow image near the top, a table of contents for a long
+  README, AI proof before setup-heavy sections, broader dotfiles proof later,
+  and a single terminal `License` section.
+- When covering `dot_agents/skills/`, use representative examples from every skill category and link the exhaustive catalog instead of duplicating it.
+- Prefer inline relative links over a detached footnote-link block.
+- When documenting a repo-wrapped external tool, explain both the wrapper's
+  behavior and how the underlying tool is obtained.
+
 ## Tech Stack Section Rules
 
 Derive the stack section from the repository, not generic assumptions.

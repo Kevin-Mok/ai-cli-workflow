@@ -62,7 +62,7 @@ For this skill, "dirty changes" include:
    - Treat this as an execution invariant, not a presentation preference.
    - Use evidence from file history, existing plan notes, related docs, diff context, and user-provided timing to infer chronology.
    - If chronology is ambiguous, say what is ambiguous and choose the safest order that does not place clearly newer follow-up work before older prerequisite work.
-8. Assume that when the plan is later executed in this repo, each successful commit will be pushed to the active branch by default unless the user explicitly says not to.
+8. Apply this delivery rule when describing later execution: Single-commit workflows push after the commit passes verification; multi-commit workflows push once after the complete verified series, unless the user explicitly requests another cadence.
 9. Do not run any write action unless I explicitly ask for it.
 
 ## Write actions forbidden by default
@@ -158,4 +158,4 @@ feat: add retry handling for webhook delivery
 - If a file is ambiguous, call out the ambiguity instead of guessing.
 - If validation matters, recommend the minimum relevant checks before commit.
 - If `readme-recruiter-sync` likely requires a README update, include it in the matching commit or call out the blocker explicitly.
-- When suggesting how the plan would be executed in this repo, assume each successful commit is followed by a push unless the user explicitly says not to.
+- When suggesting execution, apply the single-commit versus multi-commit delivery rule from Required workflow step 8.

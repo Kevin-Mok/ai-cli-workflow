@@ -24,7 +24,7 @@ is done.
 | --- | --- | --- |
 | `chezmoi` | [`dot_config/chezmoi/chezmoi-template.toml.tmpl`](dot_config/chezmoi/chezmoi-template.toml.tmpl) | Keeps the environment reproducible across machines instead of trapping setup inside one laptop. |
 | Codex CLI and tracked config | [`dot_codex/config.toml`](dot_codex/config.toml) | Versions model, reasoning, trust, MCP, and session defaults so new Codex panes start from repo policy instead of memory. |
-| AGENTS instruction chain | [`AGENTS.md`](AGENTS.md), [`AGENTS.repo.md`](AGENTS.repo.md), and [`dot_codex/AGENTS.md`](dot_codex/AGENTS.md) | Turns planning, verification, commit hygiene, and docs sync into inspectable workflow rules. |
+| AGENTS instruction chain | [`dot_codex/AGENTS.md`](dot_codex/AGENTS.md), with compact [`AGENTS.md`](AGENTS.md) and [`AGENTS.repo.md`](AGENTS.repo.md) routing layers | Keeps one inspectable policy body for planning, verification, commit hygiene, and docs sync instead of loading duplicated instructions. |
 | Claude Code global config | [`dot_claude/CLAUDE.md`](dot_claude/CLAUDE.md.tmpl) and [`dot_claude/settings.json`](dot_claude/settings.json) | Wires `dot_codex/AGENTS.md` into Claude Code globally via `@path` import so both Codex and Claude share the same behavioral baseline without a separate copy. |
 | Local skills | [`dot_agents/skills/`](dot_agents/skills/) and [`dot_agents/skills/README.md`](dot_agents/skills/README.md) | Packages recurring jobs into reusable local capabilities shared across Codex (`~/.agents/skills/`) and Claude Code (`~/.claude/skills/` symlinks) via a post-apply chezmoi script. |
 | Graphiti MCP with Neo4j | [`dot_codex/config.toml`](dot_codex/config.toml), [`scripts/executable_codex`](scripts/executable_codex), and [`docs/graphiti-mcp-codex.md`](docs/graphiti-mcp-codex.md) | Adds a retrievable memory layer for multi-session work where provenance and evolving context matter. |
@@ -59,9 +59,8 @@ plans/
 
 Those paths define how the AI layer behaves:
 
-- [`AGENTS.md`](AGENTS.md) is the shared baseline for assistants.
-- [`AGENTS.repo.md`](AGENTS.repo.md) points Codex to the repo-specific
-  source of truth.
+- [`AGENTS.md`](AGENTS.md) and [`AGENTS.repo.md`](AGENTS.repo.md) are
+  compact compatibility layers that route assistants to one policy body.
 - [`dot_codex/AGENTS.md`](dot_codex/AGENTS.md) is the canonical merged
   instruction document that pushes Codex toward plan-first,
   verification-heavy engineering behavior.
@@ -71,7 +70,8 @@ Those paths define how the AI layer behaves:
 - [`dot_agents/skills/`](dot_agents/skills/) packages recurring work
   into reusable local capabilities.
 - [`plans/`](plans/) is where non-trivial work becomes explicit,
-  checklisted, and reviewable.
+  checklisted, and reviewable under the
+  [ExecPlan contract](.agent/PLANS.md).
 
 ## AI Layer Highlights
 
@@ -108,16 +108,14 @@ high-leverage properties:
 
 ### 1. Instruction Chain
 
-[`AGENTS.md`](AGENTS.md), [`AGENTS.repo.md`](AGENTS.repo.md), and
-[`dot_codex/AGENTS.md`](dot_codex/AGENTS.md) are the behavioral
-backbone, shared across both Codex and Claude Code.
+[`dot_codex/AGENTS.md`](dot_codex/AGENTS.md) is the behavioral backbone
+shared across Codex and Claude Code. Root [`AGENTS.md`](AGENTS.md),
+[`AGENTS.repo.md`](AGENTS.repo.md), and the deprecated
+[`AGENTS-BASE.md`](AGENTS-BASE.md) are deliberately small routing layers,
+so the same policy is not loaded and maintained twice.
 
-- [`AGENTS.md`](AGENTS.md) holds the shared baseline.
-- [`AGENTS.repo.md`](AGENTS.repo.md) says
-  [`dot_codex/AGENTS.md`](dot_codex/AGENTS.md) is authoritative for
-  Codex in this repo.
-- [`dot_codex/AGENTS.md`](dot_codex/AGENTS.md) is the canonical working
-  document for this codebase.
+- [`dot_codex/AGENTS.md`](dot_codex/AGENTS.md) is the only canonical
+  working instruction document for this codebase.
 - [`dot_claude/CLAUDE.md`](dot_claude/CLAUDE.md.tmpl) wires that same
   canonical document into Claude Code globally via an `@path` import.
   No separate Claude-specific copy is maintained.
@@ -287,7 +285,10 @@ to copied prompt snippets.
 
 ### 4. ExecPlans
 
-[`plans/`](plans/) is where non-trivial work stays explicit.
+[`.agent/PLANS.md`](.agent/PLANS.md) defines the decision-complete plan
+contract, and [`plans/`](plans/) is where non-trivial work stays explicit.
+The contract requires assumptions, checkboxes, verification evidence, review
+notes, and matching plan updates in the same commits as the work they describe.
 
 A representative plan such as
 [`plans/commit-all-dirty.md`](plans/commit-all-dirty.md) does not just
