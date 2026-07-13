@@ -173,5 +173,12 @@ of stacking duplicates.
   `60000:61000/udp` in `ufw` or `firewalld` when one is active, and
   prints whether SSH server bootstrap still needs attention before
   remote clients can connect.
+- Action: From Termux on cellular data, run the copied
+  `executable_setup-termux-mosh.sh` bootstrap with the PC's existing public
+  SSH host, user, and port, then run `ssh pc-remote true` and `pc-mosh`.
+  Expected: The bootstrap installs `mosh`, `openssh`, and `rsync`, makes the
+  one-way `pc-push`, `pc-pull`, and `pc-sync-*` helpers available, and starts
+  a Mosh session through the PC's forwarded `60000:61000/udp` range without
+  exposing an SSH server from Android.
 - Action: Run `sudo ./scripts/executable_update-chrome.sh` on a Debian or Ubuntu host with the Google Chrome apt repo configured.
   Expected: The script prints the installed and candidate Chrome versions, refreshes apt metadata, upgrades `google-chrome-stable` when needed, and ends with matching installed and candidate versions.

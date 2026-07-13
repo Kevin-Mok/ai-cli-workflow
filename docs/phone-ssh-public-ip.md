@@ -84,6 +84,56 @@ ssh -p 22229 example-user@PUBLIC_IP
 4. If you used `--keep-port-22`, rerun the script without that flag after the
    custom port works.
 
+## Mosh From Termux
+
+Mosh uses the existing SSH connection only to start a session. After that,
+the terminal session uses UDP, so it remains usable when the phone changes
+between Wi-Fi and cellular data. It is not a file-transfer protocol; use the
+included SSH helpers for `scp` and `rsync` transfers.
+
+On the PC, prepare Mosh and the host firewall:
+
+```bash
+sudo ./scripts/executable_setup-mosh.sh
+```
+
+On the router, forward the default Mosh range to this PC's stable LAN address:
+
+- external `60000:61000/udp` -> `PC_LAN_IP:60000:61000/udp`
+
+From Termux, copy this repo's bootstrap over the already-working key-based SSH
+connection. Replace the sample connection values with your existing public SSH
+endpoint:
+
+```bash
+scp -P 22229 example-user@PUBLIC_IP:/home/example/linux-config/scripts/executable_setup-termux-mosh.sh .
+chmod +x executable_setup-termux-mosh.sh
+./executable_setup-termux-mosh.sh \
+  --host PUBLIC_IP \
+  --user example-user \
+  --ssh-port 22229
+```
+
+The bootstrap installs `mosh`, `openssh`, and `rsync`, then creates the
+`pc-mosh`, `pc-push`, `pc-pull`, `pc-sync-to-pc`, and `pc-sync-from-pc`
+commands. `pc-mosh` uses the named SSH configuration rather than exposing an
+SSH or Mosh server from Android. The two sync commands are deliberately
+one-way; they do not attempt an unsafe bidirectional merge.
+
+From cellular data, verify the route:
+
+```bash
+ssh pc-remote true
+pc-mosh
+```
+
+If `pc-mosh` is not found after the bootstrap, make its default helper path
+available in the current shell:
+
+```bash
+export PATH="$HOME/.local/bin:$PATH"
+```
+
 ## Extra Hardening Against SSH Spam
 
 After the basic remote-access setup is working, apply the stricter SSH
