@@ -144,6 +144,8 @@ of stacking duplicates.
 
 ## Terminal
 
+- Action: Run `refresh-config`, then `gpgconf --kill gpg-agent`; open a new terminal and run `pass edit <non-sensitive-test-entry>`.
+  Expected: When GPG needs the store password, `pinentry-curses` prompts in that initiating terminal and `pass` continues to the configured editor after successful authentication.
 - Action: Run `/home/example/scripts/apply-desktop-display-layout`, reload i3, and inspect `xrandr --query`.
   Expected: `DVI-D-0` is 2048x1152 at `+0+0`, `DP-2` is 3840x2160 at `+2048+0`, `HDMI-0` is 1920x1080 at `+5888+0`, and i3 shows bars on all three monitors with the new middle 4K bar using the combined active `spotify`, `volume`, and `calendar` blocks.
 - Action: Start Spotify, play a track, run /home/example/.config/i3blocks/scripts/spotify_mpris from an X session, then left-, middle-, and right-click the middle 4K Spotify block.

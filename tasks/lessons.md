@@ -56,6 +56,7 @@
 - When maintaining `commit-plan`, treat oldest-to-newest commit order as an execution invariant across the plan, manual commands, and message summary.
 2026-04-10 - When asked to merge from a work tree, always push to `main` afterwards before proceeding.
 - In /home/example/linux-config, when a README check passes structural headings but fails recruiter-first positioning, run the gate against opening-hook substance, hierarchy, and stack-vs-setup ordering before reporting it as acceptable.
+- When a user says `pass edit` should use the terminal, distinguish the GPG password prompt from the editor: configure the tracked GPG Agent pinentry program rather than changing `EDITOR` or an i3 shortcut.
 
 - 2026-04-16: Fixed `readme-recruiter-sync` to resolve metadata repo-agnostically (`dot_agents/` first, then repo `.agents`, then `$HOME/.agents`, plus optional `READMERECRUITERSYNC_SKILL_DIR`) and derive repo root by walking up to nearest README. This prevents terminal-specific false failures in repos without local skill copy.
 - 2026-04-27: When Graphiti MCP needs to be available on login, mount `/dev/sdc1` to `/mnt/linux-files-3` only when the device exists and start `docker compose -f ~/coding/graphiti/mcp_server/docker/docker-compose-neo4j.yml up -d`; skip startup cleanly if host port 8000 is already bound so startup can continue.
