@@ -31,6 +31,9 @@ skills tighten one specific aspect of an existing interface.
 - [`frontend-design`](frontend-design/SKILL.md): Creates distinctive,
   production-grade interfaces while insisting on explicit audience, use
   case, and brand context before any design implementation starts.
+- [`brand-system-designer`](brand-system-designer/SKILL.md): Creates a
+  repo-native brand system with logo, color, typography, favicon, and social
+  asset guidance when visual identity is the actual task.
 - [`design-taste-frontend`](design-taste-frontend/SKILL.md): Acts as a
   senior UI/UX engineer for high-agency frontend work, with strict rules
   around component architecture, motion quality, typography, and
@@ -199,6 +202,13 @@ refresh that external bundle from the latest upstream release.
 
 ## Docs, Knowledge, And Output Control
 
+- [`ai-workflow-doctor`](ai-workflow-doctor/SKILL.md): Measures active
+  instruction context and audits duplicate policy, broken local references,
+  plan contracts, skill-catalog drift, provenance, and semantic-review
+  candidates with deterministic text or JSON evidence.
+- [`context-handoff`](context-handoff/SKILL.md): Creates bounded continuation
+  handoffs with done-criteria evidence, linked artifacts, explicit unknowns,
+  retry-safe failure history, and executable next actions.
 - [`feedback-memory`](feedback-memory/SKILL.md): Stores durable user
   corrections and working preferences in a repo-tracked `feedback.log`
   so later sessions can honor them.
@@ -212,6 +222,9 @@ refresh that external bundle from the latest upstream release.
   root `README.md` as a hard documentation gate for repo-surface changes,
   keeping setup, usage, command flags, stack rationale, and recruiter
   framing aligned with the repo.
+- [`metaprompt`](metaprompt/SKILL.md): Compiles plain-language requests into
+  paste-ready prompts, preserves a visible execution gate, and can execute the
+  compiled prompt after a standalone run signal.
 - [`smoke-test-capture`](smoke-test-capture/SKILL.md): Keeps the shared
   `docs/smoke-tests.md` checklist current whenever work reveals a manual
   verification step, a changed manual expectation, or an obvious smoke

@@ -1,14 +1,32 @@
 #!/bin/bash
-# Wire repo-tracked skills from ~/.agents/skills into ~/.claude/skills so
-# Claude Code discovers the same shared skill surface as Codex.
-# Safe to run every chezmoi apply — ln -sf is idempotent.
+# Wire complete repo-tracked skill directories into Claude's documented
+# ~/.claude/skills/<name>/SKILL.md layout so supporting files stay reachable.
 set -euo pipefail
-mkdir -p "{{ .chezmoi.homeDir }}/.claude/skills"
+claude_skills_dir="{{ .chezmoi.homeDir }}/.claude/skills"
+mkdir -p "$claude_skills_dir"
+
 for skill_dir in "{{ .chezmoi.homeDir }}/.agents/skills"/*/; do
     [ -d "$skill_dir" ] || continue
+    skill_dir=${skill_dir%/}
     skill_name=$(basename "$skill_dir")
-    skill_file="${skill_dir}SKILL.md"
+    skill_file="$skill_dir/SKILL.md"
     if [ -f "$skill_file" ]; then
-        ln -sf "$skill_file" "{{ .chezmoi.homeDir }}/.claude/skills/${skill_name}.md"
+        legacy_link="$claude_skills_dir/${skill_name}.md"
+        if [ -L "$legacy_link" ] && [ "$(readlink "$legacy_link")" = "$skill_file" ]; then
+            rm -f -- "$legacy_link"
+        fi
+
+        skill_link="$claude_skills_dir/$skill_name"
+        if [ -L "$skill_link" ]; then
+            if [ "$(readlink "$skill_link")" = "$skill_dir" ]; then
+                continue
+            fi
+            rm -f -- "$skill_link"
+        elif [ -e "$skill_link" ]; then
+            echo "Refusing to replace non-symlink Claude skill path: $skill_link" >&2
+            exit 1
+        fi
+
+        ln -s "$skill_dir" "$skill_link"
     fi
 done

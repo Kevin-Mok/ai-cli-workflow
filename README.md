@@ -26,7 +26,7 @@ is done.
 | Codex CLI and tracked config | [`dot_codex/config.toml`](dot_codex/config.toml) | Versions model, reasoning, trust, MCP, and session defaults so new Codex panes start from repo policy instead of memory. |
 | AGENTS instruction chain | [`dot_codex/AGENTS.md`](dot_codex/AGENTS.md), with compact [`AGENTS.md`](AGENTS.md) and [`AGENTS.repo.md`](AGENTS.repo.md) routing layers | Keeps one inspectable policy body for planning, verification, commit hygiene, and docs sync instead of loading duplicated instructions. |
 | Claude Code global config | [`dot_claude/CLAUDE.md`](dot_claude/CLAUDE.md.tmpl) and [`dot_claude/settings.json`](dot_claude/settings.json) | Wires `dot_codex/AGENTS.md` into Claude Code globally via `@path` import so both Codex and Claude share the same behavioral baseline without a separate copy. |
-| Local skills | [`dot_agents/skills/`](dot_agents/skills/) and [`dot_agents/skills/README.md`](dot_agents/skills/README.md) | Packages recurring jobs into reusable local capabilities shared across Codex (`~/.agents/skills/`) and Claude Code (`~/.claude/skills/` symlinks) via a post-apply chezmoi script. |
+| Local skills | [`dot_agents/skills/`](dot_agents/skills/) and [`dot_agents/skills/README.md`](dot_agents/skills/README.md) | Packages recurring jobs into reusable local capabilities shared across Codex (`~/.agents/skills/`) and Claude Code (`~/.claude/skills/<name>/` directory symlinks) via a post-apply chezmoi script. |
 | Graphiti MCP with Neo4j | [`dot_codex/config.toml`](dot_codex/config.toml), [`scripts/executable_codex`](scripts/executable_codex), and [`docs/graphiti-mcp-codex.md`](docs/graphiti-mcp-codex.md) | Adds a retrievable memory layer for multi-session work where provenance and evolving context matter. |
 | Shell and terminal tooling | [`dot_config/fish/config.fish.tmpl`](dot_config/fish/config.fish.tmpl), [`dot_tmux.conf`](dot_tmux.conf), [`dot_config/st/config.def.h.tmpl`](dot_config/st/config.def.h.tmpl), [`dot_config/kitty/kitty.conf`](dot_config/kitty/kitty.conf), and [`dot_config/i3/config.tmpl`](dot_config/i3/config.tmpl) | Optimizes for terminal-first execution and multiple parallel panes, with `kitty` as the default terminal, `st` kept ready as the low-friction alternate, and tmux handling the heavier session workflow. |
 | Python and Bash automation | [`scripts/`](scripts/) and [`dot_config/fish/functions/refresh-config.fish`](dot_config/fish/functions/refresh-config.fish) | Keeps repeatable operations small, inspectable, and version-controlled instead of burying them in chat or muscle memory. |
@@ -167,8 +167,10 @@ setup and validation workflow lives in
 [`dot_agents/skills/`](dot_agents/skills/) turns repeated prompting into
 reusable capabilities shared across Codex and Claude Code. Each skill is
 installed to `~/.agents/skills/<name>/SKILL.md` for Codex and symlinked
-to `~/.claude/skills/<name>.md` for Claude Code via a post-apply chezmoi
-script. The full inventory lives in
+as a complete directory at `~/.claude/skills/<name>/` for Claude Code via a
+post-apply chezmoi script. Directory links preserve optional references,
+scripts, assets, and metadata beside `SKILL.md`; Claude Code documents
+directory symlinks for this personal-skill layout. The full inventory lives in
 [`dot_agents/skills/README.md`](dot_agents/skills/README.md), but the
 main categories are more interesting than a flat list.
 
@@ -230,6 +232,18 @@ request into solution leakage.
 
 Representative highlights:
 
+- [`ai-workflow-doctor`](dot_agents/skills/ai-workflow-doctor/SKILL.md)
+  turns instruction size, duplicate policy, local references, skill-catalog
+  drift, and source provenance into deterministic text or JSON evidence. Its
+  `--check` mode blocks objective errors while leaving semantic candidates for
+  human review.
+- [`context-handoff`](dot_agents/skills/context-handoff/SKILL.md) creates a
+  compact continuation artifact with done-criteria evidence, explicit unknowns,
+  linked artifacts, retry-safe failure history, and executable next actions.
+- [`metaprompt`](dot_agents/skills/metaprompt/SKILL.md) compiles plain-language
+  intent into a paste-ready prompt and visible execution gate. Its detailed
+  quality, routing, and example rules load conditionally, keeping trivial prompt
+  work lightweight without weakening complex prompt construction.
 - [`feedback-memory`](dot_agents/skills/feedback-memory/SKILL.md)
   carries forward durable user corrections through a repo-tracked
   `feedback.log`.
@@ -444,6 +458,7 @@ source in this repo.
 | `chezmoi -S "$PWD" apply` | Apply the tracked source state from this clone into `$HOME`. | `-S` / `--source` uses this repo as the source state. `-P` / `--parent-dirs` is useful when you apply a nested target and also want its parent directories handled. |
 | `refresh-config` | Snapshot the live Codex config into the repo, then reapply the chezmoi-managed environment layer. | No user-facing flags. It copies `~/.codex/config.toml` into `dot_codex/config.toml`, runs `chezmoi apply`, syncs shortcuts, and reloads fish. |
 | `sync-superpowers-release` | Refresh the externally managed `obra/superpowers` skill bundle from the latest GitHub release archive through chezmoi. | `--dry-run` previews the release refresh without writing files. `LINUX_CONFIG_SOURCE` points the helper at this repo when it is not checked out at `$HOME/linux-config`. |
+| `./scripts/executable_ai-workflow-doctor` | Audit the repo's AI instruction and skill surface, or capture a stable before/after measurement for workflow optimization. | `--repo PATH` selects the repository. `--format text|json` selects human or machine output. `--snapshot PATH` writes a deterministic JSON baseline; `--compare PATH` compares the current report with one. `--verify-sources` resolves declared local source archives when available. `--check` exits nonzero for objective errors while review findings remain non-blocking warnings. |
 | `./scripts/executable_apply-pywal-theme <wallpaper>` | Regenerate the active `pywal` theme through the repo-owned wrapper so wallpaper changes also refresh kitty and the i3 color resources this repo depends on. | Pass an image path directly, or pass raw `wal` flags when you need that lower-level control. The wrapper runs `wal --saturate 0.8 -e`, reloads Xresources, refreshes running kitty windows when the socket is available, and regenerates the derived i3 palette file. |
 | `./scripts/executable_screenshot-all-monitors` | Save one combined `scrot` capture of the full X virtual desktop, covering every active monitor in one image. | No flags. Saves to `/home/example/Pictures/screenshots/desktop/unsorted/screenshot-YYYY-MM-DD_HH:MM:SS.png`. `SCREENSHOT_ALL_MONITORS_DIR`, `SCREENSHOT_ALL_MONITORS_SCROT`, and `SCREENSHOT_ALL_MONITORS_DATE` override the destination, capture binary, and timestamp binary for tests or alternate hosts. |
 | `./scripts/executable_setup-st.sh` | Render the tracked `st` config, sync it into your `st` source checkout, and install the compiled terminal you actually want to use. | `--source-dir` points the script at a non-default `st` checkout path. `--skip-install` only refreshes `~/.config/st/config.def.h` plus the source-tree `config.def.h` and prints the exact `sudo make -C ... install` command instead of running it. `--clone-if-missing` clones the official upstream source from `https://git.suckless.org/st` into the target checkout path before syncing and building. |

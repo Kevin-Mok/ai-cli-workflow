@@ -1,0 +1,4 @@
+interface:
+  display_name: "AI Workflow Doctor"
+  short_description: "Audit AI workflow context and structural drift"
+  default_prompt: "Use $ai-workflow-doctor to audit this repository AI instruction and skill surface."

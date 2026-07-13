@@ -1,0 +1,979 @@
+#!/usr/bin/env python3
+"""Audit repository AI instructions, skills, references, and provenance."""
+
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import math
+import re
+import shutil
+import string
+import subprocess
+import sys
+import unicodedata
+from collections import defaultdict
+from pathlib import Path
+from typing import Any, Iterable
+from urllib.parse import unquote, urlsplit
+
+
+SCHEMA_VERSION = 1
+TOKEN_METHOD = "ceil(unicode_characters/4)"
+SEVERITY_ORDER = {"error": 0, "warning": 1, "info": 2}
+EXCLUDED_PARTS = {".git", ".worktrees", "node_modules", "__pycache__"}
+SMART_TRANSLATION = str.maketrans(
+    {
+        "\u2018": "'",
+        "\u2019": "'",
+        "\u201c": '"',
+        "\u201d": '"',
+        "\u2013": "-",
+        "\u2014": "-",
+    }
+)
+INLINE_LINK_START_RE = re.compile(r"!?\[[^\]\n]*\]\(")
+REFERENCE_LINK_RE = re.compile(r"^\s*\[[^\]]+\]:\s*(.+?)\s*$")
+HEADING_RE = re.compile(r"^(#{2,3})\s+(.+?)\s*#*\s*$")
+SOURCE_FIELD_RE = re.compile(r"^\s*-\s*([^:]+):\s*(.*?)\s*$")
+
+
+def normalize_text(value: str) -> str:
+    normalized = unicodedata.normalize("NFKC", value).translate(SMART_TRANSLATION)
+    return re.sub(r"\s+", " ", normalized).strip().casefold()
+
+
+def relative_path(path: Path, repo: Path) -> str:
+    return path.relative_to(repo).as_posix()
+
+
+def is_excluded(path: Path, repo: Path) -> bool:
+    try:
+        parts = path.relative_to(repo).parts
+    except ValueError:
+        return True
+    return any(part in EXCLUDED_PARTS for part in parts)
+
+
+def read_text(path: Path) -> str:
+    return path.read_text(encoding="utf-8")
+
+
+def discover_instruction_files(repo: Path) -> list[Path]:
+    candidates: set[Path] = set()
+    for name in ("AGENTS.md", "AGENTS.repo.md", "AGENTS-BASE.md"):
+        path = repo / name
+        if path.is_file():
+            candidates.add(path)
+    canonical = repo / "dot_codex" / "AGENTS.md"
+    if canonical.is_file():
+        candidates.add(canonical)
+    for pattern in ("AGENTS.md", "AGENTS.override.local.md"):
+        for path in repo.rglob(pattern):
+            if path.is_file() and not is_excluded(path, repo):
+                candidates.add(path)
+    return sorted(candidates, key=lambda path: relative_path(path, repo))
+
+
+def discover_skill_directories(repo: Path) -> list[Path]:
+    root = repo / "dot_agents" / "skills"
+    if not root.is_dir():
+        return []
+    return sorted(
+        (
+            path
+            for path in root.iterdir()
+            if path.is_dir() and (path / "SKILL.md").is_file()
+        ),
+        key=lambda path: path.name,
+    )
+
+
+def duplicate_active_skill_findings(repo: Path) -> list[dict[str, Any]]:
+    grouped: dict[str, list[Path]] = defaultdict(list)
+    for relative_root in (".agents/skills", "dot_agents/skills"):
+        root = repo / relative_root
+        if not root.is_dir():
+            continue
+        for skill_dir in root.iterdir():
+            if skill_dir.is_dir() and (skill_dir / "SKILL.md").is_file():
+                grouped[skill_dir.name].append(skill_dir / "SKILL.md")
+
+    findings: list[dict[str, Any]] = []
+    for slug, paths in sorted(grouped.items()):
+        if len(paths) < 2:
+            continue
+        findings.append(
+            make_finding(
+                key=f"duplicate_active_skill_slug:{slug}",
+                code="duplicate_active_skill_slug",
+                severity="warning",
+                message=f"Skill {slug} is exposed from multiple active roots.",
+                locations=[
+                    {"line": 1, "path": relative_path(path, repo)}
+                    for path in sorted(paths)
+                ],
+                details={
+                    "review": "choose one owner or document why both are required",
+                    "skill": slug,
+                },
+            )
+        )
+    return findings
+
+
+def discover_markdown_surface(
+    repo: Path, instruction_files: Iterable[Path], skill_dirs: Iterable[Path]
+) -> list[Path]:
+    candidates: set[Path] = set(instruction_files)
+    agent_root = repo / ".agent"
+    if agent_root.is_dir():
+        candidates.update(path for path in agent_root.rglob("*.md") if path.is_file())
+    for relative in (
+        "plans/ai-workflow-optimization.md",
+        "docs/ai-workflow-optimization.md",
+        "dot_agents/skills/README.md",
+    ):
+        path = repo / relative
+        if path.is_file():
+            candidates.add(path)
+    for skill_dir in skill_dirs:
+        for name in ("SKILL.md", "SOURCE.md"):
+            path = skill_dir / name
+            if path.is_file():
+                candidates.add(path)
+        references = skill_dir / "references"
+        if references.is_dir():
+            candidates.update(path for path in references.rglob("*.md") if path.is_file())
+    return sorted(candidates, key=lambda path: relative_path(path, repo))
+
+
+def metric_for(path: Path, repo: Path) -> dict[str, Any]:
+    raw = path.read_bytes()
+    text = raw.decode("utf-8")
+    return {
+        "bytes": len(raw),
+        "characters": len(text),
+        "estimated_tokens": math.ceil(len(text) / 4),
+        "path": relative_path(path, repo),
+        "sha256": hashlib.sha256(raw).hexdigest(),
+    }
+
+
+def make_finding(
+    *,
+    key: str,
+    code: str,
+    severity: str,
+    message: str,
+    locations: list[dict[str, Any]] | None = None,
+    details: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    return {
+        "code": code,
+        "details": details or {},
+        "key": key,
+        "locations": locations or [],
+        "message": message,
+        "severity": severity,
+    }
+
+
+def sort_findings(findings: Iterable[dict[str, Any]]) -> list[dict[str, Any]]:
+    return sorted(
+        findings,
+        key=lambda finding: (
+            SEVERITY_ORDER.get(finding["severity"], 99),
+            finding["code"],
+            finding["key"],
+            (
+                finding["locations"][0].get("path", "")
+                if finding["locations"]
+                else ""
+            ),
+            (
+                finding["locations"][0].get("line", 0)
+                if finding["locations"]
+                else 0
+            ),
+        ),
+    )
+
+
+def paragraph_blocks(text: str) -> list[tuple[int, str]]:
+    blocks: list[tuple[int, str]] = []
+    buffer: list[str] = []
+    start_line = 1
+    for line_number, line in enumerate(text.splitlines(), start=1):
+        if line.strip():
+            if not buffer:
+                start_line = line_number
+            buffer.append(line)
+        elif buffer:
+            blocks.append((start_line, "\n".join(buffer)))
+            buffer = []
+    if buffer:
+        blocks.append((start_line, "\n".join(buffer)))
+    return blocks
+
+
+def duplicate_findings(
+    repo: Path, instruction_files: Iterable[Path]
+) -> list[dict[str, Any]]:
+    grouped: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    lengths: dict[str, int] = {}
+    for path in instruction_files:
+        for line, block in paragraph_blocks(read_text(path)):
+            normalized = normalize_text(block)
+            if len(normalized) < 200:
+                continue
+            digest = hashlib.sha256(normalized.encode("utf-8")).hexdigest()
+            lengths[digest] = len(normalized)
+            grouped[digest].append(
+                {"line": line, "path": relative_path(path, repo)}
+            )
+
+    findings: list[dict[str, Any]] = []
+    for digest, locations in grouped.items():
+        if len({location["path"] for location in locations}) < 2:
+            continue
+        findings.append(
+            make_finding(
+                key=f"duplicate_instruction_block:{digest}",
+                code="duplicate_instruction_block",
+                severity="error",
+                message="A normalized instruction block is duplicated across files.",
+                locations=locations,
+                details={
+                    "digest": digest,
+                    "normalized_characters": lengths[digest],
+                },
+            )
+        )
+    return findings
+
+
+def unfenced_lines(text: str) -> list[tuple[int, str]]:
+    output: list[tuple[int, str]] = []
+    fence: tuple[str, int] | None = None
+    for line_number, line in enumerate(text.splitlines(), start=1):
+        indentation = len(line) - len(line.lstrip(" "))
+        stripped = line[indentation:] if indentation <= 3 else line
+        marker_character = stripped[:1] if indentation <= 3 else ""
+        marker_length = (
+            len(stripped) - len(stripped.lstrip(marker_character))
+            if marker_character in (chr(96), "~")
+            else 0
+        )
+        if fence is not None:
+            trailing = stripped[marker_length:]
+            if (
+                marker_character == fence[0]
+                and marker_length >= fence[1]
+                and not trailing.strip(" \t")
+            ):
+                fence = None
+            continue
+        if marker_length >= 3 and indentation <= 3:
+            if fence is None:
+                fence = (marker_character, marker_length)
+            continue
+        output.append((line_number, line))
+    return output
+
+
+def unescape_destination_character(
+    value: str, cursor: int
+) -> tuple[str, int] | None:
+    if (
+        value[cursor] == "\\"
+        and cursor + 1 < len(value)
+        and value[cursor + 1] in string.punctuation
+    ):
+        return value[cursor + 1], cursor + 2
+    return None
+
+
+def inline_link_targets(line: str) -> list[str]:
+    targets: list[str] = []
+    for match in INLINE_LINK_START_RE.finditer(line):
+        cursor = match.end()
+        if cursor < len(line) and line[cursor] == "<":
+            cursor += 1
+            buffer: list[str] = []
+            while cursor < len(line):
+                escaped = unescape_destination_character(line, cursor)
+                if escaped:
+                    character, cursor = escaped
+                    buffer.append(character)
+                    continue
+                if line[cursor] == ">":
+                    targets.append("".join(buffer))
+                    break
+                buffer.append(line[cursor])
+                cursor += 1
+            continue
+
+        buffer = []
+        parenthesis_depth = 0
+        while cursor < len(line):
+            escaped = unescape_destination_character(line, cursor)
+            if escaped:
+                character, cursor = escaped
+                buffer.append(character)
+                continue
+            character = line[cursor]
+            if character == "(":
+                parenthesis_depth += 1
+            elif character == ")":
+                if parenthesis_depth == 0:
+                    targets.append("".join(buffer).strip())
+                    break
+                parenthesis_depth -= 1
+            elif character.isspace() and parenthesis_depth == 0:
+                targets.append("".join(buffer).strip())
+                break
+            buffer.append(character)
+            cursor += 1
+    return targets
+
+
+def reference_link_target(value: str) -> str:
+    value = value.strip()
+    if value.startswith("<"):
+        buffer: list[str] = []
+        cursor = 1
+        while cursor < len(value):
+            escaped = unescape_destination_character(value, cursor)
+            if escaped:
+                character, cursor = escaped
+                buffer.append(character)
+                continue
+            if value[cursor] == ">":
+                return "".join(buffer)
+            buffer.append(value[cursor])
+            cursor += 1
+        return ""
+
+    buffer = []
+    cursor = 0
+    while cursor < len(value) and not value[cursor].isspace():
+        escaped = unescape_destination_character(value, cursor)
+        if escaped:
+            character, cursor = escaped
+            buffer.append(character)
+            continue
+        buffer.append(value[cursor])
+        cursor += 1
+    return "".join(buffer)
+
+
+def link_targets(text: str) -> list[tuple[int, str]]:
+    targets: list[tuple[int, str]] = []
+    for line_number, line in unfenced_lines(text):
+        for target in inline_link_targets(line):
+            targets.append((line_number, target))
+        definition = REFERENCE_LINK_RE.match(line)
+        if definition:
+            target = reference_link_target(definition.group(1))
+            targets.append((line_number, target))
+    return targets
+
+
+def reference_findings(
+    repo: Path,
+    markdown_files: Iterable[Path],
+    instruction_files: Iterable[Path],
+) -> list[dict[str, Any]]:
+    findings: list[dict[str, Any]] = []
+    plan_contract = repo / ".agent" / "PLANS.md"
+    plan_referenced = any(
+        ".agent/PLANS.md" in read_text(path) for path in instruction_files
+    )
+    if plan_referenced and not plan_contract.is_file():
+        findings.append(
+            make_finding(
+                key="missing_plan_contract:.agent/PLANS.md",
+                code="missing_plan_contract",
+                severity="error",
+                message="Instructions reference .agent/PLANS.md, but it is missing.",
+                locations=[{"line": 1, "path": ".agent/PLANS.md"}],
+                details={"target": ".agent/PLANS.md"},
+            )
+        )
+
+    repo_resolved = repo.resolve()
+    for path in markdown_files:
+        source_path = relative_path(path, repo)
+        for line, raw_target in link_targets(read_text(path)):
+            parsed = urlsplit(raw_target)
+            if (
+                not raw_target
+                or raw_target.startswith(("#", "/", "~"))
+                or parsed.scheme
+                or parsed.netloc
+            ):
+                continue
+            decoded = unquote(parsed.path)
+            if not decoded:
+                continue
+            if decoded == ".agent/PLANS.md" and plan_referenced and not plan_contract.is_file():
+                continue
+            candidate = (path.parent / decoded).resolve(strict=False)
+            try:
+                candidate.relative_to(repo_resolved)
+            except ValueError:
+                findings.append(
+                    make_finding(
+                        key=f"reference_escapes_repo:{source_path}:{decoded}",
+                        code="reference_escapes_repo",
+                        severity="error",
+                        message=f"{source_path} links outside the repository.",
+                        locations=[{"line": line, "path": source_path}],
+                        details={"target": decoded},
+                    )
+                )
+                continue
+            if not candidate.exists():
+                findings.append(
+                    make_finding(
+                        key=f"broken_local_reference:{source_path}:{decoded}",
+                        code="broken_local_reference",
+                        severity="error",
+                        message=f"{source_path} has a missing local reference.",
+                        locations=[{"line": line, "path": source_path}],
+                        details={"target": decoded},
+                    )
+                )
+    return findings
+
+
+def catalogued_skill_names(catalog: Path) -> set[str]:
+    if not catalog.is_file():
+        return set()
+    names: set[str] = set()
+    for _, target in link_targets(read_text(catalog)):
+        decoded = unquote(urlsplit(target).path)
+        parts = Path(decoded).parts
+        if len(parts) == 2 and parts[1] == "SKILL.md" and parts[0] not in (".", ".."):
+            names.add(parts[0])
+    return names
+
+
+def catalog_findings(
+    repo: Path, skill_dirs: Iterable[Path]
+) -> tuple[list[dict[str, Any]], dict[str, int]]:
+    actual = {path.name for path in skill_dirs}
+    catalog_path = repo / "dot_agents" / "skills" / "README.md"
+    catalogued = catalogued_skill_names(catalog_path)
+    findings: list[dict[str, Any]] = []
+    for slug in sorted(actual - catalogued):
+        findings.append(
+            make_finding(
+                key=f"uncatalogued_skill:{slug}",
+                code="uncatalogued_skill",
+                severity="error",
+                message=f"Skill {slug} is not listed in the local catalog.",
+                locations=[
+                    {
+                        "line": 1,
+                        "path": f"dot_agents/skills/{slug}/SKILL.md",
+                    }
+                ],
+                details={"skill": slug},
+            )
+        )
+    for slug in sorted(catalogued - actual):
+        findings.append(
+            make_finding(
+                key=f"stale_catalog_entry:{slug}",
+                code="stale_catalog_entry",
+                severity="error",
+                message=f"Catalog entry {slug} has no corresponding skill.",
+                locations=[
+                    {"line": 1, "path": "dot_agents/skills/README.md"}
+                ],
+                details={"skill": slug},
+            )
+        )
+    return findings, {"actual": len(actual), "catalogued": len(catalogued)}
+
+
+def source_fields(text: str) -> dict[str, str]:
+    fields: dict[str, str] = {}
+    for _, line in unfenced_lines(text):
+        match = SOURCE_FIELD_RE.match(line)
+        if not match:
+            continue
+        key = normalize_text(match.group(1))
+        value = match.group(2).strip().strip(chr(96)).strip()
+        fields[key] = value
+    return fields
+
+
+def first_field(fields: dict[str, str], aliases: tuple[str, ...]) -> str:
+    for alias in aliases:
+        value = fields.get(alias, "").strip()
+        if value:
+            return value
+    return ""
+
+
+def validate_source(
+    path: Path, slug: str, repo: Path, verify_sources: bool
+) -> dict[str, Any] | None:
+    fields = source_fields(read_text(path))
+    source_repo = first_field(
+        fields, ("upstream repo", "source repo", "source archive")
+    )
+    source_path = first_field(
+        fields, ("original source path", "source path", "source-relative path")
+    )
+    commit = first_field(fields, ("upstream commit", "source commit"))
+    source_hash = first_field(fields, ("source sha-256", "source sha256"))
+    supporting_paths = [
+        item.strip().strip(chr(96)).strip()
+        for item in fields.get("supporting source paths", "").split(";")
+        if item.strip().strip(chr(96)).strip()
+    ]
+    date = first_field(fields, ("adapted on", "imported on"))
+    basis = first_field(fields, ("adaptation basis", "import basis"))
+    local = first_field(
+        fields,
+        (
+            "local adaptation",
+            "local modifications after import",
+            "local result",
+        ),
+    )
+
+    missing: list[str] = []
+    for name, value in (
+        ("source repository", source_repo),
+        ("source path", source_path),
+        ("date", date),
+        ("basis", basis),
+        ("local adaptation", local),
+    ):
+        if not value:
+            missing.append(name)
+    invalid: list[str] = []
+    commit_valid = bool(re.fullmatch(r"[0-9a-fA-F]{40}", commit))
+    source_hash_valid = bool(re.fullmatch(r"[0-9a-fA-F]{64}", source_hash))
+    if not (commit_valid or source_hash_valid):
+        invalid.append("immutable revision")
+    try:
+        if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", date):
+            raise ValueError
+        from datetime import date as calendar_date
+
+        calendar_date.fromisoformat(date)
+    except ValueError:
+        invalid.append("date")
+
+    source_path_safe = (
+        bool(source_path)
+        and not Path(source_path).is_absolute()
+        and ".." not in Path(source_path).parts
+    )
+    if source_path and not source_path_safe:
+        invalid.append("source path")
+    for supporting_path in supporting_paths:
+        if Path(supporting_path).is_absolute() or ".." in Path(supporting_path).parts:
+            invalid.append("supporting source path")
+
+    unverifiable_reason = ""
+    parsed_repo = urlsplit(source_repo)
+    remote_scp = bool(re.match(r"^[^/]+@[^:]+:", source_repo))
+    local_source = bool(
+        source_repo
+        and not parsed_repo.scheme
+        and not parsed_repo.netloc
+        and not remote_scp
+    )
+    if verify_sources and local_source and source_path_safe:
+        declared_repo = Path(source_repo).expanduser()
+        local_repo = (
+            declared_repo
+            if declared_repo.is_absolute()
+            else repo / declared_repo
+        )
+        if not local_repo.is_dir():
+            unverifiable_reason = "source repository unavailable"
+        elif commit_valid and shutil.which("git") is None:
+            unverifiable_reason = "git unavailable"
+        elif commit_valid:
+            repository_check = subprocess.run(
+                ["git", "-C", str(local_repo), "rev-parse", "--git-dir"],
+                capture_output=True,
+                text=True,
+                check=False,
+                timeout=10,
+            )
+            if repository_check.returncode != 0:
+                invalid.append("source repository")
+            elif subprocess.run(
+                [
+                    "git",
+                    "-C",
+                    str(local_repo),
+                    "cat-file",
+                    "-e",
+                    f"{commit}^{{commit}}",
+                ],
+                capture_output=True,
+                check=False,
+                timeout=10,
+            ).returncode != 0:
+                invalid.append("source revision")
+            else:
+                source_objects = [
+                    (source_path, "source path at revision"),
+                    *(
+                        (supporting_path, "supporting source path at revision")
+                        for supporting_path in supporting_paths
+                    ),
+                ]
+                for object_path, invalid_field in source_objects:
+                    if subprocess.run(
+                        [
+                            "git",
+                            "-C",
+                            str(local_repo),
+                            "cat-file",
+                            "-e",
+                            f"{commit}:{object_path}",
+                        ],
+                        capture_output=True,
+                        check=False,
+                        timeout=10,
+                    ).returncode != 0:
+                        invalid.append(invalid_field)
+        elif source_hash_valid:
+            source_file = (local_repo / source_path).resolve(strict=False)
+            try:
+                source_file.relative_to(local_repo.resolve())
+            except ValueError:
+                invalid.append("source path")
+            else:
+                if not source_file.is_file() or hashlib.sha256(
+                    source_file.read_bytes()
+                ).hexdigest() != source_hash.lower():
+                    invalid.append("source hash")
+    if missing or invalid:
+        return make_finding(
+            key=f"invalid_source_provenance:{slug}",
+            code="invalid_source_provenance",
+            severity="error",
+            message=f"Skill {slug} has incomplete or invalid source provenance.",
+            locations=[{"line": 1, "path": relative_path(path, repo)}],
+            details={
+                "invalid_fields": sorted(set(invalid)),
+                "missing_fields": missing,
+            },
+        )
+    if unverifiable_reason:
+        return make_finding(
+            key=f"unverifiable_source_provenance:{slug}",
+            code="unverifiable_source_provenance",
+            severity="warning",
+            message=f"Skill {slug} source evidence could not be resolved.",
+            locations=[{"line": 1, "path": relative_path(path, repo)}],
+            details={"reason": unverifiable_reason, "skill": slug},
+        )
+    return None
+
+
+def provenance_findings(
+    repo: Path, skill_dirs: Iterable[Path], verify_sources: bool
+) -> list[dict[str, Any]]:
+    findings: list[dict[str, Any]] = []
+    for skill_dir in skill_dirs:
+        slug = skill_dir.name
+        skill_path = skill_dir / "SKILL.md"
+        source_path = skill_dir / "SOURCE.md"
+        sentinel = f"<!-- {slug}: adapted -->"
+        marked = any(line.strip() == sentinel for _, line in unfenced_lines(read_text(skill_path)))
+        if marked and not source_path.is_file():
+            findings.append(
+                make_finding(
+                    key=f"missing_source_provenance:{slug}",
+                    code="missing_source_provenance",
+                    severity="error",
+                    message=f"Adapted skill {slug} is missing SOURCE.md.",
+                    locations=[
+                        {
+                            "line": 1,
+                            "path": relative_path(skill_path, repo),
+                        }
+                    ],
+                    details={"skill": slug},
+                )
+            )
+        if source_path.is_file():
+            invalid = validate_source(source_path, slug, repo, verify_sources)
+            if invalid:
+                findings.append(invalid)
+    return findings
+
+
+def heading_sections(text: str) -> list[tuple[str, int, str]]:
+    sections: list[tuple[str, int, str]] = []
+    current_heading: str | None = None
+    current_line = 0
+    body: list[str] = []
+    for line_number, line in enumerate(text.splitlines(), start=1):
+        match = HEADING_RE.match(line)
+        if match:
+            if current_heading is not None:
+                sections.append(
+                    (current_heading, current_line, normalize_text("\n".join(body)))
+                )
+            current_heading = normalize_text(match.group(2))
+            current_line = line_number
+            body = []
+        elif current_heading is not None:
+            body.append(line)
+    if current_heading is not None:
+        sections.append(
+            (current_heading, current_line, normalize_text("\n".join(body)))
+        )
+    return sections
+
+
+def semantic_findings(
+    repo: Path, instruction_files: Iterable[Path]
+) -> list[dict[str, Any]]:
+    grouped: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for path in instruction_files:
+        for heading, line, body in heading_sections(read_text(path)):
+            grouped[heading].append(
+                {
+                    "body": body,
+                    "line": line,
+                    "path": relative_path(path, repo),
+                }
+            )
+    findings: list[dict[str, Any]] = []
+    for heading, entries in grouped.items():
+        if len({entry["path"] for entry in entries}) < 2:
+            continue
+        if len({entry["body"] for entry in entries}) < 2:
+            continue
+        digest = hashlib.sha256(heading.encode("utf-8")).hexdigest()[:12]
+        findings.append(
+            make_finding(
+                key=f"semantic_conflict_candidate:{digest}",
+                code="semantic_conflict_candidate",
+                severity="warning",
+                message=f"Section {heading!r} differs across instruction files.",
+                locations=[
+                    {"line": entry["line"], "path": entry["path"]}
+                    for entry in entries
+                ],
+                details={"heading": heading, "review": "human_review_required"},
+            )
+        )
+    return findings
+
+
+def build_report(repo: Path, verify_sources: bool = False) -> dict[str, Any]:
+    instruction_files = discover_instruction_files(repo)
+    skill_dirs = discover_skill_directories(repo)
+    markdown_files = discover_markdown_surface(repo, instruction_files, skill_dirs)
+    metrics = [metric_for(path, repo) for path in instruction_files]
+    active_paths = [
+        path
+        for path in (repo / "AGENTS.md", repo / "dot_codex" / "AGENTS.md")
+        if path.is_file()
+    ]
+    active_bytes = sum(path.stat().st_size for path in active_paths)
+    active_characters = sum(len(read_text(path)) for path in active_paths)
+    catalog_issues, skill_metrics = catalog_findings(repo, skill_dirs)
+    findings = sort_findings(
+        [
+            *duplicate_findings(repo, instruction_files),
+            *duplicate_active_skill_findings(repo),
+            *reference_findings(repo, markdown_files, instruction_files),
+            *catalog_issues,
+            *provenance_findings(repo, skill_dirs, verify_sources),
+            *semantic_findings(repo, instruction_files),
+        ]
+    )
+    errors = sum(finding["severity"] == "error" for finding in findings)
+    warnings = sum(finding["severity"] == "warning" for finding in findings)
+    return {
+        "findings": findings,
+        "metrics": {
+            "active_totals": {
+                "bytes": active_bytes,
+                "characters": active_characters,
+                "estimated_tokens": math.ceil(active_characters / 4),
+            },
+            "instructions": metrics,
+            "skills": skill_metrics,
+        },
+        "schema_version": SCHEMA_VERSION,
+        "summary": {
+            "errors": errors,
+            "status": "pass" if errors == 0 else "fail",
+            "warnings": warnings,
+        },
+        "token_estimate_method": TOKEN_METHOD,
+    }
+
+
+def validate_snapshot(report: Any) -> dict[str, Any]:
+    if not isinstance(report, dict) or report.get("schema_version") != SCHEMA_VERSION:
+        raise ValueError("snapshot has an unsupported schema")
+    metrics = report.get("metrics")
+    findings = report.get("findings")
+    if not isinstance(metrics, dict) or not isinstance(findings, list):
+        raise ValueError("snapshot is missing required report fields")
+    active_totals = metrics.get("active_totals")
+    if not isinstance(active_totals, dict):
+        raise ValueError("snapshot is missing active instruction totals")
+    for field in ("bytes", "characters", "estimated_tokens"):
+        value = active_totals.get(field)
+        if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+            raise ValueError(f"snapshot has invalid active_totals.{field}")
+    if any(
+        not isinstance(finding, dict)
+        or not isinstance(finding.get("key"), str)
+        or not finding["key"]
+        for finding in findings
+    ):
+        raise ValueError("snapshot has an invalid finding entry")
+    return report
+
+
+def add_comparison(
+    current: dict[str, Any], baseline: dict[str, Any]
+) -> dict[str, Any]:
+    current_totals = current["metrics"]["active_totals"]
+    baseline_totals = baseline["metrics"]["active_totals"]
+    deltas = {
+        f"active_totals.{field}": current_totals.get(field, 0)
+        - baseline_totals.get(field, 0)
+        for field in ("bytes", "characters", "estimated_tokens")
+    }
+    current_keys = {finding["key"] for finding in current["findings"]}
+    baseline_keys = {finding["key"] for finding in baseline["findings"]}
+    current["comparison"] = {
+        "added_finding_keys": sorted(current_keys - baseline_keys),
+        "metric_deltas": deltas,
+        "resolved_finding_keys": sorted(baseline_keys - current_keys),
+        "unchanged_finding_keys": sorted(current_keys & baseline_keys),
+    }
+    return current
+
+
+def canonical_json(report: dict[str, Any]) -> str:
+    return json.dumps(report, indent=2, sort_keys=True) + "\n"
+
+
+def text_report(report: dict[str, Any]) -> str:
+    summary = report["summary"]
+    totals = report["metrics"]["active_totals"]
+    lines = [
+        "AI workflow doctor",
+        f"Status: {summary['status']}",
+        f"Errors: {summary['errors']}",
+        f"Warnings: {summary['warnings']}",
+        (
+            "Active instructions: "
+            f"{totals['bytes']} bytes, {totals['characters']} characters, "
+            f"~{totals['estimated_tokens']} tokens"
+        ),
+    ]
+    if report["findings"]:
+        lines.append("Findings:")
+        for finding in report["findings"]:
+            locations = ", ".join(
+                (
+                    f"{location['path']}:{location['line']}"
+                    if location.get("line")
+                    else location["path"]
+                )
+                for location in finding["locations"]
+            )
+            detail_items: list[str] = []
+            for key in ("target", "skill", "heading", "reason"):
+                if key in finding["details"]:
+                    detail_items.append(f"{key}={finding['details'][key]}")
+            for key in ("invalid_fields", "missing_fields"):
+                values = finding["details"].get(key, [])
+                if values:
+                    detail_items.append(f"{key}=[{', '.join(values)}]")
+            suffix = f" [{locations}]" if locations else ""
+            if detail_items:
+                suffix += f" ({', '.join(detail_items)})"
+            lines.append(
+                f"- {finding['severity'].upper()} {finding['code']}: "
+                f"{finding['message']}{suffix}"
+            )
+    else:
+        lines.append("Findings: none")
+    if "comparison" in report:
+        comparison = report["comparison"]
+        lines.append("Comparison:")
+        for key, value in sorted(comparison["metric_deltas"].items()):
+            lines.append(f"- {key}: {value:+d}")
+        added = ", ".join(comparison["added_finding_keys"]) or "none"
+        resolved = ", ".join(comparison["resolved_finding_keys"]) or "none"
+        lines.append(f"- Added finding keys: {added}")
+        lines.append(f"- Resolved finding keys: {resolved}")
+    return "\n".join(lines) + "\n"
+
+
+def parser() -> argparse.ArgumentParser:
+    argument_parser = argparse.ArgumentParser(prog="ai-workflow-doctor")
+    argument_parser.add_argument("--repo", default=".")
+    argument_parser.add_argument("--format", choices=("text", "json"), default="text")
+    argument_parser.add_argument("--snapshot")
+    argument_parser.add_argument("--compare")
+    argument_parser.add_argument("--verify-sources", action="store_true")
+    argument_parser.add_argument("--check", action="store_true")
+    return argument_parser
+
+
+def run(arguments: list[str] | None = None) -> int:
+    args = parser().parse_args(arguments)
+    try:
+        repo = Path(args.repo).expanduser().resolve()
+        if not repo.is_dir():
+            raise ValueError(f"repository path is not a directory: {args.repo}")
+        report = build_report(repo, verify_sources=args.verify_sources)
+        snapshot_json = canonical_json(report)
+        if args.compare:
+            snapshot_path = Path(args.compare).expanduser()
+            baseline = validate_snapshot(
+                json.loads(snapshot_path.read_text(encoding="utf-8"))
+            )
+            report = add_comparison(report, baseline)
+        rendered_json = canonical_json(report)
+        if args.snapshot:
+            snapshot_path = Path(args.snapshot).expanduser()
+            snapshot_path.parent.mkdir(parents=True, exist_ok=True)
+            snapshot_path.write_text(snapshot_json, encoding="utf-8")
+        output = rendered_json if args.format == "json" else text_report(report)
+        sys.stdout.write(output)
+        if args.check and report["summary"]["errors"]:
+            return 1
+        return 0
+    except (
+        KeyError,
+        OSError,
+        TypeError,
+        UnicodeError,
+        json.JSONDecodeError,
+        subprocess.SubprocessError,
+        ValueError,
+    ) as error:
+        print(f"ai-workflow-doctor: {error}", file=sys.stderr)
+        return 2
+
+
+if __name__ == "__main__":
+    raise SystemExit(run())

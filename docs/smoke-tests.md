@@ -29,6 +29,23 @@ of stacking duplicates.
   Expected: This document gains or updates a grouped `Action` +
   `Expected` entry instead of leaving the check only in chat, plans, or
   final notes.
+- Action: Invoke `metaprompt` for a trivial request, then for a current-source
+  comparison; include `run` inside a revision before sending standalone `go`.
+  Expected: The trivial prompt stays one or two sentences, both prompts include
+  the prompt/Run/Weight gate, the revision re-gates without executing, and only
+  standalone `go` selects and starts the appropriate execution mode.
+- Action: Invoke `context-handoff` on normal, low-context, and repeated-failure
+  work states.
+  Expected: Each result is at most 600 words with all eight ordered headings,
+  maps every done criterion to evidence, marks unchecked facts `Unknown`, links
+  artifacts instead of copying them, groups unchanged failures, and gives each
+  next action an owner, action, expected result, and stop condition.
+- Action: Finish a change with a user-observable CLI, browser, package, API, or
+  rendered-config surface after automated tests pass.
+  Expected: Verification still exercises the real user entrypoint, captures
+  observed evidence, covers invalid input when relevant, and considers an
+  adjacent edge probe when it would add useful runtime evidence instead of
+  treating automated tests alone as runtime proof.
 
 ## Installed Skill Surface
 
@@ -50,6 +67,15 @@ of stacking duplicates.
   Expected: The corresponding public docs and reusable verification guidance stay in sync with that rule in the same change.
 - Action: Start non-trivial work from a plan under `plans/`, then inspect the plan before the related commit is prepared.
   Expected: The plan follows `.agent/PLANS.md` with assumptions, checkboxes, verification evidence, review notes, and progress updates intended for the same commit as the work they describe.
+- Action: Run `./scripts/executable_ai-workflow-doctor --repo . --check` from the repository root.
+  Expected: The command exits `0` when the AI workflow surface has no objective structural errors; any semantic-conflict candidate is labeled as a non-blocking human-review warning rather than auto-resolved.
+- Action: With a declared local provenance archive available, run
+  `./scripts/executable_ai-workflow-doctor --repo . --verify-sources --check`.
+  Expected: Declared Git commits plus primary and supporting paths resolve;
+  reachable mismatches fail the gate, while an unavailable local archive is an
+  explicit non-blocking warning and remote sources are not fetched.
+- Action: Run `./scripts/executable_ai-workflow-doctor --repo . --format json --snapshot /tmp/ai-workflow-smoke.json`, then compare the unchanged repo with `--format json --compare /tmp/ai-workflow-smoke.json`.
+  Expected: The snapshot is valid deterministic schema-version-1 JSON, and the comparison reports zero active-instruction deltas with no added or resolved finding keys.
 
 ## Keyboard And Input
 
@@ -96,11 +122,23 @@ of stacking duplicates.
 - Action: Run `chezmoi apply` (or `refresh-config`) on a machine with this repo applied, then check `~/.claude/CLAUDE.md`.
   Expected: `~/.claude/CLAUDE.md` exists and contains a single `@/home/example/linux-config/dot_codex/AGENTS.md` import line, confirming Claude Code will load the shared instruction document globally.
 - Action: After `chezmoi apply`, check `~/.claude/skills/` for skill symlinks.
-  Expected: `~/.claude/skills/` exists and contains one `.md` symlink per skill directory found under `~/.agents/skills/` (e.g. `~/.claude/skills/commit-dirty.md -> ~/.agents/skills/commit-dirty/SKILL.md`). No symlinks are created for `README.md` or the `superpowers` entry because those have no top-level `SKILL.md`.
+  Expected: `~/.claude/skills/` contains one directory symlink per skill with
+  a top-level `SKILL.md` (for example,
+  `~/.claude/skills/metaprompt -> ~/.agents/skills/metaprompt`), so supporting
+  `references/`, scripts, assets, and metadata remain reachable. Managed legacy
+  `<name>.md` links are removed; `README.md` and the `superpowers` entry are not
+  linked because they have no top-level `SKILL.md`.
 - Action: Launch Claude Code in any project directory and run `/commit-dirty` (or another tracked skill).
-  Expected: Claude Code resolves the skill from `~/.claude/skills/commit-dirty.md` and follows the workflow defined in the shared `dot_agents/skills/commit-dirty/SKILL.md` source.
+  Expected: Claude Code resolves `~/.claude/skills/commit-dirty/SKILL.md` through
+  the shared directory and follows the repo-tracked workflow.
+- Action: Run `bash tests/test_claude_skill_links.sh`.
+  Expected: The isolated installer fixture links a complete skill directory,
+  exposes a supporting reference, removes only the matching managed legacy
+  link, remains idempotent, and refuses to replace a real user directory.
 - Action: After applying this repo, launch Codex and verify `/commit-dirty` still works.
-  Expected: `~/.agents/skills/commit-dirty/SKILL.md` is unchanged and Codex resolves the skill normally — the Claude skill wiring adds symlinks only and does not touch the Codex skill surface.
+  Expected: `~/.agents/skills/commit-dirty/SKILL.md` is unchanged and Codex
+  resolves the skill normally; Claude wiring adds directory symlinks only and
+  does not touch the Codex skill surface.
 
 ## Codex And Graphiti
 

@@ -21,11 +21,15 @@ metadata.
 
 - Work is active on `feat/ai-workflow-optimization` in the shared working
   tree. The approved prompt and this plan predate Task 1 implementation.
-- The full plan spans six tasks. Task 1 owns instruction routing, the ExecPlan
-  contract, Git delivery policy, matching README/smoke/provenance updates, and
-  its focused contract test. Tasks 2 through 6 remain pending.
-- The pre-existing `dot_codex/config.toml` diff and untracked
-  `dot_agents/skills/metaprompt/` are protected from Task 1 edits and staging.
+- The full plan spans six tasks. Tasks 1 through 5 now cover compact instruction
+  routing, the ExecPlan and Git delivery contracts, the deterministic doctor,
+  progressive metaprompt disclosure, context handoffs, and the evidence-backed
+  rejection of a redundant runtime skill. Task 6 implementation and final
+  verification and all required reviews are complete. This finalized plan lands
+  in the second planned commit before the verified series is pushed.
+- The pre-existing `dot_codex/config.toml` diff remains protected from edits and
+  staging. The pre-existing metaprompt baseline was hashed before its approved,
+  measured Task 3 refactor.
 - Task 1's active Git metadata scope explicitly includes
   `dot_agents/skills/commit-dirty/agents/openai.yaml` and
   `dot_agents/skills/commit-session/agents/openai.yaml`.
@@ -50,8 +54,15 @@ metadata.
   Do not run it during Task 1; Task 6 owns targeted live/tracked comparison.
 - Historical feedback may contain obsolete push cadence. Apply the newest entry
   without rewriting append-only history, and keep lessons as a pointer.
+- The pre-existing `brand-system-designer` slug is exposed from both tracked
+  skill roots. The doctor keeps this as a non-blocking warning; do not choose an
+  owner by deleting user files without explicit authorization.
 - Rollback Task 1 by reverting only its instruction, policy, test, plan, and
   documentation files. Preserve the protected config diff and metaprompt tree.
+- Roll back Tasks 2 through 6 by reverting the second planned commit, then
+  reapply chezmoi so the doctor, skills, metaprompt layout, and Claude skill-link
+  generator return to their prior tracked state. Preserve
+  `dot_codex/config.toml` and the pre-existing duplicate skill directories.
 
 ## Verification Evidence
 
@@ -110,6 +121,168 @@ metadata.
   pushes once after the complete series is verified unless the user requests
   another cadence. It performed no Git writes.
 - Status: PASS.
+
+### Task 2 Doctor Contract
+
+- Command: `python3 tests/test_ai_workflow_doctor.py`
+- Expected: All deterministic CLI, metric, drift, provenance, snapshot, and
+  exit-code contracts pass.
+- Observed: All seventeen tests passed and returned `OK`.
+- Exit status: `0`.
+- RED evidence: Before the executable existed, the same twelve-test suite
+  produced eleven expected failures for the missing CLI and executable bit.
+- Review RED evidence: Earlier regressions initially failed for a nested
+  four-backtick fence, malformed nested schema-v1 fields, and simultaneous
+  `--compare` plus `--snapshot`. A later captured RED run exposed five more
+  gaps: cross-root duplicate detection, explicit source resolution, portable
+  missing-archive behavior, cwd-independent installed invocation, and detailed
+  text comparisons. All now pass; text findings also include actionable
+  locations and provenance fields.
+- Final specialist RED evidence: two added regressions failed because relative
+  source archives used the caller CWD and valid balanced-parenthesis or
+  angle-bracket CommonMark destinations became false errors. Relative archives
+  now resolve from the audited repo root and both valid link forms pass.
+
+### Task 2 Repository And Skill Checks
+
+- Command: `./scripts/executable_ai-workflow-doctor --repo . --check`
+- Expected: Exit `0` with no objective errors in the current AI workflow
+  surface.
+- Observed at the Task 2 checkpoint: Status `pass`; zero errors, zero warnings,
+  9,817 active-instruction bytes, and 45 actual / 45 catalogued skills.
+- Exit status: `0`.
+- Command: `python3 /home/example/.codex/skills/.system/skill-creator/scripts/quick_validate.py dot_agents/skills/ai-workflow-doctor`
+- Expected: The official validator reports a valid skill.
+- Observed: `Skill is valid!`
+- Exit status: `0`.
+- Command: `./scripts/executable_ai-workflow-doctor --repo . --format json --compare /tmp/ai-workflow-baseline.json`
+- Expected: An unchanged comparison has zero metric deltas and no added or
+  resolved finding keys.
+- Observed: All three active-total deltas were zero; added, resolved, and
+  unchanged finding-key arrays were empty.
+- Exit status: `0`.
+
+### Task 2 Manual Forward Verification
+
+- Manual action: Start a context-free agent with only the instruction to run
+  the repo-tracked doctor JSON audit and report its evidence without writes.
+- Expected: It reports the structured status and metrics, does not claim a
+  semantic resolution absent from the findings, and provides the exact future
+  compare command.
+- Observed: It reported exit `0`, status `pass`, zero errors/warnings, 9,817
+  bytes, 9,817 characters, about 2,455 tokens, and 45 / 45 skills. It reported
+  no auto-resolution because findings were empty and returned the compare
+  command using `/tmp/ai-workflow-baseline.json`.
+- Status: PASS.
+
+### Task 3 Metaprompt Contract And Measurement
+
+- Command: `python3 tests/test_metaprompt_contract.py`
+- Expected: The compact entrypoint, one-hop references, activation boundary,
+  compile/gate behavior, post-go routing, metadata, and provenance exclusions
+  pass.
+- Observed: All seven tests passed and returned `OK`.
+- Exit status: `0`.
+- Initial RED evidence: The unmodified 3,442-word skill produced three failures
+  and four missing-file errors for the compact/reference/metadata contract.
+- Review RED evidence: Two added assertions then failed for the lost standalone
+  `go`/one-word-fact activation boundary and an execution reference that could
+  load before `go`; both now pass.
+- Command: `wc -wc dot_agents/skills/metaprompt/SKILL.md dot_agents/skills/metaprompt/references/*.md`
+- Observed: The always-loaded entrypoint is 404 words / 2,855 bytes, down from
+  3,442 words / 21,213 bytes. All four Markdown files total 15,312 bytes.
+- Command: `python3 /home/example/.codex/skills/.system/skill-creator/scripts/quick_validate.py dot_agents/skills/metaprompt`
+- Observed: `Skill is valid!`
+- Exit status: `0`.
+
+### Task 3 Manual Forward Verification
+
+- Manual action: Run fresh Trivial, current-source Standard, and read-only
+  Complex audit scenarios. Put `run` inside a Standard revision, then send
+  standalone `go`.
+- Expected: Trivial stays lean; the revision re-gates; standalone `go` executes;
+  current research uses official sources; the large audit selects parallel
+  workflow routing without mutating code.
+- Observed: The Trivial output was one sentence plus the gate. The revision
+  recompiled and re-gated without executing. Standalone `go` produced a cited
+  GitHub/GitLab comparison from official sources. The Complex prompt selected a
+  read-only parallel audit and, on `go`, asked for the missing logs/run IDs
+  rather than fabricating evidence.
+- Status: PASS.
+
+### Task 4 Context-Handoff Contract And Forward Verification
+
+- Command: `python3 tests/test_context_handoff_contract.py`
+- Expected: Files, ordered headings, 600-word output cap, DC evidence mapping,
+  None/Unknown semantics, failure grouping, literal next actions, metadata,
+  provenance, catalog, and doctor compatibility pass.
+- Observed: All six tests passed and returned `OK`.
+- Exit status: `0`.
+- Initial RED evidence: Before initialization, all six tests failed explicitly
+  because required skill files were absent.
+- Review RED evidence: A new literal-action assertion failed after a forward
+  output said “original command.” The skill now requires literal executable
+  commands or precise path-scoped edits and bans anaphora; the test and a fresh
+  failure-heavy scenario pass.
+- Command: `wc -w dot_agents/skills/context-handoff/SKILL.md`
+- Observed: `390`, below the 500-word skill target.
+- Command: `python3 /home/example/.codex/skills/.system/skill-creator/scripts/quick_validate.py dot_agents/skills/context-handoff`
+- Observed: `Skill is valid!`
+- Exit status: `0`.
+- Manual action: Run fresh normal, low-context, and failure-heavy scenarios.
+- Observed: All three returned the eight headings below 600 words. The normal
+  handoff mapped verified/open DCs and protected state; low-context recovery
+  kept missing facts Unknown and started from the authoritative plan; the
+  failure-heavy retry grouped stable signatures and used literal commands,
+  paths, change facts, and stop conditions without blind retries.
+- Status: PASS.
+
+### Task 6 Final Measurement And Workflow Checks
+
+- Command: `./scripts/executable_ai-workflow-doctor --repo . --verify-sources --format json --compare /tmp/ai-workflow-baseline.json --snapshot /tmp/ai-workflow-final.json --check`
+- Expected: A passing schema-v1 final snapshot, resolved declared local source
+  evidence, no objective errors, and no active-instruction regression from the
+  Task 2 baseline; any reviewer-added diagnostic must remain explicit.
+- Observed: Exit `0`, status `pass`, zero errors, one warning, 46 actual / 46
+  catalogued skills, 9,817 active bytes, and about 2,455 estimated tokens. All
+  active-total deltas are zero. The added finding key
+  `duplicate_active_skill_slug:brand-system-designer` identifies two
+  pre-existing tracked copies across `.agents/skills/` and
+  `dot_agents/skills/`; they remain because deleting user-owned files requires
+  explicit authorization. The local archive commit and all declared
+  primary/supporting paths resolved. The written snapshot remains
+  comparison-free and reusable.
+- Command: `chezmoi -S /home/example/linux-config apply -n -v /home/example/scripts/ai-workflow-doctor /home/example/.agents/skills/ai-workflow-doctor /home/example/.agents/skills/context-handoff /home/example/.agents/skills/metaprompt`
+- Expected: Render the affected install surface without writing live files.
+- Observed: Exit `0`; dry-run output proposed the cwd-independent installed
+  doctor command plus doctor, context-handoff, and metaprompt
+  source/metadata/reference changes under `~/.agents/skills/`.
+- Command: `cmp -s /home/example/.codex/config.toml dot_codex/config.toml`
+- Expected: Compare protected live/tracked config without overwriting either.
+- Observed: Exit `0`; both SHA-256 values were
+  `3edd706e3cc03132764d9d0a1b741e0713f42e39dc16a6018ab205f9d1a85e2e`.
+- Command: `bash tests/test_claude_skill_links.sh`
+- Expected: Directory-link installation preserves supporting references,
+  removes only managed legacy links, remains idempotent, and refuses to
+  replace a real user directory.
+- RED/GREEN: The initial fixture failed against legacy flat `<name>.md` links;
+  after the directory-link migration it passed all reference reachability,
+  cleanup, idempotency, and conflict-safety checks.
+- Exit status: `0`.
+- Command: `python3 -m unittest discover -s tests -p 'test_*.py'`
+- Expected: All Python workflow contracts pass.
+- Observed: 41 tests passed in 2.220 seconds.
+- Exit status: `0`.
+- Commands: `bash tests/scripts/executable_codex_test.sh` and
+  `bash tests/test_refresh_config_function.sh`
+- Expected: Existing Codex and refresh-config workflow regressions pass.
+- Observed: Both exited `0`. Direct file execution first returned `126` because
+  these test files are non-executable; invoking their Bash interpreter ran the
+  tests successfully. The protected config hash remained unchanged afterward.
+- Command: `./scripts/executable_readme-recruiter-sync`
+- Expected: The required README gate passes without an unrelated rewrite.
+- Observed: `pass_no_change`.
+- Exit status: `0`.
 
 ## Global Constraints
 
@@ -183,42 +356,53 @@ executable plan contract, and one push policy.
 
 ```text
 ai-workflow-doctor [--repo PATH] [--format text|json]
-                   [--snapshot PATH] [--compare PATH] [--check]
+                   [--snapshot PATH] [--compare PATH] [--verify-sources]
+                   [--check]
 ```
 
 **Produces:** Deterministic instruction metrics and structural validation.
 
-- [ ] Run baseline agent scenarios without the skill and record concrete
+- [x] Run baseline agent scenarios without the skill and record concrete
       omissions or over-broad behavior.
-- [ ] Write CLI tests first for text/JSON output, snapshots, comparisons,
+- [x] Write CLI tests first for text/JSON output, snapshots, comparisons,
       normalized duplicate blocks of at least 200 characters, broken local
       references, missing plan contracts, uncatalogued skills, missing source
       provenance, and `--check` exit codes; verify they fail.
-- [ ] Implement the minimal standard-library CLI to pass the tests. Semantic
+- [x] Implement the minimal standard-library CLI to pass the tests. Semantic
       conflicts must be reported for agent review, not guessed by regex.
-- [ ] Initialize and write the concise skill, `SOURCE.md`, and
+- [x] Initialize and write the concise skill, `SOURCE.md`, and
       `agents/openai.yaml`; point it at the executable instead of duplicating
       CLI documentation.
-- [ ] Run code tests, skill validation, and forward scenarios before marking
+- [x] Run code tests, skill validation, and forward scenarios before marking
       this task complete.
 
-### Task 3: Add Research Routing To Metaprompt
+### Task 3: Reduce Metaprompt's Always-Loaded Context
 
 **Files:**
 
 - Modify: `dot_agents/skills/metaprompt/SKILL.md`
-- Create: `dot_agents/skills/metaprompt/references/research-routing.md`
-- Create: `dot_agents/skills/metaprompt/SOURCE.md`
+- Create: `dot_agents/skills/metaprompt/references/compilation-rules.md`
+- Create: `dot_agents/skills/metaprompt/references/execution-routing.md`
+- Create: `dot_agents/skills/metaprompt/references/examples.md`
 - Create/update: `dot_agents/skills/metaprompt/agents/openai.yaml`
+- Test: `tests/test_metaprompt_contract.py`
 
-**Produces:** Conditional broad-to-narrow retrieval, competing-hypothesis
-queries, prior-evidence retrieval, bounded output, and saturation stopping.
+**Produces:** A behavior-preserving, progressively disclosed metaprompt whose
+always-loaded `SKILL.md` is under 500 words while detailed compilation,
+execution-routing, and example guidance remains available one hop away.
 
-- [ ] Run baseline scenarios against the unmodified skill and record failures.
-- [ ] Add one short conditional hook; move enough detail out of `SKILL.md` that
-      its byte count does not increase.
-- [ ] Preserve the mandatory compiled-prompt output and explicit `go` gate.
-- [ ] Validate metadata and forward-test trivial, standard, and complex
+- [x] Run baseline scenarios against the unmodified skill. Its compiled prompt
+      required current sources, narrowed queries, prior-evidence reuse,
+      parallel independent checks, and a saturation stop, so a second
+      research-routing policy would be redundant. The post-refactor standalone
+      `go` forward run separately executed official-source research.
+- [x] Write the extraction contract first and verify it fails on the unmodified
+      3,442-word skill and missing reference/metadata files.
+- [x] Extract detailed rules mechanically into three one-hop references; do
+      not add a baseline-shaped `research-routing.md` or source provenance for
+      behavior that was not adapted from the archive.
+- [x] Preserve the mandatory compiled-prompt output and explicit `go` gate.
+- [x] Validate metadata and forward-test trivial, standard, and complex
       research prompts before continuing.
 
 ### Task 4: Add Compact Context Handoffs
@@ -230,48 +414,52 @@ queries, prior-evidence retrieval, bounded output, and saturation stopping.
 Constraints, Decisions, Current State, Evidence and Failed Attempts, Artifacts,
 Blockers, and Ordered Next Actions.
 
-- [ ] Run baseline handoff scenarios without the skill and capture omissions,
+- [x] Run baseline handoff scenarios without the skill and capture omissions,
       transcript duplication, or weak next actions.
-- [ ] Initialize the skill and write the minimum positive output contract that
+- [x] Initialize the skill and write the minimum positive output contract that
       addresses those failures.
-- [ ] Forward-test normal handoff, low-context, and failure-heavy scenarios;
+- [x] Forward-test normal handoff, low-context, and failure-heavy scenarios;
       confirm referenced artifacts replace large copied content.
-- [ ] Validate metadata and word budget before continuing.
+- [x] Validate metadata and word budget before continuing.
 
-### Task 5: Add Runtime-Surface Verification
+### Task 5: Confirm Runtime Verification Is Already Covered
 
-**Files:** Create `dot_agents/skills/runtime-verify/` with `SKILL.md`,
-`SOURCE.md`, and `agents/openai.yaml`.
+**Files:** Record the baseline decision in this plan and
+`docs/ai-workflow-optimization.md`; do not create a redundant skill.
 
-**Produces:** Verification records with Action, Expected, Observed, Evidence,
-and one Adjacent Edge Probe for CLI, API, browser, package, or rendered-config
-surfaces.
+**Produces:** An evidence-backed `already covered` decision that avoids another
+always-available routing layer and its activation ambiguity.
 
-- [ ] Run baseline scenarios without the skill and capture test-only or
-      evidence-free completion claims.
-- [ ] Initialize a concise routing skill that composes existing Playwright,
-      screenshot, and verification skills; it must never replace automated
-      tests.
-- [ ] Forward-test CLI, browser, and no-runtime-surface scenarios.
-- [ ] Validate metadata and ensure the skill abstains when automated tests
-      already prove the complete observable behavior.
+- [x] Run a context-free baseline scenario without the proposed skill.
+- [x] Confirm the existing verification rules reject test-only completion,
+      require the actual user entrypoint, rendered/install evidence, invalid
+      input, and consider an adjacent probe when it would add useful evidence.
+- [x] Reject `runtime-verify` as redundant; preserve the measured baseline in
+      `.superpowers/sdd/runtime-baseline-report.md` and the durable decision in
+      the optimization document.
 
 ### Task 6: Integrate Documentation, Smoke Coverage, And Measurement
 
 **Files:** Modify `README.md`, `dot_agents/skills/README.md`,
-`docs/smoke-tests.md`, `docs/ai-workflow-optimization.md`, and this plan.
+`docs/smoke-tests.md`, `docs/ai-workflow-optimization.md`,
+`run_after_install-claude-skills.sh.tmpl`, `tests/test_claude_skill_links.sh`,
+and this plan.
 
-- [ ] Record the adopt/adapt/already-covered/reject matrix and source paths.
-- [ ] Document the doctor CLI, optimized instruction hierarchy, shared
-      Codex/Claude skill installation, and the three new capabilities.
-- [ ] Add stable Action/Expected smoke tests for doctor checks, metaprompt
+- [x] Record the adopt/adapt/already-covered/reject matrix and source paths.
+- [x] Document the doctor CLI, optimized instruction hierarchy, shared
+      Codex/Claude skill installation, two new capabilities, and the
+      behavior-preserving metaprompt refactor.
+- [x] Add stable Action/Expected smoke tests for doctor checks, metaprompt
       research routing, handoff shape, runtime verification, and skill
       discovery.
-- [ ] Compare post-change metrics to `/tmp/ai-workflow-baseline.json` and record
+- [x] Replace legacy flat Claude skill links with documented directory links so
+      one-hop references remain reachable; cover migration, idempotency, and
+      non-symlink conflict safety with an isolated Bash regression.
+- [x] Compare post-change metrics to `/tmp/ai-workflow-baseline.json` and record
       the results without inventing unavailable runtime token measurements.
-- [ ] Run focused tests, full workflow tests, README gate, targeted chezmoi
+- [x] Run focused tests, full workflow tests, README gate, targeted chezmoi
       dry-run, and live/ tracked Codex config comparison.
-- [ ] Request task and whole-branch reviews; fix every Critical or Important
+- [x] Request task and whole-branch reviews; fix every Critical or Important
       issue and re-run covering tests.
 
 ## Commit Plan
@@ -300,6 +488,29 @@ after the complete verified series.
 - Final re-review found no Critical or Important findings after a context-free,
   read-only manual routing check was recorded as `PASS` and covered by the
   contract test.
+- Task 2 completed with seventeen passing doctor tests and a valid compact skill.
+  Its pre-review checkpoint had a clean 45 / 45 catalog audit, zero errors or
+  warnings, a stable snapshot comparison, and a passing context-free forward
+  scenario; final reviewer-added diagnostics are recorded under Task 6.
+- Task 3 completed with seven passing contract tests, official validation,
+  Trivial/Standard/Complex forward scenarios, and reviewer-driven activation
+  and post-go routing fixes. Always-loaded metaprompt bytes fell 86.5%.
+- Task 4 completed with six passing contract tests, official validation, three
+  forward scenarios, and a reviewer-driven literal-action regression. Final
+  skill size is 390 words; skill semantics have no remaining Critical or
+  Important findings.
+- Task 5 rejected a redundant runtime skill after its context-free baseline
+  already demanded the real entrypoint, observed evidence, invalid input, and
+  recommended an adjacent probe when relevant.
+- Final clean-room re-review found no Critical or Important findings and found
+  no exact normalized 80-character lines or 15-word windows copied from the
+  source archive across the changed text files.
+- Final doctor re-review found no Critical or Important findings after RED/GREEN
+  fixes anchored relative source archives to the audited repo and accepted
+  balanced, escaped, and angle-bracket CommonMark destinations.
+- Final whole-branch review found no Critical or Important findings after all
+  41 Python tests, shell regressions, three skill validators, doctor gates,
+  README gate, chezmoi dry-run, config hashes, and diff checks passed.
 - Combined active instruction bytes fell from 34,805 to 9,817 (71.8%).
-- The protected `dot_codex/config.toml` diff and metaprompt baseline were not
-  modified. Tasks 2 through 6 remain pending.
+- The protected `dot_codex/config.toml` diff remains untouched and excluded from
+  the finalized implementation commit.

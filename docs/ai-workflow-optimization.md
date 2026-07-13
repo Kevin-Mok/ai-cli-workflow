@@ -107,6 +107,146 @@ Post-change active instruction sizes:
 The active pair fell by 24,988 bytes, or 71.8%, from the 34,805-byte
 baseline. The protected metaprompt hash remained unchanged.
 
+## AI Workflow Doctor
+
+Task 2 adds `scripts/executable_ai-workflow-doctor` and the matching
+`ai-workflow-doctor` skill. The standard-library CLI reports exact UTF-8 bytes,
+Unicode characters, a labeled `ceil(characters/4)` token estimate, SHA-256
+digests, skill-catalog alignment, normalized instruction duplication, bounded
+local-reference health, plan-contract presence, cross-root duplicate skill
+slugs, and source-provenance errors. Repeated section headings with different
+bodies are only semantic-review candidates: the tool never guesses a winner or
+changes policy.
+
+The versioned JSON report is deterministic and omits timestamps, absolute repo
+paths, mtimes, and Git state. `--snapshot` captures that report; `--compare`
+reports metric deltas plus stable added, resolved, and unchanged finding keys.
+They can run together: the comparison is printed while the new snapshot stays
+a reusable base report without an embedded comparison. Schema-v1 snapshots are
+validated through the nested active totals and finding keys before comparison.
+Normal audits exit `0` even when they report findings, while `--check` exits `1`
+for objective errors and leaves semantic warnings non-blocking. Usage, schema,
+decoding, and I/O failures exit `2`. The default report is repository-local and
+deterministic. Opt-in `--verify-sources` resolves declared local Git archives,
+commits, primary paths, and supporting paths; an unavailable archive is a
+non-blocking warning while a reachable mismatch is an error. Remote sources
+remain structurally validated without network access. Relative local archive
+paths resolve from the audited repository root, independent of caller CWD.
+
+TDD and repository evidence:
+
+- The initial twelve-test contract first produced eleven expected failures
+  because the executable and executable bit did not exist.
+- Independent review added regressions for CommonMark fences, malformed nested
+  snapshots, combined compare plus snapshot output, actionable text details,
+  cwd-independent installed invocation, explicit local source resolution with
+  portable missing-archive behavior, and cross-root duplicate skills. The
+  captured review RED run exposed five expected gaps; after the fixes, all
+  covered behavior passed. A final specialist RED then caught caller-CWD
+  dependence for relative archives and false errors for balanced-parenthesis or
+  angle-bracket CommonMark destinations. After those fixes, all seventeen tests
+  passed without a traceback. The official skill validator returned
+  `Skill is valid!`.
+- The first live audit found two broken cross-skill links and two uncatalogued
+  skills. The link targets now point to the existing `frontend-design`
+  references, and `brand-system-designer`, `metaprompt`, and the doctor are in
+  the catalog.
+- At the Task 2 checkpoint, the repo passed `--check` with zero errors, zero
+  warnings, 9,817 active-instruction bytes, and 45 actual / 45 catalogued
+  skills.
+- `/tmp/ai-workflow-baseline.json` is the Task 2 comparison baseline. An
+  immediate comparison reported zero active-total deltas and no finding-key
+  changes.
+- A context-free forward run reproduced the same status and metrics, did not
+  auto-resolve anything, and selected the explicit baseline compare command
+  without adding evidence-free claims.
+
+The adaptation is clean-room and pinned in
+`dot_agents/skills/ai-workflow-doctor/SOURCE.md` to source revision
+`5c86715f453f0eca188451a48bf5b165831d8b29` and
+`Anthropic/Claude Code/bundled-skills/doctor/SKILL.md`.
+
+## Metaprompt Progressive Disclosure
+
+The existing metaprompt already compiled a context-free research prompt that
+required current official sources, narrowed follow-up queries, prior-evidence
+reuse, parallel independent checks, and a saturation stop condition. That
+compile-time contract made a second archive-shaped research policy redundant,
+so no `research-routing.md` or archive provenance file was added. Separately,
+the post-refactor standalone `go` forward scenario executed the compiled prompt
+and produced an official-source comparison.
+
+Instead, Task 3 moved detailed compilation, execution-routing, and example
+rules into three conditional one-hop references. The entrypoint retains the
+activation contract, Trivial path, four-stage compile/gate flow, exact output
+shape, standalone-run boundary, logistics riders, first-match route order,
+portability, and user-language behavior.
+
+| Metaprompt surface | Before | After | Change |
+| --- | ---: | ---: | ---: |
+| Always-loaded `SKILL.md` bytes | 21,213 | 2,855 | -86.5% |
+| Always-loaded `SKILL.md` words | 3,442 | 404 | -88.3% |
+| Complete skill Markdown bytes | 21,213 | 15,312 | -27.8% |
+
+The seven-test extraction contract first failed on the 3,442-word entrypoint
+and missing references/metadata, then passed after extraction. The official
+skill validator also passed. Forward scenarios cover a lightweight Trivial
+prompt, a current-source comparison whose revision contains `run` but must
+re-gate, a standalone `go`, and a read-only multi-hypothesis CI audit.
+
+## Compact Context Handoffs
+
+`context-handoff` creates a maximum 600-word continuation artifact rather than
+copying a transcript. It maps numbered done criteria to evidence, distinguishes
+verified `None` from unchecked `Unknown`, groups repeated failures by stable
+signature and retry condition, links large artifacts, preserves literal
+protected state, and gives every next action an owner, action, expected result,
+and stop condition.
+
+The official initializer created the skill scaffold. Its six-test contract
+first failed only because the skill files were absent, then passed with a
+390-word `SKILL.md`; the official validator and workflow doctor also passed.
+The clean-room adaptation is pinned in
+`dot_agents/skills/context-handoff/SOURCE.md` to the recorded archive revision,
+with the continuation prompt as the primary source and compact/rewind material
+listed as supporting sources.
+
+## Adoption Decisions
+
+| Candidate pattern | Decision | Local result |
+| --- | --- | --- |
+| One canonical instruction body with small routing shims | Adapt | Active instruction context fell 71.8% while preserving repo boundaries. |
+| Deterministic workflow health check | Adopt | Standard-library doctor with versioned JSON, stable snapshots, drift checks, and human-only semantic review. |
+| Evidence-linked compact continuation | Adopt | `context-handoff` adds bounded, retry-safe, acceptance-mapped handoffs. |
+| Progressive disclosure for a large skill | Adapt | Metaprompt's always-loaded bytes fell 86.5%; detailed rules remain conditional. |
+| Additional metaprompt research-routing policy | Already covered | Baseline compilation required narrowed queries, evidence reuse, parallel checks, official citations, and a saturation stop; a separate post-refactor `go` run executed that research. |
+| Separate runtime-verification skill | Already covered | Existing rules already reject test-only completion, require the real entrypoint, rendered/install evidence, and invalid-input coverage, and consider an adjacent probe when relevant. |
+| Vendor prompt bodies, hidden policy, tool schemas, personalities, or binary-extracted skills | Reject | They are brittle, non-portable, unsafe to copy, and unnecessary for the local workflow outcomes. |
+
+Skills continue to install from this repo to `~/.agents/skills/` for Codex.
+Claude Code's documented personal-skill layout is
+`~/.claude/skills/<name>/SKILL.md`, with supporting files beside the entrypoint,
+and its documentation supports skill-directory symlinks. The post-apply
+generator now links each whole `~/.agents/skills/<name>` directory into that
+layout, removes only its matching managed legacy `<name>.md` link, and refuses
+to overwrite a real destination directory. This preserves metaprompt's
+conditional references without creating a second source of truth. See the
+[official Claude Code skills documentation](https://code.claude.com/docs/en/skills).
+
+The final schema-v1 snapshot at `/tmp/ai-workflow-final.json` passes with zero
+errors, one warning, 46 actual / 46 catalogued skills, and 9,817
+active-instruction bytes. All active-total deltas from the Task 2 baseline are
+zero. Reviewer-added detection contributes one finding key for the pre-existing
+`brand-system-designer` slug in both `.agents/skills/` and
+`dot_agents/skills/`. Both tracked copies are retained because repo policy
+forbids silently deleting user-owned files; the non-blocking warning keeps the
+ownership ambiguity visible until deletion is explicitly authorized. Explicit
+source verification resolved the pinned local archive commit and all declared
+primary/supporting paths. A targeted chezmoi dry-run renders all three affected
+installed skills without writes. The live and protected tracked Codex config
+compare byte-for-byte, so `refresh-config` was not used to rewrite the
+user-owned diff.
+
 ## Instruction Provenance
 
 The previous canonical document merged repo-agnostic guidance from these

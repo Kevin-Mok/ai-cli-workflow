@@ -85,7 +85,7 @@ class AIWorkflowContractTest(unittest.TestCase):
             "`./scripts/executable_readme-recruiter-sync`",
             "dot_agents/skills/commit-dirty/agents/openai.yaml",
             "dot_agents/skills/commit-session/agents/openai.yaml",
-            "- [ ] Implement the minimal standard-library CLI to pass the tests. Semantic",
+            "Implement the minimal standard-library CLI to pass the tests. Semantic",
         ):
             self.assertIn(required_evidence, plan)
 
