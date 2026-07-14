@@ -30,12 +30,14 @@ is done.
 | Graphiti MCP with Neo4j | [`dot_codex/config.toml`](dot_codex/config.toml), [`scripts/executable_codex`](scripts/executable_codex), and [`docs/graphiti-mcp-codex.md`](docs/graphiti-mcp-codex.md) | Adds a retrievable memory layer for multi-session work where provenance and evolving context matter. |
 | Shell and terminal tooling | [`dot_config/fish/config.fish.tmpl`](dot_config/fish/config.fish.tmpl), [`dot_tmux.conf`](dot_tmux.conf), [`dot_config/st/config.def.h.tmpl`](dot_config/st/config.def.h.tmpl), [`dot_config/kitty/kitty.conf`](dot_config/kitty/kitty.conf), and [`dot_config/i3/config.tmpl`](dot_config/i3/config.tmpl) | Optimizes for terminal-first execution and multiple parallel panes, with `kitty` as the default terminal, `st` kept ready as the low-friction alternate, and tmux handling the heavier session workflow. |
 | Python and Bash automation | [`scripts/`](scripts/) and [`dot_config/fish/functions/refresh-config.fish`](dot_config/fish/functions/refresh-config.fish) | Keeps repeatable operations small, inspectable, and version-controlled instead of burying them in chat or muscle memory. |
+| Markdown, Obsidian, and deterministic Python | [`second-brain/`](second-brain/), [the session skill](dot_agents/skills/second-brain-session/SKILL.md), and [the command package](scripts/second_brain/) | Makes personal and project context reviewable across Codex and Claude while keeping private raw capture outside Git, confirmation-gating public event writes, and enforcing schema, containment, approval, and retry-safe checks at each mutation boundary. |
 
 ## Table Of Contents
 
 - [Operating Model At A Glance](#operating-model-at-a-glance)
 - [AI Layer Highlights](#ai-layer-highlights)
 - [Core Components](#core-components)
+- [Second Brain Context Layer](#second-brain-context-layer)
 - [Graphiti Memory Layer](#graphiti-memory-layer)
 - [Install And Bootstrap](#install-and-bootstrap)
 - [Day-to-Day Use](#day-to-day-use)
@@ -55,6 +57,7 @@ AGENTS.repo.md
 dot_codex/
 dot_agents/
 plans/
+second-brain/
 ```
 
 Those paths define how the AI layer behaves:
@@ -72,6 +75,9 @@ Those paths define how the AI layer behaves:
 - [`plans/`](plans/) is where non-trivial work becomes explicit,
   checklisted, and reviewable under the
   [ExecPlan contract](.agent/PLANS.md).
+- [`second-brain/`](second-brain/) is the public-sanitized Markdown context
+  layer. Private raw events and migration ledgers stay in XDG state instead of
+  entering the repository.
 
 ## AI Layer Highlights
 
@@ -103,6 +109,9 @@ high-leverage properties:
   with setup, usage, command flags, and repo positioning.
 - Non-trivial work is expected to move through tracked plans instead of
   disappearing into chat scrollback.
+- The Second Brain turns one confirmed ExampleProject outcome, deterministic
+  session capture, boss-readable closeout, and copy-first migration into a
+  tested cross-agent workflow instead of another unstructured note dump.
 
 ## Core Components
 
@@ -333,6 +342,32 @@ This split only works because every pane inherits the same instruction
 chain, config defaults, trust rules, and reusable skills. The result is
 parallelism with less chaos.
 
+## Second Brain Context Layer
+
+The tracked [Second Brain vault](second-brain/) gives Codex and Claude one
+public-sanitized front door for profile context, active projects, curated
+resources, and daily summaries. Its PARA-style Markdown remains directly
+inspectable, while the shared
+[second-brain-session skill](dot_agents/skills/second-brain-session/SKILL.md)
+retrieves only the context relevant to the current session.
+
+The engineering boundary matters more than the folder tree:
+
+- raw session events stay in private XDG state with 0700/0600 permissions
+- confirmed tracked writes use exact versioned JSON schemas and stable event IDs
+- the first confirmed ExampleProject focus is reused for the day instead of silently
+  being replaced
+- the doctor checks structure, privacy, ownership, imports, hard links, and LFS
+- migration is copy-first, text-only, approval-bound, resumable, and
+  checksum-verifiable
+- protected upgrades preview one batch approval and make dated exact-byte
+  backups without overwriting existing files
+
+This layer links to the existing canonical owners for preferences, lessons,
+plans, tasks, and temporal memory; it does not duplicate them. The full
+privacy, migration, recovery, and exit-code contract is in the
+[Second Brain operator guide](docs/second-brain.md).
+
 ## Graphiti Memory Layer
 
 Graphiti is the memory and retrieval layer that sits beside the repo's
@@ -406,6 +441,11 @@ installs the latest release archive into `~/.codex/superpowers` and
 writes `~/.agents/skills/superpowers` as a symlink to its `skills/`
 directory.
 
+The same apply installs the Second Brain command and shared session skill. The
+tracked source command remains available as
+`scripts/executable_second-brain`, and the installed `second-brain` command
+works from unrelated directories without sudo.
+
 To use the AI layer after the dotfiles are in place, run the
 repo-managed wrapper directly, or make sure it is the `codex` command
 that wins on your `PATH`:
@@ -446,6 +486,14 @@ Codex config back into the repo before running `chezmoi apply`.
    changes, especially for install steps, usage, command flags, the
    repo-based tech stack section, and recruiter-facing positioning.
 
+For a context-aware work session, start with
+`second-brain status --format json`, confirm exactly one measurable ExampleProject
+outcome, and let the shared skill use `focus` and `closeout` only after
+confirmation. Use `doctor --format json --check` before trusting structural
+changes. Migration and protected upgrades always start with their read-only
+inventory, plan, or dry-run steps; see the
+[operator guide](docs/second-brain.md) before applying either.
+
 ## Core Command Reference
 
 These are the core entrypoints the README depends on. The flags and
@@ -459,7 +507,7 @@ source in this repo.
 | `chezmoi -S "$PWD" apply` | Apply the tracked source state from this clone into `$HOME`. | `-S` / `--source` uses this repo as the source state. `-P` / `--parent-dirs` is useful when you apply a nested target and also want its parent directories handled. |
 | `refresh-config` | Snapshot the live Codex config into the repo, then reapply the chezmoi-managed environment layer. | No user-facing flags. It copies `~/.codex/config.toml` into `dot_codex/config.toml`, runs `chezmoi apply`, syncs shortcuts, and reloads fish. |
 | `sync-superpowers-release` | Refresh the externally managed `obra/superpowers` skill bundle from the latest GitHub release archive through chezmoi. | `--dry-run` previews the release refresh without writing files. `LINUX_CONFIG_SOURCE` points the helper at this repo when it is not checked out at `$HOME/linux-config`. |
-| `./scripts/executable_ai-workflow-doctor` | Audit the repo's AI instruction and skill surface, or capture a stable before/after measurement for workflow optimization. | `--repo PATH` selects the repository. `--format text|json` selects human or machine output. `--snapshot PATH` writes a deterministic JSON baseline; `--compare PATH` compares the current report with one. `--verify-sources` resolves declared local source archives when available. `--check` exits nonzero for objective errors while review findings remain non-blocking warnings. |
+| `./scripts/executable_ai-workflow-doctor` | Audit the repo's AI instruction and skill surface, or capture a stable before/after measurement for workflow optimization. | `--repo PATH` selects the repository. `--format text\|json` selects human or machine output. `--snapshot PATH` writes a deterministic JSON baseline; `--compare PATH` compares the current report with one. `--verify-sources` resolves declared local source archives when available. `--check` exits nonzero for objective errors while review findings remain non-blocking warnings. |
 | `./scripts/executable_apply-pywal-theme <wallpaper>` | Regenerate the active `pywal` theme through the repo-owned wrapper so wallpaper changes also refresh kitty and the i3 color resources this repo depends on. | Pass an image path directly, or pass raw `wal` flags when you need that lower-level control. The wrapper runs `wal --saturate 0.8 -e`, reloads Xresources, refreshes running kitty windows when the socket is available, and regenerates the derived i3 palette file. |
 | `./scripts/executable_screenshot-all-monitors` | Save one combined `scrot` capture of the full X virtual desktop, covering every active monitor in one image. | No flags. Saves to `/home/example/Pictures/screenshots/desktop/unsorted/screenshot-YYYY-MM-DD_HH:MM:SS.png`. `SCREENSHOT_ALL_MONITORS_DIR`, `SCREENSHOT_ALL_MONITORS_SCROT`, and `SCREENSHOT_ALL_MONITORS_DATE` override the destination, capture binary, and timestamp binary for tests or alternate hosts. |
 | `./scripts/executable_setup-st.sh` | Render the tracked `st` config, sync it into your `st` source checkout, and install the compiled terminal you actually want to use. | `--source-dir` points the script at a non-default `st` checkout path. `--skip-install` only refreshes `~/.config/st/config.def.h` plus the source-tree `config.def.h` and prints the exact `sudo make -C ... install` command instead of running it. `--clone-if-missing` clones the official upstream source from `https://git.suckless.org/st` into the target checkout path before syncing and building. |
@@ -467,6 +515,10 @@ source in this repo.
 | `sudo ./scripts/executable_update-chrome.sh` | Check the installed Google Chrome apt package version and upgrade it when the Google repo has a newer build. | `--check` prints the installed and candidate versions without modifying the system. With no flags, the script refreshes apt metadata and upgrades only `google-chrome-stable` when needed. |
 | `"$HOME/scripts/codex"` or `codex` when that wrapper wins on `PATH` | Start Codex in the repo so the tracked instruction chain and config take effect. The repo wrapper also ensures the Graphiti sidecar command is running first. | `-C` / `--cd` sets the repo root when you launch from another directory. `--search` enables live web search for tasks that need current external information. `CODEX_WRAPPER_GRAPHITI_CWD` and `CODEX_WRAPPER_STATE_DIR` override the wrapper's Graphiti checkout path and state directory. |
 | `codex mcp list --json` | Verify which MCP servers Codex is loading from the tracked config. | `--json` emits machine-readable output that is easier to inspect or diff. |
+| `second-brain status` plus `capture`, `focus`, and `closeout` | Retrieve targeted context, keep raw session text private, and persist only explicitly confirmed public-safe focus or closeout records. | `status --format text\|json`; `capture --kind raw-session\|personal-decision --payload PATH_OR_DASH`; `focus --payload PATH_OR_DASH`; `closeout --payload PATH_OR_DASH`. Payload shapes live in the [routing reference](dot_agents/skills/second-brain-session/references/routing.md). |
+| `second-brain doctor` | Audit the tracked vault for structure, privacy, ownership, import-frontmatter, hard-link, and Git LFS errors without mutating it. | `--format text\|json` selects output. `--check` exits 1 when objective errors exist. |
+| `second-brain migrate` | Inventory and plan selected external text, copy one explicitly approved batch into the archive, or verify its private resume ledger. | Subcommands are `inventory --source PATH` with repeatable absolute roots, `plan --inventory PATH`, `apply --plan PATH --approve SHA256`, and `verify --ledger PATH`. Follow [the copy-first procedure](docs/second-brain.md#copy-first-text-migration); no initial migration is automatic. |
+| `second-brain upgrade` | Preview append-only protected-vault changes and exact-byte dated backups. | `--dry-run` prints the current batch and approval SHA. `--apply --approve SHA256` accepts only that unchanged batch; the current schema-v1 preview has zero pending operations. |
 
 ## Reproducibility Through Chezmoi
 

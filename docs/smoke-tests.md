@@ -69,25 +69,35 @@ of stacking duplicates.
 
 ## Second Brain
 
-- Action: Run `scripts/executable_second-brain status --format json` from the
-  repository root, then run the applied `second-brain status --format json`
-  command from an unrelated directory.
-  Expected: Both entrypoints read the chezmoi source vault, report schema
-  version 1, the Toronto-local date, the three approved active projects, Inbox
-  state, and up to three recent Daily Notes without dumping private raw text or
-  modifying tracked files.
-- Action: Start a fresh Codex or Claude session that needs ExampleProject context and
-  invoke the Second Brain session workflow.
-  Expected: The agent reads targeted context rather than the whole vault,
-  proposes exactly one measurable ExampleProject outcome, waits for confirmation,
-  persists the first confirmed focus for that date, reuses it across later
-  sessions, and does not commit or push.
-- Action: In an isolated fixture, repeat the same confirmed focus, raw-capture,
-  and closeout event IDs.
-  Expected: Each first write reports `created` or `updated`; every repeat
-  reports `noop`; raw text stays in private XDG state with likely secrets
-  redacted; and closeout is rejected unless its planned result matches the
-  confirmed ExampleProject focus.
+- Action: scripts/executable_second-brain status --format json
+  Expected: The source entrypoint reports schema version 1, the Toronto-local
+  date, the three approved active projects, Inbox state, and up to three recent
+  Daily Notes without exposing raw text or modifying tracked files.
+- Action: env -C /tmp second-brain status --format json
+  Expected: The installed command resolves the chezmoi source vault from an
+  unrelated directory and reports the same safe status fields.
+- Action: scripts/executable_second-brain doctor --format text
+  Expected: The read-only text audit reports a passing vault without printing
+  private raw capture or changing tracked files.
+- Action: scripts/executable_second-brain doctor --format json --check
+  Expected: The deterministic schema-version-1 report exits 0 with no objective
+  errors; unsafe imports, hard links, visibility, secrets, and non-LFS media
+  would make the check fail without leaking their content.
+- Action: scripts/executable_second-brain migrate --help
+  Expected: Help lists inventory, plan, apply, and verify without reading or
+  copying any migration source.
+- Action: python3 -B -m unittest tests.test_second_brain_migration tests.test_second_brain_migration_apply -v
+  Expected: Fixture-only inventory, approval, source-policy, collision,
+  exclusive-create, resume, and checksum contracts pass; no real user path is
+  migrated.
+- Action: scripts/executable_second-brain upgrade --dry-run
+  Expected: The read-only schema-v1 preview exits 0 with an empty operations
+  list for the complete initial vault and changes no file.
+- Action: python3 -B -m unittest tests.test_second_brain_command tests.test_second_brain_concurrency -v
+  Expected: Fixture-only capture, focus, and closeout retries are idempotent,
+  changed payloads and concurrent editor saves conflict safely, closeout rolls
+  back only its own unchanged write, raw text stays in private XDG state, and
+  a held mutation lock blocks writes until it is released.
 
 ## Repo Instructions
 

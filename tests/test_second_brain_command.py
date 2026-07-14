@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import fcntl
 import json
 import os
 import shutil
@@ -325,6 +326,55 @@ class SecondBrainCommandTest(unittest.TestCase):
         self.assertNotIn("Traceback", result.stderr)
         self.assertEqual(outside_lock.read_text(encoding="utf-8"), "DO_NOT_TOUCH")
         self.assertFalse((self.state_home / "second-brain" / "raw").exists())
+
+    def test_capture_rejects_lock_contention_then_succeeds_after_release(self) -> None:
+        lock_dir = self.state_home / "second-brain" / "locks"
+        lock_dir.mkdir(parents=True, mode=0o700)
+        lock_path = lock_dir / "mutation.lock"
+        lock_path.touch(mode=0o600)
+        payload = {
+            **self.common_payload("decision-lock-contention-001"),
+            "title": "Retry after lock contention",
+            "summary": "A released mutation lock permits the same safe capture.",
+            "target": "00 Context/Decisions.md",
+            "links": [],
+            "visibility": "public-sanitized",
+            "confirmed": True,
+        }
+        before = self.vault_snapshot()
+
+        with lock_path.open("a+", encoding="utf-8") as lock_stream:
+            fcntl.flock(lock_stream.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+            blocked = self.run_command(
+                "capture",
+                "--kind",
+                "personal-decision",
+                "--payload",
+                "-",
+                payload=payload,
+            )
+
+        self.assertEqual(blocked.returncode, 2)
+        self.assertEqual(blocked.stdout, "")
+        self.assertIn("already running", blocked.stderr)
+        self.assertNotIn("Traceback", blocked.stderr)
+        self.assertEqual(self.vault_snapshot(), before)
+
+        retried = self.run_command(
+            "capture",
+            "--kind",
+            "personal-decision",
+            "--payload",
+            "-",
+            payload=payload,
+        )
+        self.assertEqual(retried.returncode, 0, retried.stderr)
+        self.assertEqual(json.loads(retried.stdout)["result"], "updated")
+        decisions = self.repo / "second-brain" / "00 Context" / "Decisions.md"
+        self.assertIn(
+            "<!-- second-brain:event:decision-lock-contention-001 -->",
+            decisions.read_text(encoding="utf-8"),
+        )
 
     def test_confirmed_personal_decision_updates_only_authorized_note(self) -> None:
         payload = {
@@ -804,6 +854,237 @@ class SecondBrainCommandTest(unittest.TestCase):
                 self.assertNotIn("Traceback", result.stderr)
                 self.assertNotIn(summary, result.stderr)
                 self.assertEqual(decision_path.read_bytes(), before)
+
+    def test_raw_capture_uses_toronto_calendar_date(self) -> None:
+        payload = {
+            **self.common_payload("raw-toronto-date-001"),
+            "timestamp": "2026-07-15T01:30:00+00:00",
+            "session_id": "session-toronto-date-001",
+            "role": "user",
+            "text": "Use the event instant in example-user's local timezone.",
+        }
+        result = self.run_command(
+            "capture",
+            "--kind",
+            "raw-session",
+            "--payload",
+            "-",
+            payload=payload,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertTrue(
+            (self.state_home / "second-brain" / "raw" / "2026-07-14.jsonl").is_file()
+        )
+        self.assertFalse(
+            (self.state_home / "second-brain" / "raw" / "2026-07-15.jsonl").exists()
+        )
+
+    def test_reused_event_id_with_changed_raw_payload_is_a_conflict(self) -> None:
+        first_payload = {
+            **self.common_payload("raw-conflict-001"),
+            "session_id": "session-conflict-001",
+            "role": "user",
+            "text": "First body stays private.",
+        }
+        first = self.run_command(
+            "capture",
+            "--kind",
+            "raw-session",
+            "--payload",
+            "-",
+            payload=first_payload,
+        )
+        self.assertEqual(first.returncode, 0, first.stderr)
+        raw_path = self.state_home / "second-brain" / "raw" / "2026-07-14.jsonl"
+        before = raw_path.read_bytes()
+
+        changed = self.run_command(
+            "capture",
+            "--kind",
+            "raw-session",
+            "--payload",
+            "-",
+            payload={**first_payload, "text": "PRIVATE_CHANGED_BODY"},
+        )
+        self.assertEqual(changed.returncode, 2)
+        self.assertEqual(changed.stdout, "")
+        self.assertIn("event", changed.stderr.lower())
+        self.assertIn("conflict", changed.stderr.lower())
+        self.assertNotIn("PRIVATE_CHANGED_BODY", changed.stderr)
+        self.assertEqual(raw_path.read_bytes(), before)
+
+    def test_reused_event_id_with_changed_tracked_payload_is_a_conflict(self) -> None:
+        payload = {
+            **self.common_payload("decision-conflict-001"),
+            "title": "Keep the first decision",
+            "summary": "The original confirmed decision remains canonical.",
+            "target": "00 Context/Decisions.md",
+            "links": [],
+            "visibility": "public-sanitized",
+            "confirmed": True,
+        }
+        first = self.run_command(
+            "capture",
+            "--kind",
+            "personal-decision",
+            "--payload",
+            "-",
+            payload=payload,
+        )
+        self.assertEqual(first.returncode, 0, first.stderr)
+        target = self.repo / "second-brain" / "00 Context" / "Decisions.md"
+        before = target.read_bytes()
+
+        changed = self.run_command(
+            "capture",
+            "--kind",
+            "personal-decision",
+            "--payload",
+            "-",
+            payload={**payload, "summary": "PRIVATE_CHANGED_DECISION"},
+        )
+        self.assertEqual(changed.returncode, 2)
+        self.assertEqual(changed.stdout, "")
+        self.assertIn("event", changed.stderr.lower())
+        self.assertIn("conflict", changed.stderr.lower())
+        self.assertNotIn("PRIVATE_CHANGED_DECISION", changed.stderr)
+        self.assertEqual(target.read_bytes(), before)
+
+    def test_status_rejects_symlinked_required_note_without_reading_target(self) -> None:
+        inbox = self.repo / "second-brain" / "01 Inbox" / "Brain Dump.md"
+        outside = self.root / "outside-inbox.md"
+        outside.write_text("- PRIVATE_STATUS_SENTINEL\n", encoding="utf-8")
+        inbox.unlink()
+        inbox.symlink_to(outside)
+        before = outside.read_bytes()
+
+        result = self.run_command("status", "--format", "json")
+        self.assertEqual(result.returncode, 2)
+        self.assertEqual(result.stdout, "")
+        self.assertNotIn("PRIVATE_STATUS_SENTINEL", result.stderr)
+        self.assertNotIn(str(self.root), result.stderr)
+        self.assertEqual(outside.read_bytes(), before)
+
+    def test_capture_rejects_malformed_protected_note(self) -> None:
+        decisions = self.repo / "second-brain" / "00 Context" / "Decisions.md"
+        malformed = decisions.read_text(encoding="utf-8").replace(
+            "## Entries\n", "## Renamed Entries\n", 1
+        )
+        decisions.write_text(malformed, encoding="utf-8")
+        before = decisions.read_bytes()
+        payload = {
+            **self.common_payload("decision-malformed-001"),
+            "title": "PRIVATE_MALFORMED_TITLE",
+            "summary": "PRIVATE_MALFORMED_SUMMARY",
+            "target": "00 Context/Decisions.md",
+            "links": [],
+            "visibility": "public-sanitized",
+            "confirmed": True,
+        }
+
+        result = self.run_command(
+            "capture",
+            "--kind",
+            "personal-decision",
+            "--payload",
+            "-",
+            payload=payload,
+        )
+        self.assertEqual(result.returncode, 2)
+        self.assertEqual(result.stdout, "")
+        self.assertIn("structure", result.stderr.lower())
+        self.assertNotIn("PRIVATE_MALFORMED", result.stderr)
+        self.assertEqual(decisions.read_bytes(), before)
+
+    def test_closeout_rolls_back_when_the_second_file_write_fails(self) -> None:
+        focused = self.run_command(
+            "focus", "--payload", "-", payload=self.focus_payload()
+        )
+        self.assertEqual(focused.returncode, 0, focused.stderr)
+        daily = self.repo / "second-brain" / "05 Daily Notes" / "2026-07-14.md"
+        project = self.repo / "second-brain" / "02 Projects" / "ExampleProject.md"
+        before = (daily.read_bytes(), project.read_bytes())
+        payload_path = self.root / "transactional-closeout.json"
+        payload_path.write_text(
+            json.dumps(
+                {
+                    **self.common_payload("closeout-transaction-001"),
+                    "date": "2026-07-14",
+                    "project": "ExampleProject",
+                    "planned": "Validate 20 Grade 8 contest questions.",
+                    "completed": "17 validated.",
+                    "evidence": "https://example.invalid/evidence",
+                    "blocker": "Three remain.",
+                    "decisions": [],
+                    "open": [],
+                    "next": "Finish three.",
+                    "confirmed": True,
+                }
+            ),
+            encoding="utf-8",
+        )
+        code = (
+            "from unittest import mock\n"
+            "from second_brain import cli, vault\n"
+            "original = vault.atomic_replace_if_unchanged\n"
+            "calls = {'count': 0}\n"
+            "def fail_second(root, path, expected, content, mode=0o644):\n"
+            "    calls['count'] += 1\n"
+            "    if calls['count'] == 2:\n"
+            "        raise OSError('PRIVATE_FAILURE_DETAIL')\n"
+            "    return original(root, path, expected, content, mode)\n"
+            "with mock.patch.object(vault, 'atomic_replace_if_unchanged', side_effect=fail_second):\n"
+            "    raise SystemExit(cli.main(['closeout', '--payload', '"
+            + str(payload_path)
+            + "']))\n"
+        )
+        env = {
+            **self.env,
+            "PYTHONPATH": str(self.repo / "scripts"),
+        }
+        result = subprocess.run(
+            [sys.executable, "-B", "-c", code],
+            cwd=self.outside,
+            env=env,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+        self.assertEqual(result.returncode, 2)
+        self.assertEqual(result.stdout, "")
+        self.assertNotIn("PRIVATE_FAILURE_DETAIL", result.stderr)
+        self.assertEqual((daily.read_bytes(), project.read_bytes()), before)
+        self.assertEqual(list(daily.parent.glob(f".{daily.name}.*")), [])
+        self.assertEqual(list(project.parent.glob(f".{project.name}.*")), [])
+
+    def test_symlinked_repo_override_is_rejected(self) -> None:
+        repo_link = self.root / "repo-link"
+        repo_link.symlink_to(self.repo, target_is_directory=True)
+        env = {**self.env, "SECOND_BRAIN_REPO_ROOT": str(repo_link)}
+        decisions = self.repo / "second-brain" / "00 Context" / "Decisions.md"
+        before = decisions.read_bytes()
+        payload = {
+            **self.common_payload("decision-repo-link-001"),
+            "title": "Do not trust repo links",
+            "summary": "Repository overrides must be canonical source paths.",
+            "target": "00 Context/Decisions.md",
+            "links": [],
+            "visibility": "public-sanitized",
+            "confirmed": True,
+        }
+        result = self.run_command(
+            "capture",
+            "--kind",
+            "personal-decision",
+            "--payload",
+            "-",
+            payload=payload,
+            env=env,
+        )
+        self.assertEqual(result.returncode, 2)
+        self.assertEqual(result.stdout, "")
+        self.assertNotIn(str(self.root), result.stderr)
+        self.assertEqual(decisions.read_bytes(), before)
 
 
 if __name__ == "__main__":

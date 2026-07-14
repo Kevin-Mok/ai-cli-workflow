@@ -144,8 +144,20 @@ Not in scope:
   Example Employer logo or implied affiliation.
 - Initial migration is preview-only. Eligible future imports are explicit text
   selections under 1,000,000 bytes; `/home/example/coding` remains reference-only.
-- Git LFS is configured now but remains empty until a future explicit media
-  import.
+- Eligible migration content maps by default into
+  `06 Archive/Imports/SANITIZED_SOURCE`. Inventory, plan, and apply each
+  recheck source policy; one SHA-256 approves the complete inspected batch.
+- Migration resume state is private 0700/0600 XDG state, not a tracked vault
+  artifact. New imports use descriptor-relative, no-follow, atomic
+  no-overwrite creation and verification fails while any ledger entry is
+  pending.
+- Migration inventory and plan controls stay in a private mode-0700 state
+  directory, are created under `umask 077`, and never enter Git.
+- Protected upgrades use immutable append-only specifications, one batch
+  approval, exact-byte dated backups, and atomic no-overwrite creation. The
+  complete schema-v1 vault has no pending default upgrade.
+- Git LFS configuration is deferred to Task 3 and remains empty until a future
+  explicit media import.
 - Raw available session text is local/private and secret-redacted; confirmed
   sanitized summaries alone may enter Git.
 - Daily briefing contains one confirmed measurable ExampleProject outcome. Closeout
@@ -248,13 +260,36 @@ content or binary attachment is part of Task 1:
 - Create `scripts/second_brain/cli.py` for command dispatch.
 - Create `scripts/second_brain/schema.py` for JSON schema validation and safe
   errors.
+- Create `scripts/second_brain/content_security.py` for shared secret-name,
+  assignment, and linear netrc detection.
 - Create `scripts/second_brain/paths.py` for repo/XDG resolution, containment,
-  locks, permissions, and atomic replace.
+  locks, permissions, and compatibility exports.
+- Create `scripts/second_brain/safe_contract.py` for shared filesystem errors
+  and lexical containment.
+- Create `scripts/second_brain/safe_create.py` for portable exclusive creation
+  and ancestor revalidation.
+- Create `scripts/second_brain/safe_files.py` for descriptor-relative reads,
+  Linux write leases, and checksum-bound atomic exchange.
+- Create `scripts/second_brain/private_state.py` for anchored 0700/0600 private
+  control-file reads.
 - Create `scripts/second_brain/vault.py` for frontmatter, stable sections,
-  capture, closeout, status, and upgrades.
+  capture, closeout, and status.
 - Create `scripts/second_brain/doctor.py` for stable findings and `--check`.
-- Create `scripts/second_brain/migration.py` for inventory, plan, approval,
-  copy ledger, collision handling, and verification.
+- Create `scripts/second_brain/doctor_contract.py` for the static vault health
+  contract used by the doctor.
+- Create `scripts/second_brain/doctor_lfs.py` for Git LFS attribute inspection.
+- Create `scripts/second_brain/migration_common.py` for shared source policy,
+  canonical JSON, hashing, and no-follow source reads.
+- Create `scripts/second_brain/migration_inventory.py` for deterministic,
+  content-safe inventory and classification.
+- Create `scripts/second_brain/migration.py` for sanitized destination
+  planning, signed-plan validation, and stable collision handling.
+- Create `scripts/second_brain/migration_apply.py` for all-source preflight,
+  exclusive copy, and private resume-ledger updates.
+- Create `scripts/second_brain/migration_verify.py` for strict standalone
+  ledger validation and source/destination checksum findings.
+- Create `scripts/second_brain/upgrade.py` for approval-bound append-only
+  upgrades and protected exact-byte backups.
 - Create `scripts/second_brain/checkpoint.py` for Git validation, allowlisting,
   staged scans, commit, and push.
 - Create `scripts/second_brain/config_snapshot.py` for shared live-to-source
@@ -378,42 +413,48 @@ only interfaces already present in this commit.
 
 ### Task 2: Deterministic capture, doctor, migration, and protected upgrades
 
-**Files:** `scripts/second_brain/{doctor,migration}.py`,
-`tests/test_second_brain_command.py`, `tests/test_second_brain_doctor.py`,
-`tests/test_second_brain_migration.py`, `docs/second-brain.md`, root
-`README.md`, and this plan.
+**Files:** `scripts/second_brain/{cli,content_security,paths,safe_contract,
+safe_create,safe_files,private_state,vault,doctor,doctor_contract,doctor_lfs,
+migration_common,migration_inventory,migration,migration_apply,
+migration_verify,upgrade}.py`,
+`tests/test_second_brain_command.py`, `tests/test_second_brain_concurrency.py`,
+`tests/test_second_brain_doctor.py`,
+`tests/test_second_brain_migration.py`,
+`tests/test_second_brain_migration_apply.py`,
+`tests/test_second_brain_paths.py`, `tests/test_second_brain_upgrade.py`,
+`docs/second-brain.md`, `docs/smoke-tests.md`, root `README.md`, and this plan.
 
 **Consumes:** the exact vault paths, skill payload shapes, and core CLI from
 Task 1.
 
 **Produces:** the stable CLI except checkpoint, plus operator documentation.
 
-- [ ] Write command tests for caller-independent repo discovery, Toronto date
+- [x] Write command tests for caller-independent repo discovery, Toronto date
   override, schema errors, safe error text, traversal, symlink escape, invalid
   names, stable frontmatter/sections, atomic writes, lock contention, concurrent
   calls, and repeated-event idempotency.
-- [ ] Write capture/closeout tests using JSON from files and stdin. Assert raw
+- [x] Write capture/closeout tests using JSON from files and stdin. Assert raw
   capture uses private XDG state, confirmed capture updates authorized notes,
   and unconfirmed tracked writes fail.
-- [ ] Write doctor fixture tests for stable finding keys, missing paths,
+- [x] Write doctor fixture tests for stable finding keys, missing paths,
   malformed frontmatter, placeholders, duplicate ownership content, sensitive
   visibility, and non-LFS attachment media.
-- [ ] Write migration/upgrade tests for source containment, overlapping source
+- [x] Write migration/upgrade tests for source containment, overlapping source
   roots, nested Git repositories, symlinks, hard links, 1,000,000-byte boundary,
   UTF-8/NUL detection, secrets, deterministic collisions, interrupted resume,
   approval hash, checksum verification, source immutability, protected-file
   preview, and dated backups.
-- [ ] Run all Task 2 focused tests and observe expected missing-command/module
+- [x] Run all Task 2 focused tests and observe expected missing-command/module
   failures.
-- [ ] Implement the smallest cohesive modules and entrypoint that make the
+- [x] Implement the smallest cohesive modules and entrypoint that make the
   focused suite GREEN; refactor only after GREEN while keeping modules below the
   repository's cohesion/size threshold.
-- [ ] Verify `--help`, text/JSON status, capture/closeout idempotency, doctor
+- [x] Verify `--help`, text/JSON status, capture/closeout idempotency, doctor
   fixtures, and migration fixtures. Do not apply a real migration.
-- [ ] Add operator/recovery docs and a recruiter-README hunk grounded in actual
+- [x] Add operator/recovery docs and a recruiter-README hunk grounded in actual
   `--help` output. If the pre-existing README hunk overlaps, stop the commit and
   isolate the Second Brain blob/hunk rather than staging user work.
-- [ ] Update this plan with evidence, verify protected paths and config hash,
+- [x] Update this plan with evidence, verify protected paths and config hash,
   inspect the staged diff, and commit
   `feat(second-brain): add deterministic capture and migration tools`.
 
@@ -478,7 +519,7 @@ Focused automated commands:
 
 ```bash
 python3 -m unittest tests.test_second_brain_vault tests.test_second_brain_skill -v
-python3 -m unittest tests.test_second_brain_command tests.test_second_brain_doctor tests.test_second_brain_migration -v
+python3 -B -m unittest tests.test_second_brain_command tests.test_second_brain_concurrency tests.test_second_brain_doctor tests.test_second_brain_paths tests.test_second_brain_migration tests.test_second_brain_migration_apply tests.test_second_brain_upgrade -v
 python3 -m unittest tests.test_second_brain_config_snapshot tests.test_second_brain_checkpoint tests.test_second_brain_timer -v
 bash tests/test_refresh_config_function.sh
 python3 -m unittest tests.test_ai_workflow_contract tests.test_ai_workflow_doctor tests.test_context_handoff_contract -v
@@ -521,10 +562,12 @@ Manual/runtime checks after implementation commits are pushed:
   secret/sensitive-path scans, explicit confirmation, and local-only raw state.
 - **Lost instructions:** raw events carry stable event/session IDs; canonical
   preferences are routed to feedback memory; confirmed closeout is idempotent.
-- **Duplicate memory:** doctor checks links/ownership and rejects copied
-  canonical plan/preference/lesson content.
-- **Concurrent writers:** mutation lock plus atomic replace; contention returns
-  an actionable nonzero result without partial files.
+- **Duplicate memory:** vault contracts check canonical-owner links; the doctor
+  rejects copied canonical preference/lesson content.
+- **Concurrent writers:** mutation lock plus descriptor-relative portable
+  exclusive create and leased checksum-bound exchange; contention, an open
+  editor, a changed target, or a late destination returns a nonzero result
+  while preserving competing bytes or a named recovery artifact.
 - **Migration damage:** preview and approval hash precede copying; sources are
   read-only and re-hashed; ledger resumes without overwrites.
 - **Git contamination:** abort on staged input, stage only exact allowlist,
@@ -548,7 +591,7 @@ Manual/runtime checks after implementation commits are pushed:
 - [x] Protected dirty paths and Codex config hash recorded before the first
   repository patch.
 - [x] Task 1 implemented, reviewed, verified, and committed.
-- [ ] Task 2 implemented, reviewed, verified, and committed.
+- [x] Task 2 implemented, reviewed, verified, and committed.
 - [ ] Task 3 implemented, reviewed, verified, and committed.
 - [ ] Full verification and final independent review completed.
 - [ ] Implementation series pushed and upstream equality confirmed.
@@ -579,6 +622,22 @@ Manual/runtime checks after implementation commits are pushed:
 | Task 1 final integration | 34 AI-workflow/doctor/handoff tests; skill validator; workflow doctor; README gate; three shell fixtures | Existing surfaces remain green and new skill is valid | 34 tests passed; `Skill is valid!`; doctor pass with one pre-existing warning; `pass_no_change`; all fixtures passed | 0 |
 | Task 1 real status | `scripts/executable_second-brain status --format json` | Read source vault without mutation | Schema 1; three approved projects; Inbox 0; latest note 2026-07-14 | 0 |
 | Task 1 final hygiene | `git diff --check`; protected config SHA-256 | Clean diff and unchanged protected config | Clean; exact `3edd706e...85e2e` hash | 0 |
+| Task 2 command-hardening RED | Seven new command contracts against the Task 1 implementation | Expose date, event conflict, symlink, structure, rollback, and repo-alias gaps | 7 of 27 tests failed for the intended reasons | 1 |
+| Task 2 command-hardening GREEN | `python3 -B -m unittest tests.test_second_brain_command -v` | All command and lock contracts pass | 28 tests passed, including held-lock rejection and retry | 0 |
+| Task 2 doctor RED/GREEN | `python3 -B -m unittest tests.test_second_brain_doctor -v` | Missing surface fails, then stable safe findings pass | Initial 11 missing-command failures; final 23 passed after all-file secret, bounded-media, and bounded canonical-owner hardening | 0 |
+| Task 2 migration RED/GREEN | `python3 -B -m unittest tests.test_second_brain_migration tests.test_second_brain_migration_apply -v` | Missing surface fails, then inventory/plan/apply/verify pass | Initial 15 failures; final 44 passed after canonical-path and anchored-ledger hardening | 0 |
+| Task 2 upgrade RED/GREEN | `python3 -B -m unittest tests.test_second_brain_upgrade -v` | Missing surface fails, then preview/apply/backup/idempotency pass | Initial 7 failures; final 9 tests passed including injected target/backup races | 0 |
+| Task 2 security review | Fresh read-only adversarial review plus executable reproducers | Identify unsafe cases before commit | 4 Important findings: source-policy bypass, no-overwrite TOCTOU, false-pass ledgers, and unvalidated imports/hard links | n/a |
+| Task 2 security RED/GREEN | Doctor, path, source-policy, ledger, and late-destination regressions | Reproduce and close every Important class | Doctor 5 review failures then 16 passed; path 4 errors then 4 passed; source-policy 4 subcases rejected; ledger 9 failures then 25 passed; final apply 26 passed | 0 |
+| Task 2 final adversarial review | Independent exact-diff review plus executable race, path, privacy, and resource-bound reproducers | No unresolved security blocker | Portable-create/replace races, netrc/JSON detection, all-file doctor scanning, private-ledger boundaries, and canonical paths reproduced RED then closed; post-extraction verdict READY | n/a |
+| Task 2 final documentation audit | Independent operator-doc, README-table, plan-claim, and resource-bound audit | Every public claim matches code and fresh evidence | Initial verdict NOT READY; table parsing, bounded canonical-owner scanning, and duplicate-owner scope corrected; final verdict READY | n/a |
+| Task 2 cohesion refactor | Split mixed-concern modules at the warning boundary | Keep each implementation module before 500 lines | Apply 292; verify 278; common 295; safe-files 497; safe-create 148; safe-contract 25; paths 216; private-state 116; doctor 499; doctor-contract 60; doctor-LFS 23; content-security 138 lines | 0 |
+| Task 2 complete fixture suite | `python3 -B -m unittest tests.test_second_brain_vault tests.test_second_brain_skill tests.test_second_brain_command tests.test_second_brain_concurrency tests.test_second_brain_doctor tests.test_second_brain_paths tests.test_second_brain_migration tests.test_second_brain_migration_apply tests.test_second_brain_upgrade` | All Second Brain contracts pass | 142 tests passed in 17.088s after final security and documentation-review fixes | 0 |
+| Task 2 repository regression | `python3 -B -m unittest discover -s tests -p 'test*.py'` | The complete Python test surface remains green | 187 tests passed in 19.539s | 0 |
+| Task 2 real read-only CLI | Help; text/JSON status; text/JSON doctor check; migrate help; upgrade dry-run | Truthful commands, healthy vault, and no mutation | All exited 0; doctor 0 errors/0 warnings; schema-v1 upgrade operations empty | 0 |
+| Task 2 integration gates | 34 AI workflow tests; skill validator; workflow doctor; README gate; three shell fixtures; `git diff --check` | Existing surfaces remain green and docs are synchronized | 34 passed; skill valid; doctor pass with one pre-existing duplicate-slug warning; `pass_no_change`; all fixtures and diff check passed | 0 |
+| Task 2 chezmoi dry-run | `chezmoi apply --dry-run --force` | Resolve the existing live-config divergence without prompting and perform no writes | Exited 0; the protected config checksum remained exact afterward | 0 |
+| Task 2 protected state | `sha256sum dot_codex/config.toml` | User-owned config remains literal and unstaged | Exact `3edd706e3cc03132764d9d0a1b741e0713f42e39dc16a6018ab205f9d1a85e2e` | 0 |
 
 Task RED/GREEN, review, commit, push, and runtime evidence will be appended to
 this table as each checklist item is actually completed.
@@ -590,10 +649,9 @@ this table as each checklist item is actually completed.
   design input only; local tests define behavior.
 - The source's three synchronized instruction files conflict with this repo's
   canonical instruction chain and recruiter README, so that pattern is rejected.
-- The current README, smoke checklist, and skill index already contain unrelated
-  edits. This implementation may add non-overlapping working-tree hunks, but it
-  must stage a Second-Brain-only index representation and inspect it before each
-  commit.
+- The earlier unrelated README, smoke-checklist, skill-index, and metaprompt
+  edits were committed independently. Only the protected
+  `dot_codex/config.toml` diff remains user-owned and unstaged for Task 2.
 - The actual checkpoint is intentionally deferred until after implementation
   commits are verified and pushed, preserving the user's live config change.
 - The first Task 1 review correctly found that proposal-only daily focus was not
@@ -602,3 +660,21 @@ this table as each checklist item is actually completed.
 - While Task 1 was in progress, the user's pre-existing metaprompt work was
   independently committed and pushed as `dbc311d`. Task 1 did not stage or
   alter that work; the protected `dot_codex/config.toml` remains unstaged.
+- Task 1 was committed locally as `bd3d835` and remains unpushed until the
+  three-commit implementation series is complete.
+- Initial migration remains unapplied. The initial schema-v1 upgrade registry
+  intentionally has no pending operation; future operations append immutable
+  specifications rather than rewriting history.
+- Final Task 2 review reproduced every reported race and privacy gap before a
+  fix. The behavior-neutral module extraction retained a green focused suite,
+  and the independent post-extraction security re-review returned READY with no
+  blockers.
+- The final documentation audit found broken Markdown table pipes and an
+  unbounded canonical-owner duplicate scan. The exact 1,000,000-byte regression
+  failed first, then passed with a deterministic content-safe error; the final
+  focused suite now passes 142 tests. Independent documentation and security
+  re-reviews both returned READY after the corrections.
+- A plain non-interactive `chezmoi apply --dry-run --verbose` stops at the
+  pre-existing live `~/.codex/config.toml` divergence. The final read-only gate
+  therefore used `--dry-run --force`; it exited 0 without writing, and the
+  protected tracked config checksum remained exact.

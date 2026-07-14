@@ -2,17 +2,23 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import re
+from datetime import datetime
 from pathlib import Path
 from typing import Any
+from zoneinfo import ZoneInfo
 
+from .content_security import redact
 from .paths import (
     PathError,
+    atomic_replace_if_unchanged,
     atomic_write,
     ensure_private_directory,
     local_now,
     mutation_lock,
+    regular_file_bytes,
     resolve_repo,
     safe_vault_path,
     state_root,
@@ -26,33 +32,10 @@ from .schema import (
 )
 
 
-SECRET_PATTERNS = (
-    re.compile(
-        r"-----BEGIN [^-\r\n]*PRIVATE KEY-----.*?"
-        r"-----END [^-\r\n]*PRIVATE KEY-----",
-        re.DOTALL,
-    ),
-    re.compile(r"(?i)\bauthorization\s*:\s*bearer\s+[^\s,;]+"),
-    re.compile(r"\bgh[pousr]_[A-Za-z0-9]{20,}\b"),
-    re.compile(r"\bgithub_pat_[A-Za-z0-9_]{20,}\b"),
-    re.compile(r"\bxox[baprs]-[A-Za-z0-9-]{10,}\b"),
-    re.compile(r"\bAKIA[0-9A-Z]{16}\b"),
-    re.compile(r"sk-[A-Za-z0-9_-]{16,}"),
-    re.compile(
-        r"(?i)\b[A-Za-z0-9_.-]*(?:api[_ -]?key|password|token|secret)"
-        r"\s*[:=]\s*[^\s,;]+"
-    ),
-)
 EVENT_MARKER = "<!-- second-brain:event:{event_id} -->"
 FOCUS_MARKER = "<!-- second-brain:focus:{event_id} -->"
 FOCUS_MARKER_PREFIX = "<!-- second-brain:focus:"
-
-
-def redact(text: str) -> str:
-    redacted = text
-    for pattern in SECRET_PATTERNS:
-        redacted = pattern.sub("[REDACTED]", redacted)
-    return redacted
+DIGEST_MARKER = "<!-- second-brain:digest:{digest} -->"
 
 
 def _reject_tracked_secrets(payload: dict[str, Any], fields: tuple[str, ...]) -> None:
@@ -65,17 +48,26 @@ def _reject_tracked_secrets(payload: dict[str, Any], fields: tuple[str, ...]) ->
 
 def status_report() -> dict[str, Any]:
     repo = resolve_repo()
-    vault = repo / "second-brain"
+    projects_dir = safe_vault_path(repo, "02 Projects")
+    daily_dir = safe_vault_path(repo, "05 Daily Notes")
+    inbox_path = safe_vault_path(repo, "01 Inbox/Brain Dump.md")
+    if not projects_dir.is_dir() or not daily_dir.is_dir():
+        raise PathError("Second Brain status directories are missing or invalid")
+    if not inbox_path.is_file():
+        raise PathError("Second Brain Inbox note is missing or invalid")
     projects = []
-    for path in sorted((vault / "02 Projects").glob("*.md")):
+    for path in sorted(projects_dir.glob("*.md")):
+        if path.is_symlink() or not path.is_file():
+            raise PathError("Second Brain project note is missing or invalid")
         content = path.read_text(encoding="utf-8")
         if re.search(r"(?m)^status: active$", content):
             projects.append(path.stem)
-    daily_notes = sorted(
-        (path.stem for path in (vault / "05 Daily Notes").glob("????-??-??.md")),
-        reverse=True,
-    )[:3]
-    inbox_path = vault / "01 Inbox" / "Brain Dump.md"
+    daily_notes = []
+    for path in daily_dir.glob("????-??-??.md"):
+        if path.is_symlink() or not path.is_file():
+            raise PathError("Second Brain Daily Note is missing or invalid")
+        daily_notes.append(path.stem)
+    daily_notes = sorted(daily_notes, reverse=True)[:3]
     inbox = inbox_path.read_text(encoding="utf-8")
     inbox_items = sum(
         1
@@ -102,17 +94,36 @@ def capture(kind: str, payload: dict[str, Any]) -> dict[str, Any]:
 def _capture_raw(payload: dict[str, Any]) -> dict[str, Any]:
     raw_dir = state_root() / "raw"
     event_id = payload["event_id"]
-    date_value = payload["timestamp"][:10]
+    date_value = (
+        datetime.fromisoformat(payload["timestamp"])
+        .astimezone(ZoneInfo("America/Toronto"))
+        .date()
+        .isoformat()
+    )
     raw_path = raw_dir / f"{date_value}.jsonl"
     with mutation_lock():
         ensure_private_directory(raw_dir)
         if raw_path.is_symlink():
             raise PathError("raw event file must not be a symlink")
-        existing = raw_path.read_text(encoding="utf-8") if raw_path.exists() else ""
-        if f'"event_id": "{event_id}"' in existing:
-            return {"schema_version": 1, "command": "capture", "result": "noop"}
         safe_payload = dict(payload)
         safe_payload["text"] = redact(payload["text"])
+        existing = raw_path.read_text(encoding="utf-8") if raw_path.exists() else ""
+        for line in existing.splitlines():
+            try:
+                recorded = json.loads(line)
+            except json.JSONDecodeError as error:
+                raise PathError("private raw session state is malformed") from error
+            if not isinstance(recorded, dict):
+                raise PathError("private raw session state is malformed")
+            if recorded.get("event_id") != event_id:
+                continue
+            if recorded == safe_payload:
+                return {
+                    "schema_version": 1,
+                    "command": "capture",
+                    "result": "noop",
+                }
+            raise ValidationError("event ID conflicts with an existing raw capture")
         line = json.dumps(safe_payload, ensure_ascii=False, sort_keys=True) + "\n"
         atomic_write(raw_path, existing + line, mode=0o600)
     return {"schema_version": 1, "command": "capture", "result": "created"}
@@ -122,25 +133,39 @@ def _capture_personal_decision(payload: dict[str, Any]) -> dict[str, Any]:
     _reject_tracked_secrets(payload, ("title", "summary", "links"))
     repo = resolve_repo()
     marker = EVENT_MARKER.format(event_id=payload["event_id"])
+    digest_marker = _digest_marker(payload)
     links = " ".join(payload["links"])
     block = (
-        f"{marker}\n\n"
+        f"{marker}\n{digest_marker}\n\n"
         f"### {payload['timestamp'][:10]} - {payload['title']}\n\n"
         f"{payload['summary']}\n"
     )
     if links:
         block += f"\nLinks: {links}\n"
     with mutation_lock():
+        vault = repo / "second-brain"
         target = safe_vault_path(repo, payload["target"])
         if not target.is_file():
             raise PathError(
                 "authorized capture target is missing or not a regular file"
             )
-        content = target.read_text(encoding="utf-8")
+        original, content = _read_tracked_note(vault, target)
+        _require_note_structure(content, ("## Entries",))
         if marker in content:
-            return {"schema_version": 1, "command": "capture", "result": "noop"}
+            if _marker_has_digest(content, marker, digest_marker):
+                return {
+                    "schema_version": 1,
+                    "command": "capture",
+                    "result": "noop",
+                }
+            raise ValidationError("event ID conflicts with an existing capture")
         updated = _append_to_section(content, "## Entries", block)
-        atomic_write(target, updated)
+        atomic_replace_if_unchanged(
+            vault,
+            target,
+            hashlib.sha256(original).hexdigest(),
+            updated.encode("utf-8"),
+        )
     return {"schema_version": 1, "command": "capture", "result": "updated"}
 
 
@@ -149,26 +174,43 @@ def focus(payload: dict[str, Any]) -> dict[str, Any]:
     _reject_tracked_secrets(payload, ("project", "outcome", "done_when", "evidence"))
     repo = resolve_repo()
     marker = FOCUS_MARKER.format(event_id=payload["event_id"])
+    digest_marker = _digest_marker(payload)
     block = (
-        f"{marker}\n\n"
+        f"{marker}\n{digest_marker}\n\n"
         f"- **Outcome:** {payload['outcome']}\n"
         f"- **Done when:** {payload['done_when']}\n"
         f"- **Evidence:** {payload['evidence']}\n"
     )
     with mutation_lock():
+        vault = repo / "second-brain"
         daily_path = safe_vault_path(
             repo, f"05 Daily Notes/{payload['date']}.md"
         )
         if not daily_path.is_file():
             raise PathError("daily focus date does not have a Daily Note")
-        daily = daily_path.read_text(encoding="utf-8")
+        original, daily = _read_tracked_note(vault, daily_path)
+        _require_note_structure(
+            daily,
+            ("## Focus", "## Done", "## Decisions", "## Open", "## Next"),
+        )
         focus_body = _section_body(daily, "## Focus")
         if marker in focus_body:
-            return {"schema_version": 1, "command": "focus", "result": "noop"}
+            if digest_marker in focus_body:
+                return {
+                    "schema_version": 1,
+                    "command": "focus",
+                    "result": "noop",
+                }
+            raise ValidationError("event ID conflicts with an existing focus")
         if FOCUS_MARKER_PREFIX in focus_body:
             raise ValueError("a ExampleProject focus is already confirmed for this date")
         daily = _replace_section(daily, "## Focus", block)
-        atomic_write(daily_path, daily)
+        atomic_replace_if_unchanged(
+            vault,
+            daily_path,
+            hashlib.sha256(original).hexdigest(),
+            daily.encode("utf-8"),
+        )
     return {"schema_version": 1, "command": "focus", "result": "updated"}
 
 
@@ -192,8 +234,9 @@ def closeout(payload: dict[str, Any]) -> dict[str, Any]:
     repo = resolve_repo()
     project_name = payload["project"]
     marker = EVENT_MARKER.format(event_id=payload["event_id"])
+    digest_marker = _digest_marker(payload)
     done_block = (
-        f"{marker}\n\n"
+        f"{marker}\n{digest_marker}\n\n"
         f"### {project_name} closeout\n\n"
         f"- **Planned:** {payload['planned']}\n"
         f"- **Completed:** {payload['completed']}\n"
@@ -201,13 +244,14 @@ def closeout(payload: dict[str, Any]) -> dict[str, Any]:
         f"- **Blocker:** {payload['blocker'] or 'None reported.'}\n"
     )
     progress_block = (
-        f"{marker}\n\n"
+        f"{marker}\n{digest_marker}\n\n"
         f"### {payload['date']}\n\n"
         f"- Completed: {payload['completed']}\n"
         f"- Evidence: {payload['evidence']}\n"
         f"- Blocker: {payload['blocker'] or 'None reported.'}\n"
     )
     with mutation_lock():
+        vault = repo / "second-brain"
         daily_path = safe_vault_path(
             repo, f"05 Daily Notes/{payload['date']}.md"
         )
@@ -216,8 +260,13 @@ def closeout(payload: dict[str, Any]) -> dict[str, Any]:
             raise PathError("closeout date does not have a Daily Note")
         if not project_path.is_file():
             raise PathError("ExampleProject project note is missing or invalid")
-        daily = daily_path.read_text(encoding="utf-8")
-        project = project_path.read_text(encoding="utf-8")
+        original_daily_bytes, daily = _read_tracked_note(vault, daily_path)
+        original_project_bytes, project = _read_tracked_note(vault, project_path)
+        _require_note_structure(
+            daily,
+            ("## Focus", "## Done", "## Decisions", "## Open", "## Next"),
+        )
+        _require_note_structure(project, ("## Progress",))
         focus_body = _section_body(daily, "## Focus")
         outcome_match = re.search(
             r"(?m)^- \*\*Outcome:\*\* (.+)$",
@@ -227,8 +276,16 @@ def closeout(payload: dict[str, Any]) -> dict[str, Any]:
             raise ValidationError("closeout requires a confirmed daily ExampleProject focus")
         if outcome_match.group(1) != payload["planned"]:
             raise ValidationError("closeout planned result must match the daily focus")
+        if marker in daily and not _marker_has_digest(daily, marker, digest_marker):
+            raise ValidationError("event ID conflicts with an existing closeout")
+        if marker in project and not _marker_has_digest(
+            project, marker, digest_marker
+        ):
+            raise ValidationError("event ID conflicts with an existing closeout")
         if marker in daily and marker in project:
             return {"schema_version": 1, "command": "closeout", "result": "noop"}
+        original_daily = daily
+        original_project = project
         if marker not in daily:
             daily = _append_to_section(daily, "## Done", done_block)
             if payload["decisions"]:
@@ -252,11 +309,95 @@ def closeout(payload: dict[str, Any]) -> dict[str, Any]:
             daily = _append_to_section(
                 daily, "## Next", f"- {payload['next']}\n"
             )
-            atomic_write(daily_path, daily)
         if marker not in project:
             project = _append_to_section(project, "## Progress", progress_block)
-            atomic_write(project_path, project)
+        updates = []
+        if daily != original_daily:
+            updates.append(
+                (daily_path, daily.encode("utf-8"), original_daily_bytes)
+            )
+        if project != original_project:
+            updates.append(
+                (project_path, project.encode("utf-8"), original_project_bytes)
+            )
+        written = []
+        try:
+            for path, updated, original in updates:
+                atomic_replace_if_unchanged(
+                    vault,
+                    path,
+                    hashlib.sha256(original).hexdigest(),
+                    updated,
+                )
+                written.append((path, original, hashlib.sha256(updated).hexdigest()))
+        except Exception:
+            rollback_error = None
+            for path, original, written_sha256 in reversed(written):
+                try:
+                    atomic_replace_if_unchanged(
+                        vault,
+                        path,
+                        written_sha256,
+                        original,
+                    )
+                except Exception as error:
+                    rollback_error = error
+            if rollback_error is not None:
+                raise PathError(
+                    "closeout rollback could not preserve every note"
+                ) from rollback_error
+            raise
     return {"schema_version": 1, "command": "closeout", "result": "updated"}
+
+
+def _payload_digest(payload: dict[str, Any]) -> str:
+    encoded = json.dumps(
+        payload,
+        ensure_ascii=False,
+        separators=(",", ":"),
+        sort_keys=True,
+    ).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
+
+
+def _digest_marker(payload: dict[str, Any]) -> str:
+    return DIGEST_MARKER.format(digest=_payload_digest(payload))
+
+
+def _marker_has_digest(content: str, marker: str, digest_marker: str) -> bool:
+    marker_index = content.find(marker)
+    if marker_index < 0:
+        return False
+    next_heading = content.find("\n### ", marker_index + len(marker))
+    block_end = len(content) if next_heading < 0 else next_heading
+    return digest_marker in content[marker_index:block_end]
+
+
+def _require_note_structure(content: str, headings: tuple[str, ...]) -> None:
+    if not content.startswith("---\n"):
+        raise PathError("protected note has invalid frontmatter structure")
+    frontmatter_end = content.find("\n---\n", 4)
+    if frontmatter_end < 0:
+        raise PathError("protected note has invalid frontmatter structure")
+    body_start = frontmatter_end + len("\n---\n")
+    positions = []
+    for heading in headings:
+        matches = list(re.finditer(rf"(?m)^{re.escape(heading)}\s*$", content))
+        if len(matches) != 1:
+            raise PathError("protected note has invalid stable section structure")
+        if matches[0].start() < body_start:
+            raise PathError("protected note has invalid stable section structure")
+        positions.append(matches[0].start())
+    if positions != sorted(positions):
+        raise PathError("protected note has invalid stable section structure")
+
+
+def _read_tracked_note(vault: Path, target: Path) -> tuple[bytes, str]:
+    content = regular_file_bytes(vault, target)
+    try:
+        return content, content.decode("utf-8")
+    except UnicodeError as error:
+        raise PathError("protected note must be valid UTF-8") from error
 
 
 def _section_body(content: str, heading: str) -> str:

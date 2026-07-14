@@ -7,8 +7,14 @@ import json
 import sys
 from typing import Any, Sequence
 
+from .doctor import build_report as build_doctor_report
+from .doctor import text_report as doctor_text_report
+from .migration import build_inventory, build_plan
+from .migration_apply import apply_migration
+from .migration_verify import verify_migration
 from .paths import LockError, PathError
 from .schema import ValidationError, load_payload
+from .upgrade import UPGRADE_SPECS, apply_upgrade, build_upgrade_preview
 from .vault import capture, closeout, focus, status_report
 
 
@@ -16,7 +22,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="second-brain",
         description=(
-            "Safely capture, retrieve, validate, and checkpoint the Second Brain."
+            "Safely capture, retrieve, validate, and migrate the Second Brain."
         ),
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -43,11 +49,56 @@ def build_parser() -> argparse.ArgumentParser:
     status_parser.add_argument(
         "--format", choices=("text", "json"), default="text"
     )
+    doctor_parser = subparsers.add_parser(
+        "doctor", help="Audit vault structure, privacy, ownership, and LFS state."
+    )
+    doctor_parser.add_argument(
+        "--format", choices=("text", "json"), default="text"
+    )
+    doctor_parser.add_argument("--check", action="store_true")
+    upgrade_parser = subparsers.add_parser(
+        "upgrade", help="Preview or apply approval-bound protected vault upgrades."
+    )
+    upgrade_mode = upgrade_parser.add_mutually_exclusive_group(required=True)
+    upgrade_mode.add_argument("--dry-run", action="store_true")
+    upgrade_mode.add_argument("--apply", action="store_true")
+    upgrade_parser.add_argument("--approve")
+
+    migrate_parser = subparsers.add_parser(
+        "migrate", help="Inventory, plan, apply, or verify safe text migrations."
+    )
+    migrate_commands = migrate_parser.add_subparsers(
+        dest="migrate_command", required=True
+    )
+    inventory_parser = migrate_commands.add_parser(
+        "inventory", help="Inventory external text sources without writing."
+    )
+    inventory_parser.add_argument("--source", action="append", required=True)
+    plan_parser = migrate_commands.add_parser(
+        "plan", help="Build a deterministic approval-bound migration plan."
+    )
+    plan_parser.add_argument("--inventory", required=True)
+    apply_parser = migrate_commands.add_parser(
+        "apply", help="Copy an approved plan with a private resume ledger."
+    )
+    apply_parser.add_argument("--plan", required=True)
+    apply_parser.add_argument("--approve", required=True)
+    verify_parser = migrate_commands.add_parser(
+        "verify", help="Verify copied source and destination checksums."
+    )
+    verify_parser.add_argument("--ledger", required=True)
     return parser
 
 
 def _print_json(value: dict[str, Any]) -> None:
-    print(json.dumps(value, ensure_ascii=False, sort_keys=True))
+    print(
+        json.dumps(
+            value,
+            ensure_ascii=False,
+            separators=(",", ":"),
+            sort_keys=True,
+        )
+    )
 
 
 def _print_status_text(report: dict[str, Any]) -> None:
@@ -73,6 +124,39 @@ def main(argv: Sequence[str] | None = None) -> int:
             else:
                 _print_status_text(report)
             return 0
+        if args.command == "doctor":
+            report = build_doctor_report()
+            if args.format == "json":
+                _print_json(report)
+            else:
+                sys.stdout.write(doctor_text_report(report))
+            if args.check and report["summary"]["errors"]:
+                return 1
+            return 0
+        if args.command == "upgrade":
+            if args.dry_run:
+                if args.approve:
+                    raise ValidationError("upgrade dry-run does not accept approval")
+                _print_json(build_upgrade_preview())
+                return 0
+            if not args.approve:
+                raise ValidationError("upgrade apply requires --approve SHA256")
+            _print_json(apply_upgrade(UPGRADE_SPECS, args.approve))
+            return 0
+        if args.command == "migrate":
+            if args.migrate_command == "inventory":
+                _print_json(build_inventory(args.source))
+                return 0
+            if args.migrate_command == "plan":
+                _print_json(build_plan(args.inventory))
+                return 0
+            if args.migrate_command == "apply":
+                _print_json(apply_migration(args.plan, args.approve))
+                return 0
+            if args.migrate_command == "verify":
+                report = verify_migration(args.ledger)
+                _print_json(report)
+                return 1 if report["summary"]["errors"] else 0
         if args.command == "capture":
             payload = load_payload(args.payload)
             _print_json(capture(args.kind, payload))

@@ -13,9 +13,9 @@ from pathlib import Path
 from typing import Iterator
 from zoneinfo import ZoneInfo
 
-
-class PathError(RuntimeError):
-    """A path or repository boundary is invalid."""
+from .safe_contract import PathError, TargetExistsError
+from .safe_create import atomic_create
+from .safe_files import atomic_replace_if_unchanged, regular_file_bytes
 
 
 class LockError(RuntimeError):
@@ -62,7 +62,15 @@ def _repo_from_chezmoi() -> Path:
 def _validated_source_repo(candidate: Path) -> Path:
     if not candidate.is_absolute():
         raise PathError("Second Brain repository path must be absolute")
-    lexical = candidate.expanduser()
+    lexical = candidate.expanduser().absolute()
+    try:
+        resolved = lexical.resolve(strict=True)
+    except OSError as error:
+        raise PathError("Second Brain repository could not be resolved") from error
+    if resolved != lexical:
+        raise PathError(
+            "Second Brain repository path must not contain symlinks or aliases"
+        )
     vault = lexical / "second-brain"
     if not (lexical / ".git").exists():
         raise PathError("Second Brain source checkout is not a Git repository")
@@ -71,7 +79,7 @@ def _validated_source_repo(candidate: Path) -> Path:
     front_door = vault / "README.md"
     if not front_door.is_file() or front_door.is_symlink():
         raise PathError("Second Brain repository could not be resolved")
-    return lexical.resolve()
+    return resolved
 
 
 def state_root() -> Path:
