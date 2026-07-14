@@ -18,6 +18,8 @@ from pathlib import Path
 from typing import Any, Iterable
 from urllib.parse import unquote, urlsplit
 
+from ai_workflow_second_brain import second_brain_findings
+
 
 SCHEMA_VERSION = 1
 TOKEN_METHOD = "ceil(unicode_characters/4)"
@@ -799,6 +801,7 @@ def build_report(repo: Path, verify_sources: bool = False) -> dict[str, Any]:
             *catalog_issues,
             *provenance_findings(repo, skill_dirs, verify_sources),
             *semantic_findings(repo, instruction_files),
+            *second_brain_findings(repo),
         ]
     )
     errors = sum(finding["severity"] == "error" for finding in findings)

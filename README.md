@@ -362,6 +362,12 @@ The engineering boundary matters more than the folder tree:
   checksum-verifiable
 - protected upgrades preview one batch approval and make dated exact-byte
   backups without overwriting existing files
+- the daily checkpoint refuses a dirty index, freezes and scans only the vault
+  and Codex-config allowlist, uploads reachable Git LFS objects explicitly,
+  and pushes only the current branch's exact configured-upstream ref without
+  local hooks or unrelated tags
+- an opt-in persistent systemd user timer runs that checkpoint at 16:20 local
+  time and catches up after sleep or downtime without requiring sudo
 
 This layer links to the existing canonical owners for preferences, lessons,
 plans, tasks, and temporal memory; it does not duplicate them. The full
@@ -441,10 +447,18 @@ installs the latest release archive into `~/.codex/superpowers` and
 writes `~/.agents/skills/superpowers` as a symlink to its `skills/`
 directory.
 
-The same apply installs the Second Brain command and shared session skill. The
-tracked source command remains available as
+The same apply installs the Second Brain command, shared session skill, and
+user-level checkpoint units, but it does not enable the timer. The tracked
+source command remains available as
 `scripts/executable_second-brain`, and the installed `second-brain` command
 works from unrelated directories without sudo.
+
+After the verified implementation is pushed, opt into the daily checkpoint
+with `setup-second-brain-timer --enable`. The setup command reapplies and
+validates only the installed launcher, exact runtime-package modules, and two
+user units before enabling the timer; it never invokes sudo. Chezmoi ignores
+generated Python bytecode, and setup rejects unexpected runtime-package root
+entries that could shadow the reviewed modules.
 
 To use the AI layer after the dotfiles are in place, run the
 repo-managed wrapper directly, or make sure it is the `codex` command
@@ -477,12 +491,18 @@ Codex config back into the repo before running `chezmoi apply`.
    one step.
 4. Apply changes with `chezmoi -S "$PWD" apply` when you want the direct
    chezmoi path instead of the higher-level refresh helper.
-5. Run `sync-superpowers-release` when you want chezmoi to refresh the
+5. Preview the protected daily Git operation with
+   `second-brain checkpoint --dry-run`; use `--no-push` only when you
+   intentionally want the resulting checkpoint commit to remain local.
+6. Use `setup-second-brain-timer --check` to validate an installed setup,
+   `--enable` to opt into the persistent 16:20 user timer, and `--disable` to
+   stop it.
+7. Run `sync-superpowers-release` when you want chezmoi to refresh the
    external `obra/superpowers` bundle from the latest GitHub release.
-6. Run the repo-managed `codex` wrapper from the repo root when you want
+8. Run the repo-managed `codex` wrapper from the repo root when you want
    the tracked AGENTS chain, Codex config, local skills, and plans to
    shape the session.
-7. Keep the root `README.md` aligned whenever the repo's public workflow
+9. Keep the root `README.md` aligned whenever the repo's public workflow
    changes, especially for install steps, usage, command flags, the
    repo-based tech stack section, and recruiter-facing positioning.
 
@@ -505,7 +525,7 @@ source in this repo.
 | `chezmoi -S "$PWD" diff` | Preview what the checked-out source tree would change in `$HOME`. | `-S` / `--source` points chezmoi at this clone instead of the default source directory. `--reverse` flips the diff direction when you need the comparison the other way around. |
 | `chezmoi -S "$PWD" apply -n -v` | Dry-run an apply with extra detail before touching files in `$HOME`. | `-S` / `--source` uses this repo as the source state. `-n` / `--dry-run` previews changes without writing them. `-v` / `--verbose` prints more detail. |
 | `chezmoi -S "$PWD" apply` | Apply the tracked source state from this clone into `$HOME`. | `-S` / `--source` uses this repo as the source state. `-P` / `--parent-dirs` is useful when you apply a nested target and also want its parent directories handled. |
-| `refresh-config` | Snapshot the live Codex config into the repo, then reapply the chezmoi-managed environment layer. | No user-facing flags. It copies `~/.codex/config.toml` into `dot_codex/config.toml`, runs `chezmoi apply`, syncs shortcuts, and reloads fish. |
+| `refresh-config` | Snapshot the live Codex config into the repo, then reapply the chezmoi-managed environment layer. | No user-facing flags. It calls the shared `snapshot-codex-config` safety boundary, runs `chezmoi apply`, syncs shortcuts, and reloads fish. |
 | `sync-superpowers-release` | Refresh the externally managed `obra/superpowers` skill bundle from the latest GitHub release archive through chezmoi. | `--dry-run` previews the release refresh without writing files. `LINUX_CONFIG_SOURCE` points the helper at this repo when it is not checked out at `$HOME/linux-config`. |
 | `./scripts/executable_ai-workflow-doctor` | Audit the repo's AI instruction and skill surface, or capture a stable before/after measurement for workflow optimization. | `--repo PATH` selects the repository. `--format text\|json` selects human or machine output. `--snapshot PATH` writes a deterministic JSON baseline; `--compare PATH` compares the current report with one. `--verify-sources` resolves declared local source archives when available. `--check` exits nonzero for objective errors while review findings remain non-blocking warnings. |
 | `./scripts/executable_apply-pywal-theme <wallpaper>` | Regenerate the active `pywal` theme through the repo-owned wrapper so wallpaper changes also refresh kitty and the i3 color resources this repo depends on. | Pass an image path directly, or pass raw `wal` flags when you need that lower-level control. The wrapper runs `wal --saturate 0.8 -e`, reloads Xresources, refreshes running kitty windows when the socket is available, and regenerates the derived i3 palette file. |
@@ -519,6 +539,9 @@ source in this repo.
 | `second-brain doctor` | Audit the tracked vault for structure, privacy, ownership, import-frontmatter, hard-link, and Git LFS errors without mutating it. | `--format text\|json` selects output. `--check` exits 1 when objective errors exist. |
 | `second-brain migrate` | Inventory and plan selected external text, copy one explicitly approved batch into the archive, or verify its private resume ledger. | Subcommands are `inventory --source PATH` with repeatable absolute roots, `plan --inventory PATH`, `apply --plan PATH --approve SHA256`, and `verify --ledger PATH`. Follow [the copy-first procedure](docs/second-brain.md#copy-first-text-migration); no initial migration is automatic. |
 | `second-brain upgrade` | Preview append-only protected-vault changes and exact-byte dated backups. | `--dry-run` prints the current batch and approval SHA. `--apply --approve SHA256` accepts only that unchanged batch; the current schema-v1 preview has zero pending operations. |
+| `snapshot-codex-config` | Validate and atomically copy the live `~/.codex/config.toml` into its exact chezmoi source target. | `--dry-run` validates regular-file ownership, the strict 1,000,000-byte boundary, TOML, likely-secret content, target mapping, and filesystem boundaries without changing the tracked target. Checkpoint callers additionally bind that target to their exact repository. |
+| `second-brain checkpoint` | Validate and ship one allowlisted daily Second Brain/Codex-config checkpoint on the current branch. | `--dry-run` performs candidate preflight without staging, committing, or pushing; it does not prove the later immutable-tree or shipping gates. `--no-push` commits after all gates but leaves the commit local. With no flags, the command explicitly uploads reachable LFS objects and pushes only the exact configured-upstream ref without local hooks, tags, or force. |
+| `setup-second-brain-timer` | Validate, enable, or disable the persistent 16:20 systemd user checkpoint timer without sudo. | Exactly one of `--check`, `--enable`, or `--disable` is required. `--enable` applies the launcher, exact runtime-package modules, and two unit targets before daemon reload and activation; unexpected package-root files, directories, or symlinks fail closed, while an owned real `__pycache__` directory is allowed. Recovery-oriented `--disable` does not require chezmoi or a source checkout. |
 
 ## Reproducibility Through Chezmoi
 

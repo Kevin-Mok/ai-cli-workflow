@@ -7,6 +7,7 @@ import json
 import sys
 from typing import Any, Sequence
 
+from .checkpoint import CheckpointError, run_checkpoint
 from .doctor import build_report as build_doctor_report
 from .doctor import text_report as doctor_text_report
 from .migration import build_inventory, build_plan
@@ -56,6 +57,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--format", choices=("text", "json"), default="text"
     )
     doctor_parser.add_argument("--check", action="store_true")
+    checkpoint_parser = subparsers.add_parser(
+        "checkpoint", help="Validate and ship one safe daily checkpoint."
+    )
+    checkpoint_parser.add_argument("--dry-run", action="store_true")
+    checkpoint_parser.add_argument("--no-push", action="store_true")
     upgrade_parser = subparsers.add_parser(
         "upgrade", help="Preview or apply approval-bound protected vault upgrades."
     )
@@ -133,6 +139,11 @@ def main(argv: Sequence[str] | None = None) -> int:
             if args.check and report["summary"]["errors"]:
                 return 1
             return 0
+        if args.command == "checkpoint":
+            _print_json(
+                run_checkpoint(dry_run=args.dry_run, no_push=args.no_push)
+            )
+            return 0
         if args.command == "upgrade":
             if args.dry_run:
                 if args.approve:
@@ -170,7 +181,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             _print_json(closeout(payload))
             return 0
         parser.error("unsupported command")
-    except (ValidationError, PathError, LockError) as error:
+    except (ValidationError, PathError, LockError, CheckpointError) as error:
         print(f"second-brain: {error}", file=sys.stderr)
         return 2
     except ValueError as error:

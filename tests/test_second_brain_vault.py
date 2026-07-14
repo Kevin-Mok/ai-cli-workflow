@@ -2,6 +2,7 @@
 
 import json
 import re
+import subprocess
 import unittest
 from pathlib import Path
 
@@ -239,6 +240,46 @@ class SecondBrainVaultTest(unittest.TestCase):
         self.assertIn("Git LFS", policy)
         self.assertIn("manual", policy.lower())
         self.assertIn("External Media Index", policy)
+
+    def test_attachment_media_patterns_are_enforced_by_git_lfs(self) -> None:
+        attributes = REPO_ROOT / ".gitattributes"
+        self.assertTrue(attributes.is_file(), "Git LFS attributes are missing")
+        extensions = (
+            "png", "jpg", "jpeg", "gif", "webp", "avif", "svg", "pdf",
+            "mp3", "wav", "m4a", "flac", "ogg", "opus", "aac",
+            "mp4", "mov", "mkv", "webm", "avi",
+        )
+        for extension in extensions:
+            relative = f"second-brain/07 Attachments/fixture.{extension}"
+            completed = subprocess.run(
+                [
+                    "git", "check-attr", "filter", "diff", "merge", "text",
+                    "--", relative,
+                ],
+                cwd=REPO_ROOT,
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            self.assertEqual(
+                completed.stdout.splitlines(),
+                [
+                    f"{relative}: filter: lfs",
+                    f"{relative}: diff: lfs",
+                    f"{relative}: merge: lfs",
+                    f"{relative}: text: unset",
+                ],
+            )
+
+        markdown = "second-brain/07 Attachments/fixture.md"
+        completed = subprocess.run(
+            ["git", "check-attr", "filter", "--", markdown],
+            cwd=REPO_ROOT,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(completed.stdout, f"{markdown}: filter: unspecified\n")
 
     def test_no_unresolved_placeholders_exist(self) -> None:
         placeholder = re.compile(

@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import importlib
 import os
+import stat
 import subprocess
 import sys
 import tempfile
@@ -92,6 +93,25 @@ class SecondBrainPathSafetyTest(unittest.TestCase):
             )
 
         self.assertEqual(target.read_bytes(), b"changed-after-preview\n")
+
+    def test_atomic_replace_rejects_target_mode_drift_under_lease(self) -> None:
+        original = b"previewed\n"
+        target = self.boundary / "protected-mode.md"
+        target.write_bytes(original)
+        target.chmod(0o600)
+
+        with self.assertRaises(self.paths.PathError):
+            self.paths.atomic_replace_if_unchanged(
+                self.boundary,
+                target,
+                hashlib.sha256(original).hexdigest(),
+                b"AUTOMATED_UPDATE\n",
+                mode=0o640,
+                expected_mode=0o640,
+            )
+
+        self.assertEqual(original, target.read_bytes())
+        self.assertEqual(0o600, stat.S_IMODE(target.stat().st_mode))
 
     def test_atomic_replace_preserves_edit_injected_after_identity_check(self) -> None:
         original = b"previewed\n"

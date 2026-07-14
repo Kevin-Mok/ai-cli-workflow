@@ -62,9 +62,11 @@ confirmation before tracked writes.
 At 16:20 local time, a systemd user timer validates the current branch and
 upstream, refuses an already-dirty index, snapshots the live Codex config through
 the same helper used by `refresh-config`, validates the vault and staged content,
-stages only the approved allowlist, commits a dated checkpoint when needed, and
-performs an ordinary push. It never switches branches, pulls, rebases, resets,
-amends, force-pushes, or consumes unrelated staged work.
+stages only the approved allowlist, freezes and validates an immutable tree,
+commits that exact tree when needed, explicitly uploads reachable Git LFS
+objects, and pushes only the exact configured-upstream ref without local hooks
+or unrelated tags. It never switches branches, pulls, rebases, resets, amends,
+force-pushes, or consumes unrelated staged work.
 
 ## Current Context And Protected State
 
@@ -156,8 +158,8 @@ Not in scope:
 - Protected upgrades use immutable append-only specifications, one batch
   approval, exact-byte dated backups, and atomic no-overwrite creation. The
   complete schema-v1 vault has no pending default upgrade.
-- Git LFS configuration is deferred to Task 3 and remains empty until a future
-  explicit media import.
+- Task 3 configures Git LFS attributes for future explicit media imports; the
+  tracked LFS object set remains empty until such an import is approved.
 - Raw available session text is local/private and secret-redacted; confirmed
   sanitized summaries alone may enter Git.
 - Daily briefing contains one confirmed measurable ExampleProject outcome. Closeout
@@ -270,7 +272,7 @@ content or binary attachment is part of Task 1:
   and ancestor revalidation.
 - Create `scripts/second_brain/safe_files.py` for descriptor-relative reads,
   Linux write leases, and checksum-bound atomic exchange.
-- Create `scripts/second_brain/private_state.py` for anchored 0700/0600 private
+- Create `scripts/second_brain/state_private.py` for anchored 0700/0600 private
   control-file reads.
 - Create `scripts/second_brain/vault.py` for frontmatter, stable sections,
   capture, closeout, and status.
@@ -290,8 +292,9 @@ content or binary attachment is part of Task 1:
   ledger validation and source/destination checksum findings.
 - Create `scripts/second_brain/upgrade.py` for approval-bound append-only
   upgrades and protected exact-byte backups.
-- Create `scripts/second_brain/checkpoint.py` for Git validation, allowlisting,
-  staged scans, commit, and push.
+- Create cohesive `scripts/second_brain/checkpoint*.py` modules for Git
+  validation, allowlisting, immutable-tree scans, exact commit creation,
+  explicit LFS delivery, and isolated exact-ref push.
 - Create `scripts/second_brain/config_snapshot.py` for shared live-to-source
   config snapshot behavior.
 
@@ -414,7 +417,7 @@ only interfaces already present in this commit.
 ### Task 2: Deterministic capture, doctor, migration, and protected upgrades
 
 **Files:** `scripts/second_brain/{cli,content_security,paths,safe_contract,
-safe_create,safe_files,private_state,vault,doctor,doctor_contract,doctor_lfs,
+safe_create,safe_files,state_private,vault,doctor,doctor_contract,doctor_lfs,
 migration_common,migration_inventory,migration,migration_apply,
 migration_verify,upgrade}.py`,
 `tests/test_second_brain_command.py`, `tests/test_second_brain_concurrency.py`,
@@ -460,55 +463,68 @@ Task 1.
 
 ### Task 3: Safe config snapshot, checkpoint, LFS validation, and timer
 
-**Files:** `scripts/second_brain/{config_snapshot,checkpoint}.py`,
+**Files:** `.gitattributes`, `.chezmoiignore`,
+`scripts/ai_workflow_second_brain.py`,
+`scripts/second_brain/{cli,config_snapshot,checkpoint,checkpoint_contract,
+checkpoint_git,checkpoint_scan,migration_common,paths,remove_state,safe_files,
+state_private}.py`,
 `scripts/executable_snapshot-codex-config`,
 `scripts/executable_setup-second-brain-timer`,
 `dot_config/systemd/user/second-brain-checkpoint.{service,timer}`,
-`dot_config/fish/functions/refresh-config.fish`, `.gitattributes`,
+`dot_config/fish/functions/refresh-config.fish`,
 `scripts/executable_ai-workflow-doctor`,
 `tests/test_second_brain_config_snapshot.py`,
-`tests/test_second_brain_checkpoint.py`, `tests/test_second_brain_timer.py`,
+`tests/test_second_brain_checkpoint.py`,
+`tests/test_second_brain_checkpoint_{commit_failure,hook_isolation,journal,
+security}.py`, `tests/test_second_brain_timer.py`,
+`tests/test_second_brain_{paths,vault}.py`,
 `tests/test_refresh_config_function.sh`, `tests/test_ai_workflow_doctor.py`,
-`docs/smoke-tests.md`, root `README.md`, and this plan.
+`docs/second-brain.md`, `docs/smoke-tests.md`,
+`docs/postmortem/2026-07-14-shell-interpolation-early-push.md`, root
+`README.md`, `tasks/lessons.md`, and this plan.
 
 **Consumes:** Task 2 doctor and common path/locking primitives.
 
 **Produces:** safe daily Git shipping and final runtime setup.
 
-- [ ] Write config-snapshot tests for chezmoi target resolution, regular-file
+- [x] Write config-snapshot tests for chezmoi target resolution, regular-file
   checks, TOML validation, expected target mapping, no-content logging, dry run,
   atomic copy, and explicit fixture overrides.
-- [ ] Extend the refresh-config shell contract test so the shared helper is
+- [x] Extend the refresh-config shell contract test so the shared helper is
   required while apply, shortcut regeneration, and Fish reload remain only in
   the interactive function.
-- [ ] Write temporary-repository checkpoint tests for lock contention,
+- [x] Write temporary-repository checkpoint tests for lock contention,
   non-worktree/detached/missing-upstream rejection, dirty-index abort, config
   inclusion, stable secret/sensitive-path and LFS rejection, exact allowlist,
-  no-op, exact commit subject, ordinary push, and preserved local commit after a
-  fake-remote push failure.
-- [ ] Write timer/setup tests for exact 16:20 schedule, `Persistent=true`, no
-  sudo, XDG lock, content-safe journal output, chezmoi paths, and setup/check/
-  disable idempotency.
-- [ ] Run Task 3 focused tests and observe expected missing-helper/module/unit
+  no-op, exact immutable commit tree, explicit reachable-LFS upload, isolated
+  exact-ref push, and preserved local commit after upload or ref-push failure.
+- [x] Write timer/setup tests for exact 16:20 schedule, `Persistent=true`, no
+  sudo, XDG lock, content-safe journal output, exact launcher/runtime-module/
+  unit installation, bytecode-cache exclusion, runtime shadow rejection, and
+  source-independent disable recovery.
+- [x] Run Task 3 focused tests and observe expected missing-helper/module/unit
   failures.
-- [ ] Implement the shared snapshot helper, Fish integration, checkpoint module,
-  setup tool, LFS attributes, systemd units, and composed doctor behavior.
-- [ ] Run the Task 3 focused suite to GREEN, then run all Second Brain tests and
+- [x] Implement the shared snapshot helper, Fish integration, cohesive
+  checkpoint modules, setup tool, LFS attributes, systemd units, and composed
+  doctor behavior.
+- [x] Run the Task 3 focused suite to GREEN, then run all Second Brain tests and
   the existing relevant AI workflow/shell regression suite.
-- [ ] Apply the smoke-test-capture skill to add one-line Action/Expected checks.
+- [x] Apply the smoke-test-capture skill to add one-line Action/Expected checks.
   Apply the readme-recruiter-sync gate using verified command help and preserve
   every pre-existing README/smoke hunk.
-- [ ] Run `git diff --check`, focused and broader test suites, skill validation,
+- [x] Run `git diff --check`, focused and broader test suites, skill validation,
   AI workflow doctor before/after comparison, exact chezmoi dry-runs for every
   installed target, and temporary-repository checkpoint proof.
-- [ ] Reconcile final diff against the approved tree, ownership, data flow,
+- [x] Reconcile final diff against the approved tree, ownership, data flow,
   adoption record, and source provenance. Run independent task and whole-change
   reviews; resolve every Critical/Important finding and re-verify.
-- [ ] Update this plan with final evidence, verify the protected config hash and
+- [x] Update this plan with final evidence, verify the protected config hash and
   staged allowlist, inspect the complete staged diff, and commit
   `feat(second-brain): add safe daily checkpoint automation`.
-- [ ] Push the three verified implementation commits once to the configured
-  upstream. Confirm local HEAD equals upstream.
+- [x] Record that an accidental shell interpolation pushed the already-verified
+  Task 1 and Task 2 commits early; do not rewrite published history.
+- [ ] Push the verified Task 3 commit to the configured upstream and confirm
+  local HEAD equals upstream.
 - [ ] Only after the push, run `setup-second-brain-timer --enable`, inspect the
   enabled state and next trigger, and handle any persistent catch-up as a
   separate authorized `chore(second-brain): checkpoint 2026-07-14` commit.
@@ -520,7 +536,7 @@ Focused automated commands:
 ```bash
 python3 -m unittest tests.test_second_brain_vault tests.test_second_brain_skill -v
 python3 -B -m unittest tests.test_second_brain_command tests.test_second_brain_concurrency tests.test_second_brain_doctor tests.test_second_brain_paths tests.test_second_brain_migration tests.test_second_brain_migration_apply tests.test_second_brain_upgrade -v
-python3 -m unittest tests.test_second_brain_config_snapshot tests.test_second_brain_checkpoint tests.test_second_brain_timer -v
+python3 -m unittest tests.test_second_brain_config_snapshot tests.test_second_brain_checkpoint tests.test_second_brain_checkpoint_commit_failure tests.test_second_brain_checkpoint_hook_isolation tests.test_second_brain_checkpoint_journal tests.test_second_brain_checkpoint_security tests.test_second_brain_timer -v
 bash tests/test_refresh_config_function.sh
 python3 -m unittest tests.test_ai_workflow_contract tests.test_ai_workflow_doctor tests.test_context_handoff_contract -v
 bash tests/test_claude_skill_links.sh
@@ -538,6 +554,7 @@ scripts/executable_readme-recruiter-sync
 git diff --check
 git lfs ls-files
 chezmoi apply --dry-run --verbose
+chezmoi managed
 sha256sum dot_codex/config.toml
 git diff --cached --name-only
 ```
@@ -551,8 +568,9 @@ Manual/runtime checks after implementation commits are pushed:
   and latest Daily Notes appear without dumping the full vault.
 - [ ] Action: run a fixture-backed capture and repeat it. Expected: the second
   invocation reports a no-op and note sections remain stable.
-- [ ] Action: run `setup-second-brain-timer --check`. Expected: units validate,
-  the user manager is reachable, and no sudo is requested.
+- [ ] Action: run `setup-second-brain-timer --check`. Expected: launcher,
+  runtime-package modules, and units validate; the user manager is reachable;
+  and no sudo is requested.
 - [ ] Action: inspect `systemctl --user status` and `list-timers` after enable.
   Expected: the timer is enabled and the next local trigger is 16:20.
 
@@ -572,15 +590,17 @@ Manual/runtime checks after implementation commits are pushed:
   read-only and re-hashed; ledger resumes without overwrites.
 - **Git contamination:** abort on staged input, stage only exact allowlist,
   inspect staged names, and never manipulate unrelated unstaged changes.
-- **Push failure:** retain the local checkpoint commit and report recovery; do
-  not retry, pull, merge, reset, or rewrite.
+- **Push failure:** explicitly upload reachable LFS objects before the isolated
+  exact-ref push; retain the local checkpoint commit and report content-safe
+  recovery without a bare push, retry, pull, merge, reset, or rewrite.
 - **Config damage:** validate TOML and target mapping, write atomically, keep the
   current config hash unchanged through all implementation commits.
 - **Timer catch-up:** activate only after implementation push; classify an
   immediate persistent run as a separate runtime checkpoint.
-- **Rollback:** run `setup-second-brain-timer --disable`, revert implementation
-  commits normally, restore approved overwrites from dated archive backups, and
-  leave migration originals and private raw state untouched.
+- **Rollback:** run the source-independent `setup-second-brain-timer --disable`,
+  revert implementation commits normally, restore approved overwrites from
+  dated archive backups, and leave migration originals and private raw state
+  untouched.
 
 ## Progress
 
@@ -592,8 +612,8 @@ Manual/runtime checks after implementation commits are pushed:
   repository patch.
 - [x] Task 1 implemented, reviewed, verified, and committed.
 - [x] Task 2 implemented, reviewed, verified, and committed.
-- [ ] Task 3 implemented, reviewed, verified, and committed.
-- [ ] Full verification and final independent review completed.
+- [x] Task 3 implemented, reviewed, verified, and committed.
+- [x] Full verification and final independent review completed.
 - [ ] Implementation series pushed and upstream equality confirmed.
 - [ ] Timer enabled and runtime state/next trigger verified.
 
@@ -638,6 +658,24 @@ Manual/runtime checks after implementation commits are pushed:
 | Task 2 integration gates | 34 AI workflow tests; skill validator; workflow doctor; README gate; three shell fixtures; `git diff --check` | Existing surfaces remain green and docs are synchronized | 34 passed; skill valid; doctor pass with one pre-existing duplicate-slug warning; `pass_no_change`; all fixtures and diff check passed | 0 |
 | Task 2 chezmoi dry-run | `chezmoi apply --dry-run --force` | Resolve the existing live-config divergence without prompting and perform no writes | Exited 0; the protected config checksum remained exact afterward | 0 |
 | Task 2 protected state | `sha256sum dot_codex/config.toml` | User-owned config remains literal and unstaged | Exact `3edd706e3cc03132764d9d0a1b741e0713f42e39dc16a6018ab205f9d1a85e2e` | 0 |
+| Task 3 initial RED | Focused config-snapshot, checkpoint, and timer modules | Missing production surfaces fail before implementation | The focused suite failed on the absent helper, checkpoint modules, setup command, and units | 1 |
+| Task 3 snapshot review RED/GREEN | Descriptor-bound source/target, strict-size, mode-drift, secret-content, and cross-repository mapping reproducers | Reject unsafe or changed files in dry-run and write modes without touching the protected target | Every reproduced boundary now fails closed; checkpoint callers bind chezmoi resolution to their exact repository target | 0 |
+| Task 3 checkpoint review RED/GREEN | Disposable repositories covering dirty index, intent-to-add, hooks, tags, upstream selection, immutable trees, LFS upload, and ref-push failure | Ship only the frozen allowlisted tree and preserve content-safe recovery evidence | Exact reachable-LFS upload precedes an isolated exact-ref push; hooks, tags, force, push defaults, and unrelated index/worktree state cannot alter the operation | 0 |
+| Task 3 timer cache RED | `test_chezmoi_ignores_runtime_bytecode_mapping_collisions` against the tracked ignore file | Generated cache entries must not collide with chezmoi directives | Failed with an inconsistent `private_state`/`remove_state` bytecode mapping | 1 |
+| Task 3 runtime exactness RED | Shadow-extension, package-directory, symlink, and symlinked-cache setup tests | Every unexpected or unsafe package-root entry must abort before activation | Four subcases activated under the earlier suffix-only check | 1 |
+| Task 3 timer cache/exactness GREEN | Four focused cache and runtime-root tests; real `chezmoi managed`; legacy-target dry-run | Caches are ignored, reviewed modules remain exact, and normal owned cache directories work | 4 tests passed in 0.498s; both real chezmoi commands exited cleanly with generated caches present | 0 |
+| Task 3 focused GREEN | Seven config/checkpoint/failure/hook/journal/security/timer modules | Complete Task 3 contract stays green after final hardening | 83 tests passed in 6.411s | 0 |
+| Early prerequisite push | Local/upstream hashes plus protected config hash after the shell-interpolation incident | No Task 3 or protected config content reached upstream | Local and upstream remained `dec36e0`; protected config stayed exact; linked postmortem records the incident | 0 |
+| Task 3 complete Second Brain suite | `python3 -B -m unittest discover -s tests -p 'test_second_brain_*.py'` | All Second Brain behavior remains green | 227 tests passed in 23.606s | 0 |
+| Task 3 repository regression | `python3 -B -m unittest discover -s tests -p 'test_*.py'` | Complete Python surface remains green | 274 tests passed in 26.357s | 0 |
+| Task 3 integration gates | 36 AI workflow tests; refresh-config, Claude-link, and Codex-wrapper fixtures; skill validator; systemd verify; README gate; `git diff --check`; changed-surface compile | Existing workflows, docs, units, and syntax remain valid | 36 passed; all fixtures passed; `Skill is valid!`; systemd and compile passed; `pass_no_change`; clean diff | 0 |
+| Task 3 live read-only health | Status, Second Brain doctor, upgrade dry-run, snapshot dry-run, and checkpoint dry-run | Healthy personalized vault and no mutation | Three projects, Inbox 0; doctor 0/0; upgrade empty; both dry-runs passed; checkpoint reported only the protected config candidate | 0 |
+| Task 3 AI doctor comparison | `scripts/executable_ai-workflow-doctor --repo . --format json --compare /tmp/second-brain-task2-doctor.json --check` | No new workflow finding or active instruction growth | No added/resolved findings and zero metric deltas; only the pre-existing duplicate brand-skill warning remains | 0 |
+| Task 3 chezmoi deployment | Exact 33-target and global `chezmoi apply --dry-run --force`; `chezmoi managed` with caches present | Every tracked install mapping resolves without writes or cache collisions | Exact target count 33; all three commands exited cleanly | 0 |
+| Task 3 LFS policy | `git lfs ls-files`; `git check-attr` probes | No current LFS payloads; attachment media uses LFS while Markdown stays text | LFS inventory empty; PNG/PDF mapped to LFS; Markdown attributes unspecified | 0 |
+| Task 3 final independent review | Fresh adversarial whole-change review and independent matrix | No unresolved Critical, Important, or Minor issue | Verdict READY; 128/128 reviewer matrix passed | n/a |
+| Task 3 protected pre-stage state | Config SHA-256, cached names, status, local/upstream hashes | Protected config exact and unstaged; index empty; prerequisite refs equal | Exact `3edd706e3cc03132764d9d0a1b741e0713f42e39dc16a6018ab205f9d1a85e2e`; cached list empty; both refs `dec36e0` | 0 |
+| Task 3 staged allowlist | Cached name/status/stat inspection plus complete staged diff review | Only approved Task 3 files are staged and protected config is excluded | 37 paths, 4,594 insertions, 85 deletions; protected config remained only an unstaged user modification; staged diff check clean | 0 |
 
 Task RED/GREEN, review, commit, push, and runtime evidence will be appended to
 this table as each checklist item is actually completed.
@@ -660,8 +698,8 @@ this table as each checklist item is actually completed.
 - While Task 1 was in progress, the user's pre-existing metaprompt work was
   independently committed and pushed as `dbc311d`. Task 1 did not stage or
   alter that work; the protected `dot_codex/config.toml` remains unstaged.
-- Task 1 was committed locally as `bd3d835` and remains unpushed until the
-  three-commit implementation series is complete.
+- Task 1 was committed as `bd3d835`; it and Task 2 reached upstream early
+  only through the separately documented shell-interpolation incident.
 - Initial migration remains unapplied. The initial schema-v1 upgrade registry
   intentionally has no pending operation; future operations append immutable
   specifications rather than rewriting history.
@@ -678,3 +716,15 @@ this table as each checklist item is actually completed.
   pre-existing live `~/.codex/config.toml` divergence. The final read-only gate
   therefore used `--dry-run --force`; it exited 0 without writing, and the
   protected tracked config checksum remained exact.
+- Task 3 review found that generated bytecode inherited chezmoi's filename
+  modifiers and collided after the state-module rename. The tracked ignore now
+  excludes every `__pycache__` tree and `.pyc` file; a real mapping
+  regression proves the fix with caches already present.
+- Installed timer runtime validation uses an exact root allowlist. It permits
+  only the reviewed regular module manifest and an owned, non-symlinked
+  `__pycache__` directory, rejecting native extensions, package directories,
+  other files, and symlinks before systemd activation.
+- Shell command substitution in a double-quoted read-only search caused the
+  verified Task 1 and Task 2 commits to push before Task 3. Published history
+  remains intact; the [postmortem](../docs/postmortem/2026-07-14-shell-interpolation-early-push.md)
+  and repository lesson record the prevention rule.

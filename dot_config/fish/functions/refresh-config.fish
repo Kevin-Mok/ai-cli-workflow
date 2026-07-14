@@ -1,6 +1,6 @@
 function refresh-config
-    set codex_source_path (chezmoi source-path ~/.codex/config.toml)
-    and cp ~/.codex/config.toml $codex_source_path
+    snapshot-codex-config
+    or return $status
     and echo 'Copied local Codex config into repo source.'
     chezmoi apply
     and echo 'Applied chezmoi.'

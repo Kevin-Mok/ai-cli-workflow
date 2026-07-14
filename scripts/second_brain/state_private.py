@@ -1,4 +1,4 @@
-"""Descriptor-anchored, permission-strict reads for private state files."""
+"""Descriptor-anchored, permission-strict private-state reads."""
 
 from __future__ import annotations
 

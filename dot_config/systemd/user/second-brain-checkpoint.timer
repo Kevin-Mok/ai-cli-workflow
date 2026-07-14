@@ -1,0 +1,11 @@
+[Unit]
+Description=Run the Second Brain checkpoint at 4:20 PM daily
+
+[Timer]
+OnCalendar=*-*-* 16:20:00
+Persistent=true
+AccuracySec=1s
+Unit=second-brain-checkpoint.service
+
+[Install]
+WantedBy=timers.target

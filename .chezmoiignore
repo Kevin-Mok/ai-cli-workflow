@@ -1,6 +1,9 @@
 README.md
 commit-msg.txt
 .agents/skills/feedback-memory/feedback.log
+**/__pycache__
+**/__pycache__/**
+**/*.pyc
 
 {{ if not .gui }}
 .config/i3/

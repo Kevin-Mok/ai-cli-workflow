@@ -1,0 +1,43 @@
+#!/usr/bin/env python3
+"""Safely snapshot the live Codex config into the chezmoi source tree."""
+
+from __future__ import annotations
+
+import argparse
+import sys
+from typing import Sequence
+
+from second_brain.config_snapshot import ConfigSnapshotError, snapshot_codex_config
+
+
+def main(argv: Sequence[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(
+        prog="snapshot-codex-config",
+        description="Validate and atomically snapshot the live Codex config.",
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Validate source and target without changing the target.",
+    )
+    args = parser.parse_args(argv)
+    try:
+        result = snapshot_codex_config(dry_run=args.dry_run)
+    except (ConfigSnapshotError, OSError, UnicodeError):
+        print(
+            "snapshot-codex-config: snapshot validation failed",
+            file=sys.stderr,
+        )
+        return 2
+
+    if result.dry_run:
+        print("Codex config snapshot dry run passed; no files changed.")
+    elif result.changed:
+        print("Codex config snapshot completed.")
+    else:
+        print("Codex config snapshot already current.")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

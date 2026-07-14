@@ -3,8 +3,7 @@
 The Second Brain is a deterministic, plain-Markdown context layer shared by
 Codex and Claude. The tracked vault stays public-sanitized and inspectable;
 private raw session capture stays outside Git. This guide covers the verified
-Task 2 command surface. The daily Git checkpoint and timer remain a separate
-Task 3 concern.
+capture, migration, config-snapshot, daily-checkpoint, and timer surfaces.
 
 ## Trust And Memory Boundaries
 
@@ -105,6 +104,144 @@ smaller than 1,000,000 bytes. Larger media is not loaded into memory and is
 still checked for LFS coverage, while oversized Markdown or canonical-owner
 files are errors. Finding keys and JSON ordering are stable. Without --check,
 findings are reported with exit 0; with --check, any error produces exit 1.
+
+## Codex Config Snapshot
+
+The shared snapshot helper validates the live Codex config and its exact
+chezmoi target without printing either file's contents:
+
+    scripts/executable_snapshot-codex-config --dry-run
+    scripts/executable_snapshot-codex-config
+
+The dry run resolves `~/.codex/config.toml` through chezmoi, requires the
+target to end in `dot_codex/config.toml`, validates both as distinct,
+single-link regular files owned by the current user and strictly smaller than
+1,000,000 bytes, parses the live file as TOML, rejects likely-secret content,
+and changes nothing. A normal run reports `already current` when the bytes
+match. When they differ, it atomically replaces only the tracked target,
+preserves the target mode, and refuses a concurrent target change instead of
+overwriting it.
+
+`refresh-config` calls this helper before its interactive chezmoi apply,
+shortcut regeneration, and Fish reload. The daily checkpoint calls the same
+snapshot operation before staging, but additionally requires chezmoi's resolved
+target to equal that checkpoint's exact repository target. Any mismatch or
+snapshot failure aborts the checkpoint with a content-free error.
+
+## Daily Checkpoint And Recovery
+
+Preview the candidate preflight without changing the config snapshot target,
+staging, committing, or pushing:
+
+    second-brain checkpoint --dry-run
+
+Passing this preflight does not exercise or prove the later immutable-tree,
+commit, Git LFS upload, or exact-ref push gates.
+
+Use `--no-push` to create a reviewed local checkpoint commit without pushing,
+or omit both flags for the normal commit-and-push path:
+
+    second-brain checkpoint --no-push
+    second-brain checkpoint
+
+The checkpoint acquires the shared mutation lock and requires a Git worktree,
+an attached branch, a configured upstream, and a clean index. It then runs the
+config snapshot, Second Brain doctor, and README recruiter-sync gate before it
+stages anything. An existing staged change, including intent-to-add, is left
+untouched and causes an immediate failure.
+
+Only these paths may enter a checkpoint:
+
+- `second-brain/00 Context/`
+- `second-brain/01 Inbox/`
+- `second-brain/02 Projects/`
+- `second-brain/03 Areas/`
+- `second-brain/04 Resources/`
+- `second-brain/05 Daily Notes/`
+- `second-brain/06 Archive/`
+- `second-brain/07 Attachments/`
+- `dot_codex/config.toml`
+
+Unrelated unstaged changes remain untouched. Candidate paths are rechecked
+against the allowlist, regular-file boundaries, sensitive names, secret-like
+content, and Git LFS policy. After exact-path staging, the helper freezes an
+immutable Git tree, derives its paths against the original parent, and repeats
+those checks against the frozen blobs. Non-media content must be valid UTF-8
+without NUL bytes and strictly smaller than 1,000,000 bytes so the secret scan
+can audit it completely. Attachment media must match the tracked LFS patterns,
+and the frozen blob must be an LFS pointer rather than embedded binary data.
+
+No eligible diff reports a noop. Otherwise the commit subject is exactly
+`chore(second-brain): checkpoint YYYY-MM-DD`. The helper creates that exact
+tree without running commit hooks and atomically advances only the branch it
+validated. The normal path explicitly uploads Git LFS objects reachable from
+the checkpoint commit, then pushes only that commit to the exact configured
+upstream ref with local push hooks, tags, signing, recursion, pruning,
+mirroring, and force disabled. It never pulls, rebases, resets, amends,
+switches branches, or retries in a loop.
+
+If validation fails after automatic staging, or a commit operation fails, the
+helper restores its allowlisted staging only when HEAD and the index still
+match the state it owns; otherwise it preserves concurrent state and exits
+nonzero. Preserve the evidence, fix the reported gate, confirm the index is
+clean, and rerun. Do not discard unrelated work.
+
+If the LFS upload or ref push fails, the dated local commit remains intact and
+the error reports its exact hash; an LFS failure happens before the remote Git
+ref moves. Inspect that commit and the configured remote/ref, correct the
+remote condition, then repeat the same two explicit operations with those
+validated values:
+
+    git lfs push <remote> <commit>
+    git push --no-all --no-mirror --no-tags --no-follow-tags --no-prune --no-force --no-verify --signed=no --recurse-submodules=no -- <remote> <commit>:<refs/heads/upstream>
+
+Do not use a bare `git push`, rewrite, or recreate the preserved commit. A
+successful `--no-push` run uses the same explicit recovery sequence when it is
+ready to ship.
+
+## 4:20 PM User Timer
+
+The chezmoi-managed systemd user timer runs at 16:20 in the machine's local
+timezone and uses `Persistent=true`, so a missed trigger may run immediately
+when the timer next starts. The service runs `second-brain checkpoint`, sends
+content-free outcomes and errors to the user journal, and never needs sudo.
+
+The reusable setup tool supports all lifecycle operations:
+
+    scripts/executable_setup-second-brain-timer --check
+    scripts/executable_setup-second-brain-timer --enable
+    scripts/executable_setup-second-brain-timer --disable
+
+After chezmoi installs the tool, the shorter `setup-second-brain-timer` command
+is equivalent. Every operation uses a private lock below
+`${XDG_STATE_HOME:-$HOME/.local/state}/second-brain/locks` and fails nonzero if
+another setup operation is running. `--check` validates the source units, user
+manager, installed launcher identity, installed runtime-package modules,
+installed unit identity, and installed unit syntax without applying or enabling
+anything. The runtime-package root may contain only the exact manifest of
+owned, single-link regular `.py` modules plus an owned real `__pycache__`
+directory. Unexpected extensions, package directories, files, or symlinks fail
+before activation because they could shadow reviewed code. Generated bytecode
+is ignored by chezmoi so it cannot become a conflicting managed target.
+`--enable` applies exactly the launcher, runtime-package modules, and two
+units, repeats those installed checks, reloads the user manager, and enables
+the timer immediately. `--disable` idempotently stops and disables the timer
+but leaves the managed files in place; its private XDG lock does not depend on
+chezmoi or a working source checkout, so it remains available for recovery.
+
+Do not run `--enable` until the complete verified implementation series has
+been pushed. After that push, activate and inspect it without sudo:
+
+    scripts/executable_setup-second-brain-timer --enable
+    scripts/executable_setup-second-brain-timer --check
+    systemctl --user list-timers second-brain-checkpoint.timer
+    systemctl --user status second-brain-checkpoint.timer
+    journalctl --user -u second-brain-checkpoint.service
+
+Confirm the next local trigger is 16:20. If `Persistent=true` causes an
+immediate catch-up, treat it as the separately authorized daily checkpoint:
+inspect its content-free journal result and the repository/upstream state
+rather than folding it into the implementation commit series.
 
 ## Copy-First Text Migration
 

@@ -3,6 +3,7 @@
 import json
 import math
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -143,6 +144,46 @@ class AiWorkflowDoctorTests(unittest.TestCase):
         self.assertEqual(
             json_report["metrics"]["skills"], {"actual": 1, "catalogued": 1}
         )
+
+    def test_composes_second_brain_findings_without_rewriting_existing_keys(
+        self,
+    ) -> None:
+        files = healthy_files()
+        files["AGENTS.md"] += "\n[missing](docs/missing.md)\n"
+        directory, repo = self.make_repo(files)
+        self.addCleanup(directory.cleanup)
+        (repo / ".git").mkdir()
+        shutil.copytree(REPO_ROOT / "second-brain", repo / "second-brain")
+        learning = repo / "second-brain" / "00 Context" / "Learnings.md"
+        learning.write_text(
+            learning.read_text(encoding="utf-8") + "\n{{review later}}\n",
+            encoding="utf-8",
+        )
+
+        report = self.json_report(repo)
+        keys = {finding["key"] for finding in report["findings"]}
+        self.assertIn(
+            "broken_local_reference:AGENTS.md:docs/missing.md",
+            keys,
+        )
+        self.assertIn(
+            "unresolved_placeholder:00 Context/Learnings.md",
+            keys,
+        )
+
+    def test_non_git_fixture_with_second_brain_skips_git_extension_safely(
+        self,
+    ) -> None:
+        directory, repo = self.make_repo()
+        self.addCleanup(directory.cleanup)
+        shutil.copytree(REPO_ROOT / "second-brain", repo / "second-brain")
+
+        completed = self.run_doctor(repo, "--format", "json")
+
+        self.assertEqual(completed.returncode, 0, completed.stderr)
+        self.assertNotIn("Traceback", completed.stderr)
+        report = json.loads(completed.stdout)
+        self.assertEqual(report["summary"]["status"], "pass")
 
     def test_metrics_distinguish_utf8_bytes_characters_and_token_estimate(self) -> None:
         content = "# Café 🚀\n"

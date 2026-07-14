@@ -33,6 +33,19 @@ def resolve_repo() -> Path:
     return repo
 
 
+def _known_repo_without_external_lookup() -> Path | None:
+    override = os.environ.get("SECOND_BRAIN_REPO_ROOT")
+    if override:
+        try:
+            return _validated_source_repo(Path(override).expanduser())
+        except PathError:
+            pass
+    try:
+        return _repo_from_module()
+    except PathError:
+        return None
+
+
 def _repo_from_module() -> Path | None:
     module = Path(__file__).resolve()
     for parent in module.parents:
@@ -82,7 +95,7 @@ def _validated_source_repo(candidate: Path) -> Path:
     return resolved
 
 
-def state_root() -> Path:
+def state_root(*, require_repository: bool = True) -> Path:
     base = Path(
         os.environ.get("XDG_STATE_HOME", str(Path.home() / ".local" / "state"))
     ).expanduser()
@@ -93,9 +106,16 @@ def state_root() -> Path:
     root = base / "second-brain"
     if root.is_symlink():
         raise PathError("Second Brain state root must not be a symlink")
-    repo = resolve_repo()
     resolved_root = root.resolve(strict=False)
-    for protected in (repo.resolve(), (repo / "second-brain").resolve()):
+    repo = (
+        resolve_repo()
+        if require_repository
+        else _known_repo_without_external_lookup()
+    )
+    protected_paths = [Path(__file__).resolve().parents[1]]
+    if repo is not None:
+        protected_paths.extend((repo.resolve(), (repo / "second-brain").resolve()))
+    for protected in protected_paths:
         if _paths_overlap(resolved_root, protected):
             raise PathError("Second Brain state must stay outside the repository")
     if (root / "README.md").is_file():
@@ -146,8 +166,12 @@ def safe_vault_path(repo: Path, relative: str) -> Path:
     return candidate
 
 
-def ensure_private_directory(path: Path) -> None:
-    root = state_root()
+def ensure_private_directory(
+    path: Path,
+    *,
+    require_repository: bool = True,
+) -> None:
+    root = state_root(require_repository=require_repository)
     try:
         relative = path.relative_to(root)
     except ValueError as error:

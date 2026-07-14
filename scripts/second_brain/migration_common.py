@@ -11,7 +11,7 @@ from typing import Any
 
 from .content_security import likely_secret_name, redact
 from .paths import PathError, safe_vault_path
-from .private_state import private_file_bytes
+from .state_private import private_file_bytes
 
 
 MAX_TEXT_BYTES = 1_000_000

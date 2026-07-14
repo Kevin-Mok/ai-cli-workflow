@@ -322,8 +322,9 @@ def atomic_replace_if_unchanged(
     expected_sha256: str,
     content: bytes,
     mode: int = 0o644,
+    expected_mode: int | None = None,
 ) -> None:
-    """Exchange a file only when the displaced bytes match the approved bytes."""
+    """Exchange a file only when approved bytes and optional mode still match."""
 
     with _open_relative_parent(root, target, create_parents=False) as (
         parent_fd,
@@ -335,7 +336,10 @@ def atomic_replace_if_unchanged(
             lease_was_broken,
             leased_descriptor,
         ):
-            if hashlib.sha256(before).hexdigest() != expected_sha256:
+            if (
+                hashlib.sha256(before).hexdigest() != expected_sha256
+                or not _same_file_state(metadata, metadata, expected_mode)
+            ):
                 raise PathError("safe filesystem target changed after approval")
             temporary_name = _write_temp_at(parent_fd, target_name, content, mode)
             preserve_temporary = False
@@ -350,14 +354,16 @@ def atomic_replace_if_unchanged(
                     dir_fd=parent_fd,
                     follow_symlinks=False,
                 )
-                if not _same_file_identity(prepared_name, prepared):
+                if not _same_file_state(prepared_name, prepared, mode):
                     raise PathError("safe filesystem temporary file changed")
                 current = os.stat(
                     target_name,
                     dir_fd=parent_fd,
                     follow_symlinks=False,
                 )
-                if lease_was_broken() or not _same_file_identity(current, metadata):
+                if lease_was_broken() or not _same_file_state(
+                    current, metadata, expected_mode
+                ):
                     raise PathError("safe filesystem target changed after approval")
                 _rename_exchange_at(parent_fd, temporary_name, target_name)
                 preserve_temporary = True
@@ -370,7 +376,9 @@ def atomic_replace_if_unchanged(
                     dir_fd=parent_fd,
                     follow_symlinks=False,
                 )
-                if not _same_file_identity(displaced_name_metadata, metadata):
+                if not _same_file_state(
+                    displaced_name_metadata, metadata, expected_mode
+                ):
                     preserve_temporary = True
                     os.fsync(parent_fd)
                     raise PathError(
@@ -378,7 +386,9 @@ def atomic_replace_if_unchanged(
                     )
                 displaced, displaced_metadata = _read_descriptor(leased_descriptor)
                 if (
-                    not _same_file_identity(displaced_metadata, metadata)
+                    not _same_file_state(
+                        displaced_metadata, metadata, expected_mode
+                    )
                     or hashlib.sha256(displaced).hexdigest() != expected_sha256
                 ):
                     if lease_was_broken():
@@ -398,7 +408,7 @@ def atomic_replace_if_unchanged(
                         dir_fd=parent_fd,
                         follow_symlinks=False,
                     )
-                    if not _same_file_identity(restored_temp, prepared):
+                    if not _same_file_state(restored_temp, prepared, mode):
                         preserve_temporary = True
                         raise PathError(
                             "safe filesystem conflict recovery was preserved"
@@ -414,7 +424,7 @@ def atomic_replace_if_unchanged(
                 )
                 if (
                     lease_was_broken()
-                    or not _same_file_identity(installed_metadata, prepared)
+                    or not _same_file_state(installed_metadata, prepared, mode)
                     or installed != content
                 ):
                     preserve_temporary = True
@@ -426,7 +436,9 @@ def atomic_replace_if_unchanged(
                     leased_descriptor
                 )
                 if (
-                    not _same_file_identity(displaced_now_metadata, metadata)
+                    not _same_file_state(
+                        displaced_now_metadata, metadata, expected_mode
+                    )
                     or hashlib.sha256(displaced_now).hexdigest() != expected_sha256
                 ):
                     preserve_temporary = True
@@ -441,7 +453,9 @@ def atomic_replace_if_unchanged(
                 )
                 if (
                     lease_was_broken()
-                    or not _same_file_identity(final_displaced_name, metadata)
+                    or not _same_file_state(
+                        final_displaced_name, metadata, expected_mode
+                    )
                 ):
                     preserve_temporary = True
                     os.fsync(parent_fd)
@@ -468,6 +482,23 @@ def _same_file_identity(first: os.stat_result, second: os.stat_result) -> bool:
         and first.st_nlink == 1
         and second.st_nlink == 1
         and (first.st_dev, first.st_ino) == (second.st_dev, second.st_ino)
+    )
+
+
+def _same_file_state(
+    first: os.stat_result,
+    second: os.stat_result,
+    expected_mode: int | None,
+) -> bool:
+    return (
+        _same_file_identity(first, second)
+        and (
+            expected_mode is None
+            or (
+                stat.S_IMODE(first.st_mode) == expected_mode
+                and stat.S_IMODE(second.st_mode) == expected_mode
+            )
+        )
     )
 
 
