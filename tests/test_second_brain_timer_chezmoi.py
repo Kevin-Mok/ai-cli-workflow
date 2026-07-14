@@ -93,6 +93,55 @@ class SecondBrainTimerChezmoiTest(unittest.TestCase):
         self.assertEqual(completed.returncode, 0, completed.stderr)
         self.assertNotIn("__pycache__", completed.stdout)
 
+    def test_real_chezmoi_requires_absolute_applied_front_door(self) -> None:
+        source = self.root / "source"
+        destination = self.root / "destination"
+        managed_front_door = source / "second-brain" / "README.md"
+        applied_front_door = destination / "second-brain" / "README.md"
+        managed_front_door.parent.mkdir(parents=True)
+        managed_front_door.write_text("# Second Brain\n", encoding="utf-8")
+        destination.mkdir()
+        config = self.root / "chezmoi-config.toml"
+        config.write_text("[data]\ngui = true\n", encoding="utf-8")
+        common = [
+            "chezmoi",
+            "--config",
+            str(config),
+            "--source",
+            str(source),
+            "--destination",
+            str(destination),
+            "--persistent-state",
+            str(self.root / "source-path-state.boltdb"),
+            "source-path",
+        ]
+        env = {
+            **os.environ,
+            "HOME": str(destination),
+            "XDG_CACHE_HOME": str(self.root / "source-path-cache"),
+        }
+
+        absolute = subprocess.run(
+            [*common, str(applied_front_door)],
+            cwd=self.root,
+            env=env,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+        relative = subprocess.run(
+            [*common, "second-brain/README.md"],
+            cwd=self.root,
+            env=env,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+
+        self.assertEqual(absolute.returncode, 0, absolute.stderr)
+        self.assertEqual(Path(absolute.stdout.strip()), managed_front_door)
+        self.assertNotEqual(relative.returncode, 0)
+
     def test_real_chezmoi_exact_apply_installs_clean_target_set(self) -> None:
         destination = self.root / "clean-destination"
         runtime_dir = destination / "scripts" / "second_brain"

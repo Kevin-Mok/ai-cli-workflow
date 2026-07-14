@@ -188,8 +188,18 @@ of stacking duplicates.
   stops processes that keep the mount busy, reports `Unmounted Pixel 9
   from /mnt/pixel-9`, and exits cleanly if the phone is already
   unmounted.
-- Action: Run `fish -ic 'refresh-config'` after changing tracked repo configuration on a machine where `chezmoi` and the shell helper scripts are available.
-  Expected: The live `~/.codex/config.toml` overwrites tracked `dot_codex/config.toml`, `chezmoi apply` runs, shortcuts regenerate, and fish reloads with the refreshed repo copy now matching the live Codex config.
+- Action: If tracked `dot_codex/config.toml` contains an intentional protected
+  change, run `snapshot-codex-config --dry-run`, then compare the live and
+  tracked files byte-for-byte before `refresh-config`.
+  Expected: The dry-run validates both files without changing either one; a
+  failed byte comparison identifies the divergence, so the operator stops and
+  reconciles ownership instead of overwriting the protected tracked version.
+- Action: Run `fish -ic 'refresh-config'` after changing tracked repo
+  configuration on a machine where chezmoi and the shell helpers are available
+  and the live Codex config is approved to overwrite the tracked copy.
+  Expected: The live `~/.codex/config.toml` overwrites tracked
+  `dot_codex/config.toml`, chezmoi applies, shortcuts regenerate, and Fish
+  reloads with the refreshed repo copy matching the live Codex config.
 - Action: Run `fish -c 'backup-phone-storage'` from a machine that can
   reach the phone over SSH on port `8022`.
   Expected: If Termux has `rsync` installed, `rsync` copies the shared

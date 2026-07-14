@@ -55,9 +55,10 @@ def _repo_from_module() -> Path | None:
 
 
 def _repo_from_chezmoi() -> Path:
+    applied_front_door = Path.home() / "second-brain" / "README.md"
     try:
         completed = subprocess.run(
-            ["chezmoi", "source-path", "second-brain/README.md"],
+            ["chezmoi", "source-path", str(applied_front_door)],
             check=True,
             capture_output=True,
             text=True,

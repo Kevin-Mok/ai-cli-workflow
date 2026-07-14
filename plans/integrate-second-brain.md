@@ -555,11 +555,34 @@ timer-runtime-parent-not-installed}.md`, root
   and protected-state gates; obtain an independent focused review.
 - [x] Inspect the staged 11-path allowlist and confirm the protected config is
   unstaged.
-- [ ] Commit/push
+- [x] Commit/push
   `fix(second-brain): create timer runtime parent on first install`.
-- [ ] Retry activation only after the fix is upstream; verify installed bytes,
+- [x] Retry activation only after the fix is upstream; verify installed bytes,
   enabled/active state, next 16:20 trigger, journal output, and any separate
   persistent catch-up checkpoint.
+
+### Task 3 activation follow-up: installed repository resolution
+
+**Files:** `scripts/second_brain/paths.py`,
+`tests/test_second_brain_{command,timer_chezmoi}.py`, `docs/second-brain.md`,
+`docs/smoke-tests.md`,
+`docs/postmortem/2026-07-14-{installed-runtime-relative-chezmoi-path,
+refresh-config-protected-file-overwrite}.md`, `tasks/lessons.md`, and this plan.
+
+- [x] Reproduce the installed `setup-second-brain-timer --check` failure and
+  prove real chezmoi rejects the relative `second-brain/README.md` target.
+- [x] Strengthen the installed-layout fake so it rejects every source-path
+  argument except the absolute applied vault front door; observe RED.
+- [x] Resolve the source repository from
+  `$HOME/second-brain/README.md`; observe the defining test GREEN.
+- [x] Restore the accidentally snapshotted protected repo config from local
+  session evidence and verify its exact pre-refresh SHA-256 while preserving
+  the newer live config.
+- [x] Run focused, Second Brain, repository, README, doctor, diff, protected
+  state, and independent review gates.
+- [ ] Commit/push `fix(second-brain): resolve installed source through chezmoi`.
+- [ ] Apply the fixed runtime module, validate the installed setup and
+  checkpoint dry run, and confirm the enabled timer remains scheduled.
 
 ## Exact Verification Plan
 
@@ -647,7 +670,7 @@ Manual/runtime checks after implementation commits are pushed:
 - [x] Task 3 implemented, reviewed, verified, and committed.
 - [x] Full verification and final independent review completed.
 - [x] Implementation series pushed and upstream equality confirmed.
-- [ ] Timer enabled and runtime state/next trigger verified.
+- [x] Timer enabled and runtime state/next trigger verified.
 
 ## Verification Evidence
 
@@ -716,6 +739,13 @@ Manual/runtime checks after implementation commits are pushed:
 | Timer follow-up independent review | Fresh adversarial diff review plus prior-reproducer reruns | No unresolved safety, rollback, mode, or target-bounding blocker | Verdict READY; independent focused suite 54/54, restrictive-mode/swap/open/ownership/rollback reproducers passed, and diff check clean | n/a |
 | Timer follow-up final gates | Task 3, Second Brain, repository, AI workflow, shell, doctor, systemd, chezmoi, README, compile, LFS, diff, and protected-hash checks | All affected and broader surfaces pass without staging or changing the protected config | Task 3 89/89; Second Brain 239/239; repository 286/286; AI workflow 36/36; all three shell fixtures, both doctors, skill validation, systemd verify, global chezmoi dry-run/managed, `pass_no_change`, isolated compile, LFS, and diff checks passed; config hash exact | 0 |
 | Timer follow-up staged allowlist | Cached name/status/diff inspection plus protected hash | Only the 11 approved fix paths are staged; user config remains unstaged and exact | 11 approved paths staged; complete diff reviewed; cached diff clean; protected config absent from index with exact SHA-256 | 0 |
+| Timer clean-install fix push | Commit/push plus local/upstream comparison | Fix reaches the configured upstream before activation | Commit `a300f51`; local and upstream refs equal `a300f514560afa58227872cfd747030eb52fa1fe` | 0 |
+| Timer activation GREEN | Source setup enable/check; systemd state/list/status; journal; modes; Git refs | Exact installed bytes, active timer, next 16:20 trigger, preserved existing modes, and separately classified catch-up | Enable/check passed; timer enabled/active for 2026-07-14 16:20 EDT; existing `~/scripts` and config modes unchanged; new runtime `0755`; no catch-up journal; refs still `a300f51` | 0 |
+| Installed repository resolution RED/GREEN | Real relative/absolute chezmoi calls plus strengthened installed-layout test | Installed runtime asks chezmoi for an absolute managed destination | Relative target exited 1 as not managed and defining test failed; absolute target mapped to the repo front door and the test passed | 0 |
+| Protected config recovery | Pre/post SHA-256, local log diff evidence, and live hash | Restore exact pre-refresh repo bytes without changing newer live bytes | Repo hash restored to `3edd706e3cc03132764d9d0a1b741e0713f42e39dc16a6018ab205f9d1a85e2e`; live hash remained `f9e84d469f63addd863192cbadbac9145bea54872ed4526ece953efe4dc8f088` | 0 |
+| Installed resolution final gates | Focused, Task 3, Second Brain, repository, AI workflow, shell, doctor, systemd, README, compile, LFS, diff, and protected-state checks | Every affected and broader surface passes without staging or changing the protected config | Focused 49/49; Task 3 90/90; Second Brain 240/240; repository 287/287; AI workflow 36/36; all three shell fixtures, both doctors, skill validation, systemd verify, `pass_no_change`, isolated compile, LFS, and diff checks passed; protected repo/live hashes remained exact | 0 |
+| Installed resolution independent review | Fresh exact-diff review plus real-chezmoi and installed-layout reproducers | No unresolved correctness, security, or portability blocker | Verdict READY; all nine staged paths reviewed; real relative target failed; absolute target and a HOME path containing spaces passed; final command/path/real-chezmoi suite passed 52/52; both test-hardening recommendations were implemented | n/a |
+| Installed resolution staged allowlist | Cached name/status/diff inspection plus protected hash | Only the nine approved follow-up paths are staged and the protected config remains unstaged | Nine approved paths staged; complete diff reviewed; cached diff clean; protected config absent from the index with exact `3edd706e...85e2e` checksum | 0 |
 
 Task RED/GREEN, review, commit, push, and runtime evidence will be appended to
 this table as each checklist item is actually completed.
@@ -778,3 +808,9 @@ this table as each checklist item is actually completed.
   UID already controls these files and is not a privilege boundary; setup
   rejects pre-existing and in-helper swaps and revalidates installed types and
   bytes before enabling systemd.
+- The required refresh workflow was attempted after activation, but its first
+  step intentionally replaced the protected dirty repo config with the newer
+  live file. Local session evidence recovered the exact pre-refresh values and
+  hash without touching live state. Future protected-config deployments must
+  use the snapshot dry-run and exact chezmoi targets unless overwrite ownership
+  is explicitly reconciled.

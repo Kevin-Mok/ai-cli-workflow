@@ -39,7 +39,9 @@ Tracked focus, decisions, and closeout writes require explicit confirmation.
 
 From this source checkout, use scripts/executable_second-brain. After
 chezmoi apply, use the installed second-brain command from any directory.
-Neither entrypoint needs sudo.
+The installed entrypoint asks chezmoi for the source of the absolute applied
+vault front door at `~/second-brain/README.md`, then applies the same repository
+and vault validation as the source entrypoint. Neither entrypoint needs sudo.
 
 | Exit | Meaning |
 | --- | --- |

@@ -140,6 +140,10 @@ class SecondBrainCommandTest(unittest.TestCase):
         fake_chezmoi = fake_bin / "chezmoi"
         fake_chezmoi.write_text(
             "#!/bin/sh\n"
+            "if [ \"$#\" -ne 2 ] || [ \"${1:-}\" != source-path ] || "
+            "[ \"${2:-}\" != \"$HOME/second-brain/README.md\" ]; then\n"
+            "  exit 64\n"
+            "fi\n"
             f"printf '%s\\n' '{self.repo / 'second-brain' / 'README.md'}'\n",
             encoding="utf-8",
         )
