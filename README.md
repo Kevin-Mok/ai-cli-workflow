@@ -458,7 +458,10 @@ with `setup-second-brain-timer --enable`. The setup command reapplies and
 validates only the installed launcher, exact runtime-package modules, and two
 user units before enabling the timer; it never invokes sudo. Chezmoi ignores
 generated Python bytecode, and setup rejects unexpected runtime-package root
-entries that could shadow the reviewed modules.
+entries that could shadow the reviewed modules. On a clean first install,
+setup transactionally creates only the missing launcher, runtime-package, and
+unit parent directories; it preserves existing modes and rejects symlinks
+before the exact-file apply.
 
 To use the AI layer after the dotfiles are in place, run the
 repo-managed wrapper directly, or make sure it is the `codex` command

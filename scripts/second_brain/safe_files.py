@@ -10,9 +10,9 @@ import secrets
 import signal
 import stat
 import unicodedata
-from contextlib import contextmanager
+from contextlib import ExitStack, contextmanager
 from pathlib import Path
-from typing import Callable, Iterator
+from typing import Callable, Iterator, Sequence
 
 from .safe_contract import PathError, TargetExistsError, relative_target_parts
 
@@ -41,6 +41,7 @@ def _open_relative_parent(
     try:
         for part in parts[:-1]:
             created = False
+            expected: os.stat_result | None = None
             if create_parents:
                 if portable_unique and _portable_name_collision(current, part):
                     raise TargetExistsError(
@@ -55,6 +56,30 @@ def _open_relative_parent(
                     raise PathError(
                         "safe filesystem parent could not be prepared"
                     ) from error
+                if created:
+                    try:
+                        expected = os.stat(
+                            part,
+                            dir_fd=current,
+                            follow_symlinks=False,
+                        )
+                    except OSError as error:
+                        try:
+                            os.rmdir(part, dir_fd=current)
+                            os.fsync(current)
+                        except OSError:
+                            pass
+                        raise PathError(
+                            "safe filesystem parent could not be inspected"
+                        ) from error
+                    if not stat.S_ISDIR(expected.st_mode):
+                        raise PathError(
+                            "safe filesystem parent is not a directory"
+                        )
+                    ancestor = (current, part, expected, True)
+                    ancestors.append(ancestor)
+                    if tracked_ancestors is not None:
+                        tracked_ancestors.append(ancestor)
             try:
                 child = os.open(part, directory_flags, dir_fd=current)
             except OSError as error:
@@ -65,19 +90,22 @@ def _open_relative_parent(
             if not stat.S_ISDIR(metadata.st_mode):
                 os.close(child)
                 raise PathError("safe filesystem parent is not a directory")
+            if created and (
+                expected is None
+                or not _same_directory_identity(expected, metadata)
+            ):
+                os.close(child)
+                raise PathError("safe filesystem parent is missing or unsafe")
             if portable_unique and _portable_name_collision(current, part):
                 os.close(child)
-                if created:
-                    try:
-                        os.rmdir(part, dir_fd=current)
-                    except OSError:
-                        pass
                 raise TargetExistsError(
                     "safe filesystem parent has a portable-name collision"
                 )
-            ancestors.append((current, part, metadata, created))
-            if tracked_ancestors is not None:
-                tracked_ancestors.append(ancestors[-1])
+            if not created:
+                ancestor = (current, part, metadata, False)
+                ancestors.append(ancestor)
+                if tracked_ancestors is not None:
+                    tracked_ancestors.append(ancestor)
             opened.append(child)
             current = child
         yield current, parts[-1]
@@ -197,6 +225,128 @@ def regular_file_bytes(root: Path, target: Path) -> bytes:
     ):
         content, _ = _read_regular_at(parent_fd, target_name)
         return content
+
+
+def _open_verified_owned_directory_at(
+    parent_fd: int,
+    name: str,
+    expected: os.stat_result,
+) -> int:
+    directory_flags = os.O_RDONLY
+    if hasattr(os, "O_DIRECTORY"):
+        directory_flags |= os.O_DIRECTORY
+    if hasattr(os, "O_NOFOLLOW"):
+        directory_flags |= os.O_NOFOLLOW
+    try:
+        descriptor = os.open(
+            name,
+            directory_flags,
+            dir_fd=parent_fd,
+        )
+    except OSError as error:
+        raise PathError(
+            "safe filesystem parent is missing or unsafe"
+        ) from error
+    try:
+        current = os.fstat(descriptor)
+        named = os.stat(
+            name,
+            dir_fd=parent_fd,
+            follow_symlinks=False,
+        )
+        if (
+            not _same_directory_identity(expected, current)
+            or not _same_directory_identity(expected, named)
+            or current.st_uid != os.geteuid()
+        ):
+            raise PathError(
+                "safe filesystem parent is missing or unsafe"
+            )
+    except BaseException:
+        os.close(descriptor)
+        raise
+    return descriptor
+
+
+def ensure_owned_directory(
+    root: Path,
+    target: Path,
+    *,
+    mode: int = 0o755,
+) -> None:
+    """Create missing directories without links or existing-mode changes."""
+
+    ensure_owned_directories(root, (target,), mode=mode)
+
+
+def ensure_owned_directories(
+    root: Path,
+    targets: Sequence[Path],
+    *,
+    mode: int = 0o755,
+) -> None:
+    """Create multiple owned directories as one rollback-safe transaction."""
+
+    if not targets:
+        raise PathError("safe filesystem directory targets are missing")
+
+    tracked_groups: list[list[tuple[int, str, os.stat_result, bool]]] = []
+    try:
+        with ExitStack() as stack:
+            for target in targets:
+                tracked: list[tuple[int, str, os.stat_result, bool]] = []
+                marker = target / ".second-brain-directory-boundary"
+                stack.enter_context(
+                    _open_relative_parent(
+                        root,
+                        marker,
+                        create_parents=True,
+                        tracked_ancestors=tracked,
+                    )
+                )
+                if not tracked:
+                    raise PathError(
+                        "safe filesystem directory target is invalid"
+                    )
+                root_metadata = os.fstat(tracked[0][0])
+                if (
+                    not stat.S_ISDIR(root_metadata.st_mode)
+                    or root_metadata.st_uid != os.geteuid()
+                ):
+                    raise PathError("safe filesystem boundary is not owned")
+                tracked_groups.append(tracked)
+                for parent_fd, name, expected, created in tracked:
+                    descriptor = _open_verified_owned_directory_at(
+                        parent_fd,
+                        name,
+                        expected,
+                    )
+                    try:
+                        if created:
+                            os.fchmod(descriptor, mode)
+                            if (
+                                stat.S_IMODE(os.fstat(descriptor).st_mode)
+                                != mode
+                            ):
+                                raise PathError(
+                                    "safe filesystem parent mode could not be set"
+                                )
+                            os.fsync(descriptor)
+                            os.fsync(parent_fd)
+                    finally:
+                        os.close(descriptor)
+            for tracked in tracked_groups:
+                for parent_fd, name, expected, _created in tracked:
+                    descriptor = _open_verified_owned_directory_at(
+                        parent_fd,
+                        name,
+                        expected,
+                    )
+                    os.close(descriptor)
+    except OSError as error:
+        raise PathError(
+            "safe filesystem parent could not be prepared"
+        ) from error
 
 
 @contextmanager

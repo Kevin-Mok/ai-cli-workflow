@@ -31,6 +31,137 @@ class SecondBrainPathSafetyTest(unittest.TestCase):
         self.safe_create = importlib.import_module("second_brain.safe_create")
         self.safe_files = importlib.import_module("second_brain.safe_files")
 
+    def test_ensure_owned_directory_preserves_existing_modes(self) -> None:
+        existing = self.boundary / "existing"
+        existing.mkdir(mode=0o700)
+        existing.chmod(0o700)
+        target = existing / "created" / "nested"
+
+        self.safe_files.ensure_owned_directory(
+            self.boundary,
+            target,
+            mode=0o755,
+        )
+
+        self.assertEqual(stat.S_IMODE(existing.stat().st_mode), 0o700)
+        self.assertEqual(stat.S_IMODE(target.parent.stat().st_mode), 0o755)
+        self.assertEqual(stat.S_IMODE(target.stat().st_mode), 0o755)
+
+    def test_ensure_owned_directory_rejects_symlink_without_outside_write(
+        self,
+    ) -> None:
+        outside = self.root / "outside"
+        outside.mkdir()
+        (self.boundary / "linked").symlink_to(outside, target_is_directory=True)
+
+        with self.assertRaises(self.paths.PathError):
+            self.safe_files.ensure_owned_directory(
+                self.boundary,
+                self.boundary / "linked" / "created",
+            )
+
+        self.assertEqual(list(outside.iterdir()), [])
+
+    def test_ensure_owned_directory_detects_swap_during_mode_update(
+        self,
+    ) -> None:
+        target = self.boundary / "created"
+        displaced = self.boundary / "displaced"
+        outside = self.root / "outside"
+        outside.mkdir()
+        real_fchmod = self.safe_files.os.fchmod
+        injected = False
+
+        def swap_name_after_chmod(descriptor: int, mode: int) -> None:
+            nonlocal injected
+            real_fchmod(descriptor, mode)
+            if not injected and target.is_dir() and not target.is_symlink():
+                target.rename(displaced)
+                target.symlink_to(outside, target_is_directory=True)
+                injected = True
+
+        with mock.patch.object(
+            self.safe_files.os,
+            "fchmod",
+            side_effect=swap_name_after_chmod,
+        ):
+            with self.assertRaises(self.paths.PathError):
+                self.safe_files.ensure_owned_directory(
+                    self.boundary,
+                    target,
+                )
+
+        self.assertTrue(injected)
+        self.assertTrue(target.is_symlink())
+        self.assertEqual(list(outside.iterdir()), [])
+
+    def test_ensure_owned_directory_rolls_back_mkdir_when_open_fails(
+        self,
+    ) -> None:
+        target = self.boundary / "created"
+        real_open = self.safe_files.os.open
+        injected = False
+
+        def fail_first_created_open(path, *args, **kwargs):
+            nonlocal injected
+            if (
+                not injected
+                and path == target.name
+                and kwargs.get("dir_fd") is not None
+            ):
+                injected = True
+                raise OSError("injected directory open failure")
+            return real_open(path, *args, **kwargs)
+
+        with mock.patch.object(
+            self.safe_files.os,
+            "open",
+            side_effect=fail_first_created_open,
+        ):
+            with self.assertRaises(self.paths.PathError):
+                self.safe_files.ensure_owned_directory(
+                    self.boundary,
+                    target,
+                )
+
+        self.assertTrue(injected)
+        self.assertFalse(target.exists())
+
+    def test_ensure_owned_directories_rolls_back_earlier_targets(self) -> None:
+        first = self.boundary / "first" / "nested"
+        outside = self.root / "outside"
+        outside.mkdir()
+        unsafe = self.boundary / "unsafe"
+        unsafe.symlink_to(outside, target_is_directory=True)
+
+        with self.assertRaises(self.paths.PathError):
+            self.safe_files.ensure_owned_directories(
+                self.boundary,
+                (first, unsafe / "created"),
+            )
+
+        self.assertFalse((self.boundary / "first").exists())
+        self.assertEqual(list(outside.iterdir()), [])
+
+    def test_ensure_owned_directory_rolls_back_foreign_owned_boundary(
+        self,
+    ) -> None:
+        target = self.boundary / "created"
+        foreign_uid = os.geteuid() + 1
+
+        with mock.patch.object(
+            self.safe_files.os,
+            "geteuid",
+            return_value=foreign_uid,
+        ):
+            with self.assertRaises(self.paths.PathError):
+                self.safe_files.ensure_owned_directory(
+                    self.boundary,
+                    target,
+                )
+
+        self.assertFalse(target.exists())
+
     def test_atomic_create_never_overwrites_existing_target(self) -> None:
         target = self.boundary / "imports" / "note.md"
         target.parent.mkdir()

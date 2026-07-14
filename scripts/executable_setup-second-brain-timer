@@ -15,7 +15,7 @@ from typing import Iterator, Sequence
 
 from second_brain.paths import ensure_private_directory, state_root
 from second_brain.safe_contract import PathError
-from second_brain.safe_files import regular_file_bytes
+from second_brain.safe_files import ensure_owned_directories, regular_file_bytes
 
 
 LAUNCHER_NAME = "second-brain"
@@ -252,6 +252,23 @@ def _validate_installed_launcher(launcher: Path, source: Path) -> None:
         )
 
 
+def _prepare_install_parents(
+    targets: tuple[Path, Path, Path, Path],
+) -> None:
+    home = Path.home()
+    try:
+        ensure_owned_directories(
+            home,
+            (
+                targets[0].parent,
+                targets[1],
+                targets[2].parent,
+            ),
+        )
+    except PathError as error:
+        raise TimerSetupError("timer install parent is unsafe") from error
+
+
 def _validate_installed_package(
     target_dir: Path,
     targets: tuple[Path, ...],
@@ -356,6 +373,7 @@ def _enable() -> None:
         module_sources,
         cleanup_targets,
     ) = _validate_sources()
+    _prepare_install_parents(targets)
     _run(
         (
             "chezmoi",

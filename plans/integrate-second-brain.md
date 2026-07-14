@@ -480,7 +480,8 @@ security}.py`, `tests/test_second_brain_timer.py`,
 `tests/test_second_brain_{paths,vault}.py`,
 `tests/test_refresh_config_function.sh`, `tests/test_ai_workflow_doctor.py`,
 `docs/second-brain.md`, `docs/smoke-tests.md`,
-`docs/postmortem/2026-07-14-shell-interpolation-early-push.md`, root
+`docs/postmortem/2026-07-14-{shell-interpolation-early-push,
+timer-runtime-parent-not-installed}.md`, root
 `README.md`, `tasks/lessons.md`, and this plan.
 
 **Consumes:** Task 2 doctor and common path/locking primitives.
@@ -523,11 +524,42 @@ security}.py`, `tests/test_second_brain_timer.py`,
   `feat(second-brain): add safe daily checkpoint automation`.
 - [x] Record that an accidental shell interpolation pushed the already-verified
   Task 1 and Task 2 commits early; do not rewrite published history.
-- [ ] Push the verified Task 3 commit to the configured upstream and confirm
+- [x] Push the verified Task 3 commit to the configured upstream and confirm
   local HEAD equals upstream.
 - [ ] Only after the push, run `setup-second-brain-timer --enable`, inspect the
   enabled state and next trigger, and handle any persistent catch-up as a
   separate authorized `chore(second-brain): checkpoint 2026-07-14` commit.
+
+### Task 3 activation follow-up: clean-install runtime parent
+
+**Files:** `scripts/executable_setup-second-brain-timer`,
+`scripts/second_brain/safe_files.py`,
+`tests/test_second_brain_paths.py`, `tests/test_second_brain_timer{,_chezmoi}.py`,
+`README.md`,
+`docs/second-brain.md`, `docs/smoke-tests.md`,
+`docs/postmortem/2026-07-14-timer-runtime-parent-not-installed.md`,
+`tasks/lessons.md`, and this plan.
+
+- [x] Capture the failed real activation state without enabling systemd or
+  changing the repository/config.
+- [x] Strengthen the fake chezmoi fixture so a missing runtime package parent
+  fails; observe five defining clean-install and unsafe-parent tests fail.
+- [x] Reject the initial `--parent-dirs` candidate after an independent fixture
+  proves it broadens existing `0700` directories to `0775`.
+- [x] Add one descriptor-relative transaction that creates only missing install
+  parents, preserves existing modes, revalidates identity/ownership, rejects
+  symlinks and non-directories, and rolls back all created parents on failure.
+- [x] Add injected-swap, mkdir/open-failure, multi-target rollback, clean-home,
+  and real-chezmoi exact-27-file regressions.
+- [x] Run the timer, Task 3, Second Brain, repository, systemd, chezmoi, README,
+  and protected-state gates; obtain an independent focused review.
+- [x] Inspect the staged 11-path allowlist and confirm the protected config is
+  unstaged.
+- [ ] Commit/push
+  `fix(second-brain): create timer runtime parent on first install`.
+- [ ] Retry activation only after the fix is upstream; verify installed bytes,
+  enabled/active state, next 16:20 trigger, journal output, and any separate
+  persistent catch-up checkpoint.
 
 ## Exact Verification Plan
 
@@ -536,7 +568,7 @@ Focused automated commands:
 ```bash
 python3 -m unittest tests.test_second_brain_vault tests.test_second_brain_skill -v
 python3 -B -m unittest tests.test_second_brain_command tests.test_second_brain_concurrency tests.test_second_brain_doctor tests.test_second_brain_paths tests.test_second_brain_migration tests.test_second_brain_migration_apply tests.test_second_brain_upgrade -v
-python3 -m unittest tests.test_second_brain_config_snapshot tests.test_second_brain_checkpoint tests.test_second_brain_checkpoint_commit_failure tests.test_second_brain_checkpoint_hook_isolation tests.test_second_brain_checkpoint_journal tests.test_second_brain_checkpoint_security tests.test_second_brain_timer -v
+python3 -m unittest tests.test_second_brain_config_snapshot tests.test_second_brain_checkpoint tests.test_second_brain_checkpoint_commit_failure tests.test_second_brain_checkpoint_hook_isolation tests.test_second_brain_checkpoint_journal tests.test_second_brain_checkpoint_security tests.test_second_brain_timer tests.test_second_brain_timer_chezmoi -v
 bash tests/test_refresh_config_function.sh
 python3 -m unittest tests.test_ai_workflow_contract tests.test_ai_workflow_doctor tests.test_context_handoff_contract -v
 bash tests/test_claude_skill_links.sh
@@ -614,7 +646,7 @@ Manual/runtime checks after implementation commits are pushed:
 - [x] Task 2 implemented, reviewed, verified, and committed.
 - [x] Task 3 implemented, reviewed, verified, and committed.
 - [x] Full verification and final independent review completed.
-- [ ] Implementation series pushed and upstream equality confirmed.
+- [x] Implementation series pushed and upstream equality confirmed.
 - [ ] Timer enabled and runtime state/next trigger verified.
 
 ## Verification Evidence
@@ -676,6 +708,14 @@ Manual/runtime checks after implementation commits are pushed:
 | Task 3 final independent review | Fresh adversarial whole-change review and independent matrix | No unresolved Critical, Important, or Minor issue | Verdict READY; 128/128 reviewer matrix passed | n/a |
 | Task 3 protected pre-stage state | Config SHA-256, cached names, status, local/upstream hashes | Protected config exact and unstaged; index empty; prerequisite refs equal | Exact `3edd706e3cc03132764d9d0a1b741e0713f42e39dc16a6018ab205f9d1a85e2e`; cached list empty; both refs `dec36e0` | 0 |
 | Task 3 staged allowlist | Cached name/status/stat inspection plus complete staged diff review | Only approved Task 3 files are staged and protected config is excluded | 37 paths, 4,594 insertions, 85 deletions; protected config remained only an unstaged user modification; staged diff check clean | 0 |
+| Task 3 implementation push | `git push` followed by local/upstream hash comparison | Verified Task 3 commit reaches only its configured upstream | Both refs equal `fa80508fa1e69e194de9aa36edb5a3a00807978a` | 0 |
+| Timer activation RED | Real `setup-second-brain-timer --enable`; target/type, systemd, Git, and config inspection | First install creates runtime and enables only after validation | Apply failed; launcher/units existed but runtime parent did not; timer disabled/inactive; Git refs and protected hash unchanged | 2 |
+| Timer broad-parent candidate | Missing-parent tests plus independent restrictive-mode fixture | Candidate must preserve existing parent modes | Missing-parent tests passed, but fixture changed `~/scripts` and its runtime directory from `0700` to `0775`; reviewer verdict NOT READY and candidate rejected | n/a |
+| Timer narrow-parent RED/GREEN | Five clean-install/unsafe-parent tests before and after the descriptor-relative helper | Create only missing parents, preserve modes, reject unsafe paths before apply | 5/5 failed against the pushed setup, then 5/5 passed in 1.039s | 0 |
+| Parent transaction hardening | Injected-swap, mkdir/open-failure, foreign-owner, cross-target rollback, timer rollback, clean-home, and real chezmoi exact-inventory tests | Catch path replacement, leave no partial safe parents on failure, and install exactly 27 files | Focused path 21/21 and split timer/chezmoi 34/34 passed | 0 |
+| Timer follow-up independent review | Fresh adversarial diff review plus prior-reproducer reruns | No unresolved safety, rollback, mode, or target-bounding blocker | Verdict READY; independent focused suite 54/54, restrictive-mode/swap/open/ownership/rollback reproducers passed, and diff check clean | n/a |
+| Timer follow-up final gates | Task 3, Second Brain, repository, AI workflow, shell, doctor, systemd, chezmoi, README, compile, LFS, diff, and protected-hash checks | All affected and broader surfaces pass without staging or changing the protected config | Task 3 89/89; Second Brain 239/239; repository 286/286; AI workflow 36/36; all three shell fixtures, both doctors, skill validation, systemd verify, global chezmoi dry-run/managed, `pass_no_change`, isolated compile, LFS, and diff checks passed; config hash exact | 0 |
+| Timer follow-up staged allowlist | Cached name/status/diff inspection plus protected hash | Only the 11 approved fix paths are staged; user config remains unstaged and exact | 11 approved paths staged; complete diff reviewed; cached diff clean; protected config absent from index with exact SHA-256 | 0 |
 
 Task RED/GREEN, review, commit, push, and runtime evidence will be appended to
 this table as each checklist item is actually completed.
@@ -728,3 +768,13 @@ this table as each checklist item is actually completed.
   verified Task 1 and Task 2 commits to push before Task 3. Published history
   remains intact; the [postmortem](../docs/postmortem/2026-07-14-shell-interpolation-early-push.md)
   and repository lesson record the prevention rule.
+- The pushed Task 3 dry-runs proved chezmoi mapping but not first-install
+  destination creation. Real activation exposed the missing-parent gap before
+  systemd enable. The broad native parent flag was rejected because it changed
+  existing modes; the focused follow-up keeps exact file targets and creates
+  only missing parents in a descriptor-relative rollback transaction.
+- A same-UID process can still replace a home-owned path after final pre-apply
+  validation because chezmoi consumes path strings, not held descriptors. That
+  UID already controls these files and is not a privilege boundary; setup
+  rejects pre-existing and in-helper swaps and revalidates installed types and
+  bytes before enabling systemd.
