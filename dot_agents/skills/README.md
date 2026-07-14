@@ -209,6 +209,9 @@ refresh that external bundle from the latest upstream release.
 - [`context-handoff`](context-handoff/SKILL.md): Creates bounded continuation
   handoffs with done-criteria evidence, linked artifacts, explicit unknowns,
   retry-safe failure history, and executable next actions.
+- [`second-brain-session`](second-brain-session/SKILL.md): Retrieves targeted
+  personal and project context, routes durable memory to its canonical owner,
+  and prepares confirmation-gated ExampleProject session closeouts.
 - [`feedback-memory`](feedback-memory/SKILL.md): Stores durable user
   corrections and working preferences in a repo-tracked `feedback.log`
   so later sessions can honor them.

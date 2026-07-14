@@ -67,6 +67,28 @@ of stacking duplicates.
   `~/.agents/skills/superpowers`, rendering the latest
   `obra/superpowers` release archive without writing files.
 
+## Second Brain
+
+- Action: Run `scripts/executable_second-brain status --format json` from the
+  repository root, then run the applied `second-brain status --format json`
+  command from an unrelated directory.
+  Expected: Both entrypoints read the chezmoi source vault, report schema
+  version 1, the Toronto-local date, the three approved active projects, Inbox
+  state, and up to three recent Daily Notes without dumping private raw text or
+  modifying tracked files.
+- Action: Start a fresh Codex or Claude session that needs ExampleProject context and
+  invoke the Second Brain session workflow.
+  Expected: The agent reads targeted context rather than the whole vault,
+  proposes exactly one measurable ExampleProject outcome, waits for confirmation,
+  persists the first confirmed focus for that date, reuses it across later
+  sessions, and does not commit or push.
+- Action: In an isolated fixture, repeat the same confirmed focus, raw-capture,
+  and closeout event IDs.
+  Expected: Each first write reports `created` or `updated`; every repeat
+  reports `noop`; raw text stays in private XDG state with likely secrets
+  redacted; and closeout is rejected unless its planned result matches the
+  confirmed ExampleProject focus.
+
 ## Repo Instructions
 
 - Action: Start a fresh Codex or Claude Code session in this repo and ask it to describe the canonical instruction file and delivery cadence without creating or pushing commits.

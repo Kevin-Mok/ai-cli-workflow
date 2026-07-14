@@ -1,0 +1,604 @@
+# Second Brain Integration Implementation Plan
+
+> **For agentic workers:** REQUIRED SUB-SKILL: Use
+> `superpowers:subagent-driven-development` or
+> `superpowers:executing-plans` to execute this plan task by task. Every
+> behavior-changing slice uses RED, GREEN, and regression evidence before it is
+> committed.
+
+**Goal:** Add a safe, personalized, plain-Markdown Second Brain to this
+repository with deterministic capture, protected migration, cross-agent session
+routines, and a 4:20 PM Git checkpoint.
+
+**Architecture:** A thin `scripts/executable_second-brain` entrypoint delegates
+to cohesive standard-library Python modules under `scripts/second_brain/`. A
+compact repo-tracked skill routes Codex and Claude sessions to the command and
+the existing canonical memory owners. Private raw capture lives under the XDG
+state directory; only confirmed, sanitized material enters the tracked vault.
+
+**Tech Stack:** Python 3 standard library, Markdown/YAML frontmatter, Git and
+Git LFS, chezmoi, Fish, systemd user units, `unittest`, and shell contract tests.
+
+## Global Constraints
+
+- Keep `dot_codex/AGENTS.md` as the only canonical AI policy body and keep the
+  root `README.md` recruiter/operator-first.
+- Do not create or use a Git worktree.
+- Treat the tracked repository as public. Never track raw conversations,
+  credentials, proprietary source, or sensitive relationship/health details.
+- Copy only explicitly selected regular text files strictly smaller than
+  1,000,000 bytes. Reject binary files, nested Git repositories, containment
+  cycles, symlink escapes, hard-link surprises, secrets, caches, logs, and app
+  data.
+- Preserve source files literally. Migration is copy-only and checksum-tracked.
+- Use `America/Toronto` for default note dates with explicit test overrides.
+- Lock mutations, write atomically, preserve frontmatter and section order, and
+  make identical capture/closeout event IDs idempotent.
+- Keep raw session capture under `${XDG_STATE_HOME:-$HOME/.local/state}` with
+  private permissions. It is never staged by the checkpoint.
+- Configure Git LFS for future manually selected media, but import no binary
+  attachments during initial setup.
+- Never run the real config snapshot or real checkpoint during implementation.
+  All tests use temporary fixtures and local fake Git remotes.
+- Enable the timer only after all implementation commits pass verification and
+  are pushed. A `Persistent=true` catch-up is a separate runtime checkpoint.
+- Record MIT provenance for `/home/example/coding/second-brain-setup` revision
+  `90584269f7a4a47ea19f85a9029246873365aaf8` beside adapted material.
+- Keep matching ExecPlan, tests, operator docs, smoke checks, and README changes
+  in the same commits as the behavior they describe.
+
+---
+
+## Purpose And Observable Outcome
+
+The completed system gives example-user one command and one shared Codex/Claude skill
+for targeted context retrieval, private raw capture, confirmed tracked capture,
+daily ExampleProject closeout, vault health checks, safe migrations, and protected
+upgrades. Each morning the workflow proposes exactly one measurable ExampleProject
+outcome with a completion criterion and evidence location. Each natural session
+end drafts one nontechnical boss-readable progress record and waits for
+confirmation before tracked writes.
+
+At 16:20 local time, a systemd user timer validates the current branch and
+upstream, refuses an already-dirty index, snapshots the live Codex config through
+the same helper used by `refresh-config`, validates the vault and staged content,
+stages only the approved allowlist, commits a dated checkpoint when needed, and
+performs an ordinary push. It never switches branches, pulls, rebases, resets,
+amends, force-pushes, or consumes unrelated staged work.
+
+## Current Context And Protected State
+
+- Repository: `/home/example/linux-config`
+- Branch: `feat/ai-workflow-optimization`
+- Baseline HEAD: `d529decf48504f53825e2d977f50d1c8675bd454`
+- Upstream: `origin/feat/ai-workflow-optimization`
+- Approved design date: `2026-07-14`
+- Baseline `dot_codex/config.toml` SHA-256:
+  `3edd706e3cc03132764d9d0a1b741e0713f42e39dc16a6018ab205f9d1a85e2e`
+- Baseline relevant tests: AI workflow contract 11 passed, doctor 17 passed,
+  context handoff 6 passed, refresh-config fixture passed, Claude links passed,
+  and Codex wrapper passed.
+- Git LFS 3.4.1 and a running systemd user manager are available.
+
+The following paths were dirty before implementation and are user-owned. Do not
+stage their pre-existing hunks; where this task also needs a file, isolate and
+stage only the Second Brain hunk after inspecting the staged diff:
+
+```text
+README.md
+docs/ai-workflow-optimization.md
+docs/smoke-tests.md
+dot_agents/skills/README.md
+dot_agents/skills/metaprompt/SKILL.md
+dot_agents/skills/metaprompt/agents/openai.yaml
+dot_agents/skills/metaprompt/references/compilation-rules.md
+dot_agents/skills/metaprompt/references/examples.md
+dot_agents/skills/metaprompt/references/execution-routing.md
+dot_codex/config.toml
+tests/test_metaprompt_contract.py
+dot_agents/skills/metaprompt/LICENSE.txt
+dot_agents/skills/metaprompt/SOURCE.md
+dot_agents/skills/metaprompt/references/model-profiles.md
+plans/unify-metaprompt-skill.md
+```
+
+Before every implementation commit, re-run `sha256sum dot_codex/config.toml`,
+compare it to the baseline above, inspect `git diff --cached --name-only`, and
+prove no metaprompt or other pre-existing hunks are staged.
+
+## Scope Boundaries And Non-Goals
+
+In scope:
+
+- The approved `second-brain/` Markdown and Obsidian-compatible tree.
+- One compact `second-brain-session` skill shared through existing Codex/Claude
+  installation wiring.
+- Deterministic capture, closeout, status, doctor, checkpoint, migration, and
+  protected-upgrade interfaces.
+- A reusable noninteractive Codex-config snapshot helper.
+- Git LFS attributes and validation for future attachments.
+- Chezmoi-managed systemd user service/timer and an idempotent setup/check tool.
+- Tests, public/operator documentation, smoke checks, and runtime activation.
+
+Not in scope:
+
+- A new database, MCP service, cloud sync provider, web UI, or Obsidian plugin.
+- Automatic copying of current journals, Drive material, pictures, or code.
+- Binary attachment import during this implementation.
+- Automatic promotion of interests into projects or tasks.
+- Global interception of online ChatGPT conversations; those require explicit
+  export/import.
+- Moving, editing, deleting, or auto-merging any migration source.
+
+## Settled Decisions
+
+- Vault language is compact, direct English with scannable technical detail.
+- Public profile: education-AI developer, former Example Employer intern, University of
+  Toronto CS graduate (3.84 GPA), and AI-native workflow builder. Do not publish
+  the private framing that example-user has not directly read code for about one year.
+- Active projects are Linux Config AI Workflow, ExampleProject, and Beginner Python
+  Teaching Sites. Interests remain resources unless example-user approves promotion.
+- Areas are Work and Career, AI Workflow, Teaching, Wellbeing, and Relationship.
+- Resources remain flat until content justifies subfolders.
+- Obsidian is enabled with Hack, black surfaces, restrained red accents, and no
+  Example Employer logo or implied affiliation.
+- Initial migration is preview-only. Eligible future imports are explicit text
+  selections under 1,000,000 bytes; `/home/example/coding` remains reference-only.
+- Git LFS is configured now but remains empty until a future explicit media
+  import.
+- Raw available session text is local/private and secret-redacted; confirmed
+  sanitized summaries alone may enter Git.
+- Daily briefing contains one confirmed measurable ExampleProject outcome. Closeout
+  records planned, completed, evidence, and blocker in boss-readable language.
+
+## Memory Ownership
+
+| Information | Canonical owner | Second Brain behavior |
+|---|---|---|
+| Durable workflow/style preference | `dot_agents/skills/feedback-memory/feedback.log` | Link or short navigation summary only |
+| Repo engineering lesson | `tasks/lessons.md` | Link only |
+| Implementation state/decision/evidence | `plans/` | Project note links to the plan |
+| Bounded continuation artifact | `context-handoff` | Link to the handoff owner |
+| Temporal fact/relationship | Graphiti | Do not duplicate the record |
+| Actionable task and task note | Taskwarrior/Taskopen | Daily note may link to the task |
+| Profile, PARA navigation, Inbox, daily summary, curated context | `second-brain/` | Canonical here |
+
+## Adoption Record
+
+| Source capability | Decision | Target owner and adaptation |
+|---|---|---|
+| Resumable onboarding | adapt | This ExecPlan replaces `setup-progress.md` |
+| PARA Context/Inbox/Projects/Areas/Resources/Archive | adopt | `second-brain/` |
+| Session start/during/end and Daily Notes | adapt | Shared skill plus deterministic command |
+| Decisions/learnings/preferences/progress | adapt | Route through the ownership table |
+| One-command capture and retrieval | adopt | `second-brain` CLI |
+| Claude/Codex shared behavior | adapt | Existing skill install/link wiring |
+| Copy-first migration | adapt | Text-only, approved-plan hash, ledger, checksums |
+| Protected reruns/upgrades | adopt | Preview, approval hash, dated backups |
+| Doctor | adapt | Compose with existing AI workflow doctor |
+| Obsidian | adopt | Minimal tracked config; device state ignored |
+| Git history/backup/restore | adapt | Existing repo plus safe systemd checkpoint |
+| Portable names/frontmatter | adopt | Deterministic sanitizer and schema tests |
+| Duplicated AGENTS/CLAUDE/README policy | reject | Canonical AGENTS and recruiter README remain |
+| Second preference/lesson/plan/task/temporal store | reject | Existing canonical stores remain |
+| Untested source assertions | reject | Local fixtures and observable checks required |
+| Additional database or MCP | reject | Markdown plus existing Graphiti are sufficient |
+
+## File And Interface Map
+
+### Exact tracked vault manifest
+
+The approved initial tree contains exactly these regular files. No imported
+content or binary attachment is part of Task 1:
+
+- second-brain/README.md
+- second-brain/.obsidian/.gitignore
+- second-brain/.obsidian/app.json
+- second-brain/.obsidian/appearance.json
+- second-brain/.obsidian/snippets/example-user.css
+- second-brain/00 Context/About Me.md
+- second-brain/00 Context/Writing Style.md
+- second-brain/00 Context/Memory Map.md
+- second-brain/00 Context/Decisions.md
+- second-brain/00 Context/Learnings.md
+- second-brain/00 Context/AI Workflow.md
+- second-brain/00 Context/Audience and Privacy.md
+- second-brain/00 Context/External Locations.md
+- second-brain/01 Inbox/Brain Dump.md
+- second-brain/02 Projects/Linux Config AI Workflow.md
+- second-brain/02 Projects/ExampleProject.md
+- second-brain/02 Projects/Beginner Python Teaching Sites.md
+- second-brain/03 Areas/Work and Career.md
+- second-brain/03 Areas/AI Workflow.md
+- second-brain/03 Areas/Teaching.md
+- second-brain/03 Areas/Wellbeing.md
+- second-brain/03 Areas/Relationship.md
+- second-brain/04 Resources/AI Agents and Prompting.md
+- second-brain/04 Resources/Education Product Design.md
+- second-brain/04 Resources/CEMC Math Contest Prep.md
+- second-brain/04 Resources/Beginner Programming Pedagogy.md
+- second-brain/04 Resources/Software Architecture and UX.md
+- second-brain/04 Resources/Linux Automation.md
+- second-brain/04 Resources/Parent Facing Sales and Marketing.md
+- second-brain/04 Resources/CBT and Wellbeing.md
+- second-brain/05 Daily Notes/2026-07-14.md
+- second-brain/06 Archive/README.md
+- second-brain/06 Archive/backups/README.md
+- second-brain/07 Attachments/README.md
+- second-brain/07 Attachments/External Media Index.md
+
+### Vault and skill
+
+- Create the exact approved `second-brain/` tree from the design gate, including
+  minimal `.obsidian/` settings and no unresolved placeholders.
+- Create `dot_agents/skills/second-brain-session/SKILL.md` as the compact trigger
+  and procedure.
+- Create `dot_agents/skills/second-brain-session/references/routing.md` for
+  payload schemas, owner routing, and daily briefing/closeout shapes.
+- Create `dot_agents/skills/second-brain-session/SOURCE.md` with MIT provenance.
+- Create `dot_agents/skills/second-brain-session/agents/openai.yaml` with only
+  display name, 25-64 character description, and a prompt naming
+  `$second-brain-session`.
+- Modify `dot_codex/AGENTS.md` with one concise conditional route.
+
+### Command package
+
+- Create `scripts/executable_second-brain` as argument parsing and exit-code
+  boundary only.
+- Create `scripts/second_brain/cli.py` for command dispatch.
+- Create `scripts/second_brain/schema.py` for JSON schema validation and safe
+  errors.
+- Create `scripts/second_brain/paths.py` for repo/XDG resolution, containment,
+  locks, permissions, and atomic replace.
+- Create `scripts/second_brain/vault.py` for frontmatter, stable sections,
+  capture, closeout, status, and upgrades.
+- Create `scripts/second_brain/doctor.py` for stable findings and `--check`.
+- Create `scripts/second_brain/migration.py` for inventory, plan, approval,
+  copy ledger, collision handling, and verification.
+- Create `scripts/second_brain/checkpoint.py` for Git validation, allowlisting,
+  staged scans, commit, and push.
+- Create `scripts/second_brain/config_snapshot.py` for shared live-to-source
+  config snapshot behavior.
+
+Stable interface:
+
+```text
+second-brain capture --kind KIND --payload PATH_OR_DASH
+second-brain focus --payload PATH_OR_DASH
+second-brain closeout --payload PATH_OR_DASH
+second-brain status [--format text|json]
+second-brain doctor [--format text|json] [--check]
+second-brain checkpoint [--dry-run] [--no-push]
+second-brain migrate inventory --source PATH
+second-brain migrate plan --inventory PATH
+second-brain migrate apply --plan PATH --approve SHA256
+second-brain migrate verify --ledger PATH
+second-brain upgrade --dry-run
+second-brain upgrade --apply --approve SHA256
+```
+
+Every mutation payload has `schema_version`, `event_id`, `source`, and
+`timestamp`. Raw-session payloads add `session_id`, `role`, and `text`.
+Confirmed vault capture adds `title`, `summary`, `target`, `links`,
+`visibility`, and `confirmed: true`. Daily focus adds `date`, the fixed
+`ExampleProject` project, `outcome`, `done_when`, `evidence`, and
+`confirmed: true`. Closeout adds `date`, `project`, `planned`,
+`completed`, `evidence`, `blocker`, `decisions`, `open`, `next`, and
+`confirmed: true`.
+
+Task 1 freezes these minimum command boundaries:
+
+- Capture kinds are `raw-session` and `personal-decision`.
+- After confirmation, `focus` persists exactly one ExampleProject outcome in the
+  Daily Note `Focus` section. The first confirmed focus is canonical for that
+  date; repeated event IDs are no-ops and a second outcome is rejected.
+- Status JSON contains `schema_version: 1`, the Toronto-local `date`, sorted
+  `active_projects`, up to three descending `latest_daily_notes`, and an
+  `inbox` object with a count and vault-relative path. Text status exposes the
+  same information without a layout-stability promise.
+- Success exits 0. Invalid input, schema, confirmation, path, or lock state exits
+  2 without payload content. Mutation results are `created`, `updated`, or
+  `noop`.
+- Raw events live at
+  ${XDG_STATE_HOME:-$HOME/.local/state}/second-brain/raw/YYYY-MM-DD.jsonl.
+  The raw directory is mode 0700 and event files are mode 0600.
+- `SECOND_BRAIN_REPO_ROOT` and `SECOND_BRAIN_NOW` are explicit fixture hooks;
+  normal repo resolution accepts the command location only inside a real Git
+  source checkout and otherwise uses `chezmoi source-path`. Standard
+  `XDG_STATE_HOME`, not a Second-Brain-specific state override, controls state
+  and must be absolute, non-symlinked, and outside the source repository/vault.
+- Closeout writes the boss-readable result under Daily Note `Done`, confirmed
+  decision strings under `Decisions`, blocker/open strings under `Open`, the
+  next action under `Next`, and a compact result under ExampleProject `Progress`.
+  It is rejected unless `planned` exactly matches that date's confirmed focus.
+- The `interface` mapping in skill metadata has exactly display name, short
+  description, and default prompt. A separate implicit-invocation policy is
+  allowed so both agents can discover the conditional workflow.
+
+### Config snapshot and timer
+
+- Create `scripts/executable_snapshot-codex-config` as the reusable helper
+  entrypoint.
+- Modify `dot_config/fish/functions/refresh-config.fish` so only its first copy
+  step calls that helper; chezmoi apply, shortcut regeneration, and Fish reload
+  remain interactive refresh behavior.
+- Create `scripts/executable_setup-second-brain-timer` with `--check`,
+  `--enable`, and `--disable`.
+- Create `dot_config/systemd/user/second-brain-checkpoint.service`.
+- Create `dot_config/systemd/user/second-brain-checkpoint.timer` with
+  `OnCalendar=*-*-* 16:20:00` and `Persistent=true`.
+- Create `.gitattributes` LFS patterns for future attachment images, PDFs,
+  audio, and video.
+- Modify `scripts/executable_ai-workflow-doctor` to compose Second Brain
+  findings without changing existing finding keys.
+
+## Ordered TDD Checklist
+
+### Task 1: Personalized vault and cross-agent session workflow
+
+**Files:** approved `second-brain/` tree,
+`dot_agents/skills/second-brain-session/`, `dot_codex/AGENTS.md`,
+`scripts/executable_second-brain`,
+`scripts/second_brain/{cli,schema,paths,vault}.py`,
+`tests/test_second_brain_vault.py`, `tests/test_second_brain_skill.py`,
+`tests/test_second_brain_command.py`, `dot_agents/skills/README.md`,
+`docs/smoke-tests.md`, and this plan.
+
+**Produces:** tracked vault schema, personalized sanitized notes, the minimum
+stable status/capture/closeout command surface, and a shared skill that invokes
+only interfaces already present in this commit.
+
+- [x] Run a fresh subagent pressure scenario without the new skill. Record
+  whether it duplicates memory owners, silently promotes tasks, or writes a
+  closeout without confirmation.
+- [x] Initialize a disposable `second-brain-session` skill scaffold under
+  `/tmp` with the official skill initializer and inspect its generated shape.
+- [x] Write vault contract tests asserting every approved path, required
+  frontmatter fields, Daily Note sections, no placeholder tokens, sanitized
+  public content, external/private references, and canonical-owner links.
+- [x] Write skill contract tests asserting concise frontmatter, source
+  provenance, metadata, Codex route, Claude discovery wiring, targeted startup
+  reads, one ExampleProject task, private raw capture, confirmed closeout, and no
+  session commit.
+- [x] Write command tests for caller-independent source/installed discovery,
+  Toronto date override, one confirmed daily focus, schema-safe errors, private
+  raw capture, confirmed tracked capture, stable note sections, repeated-event
+  idempotency, and matching confirmed closeout.
+- [x] Run the three focused test modules and observe failure because the vault,
+  command, and skill do not yet exist.
+- [x] Create the minimum vault, command modules, Obsidian settings, skill,
+  routing reference, provenance, metadata, and canonical AGENTS route that
+  satisfy the tests.
+- [x] Run all three focused tests to GREEN, validate the skill with
+  `quick_validate.py`, check `SKILL.md` word count, and forward-test the same
+  pressure scenario with the skill present.
+- [x] Update the skill index with only this task's hunk, update this plan with
+  RED/GREEN evidence, verify the protected config hash, inspect the staged diff,
+  and commit `feat(second-brain): add personalized vault and session workflow`.
+
+### Task 2: Deterministic capture, doctor, migration, and protected upgrades
+
+**Files:** `scripts/second_brain/{doctor,migration}.py`,
+`tests/test_second_brain_command.py`, `tests/test_second_brain_doctor.py`,
+`tests/test_second_brain_migration.py`, `docs/second-brain.md`, root
+`README.md`, and this plan.
+
+**Consumes:** the exact vault paths, skill payload shapes, and core CLI from
+Task 1.
+
+**Produces:** the stable CLI except checkpoint, plus operator documentation.
+
+- [ ] Write command tests for caller-independent repo discovery, Toronto date
+  override, schema errors, safe error text, traversal, symlink escape, invalid
+  names, stable frontmatter/sections, atomic writes, lock contention, concurrent
+  calls, and repeated-event idempotency.
+- [ ] Write capture/closeout tests using JSON from files and stdin. Assert raw
+  capture uses private XDG state, confirmed capture updates authorized notes,
+  and unconfirmed tracked writes fail.
+- [ ] Write doctor fixture tests for stable finding keys, missing paths,
+  malformed frontmatter, placeholders, duplicate ownership content, sensitive
+  visibility, and non-LFS attachment media.
+- [ ] Write migration/upgrade tests for source containment, overlapping source
+  roots, nested Git repositories, symlinks, hard links, 1,000,000-byte boundary,
+  UTF-8/NUL detection, secrets, deterministic collisions, interrupted resume,
+  approval hash, checksum verification, source immutability, protected-file
+  preview, and dated backups.
+- [ ] Run all Task 2 focused tests and observe expected missing-command/module
+  failures.
+- [ ] Implement the smallest cohesive modules and entrypoint that make the
+  focused suite GREEN; refactor only after GREEN while keeping modules below the
+  repository's cohesion/size threshold.
+- [ ] Verify `--help`, text/JSON status, capture/closeout idempotency, doctor
+  fixtures, and migration fixtures. Do not apply a real migration.
+- [ ] Add operator/recovery docs and a recruiter-README hunk grounded in actual
+  `--help` output. If the pre-existing README hunk overlaps, stop the commit and
+  isolate the Second Brain blob/hunk rather than staging user work.
+- [ ] Update this plan with evidence, verify protected paths and config hash,
+  inspect the staged diff, and commit
+  `feat(second-brain): add deterministic capture and migration tools`.
+
+### Task 3: Safe config snapshot, checkpoint, LFS validation, and timer
+
+**Files:** `scripts/second_brain/{config_snapshot,checkpoint}.py`,
+`scripts/executable_snapshot-codex-config`,
+`scripts/executable_setup-second-brain-timer`,
+`dot_config/systemd/user/second-brain-checkpoint.{service,timer}`,
+`dot_config/fish/functions/refresh-config.fish`, `.gitattributes`,
+`scripts/executable_ai-workflow-doctor`,
+`tests/test_second_brain_config_snapshot.py`,
+`tests/test_second_brain_checkpoint.py`, `tests/test_second_brain_timer.py`,
+`tests/test_refresh_config_function.sh`, `tests/test_ai_workflow_doctor.py`,
+`docs/smoke-tests.md`, root `README.md`, and this plan.
+
+**Consumes:** Task 2 doctor and common path/locking primitives.
+
+**Produces:** safe daily Git shipping and final runtime setup.
+
+- [ ] Write config-snapshot tests for chezmoi target resolution, regular-file
+  checks, TOML validation, expected target mapping, no-content logging, dry run,
+  atomic copy, and explicit fixture overrides.
+- [ ] Extend the refresh-config shell contract test so the shared helper is
+  required while apply, shortcut regeneration, and Fish reload remain only in
+  the interactive function.
+- [ ] Write temporary-repository checkpoint tests for lock contention,
+  non-worktree/detached/missing-upstream rejection, dirty-index abort, config
+  inclusion, stable secret/sensitive-path and LFS rejection, exact allowlist,
+  no-op, exact commit subject, ordinary push, and preserved local commit after a
+  fake-remote push failure.
+- [ ] Write timer/setup tests for exact 16:20 schedule, `Persistent=true`, no
+  sudo, XDG lock, content-safe journal output, chezmoi paths, and setup/check/
+  disable idempotency.
+- [ ] Run Task 3 focused tests and observe expected missing-helper/module/unit
+  failures.
+- [ ] Implement the shared snapshot helper, Fish integration, checkpoint module,
+  setup tool, LFS attributes, systemd units, and composed doctor behavior.
+- [ ] Run the Task 3 focused suite to GREEN, then run all Second Brain tests and
+  the existing relevant AI workflow/shell regression suite.
+- [ ] Apply the smoke-test-capture skill to add one-line Action/Expected checks.
+  Apply the readme-recruiter-sync gate using verified command help and preserve
+  every pre-existing README/smoke hunk.
+- [ ] Run `git diff --check`, focused and broader test suites, skill validation,
+  AI workflow doctor before/after comparison, exact chezmoi dry-runs for every
+  installed target, and temporary-repository checkpoint proof.
+- [ ] Reconcile final diff against the approved tree, ownership, data flow,
+  adoption record, and source provenance. Run independent task and whole-change
+  reviews; resolve every Critical/Important finding and re-verify.
+- [ ] Update this plan with final evidence, verify the protected config hash and
+  staged allowlist, inspect the complete staged diff, and commit
+  `feat(second-brain): add safe daily checkpoint automation`.
+- [ ] Push the three verified implementation commits once to the configured
+  upstream. Confirm local HEAD equals upstream.
+- [ ] Only after the push, run `setup-second-brain-timer --enable`, inspect the
+  enabled state and next trigger, and handle any persistent catch-up as a
+  separate authorized `chore(second-brain): checkpoint 2026-07-14` commit.
+
+## Exact Verification Plan
+
+Focused automated commands:
+
+```bash
+python3 -m unittest tests.test_second_brain_vault tests.test_second_brain_skill -v
+python3 -m unittest tests.test_second_brain_command tests.test_second_brain_doctor tests.test_second_brain_migration -v
+python3 -m unittest tests.test_second_brain_config_snapshot tests.test_second_brain_checkpoint tests.test_second_brain_timer -v
+bash tests/test_refresh_config_function.sh
+python3 -m unittest tests.test_ai_workflow_contract tests.test_ai_workflow_doctor tests.test_context_handoff_contract -v
+bash tests/test_claude_skill_links.sh
+bash tests/scripts/executable_codex_test.sh
+```
+
+Repository and integration gates:
+
+```bash
+python3 -m unittest discover -s tests -p 'test_*.py'
+python3 /home/example/.codex/skills/.system/skill-creator/scripts/quick_validate.py dot_agents/skills/second-brain-session
+scripts/executable_second-brain doctor --format json --check
+scripts/executable_ai-workflow-doctor --format json
+scripts/executable_readme-recruiter-sync
+git diff --check
+git lfs ls-files
+chezmoi apply --dry-run --verbose
+sha256sum dot_codex/config.toml
+git diff --cached --name-only
+```
+
+Manual/runtime checks after implementation commits are pushed:
+
+- [ ] Action: open `second-brain/` as an Obsidian vault. Expected: Hack-based
+  dark styling loads, navigation links work, and device workspace state remains
+  untracked.
+- [ ] Action: run `second-brain status`. Expected: active projects, Inbox state,
+  and latest Daily Notes appear without dumping the full vault.
+- [ ] Action: run a fixture-backed capture and repeat it. Expected: the second
+  invocation reports a no-op and note sections remain stable.
+- [ ] Action: run `setup-second-brain-timer --check`. Expected: units validate,
+  the user manager is reachable, and no sudo is requested.
+- [ ] Action: inspect `systemctl --user status` and `list-timers` after enable.
+  Expected: the timer is enabled and the next local trigger is 16:20.
+
+## Risks, Edge Cases, And Rollback
+
+- **Public-repo disclosure:** require sanitized `visibility` frontmatter,
+  secret/sensitive-path scans, explicit confirmation, and local-only raw state.
+- **Lost instructions:** raw events carry stable event/session IDs; canonical
+  preferences are routed to feedback memory; confirmed closeout is idempotent.
+- **Duplicate memory:** doctor checks links/ownership and rejects copied
+  canonical plan/preference/lesson content.
+- **Concurrent writers:** mutation lock plus atomic replace; contention returns
+  an actionable nonzero result without partial files.
+- **Migration damage:** preview and approval hash precede copying; sources are
+  read-only and re-hashed; ledger resumes without overwrites.
+- **Git contamination:** abort on staged input, stage only exact allowlist,
+  inspect staged names, and never manipulate unrelated unstaged changes.
+- **Push failure:** retain the local checkpoint commit and report recovery; do
+  not retry, pull, merge, reset, or rewrite.
+- **Config damage:** validate TOML and target mapping, write atomically, keep the
+  current config hash unchanged through all implementation commits.
+- **Timer catch-up:** activate only after implementation push; classify an
+  immediate persistent run as a separate runtime checkpoint.
+- **Rollback:** run `setup-second-brain-timer --disable`, revert implementation
+  commits normally, restore approved overwrites from dated archive backups, and
+  leave migration originals and private raw state untouched.
+
+## Progress
+
+- [x] Source/target discovery and baseline audit completed.
+- [x] Guided interview completed and each section confirmed.
+- [x] Exact tree, ownership, data flow, migration, tests, risks, and commits
+  approved by the user on 2026-07-14.
+- [x] Protected dirty paths and Codex config hash recorded before the first
+  repository patch.
+- [x] Task 1 implemented, reviewed, verified, and committed.
+- [ ] Task 2 implemented, reviewed, verified, and committed.
+- [ ] Task 3 implemented, reviewed, verified, and committed.
+- [ ] Full verification and final independent review completed.
+- [ ] Implementation series pushed and upstream equality confirmed.
+- [ ] Timer enabled and runtime state/next trigger verified.
+
+## Verification Evidence
+
+| Requirement | Command/action | Expected | Observed | Exit |
+|---|---|---|---|---|
+| Protected baseline | `git status --short` | Existing user paths recorded | Paths listed above | 0 |
+| Config baseline | `sha256sum dot_codex/config.toml` | Stable protected hash | `3edd706e...85e2e` | 0 |
+| Source provenance | `git -C /home/example/coding/second-brain-setup rev-parse HEAD` | Exact audited revision | `90584269...aaf8` | 0 |
+| Baseline AI workflow | Focused baseline commands listed in Current Context | Existing behavior remains green | 11 + 17 + 6 Python tests and shell fixtures passed during discovery | 0 |
+| Task 1 pressure baseline | Read-only subagent scenario without the skill | Expose the missing workflow | Correct owners were identified, but personal-decision persistence and confirmed ExampleProject closeout were unavailable | n/a |
+| Task 1 initial RED | `python3 -m unittest tests.test_second_brain_vault tests.test_second_brain_skill tests.test_second_brain_command -v` | Fail because production surfaces do not exist | 24 tests failed for missing vault, skill, and command | 1 |
+| Task 1 strengthened RED | Same focused suite after adversarial fixture expansion | New assertions catch real remaining gaps | 3 failures: owner links, structured provenance, and standard XDG state | 1 |
+| Task 1 GREEN | `python3 -B -m unittest tests.test_second_brain_vault tests.test_second_brain_skill tests.test_second_brain_command -v` | All focused contracts pass | 27 tests passed in 1.207s | 0 |
+| Skill validation | `quick_validate.py dot_agents/skills/second-brain-session` and `wc -w SKILL.md` | Valid and concise | `Skill is valid!`; 256 words | 0 |
+| Task 1 forward pressure test | Read-only subagent scenario with the skill | Targeted, private, confirmation-gated handling with no Git writes | All eight behavioral criteria satisfied; no mutation performed | n/a |
+| AI workflow integration | `scripts/executable_ai-workflow-doctor --repo . --format json` | No errors and skill catalog parity | Pass, 0 errors, 47 actual/catalogued skills; one pre-existing duplicate-slug warning | 0 |
+| Task 1 regressions | 34 AI-workflow/doctor/handoff tests plus refresh-config, Claude-link, and Codex-wrapper fixtures | Existing integration remains green | 34 tests and all 3 shell fixtures passed | 0 |
+| Task 1 hygiene | `git diff --check`; config SHA-256 | No diff errors; protected hash unchanged | Clean; exact `3edd706e...85e2e` hash | 0 |
+| Task 1 independent review | Read-only senior review of the uncommitted slice | Identify correctness, privacy, and plan gaps before commit | 2 Critical, 6 Important, and 3 Minor findings; verdict not ready | n/a |
+| Task 1 review RED | Expanded 38-test focused suite | Reproduce every actionable review class before fixes | 19 failures covering installed source selection, state/lock/vault containment, focus cardinality, schema/content safety, routing, and provenance | 1 |
+| Task 1 review GREEN | Expanded focused suite after fixes | All reviewer-driven contracts pass | 39 tests passed in 2.474s | 0 |
+| Task 1 re-review | Fresh read-only review plus routing follow-up | Every prior Critical/Important/Minor finding resolved and no new material defect | Ready to proceed: Yes; two final reference gaps were reproduced and fixed | n/a |
+| Task 1 final focused | `python3 -B -m unittest tests.test_second_brain_vault tests.test_second_brain_skill tests.test_second_brain_command -v` | Complete Task 1 contract stays green | 40 tests passed in 2.745s | 0 |
+| Task 1 final integration | 34 AI-workflow/doctor/handoff tests; skill validator; workflow doctor; README gate; three shell fixtures | Existing surfaces remain green and new skill is valid | 34 tests passed; `Skill is valid!`; doctor pass with one pre-existing warning; `pass_no_change`; all fixtures passed | 0 |
+| Task 1 real status | `scripts/executable_second-brain status --format json` | Read source vault without mutation | Schema 1; three approved projects; Inbox 0; latest note 2026-07-14 | 0 |
+| Task 1 final hygiene | `git diff --check`; protected config SHA-256 | Clean diff and unchanged protected config | Clean; exact `3edd706e...85e2e` hash | 0 |
+
+Task RED/GREEN, review, commit, push, and runtime evidence will be appended to
+this table as each checklist item is actually completed.
+
+## Review Notes
+
+- The upstream source contains prose/setup assets but no tests, fixtures,
+  generated-vault example, CI, or proven cross-platform runtime. Its claims are
+  design input only; local tests define behavior.
+- The source's three synchronized instruction files conflict with this repo's
+  canonical instruction chain and recruiter README, so that pattern is rejected.
+- The current README, smoke checklist, and skill index already contain unrelated
+  edits. This implementation may add non-overlapping working-tree hunks, but it
+  must stage a Second-Brain-only index representation and inspect it before each
+  commit.
+- The actual checkpoint is intentionally deferred until after implementation
+  commits are verified and pushed, preserving the user's live config change.
+- The first Task 1 review correctly found that proposal-only daily focus was not
+  durable enough for the user's lost-instruction problem. Task 1 now persists
+  one confirmed ExampleProject focus per date and requires closeout to match it.
+- While Task 1 was in progress, the user's pre-existing metaprompt work was
+  independently committed and pushed as `dbc311d`. Task 1 did not stage or
+  alter that work; the protected `dot_codex/config.toml` remains unstaged.

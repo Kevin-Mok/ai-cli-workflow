@@ -133,6 +133,13 @@ education work:
 - Apply the newest applicable durable preference when an older historical entry
   conflicts with it.
 
+### Conditional Session Memory
+
+- Use the `second-brain-session` skill when work needs personal/project
+  context, explicit session capture, a ExampleProject daily outcome, or natural-end
+  closeout. Keep its detailed procedure in the skill instead of loading the
+  entire vault into standing instructions.
+
 ## Git And Delivery
 
 - Keep commits focused and chronologically ordered from oldest prerequisite to
