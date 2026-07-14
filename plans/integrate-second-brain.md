@@ -580,8 +580,8 @@ refresh-config-protected-file-overwrite}.md`, `tasks/lessons.md`, and this plan.
   the newer live config.
 - [x] Run focused, Second Brain, repository, README, doctor, diff, protected
   state, and independent review gates.
-- [ ] Commit/push `fix(second-brain): resolve installed source through chezmoi`.
-- [ ] Apply the fixed runtime module, validate the installed setup and
+- [x] Commit/push `fix(second-brain): resolve installed source through chezmoi`.
+- [x] Apply the fixed runtime module, validate the installed setup and
   checkpoint dry run, and confirm the enabled timer remains scheduled.
 
 ## Exact Verification Plan
@@ -619,14 +619,14 @@ Manual/runtime checks after implementation commits are pushed:
 - [ ] Action: open `second-brain/` as an Obsidian vault. Expected: Hack-based
   dark styling loads, navigation links work, and device workspace state remains
   untracked.
-- [ ] Action: run `second-brain status`. Expected: active projects, Inbox state,
+- [x] Action: run `second-brain status`. Expected: active projects, Inbox state,
   and latest Daily Notes appear without dumping the full vault.
 - [ ] Action: run a fixture-backed capture and repeat it. Expected: the second
   invocation reports a no-op and note sections remain stable.
-- [ ] Action: run `setup-second-brain-timer --check`. Expected: launcher,
+- [x] Action: run `setup-second-brain-timer --check`. Expected: launcher,
   runtime-package modules, and units validate; the user manager is reachable;
   and no sudo is requested.
-- [ ] Action: inspect `systemctl --user status` and `list-timers` after enable.
+- [x] Action: inspect `systemctl --user status` and `list-timers` after enable.
   Expected: the timer is enabled and the next local trigger is 16:20.
 
 ## Risks, Edge Cases, And Rollback
@@ -746,6 +746,8 @@ Manual/runtime checks after implementation commits are pushed:
 | Installed resolution final gates | Focused, Task 3, Second Brain, repository, AI workflow, shell, doctor, systemd, README, compile, LFS, diff, and protected-state checks | Every affected and broader surface passes without staging or changing the protected config | Focused 49/49; Task 3 90/90; Second Brain 240/240; repository 287/287; AI workflow 36/36; all three shell fixtures, both doctors, skill validation, systemd verify, `pass_no_change`, isolated compile, LFS, and diff checks passed; protected repo/live hashes remained exact | 0 |
 | Installed resolution independent review | Fresh exact-diff review plus real-chezmoi and installed-layout reproducers | No unresolved correctness, security, or portability blocker | Verdict READY; all nine staged paths reviewed; real relative target failed; absolute target and a HOME path containing spaces passed; final command/path/real-chezmoi suite passed 52/52; both test-hardening recommendations were implemented | n/a |
 | Installed resolution staged allowlist | Cached name/status/diff inspection plus protected hash | Only the nine approved follow-up paths are staged and the protected config remains unstaged | Nine approved paths staged; complete diff reviewed; cached diff clean; protected config absent from the index with exact `3edd706e...85e2e` checksum | 0 |
+| Installed resolution fix push | Commit/push plus local/upstream comparison | The verified fix reaches the configured upstream before deployment | Commit `0bdb8c2`; local and upstream refs equal `0bdb8c20e0a4ba93b25eeb79ce268d8497e84e38` | 0 |
+| Installed runtime verification GREEN | Source setup enable; installed setup check, status, and checkpoint dry run from `/tmp`; module hashes; timer state/schedule; journal; Git/config state | Installed commands resolve the source repo, dry run without mutation, and keep the verified timer scheduled | Setup/check passed; status reported three projects and Inbox 0; dry run reported only `dot_codex/config.toml`; source/installed module hashes matched; timer enabled/active for 16:20 EDT; journal empty; refs stayed equal; index empty; protected repo/live hashes stayed exact | 0 |
 
 Task RED/GREEN, review, commit, push, and runtime evidence will be appended to
 this table as each checklist item is actually completed.

@@ -34,9 +34,13 @@ and vault-front-door validation.
 ## Verification
 
 The strengthened installed-layout test failed before the fix and passed after
-it. The complete command, path, and timer suites pass. Final installed command,
-checkpoint dry-run, timer, Git-ref, and protected-state evidence is recorded in
-the [Second Brain ExecPlan](../../plans/integrate-second-brain.md).
+it; the final independent command/path/real-chezmoi suite passed 52 tests. After
+commit `0bdb8c2` was pushed, source and installed runtime hashes matched, the
+installed setup check and status passed from `/tmp`, and checkpoint dry-run
+reported only the protected config without mutation. The timer remained
+enabled and active for 16:20 with no catch-up journal. Git refs and protected
+repo/live checksums remained exact. Full evidence is recorded in the
+[Second Brain ExecPlan](../../plans/integrate-second-brain.md).
 
 ## Follow-Up
 
