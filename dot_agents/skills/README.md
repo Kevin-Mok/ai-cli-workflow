@@ -222,9 +222,10 @@ refresh that external bundle from the latest upstream release.
   root `README.md` as a hard documentation gate for repo-surface changes,
   keeping setup, usage, command flags, stack rationale, and recruiter
   framing aligned with the repo.
-- [`metaprompt`](metaprompt/SKILL.md): Compiles plain-language requests into
-  paste-ready prompts, preserves a visible execution gate, and can execute the
-  compiled prompt after a standalone run signal.
+- [`metaprompt`](metaprompt/SKILL.md): Compiles and sharpens plain-language
+  requests into target-aware prompts or reusable `{{variable}}` templates,
+  preserving a strict standalone `go` gate for every execution and high-stakes
+  pass.
 - [`smoke-test-capture`](smoke-test-capture/SKILL.md): Keeps the shared
   `docs/smoke-tests.md` checklist current whenever work reveals a manual
   verification step, a changed manual expectation, or an obvious smoke

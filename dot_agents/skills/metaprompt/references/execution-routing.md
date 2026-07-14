@@ -4,16 +4,25 @@
 
 ## Run-signal boundary
 
-Execute only after a standalone affirmative such as `go`, `execute`, `run`,
-`los`, or `mach`. A run word inside a change request is a revision: update the
-compiled prompt, re-present it, and re-gate. The user may override execution
-mode by naming one, but otherwise choose it for them.
+Require a fresh standalone `go` for every execution and every high-stakes
+pass. A prior signal never carries into a later pass. An original request to
+"compile and run" or equivalent still compiles, presents, and waits; it is not
+the standalone run signal. A `go` authorizes only the currently gated pass.
 
-Logistics riders may accompany `go` when they change only where or how the
-accepted prompt runs, such as pulling an artifact into its slot or changing
-the destination. Apply those riders without another note. If a rider changes
-prompt wording, role, intent, scope, or structure, it is a revision and must
-re-gate. Only compile-time assumptions belong in the Assumptions line.
+Only the exact standalone token `go` authorizes the current gate. Any synonym,
+sentence, rider, or embedded run word is a revision: update the compiled
+prompt, re-present it, and re-gate. The user may override execution mode by
+naming one before authorization, but otherwise choose it for them.
+
+Logistics riders change where or how the accepted prompt runs, such as pulling
+an artifact into its slot or changing the destination. Incorporate them into
+the run recommendation, then re-gate. Only compile-time assumptions belong in
+the Assumptions line.
+
+For Judge -> Rewrite -> Re-check, present all three numbered prompt blocks at
+compile time but gate only Judge. After showing Judge's result, ask for a fresh
+`go` for Rewrite; repeat after Rewrite for Re-check. Never run two high-stakes
+passes from one signal or let an author certify its own work.
 
 ## Route order
 

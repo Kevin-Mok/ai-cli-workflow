@@ -241,9 +241,10 @@ Representative highlights:
   compact continuation artifact with done-criteria evidence, explicit unknowns,
   linked artifacts, retry-safe failure history, and executable next actions.
 - [`metaprompt`](dot_agents/skills/metaprompt/SKILL.md) compiles plain-language
-  intent into a paste-ready prompt and visible execution gate. Its detailed
-  quality, routing, and example rules load conditionally, keeping trivial prompt
-  work lightweight without weakening complex prompt construction.
+  intent into target-aware prompts and reusable `{{variable}}` templates behind
+  a strict per-pass `go` gate. Conditional references add hostile-input
+  hardening, agent boundaries, media guidance, and judge/rewrite/re-check flows
+  while keeping the entrypoint compact.
 - [`feedback-memory`](dot_agents/skills/feedback-memory/SKILL.md)
   carries forward durable user corrections through a repo-tracked
   `feedback.log`.

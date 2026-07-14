@@ -194,6 +194,30 @@ skill validator also passed. Forward scenarios cover a lightweight Trivial
 prompt, a current-source comparison whose revision contains `run` but must
 re-gate, a standalone `go`, and a read-only multi-hypothesis CI audit.
 
+### 2026-07-14 Curated Integration Follow-Up
+
+The current skill is a curated synthesis of `metaprompt-alxve` v2.0.1 at
+revision `4c30dda5754fe48ce3399c2379a7a370b652b155`, documented in
+`dot_agents/skills/metaprompt/SOURCE.md` with its MIT notice. It selectively
+adds reusable templates, example harvesting, target-system complements,
+untrusted-input boundaries, long-context ordering, precedent slots, agent
+permissions and budgets, media guidance, and conservatively dosed completion
+checks. It does not import the upstream fast lane, overlay, PowerShell tooling,
+branding, author-specific leak denylist, or unverifiable model claims.
+
+The entrypoint remains under 500 words and progressively discloses one-hop
+references. A fresh standalone `go` is still mandatory for every execution and
+every high-stakes pass, including an original compile-and-run request. Reusable
+prompts expose canonical `{{variable}}` slots, and judge/rewrite/re-check work
+emits three separately runnable, separately gated prompt blocks.
+
+The dated model-profile reference permits only direct official URLs, explicit
+heuristics, or `unknown`, with an expiry rule that prevents stale guidance from
+silently becoming fact. This follow-up records current behavior without
+rewriting the historical measurements above. The integration deliberately does
+not refresh tracked configuration or apply the package to the live skill; that
+installation remains a later explicit user action.
+
 ## Compact Context Handoffs
 
 `context-handoff` creates a maximum 600-word continuation artifact rather than

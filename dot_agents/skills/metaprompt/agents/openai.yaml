@@ -1,4 +1,4 @@
 interface:
   display_name: "Metaprompt"
-  short_description: "Compile requests into paste-ready prompts"
-  default_prompt: "Use $metaprompt to compile my request into a paste-ready prompt, then wait for my go."
+  short_description: "Compile, sharpen, and template prompts"
+  default_prompt: "Use $metaprompt to compile, sharpen, or template my request, then wait for my standalone go before running any pass."

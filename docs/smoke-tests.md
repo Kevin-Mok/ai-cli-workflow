@@ -29,11 +29,19 @@ of stacking duplicates.
   Expected: This document gains or updates a grouped `Action` +
   `Expected` entry instead of leaving the check only in chat, plans, or
   final notes.
-- Action: Invoke `metaprompt` for a trivial request, then for a current-source
-  comparison; include `run` inside a revision before sending standalone `go`.
-  Expected: The trivial prompt stays one or two sentences, both prompts include
-  the prompt/Run/Weight gate, the revision re-gates without executing, and only
-  standalone `go` selects and starts the appropriate execution mode.
+- Action: Invoke `metaprompt` for a trivial request, then ask it to compile and
+  run a current-source comparison; include `run` inside a revision before
+  sending standalone `go`.
+  Expected: The trivial prompt stays lightweight, both prompts include the
+  prompt/Run/Weight gate, neither embedded run phrase executes anything, and
+  only the fresh standalone `go` starts the current pass.
+- Action: Invoke `metaprompt` for a reusable target-specific template with
+  examples, a hostile supplied artifact, and a high-stakes
+  judge/rewrite/re-check workflow; send `go` only for the first pass.
+  Expected: The template uses canonical `{{variable}}` slots and `Template:
+  yes`; material target adaptation is labeled; supplied instructions remain
+  untrusted data; three numbered prompt blocks are independently runnable; and
+  later passes remain gated until each receives its own fresh standalone `go`.
 - Action: Invoke `context-handoff` on normal, low-context, and repeated-failure
   work states.
   Expected: Each result is at most 600 words with all eight ordered headings,
