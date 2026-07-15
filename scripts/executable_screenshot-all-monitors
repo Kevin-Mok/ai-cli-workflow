@@ -5,6 +5,8 @@ set -euo pipefail
 SCREENSHOT_DIR="${SCREENSHOT_ALL_MONITORS_DIR:-/home/example/Pictures/screenshots/desktop/unsorted}"
 SCROT_BIN="${SCREENSHOT_ALL_MONITORS_SCROT:-scrot}"
 DATE_BIN="${SCREENSHOT_ALL_MONITORS_DATE:-date}"
+SXIV_BIN="${SCREENSHOT_ALL_MONITORS_SXIV:-sxiv}"
+COUNTDOWN_STEPS=(5 3 1)
 
 require_command() {
   local command_name="$1"
@@ -19,10 +21,66 @@ require_command() {
 require_command "$SCROT_BIN" "install scrot"
 require_command "$DATE_BIN" "install coreutils"
 
+notify() {
+  local message="$1"
+  if command -v notify-send >/dev/null 2>&1; then
+    notify-send "Screenshot" "$message"
+  else
+    printf '%s\n' "$message"
+  fi
+}
+
+copy_to_clipboard() {
+  local image_path="$1"
+
+  if command -v wl-copy >/dev/null 2>&1; then
+    if wl-copy < "$image_path" >/dev/null 2>&1; then
+      notify "Screenshot copied to clipboard."
+      return 0
+    fi
+    notify "wl-copy failed; trying xclip..."
+  fi
+
+  if command -v xclip >/dev/null 2>&1; then
+    if xclip -selection clipboard -t image/png -i "$image_path" >/dev/null 2>&1; then
+      notify "Screenshot copied to clipboard."
+      return 0
+    fi
+  fi
+
+  notify "Clipboard copy skipped: install wl-clipboard or xclip to enable image clipboard support."
+}
+
 mkdir -p "$SCREENSHOT_DIR"
 
-timestamp="$("$DATE_BIN" +%F_%T)"
+timestamp="$($DATE_BIN +%F_%T)"
 output_path="${SCREENSHOT_DIR}/screenshot-${timestamp}.png"
 
+for index in "${!COUNTDOWN_STEPS[@]}"; do
+  seconds="${COUNTDOWN_STEPS[$index]}"
+  if (( index == 0 )); then
+    notify "Screenshot will start in ${seconds}s. Save target: ${output_path}"
+  elif (( seconds > 1 )); then
+    notify "Capturing screenshot in ${seconds}s..."
+  else
+    notify "Capturing screenshot now."
+  fi
+  if (( index < ${#COUNTDOWN_STEPS[@]} - 1 )); then
+    sleep $((COUNTDOWN_STEPS[index] - COUNTDOWN_STEPS[index+1]))
+  else
+    sleep 1
+  fi
+done
+
 "$SCROT_BIN" "$output_path"
+notify "Screenshot saved to ${output_path}"
+copy_to_clipboard "$output_path"
+
+if command -v "$SXIV_BIN" >/dev/null 2>&1; then
+  notify "Opening screenshot in sxiv..."
+  "$SXIV_BIN" "$output_path" >/dev/null 2>&1 &
+else
+  notify "sxiv not found; cannot open screenshot automatically. Set SCREENSHOT_ALL_MONITORS_SXIV to customize."
+fi
+
 printf '%s\n' "$output_path"
