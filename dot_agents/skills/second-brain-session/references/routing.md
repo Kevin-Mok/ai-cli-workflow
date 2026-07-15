@@ -9,7 +9,6 @@ Route one fact to one owner:
 | Durable workflow or communication preference | dot_agents/skills/feedback-memory/feedback.log |
 | Repository-specific engineering lesson | tasks/lessons.md |
 | Implementation decision, state, or verification | plans/ |
-| Bounded continuation artifact | context-handoff |
 | Temporal fact or relationship | Graphiti |
 | Actionable task and attached note | Taskwarrior/Taskopen |
 | Profile, Inbox, daily summary, project context, curated knowledge | second-brain/ |

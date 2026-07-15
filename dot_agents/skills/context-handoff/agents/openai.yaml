@@ -1,6 +1,0 @@
-interface:
-  display_name: "Context Handoff"
-  short_description: "Create compact, evidence-linked work handoffs"
-  default_prompt: "Use $context-handoff to create a compact, evidence-linked handoff for the current work."
-policy:
-  allow_implicit_invocation: true

@@ -64,7 +64,6 @@ class SecondBrainSkillTest(unittest.TestCase):
             "feedback-memory/feedback.log",
             "tasks/lessons.md",
             "plans/",
-            "context-handoff",
             "Graphiti",
             "Taskwarrior/Taskopen",
             '"confirmed": true',

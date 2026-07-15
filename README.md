@@ -246,9 +246,6 @@ Representative highlights:
   drift, and source provenance into deterministic text or JSON evidence. Its
   `--check` mode blocks objective errors while leaving semantic candidates for
   human review.
-- [`context-handoff`](dot_agents/skills/context-handoff/SKILL.md) creates a
-  compact continuation artifact with done-criteria evidence, explicit unknowns,
-  linked artifacts, retry-safe failure history, and executable next actions.
 - [`metaprompt`](dot_agents/skills/metaprompt/SKILL.md) compiles plain-language
   intent into target-aware prompts and reusable `{{variable}}` templates behind
   a strict per-pass `go` gate. Conditional references add hostile-input

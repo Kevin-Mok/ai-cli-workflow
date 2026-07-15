@@ -206,9 +206,6 @@ refresh that external bundle from the latest upstream release.
   instruction context and audits duplicate policy, broken local references,
   plan contracts, skill-catalog drift, provenance, and semantic-review
   candidates with deterministic text or JSON evidence.
-- [`context-handoff`](context-handoff/SKILL.md): Creates bounded continuation
-  handoffs with done-criteria evidence, linked artifacts, explicit unknowns,
-  retry-safe failure history, and executable next actions.
 - [`second-brain-session`](second-brain-session/SKILL.md): Retrieves targeted
   personal and project context, routes durable memory to its canonical owner,
   and prepares confirmation-gated ExampleProject session closeouts.

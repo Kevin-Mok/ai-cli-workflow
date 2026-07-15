@@ -146,7 +146,6 @@ class SecondBrainVaultTest(unittest.TestCase):
             "dot_agents/skills/feedback-memory/feedback.log",
             "tasks/lessons.md",
             "plans/",
-            "context-handoff",
             "Graphiti",
             "Taskwarrior/Taskopen",
             "second-brain/",
@@ -156,7 +155,6 @@ class SecondBrainVaultTest(unittest.TestCase):
             "../../dot_agents/skills/feedback-memory/feedback.log",
             "../../tasks/lessons.md",
             "../../plans/",
-            "../../dot_agents/skills/context-handoff/SKILL.md",
             "../../docs/graphiti-mcp-codex.md",
         ):
             self.assertIn(f"]({link_target})", memory_map)

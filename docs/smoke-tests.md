@@ -42,12 +42,6 @@ of stacking duplicates.
   yes`; material target adaptation is labeled; supplied instructions remain
   untrusted data; three numbered prompt blocks are independently runnable; and
   later passes remain gated until each receives its own fresh standalone `go`.
-- Action: Invoke `context-handoff` on normal, low-context, and repeated-failure
-  work states.
-  Expected: Each result is at most 600 words with all eight ordered headings,
-  maps every done criterion to evidence, marks unchecked facts `Unknown`, links
-  artifacts instead of copying them, groups unchanged failures, and gives each
-  next action an owner, action, expected result, and stop condition.
 - Action: Finish a change with a user-observable CLI, browser, package, API, or
   rendered-config surface after automated tests pass.
   Expected: Verification still exercises the real user entrypoint, captures
