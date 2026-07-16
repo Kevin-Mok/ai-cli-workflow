@@ -1,0 +1,119 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  cat <<'USAGE'
+Usage: executable_install-global-codex-guidance [--dry-run]
+
+Link this checkout's canonical AGENTS guidance, reusable Codex skills, and
+system-design support pack into the current user's home directory.
+
+The installer is idempotent. It refuses to replace a non-matching existing
+path, so user-managed Codex guidance and skills are never overwritten.
+
+Options:
+  --dry-run, -n  Preview links without writing files.
+  --help, -h     Show this help.
+USAGE
+}
+
+dry_run=0
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --dry-run|-n)
+      dry_run=1
+      shift
+      ;;
+    --help|-h)
+      usage
+      exit 0
+      ;;
+    *)
+      echo "executable_install-global-codex-guidance: unknown option: $1" >&2
+      usage >&2
+      exit 2
+      ;;
+  esac
+done
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+agents_source="$repo_root/dot_codex/AGENTS.md"
+skills_source="$repo_root/dot_agents/skills"
+system_design_source="$repo_root/dot_agents/system-design"
+
+for source_path in "$agents_source" "$skills_source" "$system_design_source"; do
+  if [[ ! -e "$source_path" ]]; then
+    echo "executable_install-global-codex-guidance: required source path is missing: $source_path" >&2
+    exit 1
+  fi
+done
+
+ensure_parent_directory() {
+  local directory="$1"
+
+  if [[ "$dry_run" -eq 1 ]]; then
+    [[ -d "$directory" ]] || printf 'Would create directory: %s\n' "$directory"
+    return
+  fi
+
+  mkdir -p "$directory"
+}
+
+install_link() {
+  local source_path="$1"
+  local target_path="$2"
+  local resolved_source
+
+  resolved_source="$(readlink -f "$source_path")"
+
+  if [[ -L "$target_path" ]] && [[ "$(readlink -f "$target_path")" == "$resolved_source" ]]; then
+    printf 'Already linked: %s\n' "$target_path"
+    return
+  fi
+
+  if [[ -e "$target_path" || -L "$target_path" ]]; then
+    echo "executable_install-global-codex-guidance: refusing to replace existing path: $target_path" >&2
+    exit 1
+  fi
+
+  if [[ "$dry_run" -eq 1 ]]; then
+    printf 'Would link: %s -> %s\n' "$target_path" "$resolved_source"
+    return
+  fi
+
+  ln -s "$resolved_source" "$target_path"
+  printf 'Linked: %s -> %s\n' "$target_path" "$resolved_source"
+}
+
+ensure_parent_directory "$HOME/.codex"
+ensure_parent_directory "$HOME/.codex/skills"
+ensure_parent_directory "$HOME/.agents"
+
+install_link "$agents_source" "$HOME/.codex/AGENTS.md"
+
+skill_names=()
+while IFS= read -r skill_dir; do
+  skill_name="$(basename "$skill_dir")"
+  skill_names+=("$skill_name")
+  install_link "$skill_dir" "$HOME/.codex/skills/$skill_name"
+done < <(find "$skills_source" -mindepth 1 -maxdepth 1 -type d -print | sort)
+
+install_link "$system_design_source" "$HOME/.agents/system-design"
+
+if [[ "$dry_run" -eq 1 ]]; then
+  printf 'Dry run complete. No files were changed.\n'
+  exit 0
+fi
+
+[[ -L "$HOME/.codex/AGENTS.md" ]]
+[[ "$(readlink -f "$HOME/.codex/AGENTS.md")" == "$(readlink -f "$agents_source")" ]]
+[[ -L "$HOME/.agents/system-design" ]]
+[[ "$(readlink -f "$HOME/.agents/system-design")" == "$(readlink -f "$system_design_source")" ]]
+
+for skill_name in "${skill_names[@]}"; do
+  [[ -L "$HOME/.codex/skills/$skill_name" ]]
+  [[ -f "$HOME/.codex/skills/$skill_name/SKILL.md" ]]
+done
+
+printf 'Verified %d Codex skill links. Start a new Codex session to load them.\n' "${#skill_names[@]}"

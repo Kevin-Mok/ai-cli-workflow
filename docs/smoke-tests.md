@@ -32,6 +32,8 @@ of stacking duplicates.
 
 ## Installed Skill Surface
 
+- Action: Run `./scripts/executable_install-global-codex-guidance --dry-run`, then run it without flags from a checkout that does not already own `~/.codex/AGENTS.md` or the same-named skill links.
+  Expected: Dry-run reports the planned `~/.codex/AGENTS.md`, `~/.codex/skills/<skill>`, and `~/.agents/system-design` links without writing them; the real run creates only those links, verifies every repository skill, and refuses rather than overwrites a conflicting user-managed path.
 - Action: Apply a tracked skill change to the live `~/.agents/skills/`
   install.
   Expected: The installed skill copy matches the repo-tracked source so
