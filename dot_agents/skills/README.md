@@ -129,6 +129,8 @@ installs a user-scoped recurring sync at 05:00 local time with
 `Persistent=true`; it catches up missed runs, does not require sudo, and does
 not alter already-running Codex sessions until they are restarted. Use
 `--check` to validate the setup or `--disable` to stop the recurring timer.
+Timer setup is bound to the standard `$HOME/linux-config` checkout, while the
+manual helper continues to support an alternate `LINUX_CONFIG_SOURCE`.
 
 - [`brainstorming`](https://github.com/obra/superpowers/blob/main/skills/brainstorming/SKILL.md):
   Turns a rough idea into an approved design or spec before any

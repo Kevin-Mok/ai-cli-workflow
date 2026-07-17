@@ -60,7 +60,7 @@ class SuperpowersReleaseTimerSetupTest(unittest.TestCase):
         self.addCleanup(self.tempdir.cleanup)
         self.root = Path(self.tempdir.name)
         self.home = self.root / "home"
-        self.source = self.root / "linux-config"
+        self.source = self.home / "linux-config"
         self.home.mkdir()
         self.source.mkdir()
         self.helper = self.home / "scripts" / "sync-superpowers-release"
@@ -73,11 +73,11 @@ class SuperpowersReleaseTimerSetupTest(unittest.TestCase):
         self.timer = self.units / TIMER.name
         self.service.write_bytes(SERVICE.read_bytes())
         self.timer.write_bytes(TIMER.read_bytes())
-        self.sources = self.root / "managed-sources"
-        self.sources.mkdir()
-        self.helper_source = self.sources / "executable_sync-superpowers-release"
-        self.service_source = self.sources / SERVICE.name
-        self.timer_source = self.sources / TIMER.name
+        self.helper_source = self.source / "scripts" / "executable_sync-superpowers-release"
+        self.service_source = self.source / "dot_config" / "systemd" / "user" / SERVICE.name
+        self.timer_source = self.source / "dot_config" / "systemd" / "user" / TIMER.name
+        self.helper_source.parent.mkdir(parents=True)
+        self.service_source.parent.mkdir(parents=True)
         for source, managed in ((self.helper_source, HELPER), (self.service_source, SERVICE), (self.timer_source, TIMER)):
             shutil.copy2(managed, source)
         self.helper_source.chmod(0o755)
@@ -95,6 +95,7 @@ class SuperpowersReleaseTimerSetupTest(unittest.TestCase):
             "TEST_HELPER_SOURCE": str(self.helper_source),
             "TEST_SERVICE_SOURCE": str(self.service_source),
             "TEST_TIMER_SOURCE": str(self.timer_source), "PYTHONDONTWRITEBYTECODE": "1",
+            "TEST_ANALYZE_COUNT": str(self.root / "analyze-count"),
         }
 
     def _write(self, name: str, content: str) -> None:
@@ -129,6 +130,12 @@ set -euo pipefail
 [ "$3" = "$TEST_SERVICE" ] && [ "$4" = "$TEST_TIMER" ] || exit 64
 if [ "${TEST_ANALYZE_FAIL:-0}" = 1 ]; then
 printf 'PRIVATE_NOTE_AND_CONFIG_CONTENT_MUST_NOT_LEAK\n' >&2; exit 1; fi
+count=0
+[ ! -f "$TEST_ANALYZE_COUNT" ] || count=$(cat "$TEST_ANALYZE_COUNT")
+count=$((count + 1))
+printf '%s\n' "$count" > "$TEST_ANALYZE_COUNT"
+if [ "${TEST_ANALYZE_FAIL_CALL:-0}" = "$count" ]; then
+printf 'PRIVATE_NOTE_AND_CONFIG_CONTENT_MUST_NOT_LEAK\n' >&2; exit 1; fi
 """)
         self._write("systemctl", """#!/usr/bin/env bash
 set -euo pipefail
@@ -136,7 +143,8 @@ set -euo pipefail
 case "$*" in
 '--user daemon-reload') [ "${TEST_SYSTEMCTL_FAIL:-0}" != 1 ] || {
 printf 'PRIVATE_NOTE_AND_CONFIG_CONTENT_MUST_NOT_LEAK\n' >&2; exit 1; } ;;
-'--user enable --now superpowers-release-sync.timer') ;;
+'--user enable --now superpowers-release-sync.timer') [ "${TEST_ENABLE_FAIL:-0}" != 1 ] || {
+printf 'PRIVATE_NOTE_AND_CONFIG_CONTENT_MUST_NOT_LEAK\n' >&2; exit 1; } ;;
 '--user disable --now superpowers-release-sync.timer')
 [ "${TEST_ALREADY_DISABLED:-0}" != 1 ] || { printf 'Unit superpowers-release-sync.timer is not loaded.\n' >&2; exit 1; } ;;
 *) exit 64 ;; esac
@@ -174,6 +182,7 @@ printf 'PRIVATE_NOTE_AND_CONFIG_CONTENT_MUST_NOT_LEAK\n' >&2; exit 1; } ;;
             f"chezmoi -S {self.source} source-path {self.service}",
             f"chezmoi -S {self.source} source-path {self.timer}",
             f"chezmoi -S {self.source} apply --parent-dirs {self.helper} {self.service} {self.timer}",
+            f"systemd-analyze --user verify {self.service} {self.timer}",
             "systemctl --user daemon-reload",
             "systemctl --user enable --now superpowers-release-sync.timer",
             f"systemd-analyze --user verify {self.service} {self.timer}",
@@ -257,6 +266,91 @@ printf 'PRIVATE_NOTE_AND_CONFIG_CONTENT_MUST_NOT_LEAK\n' >&2; exit 1; } ;;
             [f"chezmoi -S {self.source} source-path {self.helper}"],
         )
 
+    def test_check_rejects_alternate_checkout_for_timer_setup(self) -> None:
+        alternate = self.root / "alternate-linux-config"
+        alternate.mkdir()
+
+        completed = self.run_script(
+            "--check",
+            env={**self.env, "LINUX_CONFIG_SOURCE": str(alternate)},
+        )
+
+        self.assertEqual(completed.returncode, 2)
+        self.assertIn("timer setup requires the standard checkout", completed.stderr)
+        self.assertEqual(self.calls(), [])
+
+    def test_check_rejects_chezmoi_sources_outside_standard_checkout(self) -> None:
+        outside = self.root / "outside"
+        outside.mkdir()
+        for source, key in (
+            (outside / "executable_sync-superpowers-release", "TEST_HELPER_SOURCE"),
+            (outside / SERVICE.name, "TEST_SERVICE_SOURCE"),
+            (outside / TIMER.name, "TEST_TIMER_SOURCE"),
+        ):
+            with self.subTest(source=source.name):
+                shutil.copy2(self.helper_source, source)
+                source.chmod(0o755)
+
+                completed = self.run_script("--check", env={**self.env, key: str(source)})
+
+                self.assertEqual(completed.returncode, 2)
+                self.assertIn("does not match expected source", completed.stderr)
+                self.log.write_text("", encoding="utf-8")
+
+    def test_enable_rejects_stale_installed_targets_before_activation(self) -> None:
+        for target in (self.helper, self.service, self.timer):
+            with self.subTest(target=target.name):
+                original = target.read_bytes()
+                target.write_bytes(b"stale installed content\n")
+
+                completed = self.run_script("--enable")
+
+                self.assertEqual(completed.returncode, 2)
+                self.assertIn("installed Superpowers release timer files do not match", completed.stderr)
+                self.assertEqual(
+                    self.calls(),
+                    [
+                        f"chezmoi -S {self.source} source-path {self.helper}",
+                        f"chezmoi -S {self.source} source-path {self.service}",
+                        f"chezmoi -S {self.source} source-path {self.timer}",
+                        f"chezmoi -S {self.source} apply --parent-dirs {self.helper} {self.service} {self.timer}",
+                    ],
+                )
+                target.write_bytes(original)
+                self.log.write_text("", encoding="utf-8")
+
+    def test_enable_stops_before_activation_when_pre_activation_verify_fails(self) -> None:
+        completed = self.run_script(
+            "--enable",
+            env={**self.env, "TEST_ANALYZE_FAIL_CALL": "1"},
+        )
+
+        self.assertEqual(completed.returncode, 2)
+        self.assertIn("systemd unit validation failed", completed.stderr)
+        self.assertNotIn("PRIVATE_NOTE_AND_CONFIG_CONTENT", completed.stderr)
+        self.assertEqual(
+            self.calls()[-1],
+            f"systemd-analyze --user verify {self.service} {self.timer}",
+        )
+        self.assertFalse(any("daemon-reload" in call or " enable " in call for call in self.calls()))
+
+    def test_enable_cleans_up_after_final_verification_failure(self) -> None:
+        completed = self.run_script(
+            "--enable",
+            env={**self.env, "TEST_ANALYZE_FAIL_CALL": "2"},
+        )
+
+        self.assertEqual(completed.returncode, 2)
+        self.assertIn("systemd unit validation failed", completed.stderr)
+        self.assertNotIn("PRIVATE_NOTE_AND_CONFIG_CONTENT", completed.stderr)
+        self.assertEqual(
+            self.calls()[-2:],
+            [
+                f"systemd-analyze --user verify {self.service} {self.timer}",
+                "systemctl --user disable --now superpowers-release-sync.timer",
+            ],
+        )
+
     def test_check_rejects_executable_prefix_for_units(self) -> None:
         for source, key in (
             (self.service_source, "TEST_SERVICE_SOURCE"),
@@ -270,9 +364,8 @@ printf 'PRIVATE_NOTE_AND_CONFIG_CONTENT_MUST_NOT_LEAK\n' >&2; exit 1; } ;;
                 completed = self.run_script("--check", env=env)
 
                 self.assertEqual(completed.returncode, 2)
-                self.assertIn("chezmoi managed source is unsafe", completed.stderr)
+                self.assertIn("chezmoi managed source", completed.stderr)
                 self.log.write_text("", encoding="utf-8")
                 renamed.rename(source)
-
 if __name__ == "__main__":
     unittest.main()
