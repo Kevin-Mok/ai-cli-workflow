@@ -121,9 +121,14 @@ skills tighten one specific aspect of an existing interface.
 These skills are mounted from the chezmoi-managed
 `~/.codex/superpowers` release archive into
 `~/.agents/skills/superpowers/<skill>/SKILL.md`. They are not
-repo-tracked under `dot_agents/skills/`, but they are part of the live
-Codex skill surface on this machine. Run `sync-superpowers-release` to
-refresh that external bundle from the latest upstream release.
+repo-tracked under `dot_agents/skills/`, but they are part of the
+live external Superpowers skill surface on this machine. Use
+`sync-superpowers-release` for a manual refresh of that external bundle from
+the latest upstream release. The optional `setup-superpowers-release-timer --enable` path instead
+installs a user-scoped recurring sync at 05:00 local time with
+`Persistent=true`; it catches up missed runs, does not require sudo, and does
+not alter already-running Codex sessions until they are restarted. Use
+`--check` to validate the setup or `--disable` to stop the recurring timer.
 
 - [`brainstorming`](https://github.com/obra/superpowers/blob/main/skills/brainstorming/SKILL.md):
   Turns a rough idea into an approved design or spec before any

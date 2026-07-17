@@ -60,6 +60,18 @@ of stacking duplicates.
   mode for `~/.codex/superpowers` and
   `~/.agents/skills/superpowers`, rendering the latest
   `obra/superpowers` release archive without writing files.
+- Action: Run `scripts/executable_setup-superpowers-release-timer --check`,
+  then `--enable`; inspect
+  `systemctl --user list-timers superpowers-release-sync.timer` and
+  `journalctl --user -u superpowers-release-sync.service`; finally run
+  `scripts/executable_setup-superpowers-release-timer --disable` and repeat
+  the disable command to verify cleanup is idempotent.
+  Expected: The check validates the managed timer units, enable activates the
+  optional user-scoped timer with `Persistent=true`, and the next trigger is
+  05:00 local time. The journal shows the release-sync service result without
+  changing running Codex sessions, and both disable calls leave the timer
+  stopped and disabled while preserving its managed unit files. No sudo is
+  required; disable also works without chezmoi or the source checkout.
 
 ## Second Brain
 
