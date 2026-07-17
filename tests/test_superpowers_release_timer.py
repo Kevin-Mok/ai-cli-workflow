@@ -107,14 +107,20 @@ class SuperpowersReleaseTimerSetupTest(unittest.TestCase):
 set -euo pipefail
 { printf 'chezmoi'; printf ' %s' "$@"; printf '\n'; } >> "$TEST_CALL_LOG"
 case "${1:-}" in
-source-path) case "${2:-}" in
-"$TEST_HELPER") printf '%s\n' "$TEST_HELPER_SOURCE" ;;
-"$TEST_SERVICE") printf '%s\n' "$TEST_SERVICE_SOURCE" ;;
-"$TEST_TIMER") printf '%s\n' "$TEST_TIMER_SOURCE" ;; *) exit 64 ;; esac ;;
--S) [ "$#" = 7 ] && [ "$2" = "$LINUX_CONFIG_SOURCE" ] && [ "$3" = apply ] &&
-[ "$4" = --parent-dirs ] && [ "$5" = "$TEST_HELPER" ] && [ "$6" = "$TEST_SERVICE" ] &&
-[ "$7" = "$TEST_TIMER" ] || exit 64 ;;
-*) exit 64 ;; esac
+-S)
+  [ "$2" = "${TEST_EXPECTED_SOURCE:-$LINUX_CONFIG_SOURCE}" ] || exit 64
+  case "${3:-}" in
+  source-path) case "${4:-}" in
+    "$TEST_HELPER") printf '%s\n' "$TEST_HELPER_SOURCE" ;;
+    "$TEST_SERVICE") printf '%s\n' "$TEST_SERVICE_SOURCE" ;;
+    "$TEST_TIMER") printf '%s\n' "$TEST_TIMER_SOURCE" ;; *) exit 64 ;; esac ;;
+  apply) [ "$#" = 7 ] && [ "$4" = --parent-dirs ] &&
+    [ "$5" = "$TEST_HELPER" ] && [ "$6" = "$TEST_SERVICE" ] &&
+    [ "$7" = "$TEST_TIMER" ] || exit 64 ;;
+  *) exit 64 ;;
+  esac ;;
+*) exit 64 ;;
+esac
 """)
         self._write("systemd-analyze", """#!/usr/bin/env bash
 set -euo pipefail
@@ -153,8 +159,9 @@ printf 'PRIVATE_NOTE_AND_CONFIG_CONTENT_MUST_NOT_LEAK\n' >&2; exit 1; } ;;
         self.assertEqual(completed.returncode, 0, completed.stderr)
         self.assertEqual(completed.stdout, "Superpowers release timer units are valid.\n")
         self.assertEqual(self.calls(), [
-            f"chezmoi source-path {self.helper}", f"chezmoi source-path {self.service}",
-            f"chezmoi source-path {self.timer}",
+            f"chezmoi -S {self.source} source-path {self.helper}",
+            f"chezmoi -S {self.source} source-path {self.service}",
+            f"chezmoi -S {self.source} source-path {self.timer}",
             f"systemd-analyze --user verify {self.service} {self.timer}",
         ])
 
@@ -163,8 +170,9 @@ printf 'PRIVATE_NOTE_AND_CONFIG_CONTENT_MUST_NOT_LEAK\n' >&2; exit 1; } ;;
         self.assertEqual(completed.returncode, 0, completed.stderr)
         self.assertEqual(completed.stdout, "Superpowers release timer enabled.\n")
         self.assertEqual(self.calls(), [
-            f"chezmoi source-path {self.helper}", f"chezmoi source-path {self.service}",
-            f"chezmoi source-path {self.timer}",
+            f"chezmoi -S {self.source} source-path {self.helper}",
+            f"chezmoi -S {self.source} source-path {self.service}",
+            f"chezmoi -S {self.source} source-path {self.timer}",
             f"chezmoi -S {self.source} apply --parent-dirs {self.helper} {self.service} {self.timer}",
             "systemctl --user daemon-reload",
             "systemctl --user enable --now superpowers-release-sync.timer",
@@ -213,17 +221,58 @@ printf 'PRIVATE_NOTE_AND_CONFIG_CONTENT_MUST_NOT_LEAK\n' >&2; exit 1; } ;;
                 self.assertNotIn("PRIVATE_NOTE_AND_CONFIG_CONTENT", completed.stderr)
                 self.log.write_text("", encoding="utf-8")
 
-    def test_check_rejects_non_executable_helper_source_and_creates_private_lock(self) -> None:
+    def test_enable_rejects_non_executable_helper_source_and_creates_private_lock(self) -> None:
         self.helper_source.chmod(0o644)
         failed = self.run_script("--check")
         self.assertEqual(failed.returncode, 2)
         self.assertIn("chezmoi helper source is not executable", failed.stderr)
         self.helper_source.chmod(0o755)
-        completed = self.run_script("--check")
+        completed = self.run_script("--enable")
         self.assertEqual(completed.returncode, 0, completed.stderr)
         lock = self.root / "state" / "superpowers-release-sync" / "locks" / "timer-setup.lock"
         self.assertEqual(stat.S_IMODE(lock.parent.stat().st_mode), 0o700)
         self.assertEqual(stat.S_IMODE(lock.stat().st_mode), 0o600)
+
+    def test_check_does_not_create_state(self) -> None:
+        state_home = Path(self.env["XDG_STATE_HOME"])
+        self.assertFalse(state_home.exists())
+
+        completed = self.run_script("--check")
+
+        self.assertEqual(completed.returncode, 0, completed.stderr)
+        self.assertFalse(state_home.exists())
+
+    def test_check_rejects_mismatched_chezmoi_source(self) -> None:
+        env = {
+            **self.env,
+            "TEST_EXPECTED_SOURCE": str(self.root / "different-source"),
+        }
+
+        completed = self.run_script("--check", env=env)
+
+        self.assertEqual(completed.returncode, 2)
+        self.assertIn("chezmoi managed source resolution failed", completed.stderr)
+        self.assertEqual(
+            self.calls(),
+            [f"chezmoi -S {self.source} source-path {self.helper}"],
+        )
+
+    def test_check_rejects_executable_prefix_for_units(self) -> None:
+        for source, key in (
+            (self.service_source, "TEST_SERVICE_SOURCE"),
+            (self.timer_source, "TEST_TIMER_SOURCE"),
+        ):
+            with self.subTest(source=source.name):
+                renamed = source.with_name(f"executable_{source.name}")
+                source.rename(renamed)
+                env = {**self.env, key: str(renamed)}
+
+                completed = self.run_script("--check", env=env)
+
+                self.assertEqual(completed.returncode, 2)
+                self.assertIn("chezmoi managed source is unsafe", completed.stderr)
+                self.log.write_text("", encoding="utf-8")
+                renamed.rename(source)
 
 if __name__ == "__main__":
     unittest.main()

@@ -117,14 +117,19 @@ def _managed_targets() -> tuple[Path, Path, Path]:
     return helper, units / SERVICE_NAME, units / TIMER_NAME
 
 
-def _source_for(target: Path) -> Path:
-    completed = _run(("chezmoi", "source-path", str(target)), "chezmoi managed source resolution failed")
+def _source_for(source_root: Path, target: Path) -> Path:
+    completed = _run(
+        ("chezmoi", "-S", str(source_root), "source-path", str(target)),
+        "chezmoi managed source resolution failed",
+    )
     source = Path(completed.stdout.strip()).expanduser()
     try:
         metadata = source.lstat()
     except OSError as error:
         raise TimerSetupError("chezmoi managed source is missing") from error
-    expected_names = {target.name, f"executable_{target.name}"}
+    expected_names = {target.name}
+    if target.name == HELPER_NAME:
+        expected_names.add(f"executable_{target.name}")
     if (not source.is_absolute() or source.is_symlink() or not stat.S_ISREG(metadata.st_mode)
             or metadata.st_nlink != 1 or metadata.st_uid != os.geteuid()
             or source.name not in expected_names):
@@ -138,7 +143,7 @@ def _validate_sources() -> tuple[Path, tuple[Path, Path, Path]]:
     source = _source_root()
     targets = _managed_targets()
     for target in targets:
-        _source_for(target)
+        _source_for(source, target)
     return source, targets
 
 
@@ -175,13 +180,14 @@ def _disable() -> None:
 def main(argv: Sequence[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     try:
-        with _setup_lock():
-            if args.check:
-                _check()
-            elif args.enable:
-                _enable()
-            else:
-                _disable()
+        if args.check:
+            _check()
+        else:
+            with _setup_lock():
+                if args.enable:
+                    _enable()
+                else:
+                    _disable()
     except TimerSetupError as error:
         print(f"setup-superpowers-release-timer: {error}", file=sys.stderr)
         return 2
