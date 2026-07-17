@@ -60,19 +60,19 @@ of stacking duplicates.
   mode for `~/.codex/superpowers` and
   `~/.agents/skills/superpowers`, rendering the latest
   `obra/superpowers` release archive without writing files.
-- Action: Run the following user-scoped timer cycle in order (from the
-  standard `$HOME/linux-config` checkout):
-  `setup-superpowers-release-timer --enable`,
-  `setup-superpowers-release-timer --check`,
-  `systemctl --user list-timers superpowers-release-sync.timer`,
-  `journalctl --user -u superpowers-release-sync.service`,
-  `setup-superpowers-release-timer --disable`, then repeat
-  `setup-superpowers-release-timer --disable`.
-  Expected: The first command installs and enables the optional timer without
-  sudo. The list command shows the daily 05:00 local-time schedule with
-  `Persistent=true`; the journal command shows the service result. Both
-  disable commands leave the timer stopped and disabled, proving cleanup is
-  idempotent while preserving the managed unit files.
+- Action: setup-superpowers-release-timer --enable
+  Expected: The optional timer installs and enables without sudo, with the daily 05:00 local-time schedule and `Persistent=true` configured.
+- Action: setup-superpowers-release-timer --check
+  Expected: The installed units validate successfully from the standard `$HOME/linux-config` checkout.
+- Action: systemctl --user list-timers superpowers-release-sync.timer
+  Expected: The timer row shows its next 05:00 local-time trigger.
+- Action: journalctl --user -u superpowers-release-sync.service
+  Expected: This is an inspection step; the journal may be empty until the scheduled 05:00 run or a `Persistent=true` catch-up run occurs.
+  An empty journal does not mean enabling the timer failed or that enabling immediately ran the service.
+- Action: setup-superpowers-release-timer --disable
+  Expected: The timer is stopped and disabled while the managed unit files remain installed.
+- Action: setup-superpowers-release-timer --disable
+  Expected: Cleanup remains idempotent: the timer stays stopped and disabled without sudo.
 
 ## Second Brain
 

@@ -218,6 +218,18 @@ printf 'PRIVATE_NOTE_AND_CONFIG_CONTENT_MUST_NOT_LEAK\n' >&2; exit 1; } ;;
                     self.service_source.unlink()
                 shutil.copy2(SERVICE, self.service_source)
 
+    def test_check_rejects_symlinked_source_ancestor(self) -> None:
+        source_directory = self.helper_source.parent
+        outside = self.root / "outside-scripts"
+        source_directory.rename(outside)
+        source_directory.symlink_to(outside, target_is_directory=True)
+
+        completed = self.run_script("--check")
+
+        self.assertEqual(completed.returncode, 2)
+        self.assertIn("chezmoi managed source is unsafe", completed.stderr)
+        self.assertFalse(any("systemd-analyze" in call for call in self.calls()))
+
     def test_child_failures_are_sanitized_and_actionable(self) -> None:
         for arguments, env, error in (
             (("--check",), {**self.env, "TEST_ANALYZE_FAIL": "1"}, "systemd unit validation failed"),
@@ -347,6 +359,23 @@ printf 'PRIVATE_NOTE_AND_CONFIG_CONTENT_MUST_NOT_LEAK\n' >&2; exit 1; } ;;
             self.calls()[-2:],
             [
                 f"systemd-analyze --user verify {self.service} {self.timer}",
+                "systemctl --user disable --now superpowers-release-sync.timer",
+            ],
+        )
+
+    def test_enable_cleans_up_after_activation_failure(self) -> None:
+        completed = self.run_script(
+            "--enable",
+            env={**self.env, "TEST_ENABLE_FAIL": "1"},
+        )
+
+        self.assertEqual(completed.returncode, 2)
+        self.assertIn("timer enable failed", completed.stderr)
+        self.assertNotIn("PRIVATE_NOTE_AND_CONFIG_CONTENT", completed.stderr)
+        self.assertEqual(
+            self.calls()[-2:],
+            [
+                "systemctl --user enable --now superpowers-release-sync.timer",
                 "systemctl --user disable --now superpowers-release-sync.timer",
             ],
         )

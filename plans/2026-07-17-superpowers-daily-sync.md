@@ -4,7 +4,7 @@
 
 **Goal:** Add an opt-in systemd user timer that runs `sync-superpowers-release` every day at 05:00 local time.
 
-**Architecture:** Chezmoi will install a oneshot service and persistent daily timer alongside the existing Superpowers sync helper. A new Python setup command will validate the exact chezmoi sources, apply only the helper and two units, reload the user manager, and enable or disable the timer without sudo. The service will use the standard `$HOME/linux-config` checkout path through `LINUX_CONFIG_SOURCE`; manual use of the existing helper remains unchanged.
+**Architecture:** Chezmoi installs a oneshot service and persistent daily timer alongside the existing Superpowers sync helper. The Python setup command accepts only the direct standard `$HOME/linux-config` checkout, validates every source-path ancestor and exact target, applies only the helper and two units, reloads the user manager, and enables or disables the timer without sudo. The service uses the standard path through `LINUX_CONFIG_SOURCE`; manual use of the existing helper retains alternate-source support.
 
 **Tech Stack:** Python 3 standard library, Bash helper entrypoints, systemd user services/timers, chezmoi source-path/apply, unittest fixtures, Markdown operator documentation.
 
@@ -90,12 +90,12 @@ WantedBy=timers.target
 - `setup-superpowers-release-timer --disable` disables and stops the timer without requiring chezmoi or a source checkout.
 
 - [x] Extend the fixture with fake `chezmoi`, `systemctl`, and `systemd-analyze` commands that log argv and reject unexpected target lists or unit names.
-- [x] Add failing tests for: required action selection; `--check` source resolution and unit verification; `--enable` exact apply ordering before daemon reload/activation; `--disable` idempotence without source resolution; rejection of symlinked or missing unit sources; and propagation of analysis/systemd failures without leaking private fixture content.
+- [x] Add failing tests for: required action selection; `--check` source resolution and unit verification; `--enable` exact apply ordering before daemon reload/activation; `--disable` idempotence without source resolution; rejection of symlinked sources (including a symlinked source ancestor) or missing unit sources; and propagation of analysis/systemd failures without leaking private fixture content. Assert best-effort `disable --now` after activation and final-verification failures.
 - [x] Run `python3 -B -m unittest tests.test_superpowers_release_timer -v`; confirm the behavior tests fail before the command exists.
 - [x] Implement a Python standard-library command modeled on `scripts/executable_setup-second-brain-timer` with these concrete operations:
   - Require timer setup to use the standard `$HOME/linux-config` checkout and reject a missing, non-directory, symlinked, or alternate `LINUX_CONFIG_SOURCE`; manual helper behavior remains unchanged.
   - Resolve the installed helper at `$HOME/scripts/sync-superpowers-release` and the two units under `$HOME/.config/systemd/user`.
-  - Use `chezmoi source-path` for the three managed targets; require each owned, regular, non-symlink result to resolve to its exact expected relative path under that checkout, and require the helper source to be executable.
+  - Use `chezmoi source-path` for the three managed targets; require each owned, regular, non-symlink result at its exact expected lexical path under that checkout, inspect every ancestor from the checkout root for direct-directory status, and require the helper source to be executable.
   - For `--check`, run `systemd-analyze --user verify` against the installed service and timer.
   - For `--enable`, apply the exact three targets, compare each installed target’s bytes with its selected source bytes, verify installed units, then daemon-reload, enable/start, and verify again; best-effort disable on activation or final-verification failure.
   - For `--disable`, run `systemctl --user disable --now superpowers-release-sync.timer`, tolerate the already-disabled result, and do not call chezmoi.
@@ -116,7 +116,7 @@ WantedBy=timers.target
 
 - [x] Add the timer to the README install/day-to-day narrative and command table, stating that it is opt-in, user-scoped, runs daily at 05:00 local time, catches up missed runs with `Persistent=true`, and leaves running Codex sessions unchanged until restarted.
 - [x] Update the skills README so the external Superpowers section distinguishes the manual `sync-superpowers-release` path from the optional recurring timer.
-- [x] Add a grouped `Action`/`Expected` entry to `docs/smoke-tests.md` in runnable `--enable`, `--check`, timer-list, journal, `--disable`, repeat-`--disable` order; state no sudo, 05:00 local time, `Persistent=true`, first install, and idempotent cleanup.
+- [x] Add grouped `Action`/`Expected` entries to `docs/smoke-tests.md` in runnable `--enable`, `--check`, timer-list, journal, `--disable`, repeat-`--disable` order; state no sudo, 05:00 local time, `Persistent=true`, first install, idempotent cleanup, and that the journal is inspection-only and may remain empty until a scheduled or catch-up run.
 - [x] Verify every documented flag against `scripts/executable_setup-superpowers-release-timer --help` and keep unrelated dirty documentation out of the diff.
 
 ### Task 4: Full verification and review handoff
@@ -161,13 +161,14 @@ Fresh final-verification evidence on 2026-07-17:
 - The live timer remains uninstalled and disabled: `systemctl --user list-timers --all superpowers-release-sync.timer` exited 0 with `0 timers listed`; `systemctl --user is-enabled superpowers-release-sync.timer` exited 4 with `not-found`. `./scripts/executable_setup-superpowers-release-timer --check` exited 2 with `systemd unit validation failed`; direct inspection confirmed both installed unit paths under `~/.config/systemd/user/` are absent, and `systemd-analyze --user verify` exited 1 with both units not found.
 - `--enable` was deliberately not run, so no live timer state was changed. `--disable` was not run because this task did not enable the timer and must not modify a pre-existing timer. The fixture suite verifies the recovery path is idempotent; the live rollback command remains `setup-superpowers-release-timer --disable` after a user-authorized enable.
 - `./scripts/executable_readme-recruiter-sync` exited 0 with `pass_no_change`; no README change is required.
-- Final-review fix-wave RED: `python3 -B -m unittest tests.test_superpowers_release_timer -v` ran 18 tests and failed the alternate-checkout, out-of-root source-path, stale-target, pre-activation verification, ordering, and post-activation cleanup cases before the implementation changed.
-- Final-review fix-wave GREEN: `python3 -B -m unittest tests.test_superpowers_release_timer tests.test_second_brain_timer tests.test_second_brain_timer_chezmoi -v` exited 0 with 53 tests in 5.618s. It covers standard-checkout rejection, exact three-path source mapping, deployed-byte checks before activation, pre-activation verification, and cleanup after failed final verification.
+- Final-review RED: `python3 -B -m unittest tests.test_superpowers_release_timer.SuperpowersReleaseTimerSetupTest.test_check_rejects_symlinked_source_ancestor tests.test_superpowers_release_timer.SuperpowersReleaseTimerSetupTest.test_enable_cleans_up_after_activation_failure -v` failed as intended: the symlinked-`scripts/` case returned 0 instead of 2, while the pre-existing activation cleanup behavior already passed its new assertion.
+- Final-review GREEN: the same two-test command exited 0 after lexical exact-path and ancestor validation were added.
+- Broader regression: `python3 -B -m unittest tests.test_superpowers_release_timer tests.test_second_brain_timer tests.test_second_brain_timer_chezmoi -v` exited 0 with 55 tests in 5.801s, including standard-checkout rejection, direct source-ancestor validation, deployed-byte checks, pre-activation verification, and cleanup after both activation and final-verification failures.
 - `systemd-analyze verify dot_config/systemd/user/superpowers-release-sync.service dot_config/systemd/user/superpowers-release-sync.timer`, `bash -n scripts/executable_sync-superpowers-release`, both helper `--help` commands, `./scripts/executable_readme-recruiter-sync`, and `git diff --check` each exited 0. The README gate reported `pass_no_change`.
 
 ### Final Review Notes
 
 - Initial protected worktree state included unrelated aliases, Second Brain files, feedback memory, Codex config/instructions, fish config, and `scripts/executable_setup-second-brain-state`; this fix wave edits and stages only the declared release-timer files.
-- Final-review fix wave added standard-checkout binding, exact chezmoi source-path mapping, deployed-byte comparison, pre-activation unit verification, and best-effort cleanup after failed activation or final verification.
+- Final-review fix wave additionally rejects symlinked or non-directory source ancestors beneath the standard checkout, asserts best-effort cleanup after a failed `systemctl enable --now`, and corrects the journal smoke expectation; the design distinguishes timer setup's standard-checkout-only contract from manual alternate-source support.
 - The approved plan is tracked. Its checklist and final-review evidence ship in the same commit as this implementation and documentation work.
 - The remaining live `--enable`, `--check`, timer inspection, and `--disable` cycle is manual and intentionally unrun to preserve the opt-in timer state.

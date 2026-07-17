@@ -147,6 +147,26 @@ def _managed_targets() -> tuple[Path, Path, Path]:
     return helper, units / SERVICE_NAME, units / TIMER_NAME
 
 
+def _validate_source_path(source_root: Path, source: Path, expected: Path) -> None:
+    if source != expected:
+        raise TimerSetupError("chezmoi managed source does not match expected source")
+    try:
+        relative = expected.relative_to(source_root)
+    except ValueError as error:
+        raise TimerSetupError(
+            "chezmoi managed source does not match expected source"
+        ) from error
+    current = source_root
+    for component in relative.parts[:-1]:
+        current /= component
+        try:
+            metadata = current.lstat()
+        except OSError as error:
+            raise TimerSetupError("chezmoi managed source is unsafe") from error
+        if current.is_symlink() or not stat.S_ISDIR(metadata.st_mode):
+            raise TimerSetupError("chezmoi managed source is unsafe")
+
+
 def _source_for(source_root: Path, target: Path) -> Path:
     completed = _run(
         ("chezmoi", "-S", str(source_root), "source-path", str(target)),
@@ -166,8 +186,7 @@ def _source_for(source_root: Path, target: Path) -> Path:
         or metadata.st_uid != os.geteuid()
     ):
         raise TimerSetupError("chezmoi managed source is unsafe")
-    if source.resolve() != expected.resolve():
-        raise TimerSetupError("chezmoi managed source does not match expected source")
+    _validate_source_path(source_root, source, expected)
     if target.name == HELPER_NAME and not metadata.st_mode & 0o111:
         raise TimerSetupError("chezmoi helper source is not executable")
     return source
