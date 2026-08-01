@@ -386,6 +386,9 @@ trust_level = "trusted"
 [projects."/mnt/linux-files-3/concerts/jcole"]
 trust_level = "trusted"
 
+[projects."/mnt/linux-files-3/concerts/ariana-grande/101APPLE"]
+trust_level = "trusted"
+
 [notice]
 fast_default_opt_out = true
 
