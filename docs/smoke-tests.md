@@ -224,6 +224,11 @@ of stacking duplicates.
   progress, ETA, the current path, and rsync `xfr#/to-chk` counters;
   otherwise the helper exits early with an install hint instead of
   failing mid-transfer.
+- Action: Mount an iPad at `/mnt/ipad`, then run
+  `rsync-media-date 2026-07-28 /mnt/ipad /mnt/linux-files-3/concerts/jcole`.
+  Expected: The July 28 `.MOV`, `.MP4`, and `.M4V` originals beneath
+  `/mnt/ipad/DCIM` copy directly into the J. Cole folder with rsync progress,
+  overwriting same-named files and creating no DCIM subdirectories.
 
 ## Claude Code
 
