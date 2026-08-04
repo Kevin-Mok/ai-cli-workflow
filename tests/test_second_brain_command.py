@@ -101,12 +101,301 @@ class SecondBrainCommandTest(unittest.TestCase):
             "confirmed": True,
         }
 
+    def deferred_payload(
+        self,
+        event_id: str = "deferred-001",
+        *,
+        target_date: str | None = "2026-07-14",
+        text: str = "Review the deferred private reminder.",
+    ) -> dict[str, object]:
+        return {
+            **self.common_payload(event_id),
+            "target_date": target_date,
+            "session_id": "session-deferred-001",
+            "text": text,
+        }
+
+    def resolution_payload(self, event_id: str, resolution: str) -> dict[str, object]:
+        return {**self.common_payload(event_id), "resolution": resolution}
+
+    def schedule_payload(self, event_id: str, target_date: str) -> dict[str, object]:
+        return {
+            **self.common_payload(event_id),
+            "target_date": target_date,
+        }
+
     def test_help_exposes_task_one_commands(self) -> None:
         completed = self.run_command("--help")
         self.assertEqual(completed.returncode, 0, completed.stderr)
-        for command in ("status", "capture", "focus", "closeout"):
+        for command in (
+            "status", "capture", "focus", "closeout", "defer",
+            "schedule-deferred", "process-deferred", "list-deferred",
+            "resolve-deferred",
+        ):
             self.assertIn(command, completed.stdout)
 
+    def test_defer_without_a_date_creates_a_private_someday_reminder(self) -> None:
+        payload = self.deferred_payload(
+            "someday-001",
+            target_date=None,
+            text="Document the low-priority ExampleProject smoke tests.",
+        )
+        vault_before = self.vault_snapshot()
+        created = self.run_command("defer", "--payload", "-", payload=payload)
+        self.assertEqual(created.returncode, 0, created.stderr)
+        self.assertEqual(json.loads(created.stdout)["result"], "created")
+        self.assertEqual(self.vault_snapshot(), vault_before)
+
+        private_file = (
+            self.state_home / "second-brain" / "deferred" / "reminders.json"
+        )
+        record = json.loads(private_file.read_text(encoding="utf-8"))["reminders"][0]
+        self.assertEqual(record["state"], "someday")
+        self.assertIsNone(record["target_date"])
+
+        status = self.run_command("status", "--format", "json")
+        self.assertEqual(status.returncode, 0, status.stderr)
+        self.assertEqual(
+            json.loads(status.stdout)["private_reminders"],
+            {"someday": 1, "deferred": 0, "inbox": 0},
+        )
+        self.assertNotIn("Document the low-priority", status.stdout)
+
+        listed = self.run_command(
+            "list-deferred", "--state", "someday", "--format", "json"
+        )
+        self.assertEqual(listed.returncode, 0, listed.stderr)
+        self.assertEqual(
+            json.loads(listed.stdout)["reminders"][0]["event_id"], "someday-001"
+        )
+
+    def test_someday_reminder_requires_a_future_date_to_schedule(self) -> None:
+        created = self.run_command(
+            "defer",
+            "--payload",
+            "-",
+            payload=self.deferred_payload("someday-schedule", target_date=None),
+        )
+        self.assertEqual(created.returncode, 0, created.stderr)
+
+        scheduled = self.run_command(
+            "schedule-deferred",
+            "--payload",
+            "-",
+            payload=self.schedule_payload("someday-schedule", "2026-07-15"),
+        )
+        self.assertEqual(scheduled.returncode, 0, scheduled.stderr)
+        self.assertEqual(json.loads(scheduled.stdout)["result"], "updated")
+
+        repeated = self.run_command(
+            "schedule-deferred",
+            "--payload",
+            "-",
+            payload=self.schedule_payload("someday-schedule", "2026-07-15"),
+        )
+        self.assertEqual(repeated.returncode, 0, repeated.stderr)
+        self.assertEqual(json.loads(repeated.stdout)["result"], "noop")
+
+    def test_deferred_private_lifecycle_is_redacted_idempotent_and_vault_safe(self) -> None:
+        payload = self.deferred_payload(
+            "deferred-secret",
+            target_date="2026-07-13",
+            text="Remember token sk-abcdefghijklmnopqrstuv",
+        )
+        vault_before = self.vault_snapshot()
+        created = self.run_command("defer", "--payload", "-", payload=payload)
+        self.assertEqual(created.returncode, 0, created.stderr)
+        self.assertEqual(json.loads(created.stdout)["result"], "created")
+        self.assertEqual(self.vault_snapshot(), vault_before)
+
+        private_file = (
+            self.state_home / "second-brain" / "deferred" / "reminders.json"
+        )
+        stored = private_file.read_text(encoding="utf-8")
+        self.assertIn("[REDACTED]", stored)
+        self.assertNotIn("sk-abcdefghijklmnopqrstuv", stored)
+        self.assertEqual(stat.S_IMODE(private_file.stat().st_mode), 0o600)
+        self.assertEqual(stat.S_IMODE(private_file.parent.stat().st_mode), 0o700)
+
+        private_before = private_file.read_bytes()
+        vault_before = self.vault_snapshot()
+        repeated = self.run_command("defer", "--payload", "-", payload=payload)
+        self.assertEqual(repeated.returncode, 0, repeated.stderr)
+        self.assertEqual(json.loads(repeated.stdout)["result"], "noop")
+        self.assertEqual(private_file.read_bytes(), private_before)
+        self.assertEqual(self.vault_snapshot(), vault_before)
+
+        vault_before = self.vault_snapshot()
+        conflicting = self.run_command(
+            "defer",
+            "--payload",
+            "-",
+            payload={**payload, "text": "PRIVATE_CHANGED_REMINDER"},
+        )
+        self.assertEqual(conflicting.returncode, 2)
+        self.assertIn("conflict", conflicting.stderr.lower())
+        self.assertNotIn("PRIVATE_CHANGED_REMINDER", conflicting.stderr)
+        self.assertEqual(private_file.read_bytes(), private_before)
+        self.assertEqual(self.vault_snapshot(), vault_before)
+
+        vault_before = self.vault_snapshot()
+        processed = self.run_command("process-deferred")
+        self.assertEqual(processed.returncode, 0, processed.stderr)
+        self.assertEqual(json.loads(processed.stdout)["promoted"], 1)
+        self.assertEqual(self.vault_snapshot(), vault_before)
+
+        vault_before = self.vault_snapshot()
+        listed = self.run_command("list-deferred", "--format", "json")
+        self.assertEqual(listed.returncode, 0, listed.stderr)
+        self.assertEqual(
+            json.loads(listed.stdout)["reminders"][0]["event_id"], "deferred-secret"
+        )
+        self.assertEqual(self.vault_snapshot(), vault_before)
+
+        vault_before = self.vault_snapshot()
+        resolved = self.run_command(
+            "resolve-deferred",
+            "--payload",
+            "-",
+            payload=self.resolution_payload("deferred-secret", "focused"),
+        )
+        self.assertEqual(resolved.returncode, 0, resolved.stderr)
+        self.assertEqual(json.loads(resolved.stdout)["result"], "updated")
+        record = json.loads(private_file.read_text(encoding="utf-8"))["reminders"][0]
+        self.assertEqual(record["state"], "resolved")
+        self.assertEqual(record["resolution"], "focused")
+        self.assertNotIn("text", record)
+        self.assertEqual(self.vault_snapshot(), vault_before)
+
+        vault_before = self.vault_snapshot()
+        resolution_repeat = self.run_command(
+            "resolve-deferred",
+            "--payload",
+            "-",
+            payload=self.resolution_payload("deferred-secret", "focused"),
+        )
+        self.assertEqual(resolution_repeat.returncode, 0, resolution_repeat.stderr)
+        self.assertEqual(json.loads(resolution_repeat.stdout)["result"], "noop")
+        self.assertEqual(self.vault_snapshot(), vault_before)
+
+    def test_deferred_rejects_invalid_dates_states_and_resolution_values(self) -> None:
+        invalid_payloads = (
+            self.deferred_payload("deferred-invalid-date", target_date="2026-02-30"),
+            self.deferred_payload("deferred-invalid-type", target_date=123),  # type: ignore[arg-type]
+            self.deferred_payload("deferred-invalid-text", text="PRIVATE_UNSAFE\x00TEXT"),
+        )
+        for invalid in invalid_payloads:
+            with self.subTest(event_id=invalid["event_id"]):
+                vault_before = self.vault_snapshot()
+                result = self.run_command("defer", "--payload", "-", payload=invalid)
+                self.assertEqual(result.returncode, 2)
+                self.assertEqual(result.stdout, "")
+                self.assertNotIn("PRIVATE_UNSAFE", result.stderr)
+                self.assertEqual(self.vault_snapshot(), vault_before)
+
+        payload = self.deferred_payload("deferred-pending", target_date="2026-07-15")
+        vault_before = self.vault_snapshot()
+        created = self.run_command("defer", "--payload", "-", payload=payload)
+        self.assertEqual(created.returncode, 0, created.stderr)
+        self.assertEqual(self.vault_snapshot(), vault_before)
+
+        vault_before = self.vault_snapshot()
+        wrong_state = self.run_command(
+            "resolve-deferred",
+            "--payload",
+            "-",
+            payload=self.resolution_payload("deferred-pending", "focused"),
+        )
+        self.assertEqual(wrong_state.returncode, 2)
+        self.assertIn("inbox", wrong_state.stderr.lower())
+        self.assertEqual(self.vault_snapshot(), vault_before)
+
+        vault_before = self.vault_snapshot()
+        wrong_resolution = self.run_command(
+            "resolve-deferred",
+            "--payload",
+            "-",
+            payload=self.resolution_payload("deferred-pending", "pending"),
+        )
+        self.assertEqual(wrong_resolution.returncode, 2)
+        self.assertNotIn("pending", wrong_resolution.stderr)
+        self.assertEqual(self.vault_snapshot(), vault_before)
+
+    def test_deferred_allows_dismissed_resolution(self) -> None:
+        payload = self.deferred_payload("deferred-dismissed", target_date="2026-07-13")
+        vault_before = self.vault_snapshot()
+        created = self.run_command("defer", "--payload", "-", payload=payload)
+        self.assertEqual(created.returncode, 0, created.stderr)
+        self.assertEqual(self.vault_snapshot(), vault_before)
+
+        vault_before = self.vault_snapshot()
+        promoted = self.run_command("process-deferred")
+        self.assertEqual(promoted.returncode, 0, promoted.stderr)
+        self.assertEqual(self.vault_snapshot(), vault_before)
+
+        vault_before = self.vault_snapshot()
+        dismissed = self.run_command(
+            "resolve-deferred",
+            "--payload",
+            "-",
+            payload=self.resolution_payload("deferred-dismissed", "dismissed"),
+        )
+        self.assertEqual(dismissed.returncode, 0, dismissed.stderr)
+        self.assertEqual(json.loads(dismissed.stdout)["result"], "updated")
+        self.assertEqual(self.vault_snapshot(), vault_before)
+
+    def test_deferred_status_counts_and_late_promotion_remain_private(self) -> None:
+        payload = self.deferred_payload(
+            "deferred-late",
+            target_date="2026-07-15",
+            text="PRIVATE_STATUS_REMINDER",
+        )
+        vault_before = self.vault_snapshot()
+        created = self.run_command("defer", "--payload", "-", payload=payload)
+        self.assertEqual(created.returncode, 0, created.stderr)
+        self.assertEqual(self.vault_snapshot(), vault_before)
+
+        vault_before = self.vault_snapshot()
+        status = self.run_command("status", "--format", "json")
+        self.assertEqual(status.returncode, 0, status.stderr)
+        self.assertEqual(
+            json.loads(status.stdout)["private_reminders"],
+            {"someday": 0, "deferred": 1, "inbox": 0},
+        )
+        self.assertNotIn("PRIVATE_STATUS_REMINDER", status.stdout)
+        self.assertEqual(self.vault_snapshot(), vault_before)
+
+        vault_before = self.vault_snapshot()
+        late = self.run_command(
+            "process-deferred",
+            env={**self.env, "SECOND_BRAIN_NOW": "2026-07-16T04:00:00-04:00"},
+        )
+        self.assertEqual(late.returncode, 0, late.stderr)
+        self.assertEqual(json.loads(late.stdout)["promoted"], 1)
+        self.assertEqual(self.vault_snapshot(), vault_before)
+
+        private_file = (
+            self.state_home / "second-brain" / "deferred" / "reminders.json"
+        )
+        private_before = private_file.read_bytes()
+        vault_before = self.vault_snapshot()
+        repeat = self.run_command(
+            "process-deferred",
+            env={**self.env, "SECOND_BRAIN_NOW": "2026-07-16T04:00:00-04:00"},
+        )
+        self.assertEqual(repeat.returncode, 0, repeat.stderr)
+        self.assertEqual(json.loads(repeat.stdout)["result"], "noop")
+        self.assertEqual(private_file.read_bytes(), private_before)
+        self.assertEqual(self.vault_snapshot(), vault_before)
+
+        vault_before = self.vault_snapshot()
+        text_status = self.run_command("status")
+        self.assertEqual(text_status.returncode, 0, text_status.stderr)
+        self.assertIn(
+            "Private reminders: 0 someday, 0 deferred, 1 inbox", text_status.stdout
+        )
+        self.assertNotIn("PRIVATE_STATUS_REMINDER", text_status.stdout)
+        self.assertEqual(self.vault_snapshot(), vault_before)
     def test_status_resolves_repo_independent_of_caller_cwd(self) -> None:
         completed = self.run_command("status", "--format", "json")
         self.assertEqual(completed.returncode, 0, completed.stderr)
@@ -121,7 +410,11 @@ class SecondBrainCommandTest(unittest.TestCase):
                 "Linux Config AI Workflow",
             ],
         )
-        self.assertEqual(report["latest_daily_notes"], ["2026-07-14"])
+        expected_daily_notes = sorted(
+            (path.stem for path in (self.repo / "second-brain/05 Daily Notes").glob("????-??-??.md")),
+            reverse=True,
+        )[:3]
+        self.assertEqual(report["latest_daily_notes"], expected_daily_notes)
         self.assertEqual(report["inbox"]["path"], "01 Inbox/Brain Dump.md")
 
     def test_installed_layout_mutates_chezmoi_source_not_applied_home_copy(self) -> None:

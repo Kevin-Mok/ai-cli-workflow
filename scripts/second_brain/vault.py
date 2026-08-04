@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any
 from zoneinfo import ZoneInfo
 
+from .deferred import counts as deferred_counts
 from .content_security import redact
 from .paths import (
     PathError,
@@ -79,6 +80,7 @@ def status_report() -> dict[str, Any]:
         "date": local_now().date().isoformat(),
         "active_projects": projects,
         "latest_daily_notes": daily_notes,
+        "private_reminders": deferred_counts(),
         "inbox": {"count": inbox_items, "path": "01 Inbox/Brain Dump.md"},
     }
 

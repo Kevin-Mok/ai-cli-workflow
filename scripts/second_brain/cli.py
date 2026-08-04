@@ -7,6 +7,7 @@ import json
 import sys
 from typing import Any, Sequence
 
+from .deferred import defer, list_reminders, process_due, resolve, schedule
 from .checkpoint import CheckpointError, run_checkpoint
 from .doctor import build_report as build_doctor_report
 from .doctor import text_report as doctor_text_report
@@ -44,6 +45,30 @@ def build_parser() -> argparse.ArgumentParser:
     )
     focus_parser.add_argument("--payload", required=True)
 
+    defer_parser = subparsers.add_parser(
+        "defer", help="Store one private reminder for a future local date."
+    )
+    defer_parser.add_argument("--payload", required=True)
+    schedule_parser = subparsers.add_parser(
+        "schedule-deferred", help="Schedule one private unscheduled reminder."
+    )
+    schedule_parser.add_argument("--payload", required=True)
+    subparsers.add_parser(
+        "process-deferred", help="Promote due private reminders to the inbox."
+    )
+    list_deferred_parser = subparsers.add_parser(
+        "list-deferred", help="List private inbox reminders as JSON."
+    )
+    list_deferred_parser.add_argument(
+        "--format", choices=("json",), required=True
+    )
+    list_deferred_parser.add_argument(
+        "--state", choices=("inbox", "someday"), default="inbox"
+    )
+    resolve_deferred_parser = subparsers.add_parser(
+        "resolve-deferred", help="Resolve one private inbox reminder."
+    )
+    resolve_deferred_parser.add_argument("--payload", required=True)
     status_parser = subparsers.add_parser(
         "status", help="Show active projects, Inbox state, and recent Daily Notes."
     )
@@ -116,6 +141,11 @@ def _print_status_text(report: dict[str, Any]) -> None:
         f"Inbox: {report['inbox']['count']} reviewed item(s) "
         f"at {report['inbox']['path']}"
     )
+    private = report["private_reminders"]
+    print(
+        f"Private reminders: {private['someday']} someday, "
+        f"{private['deferred']} deferred, {private['inbox']} inbox"
+    )
     print("Latest Daily Notes: " + ", ".join(report["latest_daily_notes"]))
 
 
@@ -130,6 +160,28 @@ def main(argv: Sequence[str] | None = None) -> int:
             else:
                 _print_status_text(report)
             return 0
+        if args.command == "defer":
+            _print_json(defer(load_payload(args.payload)))
+            return 0
+        if args.command == "schedule-deferred":
+            _print_json(schedule(load_payload(args.payload)))
+            return 0
+        if args.command == "process-deferred":
+            _print_json(process_due())
+            return 0
+        if args.command == "list-deferred":
+            _print_json(
+                {
+                    "schema_version": 1,
+                    "command": "list-deferred",
+                    "reminders": list_reminders(args.state),
+                }
+            )
+            return 0
+        if args.command == "resolve-deferred":
+            _print_json(resolve(load_payload(args.payload)))
+            return 0
+
         if args.command == "doctor":
             report = build_doctor_report()
             if args.format == "json":

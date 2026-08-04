@@ -34,6 +34,21 @@ TIMER = (
     / "user"
     / "second-brain-checkpoint.timer"
 )
+DEFERRED_SERVICE = (
+    REPO_ROOT
+    / "dot_config"
+    / "systemd"
+    / "user"
+    / "second-brain-deferred.service"
+)
+DEFERRED_TIMER = (
+    REPO_ROOT
+    / "dot_config"
+    / "systemd"
+    / "user"
+    / "second-brain-deferred.timer"
+)
+
 CHEZMOI_IGNORE = REPO_ROOT / ".chezmoiignore"
 
 
@@ -154,6 +169,8 @@ class SecondBrainTimerChezmoiTest(unittest.TestCase):
         modules = [runtime_dir / name for name in RUNTIME_MODULE_NAMES]
         service = unit_dir / SERVICE.name
         timer = unit_dir / TIMER.name
+        deferred_service = unit_dir / DEFERRED_SERVICE.name
+        deferred_timer = unit_dir / DEFERRED_TIMER.name
 
         completed = subprocess.run(
             [
@@ -172,6 +189,8 @@ class SecondBrainTimerChezmoiTest(unittest.TestCase):
                 str(runtime_dir / LEGACY_RUNTIME_TARGET_NAME),
                 str(service),
                 str(timer),
+                str(deferred_service),
+                str(deferred_timer),
             ],
             cwd=self.root,
             env={
@@ -190,6 +209,8 @@ class SecondBrainTimerChezmoiTest(unittest.TestCase):
             *(f"scripts/second_brain/{name}" for name in RUNTIME_MODULE_NAMES),
             f".config/systemd/user/{SERVICE.name}",
             f".config/systemd/user/{TIMER.name}",
+            f".config/systemd/user/{DEFERRED_SERVICE.name}",
+            f".config/systemd/user/{DEFERRED_TIMER.name}",
         }
         actual = {
             path.relative_to(destination).as_posix()
@@ -197,7 +218,7 @@ class SecondBrainTimerChezmoiTest(unittest.TestCase):
             if path.is_file() or path.is_symlink()
         }
         self.assertEqual(actual, expected)
-        self.assertEqual(len(actual), 27)
+        self.assertEqual(len(actual), len(expected))
         self.assertFalse((runtime_dir / LEGACY_RUNTIME_TARGET_NAME).exists())
 
 

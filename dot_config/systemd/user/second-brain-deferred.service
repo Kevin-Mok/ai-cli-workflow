@@ -1,0 +1,12 @@
+[Unit]
+Description=Promote due private Second Brain reminders
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/env %h/scripts/second-brain process-deferred
+Environment=PYTHONDONTWRITEBYTECODE=1
+Environment="PATH=%h/.local/bin:/usr/local/bin:/usr/bin:/bin"
+UMask=0077
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=second-brain-deferred

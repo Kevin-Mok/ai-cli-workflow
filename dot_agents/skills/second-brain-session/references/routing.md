@@ -76,6 +76,10 @@ to second-brain focus --payload -:
 The first confirmed focus is canonical for that date. Reuse it across sessions;
 do not replace it with another outcome.
 
+## Deferred reminders
+
+When example-user explicitly defers a task or says to return to it later, create a private reminder immediately with `second-brain defer --payload -`. Use `"target_date": null` when no date is chosen; this keeps the reminder in the private someday queue. At session start, report only the someday count from `second-brain status --format json`. Ask whether example-user explicitly wants to review those reminders before running `second-brain list-deferred --state someday --format json`. Never create a daily focus automatically. When example-user chooses a date, run `second-brain schedule-deferred --payload -` with a future Toronto-local date.
+
 ## Closeout
 
 Keep the result boss-readable.

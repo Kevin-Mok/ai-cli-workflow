@@ -39,6 +39,21 @@ TIMER = (
     / "user"
     / "second-brain-checkpoint.timer"
 )
+DEFERRED_SERVICE = (
+    REPO_ROOT
+    / "dot_config"
+    / "systemd"
+    / "user"
+    / "second-brain-deferred.service"
+)
+DEFERRED_TIMER = (
+    REPO_ROOT
+    / "dot_config"
+    / "systemd"
+    / "user"
+    / "second-brain-deferred.timer"
+)
+
 
 
 class SecondBrainTimerTest(unittest.TestCase):
@@ -63,10 +78,16 @@ class SecondBrainTimerTest(unittest.TestCase):
         self.unit_target_dir.mkdir(parents=True)
         self.service_target = self.unit_target_dir / SERVICE.name
         self.timer_target = self.unit_target_dir / TIMER.name
+        self.deferred_service_target = self.unit_target_dir / DEFERRED_SERVICE.name
+        self.deferred_timer_target = self.unit_target_dir / DEFERRED_TIMER.name
         self.service_target.write_bytes(SERVICE.read_bytes())
         self.timer_target.write_bytes(TIMER.read_bytes())
+        self.deferred_service_target.write_bytes(DEFERRED_SERVICE.read_bytes())
+        self.deferred_timer_target.write_bytes(DEFERRED_TIMER.read_bytes())
         self.service_target.chmod(0o644)
         self.timer_target.chmod(0o644)
+        self.deferred_service_target.chmod(0o644)
+        self.deferred_timer_target.chmod(0o644)
         self.state_home = self.root / "state"
         self.fake_bin = self.root / "bin"
         self.fake_bin.mkdir()
@@ -87,6 +108,10 @@ class SecondBrainTimerTest(unittest.TestCase):
             "TEST_SERVICE_TARGET": str(self.service_target),
             "TEST_TIMER_SOURCE": str(TIMER),
             "TEST_TIMER_TARGET": str(self.timer_target),
+            "TEST_DEFERRED_SERVICE_SOURCE": str(DEFERRED_SERVICE),
+            "TEST_DEFERRED_SERVICE_TARGET": str(self.deferred_service_target),
+            "TEST_DEFERRED_TIMER_SOURCE": str(DEFERRED_TIMER),
+            "TEST_DEFERRED_TIMER_TARGET": str(self.deferred_timer_target),
             "PYTHONDONTWRITEBYTECODE": "1",
         }
 
@@ -107,6 +132,8 @@ case "${1:-}" in
   source-path)
     case "${2:-}" in
       */.codex/config.toml) printf '%s\n' "$TEST_CONFIG_TARGET" ;;
+      *second-brain-deferred.service) printf '%s\n' "$TEST_DEFERRED_SERVICE_SOURCE" ;;
+      *second-brain-deferred.timer) printf '%s\n' "$TEST_DEFERRED_TIMER_SOURCE" ;;
       */scripts/second_brain) printf '%s\n' "$TEST_RUNTIME_PACKAGE_SOURCE" ;;
       */scripts/second-brain) printf '%s\n' "$TEST_LAUNCHER_SOURCE" ;;
       *second-brain-checkpoint.service) printf '%s\n' "$TEST_SERVICE_SOURCE" ;;
@@ -145,6 +172,16 @@ case "${1:-}" in
           mkdir -p "$(dirname "$TEST_LAUNCHER_TARGET")"
           cp "$TEST_LAUNCHER_SOURCE" "$TEST_LAUNCHER_TARGET"
           chmod 0755 "$TEST_LAUNCHER_TARGET"
+          ;;
+      esac
+      case " $* " in
+        *" $TEST_DEFERRED_SERVICE_TARGET "*)
+          cp "$TEST_DEFERRED_SERVICE_SOURCE" "$TEST_DEFERRED_SERVICE_TARGET"
+          ;;
+      esac
+      case " $* " in
+        *" $TEST_DEFERRED_TIMER_TARGET "*)
+          cp "$TEST_DEFERRED_TIMER_SOURCE" "$TEST_DEFERRED_TIMER_TARGET"
           ;;
       esac
     fi
@@ -283,6 +320,8 @@ exit 99
         first = self.run_script("--check")
         second = self.run_script("--check")
         self.assertEqual(first.returncode, 0, first.stderr)
+        deferred_service_target = self.unit_target_dir / DEFERRED_SERVICE.name
+        deferred_timer_target = self.unit_target_dir / DEFERRED_TIMER.name
         self.assertEqual(second.returncode, 0, second.stderr)
         self.assertEqual(first.stdout, "Second Brain timer units are valid.\n")
         self.assertEqual(second.stdout, first.stdout)
@@ -294,11 +333,13 @@ exit 99
             f"chezmoi source-path {self.runtime_package_target}",
             f"chezmoi source-path {service_target}",
             f"chezmoi source-path {timer_target}",
-            f"systemd-analyze --user verify {SERVICE} {TIMER}",
+            f"chezmoi source-path {deferred_service_target}",
+            f"chezmoi source-path {deferred_timer_target}",
+            f"systemd-analyze --user verify {SERVICE} {TIMER} {DEFERRED_SERVICE} {DEFERRED_TIMER}",
             "systemctl --user show-environment",
             (
                 "systemd-analyze --user verify "
-                f"{service_target} {timer_target}"
+                f"{service_target} {timer_target} {deferred_service_target} {deferred_timer_target}"
             ),
         ]
         self.assertEqual(self.calls(), expected_once * 2)
@@ -321,6 +362,8 @@ exit 99
 
         service_target = self.unit_target_dir / SERVICE.name
         timer_target = self.unit_target_dir / TIMER.name
+        deferred_service_target = self.unit_target_dir / DEFERRED_SERVICE.name
+        deferred_timer_target = self.unit_target_dir / DEFERRED_TIMER.name
         module_targets = [
             self.runtime_package_target / name
             for name in RUNTIME_MODULE_NAMES
@@ -330,7 +373,9 @@ exit 99
             f"chezmoi source-path {self.runtime_package_target}",
             f"chezmoi source-path {service_target}",
             f"chezmoi source-path {timer_target}",
-            f"systemd-analyze --user verify {SERVICE} {TIMER}",
+            f"chezmoi source-path {deferred_service_target}",
+            f"chezmoi source-path {deferred_timer_target}",
+            f"systemd-analyze --user verify {SERVICE} {TIMER} {DEFERRED_SERVICE} {DEFERRED_TIMER}",
             "systemctl --user show-environment",
             "chezmoi apply "
             + " ".join(
@@ -343,14 +388,16 @@ exit 99
                     ),
                     str(service_target),
                     str(timer_target),
+                    str(deferred_service_target),
+                    str(deferred_timer_target),
                 ]
             ),
             (
                 "systemd-analyze --user verify "
-                f"{service_target} {timer_target}"
+                f"{service_target} {timer_target} {deferred_service_target} {deferred_timer_target}"
             ),
             "systemctl --user daemon-reload",
-            "systemctl --user enable --now second-brain-checkpoint.timer",
+            "systemctl --user enable --now second-brain-checkpoint.timer second-brain-deferred.timer",
         ]
         self.assertEqual(self.calls(), expected_once * 2)
         self.assertFalse(any(call.startswith("sudo") for call in self.calls()))
@@ -559,7 +606,7 @@ exit 99
 
         self.assertEqual(completed.returncode, 0, completed.stderr)
         self.assertIn(
-            "systemctl --user enable --now second-brain-checkpoint.timer",
+            "systemctl --user enable --now second-brain-checkpoint.timer second-brain-deferred.timer",
             self.calls(),
         )
 
@@ -598,7 +645,7 @@ exit 99
                 apply_call,
             )
         self.assertIn(
-            "systemctl --user enable --now second-brain-checkpoint.timer",
+            "systemctl --user enable --now second-brain-checkpoint.timer second-brain-deferred.timer",
             self.calls(),
         )
 
@@ -726,9 +773,11 @@ exit 99
         self.assertEqual(completed.returncode, 0, completed.stderr)
         self.assertEqual(self.service_target.read_bytes(), SERVICE.read_bytes())
         self.assertEqual(self.timer_target.read_bytes(), TIMER.read_bytes())
+        self.assertEqual(self.deferred_service_target.read_bytes(), DEFERRED_SERVICE.read_bytes())
+        self.assertEqual(self.deferred_timer_target.read_bytes(), DEFERRED_TIMER.read_bytes())
         self.assertIn(
             "systemd-analyze --user verify "
-            f"{self.service_target} {self.timer_target}",
+            f"{self.service_target} {self.timer_target} {self.deferred_service_target} {self.deferred_timer_target}",
             self.calls(),
         )
 
@@ -743,9 +792,9 @@ exit 99
             self.calls(),
             [
                 "systemctl --user show-environment",
-                "systemctl --user disable --now second-brain-checkpoint.timer",
+                "systemctl --user disable --now second-brain-checkpoint.timer second-brain-deferred.timer",
                 "systemctl --user show-environment",
-                "systemctl --user disable --now second-brain-checkpoint.timer",
+                "systemctl --user disable --now second-brain-checkpoint.timer second-brain-deferred.timer",
             ],
         )
         self.assertFalse(any(call.startswith("sudo") for call in self.calls()))
@@ -770,7 +819,7 @@ exit 99
             self.calls(),
             [
                 "systemctl --user show-environment",
-                "systemctl --user disable --now second-brain-checkpoint.timer",
+                "systemctl --user disable --now second-brain-checkpoint.timer second-brain-deferred.timer",
             ],
         )
         self.assertFalse(any(call.startswith("chezmoi") for call in self.calls()))
@@ -919,6 +968,49 @@ exit 99
         self.assertNotIn(payload_sentinel, visible_output)
         self.assertNotIn(config_sentinel, visible_output)
 
+
+    def test_deferred_units_define_a_safe_persistent_local_0400_schedule(
+        self,
+    ) -> None:
+        self.assertTrue(
+            DEFERRED_SERVICE.is_file(),
+            f"missing deferred service: {DEFERRED_SERVICE}",
+        )
+        self.assertTrue(
+            DEFERRED_TIMER.is_file(),
+            f"missing deferred timer: {DEFERRED_TIMER}",
+        )
+        service = DEFERRED_SERVICE.read_text(encoding="utf-8")
+        timer = DEFERRED_TIMER.read_text(encoding="utf-8")
+        self.assertIn("Type=oneshot", service)
+        self.assertIn(
+            "ExecStart=/usr/bin/env %h/scripts/second-brain process-deferred",
+            service,
+        )
+        self.assertIn("StandardOutput=journal", service)
+        self.assertIn("StandardError=journal", service)
+        self.assertIn("SyslogIdentifier=second-brain-deferred", service)
+        self.assertIn(
+            'Environment="PATH=%h/.local/bin:/usr/local/bin:/usr/bin:/bin"',
+            service,
+        )
+        self.assertIn("UMask=0077", service)
+        for unsafe in ("sudo", "sh -c", "bash -c", "cat ", "config.toml"):
+            self.assertNotIn(unsafe, service)
+        self.assertIn("OnCalendar=*-*-* 04:00:00", timer)
+        self.assertIn("Persistent=true", timer)
+        self.assertIn("Unit=second-brain-deferred.service", timer)
+        self.assertIn("WantedBy=timers.target", timer)
+        self.assertNotIn("Timezone=", timer)
+        self.assertNotIn("UTC", timer)
+
+    def test_installer_declares_and_installs_the_deferred_pair(self) -> None:
+        installer = SCRIPT.read_text(encoding="utf-8")
+        self.assertIn('DEFERRED_SERVICE_NAME = "second-brain-deferred.service"', installer)
+        self.assertIn('DEFERRED_TIMER_NAME = "second-brain-deferred.timer"', installer)
+        self.assertIn('"deferred.py",', installer)
+        self.assertIn("DEFERRED_SERVICE_NAME", installer)
+        self.assertIn("DEFERRED_TIMER_NAME", installer)
 
 if __name__ == "__main__":
     unittest.main()

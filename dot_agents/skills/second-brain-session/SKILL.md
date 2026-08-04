@@ -36,6 +36,20 @@ public-safe, useful for navigation, and explicitly confirmed.
 
 Do not turn an interest into a project or task without asking example-user.
 
+## Deferred Reminders
+
+When example-user explicitly says to defer a task or return to it later, create the
+private reminder immediately with `second-brain defer --payload -`; use
+`"target_date": null` when no date is chosen. Report only safe result metadata.
+
+At session start, use the status someday count. If it is nonzero, say the count
+and ask whether example-user explicitly asks to review it. Only then run
+`second-brain list-deferred --state someday --format json`. To set a date later,
+use `second-brain schedule-deferred --payload -` with a future local date.
+
+A deferred reminder never creates a focus automatically. A dated Inbox reminder
+still requires example-user's separate focus, dismiss, or pending decision.
+
 ## Close
 
 At a natural or explicit end:

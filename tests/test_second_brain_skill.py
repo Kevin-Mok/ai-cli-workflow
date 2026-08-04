@@ -74,6 +74,21 @@ class SecondBrainSkillTest(unittest.TestCase):
         ):
             self.assertIn(required, combined)
 
+    def test_skill_routes_private_someday_reminders_only_on_opt_in(self) -> None:
+        skill = read_required(SKILL_PATH)
+        routing = read_required(ROUTING_PATH)
+        combined = " ".join((skill + "\n" + routing).split())
+        for required in (
+            "second-brain defer --payload -",
+            '"target_date": null',
+            "schedule-deferred --payload -",
+            "list-deferred --state someday --format json",
+            "someday count",
+            "explicitly asks to review",
+            "never creates a focus automatically",
+        ):
+            self.assertIn(required, combined)
+
     def test_closeout_shape_is_boss_readable_and_confirmation_gated(self) -> None:
         routing = read_required(ROUTING_PATH)
         normalized = " ".join(routing.split())

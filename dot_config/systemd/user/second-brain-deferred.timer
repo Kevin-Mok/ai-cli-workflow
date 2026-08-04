@@ -1,0 +1,10 @@
+[Unit]
+Description=Promote due private Second Brain reminders at 4:00 AM daily
+
+[Timer]
+OnCalendar=*-*-* 04:00:00
+Persistent=true
+Unit=second-brain-deferred.service
+
+[Install]
+WantedBy=timers.target

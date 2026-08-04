@@ -2,7 +2,7 @@
 
 ## Goal
 
-Let a session explicitly defer a full private reminder to a future local date.
+Let a session explicitly defer a full private reminder either to a future local date or to a private unscheduled someday queue.
 At 04:00 local time on that date, Second Brain moves it into a private Inbox.
 The item remains pending until example-user resolves it; it must never silently create
 a focus, task, or tracked-vault entry.
@@ -36,7 +36,7 @@ so retries are safe and a repeated event ID is a no-op.
 
 ## Commands and Status
 
-`second-brain defer --payload -` creates a deferred private item. The command
+`second-brain defer --payload -` creates either a dated deferred item or an unscheduled someday item when target_date is null. `second-brain schedule-deferred --payload -` assigns a future local date to a someday item. The command
 uses the existing JSON-on-stdin convention, validation behavior, mutation lock,
 and content-safe errors.
 

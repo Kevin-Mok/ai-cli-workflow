@@ -76,6 +76,14 @@ of stacking duplicates.
 
 ## Second Brain
 
+- Action: python3 -B -m unittest tests.test_second_brain_command tests.test_second_brain_timer tests.test_second_brain_skill -v
+  Expected: Fixture-only deferred reminders support private `someday` records, future-date scheduling, 04:00 persistent promotion, count-only status, opt-in private listing, and no tracked-vault reminder text.
+- Action: scripts/executable_second-brain defer --help
+  Expected: Help exposes the private defer command without printing or creating reminder text.
+- Action: scripts/executable_setup-second-brain-timer --check
+  Expected: After the verified install, the checkpoint and deferred 04:00 timer units both validate without sudo.
+
+
 - Action: scripts/executable_second-brain status --format json
   Expected: The source entrypoint reports schema version 1, the Toronto-local
   date, the three approved active projects, Inbox state, and up to three recent

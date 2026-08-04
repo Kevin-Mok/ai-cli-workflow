@@ -262,3 +262,56 @@ def validate_closeout(payload: dict[str, Any]) -> dict[str, Any]:
     if payload.get("confirmed") is not True:
         raise ValidationError("closeout requires explicit confirmation")
     return payload
+
+
+def validate_deferred(payload: dict[str, Any]) -> dict[str, Any]:
+    required = {
+        "schema_version",
+        "event_id",
+        "source",
+        "timestamp",
+        "target_date",
+        "session_id",
+        "text",
+    }
+    _validate_common(payload)
+    _require_exact_keys(payload, required)
+    target_date = payload.get("target_date")
+    if target_date is not None:
+        target_date = _require_string(payload, "target_date", max_length=10)
+        try:
+            datetime.strptime(target_date, "%Y-%m-%d")
+        except ValueError as error:
+            raise ValidationError("target_date must use YYYY-MM-DD or null") from error
+    session_id = _require_string(payload, "session_id", max_length=128)
+    if not EVENT_ID_RE.fullmatch(session_id):
+        raise ValidationError("session_id has an invalid format")
+    _require_string(payload, "text", allow_empty=True, max_length=900_000)
+    return payload
+
+
+def validate_deferred_schedule(payload: dict[str, Any]) -> dict[str, Any]:
+    required = {
+        "schema_version",
+        "event_id",
+        "source",
+        "timestamp",
+        "target_date",
+    }
+    _validate_common(payload)
+    _require_exact_keys(payload, required)
+    target_date = _require_string(payload, "target_date", max_length=10)
+    try:
+        datetime.strptime(target_date, "%Y-%m-%d")
+    except ValueError as error:
+        raise ValidationError("target_date must use YYYY-MM-DD") from error
+    return payload
+
+
+def validate_deferred_resolution(payload: dict[str, Any]) -> dict[str, Any]:
+    required = {"schema_version", "event_id", "source", "timestamp", "resolution"}
+    _validate_common(payload)
+    _require_exact_keys(payload, required)
+    if payload.get("resolution") not in {"focused", "dismissed"}:
+        raise ValidationError("deferred reminder resolution is not supported")
+    return payload

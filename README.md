@@ -351,6 +351,7 @@ retrieves only the context relevant to the current session.
 The engineering boundary matters more than the folder tree:
 
 - raw session events stay in private XDG state with 0700/0600 permissions
+- explicit deferred reminders can remain private in an unscheduled someday queue until example-user assigns a future local date
 - confirmed tracked writes use exact versioned JSON schemas and stable event IDs
 - the first confirmed ExampleProject focus is reused for the day instead of silently
   being replaced

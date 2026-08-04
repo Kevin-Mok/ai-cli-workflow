@@ -22,6 +22,15 @@ LAUNCHER_NAME = "second-brain"
 PACKAGE_NAME = "second_brain"
 SERVICE_NAME = "second-brain-checkpoint.service"
 TIMER_NAME = "second-brain-checkpoint.timer"
+DEFERRED_SERVICE_NAME = "second-brain-deferred.service"
+DEFERRED_TIMER_NAME = "second-brain-deferred.timer"
+UNIT_NAMES = (
+    SERVICE_NAME,
+    TIMER_NAME,
+    DEFERRED_SERVICE_NAME,
+    DEFERRED_TIMER_NAME,
+)
+TIMER_NAMES = (TIMER_NAME, DEFERRED_TIMER_NAME)
 RUNTIME_MODULE_NAMES = (
     "__init__.py",
     "checkpoint.py",
@@ -31,6 +40,7 @@ RUNTIME_MODULE_NAMES = (
     "cli.py",
     "config_snapshot.py",
     "content_security.py",
+    "deferred.py",
     "doctor.py",
     "doctor_contract.py",
     "doctor_lfs.py",
@@ -128,11 +138,15 @@ def _setup_lock(*, require_repository: bool = True) -> Iterator[None]:
         os.close(descriptor)
 
 
-def _managed_targets() -> tuple[Path, Path, Path, Path]:
+def _managed_targets() -> tuple[Path, ...]:
     launcher = Path.home() / "scripts" / LAUNCHER_NAME
     package = launcher.parent / PACKAGE_NAME
     target_dir = Path.home() / ".config" / "systemd" / "user"
-    return launcher, package, target_dir / SERVICE_NAME, target_dir / TIMER_NAME
+    return (
+        launcher,
+        package,
+        *(target_dir / unit_name for unit_name in UNIT_NAMES),
+    )
 
 
 def _source_for(target: Path) -> Path:
@@ -207,8 +221,8 @@ def _runtime_modules(
 
 
 def _validate_sources() -> tuple[
-    tuple[Path, Path, Path, Path],
-    tuple[Path, Path, Path, Path],
+    tuple[Path, ...],
+    tuple[Path, ...],
     tuple[Path, ...],
     tuple[Path, ...],
     tuple[Path, ...],
@@ -253,7 +267,7 @@ def _validate_installed_launcher(launcher: Path, source: Path) -> None:
 
 
 def _prepare_install_parents(
-    targets: tuple[Path, Path, Path, Path],
+    targets: tuple[Path, ...],
 ) -> None:
     home = Path.home()
     try:
@@ -338,8 +352,8 @@ def _validate_installed_package(
 
 
 def _validate_installed_units(
-    targets: tuple[Path, Path],
-    sources: tuple[Path, Path],
+    targets: tuple[Path, ...],
+    sources: tuple[Path, ...],
 ) -> None:
     for target, source in zip(targets, sources, strict=True):
         try:
@@ -393,7 +407,7 @@ def _enable() -> None:
         "systemd user daemon reload failed",
     )
     _run(
-        ("systemctl", "--user", "enable", "--now", TIMER_NAME),
+        ("systemctl", "--user", "enable", "--now", *TIMER_NAMES),
         "timer enable failed",
     )
     print("Second Brain timer enabled.")
@@ -405,7 +419,7 @@ def _disable() -> None:
         "systemd user manager is unavailable",
     )
     _run(
-        ("systemctl", "--user", "disable", "--now", TIMER_NAME),
+        ("systemctl", "--user", "disable", "--now", *TIMER_NAMES),
         "timer disable failed",
     )
     print("Second Brain timer disabled.")

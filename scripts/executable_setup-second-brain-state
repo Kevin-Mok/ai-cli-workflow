@@ -1,0 +1,98 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+    cat <<'EOF'
+Set up Second Brain's private state outside the repository.
+
+Usage:
+  setup-second-brain-state [--state-base PATH] [--write-shell-config]
+
+By default, creates:
+  ~/second-brain/raw
+  ~/second-brain/migrations
+  ~/second-brain/locks
+
+Options:
+  --state-base PATH       Use PATH instead of $HOME as the parent directory.
+  --write-shell-config    Add XDG_STATE_HOME to Bash, Zsh, and Fish config.
+  -h, --help              Show this help.
+EOF
+}
+
+state_base="${HOME:?HOME is not set}/.local/state"
+write_shell_config=false
+
+while (($#)); do
+    case "$1" in
+        --state-base)
+            (($# >= 2)) || { echo "Missing value for --state-base" >&2; exit 2; }
+            state_base="$2"
+            shift 2
+            ;;
+        --write-shell-config)
+            write_shell_config=true
+            shift
+            ;;
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        *)
+            echo "Unknown option: $1" >&2
+            usage >&2
+            exit 2
+            ;;
+    esac
+done
+
+if [[ "$state_base" != /* ]]; then
+    echo "--state-base must be an absolute path" >&2
+    exit 2
+fi
+
+state_root="$state_base/second-brain"
+export XDG_STATE_HOME="$state_base"
+
+mkdir -p "$state_root/raw" "$state_root/migrations" "$state_root/locks"
+chmod 700 "$state_root" "$state_root/raw" "$state_root/migrations" "$state_root/locks"
+
+shell_line="export XDG_STATE_HOME=\"$state_base\""
+fish_shell_line="set -gx XDG_STATE_HOME \"$state_base\""
+
+if [[ "$write_shell_config" == true ]]; then
+    for shell_config in "$HOME/.bashrc" "$HOME/.zshrc"; do
+        [[ -e "$shell_config" ]] || touch "$shell_config"
+        if ! rg -Fq "$shell_line" "$shell_config"; then
+            {
+                printf '\n# Second Brain private state\n'
+                printf '%s\n' "$shell_line"
+            } >> "$shell_config"
+            echo "Updated $shell_config"
+        fi
+    done
+
+    fish_config="$HOME/.config/fish/config.fish"
+    if command -v chezmoi >/dev/null 2>&1; then
+        chezmoi_fish_config="$(chezmoi source-path ~/.config/fish/config.fish 2>/dev/null || true)"
+        if [[ -n "$chezmoi_fish_config" && -f "$chezmoi_fish_config" ]]; then
+            fish_config="$chezmoi_fish_config"
+        fi
+    fi
+
+    mkdir -p "${fish_config%/*}"
+    touch "$fish_config"
+    if ! rg -Fq "$fish_shell_line" "$fish_config"; then
+        {
+            printf '\n# Second Brain private state\n'
+            printf '%s\n' "$fish_shell_line"
+        } >> "$fish_config"
+        echo "Updated $fish_config"
+    fi
+fi
+
+echo "Second Brain private state is ready at $state_root"
+echo "Current shell: $shell_line"
+if [[ "$write_shell_config" == false ]]; then
+    echo "To make it permanent, rerun with --write-shell-config."
+fi
