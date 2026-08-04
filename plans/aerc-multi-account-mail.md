@@ -132,6 +132,8 @@ executables. Assertions must cover:
   secret, and never prints the fake secret.
 - A symlink accounts target causes a safe failure.
 - Gmail setup writes the declared `[hooks]` `mail-received` notification hook.
+- A second Outlook account reuses the shared Microsoft client-ID credential and authorizes successfully.
+- A symlinked `XDG_CONFIG_HOME` parent fails before any account file is created.
 
 ### Documentation
 
@@ -201,6 +203,7 @@ individual-account workflow are described; no account or secret is requested.
 - 2026-08-04: `refresh-config` was intentionally not run: this change adds a
   repo-owned script and documentation but no tracked chezmoi-managed config.
 - 2026-08-04: Reviewed the staged aerc scope: script, fixture test, README entry, matching smoke-test hunk, and this plan only; no credential or unrelated file is staged. Commit ready.
+- 2026-08-04 review follow-up: Independent review found that repeated Outlook setup failed on the shared Microsoft client-ID key and ancestor symlinks were followed. Added RED fixture coverage for both. Outlook additions now reuse an existing shared `pass` entry without reading its value; `ensure_no_symlink_component` rejects every path component before writes. `bash -n scripts/executable_setup-aerc-mail.sh && bash tests/scripts/executable_setup-aerc-mail_test.sh` exited 0.
 
 ## Handoff
 

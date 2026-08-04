@@ -158,6 +158,10 @@ assert_contains 'client_id_cmd: |' "${fixture_config}/oama/config.yaml"
 assert_contains 'pass show email/aerc/oama/microsoft-client-id' "${fixture_config}/oama/config.yaml"
 assert_contains 'authorize:microsoft:outlook.main@example.com:--device' "${fixture_log}/oama.log"
 
+printf 'outlook-secondary\noutlook.secondary@example.com\nfixture-client-id\n' | run_script --add-outlook
+assert_contains '# BEGIN aerc-mail-setup: outlook-secondary' "$accounts_file"
+assert_contains 'authorize:microsoft:outlook.secondary@example.com:--device' "${fixture_log}/oama.log"
+
 status_output="${fixture_root}/status.out"
 run_script --status > "$status_output"
 assert_contains 'gmail-main: gmail' "$status_output"
@@ -179,3 +183,14 @@ if printf 'gmail-link\nlink@example.com\napp-password\n' | run_script --add-gmai
   exit 1
 fi
 assert_contains 'refusing symbolic link' "${fixture_root}/symlink.out"
+
+linked_config="${fixture_root}/linked-config"
+linked_target="${fixture_root}/linked-target"
+mkdir -p "$linked_target"
+ln -s "$linked_target" "$linked_config"
+if printf 'gmail-parent-link\nparent.link@example.com\napp-password\n' | HOME="$fixture_home" XDG_CONFIG_HOME="$linked_config" XDG_STATE_HOME="$fixture_state" PASSWORD_STORE_DIR="$fixture_store" FAKE_PASS_DATA="${fixture_root}/pass-data" FAKE_LOG="$fixture_log" PATH="${fixture_bin}:$PATH" "$script_path" --add-gmail > "${fixture_root}/parent-symlink.out" 2>&1; then
+  printf 'expected symlinked config parent to fail\n' >&2
+  exit 1
+fi
+assert_contains 'refusing symbolic link' "${fixture_root}/parent-symlink.out"
+test ! -e "$linked_target/aerc/accounts.conf"

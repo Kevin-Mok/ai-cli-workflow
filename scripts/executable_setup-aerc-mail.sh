@@ -112,8 +112,19 @@ url_encode_email() {
   printf '%s\n' "${1//@/%40}"
 }
 
+ensure_no_symlink_component() {
+  local path="$1"
+
+  while [ "$path" != "/" ] && [ "$path" != "." ]; do
+    [ ! -L "$path" ] || fail "refusing symbolic link path component: $path"
+    path="$(dirname "$path")"
+  done
+}
+
 ensure_private_dir() {
   local path="$1"
+
+  ensure_no_symlink_component "$path"
 
   [ ! -L "$path" ] || fail "refusing symbolic link directory: $path"
   if [ ! -e "$path" ]; then
@@ -129,6 +140,8 @@ ensure_private_dir() {
 
 ensure_private_file() {
   local path="$1"
+
+  ensure_no_symlink_component "$path"
 
   [ ! -L "$path" ] || fail "refusing symbolic link target: $path"
   if [ ! -e "$path" ]; then
@@ -191,6 +204,10 @@ ensure_mail_hook() {
   ensure_private_dir "$aerc_dir"
   ensure_private_file "$aerc_config"
 
+  if [ ! -e "$aerc_config" ]; then
+    return 0
+  fi
+
   if grep -Eq '^[[:space:]]*mail-received[[:space:]]*=' "$aerc_config"; then
     note 'aerc mail-received hook already exists; leaving it unchanged.'
     return
@@ -212,6 +229,9 @@ EOF
 prepare_accounts_file() {
   ensure_private_dir "$aerc_dir"
   ensure_private_file "$accounts_config"
+  if [ ! -e "$accounts_config" ]; then
+    return 0
+  fi
   backup_if_needed "$accounts_config"
 }
 
@@ -349,7 +369,9 @@ add_outlook() {
     note "would add Outlook account $label"
     return
   fi
-  store_pass_secret "$pass_key" "$client_id"
+  if ! pass show "$pass_key" >/dev/null 2>&1; then
+    store_pass_secret "$pass_key" "$client_id"
+  fi
   ensure_oama_client_id_command
   block="# BEGIN aerc-mail-setup: ${label}
 [${label}]
