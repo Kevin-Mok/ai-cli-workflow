@@ -324,6 +324,11 @@ of stacking duplicates.
 
 ## Remote Access
 
+- Action: tests/scripts/executable_setup-aerc-mail_test.sh
+  Expected: Fixture-only Gmail and Outlook additions use direct IMAP and their
+  respective password/OAuth credential commands; malformed or duplicate labels
+  and symbolic targets fail safely; dry runs, status, and test output never
+  expose credential values or invoke real OAuth or package mutations.
 - Action: Run `sudo ./scripts/executable_setup-mosh.sh` on a Linux host
   meant to accept remote `mosh` sessions.
   Expected: The script installs `mosh` when missing, opens
