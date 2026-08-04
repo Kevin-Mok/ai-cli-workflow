@@ -151,6 +151,9 @@ education work:
 - Single-commit workflows push after the commit passes verification; multi-commit workflows push once after the complete verified series, unless the user explicitly requests another cadence.
 - Push the configured upstream only when the target is clear. Do not amend,
   rebase, squash, reset, force-push, or rewrite history unless explicitly asked.
+- After pushing a web-app commit, attempt a Vercel deployment when the project
+  is configured for Vercel, then provide the deployed URL. If deployment cannot
+  complete, report the failure and its cause clearly.
 - If an explicitly requested worktree is merged, push `main` after the merge
   succeeds.
 
