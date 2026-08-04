@@ -32,9 +32,11 @@ of stacking duplicates.
 - Action: Invoke `metaprompt` for a trivial request, then ask it to compile and
   run a current-source comparison; include `run` inside a revision before
   sending standalone `go`.
-  Expected: The trivial prompt stays lightweight, both prompts include the
-  prompt/Run/Weight gate, neither embedded run phrase executes anything, and
-  only the fresh standalone `go` starts the current pass.
+  Expected: The trivial prompt stays lightweight. Both prompts include the
+  prompt/Saved/Run/Weight gate, and each saved `prompts/<kebab-case>.md`
+  contains only its compiled prompt; a collision receives a non-destructive
+  suffix. Neither embedded run phrase executes anything, and only fresh
+  standalone `go` starts the current pass.
 - Action: Invoke `metaprompt` for a reusable target-specific template with
   examples, a hostile supplied artifact, and a high-stakes
   judge/rewrite/re-check workflow; send `go` only for the first pass.

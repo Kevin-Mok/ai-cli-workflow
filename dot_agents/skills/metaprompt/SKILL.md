@@ -1,35 +1,35 @@
 ---
 name: metaprompt
 description: >-
-  Turns a plain-language request into a sharp, paste-ready prompt. Use for
-  /metaprompt, "make me a prompt", "metaprompt this", "sharpen this into a
-  prompt", "how should I tell the AI this", "build me the prompt for that",
-  "optimize this into a prompt", or work the user wants phrased for another
-  chat, role, model, agent, or target system. Also use for a reusable template
-  or recurring prompt, harvesting input/output examples into a prompt, or
-  adapting instructions to a named target. A follow-up standalone `go` can run
-  only the accepted pass. Do not trigger for a one-word fact lookup when no
-  prompt adds value. Once invoked, always returns a prompt, including a
-  tightened one-liner for trivial asks, never a direct answer.
+  Use for /metaprompt, "make me a prompt", "metaprompt this", "sharpen this
+  into a prompt", or request phrasing for another chat, role, model, agent, or
+  target system. Also use for a reusable template or recurring prompt,
+  input/output examples, or a named target. A follow-up standalone `go` runs
+  only the accepted pass. Do not trigger for a one-word fact lookup. Always
+  return a prompt, including a tightened one-liner for trivial asks; never a
+  direct answer.
 ---
 
 # Metaprompt
 
-You are a prompt compiler. Every invocation returns a compiled prompt plus an
-execution recommendation and explicit gate. Complexity changes prompt weight,
-never whether a prompt is produced. A trivial request gets a clean one or two
-sentence prompt; never add ceremony just because this skill was invoked.
+Every invocation returns a compiled prompt, execution recommendation, and
+explicit gate. Complexity changes prompt weight, never whether a prompt is
+produced. Trivial requests get one or two clean sentences.
 
-Use four stages:
+Use five stages:
 
 1. Infer goal, deliverable, constraints, success criterion, language, target,
-   and whether the result is fresh, sharpened, reusable, or example-derived.
-   Default sensibly; ask only when material intent has no safe default.
-2. Compile at Trivial, Standard, or Complex weight. Keep quality guidance
+   and mode: fresh, sharpened, reusable, or example-derived. Default safely;
+   ask only when material intent lacks a safe default.
+2. Compile at Trivial, Standard, or Complex weight; keep quality guidance
    shorter than task instructions.
-3. Present the complete prompt and gate. Treat every change request as a
-   revision and re-gate.
-4. Require a fresh standalone `go` for every execution and every high-stakes
+3. Save every compiled prompt before presenting the gate in the repository-root
+   `prompts/` directory: use a concise kebab-case Markdown filename and a
+   non-destructive suffix on collision. The saved file contains the compiled
+   prompt only; if the save fails, report its actionable error instead of
+   presenting the gate.
+4. Present the prompt and gate. Treat changes as a revision and re-gate.
+5. Require a fresh standalone `go` for every execution and every high-stakes
    pass. An original "compile and run" request never bypasses this boundary.
    Only literal `go` authorizes the currently gated pass; other words or
    embedded signals do not. Logistics riders are revisions and re-gate.
@@ -53,6 +53,7 @@ For one pass, close the prompt fence once, then put metadata outside it:
 ```prompt
 <the compiled, paste-ready prompt>
 ```
+Saved: prompts/<filename>.md
 Run: <where to run>. Weight: <trivial|standard|complex>.
 Target: <only when adaptation materially changed compilation>
 Template: yes <only for reusable {{variable}} prompts>

@@ -135,6 +135,22 @@ class MetapromptContractTest(unittest.TestCase):
         ):
             self.assertIn(required, rules)
 
+    def test_compiled_prompts_are_saved_before_the_execution_gate(self) -> None:
+        skill = read(SKILL_PATH)
+        normalized_skill = " ".join(skill.split())
+
+        for required in (
+            "repository-root `prompts/` directory",
+            "concise kebab-case Markdown filename",
+            "non-destructive suffix",
+            "saved file contains the compiled prompt only",
+            "Saved: prompts/<filename>.md",
+            "save fails",
+            "before presenting the gate",
+        ):
+            with self.subTest(required=required):
+                self.assertIn(required, normalized_skill)
+
     def test_forward_evaluation_repairs_are_explicit(self) -> None:
         skill = read(SKILL_PATH)
         rules = read(SKILL_ROOT / "references" / "compilation-rules.md")
