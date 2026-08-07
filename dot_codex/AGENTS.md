@@ -110,6 +110,9 @@ education work:
 - When a reusable manual check appears or changes, update
   `docs/smoke-tests.md` in the same change. Use grouped `Action` and
   `Expected` entries; update stale checks rather than duplicating them.
+- When a user asks for clarification because a smoke test or documented
+  procedure is unclear, update `docs/smoke-tests.md` or the relevant
+  document in the same change; do not leave the clarification only in chat.
 - For a completed bug fix or incident repair, add a concise linked postmortem
   under `docs/postmortem/` in the same change: symptom, impact, evidence, root
   cause, resolution, verification, and follow-up.
