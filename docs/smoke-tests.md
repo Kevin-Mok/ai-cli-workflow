@@ -308,6 +308,12 @@ of stacking duplicates.
 
 ## Terminal
 
+- Action: Run `./scripts/executable_install-tmux-tpm.sh --help`, then run
+  `./scripts/executable_install-tmux-tpm.sh` on a host with tmux configured.
+  Expected: Help describes the TPM install/update and `prefix + I` follow-up;
+  the install creates or fast-forwards `~/.tmux/plugins/tpm`, ensures its
+  `tpm` entrypoint is executable, and reloads the active tmux server when one
+  is reachable.
 - Action: Run `refresh-config`, then `gpgconf --kill gpg-agent`; open a new terminal and run `pass edit <non-sensitive-test-entry>`.
   Expected: When GPG needs the store password, `pinentry-curses` prompts in that initiating terminal and `pass` continues to the configured editor after successful authentication.
 - Action: Run `/home/example/scripts/apply-desktop-display-layout`, reload i3, and inspect `xrandr --query`.

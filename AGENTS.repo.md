@@ -11,3 +11,7 @@ may only add stricter local constraints.
 
 Non-trivial work follows [`.agent/PLANS.md`](.agent/PLANS.md), with live plans
 stored under [`plans/`](plans/) and committed alongside the related work.
+
+Treat model and model-reasoning-effort changes in `dot_codex/config.toml` as
+personal local preferences. Ordinary commit workflows must leave them out
+unless the user explicitly asks to include them.
