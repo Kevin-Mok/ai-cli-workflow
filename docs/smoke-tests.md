@@ -197,7 +197,8 @@ of stacking duplicates.
 ## Fish Helpers
 
 - Action: Run `fish -c 'source ~/.config/fish/functions/fn-progress.fish; fn-progress'` during C7S3.
-  Expected: The helper identifies the season as C7S3, shows the June 6 through August 19, 2026 schedule, and prints progress rather than an ended message before that timestamp.
+  Expected: The helper identifies the season as C7S3, shows the June 6 through August 19, 2026 schedule, prints a nearest-whole-number percentage, and reports labeled elapsed and remaining whole-day counts rather than an ended message before that timestamp.
+  See the [rounding and day-count postmortem](postmortem/2026-08-11-fn-progress-days-and-rounding.md).
 
 - Action: Connect a Pixel 9 over USB, unlock it, set USB mode to
   `File transfer`, then run `/home/example/scripts/mount-pixel-9`.

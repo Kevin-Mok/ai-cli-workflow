@@ -24,16 +24,17 @@ function fn-progress
     set TOTAL_DURATION (math "$END_SECONDS - $START_SECONDS")
     set TIME_PASSED (math "$CURRENT_SECONDS - $START_SECONDS")
 
-    # --- Calculate the ceiling percentage (The Critical Change) ---
-    # Setting scale=0 forces bc to output only the integer part (truncation), 
-    # and adding 0.9999 before truncation implements the ceiling logic.
-    set PROGRESS_PERCENT (echo "scale=0; (($TIME_PASSED * 100) / $TOTAL_DURATION) + 0.9999" | bc)
+    # --- Calculate whole-day progress and a nearest whole percentage ---
+    set ELAPSED_DAYS (math -s0 "$TIME_PASSED / 86400")
+    set REMAINING_DAYS (math -s0 "($END_SECONDS - $CURRENT_SECONDS) / 86400")
+    set PROGRESS_PERCENT (echo "scale=0; (($TIME_PASSED * 100) + ($TOTAL_DURATION / 2)) / $TOTAL_DURATION" | bc)
 
     # --- Output Result ---
     echo "📅 Current Date/Time: $CURRENT_DATE_TIME"
     echo "🚀 Season Start: $SEASON_START"
     echo "🛑 Season End: $SEASON_END"
     echo "---"
+    echo "⏱️ Days: $ELAPSED_DAYS elapsed, $REMAINING_DAYS remaining"
     echo "✅ Fortnite C7S3 is **$PROGRESS_PERCENT%** complete!"
     echo "---"
 end

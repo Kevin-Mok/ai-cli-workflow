@@ -20,14 +20,12 @@ if [ "$#" -eq 0 ]; then
   printf 'Tue Aug  4 10:07:46 EDT 2026\n'
 elif [ "$1" = "-d" ]; then
   case "$2" in
-    "2026-06-06 00:00:00") printf '100\n' ;;
-    "2026-06-10 00:00:00") printf '100\n' ;;
-    "2026-08-10 00:00:00") printf '140\n' ;;
-    "2026-08-19 00:00:00") printf '200\n' ;;
+    "2026-06-06 00:00:00") printf '0\n' ;;
+    "2026-08-19 00:00:00") printf '864000\n' ;;
     *) printf 'unexpected parsed date: %s\n' "$2" >&2; exit 2 ;;
   esac
 elif [ "$1" = "+%s" ]; then
-  printf '150\n'
+  printf '776736\n'
 else
   printf 'unexpected date arguments: %s\n' "$*" >&2
   exit 2
@@ -44,6 +42,16 @@ fi
 
 if [[ "$output" != *'🛑 Season End: 2026-08-19 00:00:00'* ]]; then
   printf 'expected August 19 C7S3 season end in output\n%s\n' "$output" >&2
+  exit 1
+fi
+
+if [[ "$output" != *'⏱️ Days: 8 elapsed, 1 remaining'* ]]; then
+  printf 'expected elapsed and remaining whole-day output\n%s\n' "$output" >&2
+  exit 1
+fi
+
+if [[ "$output" != *'✅ Fortnite C7S3 is **90%** complete!'* ]]; then
+  printf 'expected 89.9 percent to round to 90 percent\n%s\n' "$output" >&2
   exit 1
 fi
 
