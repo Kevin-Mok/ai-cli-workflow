@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+target_file="dot_codex/config.toml"
+model_line_regex='^[[:space:]]*model[[:space:]]*='
+
+if ! git ls-files --error-unmatch -- "$target_file" >/dev/null 2>&1; then
+  git status "$@"
+  exit 0
+fi
+
+diff="$(git diff --unified=0 -- "$target_file")"
+if [ -z "$diff" ]; then
+  git status "$@"
+  exit 0
+fi
+
+has_non_model=0
+while IFS= read -r line; do
+  case "$line" in
+    +++* | ---*) continue ;;
+    +*) change="${line:1}" ;;
+    -*) change="${line:1}" ;;
+    *) continue ;;
+  esac
+
+  if [[ ! "$change" =~ $model_line_regex ]]; then
+    has_non_model=1
+    break
+  fi
+done <<< "$diff"
+
+if [ "$has_non_model" -eq 1 ]; then
+  git status "$@"
+  exit 0
+fi
+
+git status "$@" | awk -v target="$target_file" '
+{
+  if ($NF == target) {
+    next
+  }
+  print
+}
+'
