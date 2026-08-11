@@ -1,0 +1,6 @@
+interface:
+  display_name: "Commit Plan & Push"
+  short_description: "Plan, commit, and push dirty Git work"
+  default_prompt: "Use $commit-plan-push to inspect the current dirty Git worktree, create the smallest safe commit series, and push it after verification."
+policy:
+  allow_implicit_invocation: false

@@ -57,6 +57,10 @@ of stacking duplicates.
   install.
   Expected: The installed skill copy matches the repo-tracked source so
   future sessions see the same instructions and metadata.
+- Action: Open the Codex skill picker and select `Commit Plan & Push`.
+  Expected: It invokes the stable `$commit-plan-push` skill with its managed
+  title and `agents/openai.yaml` metadata. Picker ordering is controlled by Codex; no unsupported
+  priority field is relied on.
 - Action: sync-superpowers-release --dry-run
   Expected: The helper runs `chezmoi apply --refresh-externals` in dry-run
   mode for `~/.codex/superpowers` and

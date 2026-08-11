@@ -211,14 +211,21 @@ class AIWorkflowContractTest(unittest.TestCase):
                 self.assertNotIn(banned_fragment, content, relative_path)
 
     def test_delivery_preference_lives_only_in_feedback_log(self) -> None:
-        latest_feedback = read_repo_file(
+        feedback = read_repo_file(
             "dot_agents/skills/feedback-memory/feedback.log"
-        ).splitlines()[-1]
+        ).splitlines()
+        delivery_entries = [
+            entry
+            for entry in feedback
+            if entry.startswith("2026-07-13 - Single-commit workflows")
+        ]
         self.assertEqual(
-            latest_feedback,
-            "2026-07-13 - Single-commit workflows push after the commit passes "
-            "verification; multi-commit workflows push once after the complete "
-            "verified series, unless I explicitly request another cadence.",
+            delivery_entries,
+            [
+                "2026-07-13 - Single-commit workflows push after the commit passes "
+                "verification; multi-commit workflows push once after the complete "
+                "verified series, unless I explicitly request another cadence."
+            ],
         )
 
         lessons = read_repo_file("tasks/lessons.md")
