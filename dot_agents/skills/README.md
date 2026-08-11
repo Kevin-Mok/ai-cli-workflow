@@ -194,7 +194,9 @@ manual helper continues to support an alternate `LINUX_CONFIG_SOURCE`.
   dirtied during the current Codex session by combining a pre-write git
   baseline with direct session-touch evidence, including an
   observed-touch-only fallback when the baseline is missing, then pushes
-  the verified scoped commit unless the user requests another cadence.
+  the safely scoped commit unless the user requests another cadence. It
+  records validation failures as warnings and repairs truthful
+  README-gate findings before committing.
 - [`open-pr`](open-pr/SKILL.md): Drafts or publishes pull request
   titles and bodies from branch-vs-base evidence, keeps `docs/pr/`
   handoff docs aligned when a repo uses them, and preserves ExampleProject

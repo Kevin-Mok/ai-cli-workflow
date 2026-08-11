@@ -24,6 +24,12 @@ of stacking duplicates.
   an older prerequisite change and a newer follow-up change.
   Expected: The proposed commits, optional manual commands, and commit
   message summary all list the older change before the newer follow-up.
+- Action: Run `commit-session` after it establishes a safe, non-empty scoped
+  set and a focused validation or rerun README gate reports a non-safety
+  failure.
+  Expected: The workflow records the failure as a warning, repairs any
+  truthful in-scope README finding, and stages only the verified scoped files;
+  unsafe ownership, empty scope, or an unstageable README repair still stops it.
 - Action: Finish a task that introduced a reusable manual verification
   step or exposed a missing smoke check.
   Expected: This document gains or updates a grouped `Action` +

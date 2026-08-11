@@ -22,13 +22,14 @@ Use this skill for explicit write requests that should ship only the files dirti
    - `commitable` can include directly observed edits, including files that were already dirty at the session baseline, and files that became dirty after the session baseline.
    - If any `commitable` file still looks mixed or suspicious, stop instead of guessing.
 6. Run the smallest relevant automated checks for the scoped change.
+   - Record failed focused validation as a warning and continue to staging.
 7. Run the `readme-recruiter-sync` skill check against the root `README.md`.
    For a shell-only path, run `./scripts/executable_readme-recruiter-sync`.
-   - Treat the gate as mandatory before staging or committing.
    - If the gate passes without README changes, continue.
-   - If the gate requires `README.md` edits, continue only when `README.md` is already present in `commitable`, including via a direct current-session touch.
-   - If `README.md` was already dirty at the session baseline and was not directly touched in the current session, or is otherwise excluded from `commitable`, stop and report that the session-scoped commit cannot satisfy the required README gate safely.
-8. Stage only the union of `stage_paths` from `commitable`.
+   - If it fails, repair only truthful, repo-supported README issues before staging.
+   - Re-run the scope helper after the repair. Continue only when the repaired `README.md` is present in `commitable`; otherwise stop and report that the repair cannot be safely included in the session-scoped commit.
+   - Re-run the gate after the repair. Record any remaining failure as a warning and continue to staging.
+8. Stage only the union of `stage_paths` from the final `commitable` result.
 9. Write the commit message.
    - Use a concise Conventional Commit subject line.
    - Add a body with around 5 to 10 concrete bullet points describing the actual changes.
@@ -43,8 +44,10 @@ Use this skill for explicit write requests that should ship only the files dirti
 
 - Never stage files listed under `skipped_preexisting`.
 - Never stage files listed under `skipped_unknown`.
-- Never bypass `readme-recruiter-sync` because the scoped diff looks small.
+- Never skip `readme-recruiter-sync` because the scoped diff looks small; repair its truthful findings before committing.
 - Never invent README claims, flags, install steps, or recruiter copy that the repo does not support.
+- Do not skip a safe scoped commit solely because best-effort validation fails.
+- Do not skip a safe scoped commit after all truthful README repairs have been made solely because the rerun gate still reports a non-safety failure.
 - Never leave a verified single-commit session workflow unpushed unless the user explicitly requests another cadence.
 - If the helper cannot find a pre-write `git status --short` baseline for the session, only directly observed touched files are eligible; leave every other dirty file out of scope instead of reconstructing ownership from timestamps or memory.
 - If a file was already dirty at the session baseline and the current session did not directly touch it, leave the file uncommitted unless the user explicitly asks for a manual split.

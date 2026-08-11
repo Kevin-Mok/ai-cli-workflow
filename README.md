@@ -195,7 +195,9 @@ Representative highlights:
   without staging, committing, or rewriting history.
 - [`commit-session`](dot_agents/skills/commit-session/SKILL.md) ships
   only the files owned by the current Codex session, with fallback logic
-  when a session missed its pre-write baseline.
+  when a session missed its pre-write baseline; after safe scoping, it
+  records validation warnings and repairs truthful README-gate findings
+  before committing.
 - [`open-pr`](dot_agents/skills/open-pr/SKILL.md) turns branch-vs-base
   evidence into reviewer-ready PR titles and bodies, including
   `docs/pr/` sync and ExampleProject DD/Reviewer A handoff context when those
