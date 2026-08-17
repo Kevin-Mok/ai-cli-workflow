@@ -29,6 +29,11 @@ chmod +x "${tmpdir}/bin/snapshot-codex-config"
 cat > "${tmpdir}/bin/chezmoi" <<'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
+if [ "$1" = "source-path" ] && [ "$2" = "$HOME/.gitconfig" ]; then
+  printf 'chezmoi:%s\n' "$*" >> "$TEST_LOG"
+  printf '%s\n' "$TEST_GITCONFIG_TARGET"
+  exit 0
+fi
 printf 'chezmoi:%s\n' "$*" >> "$TEST_LOG"
 EOF
 chmod +x "${tmpdir}/bin/chezmoi"
@@ -51,6 +56,13 @@ cat > "${tmpdir}/home/.codex/config.toml" <<'EOF'
 model = "local"
 EOF
 
+cat > "${tmpdir}/home/.gitconfig" <<'EOF'
+[user]
+\tname = Local User
+[credential "https://github.com"]
+EOF
+printf '\thelper = %s\n' '' >> "${tmpdir}/home/.gitconfig"
+
 cat > "${tmpdir}/home/.config/fish/key_abbr.fish" <<'EOF'
 printf 'sourced-shortcuts\n' >> "$TEST_LOG"
 EOF
@@ -59,9 +71,15 @@ cat > "${tmpdir}/repo/dot_codex/config.toml" <<'EOF'
 model = "repo"
 EOF
 
+cat > "${tmpdir}/repo/dot_gitconfig.tmpl" <<'EOF'
+[user]
+\tname = Repo User
+EOF
+
 TEST_LOG="$log_path" \
 TEST_CODEX_SOURCE="${tmpdir}/home/.codex/config.toml" \
 TEST_CODEX_TARGET="${tmpdir}/repo/dot_codex/config.toml" \
+TEST_GITCONFIG_TARGET="${tmpdir}/repo/dot_gitconfig.tmpl" \
 PATH="${tmpdir}/bin:${PATH}" \
 HOME="${tmpdir}/home" \
 "$real_fish" -c "source '$function_path'; refresh-config"
@@ -72,14 +90,35 @@ if ! grep -Fxq 'snapshot-codex-config:' "$log_path"; then
   exit 1
 fi
 
+expected_force_apply="chezmoi:apply --force ${tmpdir}/home/.codex/config.toml"
+if ! grep -Fxq "$expected_force_apply" "$log_path"; then
+  printf 'expected refresh-config to force-apply only the config it just snapshotted\n' >&2
+  cat "$log_path" >&2
+  exit 1
+fi
+
+expected_gitconfig_source="chezmoi:source-path ${tmpdir}/home/.gitconfig"
+if ! grep -Fxq "$expected_gitconfig_source" "$log_path"; then
+  printf 'expected refresh-config to resolve the tracked Git config target\n' >&2
+  cat "$log_path" >&2
+  exit 1
+fi
+
+expected_gitconfig_apply="chezmoi:apply --force ${tmpdir}/home/.gitconfig"
+if ! grep -Fxq "$expected_gitconfig_apply" "$log_path"; then
+  printf 'expected refresh-config to force-apply only the Git config it just copied\n' >&2
+  cat "$log_path" >&2
+  exit 1
+fi
+
 if ! grep -Fq 'chezmoi:apply' "$log_path"; then
   printf 'expected refresh-config to run chezmoi apply\n' >&2
   cat "$log_path" >&2
   exit 1
 fi
 
-if grep -Fq 'chezmoi:source-path' "$log_path"; then
-  printf 'expected source-path resolution to stay inside snapshot-codex-config\n' >&2
+if grep -Fxq "chezmoi:source-path ${tmpdir}/home/.codex/config.toml" "$log_path"; then
+  printf 'expected Codex source-path resolution to stay inside snapshot-codex-config\n' >&2
   cat "$log_path" >&2
   exit 1
 fi
@@ -105,6 +144,18 @@ fi
 if ! grep -Fq 'model = "local"' "${tmpdir}/repo/dot_codex/config.toml"; then
   printf 'expected repo config to be overwritten by local config contents\n' >&2
   cat "${tmpdir}/repo/dot_codex/config.toml" >&2
+  exit 1
+fi
+
+if ! grep -Fq 'name = Local User' "${tmpdir}/repo/dot_gitconfig.tmpl"; then
+  printf 'expected tracked Git config to be overwritten by local config contents\n' >&2
+  cat "${tmpdir}/repo/dot_gitconfig.tmpl" >&2
+  exit 1
+fi
+
+if rg -q '[[:blank:]]+$' "${tmpdir}/repo/dot_gitconfig.tmpl"; then
+  printf 'expected copied blank credential helpers to have no trailing whitespace\n' >&2
+  cat "${tmpdir}/repo/dot_gitconfig.tmpl" >&2
   exit 1
 fi
 

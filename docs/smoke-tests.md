@@ -230,9 +230,9 @@ of stacking duplicates.
 - Action: Run `fish -ic 'refresh-config'` after changing tracked repo
   configuration on a machine where chezmoi and the shell helpers are available
   and the live Codex config is approved to overwrite the tracked copy.
-  Expected: The live `~/.codex/config.toml` overwrites tracked
-  `dot_codex/config.toml`, chezmoi applies, shortcuts regenerate, and Fish
-  reloads with the refreshed repo copy matching the live Codex config.
+  Expected: The live `~/.codex/config.toml` and `~/.gitconfig` overwrite their
+  tracked sources, ChezMoi force-applies only those two targets without prompts,
+  then applies other targets normally; shortcuts regenerate and Fish reloads.
 - Action: Run `fish -c 'backup-phone-storage'` from a machine that can
   reach the phone over SSH on port `8022`.
   Expected: If Termux has `rsync` installed, `rsync` copies the shared
