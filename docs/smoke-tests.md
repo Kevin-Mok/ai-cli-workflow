@@ -232,7 +232,8 @@ of stacking duplicates.
   and the live Codex config is approved to overwrite the tracked copy.
   Expected: The live `~/.codex/config.toml` and `~/.gitconfig` overwrite their
   tracked sources, ChezMoi force-applies only those two targets without prompts,
-  then applies other targets normally; shortcuts regenerate and Fish reloads.
+  then applies other targets normally; shortcuts regenerate, Fish reloads, and
+  one bold `REFRESH COMPLETE` line confirms the successful workflow.
 - Action: Run `fish -c 'backup-phone-storage'` from a machine that can
   reach the phone over SSH on port `8022`.
   Expected: If Termux has `rsync` installed, `rsync` copies the shared

@@ -1,29 +1,30 @@
 function refresh-config
-    snapshot-codex-config
+    snapshot-codex-config >/dev/null
     or return $status
-    and echo 'Copied local Codex config into repo source.'
-    chezmoi apply --force ~/.codex/config.toml
+    chezmoi apply --force ~/.codex/config.toml >/dev/null
     or return $status
-    and echo 'Applied snapshotted Codex config.'
     set gitconfig_source_path (chezmoi source-path ~/.gitconfig)
     or return $status
     cp ~/.gitconfig $gitconfig_source_path
     or return $status
     sed -i 's/^\([[:space:]]*helper =\)[[:space:]]*$/\1/' $gitconfig_source_path
     or return $status
-    and echo 'Copied local Git config into repo source.'
-    chezmoi apply --force ~/.gitconfig
+    chezmoi apply --force ~/.gitconfig >/dev/null
     or return $status
-    and echo 'Applied snapshotted Git config.'
-    chezmoi apply
-    and echo 'Applied chezmoi.'
+    chezmoi apply >/dev/null
+    or return $status
     # and tmux source-file ~/.tmux.conf
-    # and echo 'Sourced tmux config.'
 
-    sync-shortcuts
-    echo 'Synced shortcuts.'
-    source ~/.config/fish/key_abbr.fish > /dev/null
-    and echo 'Sourced shortcuts.'
-    and echo 'Reloading fish.'
-    and exec fish
+    sync-shortcuts >/dev/null
+    or return $status
+    source ~/.config/fish/key_abbr.fish >/dev/null
+    or return $status
+    if isatty stdout
+        set_color --bold green
+    end
+    echo 'REFRESH COMPLETE'
+    if isatty stdout
+        set_color normal
+    end
+    exec fish
 end

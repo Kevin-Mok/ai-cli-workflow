@@ -76,13 +76,18 @@ cat > "${tmpdir}/repo/dot_gitconfig.tmpl" <<'EOF'
 \tname = Repo User
 EOF
 
-TEST_LOG="$log_path" \
+success_output="$(TEST_LOG="$log_path" \
 TEST_CODEX_SOURCE="${tmpdir}/home/.codex/config.toml" \
 TEST_CODEX_TARGET="${tmpdir}/repo/dot_codex/config.toml" \
 TEST_GITCONFIG_TARGET="${tmpdir}/repo/dot_gitconfig.tmpl" \
 PATH="${tmpdir}/bin:${PATH}" \
 HOME="${tmpdir}/home" \
-"$real_fish" -c "source '$function_path'; refresh-config"
+"$real_fish" -c "source '$function_path'; refresh-config")"
+
+if [ "$success_output" != 'REFRESH COMPLETE' ]; then
+  printf 'expected one skimmable success line, got: %s\n' "$success_output" >&2
+  exit 1
+fi
 
 if ! grep -Fxq 'snapshot-codex-config:' "$log_path"; then
   printf 'expected refresh-config to delegate to snapshot-codex-config\n' >&2
