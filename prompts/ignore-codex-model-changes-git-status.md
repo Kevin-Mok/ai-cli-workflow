@@ -1,12 +1,29 @@
-You are a Linux configuration maintainer. I need local changes to `dot_codex/config.toml` (especially Codex `model` updates) to stop showing up in `git status`, while still keeping the file tracked for normal updates.
+You are a Linux configuration maintainer. I need local changes to `dot_codex/config.toml` (especially `model` updates) to stop showing up in status output while keeping the file tracked.
 
-Give me precise shell commands to do this locally and how to safely revert later.
+Use repo-local model-only status filtering, not skip-worktree.
 
-Run, from repo root:
+1) Keep `dot_codex/config.toml` tracked and unchanged in index.
+2) Confirm it is tracked before any filtering:
+   `git ls-files --error-unmatch dot_codex/config.toml`
+3) Use the wrapper for status checks:
+   `~/linux-config/scripts/executable_codex-model-status --short -u`
+4) Verify model-only behavior:
+   - Modify only `model = ...` in `dot_codex/config.toml`.
+   - Run the wrapper status.
+   - Expect no status line for `dot_codex/config.toml`.
+5) Verify non-model keys are not suppressed:
+   - Modify `model_reasoning_effort` (or `developer_instructions`, `personality`, etc.).
+   - Run the wrapper status.
+   - Expect `dot_codex/config.toml` to be reported.
+6) Verify clean files remain unchanged:
+   - Commit `dot_codex/config.toml` and make no edits.
+   - Wrapper status should match plain `git status` behavior for this path.
+7) Manual fallback checks if the wrapper is unavailable:
+   - `git ls-files --error-unmatch dot_codex/config.toml`
+   - `git diff -- dot_codex/config.toml`
 
-1) Confirm the path is tracked: `git ls-files --error-unmatch dot_codex/config.toml`.
-2) Mark it as skip-worktree so local diffs are ignored in status/diff: `git update-index --skip-worktree dot_codex/config.toml`.
-3) Verify: change model field, then `git status --short dot_codex/config.toml` should remain clean.
-4) Add a quick rollback command: `git update-index --no-skip-worktree dot_codex/config.toml`.
+Model-only detection in the wrapper uses:
+`^[[:space:]]*model[[:space:]]*=`
+Only changed added/removed lines matching this regex are treated as ignorable.
 
-If `skip-worktree` is too blunt, provide fallback commands for `--assume-unchanged` and a short tradeoff for both.
+If the wrapper path is unavailable, use plain `git status` behavior (no model-only suppression) and re-enable the wrapper in the repo workflow.
