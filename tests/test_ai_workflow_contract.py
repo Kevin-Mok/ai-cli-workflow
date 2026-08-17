@@ -118,6 +118,23 @@ class AIWorkflowContractTest(unittest.TestCase):
         ):
             self.assertIn(required_text, canonical)
 
+    def test_canonical_policy_requires_living_unexpected_failure_postmortems(
+        self,
+    ) -> None:
+        canonical = read_repo_file("dot_codex/AGENTS.md").lower()
+        for required_text in (
+            "unexpected task failure",
+            "immediately create",
+            "current status",
+            "when the issue is fixed",
+            "root cause",
+            "resolution",
+            "verification",
+            "deliberately failing tdd red tests",
+            "intentionally exercised failure paths",
+        ):
+            self.assertIn(required_text, canonical)
+
     def test_system_design_routing_is_explicit(self) -> None:
         canonical = read_repo_file("dot_codex/AGENTS.md").lower()
         for reference_name in (

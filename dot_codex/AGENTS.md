@@ -113,9 +113,7 @@ education work:
 - When a user asks for clarification because a smoke test or documented
   procedure is unclear, update `docs/smoke-tests.md` or the relevant
   document in the same change; do not leave the clarification only in chat.
-- For a completed bug fix or incident repair, add a concise linked postmortem
-  under `docs/postmortem/` in the same change: symptom, impact, evidence, root
-  cause, resolution, verification, and follow-up.
+- For every unexpected task failure—an unplanned unsuccessful command, test, deployment, or workflow outcome—immediately create a dated, descriptive postmortem under `docs/postmortem/`. Record the symptom, impact, evidence, current status, and next steps; keep that same document current throughout investigation. When the issue is fixed, update it with root cause, resolution, verification, and follow-up, and keep the completed postmortem in the same commit as the related fix. Deliberately failing TDD RED tests and intentionally exercised failure paths do not trigger a postmortem.
 - When asked to create a prompt, write it to a concise kebab-case Markdown file
   under `prompts/`, not only in chat.
 - When tracked configuration or environment behavior changes, run

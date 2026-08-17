@@ -175,6 +175,8 @@ of stacking duplicates.
   Expected: It identifies `dot_codex/AGENTS.md` as the single policy body, treats the root AGENTS files as routing layers, and explains that a verified single-commit workflow pushes once while multi-commit work waits until the complete verified series; no Git write occurs.
 - Action: Add or change a standing workflow rule in `dot_codex/AGENTS.md`.
   Expected: The corresponding public docs and reusable verification guidance stay in sync with that rule in the same change.
+- Action: In a disposable clone, ask a fresh Codex or Claude Code session to handle and then resolve an unexpected task failure.
+  Expected: It immediately creates one dated postmortem under `docs/postmortem/`, records the initial symptom, impact, evidence, current status, and next steps, then updates that same file with root cause, resolution, verification, and follow-up; deliberate RED tests and intentionally exercised failure paths do not create one.
 - Action: Start non-trivial work from a plan under `plans/`, then inspect the plan before the related commit is prepared.
   Expected: The plan follows `.agent/PLANS.md` with assumptions, checkboxes, verification evidence, review notes, and progress updates intended for the same commit as the work they describe.
 - Action: Run `./scripts/executable_ai-workflow-doctor --repo . --check` from the repository root.

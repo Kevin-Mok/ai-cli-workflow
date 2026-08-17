@@ -136,6 +136,8 @@ engineering behavior:
   steps, assumptions, risks, and verification.
 - Failing reproducers before bug fixes so changes are grounded in
   observed behavior instead of guesswork.
+- Living postmortems for unexpected task failures so the observed evidence,
+  investigation, resolution, and verification remain reviewable in one record.
 - Explicit verification before done so completion is demonstrated with
   tests, diffs, logs, or clear manual checks.
 - Docs updates with behavior changes so README, plans, setup steps, and
