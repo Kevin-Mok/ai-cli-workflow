@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  cat <<'USAGE'
+Usage: sync-design-skills [--dry-run|--bootstrap]
+
+Refresh the managed public design skills and UI/UX Pro Max bundle.
+--dry-run previews external refreshes without modifying skill files.
+--bootstrap installs UI/UX Pro Max on a new host without refreshing externals.
+USAGE
+}
+
+mode=refresh
+case "${1:-}" in
+  --dry-run|-n) mode=dry-run ;;
+  --bootstrap) mode=bootstrap ;;
+  --help|-h) usage; exit 0 ;;
+  "") ;;
+  *) echo "sync-design-skills: unknown option: $1" >&2; usage >&2; exit 2 ;;
+esac
+
+source_dir="${LINUX_CONFIG_SOURCE:-$HOME/linux-config}"
+if [[ ! -d "$source_dir" ]]; then
+  echo "sync-design-skills: source directory not found: $source_dir" >&2
+  exit 1
+fi
+
+if [[ "$mode" == bootstrap ]]; then
+  npx --yes ui-ux-pro-max-cli init --ai codex --global
+  echo "Design skills bootstrap complete."
+  exit 0
+fi
+
+targets=(
+  "$HOME/.codex/skills/upstreams/impeccable"
+  "$HOME/.codex/skills/upstreams/21st"
+  "$HOME/.codex/skills/upstreams/review-animations"
+  "$HOME/.codex/skills/upstreams/scroll-world"
+  "$HOME/.codex/plugins/higgsfield"
+)
+apply_args=(-S "$source_dir" apply --refresh-externals -v)
+if [[ "$mode" == dry-run ]]; then
+  apply_args+=(-n)
+fi
+chezmoi "${apply_args[@]}" "${targets[@]}"
+
+if [[ "$mode" == dry-run ]]; then
+  echo "Design skill refresh preview complete."
+  exit 0
+fi
+
+if [[ -d "$HOME/.agents/skills/ui-ux-pro-max" ]]; then
+  npx --yes ui-ux-pro-max-cli update --ai codex --global
+else
+  npx --yes ui-ux-pro-max-cli init --ai codex --global
+fi
+echo "Design skills refreshed. Restart Codex sessions to load updates."

@@ -3,3 +3,38 @@
     url = {{ (gitHubLatestRelease "obra/superpowers").TarballURL | quote }}
     exact = true
     stripComponents = 1
+
+[".codex/skills/upstreams/impeccable"]
+    type = "git-repo"
+    url = "https://github.com/pbakaus/impeccable.git"
+    refreshPeriod = "24h"
+    [".codex/skills/upstreams/impeccable".pull]
+        args = ["--ff-only"]
+
+[".codex/skills/upstreams/21st"]
+    type = "git-repo"
+    url = "https://github.com/21st-dev/skill.git"
+    refreshPeriod = "24h"
+    [".codex/skills/upstreams/21st".pull]
+        args = ["--ff-only"]
+
+[".codex/skills/upstreams/review-animations"]
+    type = "git-repo"
+    url = "https://github.com/emilkowalski/skills.git"
+    refreshPeriod = "24h"
+    [".codex/skills/upstreams/review-animations".pull]
+        args = ["--ff-only"]
+
+[".codex/skills/upstreams/scroll-world"]
+    type = "git-repo"
+    url = "https://github.com/oso95/scroll-world.git"
+    refreshPeriod = "24h"
+    [".codex/skills/upstreams/scroll-world".pull]
+        args = ["--ff-only"]
+
+[".codex/plugins/higgsfield"]
+    type = "git-repo"
+    url = "https://github.com/higgsfield-ai/skills.git"
+    refreshPeriod = "24h"
+    [".codex/plugins/higgsfield".pull]
+        args = ["--ff-only"]

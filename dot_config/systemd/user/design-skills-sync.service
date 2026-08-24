@@ -1,0 +1,12 @@
+[Unit]
+Description=Refresh the external design skill stack
+
+[Service]
+Type=oneshot
+ExecStart=%h/scripts/sync-design-skills
+Environment=LINUX_CONFIG_SOURCE=%h/linux-config
+Environment="PATH=%h/.local/bin:/usr/local/bin:/usr/bin:/bin"
+UMask=0077
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=design-skills-sync

@@ -1,0 +1,11 @@
+[Unit]
+Description=Refresh design skills at 5:00 AM daily
+
+[Timer]
+OnCalendar=*-*-* 05:00:00
+Persistent=true
+AccuracySec=1s
+Unit=design-skills-sync.service
+
+[Install]
+WantedBy=timers.target

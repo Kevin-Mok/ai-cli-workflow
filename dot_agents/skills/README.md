@@ -48,6 +48,25 @@ skills tighten one specific aspect of an existing interface.
   Upgrades an existing site or app to higher visual quality without
   throwing away its current framework, CSS approach, or functionality.
 
+## Managed Public Design Stack
+
+The daily chezmoi-managed sources are documented in
+[the design-skill guide](../../docs/design-skills.md). They install as
+Codex-native symlinks under `~/.codex/skills/`, plus the Higgsfield plugin
+and UI/UX Pro Max bundle.
+
+- `impeccable`: Unified design direction, critique, quality, and polish.
+- `21st-cli-use`, `21st-ai`, `21st-design-sync`, and `21st-registry`:
+  terminal component discovery, generation, theme publishing, and registry
+  management.
+- `review-animations` and `scroll-world`: Motion review and cinematic
+  scroll-experience workflows.
+- `ui-ux-pro-max`: Official generated design intelligence; companions include
+  `brand`, `design`, `design-system`, `ui-styling`, `banner-design`,
+  and `slides`.
+- `higgsfield`: Managed visual-generation plugin; its CLI authentication and
+  credit-bearing jobs remain explicitly user-driven.
+
 ## UX, Quality, And System Alignment
 
 - [`adapt`](adapt/SKILL.md): Adjusts a design for different screen

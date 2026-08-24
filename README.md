@@ -228,6 +228,12 @@ Representative highlights:
 This category matters because it turns design direction into a
 repeatable local capability instead of a one-off prompting exercise.
 
+The managed public design stack adds Impeccable, 21st, Review Animations,
+Scroll World, UI/UX Pro Max, and Higgsfield through chezmoi externals. Its
+daily refresh, bootstrap behavior, upstream links, and explicit authentication
+boundaries are documented in
+[the design-skill guide](docs/design-skills.md).
+
 #### Coding Practice And Scaffolding
 
 Representative highlights:
@@ -536,6 +542,8 @@ source in this repo.
 | `chezmoi -S "$PWD" apply` | Apply the tracked source state from this clone into `$HOME`. | `-S` / `--source` uses this repo as the source state. `-P` / `--parent-dirs` is useful when you apply a nested target and also want its parent directories handled. |
 | `refresh-config` | Snapshot the live Codex and Git configs into the repo, force-apply those exact targets without prompts, then reapply the remaining chezmoi-managed environment layer. | No user-facing flags. It calls `snapshot-codex-config`, copies `~/.gitconfig` into its tracked source, force-applies only those two targets, runs normal `chezmoi apply` for every other target, syncs shortcuts, and reloads fish. |
 | `sync-superpowers-release` | Refresh the externally managed `obra/superpowers` skill bundle from the latest GitHub release archive through chezmoi. | `--dry-run` previews the release refresh without writing files. `LINUX_CONFIG_SOURCE` points the helper at this repo when it is not checked out at `$HOME/linux-config`. |
+| `sync-design-skills` | Refresh the managed public design skill sources and update UI/UX Pro Max. | `--dry-run` previews the external refresh without updating UI/UX Pro Max. `--bootstrap` installs UI/UX Pro Max on a fresh host. It never authenticates accounts, generates media, spends credits, or upgrades the Higgsfield CLI. |
+| `setup-design-skills-timer` | Validate, enable, or disable the daily 05:00 design-skill refresh timer. | Exactly one of `--check`, `--enable`, or `--disable` is required. `--enable` validates and activates the `Persistent=true` user timer without sudo. |
 | `setup-superpowers-release-timer` | Validate, enable, or disable the optional user-scoped release-sync timer. It runs daily at 05:00 local time and catches up missed runs with `Persistent=true`; no sudo is required. Refreshed skills are picked up by newly started Codex sessions; already-running sessions remain unchanged until restarted. | Timer setup requires the standard `$HOME/linux-config` checkout. Exactly one of `--check`, `--enable`, or `--disable` is required. `--check` validates the managed sources and installed units without changing state; `--enable` applies and activates the timer; recovery-oriented `--disable` stops it without needing chezmoi or a source checkout. |
 | `./scripts/executable_ai-workflow-doctor` | Audit the repo's AI instruction and skill surface, or capture a stable before/after measurement for workflow optimization. | `--repo PATH` selects the repository. `--format text\|json` selects human or machine output. `--snapshot PATH` writes a deterministic JSON baseline; `--compare PATH` compares the current report with one. `--verify-sources` resolves declared local source archives when available. `--check` exits nonzero for objective errors while review findings remain non-blocking warnings. |
 | `./scripts/executable_apply-pywal-theme <wallpaper>` | Regenerate the active `pywal` theme through the repo-owned wrapper so wallpaper changes also refresh kitty and the i3 color resources this repo depends on. | Pass an image path directly, or pass raw `wal` flags when you need that lower-level control. The wrapper runs `wal --saturate 0.8 -e`, reloads Xresources, refreshes running kitty windows when the socket is available, and regenerates the derived i3 palette file. |
