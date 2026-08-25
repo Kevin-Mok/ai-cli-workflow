@@ -8,3 +8,9 @@
 - Verification: `bash tests/test_fn_progress.sh`, `fish -n dot_config/fish/functions/fn-progress.fish`, `git diff --check`, and the README gate all passed after recovery.
 - Current status: Resolved; the restricted patch helper failed again during follow-up, but no file changed until the validated elevated recovery path succeeded.
 - Follow-up: Use the narrow elevated fallback only when the restricted sandbox reproduces this limitation, and validate patch hunk counts before invoking `git apply`.
+- Additional symptom: The required `refresh-config` command was not found in the elevated execution PATH, so the tracked configuration deployment step exited before running.
+- Additional impact: The source and regression test were initially updated and verified, but the installed Fish helper was not refreshed by the failed command.
+- Additional evidence: `command -v refresh-config && refresh-config` exited 1 with no command path or refresh output.
+- Additional resolution: The repository helper was sourced through Fish and invoked with `fish -ic 'refresh-config'`; it printed `REFRESH COMPLETE` and exited 0.
+- Additional verification: The installed helper now prints `✅ Fortnite C7S4 is 8% complete!` without asterisks, and the focused regression, Fish syntax, and diff checks pass.
+- Additional status: Resolved.

@@ -28,6 +28,6 @@ function fn-progress
     echo "🛑 Season End: $SEASON_END"
     echo "---"
     echo "⏱️ Days: $ELAPSED_DAYS elapsed, $REMAINING_DAYS remaining"
-    echo "✅ Fortnite C7S4 is **$PROGRESS_PERCENT%** complete!"
+    echo "✅ Fortnite C7S4 is $PROGRESS_PERCENT% complete!"
     echo "---"
 end

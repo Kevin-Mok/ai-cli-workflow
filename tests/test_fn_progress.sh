@@ -50,12 +50,12 @@ if [[ "$output" != *'⏱️ Days: 21 elapsed, 52 remaining'* ]]; then
   exit 1
 fi
 
-if [[ "$output" != *'✅ Fortnite C7S4 is **29%** complete!'* ]]; then
+if [[ "$output" != *'✅ Fortnite C7S4 is 29% complete!'* ]]; then
   printf 'expected 28.8 percent to round to 29 percent\n%s\n' "$output" >&2
   exit 1
 fi
 
-if [[ "$output" != *'✅ Fortnite C7S4 is **'*' complete!'* ]]; then
+if [[ "$output" != *'✅ Fortnite C7S4 is '*'% complete!'* ]]; then
   printf 'expected active C7S4 progress output\n%s\n' "$output" >&2
   exit 1
 fi
