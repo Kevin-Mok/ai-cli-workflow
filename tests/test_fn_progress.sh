@@ -17,15 +17,15 @@ cat > "${tmpdir}/bin/date" <<'EOF'
 set -euo pipefail
 
 if [ "$#" -eq 0 ]; then
-  printf 'Tue Aug  4 10:07:46 EDT 2026\n'
+  printf 'Thu Sep 10 10:07:46 EDT 2026\n'
 elif [ "$1" = "-d" ]; then
   case "$2" in
-    "2026-06-06 00:00:00") printf '0\n' ;;
-    "2026-08-19 00:00:00") printf '864000\n' ;;
+    "2026-08-20 00:00:00") printf '0\n' ;;
+    "2026-11-01 00:00:00") printf '6307200\n' ;;
     *) printf 'unexpected parsed date: %s\n' "$2" >&2; exit 2 ;;
   esac
 elif [ "$1" = "+%s" ]; then
-  printf '776736\n'
+  printf '1814400\n'
 else
   printf 'unexpected date arguments: %s\n' "$*" >&2
   exit 2
@@ -35,32 +35,32 @@ chmod +x "${tmpdir}/bin/date"
 
 output="$(PATH="${tmpdir}/bin:${PATH}" fish --no-config -c "source '${function_path}'; fn-progress")"
 
-if [[ "$output" != *'🚀 Season Start: 2026-06-06 00:00:00'* ]]; then
-  printf 'expected June 6 C7S3 season start in output\n%s\n' "$output" >&2
+if [[ "$output" != *'🚀 Season Start: 2026-08-20 00:00:00'* ]]; then
+  printf 'expected August 20 C7S4 season start in output\n%s\n' "$output" >&2
   exit 1
 fi
 
-if [[ "$output" != *'🛑 Season End: 2026-08-19 00:00:00'* ]]; then
-  printf 'expected August 19 C7S3 season end in output\n%s\n' "$output" >&2
+if [[ "$output" != *'🛑 Season End: 2026-11-01 00:00:00'* ]]; then
+  printf 'expected November 1 C7S4 season end in output\n%s\n' "$output" >&2
   exit 1
 fi
 
-if [[ "$output" != *'⏱️ Days: 8 elapsed, 1 remaining'* ]]; then
+if [[ "$output" != *'⏱️ Days: 21 elapsed, 52 remaining'* ]]; then
   printf 'expected elapsed and remaining whole-day output\n%s\n' "$output" >&2
   exit 1
 fi
 
-if [[ "$output" != *'✅ Fortnite C7S3 is **90%** complete!'* ]]; then
-  printf 'expected 89.9 percent to round to 90 percent\n%s\n' "$output" >&2
+if [[ "$output" != *'✅ Fortnite C7S4 is **29%** complete!'* ]]; then
+  printf 'expected 28.8 percent to round to 29 percent\n%s\n' "$output" >&2
   exit 1
 fi
 
-if [[ "$output" != *'✅ Fortnite C7S3 is **'*' complete!'* ]]; then
-  printf 'expected active C7S3 progress output\n%s\n' "$output" >&2
+if [[ "$output" != *'✅ Fortnite C7S4 is **'*' complete!'* ]]; then
+  printf 'expected active C7S4 progress output\n%s\n' "$output" >&2
   exit 1
 fi
 
 if [[ "$output" == *'has ended'* ]]; then
-  printf 'expected August 4 to remain inside the C7S3 date range\n%s\n' "$output" >&2
+  printf 'expected September 10 to remain inside the C7S4 date range\n%s\n' "$output" >&2
   exit 1
 fi
