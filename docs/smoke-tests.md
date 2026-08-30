@@ -213,7 +213,7 @@ of stacking duplicates.
 ## Fish Helpers
 
 - Action: Run `fish -c 'source ~/.config/fish/functions/fn-progress.fish; fn-progress'` during C7S4.
-  Expected: The helper identifies the season as C7S4, shows the August 20 through November 1, 2026 schedule, prints a nearest-whole-number percentage, and reports labeled elapsed and remaining whole-day counts rather than an ended message before that timestamp.
+  Expected: The helper identifies the season as C7S4, shows the August 20 through November 1, 2026 schedule, prints a nearest-whole-number percentage, and reports labeled elapsed and remaining whole-day counts rather than an ended message before that timestamp. With a current level, for example `fnpr 75`, it also reports the whole-day difference ahead of or behind the pace required to reach level 200 by season end.
   See the [C7S4 variable-expansion postmortem](postmortem/2026-08-24-fn-progress-fish-variable-expansion.md).
 
 - Action: Connect a Pixel 9 over USB, unlock it, set USB mode to

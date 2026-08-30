@@ -34,6 +34,7 @@ EOF
 chmod +x "${tmpdir}/bin/date"
 
 output="$(PATH="${tmpdir}/bin:${PATH}" fish --no-config -c "source '${function_path}'; fn-progress")"
+level_output="$(PATH="${tmpdir}/bin:${PATH}" fish --no-config -c "source '${function_path}'; fn-progress 75")"
 
 if [[ "$output" != *'🚀 Season Start: 2026-08-20 00:00:00'* ]]; then
   printf 'expected August 20 C7S4 season start in output\n%s\n' "$output" >&2
@@ -62,5 +63,10 @@ fi
 
 if [[ "$output" == *'has ended'* ]]; then
   printf 'expected September 10 to remain inside the C7S4 date range\n%s\n' "$output" >&2
+  exit 1
+fi
+
+if [[ "$level_output" != *'🎮 Level 75 is 6 days ahead of level 200 pace.'* ]]; then
+  printf 'expected level 75 to report six days ahead of level 200 pace\n%s\n' "$level_output" >&2
   exit 1
 fi

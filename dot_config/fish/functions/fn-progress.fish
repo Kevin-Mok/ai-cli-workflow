@@ -29,5 +29,18 @@ function fn-progress
     echo "---"
     echo "⏱️ Days: $ELAPSED_DAYS elapsed, $REMAINING_DAYS remaining"
     echo "✅ Fortnite C7S4 is $PROGRESS_PERCENT% complete!"
+
+    if test (count $argv) -gt 0
+        set CURRENT_LEVEL $argv[1]
+        set LEVEL_PACE_SECONDS (math "$CURRENT_LEVEL * $TOTAL_DURATION / 200")
+        set PACE_DAYS (math -s0 "($LEVEL_PACE_SECONDS - $TIME_PASSED) / 86400")
+
+        if test "$PACE_DAYS" -ge 0
+            echo "🎮 Level $CURRENT_LEVEL is $PACE_DAYS days ahead of level 200 pace."
+        else
+            echo "🎮 Level $CURRENT_LEVEL is "(math "-$PACE_DAYS")" days behind level 200 pace."
+        end
+    end
+
     echo "---"
 end
