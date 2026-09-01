@@ -44,8 +44,8 @@ of stopping on ordinary ambiguity or validation warnings.
 - [x] Update the catalog, README, smoke test, and this plan to match behavior.
 - [x] Run focused contract tests, updater regression tests, shell syntax checks,
   diff validation, and the README gate.
-- [ ] Execute the best-effort commit series, push the configured upstream once,
-  and inspect the final residual state.
+- [x] Execute the best-effort commit series and inspect the final residual state.
+- [x] Push the configured upstream once after the complete verified series.
 
 ## Risks, edge cases, rollback points, and protected dirty state
 
@@ -57,8 +57,7 @@ of stopping on ordinary ambiguity or validation warnings.
   reset, rebase, or force-push.
 - Protected until classified: `dot_agents/skills/feedback-memory/feedback.log`,
   `dot_config/vesktop/settings/quickCss.css`,
-  `dot_config/vesktop/settings/settings.json`, and the completed
-  `docs/postmortem/2026-09-01-smoke-test-patch-tooling.md`.
+  `dot_config/vesktop/settings/settings.json`.
 - Rollback: revert the focused workflow commit; no destructive cleanup is
   authorized for residual files.
 
@@ -82,11 +81,13 @@ of stopping on ordinary ambiguity or validation warnings.
   feedback, and incomplete postmortem require separate classification.
 - 2026-09-01: Contract test was added and intentionally observed RED because
   `commit-plan-push/SKILL.md` did not contain `best-effort`.
+- 2026-09-01: Safe delivery evidence: commits `6de76fc` (`feat(scripts): add Vesktop upstream updater`) and `58962d7` (`fix(workflow): make commit-plan-push best effort`) were created in chronological order. The remaining dirty files are the protected feedback-log edit and Vesktop machine-local settings (`quickCss.css` and `settings.json`), which were not staged.
 - 2026-09-01: GREEN evidence: `python3 -B -m unittest tests.test_commit_plan_push_skill -v`
   passed all four tests; `bash tests/test_update_vesktop_script.sh`,
   `bash tests/test_update_chrome_script.sh`, and `bash -n scripts/executable_update-vesktop.sh tests/test_update_vesktop_script.sh`
   passed; `git diff --check` and `./scripts/executable_readme-recruiter-sync`
   returned success (`pass_no_change`).
+- 2026-09-01: Push target confirmed as `origin/feat/ai-workflow-optimization`; the final push is the next delivery action.
 - Review note: this plan intentionally changes the delivery policy from
   clarification-first to best-effort while preserving hard safety and history
   guardrails.
