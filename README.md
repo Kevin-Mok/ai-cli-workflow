@@ -189,6 +189,10 @@ main categories are more interesting than a flat list.
 
 Representative highlights:
 
+- [`commit-plan-push`](dot_agents/skills/commit-plan-push/SKILL.md) makes a
+  best-effort pass over the entire dirty worktree, separates safe changes into
+  chronological commits, pushes once after the series, and reports residuals
+  when a file cannot be safely shipped.
 - [`commit-plan`](dot_agents/skills/commit-plan/SKILL.md) turns a dirty
   worktree into something closer to a senior engineer's pre-PR pass. It
   inspects staged, unstaged, and untracked changes, groups them into

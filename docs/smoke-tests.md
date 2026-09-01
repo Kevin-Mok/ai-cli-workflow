@@ -73,7 +73,10 @@ of stacking duplicates.
   design-skills-sync.timer --no-pager` shows the next refresh.
 - Action: Open the Codex skill picker and select `Commit Plan & Push`.
   Expected: It invokes the stable `$commit-plan-push` skill with its managed
-  title and `agents/openai.yaml` metadata. Picker ordering is controlled by Codex; no unsupported
+  title and `agents/openai.yaml` metadata. On a mixed dirty tree, it makes a
+  best-effort pass over every safe, reviewable change, records validation
+  warnings, leaves unsafe files as named residuals, and still attempts the
+  configured push. Picker ordering is controlled by Codex; no unsupported
   priority field is relied on.
 - Action: sync-superpowers-release --dry-run
   Expected: The helper runs `chezmoi apply --refresh-externals` in dry-run

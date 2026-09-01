@@ -197,10 +197,11 @@ manual helper continues to support an alternate `LINUX_CONFIG_SOURCE`.
 
 ## Git Workflow
 
-- [`commit-plan-push`](commit-plan-push/SKILL.md): Plans, safely commits, and
-  pushes the current intended dirty worktree in chronological commit order on
-  an explicit request, preserving safety stops for unrelated changes, failed
-  validation, README-gate blockers, and unclear upstreams.
+- [`commit-plan-push`](commit-plan-push/SKILL.md): Makes a best-effort pass over
+  the entire dirty worktree on an explicit request, committing every safe,
+  reviewable group in chronological order and pushing once after the series.
+  It reports validation warnings, unsafe residuals, and push failures without
+  rewriting history or abandoning independent safe changes.
 - [`commit-plan`](commit-plan/SKILL.md): Plans safe commit boundaries for
   all dirty git changes without staging, committing, or pushing, while
   documenting one push after a verified single commit or one push after

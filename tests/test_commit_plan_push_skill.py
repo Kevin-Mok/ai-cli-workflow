@@ -20,6 +20,16 @@ def read_required(path: Path) -> str:
 
 
 class CommitPlanPushSkillTest(unittest.TestCase):
+    def test_skill_requires_best_effort_delivery_for_safe_dirty_changes(self) -> None:
+        skill = read_required(SKILL_PATH)
+        self.assertIn("best-effort", skill)
+        self.assertIn("Do not stop for ordinary mixed or ambiguous changes", skill)
+        self.assertIn("Always make a best-effort delivery attempt", skill)
+        self.assertIn("continue with independent safe groups", skill)
+        self.assertIn("every safe, reviewable change", skill)
+        self.assertIn("residual", skill)
+        self.assertIn("secrets, credentials, caches, generated output", skill)
+
     def test_skill_frontmatter_preserves_the_stable_slug(self) -> None:
         skill = read_required(SKILL_PATH)
         self.assertTrue(skill.startswith("---\n"))
@@ -36,8 +46,8 @@ class CommitPlanPushSkillTest(unittest.TestCase):
             '  display_name: "Commit Plan & Push"\n'
             '  short_description: "Plan, commit, and push dirty Git work"\n'
             '  default_prompt: "Use $commit-plan-push to inspect the current '
-            'dirty Git worktree, create the smallest safe commit series, and '
-            'push it after verification."\n'
+            'dirty Git worktree, make a best-effort safe commit series, push it '
+            'after verification, and report residuals."\n'
             'policy:\n'
             '  allow_implicit_invocation: false\n'
         )
