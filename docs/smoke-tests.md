@@ -243,7 +243,7 @@ of stacking duplicates.
   and the live Codex config is approved to overwrite the tracked copy.
   Expected: The live `~/.codex/config.toml` and `~/.gitconfig` overwrite their
   tracked sources, ChezMoi force-applies only those two targets without prompts,
-  then applies other targets normally; shortcuts regenerate, Fish reloads, and
+  then applies other targets normally; shortcuts regenerate, the helper returns to the invoking Fish session, and
   one bold `REFRESH COMPLETE` line confirms the successful workflow.
 - Action: Run `fish -c 'backup-phone-storage'` from a machine that can
   reach the phone over SSH on port `8022`.
@@ -328,6 +328,14 @@ of stacking duplicates.
 
 ## Terminal
 
+- Action: ./scripts/executable_install-chatgpt-linux
+  Expected: On Ubuntu 24.04/26.04, Debian 13, or Fedora 43/44 with an x64 or
+  ARM64 processor, the script prints the matching official `.deb` or `.rpm`
+  URL, downloads it to temporary storage, and prompts for sudo only for the
+  final `apt install` or `dnf install`; unsupported OS versions and processor
+  architectures fail before download or elevation. On apt hosts, installation
+  completes without the `_apt` sandbox warning about an inaccessible temporary
+  package file.
 - Action: Run `./scripts/executable_install-tmux-tpm.sh --help`, then run
   `./scripts/executable_install-tmux-tpm.sh` on a host with tmux configured.
   Expected: Help describes the TPM install/update and `prefix + I` follow-up;

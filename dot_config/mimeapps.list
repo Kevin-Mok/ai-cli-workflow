@@ -21,6 +21,7 @@ x-scheme-handler/eclipse+command=_usr_lib_dbeaver_.desktop
 video/mp4=mpv.desktop
 x-scheme-handler/discord=vesktop.desktop
 x-scheme-handler/fnlb=fnlb.desktop
+x-scheme-handler/codex=chatgpt.desktop
 
 [Added Associations]
 x-scheme-handler/http=firefox.desktop;

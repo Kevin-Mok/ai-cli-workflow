@@ -4,6 +4,7 @@ set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 function_path="${repo_root}/dot_config/fish/functions/refresh-config.fish"
+task_function_path="${repo_root}/dot_config/fish/functions/refresh-config-task.fish"
 
 tmpdir="$(mktemp -d)"
 cleanup() {
@@ -12,6 +13,16 @@ cleanup() {
 trap cleanup EXIT
 
 mkdir -p "${tmpdir}/bin" "${tmpdir}/repo/dot_codex" "${tmpdir}/home/.codex" "${tmpdir}/home/.config/fish"
+
+if rg -q '^\s*exec fish\s*$' "$function_path"; then
+  printf 'expected refresh-config to return after completion instead of replacing the shell\n' >&2
+  exit 1
+fi
+
+if rg -q '^function refresh-config$' "$task_function_path"; then
+  printf 'expected refresh-config-task.fish not to define the refresh-config entrypoint\n' >&2
+  exit 1
+fi
 log_path="${tmpdir}/calls.log"
 real_fish="$(command -v fish)"
 
@@ -136,12 +147,6 @@ fi
 
 if ! grep -Fxq 'sourced-shortcuts' "$log_path"; then
   printf 'expected refresh-config to keep interactive shortcut sourcing\n' >&2
-  cat "$log_path" >&2
-  exit 1
-fi
-
-if ! grep -Fxq 'fish-reload:' "$log_path"; then
-  printf 'expected refresh-config to keep interactive Fish reload\n' >&2
   cat "$log_path" >&2
   exit 1
 fi
