@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+connection_name="netplan-enp42s0"
+
+sudo nmcli connection down "$connection_name"
+sudo nmcli connection up "$connection_name"
