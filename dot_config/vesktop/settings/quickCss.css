@@ -10,6 +10,29 @@
   --font-headline: "Hack", monospace;
   --font-code: "Hack", monospace;
 
+  /* Keep wallpaper sharp */
+  --background-image-blur: 0px !important;
+
+  /* Darken the actual image */
+  --background-filter: brightness(0.42) contrast(1.08)
+    saturate(calc(var(--saturation-factor, 1) * 0.80));
+
+  /* Frosted Glass - darker UI */
+  --serverlist-brightness: 0.35 !important;
+  --left-brightness: 0.35 !important;
+  --middle-brightness: 0.28 !important;
+  --right-brightness: 0.25 !important;
+  --overlay-brightness: 0.40 !important;
+
+  /* ClearVision shading */
+  --background-shading-percent: 100%;
+  --background-shading: rgba(0, 0, 0, 0.68);
+
+  --card-shading: rgba(0, 0, 0, 0.68);
+  --popout-shading: rgba(0, 0, 0, 0.88);
+  --modal-shading: rgba(0, 0, 0, 0.88);
+  --input-shading: rgba(0, 0, 0, 0.76);
+
   /* === BLAZE / ORANGE ACCENTS === */
   --main-color: #ef4d0a;
   --hover-color: #9d1d0d;
