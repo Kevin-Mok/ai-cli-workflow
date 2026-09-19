@@ -70,3 +70,13 @@ if [[ "$level_output" != *'🎮 Level 75 is 6 days ahead of level 200 pace.'* ]]
   printf 'expected level 75 to report six days ahead of level 200 pace\n%s\n' "$level_output" >&2
   exit 1
 fi
+
+if [[ "$level_output" != *'📈 At current pace, 35 days left to reach level 200.'* ]]; then
+  printf 'expected level 75 to report projected days left at current pace\n%s\n' "$level_output" >&2
+  exit 1
+fi
+
+if [[ "$level_output" != *'📊 Average pace: 3.57 levels/day.'* ]]; then
+  printf 'expected level 75 to report an average of 3.57 levels per day\n%s\n' "$level_output" >&2
+  exit 1
+fi

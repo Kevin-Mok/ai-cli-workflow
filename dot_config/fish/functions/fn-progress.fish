@@ -34,12 +34,17 @@ function fn-progress
         set CURRENT_LEVEL $argv[1]
         set LEVEL_PACE_SECONDS (math "$CURRENT_LEVEL * $TOTAL_DURATION / 200")
         set PACE_DAYS (math -s0 "($LEVEL_PACE_SECONDS - $TIME_PASSED) / 86400")
+        set CURRENT_PACE_DAYS (math -s0 "((200 - $CURRENT_LEVEL) * $TIME_PASSED) / $CURRENT_LEVEL / 86400")
+        set AVG_LEVELS_PER_DAY (math -s2 "$CURRENT_LEVEL * 86400 / $TIME_PASSED")
 
         if test "$PACE_DAYS" -ge 0
             echo "🎮 Level $CURRENT_LEVEL is $PACE_DAYS days ahead of level 200 pace."
         else
             echo "🎮 Level $CURRENT_LEVEL is "(math "-$PACE_DAYS")" days behind level 200 pace."
         end
+
+        echo "📊 Average pace: $AVG_LEVELS_PER_DAY levels/day."
+        echo "📈 At current pace, $CURRENT_PACE_DAYS days left to reach level 200."
     end
 
     echo "---"
