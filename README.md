@@ -667,6 +667,9 @@ this.
 
 ### Productivity, File Management, And Scripts
 
+- [`scripts/yt-dl`](scripts/yt-dl) downloads one YouTube video with audio at
+  yt-dlp's best available quality, without a resolution cap or MP4 preference;
+  see [usage, dependencies, and offline/live checks](docs/yt-dl.md).
 - [`dot_taskrc`](dot_taskrc) and [`dot_taskopenrc`](dot_taskopenrc) set
   up Taskwarrior and Taskopen with contexts, urgency tuning, sync
   targets, and note workflows.

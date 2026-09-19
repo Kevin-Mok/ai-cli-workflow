@@ -363,6 +363,15 @@ of stacking duplicates.
 - Action: While still scrolled up in `st`, drag-select older output, press `Ctrl+Shift+C`, then paste it elsewhere with `Ctrl+Shift+V`.
   Expected: The copied text comes from the scrolled-back output, and the copy/paste shortcuts match the normal terminal habit without forcing tmux copy mode for basic selection.
 
+## YouTube Downloader
+
+- Action: ./scripts/yt-dl --help
+  Expected: Shows the URL argument and -o/--output-dir option without requiring downloader dependencies.
+- Action: ./scripts/yt-dl 'https://www.youtube.com/watch?v=oLOzkH0zVZo' -o /tmp/yt-dl-smoke
+  Expected: In a fresh output directory, selects yt-dlp's best available video/audio without a resolution cap or MP4 preference, merges separate streams into MKV without transcoding, and prints the absolute final path. Repeating the command preserves existing media rather than upgrading it. Network/platform failures return nonzero with diagnostics.
+- Action: python3 tests/check_yt_dl_live.py
+  Expected: Retains media in a fresh /tmp/yt-dl-live-* directory and prints PASS only after matching video ID, nonempty file, audio/video streams, duration, and full decode checks succeed. Requires network access, current yt-dlp, ffmpeg, and ffprobe.
+
 ## Remote Access
 
 - Action: tests/scripts/executable_setup-aerc-mail_test.sh
