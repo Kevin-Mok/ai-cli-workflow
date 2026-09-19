@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """Download one YouTube video at yt-dlp's best available quality with audio."""
 import argparse
+from fractions import Fraction
+import json
+import math
 from pathlib import Path
 import re
 import shutil
@@ -31,25 +34,79 @@ def video_url(value):
     return f'https://www.youtube.com/watch?v={video_id}'
 
 
+def video_rank(width, height, fps):
+    """Rank resolution orientation-independently, then frame rate."""
+    width, height, fps = int(width), int(height), float(fps)
+    if min(width, height) <= 0 or not math.isfinite(fps) or fps <= 0:
+        raise ValueError('missing or invalid video dimensions/frame rate')
+    return min(width, height), fps
+
+
+def verify_quality(artifact, url, runtime):
+    """Check actual media against fresh formats, never a stale sidecar."""
+    probe = subprocess.run([
+        'ffprobe', '-v', 'error', '-show_streams', '-of', 'json', str(artifact),
+    ], capture_output=True, text=True, timeout=60)
+    if probe.returncode:
+        raise ValueError(f'quality check: ffprobe failed: {probe.stderr.strip()}')
+    streams = json.loads(probe.stdout)['streams']
+    videos = [s for s in streams if s.get('codec_type') == 'video'
+              and not s.get('disposition', {}).get('attached_pic')]
+    if not videos or not any(s.get('codec_type') == 'audio' for s in streams):
+        raise ValueError('quality check: downloaded file lacks video or audio')
+    video = videos[0]
+    actual = video_rank(video['width'], video['height'],
+                        Fraction(video['avg_frame_rate']))
+    metadata = subprocess.run([
+        'yt-dlp', '--ignore-config', '--no-playlist', *runtime,
+        '--socket-timeout', '30', '--retries', '3',
+        '--skip-download', '--dump-single-json', '--', url,
+    ], capture_output=True, text=True, timeout=180)
+    if metadata.stderr:
+        print(metadata.stderr, end='', file=sys.stderr)
+    if metadata.returncode or 'WARNING:' in metadata.stderr:
+        raise ValueError('quality check inconclusive: format extraction failed or warned; '
+                         'file retained. Update yt-dlp and check its JavaScript runtime.')
+    info = json.loads(metadata.stdout)
+    if info['id'] != parse_qs(urlsplit(url).query)['v'][0]:
+        raise ValueError('quality check: metadata video ID mismatch')
+    candidates = [f for f in info['formats']
+                  if f.get('vcodec') not in (None, 'none')
+                  and f.get('url') and not f.get('has_drm')]
+    if not candidates:
+        raise ValueError('quality check: no available video formats reported')
+    best = max(video_rank(f['width'], f['height'], f['fps']) for f in candidates)
+    # YouTube's nominal 60/30 fps may probe as 60000/1001 or 30000/1001.
+    if actual[0] < best[0] or (actual[0] == best[0] and actual[1] < best[1] - 0.1):
+        raise ValueError(
+            f'quality check FAILED: saved {actual[0]}p at {actual[1]:g} fps; '
+            f'highest reported is {best[0]}p at {best[1]:g} fps. '
+            'File retained; use -o with a fresh directory to download the higher quality.')
+    four_k = '4K or higher verified' if max(video['width'], video['height']) >= 3840 else '4K not reported by yt-dlp'
+    print(f'yt-dl: VERIFIED {video["width"]}x{video["height"]} at {actual[1]:g} fps '
+          f'with audio; highest reported resolution/frame rate; {four_k}.', file=sys.stderr)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('url', type=video_url)
     parser.add_argument('-o', '--output-dir', type=Path,
-                        default=Path.home() / 'Downloads' / 'yt-dl',
-                        help='destination directory (default: ~/Downloads/yt-dl)')
+                        default=Path('/mnt/linux-files-3/yt-vids'),
+                        help='destination directory (default: /mnt/linux-files-3/yt-vids)')
     args = parser.parse_args()
-    for dependency in ('yt-dlp', 'ffmpeg'):
+    for dependency in ('yt-dlp', 'ffmpeg', 'ffprobe'):
         if not shutil.which(dependency):
             print(f'yt-dl: missing {dependency}; install it and ensure it is on PATH', file=sys.stderr)
             return 1
+    runtime = ['--js-runtimes', 'node'] if shutil.which('node') else []
     try:
         output = args.output_dir.expanduser().resolve()
         output.mkdir(parents=True, exist_ok=True)
         result = subprocess.run([
-            'yt-dlp', '--ignore-config', '--no-playlist', '--no-overwrites',
+            'yt-dlp', '--ignore-config', '--no-playlist', '--no-overwrites', *runtime,
             '--no-simulate', '--write-info-json', '--no-progress',
             '--socket-timeout', '30', '--retries', '3',
-            '--format', 'bv*+ba/b',
+            '--format', 'bv*+ba/b', '--format-sort', 'res,fps', '--format-sort-force',
             '--merge-output-format', 'mkv', '--paths', str(output),
             '--output', '%(id)s.%(ext)s', '--print', 'after_move:filepath',
             '--', args.url,
@@ -63,9 +120,11 @@ def main():
         artifact = Path(paths[0]).resolve()
         if artifact.parent != output or not artifact.is_file() or artifact.stat().st_size == 0:
             raise ValueError('downloader reported a missing, empty, or unexpected output file')
+        verify_quality(artifact, args.url, runtime)
         print(artifact)
         return 0
-    except (OSError, ValueError) as error:
+    except (OSError, ValueError, KeyError, TypeError, ZeroDivisionError,
+            subprocess.TimeoutExpired) as error:
         print(f'yt-dl: {error}', file=sys.stderr)
         return 1
 

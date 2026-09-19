@@ -115,3 +115,84 @@ not every available format is guaranteed. No authentication or access controls
 were bypassed. The downloaded media and temporary runtime are retained outside
 the repository. Follow the [usage/handoff notes](../docs/yt-dl.md) for commands,
 the Cursor review prompt, and the proposed Conventional Commit subject.
+
+## 2026-09-19 installed runtime and destination follow-up
+
+Scope: update the obsolete installed executable, verify the user's video, and
+change the default to `/mnt/linux-files-3/yt-vids`, retaining `-o` /
+`--output-dir`. Preserve the quality selector and existing files. Initial Git
+status was clean; the incident document was created during this session.
+
+- [x] Update installed yt-dlp to 2026.08.19.
+- [x] Observe default-directory test fail, then change the default and docs.
+- [x] Run downloader regression tests and verify downloaded media at destination.
+
+Risk: missing/unwritable storage raises the existing actionable filesystem error;
+no fallback to the home drive. Tests must not write fixture media to real storage.
+Rollback: revert the default/docs change; previous installed release was
+2025.10.22 (known to fail this download). No configuration sync is needed for
+Python source and documentation changes. Verify with `python3 -m unittest
+discover -s tests -p 'test_yt_dl*.py' -v`, `./scripts/yt-dl --help`, and ffprobe
+on the completed file. Runtime warning remains a documented limitation.
+
+Evidence: the focused default test failed with actual `~/Downloads/yt-dl` versus
+expected `/mnt/linux-files-3/yt-vids`. After the change,
+`/tmp/yt-dl-runtime-SkdJyn/venv/bin/python -m unittest discover -s tests -p 'test_yt_dl*.py' -v`
+passed all 15 tests, including both existing override forms and real format
+selection. Help displays the new default; `git diff --check` passed. The live
+download exited 0 before changing the default; it and its sidecar were moved
+without overwriting to the requested directory. ffprobe confirmed 3840x2160
+video, audio, 3595.248 seconds, and 4,522,234,467 bytes. No full decode run.
+README, usage, smoke checks, and the linked incident record are updated.
+Suggested commit: `fix: update YouTube download destination and recovery notes`.
+Cursor review prompt: “Review the destination change in scripts/yt-dl and its
+default-directory test; run the downloader tests above and check help against
+docs/yt-dl.md. Preserve quality selection and both output override flags.”
+
+## Automatic post-download quality check
+
+User requires immediate verification inside the download command. Preserve all
+prior uncommitted destination/runtime work. Compare ffprobe's actual video
+resolution and FPS with fresh yt-dlp formats after download, require audio,
+enable Node when installed, and refuse a success claim if format
+extraction warns or fails. Report 4K explicitly. Highest quality here means
+highest listed resolution/FPS; codec/bitrate/HDR superiority is not provable
+from dimensions. Keep stdout path-only and preserve files on verification failure.
+
+- [x] Observe RED for 4K success reporting, lower resolution/FPS and warnings.
+- [x] Implement inline verifier and update usage/README/smoke checks.
+- [x] Run offline regression and live command against the existing 4K file.
+
+Verification: downloader unittest suite, existing video rerun without overwrites,
+and independent review. Risk: fresh extraction can fail after a valid download;
+retain it and return nonzero. Rollback is reverting only this verifier addition.
+
+Review caught a mismatch between default extractor sorting and strict maximum
+resolution/FPS verification. A real-selector RED test chose preferred 1080p
+over 2160p60; selection now forces `res,fps` ahead of other preferences.
+4K classification uses a long edge of at least 3840 pixels so cinematic
+widescreen and portrait footage are recognized. Resolution ranking uses the
+short edge, consistently with yt-dlp. Any extraction warning is inconclusive.
+
+Initial live run of `./scripts/yt-dl 'https://www.youtube.com/watch?v=kDK8-psUjzY'`
+exited 0, reporting VERIFIED 3840x2160 at 23.976 fps with audio and 4K,
+against fresh metadata. It reused the existing file. Node is now explicitly
+enabled, and this live run emitted no extraction warning. Full decode was not
+repeated; this feature checks streams and quality, not every media packet.
+
+Final verification: all 23 downloader tests passed in the retained yt-dlp
+Python environment; the final live command again exited 0 with the 4K
+verification message above. `git diff --check` passed. Tests cover retained
+low-resolution files, stale sidecars, FPS mismatch/tolerance, missing audio,
+missing ffprobe, incomplete extraction, non-4K sources, and real selection.
+Suggested commit: `feat: verify video quality immediately after download`.
+Cursor review prompt: “Review scripts/yt-dl inline verification and both
+downloader test files. Run the documented suite and rerun the existing 4K
+video without overwriting. Confirm stderr quality reporting, path-only stdout,
+and failure when a higher reported resolution/FPS exists.”
+
+Delivery: one coherent downloader commit includes destination, verification,
+tests, README, smoke checks, usage, this plan, and the incident record. Before
+staging, all 23 downloader tests passed again, CLI help matched the documented
+default/override, `git diff --check` passed, and the README gate returned
+`pass_no_change`. Push target: `origin/feat/ai-workflow-optimization`.

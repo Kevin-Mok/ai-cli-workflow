@@ -370,9 +370,9 @@ of stacking duplicates.
 ## YouTube Downloader
 
 - Action: ./scripts/yt-dl --help
-  Expected: Shows the URL argument and -o/--output-dir option without requiring downloader dependencies.
+  Expected: Shows the URL argument, /mnt/linux-files-3/yt-vids default, and -o/--output-dir override without requiring downloader dependencies.
 - Action: ./scripts/yt-dl 'https://www.youtube.com/watch?v=oLOzkH0zVZo' -o /tmp/yt-dl-smoke
-  Expected: In a fresh output directory, selects yt-dlp's best available video/audio without a resolution cap or MP4 preference, merges separate streams into MKV without transcoding, and prints the absolute final path. Repeating the command preserves existing media rather than upgrading it. Network/platform failures return nonzero with diagnostics.
+  Expected: In a fresh output directory, selects yt-dlp's best available video/audio without a resolution cap or MP4 preference, merges separate streams into MKV without transcoding, then automatically checks actual video/audio with ffprobe against fresh yt-dlp formats before printing the absolute final path. Stderr reports VERIFIED resolution/FPS and whether 4K was verified or not reported. Repeating the command preserves existing media; a lower-resolution/FPS existing file fails verification and suggests a fresh -o directory. Inconclusive extraction also returns nonzero. Network/platform failures return nonzero with diagnostics.
 - Action: python3 tests/check_yt_dl_live.py
   Expected: Retains media in a fresh /tmp/yt-dl-live-* directory and prints PASS only after matching video ID, nonempty file, audio/video streams, duration, and full decode checks succeed. Requires network access, current yt-dlp, ffmpeg, and ffprobe.
 

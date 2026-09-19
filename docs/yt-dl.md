@@ -1,7 +1,7 @@
 # YouTube downloader
 
-Run from the repository checkout (Python 3.9+, current yt-dlp, and ffmpeg on
-PATH; ffprobe is also required for the live verification). No sudo is needed.
+Run from the repository checkout (Python 3.9+, current yt-dlp, ffmpeg, and ffprobe on
+PATH). No sudo is needed.
 The wrapper does not install or update dependencies. Follow the
 [yt-dlp installation instructions](https://github.com/yt-dlp/yt-dlp#installation)
 for your environment, including its current JavaScript runtime requirements.
@@ -12,7 +12,9 @@ for your environment, including its current JavaScript runtime requirements.
 ./scripts/yt-dl --help
 ```
 
-The default directory is `~/Downloads/yt-dl`. `-o` abbreviates `--output-dir`.
+The default directory is `/mnt/linux-files-3/yt-vids`. Override it with
+`-o /path/to/videos` or `--output-dir /path/to/videos`. The destination must be
+writable; filesystem errors are reported without falling back to another drive.
 Watch, youtu.be, shorts, live, and embed video URLs are accepted. Playlist-only
 URLs are rejected; playlist and tracking parameters on video links are removed.
 Only one video is downloaded. Ambient yt-dlp configuration is ignored; no
@@ -21,7 +23,8 @@ browser cookies are read.
 The script uses `bv*+ba/b`: yt-dlp's best available video, adding its best
 audio-only stream when the video does not already contain audio, with a combined
 format fallback. There is no resolution cap or MP4/M4A preference. Quality is
-ranked by yt-dlp across the formats its extractor makes available; see the
+ranked with resolution then frame rate first (`--format-sort res,fps
+--format-sort-force`), followed by yt-dlp’s other quality preferences; see the
 [upstream selection rules](https://github.com/yt-dlp/yt-dlp#format-selection).
 Separate streams merge into MKV without transcoding or quality loss. A combined
 download keeps its original container. Files use the video ID, e.g.
@@ -34,8 +37,24 @@ existing same-name media is preserved, not automatically upgraded.
 Success prints one absolute final media path to stdout. Diagnostics go to
 stderr. Exit codes: 0 success, 2 argument error, 1 missing dependency/local
 error; downloader failures preserve yt-dlp's nonzero code, and interruption
-returns 130. Existing files are checked for presence and size, not revalidated
-by the normal download command. Use the live verifier for media integrity.
+returns 130. Immediately after downloading or reusing an existing file, the command runs
+ffprobe and fetches fresh yt-dlp formats. It verifies audio is present and the
+saved resolution/frame rate meet the highest reported video format. A concise
+`VERIFIED` message on stderr explicitly reports 4K dimensions (long edge at least 3840 pixels) or higher, or that
+4K was not reported. Portrait videos use their shorter dimension for resolution.
+
+A lower-resolution/FPS file, missing audio, probe failure, extraction warning,
+or unavailable metadata returns nonzero and prints no success path. The file
+is retained; use `-o` with a fresh directory to replace an older low-quality
+download without overwriting it. This check uses fresh metadata, not an old
+sidecar, and has 60-second probe and 180-second extraction timeouts.
+
+The script enables Node when installed; Deno remains enabled by yt-dlp by
+default. Follow upstream version requirements. Verification means highest
+resolution/frame rate **reported by the extractor**, not proof of every format
+YouTube could offer, HDR/bitrate superiority, or full media integrity. Use the
+live verifier for a full decode. A format-extraction warning deliberately makes
+the quality result inconclusive instead of claiming success.
 
 ## Verification
 
@@ -85,3 +104,6 @@ For Cursor review: “Review scripts/yt-dl and tests/test_yt_dl.py against
 docs/yt-dl.md; run the offline suite and inspect live verification evidence in
 plans/youtube-downloader.md. Preserve unrelated dirty changes and report
 concrete correctness issues.”
+
+The installed executable was updated to 2026.08.19 on September 19; see the
+[installed-version follow-up](postmortem/2026-09-19-yt-dlp-installed-version.md).

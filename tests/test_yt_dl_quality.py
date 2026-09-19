@@ -22,6 +22,7 @@ class QualitySelectionTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             artifact = Path(directory) / 'oLOzkH0zVZo.mkv'
             artifact.write_bytes(b'fixture')
+            namespace['main'].__globals__['verify_quality'] = lambda *args: None
             with patch.object(sys, 'argv', [str(SCRIPT),
                               'https://youtu.be/oLOzkH0zVZo', '-o', directory]), \
                     patch('shutil.which', return_value='/fixture/tool'), \
@@ -31,7 +32,11 @@ class QualitySelectionTest(unittest.TestCase):
                 self.assertEqual(namespace['main'](), 0)
             argv = runner.call_args.args[0]
         selector = argv[argv.index('--format') + 1]
-        with YoutubeDL({'format': selector, 'quiet': True}) as downloader:
+        options = {'format': selector, 'quiet': True}
+        if '--format-sort' in argv:
+            options['format_sort'] = argv[argv.index('--format-sort') + 1].split(',')
+        options['format_sort_force'] = '--format-sort-force' in argv
+        with YoutubeDL(options) as downloader:
             result = downloader.process_ie_result({
                 'id': 'oLOzkH0zVZo', 'title': 'Quality fixture', 'formats': formats,
             }, download=False)
@@ -50,6 +55,20 @@ class QualitySelectionTest(unittest.TestCase):
         ])
         self.assertEqual([f['format_id'] for f in result['requested_formats']],
                          ['webm-2160', 'opus-160'])
+
+    def test_resolution_and_fps_override_source_preference(self):
+        result = self.select([
+            {'format_id': 'preferred-1080', 'url': 'https://example.invalid/low.mp4',
+             'ext': 'mp4', 'vcodec': 'avc1', 'acodec': 'mp4a',
+             'height': 1080, 'width': 1920, 'fps': 60, 'preference': 10},
+            {'format_id': '2160-30', 'url': 'https://example.invalid/4k30.mp4',
+             'ext': 'mp4', 'vcodec': 'avc1', 'acodec': 'mp4a',
+             'height': 2160, 'width': 3840, 'fps': 30, 'preference': 5},
+            {'format_id': '2160-60', 'url': 'https://example.invalid/4k60.mp4',
+             'ext': 'mp4', 'vcodec': 'avc1', 'acodec': 'mp4a',
+             'height': 2160, 'width': 3840, 'fps': 60, 'preference': 0},
+        ])
+        self.assertEqual(result['format_id'], '2160-60')
 
     def test_combined_format_fallback(self):
         result = self.select([
