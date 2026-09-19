@@ -1,0 +1,221 @@
+#!/usr/bin/env python3
+"""Chrome/Chromium now-playing with Spotify fallback for the 4K i3blocks bar."""
+
+from dataclasses import dataclass
+import html
+import json
+import os
+from pathlib import Path
+import re
+import subprocess
+import sys
+import tempfile
+import time
+
+
+OBJECT = "/org/mpris/MediaPlayer2"
+INTERFACE = "org.mpris.MediaPlayer2.Player"
+SPOTIFY = "org.mpris.MediaPlayer2.spotify"
+BROWSERS = ("org.mpris.MediaPlayer2.chromium", "org.mpris.MediaPlayer2.chrome")
+
+
+class Bus:
+    """Bound the whole poll so an unresponsive player cannot stall i3blocks."""
+
+    def __init__(self):
+        self.deadline = time.monotonic() + 3.5
+
+    def run(self, *args):
+        remaining = self.deadline - time.monotonic()
+        if remaining <= 0:
+            return None
+        try:
+            result = subprocess.run(
+                ["busctl", "--user", "--json=short", "--timeout=1", *args],
+                capture_output=True, text=True, check=True,
+                timeout=min(1.5, remaining),
+            )
+            return json.loads(result.stdout) if result.stdout.strip() else None
+        except (OSError, subprocess.SubprocessError, ValueError) as error:
+            print(f"now-playing: D-Bus {args[0]} failed ({type(error).__name__})",
+                  file=sys.stderr)
+            return None
+
+    def properties(self, owner):
+        result = self.run("call", owner, OBJECT, "org.freedesktop.DBus.Properties",
+                          "GetAll", "s", INTERFACE)
+        if (isinstance(result, dict) and result.get("type") == "a{sv}"
+                and isinstance(result.get("data"), list) and len(result["data"]) == 1
+                and isinstance(result["data"][0], dict)):
+            return result["data"][0]
+        return {}
+
+
+def value(properties, key, kind, default=None):
+    entry = properties.get(key)
+    if isinstance(entry, dict) and entry.get("type") == kind:
+        return entry.get("data", default)
+    return default
+
+
+def text(value):
+    if not isinstance(value, str):
+        return ""
+    normalized = " ".join(value.split())
+    # Pango consumes XML; escaping markup alone does not remove invalid controls.
+    return "".join(char for char in normalized if
+                   " " <= char <= "\ud7ff" or "\ue000" <= char <= "\ufffd"
+                   or "\U00010000" <= char <= "\U0010ffff")
+
+
+def source_rank(name):
+    if not isinstance(name, str):
+        return None
+    if any(name == prefix or name.startswith(prefix + ".") for prefix in BROWSERS):
+        return 0
+    return 1 if name == SPOTIFY else None
+
+
+@dataclass
+class Player:
+    name: str
+    owner: str
+    title: str
+    artist: str
+    track_id: str
+    status: str
+    capabilities: frozenset[str]
+
+    @property
+    def identity(self):
+        return [self.track_id, self.title, self.artist]
+
+
+def read_player(bus, name, owner):
+    props = bus.properties(owner)
+    metadata = value(props, "Metadata", "a{sv}", {})
+    status = value(props, "PlaybackStatus", "s")
+    if not isinstance(metadata, dict) or status not in ("Playing", "Paused"):
+        return None
+    title = text(value(metadata, "xesam:title", "s"))
+    if not title:
+        return None
+    artists = value(metadata, "xesam:artist", "as", [])
+    artist = ", ".join(text(item) for item in artists if text(item)) if isinstance(artists, list) else ""
+    # Spotify sometimes exposes its track ID as a string instead of an object path.
+    track_id = text(value(metadata, "mpris:trackid", "o")
+                    or value(metadata, "mpris:trackid", "s"))
+    capabilities = frozenset(key for key in
+                            ("CanControl", "CanPause", "CanPlay", "CanGoPrevious", "CanGoNext")
+                            if value(props, key, "b") is True)
+    return Player(name, owner, title, artist, track_id, status, capabilities)
+
+
+def select_player(bus):
+    entries = bus.run("list", "--no-pager")
+    if not isinstance(entries, list):
+        return None
+    candidates = []
+    # Read the fallback first so slow browser instances cannot exhaust its budget.
+    entries = [entry for entry in entries if isinstance(entry, dict)]
+    entries.sort(key=lambda entry: (entry.get("name") != SPOTIFY, str(entry.get("name", ""))))
+    for entry in entries:
+        if not isinstance(entry, dict):
+            continue
+        name, owner = entry.get("name"), entry.get("connection")
+        rank = source_rank(name)
+        if rank is None or not isinstance(owner, str) or not re.fullmatch(r":\d+\.\d+", owner):
+            continue
+        player = read_player(bus, name, owner)
+        if player and rank == 0 and player.status == "Playing":
+            return player
+        if player:
+            candidates.append((player.status != "Playing", rank, name, player))
+    return min(candidates, key=lambda item: item[:3])[3] if candidates else None
+
+
+def cache_path():
+    return Path(os.environ.get("XDG_CACHE_HOME", Path.home() / ".cache")) / "i3blocks/now-playing.json"
+
+
+def click(bus, path, button):
+    if button not in ("1", "2", "3"):
+        return
+    try:
+        state = json.loads(path.read_text())
+        if not isinstance(state, dict):
+            return
+        # Consume the record before control. If invalidation is impossible,
+        # controls remain disabled even after a previous cache-write failure.
+        path.unlink()
+        age = time.time() - float(state.get("time", 0))
+        owner, name = state.get("owner"), state.get("name")
+        if (not 0 <= age <= 15 or source_rank(name) is None
+                or not isinstance(owner, str) or not re.fullmatch(r":\d+\.\d+", owner)):
+            return
+        player = read_player(bus, name, owner)
+        if not player or player.identity != state.get("identity") or "CanControl" not in player.capabilities:
+            return
+        method, capability = {
+            "1": ("PlayPause", "CanPause" if player.status == "Playing" else "CanPlay"),
+            "2": ("Previous", "CanGoPrevious"),
+            "3": ("Next", "CanGoNext"),
+        }[button]
+        if capability in player.capabilities:
+            bus.run("call", player.owner, OBJECT, INTERFACE, method)
+    except (OSError, ValueError, TypeError):
+        return  # No fresh, valid displayed-player record: never control a fallback.
+
+
+def remember(path, player):
+    temporary = None
+    try:
+        if player is None:
+            path.unlink(missing_ok=True)
+            return
+        path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+        with tempfile.NamedTemporaryFile(mode="w", dir=path.parent, delete=False) as stream:
+            temporary = Path(stream.name)
+            json.dump({"name": player.name, "owner": player.owner,
+                       "identity": player.identity, "time": time.time()}, stream)
+        temporary.replace(path)
+    except OSError as error:
+        # Never retain an old target after rendering a newly selected player.
+        try:
+            path.unlink(missing_ok=True)
+        except OSError:
+            pass  # click() also requires a successful unlink before controlling.
+        print(f"now-playing: cannot save click state ({error.strerror})", file=sys.stderr)
+    finally:
+        if temporary is not None:
+            try:
+                temporary.unlink(missing_ok=True)
+            except OSError:
+                pass
+
+
+def color():
+    path = Path(os.environ.get("NOW_PLAYING_COLORS_FILE", Path.home() / ".cache/wal/colors.sh"))
+    try:
+        match = re.search(r"^color7=['\"](#[0-9a-fA-F]{6})['\"]\s*$", path.read_text(), re.MULTILINE)
+        if match:
+            return match.group(1)
+    except (OSError, UnicodeError):
+        pass
+    return "#cbe4ff"
+
+
+def main():
+    bus, path = Bus(), cache_path()
+    click(bus, path, os.environ.get("BLOCK_BUTTON", ""))
+    player = select_player(bus)
+    remember(path, player)
+    title = player.title if player else ""
+    full = f"{player.artist} - {title}" if player and player.artist else title
+    print(html.escape(full, quote=False))
+    print(html.escape(title, quote=False))
+    print(color())
+
+
+if __name__ == "__main__":
+    main()

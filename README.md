@@ -657,6 +657,21 @@ this.
 - [`scripts/executable_apply-desktop-display-layout`](scripts/executable_apply-desktop-display-layout)
   saves the three-monitor desktop order used by i3: 2048px left, 4K
   middle, and 1080p right.
+- The middle 4K music block uses
+  [`now_playing_mpris`](dot_config/i3blocks/scripts/executable_now_playing_mpris)
+  to follow Chrome/Chromium media (including FlaviBot), with Spotify fallback.
+  Playing tracks take precedence over paused tracks; Chrome wins ties. It polls
+  every five seconds using Python 3 and systemd's `busctl` with JSON support
+  (both available on this Ubuntu desktop). No Discord bot or token is needed.
+  Chrome exposes its selected media session, so other tabs can replace FlaviBot.
+  Left/middle/right clicks control the displayed player when supported; stale
+  or changed-track clicks do nothing. Global media keys remain Spotify-specific.
+  The helper has no CLI options; run
+  `~/.config/i3blocks/scripts/now_playing_mpris` to inspect its three-line output.
+  `NOW_PLAYING_COLORS_FILE` overrides the pywal palette path for diagnostics;
+  click state is private under `${XDG_CACHE_HOME:-~/.cache}/i3blocks/`.
+  Apply tracked changes with `refresh-config` and restart i3 in place to reload
+  the bar command. See the [desktop smoke checks](docs/smoke-tests.md).
 - [`dot_config/i3/config.tmpl`](dot_config/i3/config.tmpl) is the main
   desktop control plane for workspace movement, app assignments,
   launcher bindings, display and audio shortcuts, and layout control.

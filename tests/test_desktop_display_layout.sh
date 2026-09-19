@@ -35,7 +35,7 @@ assert_contains 'status_command i3blocks -c ~/.config/i3blocks/i3blocks-4k.conf'
 assert_contains 'bindsym $mod+minus move workspace to output left' "$i3_path"
 assert_contains 'bindsym $mod+plus move workspace to output right' "$i3_path"
 assert_contains '[spotify]' "$i3blocks_4k_path"
-assert_contains 'command=~/.config/i3blocks/scripts/spotify_mpris' "$i3blocks_4k_path"
+assert_contains 'command=~/.config/i3blocks/scripts/now_playing_mpris' "$i3blocks_4k_path"
 assert_contains 'label=' "$i3blocks_4k_path"
 
 assert_contains '[volume]' "$i3blocks_4k_path"
