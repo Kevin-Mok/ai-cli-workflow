@@ -663,6 +663,12 @@ this.
   Playing tracks take precedence over paused tracks; Chrome wins ties. It polls
   every five seconds using Python 3 and systemd's `busctl` with JSON support
   (both available on this Ubuntu desktop). No Discord bot or token is needed.
+  Chrome media qualifies when it has artist metadata or a title containing
+  nonempty text on both sides of `-`, `–`, or `—` (spaces optional). This lenient
+  format filter allows some non-music videos; songs with neither artist metadata
+  nor a matching title cannot be recognized. Spotify still accepts title-only
+  metadata. Nonmatching Chrome sessions allow another eligible player to appear;
+  with none, the block clears. Matching labels are shown in full, without truncation.
   Chrome exposes its selected media session, so other tabs can replace FlaviBot.
   Left/middle/right clicks control the displayed player when supported; stale
   or changed-track clicks do nothing. Global media keys remain Spotify-specific.

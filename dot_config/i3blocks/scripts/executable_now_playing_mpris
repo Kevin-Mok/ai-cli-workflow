@@ -102,6 +102,10 @@ def read_player(bus, name, owner):
         return None
     artists = value(metadata, "xesam:artist", "as", [])
     artist = ", ".join(text(item) for item in artists if text(item)) if isinstance(artists, list) else ""
+    # Be lenient: structured artist metadata or an artist-title-looking string.
+    # Spotify remains eligible even when its artist metadata is missing.
+    if source_rank(name) == 0 and not artist and not re.search(r"\S.*[-–—].*\S", title):
+        return None
     # Spotify sometimes exposes its track ID as a string instead of an object path.
     track_id = text(value(metadata, "mpris:trackid", "o")
                     or value(metadata, "mpris:trackid", "s"))

@@ -114,6 +114,38 @@ class NowPlayingTest(unittest.TestCase):
     def test_playing_chrome_wins_over_spotify(self):
         self.assertEqual(self.run_block(), ["Logic - Soul Food", "Soul Food", "#112233"])
 
+    def test_browser_accepts_separate_artist_metadata_without_title_separator(self):
+        self.data["players"][":1.50"] = player("I'm Gone", "Logic")
+        self.assertEqual(self.run_block()[0], "Logic - I'm Gone")
+
+    def test_browser_accepts_lenient_artist_title_separators(self):
+        for title in ("Logic - I'm Gone", "Logic–I'm Gone", "Logic — I'm Gone",
+                      "Logic-I'm Gone", "宇多田ヒカル - 光"):
+            with self.subTest(title=title):
+                self.data["players"][":1.50"] = player(title, "")
+                self.assertEqual(self.run_block()[0], title)
+
+    def test_unstructured_browser_title_falls_back_to_spotify(self):
+        self.data["players"][":1.50"] = player("Live Set In KC / Endless Summer Tour #logic", "")
+        self.assertEqual(self.run_block()[0], "Drake - Janice STFU")
+
+    def test_unstructured_browser_title_hides_and_clears_click_state(self):
+        self.data["names"] = {CHROME: ":1.50"}
+        self.run_block()
+        for title in ("A long video title with no artist", "- Missing artist", "Missing title -"):
+            with self.subTest(title=title):
+                self.data["players"][":1.50"] = player(title, "")
+                self.assertEqual(self.run_block(), ["", "", "#112233"])
+                self.assertFalse(self.cache.exists())
+        self.run_block("1")
+        self.assertEqual(self.actions(), [])
+
+    def test_filtered_browser_does_not_mask_matching_browser(self):
+        self.data["players"][":1.50"] = player("Unstructured video", "")
+        self.data["names"][CHROME + "2"] = ":1.51"
+        self.data["players"][":1.51"] = player("Logic - I'm Gone", "")
+        self.assertEqual(self.run_block()[0], "Logic - I'm Gone")
+
     def test_playing_spotify_wins_over_paused_chrome(self):
         self.data["players"][":1.50"]["PlaybackStatus"] = variant("s", "Paused")
         self.assertEqual(self.run_block()[0], "Drake - Janice STFU")
@@ -204,7 +236,8 @@ class NowPlayingTest(unittest.TestCase):
 
     def test_missing_artist_and_color_fallback(self):
         self.colors.write_text("color7='invalid'\n")
-        self.data["players"][":1.50"] = player("Solo", "")
+        self.data["names"] = {SPOTIFY: ":1.649"}
+        self.data["players"][":1.649"] = player("Solo", "")
         self.assertEqual(self.run_block(), ["Solo", "Solo", "#cbe4ff"])
 
     def test_click_uses_previously_displayed_owner(self):
