@@ -15,7 +15,7 @@ def main():
             raise RuntimeError(f'missing dependency: {dependency}')
     output = Path(tempfile.mkdtemp(prefix='yt-dl-live-'))
     print(f'Artifacts retained in {output}', flush=True)
-    script = Path(__file__).resolve().parents[1] / 'scripts' / 'yt-dl'
+    script = Path(__file__).resolve().parents[1] / 'scripts' / 'executable_yt-dl'
     result = subprocess.run([str(script), 'https://www.youtube.com/watch?v=oLOzkH0zVZo',
                              '-o', str(output)], capture_output=True, text=True, timeout=900)
     if result.stderr:
@@ -25,7 +25,12 @@ def main():
     media = Path(result.stdout.strip())
     if not media.is_file() or media.stat().st_size == 0:
         raise RuntimeError('missing or empty media')
-    metadata = json.loads((output / 'oLOzkH0zVZo.info.json').read_text())
+    runtime = ['--js-runtimes', 'node'] if shutil.which('node') else []
+    metadata = json.loads(subprocess.run([
+        'yt-dlp', '--ignore-config', '--no-playlist', *runtime,
+        '--skip-download', '--dump-single-json',
+        'https://www.youtube.com/watch?v=oLOzkH0zVZo',
+    ], capture_output=True, text=True, check=True, timeout=180).stdout)
     if metadata.get('id') != 'oLOzkH0zVZo':
         raise RuntimeError('downloaded metadata ID does not match requested video')
     probe = subprocess.run(['ffprobe', '-v', 'error', '-show_streams', '-show_format',

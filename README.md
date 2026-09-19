@@ -682,10 +682,12 @@ this.
 
 ### Productivity, File Management, And Scripts
 
-- [`scripts/yt-dl`](scripts/yt-dl) downloads one YouTube video with audio at
+- [`yt-dl`](scripts/executable_yt-dl) downloads one YouTube video with audio at
   yt-dlp's best available quality, without a resolution cap or MP4 preference.
   Downloads default to `/mnt/linux-files-3/yt-vids`; override with `-o DIR`.
-  Immediately checks the saved resolution/frame rate against fresh formats and
+  Uses lowercase kebab-case title-only filenames without IDs or JSON sidecars.
+  Shows live download percentage, speed, and ETA, then
+  immediately checks the saved resolution/frame rate against fresh formats and
   reports whether 4K was verified;
   see [usage, dependencies, and offline/live checks](docs/yt-dl.md).
 - [`dot_taskrc`](dot_taskrc) and [`dot_taskopenrc`](dot_taskopenrc) set

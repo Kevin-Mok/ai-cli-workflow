@@ -10,7 +10,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-SCRIPT = Path(__file__).resolve().parents[1] / 'scripts' / 'yt-dl'
+SCRIPT = Path(__file__).resolve().parents[1] / 'scripts' / 'executable_yt-dl'
 
 
 @unittest.skipUnless(importlib.util.find_spec('yt_dlp'), 'requires yt-dlp Python package')
@@ -23,11 +23,16 @@ class QualitySelectionTest(unittest.TestCase):
             artifact = Path(directory) / 'oLOzkH0zVZo.mkv'
             artifact.write_bytes(b'fixture')
             namespace['main'].__globals__['verify_quality'] = lambda *args: None
+            def download(argv, **kwargs):
+                if '--dump-single-json' in argv:
+                    return subprocess.CompletedProcess(argv, 0,
+                        '{"id": "oLOzkH0zVZo", "title": "Quality Fixture"}', '')
+                Path(argv[argv.index('--print-to-file') + 2]).write_text(str(artifact) + '\n')
+                return subprocess.CompletedProcess(argv, 0)
             with patch.object(sys, 'argv', [str(SCRIPT),
                               'https://youtu.be/oLOzkH0zVZo', '-o', directory]), \
                     patch('shutil.which', return_value='/fixture/tool'), \
-                    patch('subprocess.run', return_value=subprocess.CompletedProcess(
-                        [], 0, str(artifact) + '\n')) as runner, \
+                    patch('subprocess.run', side_effect=download) as runner, \
                     contextlib.redirect_stdout(io.StringIO()):
                 self.assertEqual(namespace['main'](), 0)
             argv = runner.call_args.args[0]

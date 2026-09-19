@@ -9,6 +9,8 @@ import re
 import shutil
 import subprocess
 import sys
+import tempfile
+import unicodedata
 from urllib.parse import parse_qs, urlsplit
 
 
@@ -34,6 +36,28 @@ def video_url(value):
     return f'https://www.youtube.com/watch?v={video_id}'
 
 
+def download_stem(title):
+    normalized = unicodedata.normalize('NFKD', title).encode('ascii', 'ignore').decode()
+    slug = re.sub(r'[^a-z0-9]+', '-', normalized.lower()).strip('-')[:160].rstrip('-')
+    return slug or 'video'
+
+
+def fetch_metadata(url, runtime):
+    result = subprocess.run([
+        'yt-dlp', '--ignore-config', '--no-playlist', *runtime,
+        '--socket-timeout', '30', '--retries', '3',
+        '--skip-download', '--dump-single-json', '--', url,
+    ], capture_output=True, text=True, timeout=180)
+    if result.stderr:
+        print(result.stderr, end='', file=sys.stderr)
+    if result.returncode or 'WARNING:' in result.stderr:
+        raise ValueError('metadata extraction failed or warned; update yt-dlp and check its runtime')
+    info = json.loads(result.stdout)
+    if info['id'] != parse_qs(urlsplit(url).query)['v'][0]:
+        raise ValueError('metadata video ID mismatch')
+    return info
+
+
 def video_rank(width, height, fps):
     """Rank resolution orientation-independently, then frame rate."""
     width, height, fps = int(width), int(height), float(fps)
@@ -57,27 +81,16 @@ def verify_quality(artifact, url, runtime):
     video = videos[0]
     actual = video_rank(video['width'], video['height'],
                         Fraction(video['avg_frame_rate']))
-    metadata = subprocess.run([
-        'yt-dlp', '--ignore-config', '--no-playlist', *runtime,
-        '--socket-timeout', '30', '--retries', '3',
-        '--skip-download', '--dump-single-json', '--', url,
-    ], capture_output=True, text=True, timeout=180)
-    if metadata.stderr:
-        print(metadata.stderr, end='', file=sys.stderr)
-    if metadata.returncode or 'WARNING:' in metadata.stderr:
-        raise ValueError('quality check inconclusive: format extraction failed or warned; '
-                         'file retained. Update yt-dlp and check its JavaScript runtime.')
-    info = json.loads(metadata.stdout)
-    if info['id'] != parse_qs(urlsplit(url).query)['v'][0]:
-        raise ValueError('quality check: metadata video ID mismatch')
+    info = fetch_metadata(url, runtime)
     candidates = [f for f in info['formats']
                   if f.get('vcodec') not in (None, 'none')
                   and f.get('url') and not f.get('has_drm')]
     if not candidates:
         raise ValueError('quality check: no available video formats reported')
     best = max(video_rank(f['width'], f['height'], f['fps']) for f in candidates)
-    # YouTube's nominal 60/30 fps may probe as 60000/1001 or 30000/1001.
-    if actual[0] < best[0] or (actual[0] == best[0] and actual[1] < best[1] - 0.1):
+    # Nominal source FPS can differ slightly from muxed/variable-rate timing.
+    fps_tolerance = best[1] * 0.01
+    if actual[0] < best[0] or (actual[0] == best[0] and actual[1] < best[1] - fps_tolerance):
         raise ValueError(
             f'quality check FAILED: saved {actual[0]}p at {actual[1]:g} fps; '
             f'highest reported is {best[0]}p at {best[1]:g} fps. '
@@ -102,24 +115,32 @@ def main():
     try:
         output = args.output_dir.expanduser().resolve()
         output.mkdir(parents=True, exist_ok=True)
-        result = subprocess.run([
-            'yt-dlp', '--ignore-config', '--no-playlist', '--no-overwrites', *runtime,
-            '--no-simulate', '--write-info-json', '--no-progress',
-            '--socket-timeout', '30', '--retries', '3',
-            '--format', 'bv*+ba/b', '--format-sort', 'res,fps', '--format-sort-force',
-            '--merge-output-format', 'mkv', '--paths', str(output),
-            '--output', '%(id)s.%(ext)s', '--print', 'after_move:filepath',
-            '--', args.url,
-        ], stdout=subprocess.PIPE, text=True)
+        print('yt-dl: Fetching video information and starting download...',
+              file=sys.stderr, flush=True)
+        info = fetch_metadata(args.url, runtime)
+        stem = download_stem(info['title'])
+        with tempfile.TemporaryDirectory(prefix='yt-dl-report-') as report_dir:
+            report = Path(report_dir) / 'filepath.txt'
+            result = subprocess.run([
+                'yt-dlp', '--ignore-config', '--no-playlist', '--no-overwrites', *runtime,
+                '--no-simulate', '--no-write-info-json', '--quiet', '--progress',
+                '--socket-timeout', '30', '--retries', '3',
+                '--format', 'bv*+ba/b', '--format-sort', 'res,fps', '--format-sort-force',
+                '--merge-output-format', 'mkv', '--paths', str(output),
+                '--output', stem + '.%(ext)s',
+                '--print-to-file', 'after_move:filepath', str(report),
+                '--', args.url,
+            ], stdout=sys.stderr, text=True)
+            paths = report.read_text().strip().splitlines() if report.exists() else []
         if result.returncode:
             print('yt-dl: download failed; see yt-dlp diagnostics above', file=sys.stderr)
             return result.returncode if result.returncode > 0 else 128 - result.returncode
-        paths = result.stdout.strip().splitlines()
         if len(paths) != 1:
             raise ValueError('downloader did not report exactly one completed file')
         artifact = Path(paths[0]).resolve()
         if artifact.parent != output or not artifact.is_file() or artifact.stat().st_size == 0:
             raise ValueError('downloader reported a missing, empty, or unexpected output file')
+        print('yt-dl: Checking downloaded quality...', file=sys.stderr, flush=True)
         verify_quality(artifact, args.url, runtime)
         print(artifact)
         return 0

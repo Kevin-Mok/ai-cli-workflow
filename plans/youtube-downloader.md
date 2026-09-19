@@ -196,3 +196,132 @@ tests, README, smoke checks, usage, this plan, and the incident record. Before
 staging, all 23 downloader tests passed again, CLI help matched the documented
 default/override, `git diff --check` passed, and the README gate returned
 `pass_no_change`. Push target: `origin/feat/ai-workflow-optimization`.
+
+## Chezmoi executable installation repair
+
+Initial dirty state: user moved scripts/yt-dl to scripts/executable-yt-dl,
+with byte-identical committed content. Preserve it while correcting chezmoi's
+attribute to executable_yt-dl. The installed PATH command is stale and 0644.
+
+- [x] Reproduce with isolated chezmoi apply: expected scripts/yt-dl absent.
+- [x] Correct source name, test paths, README, usage, and smoke checks.
+- [x] Run downloader tests, refresh-config, and Fish PATH help verification.
+
+Risk: refresh-config snapshots live Codex/Git config and applies all targets;
+inspect status afterward and keep unrelated changes out of the repair. No
+manual chmod-only workaround. Rollback restores the old source name but also
+restores the install bug. Verification uses the real deployment test plus
+source/installed byte comparison. See the executable-install postmortem.
+
+Repair verification: all 24 `test_yt_dl*.py` tests passed using the retained
+yt-dlp environment. The real isolated chezmoi apply test failed before the
+rename and passed after. `fish -c 'refresh-config'` exited 0 with REFRESH
+COMPLETE; `fish -c 'command -s yt-dl; yt-dl --help'` resolved
+/home/example/scripts/yt-dl and exited 0. Installed mode is 775, and `cmp`
+confirmed exact source content. Refresh introduced no unrelated dirty files.
+`git diff --check` passed. No new video download was required for this install
+repair. Suggested commit: `fix: install yt-dl as executable through chezmoi`.
+Cursor review: “Verify scripts/executable_yt-dl deploys as ~/scripts/yt-dl; run
+the 24 downloader tests, inspect docs/yt-dl.md and the deployment incident,
+and verify Fish yt-dl --help after refresh-config.”
+
+## Live download progress
+
+Preserve the pending chezmoi deployment repair. User reports downloads look
+idle; explicit --no-progress suppressed updates. Enable --quiet --progress
+to stream percentage/speed/ETA on stderr and preserve stdout's path contract.
+Show fetching and checking status; percentage is only meaningful during transfer.
+
+- [x] RED: percentage test failed because no 50.0% progress appeared.
+- [x] Enable native progress and document stages.
+- [x] Verify regression, real yt-dlp local transfer, and refresh-config deployment.
+
+Risk: unknown total size cannot yield a percentage; separate video/audio
+streams have separate progress. Rollback removes these progress/status options.
+
+Verification: all 25 downloader tests passed. Real local HTTP transfer exposed
+that native progress uses stdout, so the wrapper now forwards child stdout
+directly to parent stderr and collects the final path via --print-to-file in
+a cleaned temporary directory. The corrected real transfer reached 100% and
+the separate report contained only the final path. Final refresh-config
+exited 0 with REFRESH COMPLETE; cmp confirms installed bytes match source.
+The already-running download cannot acquire the new code; subsequent launches
+show progress. Suggested commit: `fix: stream live video download progress`.
+Cursor review: “Run downloader tests and verify percentage output streams to
+stderr, path reports remain separate, and chezmoi installs the current source.”
+
+## Nominal FPS tolerance repair
+
+Preserve all pending installation/progress work. User's portrait 720x1280 file
+probes at 3726/125 = 29.808 fps versus nominal source 30 fps. Fixed 0.1 fps
+tolerance produces a false rejection. Use 1% relative tolerance while requiring
+full resolution and retaining actual FPS in output. This accommodates timing
+variation, not arbitrary FPS loss; 29/25/24 versus 30 and 30 versus 60 fail.
+
+- [x] Reproduce exact 29.808/30 rejection with a regression test.
+- [x] Apply tolerance, update docs, run regressions.
+- [x] Refresh chezmoi and recheck the actual retained video.
+
+Risk: verification allows up to 1% FPS shortfall by design; it remains a
+metadata quality check, not full frame-by-frame integrity analysis. Rollback
+restores 0.1 fps tolerance but reintroduces this false rejection.
+
+Evidence: exact FPS regression failed before implementation, then all 27
+downloader tests passed. refresh-config exited 0. Installed command
+`~/scripts/yt-dl 'https://www.youtube.com/watch?v=hf163Txt_pg'` exited 0:
+VERIFIED 720x1280 at 29.808 fps with audio; 4K not reported. Existing media
+was reused. Suggested commit: `fix: tolerate nominal video frame-rate drift`.
+Cursor review: “Review the 1% FPS threshold, reproduce the new nominal-30
+tests and run all downloader tests; check the retained video and docs.”
+
+## Title filenames without JSON sidecars
+
+User requests lowercase kebab-case video titles and no JSON files. Generate
+an ASCII title slug with lowercase video-ID suffix, capped title length and
+`video` fallback for titles without ASCII letters/digits. Fetch metadata only
+in memory; explicitly disable info sidecars. Preserve existing media/sidecars
+without bulk renaming/deletion. The opt-in live test fetches metadata in memory.
+
+- [x] RED: CLI filename expectation rejects old ID-only output template.
+- [x] Implement title slug and no-sidecar behavior with regressions.
+- [x] Update docs, refresh-config, and verify installed source.
+
+Risk: changing title or naming convention can create a new download; old
+files remain untouched. Lowercase ID suffix greatly reduces title collisions
+but IDs differing only by case can collide. Rollback returns ID-only naming.
+
+Verification: all 28 downloader tests passed, including real format-selection
+and isolated chezmoi deployment tests. Title punctuation/accents, fallback,
+length cap, and no-JSON CLI option are covered. refresh-config exited 0 and
+cmp confirmed the installed source matches. No additional full YouTube
+download was performed for this naming-only change.
+Suggested commit: `feat: name videos from titles without JSON sidecars`.
+Cursor review: “Run test_yt_dl*.py with yt-dlp installed; inspect title slug
+handling and no-write-info-json, and confirm deployed source matches.”
+
+## Title-only filename correction
+
+User explicitly excludes video IDs. Remove the suffix while preserving ASCII
+lowercase kebab-case normalization, 160-character cap, no JSON sidecars,
+progress, quality checks, and existing-file preservation. Same-title videos
+need separate -o directories; no-overwrites prevents replacing existing media
+but quality verification cannot establish identity. Earlier ID-suffix design
+is superseded. No bulk rename of old files requested.
+
+- [x] RED: title-only CLI test fails against the ID-suffixed implementation.
+- [x] Remove suffix and update naming tests/docs.
+- [x] Run regressions and refresh-config; compare installed source.
+
+Rollback restores the suffix. Suggested commit: `fix: use title-only video filenames`.
+
+Title-only verification: all 28 downloader tests passed; refresh-config exited
+0 and installed/source bytes match. git diff --check passed. No new full
+download was needed. Cursor review: “Check title-only output, no JSON sidecars,
+existing-file preservation, and run the downloader suite.”
+
+Delivery follow-up: ship installation, progress, FPS tolerance, and title-only
+naming together with their tests and documentation as one coherent downloader
+commit. Fresh 28-test suite, README gate (`pass_no_change`), diff check, and
+installed-source comparison all passed. Real transfer and FPS evidence are
+recorded above; no new full decode was performed during delivery.
+Push destination: origin/feat/ai-workflow-optimization.

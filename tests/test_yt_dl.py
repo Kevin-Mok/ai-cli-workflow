@@ -10,7 +10,7 @@ import sys
 import tempfile
 import unittest
 
-SCRIPT = Path(__file__).resolve().parents[1] / 'scripts' / 'yt-dl'
+SCRIPT = Path(__file__).resolve().parents[1] / 'scripts' / 'executable_yt-dl'
 URL = 'https://www.youtube.com/watch?v=oLOzkH0zVZo'
 
 
@@ -31,28 +31,32 @@ if '--dump-single-json' in a:
     assert '--skip-download' in a and '--ignore-config' in a, a
     if os.environ.get('METADATA_WARNING'):
         print('WARNING: Some formats may be missing', file=sys.stderr)
-    print(json.dumps({'id': 'oLOzkH0zVZo', 'formats': [
-        {'vcodec': 'av01', 'acodec': 'none', 'width': 1920 if os.environ.get('ONLY_1080') else 3840, 'height': 1080 if os.environ.get('ONLY_1080') else 2160, 'fps': 60, 'url': 'https://example.invalid/video'},
-        {'vcodec': 'avc1', 'acodec': 'none', 'width': 1920, 'height': 1080, 'fps': 60, 'url': 'https://example.invalid/low'}]}))
+    print(json.dumps({'id': 'oLOzkH0zVZo', 'title': 'My VIDEO: A Great Day!', 'formats': [
+        {'vcodec': 'av01', 'acodec': 'none', 'width': 1920 if os.environ.get('ONLY_1080') else 3840, 'height': 1080 if os.environ.get('ONLY_1080') else 2160, 'fps': float(os.environ.get('SOURCE_FPS', '60')), 'url': 'https://example.invalid/video'},
+        {'vcodec': 'avc1', 'acodec': 'none', 'width': 1920, 'height': 1080, 'fps': float(os.environ.get('SOURCE_FPS', '60')), 'url': 'https://example.invalid/low'}]}))
     sys.exit(0)
-required = ['--ignore-config', '--no-playlist', '--no-overwrites', '--no-simulate', '--write-info-json']
+required = ['--ignore-config', '--no-playlist', '--no-overwrites', '--no-simulate', '--no-write-info-json']
 assert all(x in a for x in required), a
 assert a[-2] == '--' and a[-1] == 'https://www.youtube.com/watch?v=oLOzkH0zVZo', a
-assert a[a.index('--print') + 1] == 'after_move:filepath', a
-assert a[a.index('--output') + 1] == '%(id)s.%(ext)s', a
+assert a[a.index('--print-to-file') + 1] == 'after_move:filepath', a
+assert a[a.index('--output') + 1] == 'my-video-a-great-day.%(ext)s', a
 assert a[a.index('--format') + 1] == 'bv*+ba/b', a
 assert a[a.index('--merge-output-format') + 1] == 'mkv', a
 if os.environ.get('FAIL_DOWNLOAD'):
     print('fixture network failure', file=sys.stderr)
     sys.exit(7)
-out = pathlib.Path(a[a.index('--paths') + 1]) / 'oLOzkH0zVZo.mp4'
+if '--progress' in a and '--no-progress' not in a:
+    assert '--quiet' in a, a
+    print('[download] 50.0% at 1MiB/s ETA 00:01', flush=True)
+out = pathlib.Path(a[a.index('--paths') + 1]) / 'my-video-a-great-day.mp4'
 if not os.environ.get('MISSING_OUTPUT'):
     if not out.exists():
         out.write_bytes(b'' if os.environ.get('EMPTY_OUTPUT') else b'fixture media')
 if not os.environ.get('NO_REPORT'):
-    print(out)
-if os.environ.get('MULTIPLE_REPORTS'):
-    print(out)
+    report = pathlib.Path(a[a.index('--print-to-file') + 2])
+    report.write_text(str(out) + chr(10))
+    if os.environ.get('MULTIPLE_REPORTS'):
+        report.write_text((str(out) + chr(10)) * 2)
 ''')
         fake.chmod(0o755)
         (self.bin / 'ffmpeg').symlink_to('/bin/true')
@@ -74,6 +78,13 @@ print(json.dumps({'streams': [
         return subprocess.run([sys.executable, str(SCRIPT), *args],
                               env=self.env, capture_output=True, text=True)
 
+    def test_title_slug_is_safe_lowercase_kebab_case(self):
+        slug = runpy.run_path(str(SCRIPT))['download_stem']
+        self.assertEqual(slug('Café / HELLO: 100%!'),
+                         'cafe-hello-100')
+        self.assertEqual(slug('🎵'), 'video')
+        self.assertLessEqual(len(slug('a' * 500)), 160)
+
     def test_help_without_dependencies(self):
         self.env['PATH'] = ''
         result = self.invoke('--help')
@@ -91,9 +102,10 @@ print(json.dumps({'streams': [
     def test_download_with_spaces_and_playlist_removed(self):
         result = self.invoke(URL + '&list=ignored', '--output-dir', str(self.output))
         self.assertEqual(result.returncode, 0, result.stderr)
-        target = self.output / 'oLOzkH0zVZo.mp4'
+        target = self.output / 'my-video-a-great-day.mp4'
         self.assertEqual(result.stdout.strip(), str(target))
         self.assertTrue(target.is_file())
+        self.assertEqual(list(self.output.glob('*.json')), [])
 
     def test_short_url_normalized(self):
         result = self.invoke('https://youtu.be/oLOzkH0zVZo?t=1', '-o', str(self.output))
@@ -110,6 +122,13 @@ print(json.dumps({'streams': [
         mkdir.assert_called_once_with(Path('/mnt/linux-files-3/yt-vids'),
                                       parents=True, exist_ok=True)
 
+    def test_percentage_progress_on_stderr(self):
+        result = self.invoke(URL, '-o', str(self.output))
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn('50.0%', result.stderr)
+        self.assertIn('Checking downloaded quality', result.stderr)
+        self.assertEqual(result.stdout.strip(), str(self.output / 'my-video-a-great-day.mp4'))
+
     def test_immediate_4k_verification(self):
         result = self.invoke(URL, '-o', str(self.output))
         self.assertEqual(result.returncode, 0, result.stderr)
@@ -119,7 +138,7 @@ print(json.dumps({'streams': [
 
     def test_existing_lower_resolution_is_not_success(self):
         self.output.mkdir()
-        target = self.output / 'oLOzkH0zVZo.mp4'
+        target = self.output / 'my-video-a-great-day.mp4'
         target.write_bytes(b'old 1080p file')
         (self.output / 'oLOzkH0zVZo.info.json').write_text('{"height": 1080}')
         self.env['LOW_QUALITY'] = '1'
@@ -128,7 +147,7 @@ print(json.dumps({'streams': [
         self.assertIn('2160', result.stderr)
         self.assertEqual(target.read_bytes(), b'old 1080p file')
         self.assertEqual(result.stdout, '')
-        self.assertTrue((self.output / 'oLOzkH0zVZo.mp4').is_file())
+        self.assertTrue((self.output / 'my-video-a-great-day.mp4').is_file())
 
     def test_lower_fps_is_not_highest_quality(self):
         self.env['LOW_FPS'] = '1'
@@ -157,6 +176,23 @@ print(json.dumps({'streams': [
         self.assertNotEqual(result.returncode, 0)
         self.assertNotIn('VERIFIED', result.stderr)
 
+    def test_nominal_30_fps_accepts_small_timing_variation(self):
+        self.env['SOURCE_FPS'] = '30'
+        self.env['PROBE_FPS'] = '3726/125'
+        result = self.invoke(URL, '-o', str(self.output))
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn('29.808 fps', result.stderr)
+        self.assertIn('VERIFIED', result.stderr)
+
+    def test_nominal_30_fps_rejects_meaningful_loss(self):
+        self.env['SOURCE_FPS'] = '30'
+        for rate in ('29/1', '25/1', '24/1'):
+            with self.subTest(rate=rate):
+                self.env['PROBE_FPS'] = rate
+                result = self.invoke(URL, '-o', str(self.output))
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn('quality check FAILED', result.stderr)
+
     def test_missing_audio_fails_quality_check(self):
         self.env['NO_AUDIO'] = '1'
         result = self.invoke(URL, '-o', str(self.output))
@@ -165,7 +201,7 @@ print(json.dumps({'streams': [
 
     def test_existing_media_preserved(self):
         self.output.mkdir()
-        target = self.output / 'oLOzkH0zVZo.mp4'
+        target = self.output / 'my-video-a-great-day.mp4'
         target.write_bytes(b'original media')
         result = self.invoke(URL, '-o', str(self.output))
         self.assertEqual(result.returncode, 0, result.stderr)
