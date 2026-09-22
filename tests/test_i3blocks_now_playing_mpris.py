@@ -54,6 +54,11 @@ if data.get("invalid_json"):
 if args == ["list", "--no-pager"]:
     print(json.dumps([{"name": name, "connection": owner}
                       for name, owner in data["names"].items()]))
+elif args[:6] == ["call", "org.freedesktop.DBus", "/org/freedesktop/DBus",
+                  "org.freedesktop.DBus", "GetConnectionUnixProcessID", "s"]:
+    assert len(args) == 7, args
+    pid = data.get("pids", {}).get(args[6], int(os.environ["TEST_PROFILE_PID"]))
+    print(json.dumps({"type": "u", "data": [pid]}))
 else:
     assert args[0] == "call", args
     assert args[2] == "/org/mpris/MediaPlayer2", args
@@ -72,6 +77,18 @@ else:
 
 
 class NowPlayingTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.profile_process = subprocess.Popen([
+            sys.executable, "-c", "import time; time.sleep(300)",
+            "--user-data-dir=" + str(Path.home() / ".local/share/flavibot-chrome"),
+        ])
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.profile_process.terminate()
+        cls.profile_process.wait(timeout=5)
+
     def setUp(self):
         self.assertTrue(SCRIPT.is_file(), "browser-aware now-playing helper is missing")
         self.temp = tempfile.TemporaryDirectory()
@@ -87,6 +104,7 @@ class NowPlayingTest(unittest.TestCase):
         self.cache = self.path / "cache/i3blocks/now-playing.json"
         self.env = {**os.environ, "PATH": f"{self.path}:{os.environ['PATH']}",
                     "TEST_BUS": str(self.fixture), "TEST_CALLS": str(self.calls),
+                    "TEST_PROFILE_PID": str(self.profile_process.pid),
                     "XDG_CACHE_HOME": str(self.path / "cache"),
                     "NOW_PLAYING_COLORS_FILE": str(self.colors)}
         self.env.pop("BLOCK_BUTTON", None)
@@ -125,26 +143,65 @@ class NowPlayingTest(unittest.TestCase):
                 self.data["players"][":1.50"] = player(title, "")
                 self.assertEqual(self.run_block()[0], title)
 
-    def test_unstructured_browser_title_falls_back_to_spotify(self):
-        self.data["players"][":1.50"] = player("Live Set In KC / Endless Summer Tour #logic", "")
-        self.assertEqual(self.run_block()[0], "Drake - Janice STFU")
+    def test_profile_detection_handles_chrome_flattened_arguments(self):
+        helper = runpy.run_path(str(SCRIPT))
+        profile = str(Path.home() / ".local/share/flavibot-chrome")
+        bus = mock.Mock()
+        bus.run.return_value = {"type": "u", "data": [123]}
+        for command in (
+            f"/opt/google/chrome/chrome\0--user-data-dir={profile}\0--new-window\0",
+            f"/opt/google/chrome/chrome --user-data-dir={profile} --new-window\0",
+            f"/opt/google/chrome/chrome\0--user-data-dir\0{profile}\0",
+        ):
+            with self.subTest(command=command), mock.patch.object(Path, "read_bytes", return_value=command.encode()):
+                self.assertTrue(helper["is_flavibot"](bus, ":1.50"))
+        for command in (
+            "/opt/google/chrome/chrome --profile-directory=Profile28",
+            f"/opt/google/chrome/chrome --user-data-dir={profile}-other",
+            f"/opt/google/chrome/chrome --user-data-dir={profile} --user-data-dir=/other",
+            f"/opt/google/chrome/chrome --app=https://example.test/{profile}",
+        ):
+            with self.subTest(command=command), mock.patch.object(Path, "read_bytes", return_value=command.encode()):
+                self.assertFalse(helper["is_flavibot"](bus, ":1.50"))
 
-    def test_unstructured_browser_title_hides_and_clears_click_state(self):
+    def test_regular_chrome_with_artist_or_separator_is_ignored(self):
+        self.data["pids"] = {":1.50": os.getpid()}
+        for title, artist in (("Full Set In KC / Endless Summer Tour", "Bounceific On Twitch"),
+                              ("Artist - Song", "Channel")):
+            with self.subTest(title=title):
+                self.data["players"][":1.50"] = player(title, artist)
+                self.assertEqual(self.run_block()[0], "Drake - Janice STFU")
+
+    def test_dedicated_browser_accepts_title_only_songs(self):
+        self.data["players"][":1.50"] = player("Solo", "")
+        self.assertEqual(self.run_block()[0], "Solo")
+
+    def test_regular_browser_hides_and_clears_click_state(self):
         self.data["names"] = {CHROME: ":1.50"}
         self.run_block()
-        for title in ("A long video title with no artist", "- Missing artist", "Missing title -"):
-            with self.subTest(title=title):
-                self.data["players"][":1.50"] = player(title, "")
-                self.assertEqual(self.run_block(), ["", "", "#112233"])
-                self.assertFalse(self.cache.exists())
-        self.run_block("1")
+        self.data["pids"] = {":1.50": os.getpid()}
+        self.assertEqual(self.run_block("1"), ["", "", "#112233"])
+        self.assertFalse(self.cache.exists())
         self.assertEqual(self.actions(), [])
 
-    def test_filtered_browser_does_not_mask_matching_browser(self):
-        self.data["players"][":1.50"] = player("Unstructured video", "")
+    def test_regular_browser_does_not_mask_dedicated_browser(self):
+        self.data["pids"] = {":1.50": os.getpid()}
+        self.data["players"][":1.50"] = player("Video", "Channel")
         self.data["names"][CHROME + "2"] = ":1.51"
-        self.data["players"][":1.51"] = player("Logic - I'm Gone", "")
+        self.data["players"][":1.51"] = player("I'm Gone", "Logic")
         self.assertEqual(self.run_block()[0], "Logic - I'm Gone")
+
+    def test_playing_youtube_cannot_replace_paused_flavibot(self):
+        self.data["pids"] = {":1.50": os.getpid()}
+        self.data["players"][":1.50"] = player("Anthropic researchers are quitting", "Fireship")
+        self.data["names"][CHROME + "2"] = ":1.51"
+        self.data["players"][":1.51"] = player("Under Pressure", "Logic", "Paused")
+        self.data["players"][":1.649"]["PlaybackStatus"] = variant("s", "Paused")
+        self.assertEqual(self.run_block()[0], "Logic - Under Pressure")
+
+    def test_missing_process_fails_closed_to_spotify(self):
+        self.data["pids"] = {":1.50": 999999999}
+        self.assertEqual(self.run_block()[0], "Drake - Janice STFU")
 
     def test_playing_spotify_wins_over_paused_chrome(self):
         self.data["players"][":1.50"]["PlaybackStatus"] = variant("s", "Paused")

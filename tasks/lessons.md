@@ -71,3 +71,5 @@
 - 2026-09-19: A browser music dashboard can publish usable MPRIS metadata without a site URL. Inspect live player state before adding a Discord bridge, document browser-wide selection, and bind i3block clicks to the last displayed unique owner rather than reselecting a different player at click time. See [FlaviBot now-playing](../docs/postmortem/2026-09-19-flavibot-now-playing.md).
 
 - 2026-09-19: In chezmoi sources, use `executable_` (underscore) for installed commands; Git executable bits and an `executable-` prefix are insufficient. Test a real isolated apply and the installed PATH command, not only checkout execution.
+
+- 2026-09-20: Chrome profile-picker profiles can share one browser process and MPRIS owner. For source-specific media filtering, verify a distinct --user-data-dir process and independent MPRIS identity before recommending profile isolation as a solution. See [YouTube media filter investigation](../docs/postmortem/2026-09-20-youtube-media-filter.md).

@@ -657,19 +657,26 @@ this.
 - [`scripts/executable_apply-desktop-display-layout`](scripts/executable_apply-desktop-display-layout)
   saves the three-monitor desktop order used by i3: 2048px left, 4K
   middle, and 1080p right.
+- [`flavibot-browser`](scripts/executable_flavibot-browser) opens the FlaviBot
+  music player in Chrome with a separate `~/.local/share/flavibot-chrome` data
+  directory. Run `~/scripts/flavibot-browser` after `refresh-config`, then sign
+  in once in that window. It takes no arguments and reuses that directory on
+  later launches. Regular Chrome profile-picker profiles do not isolate media
+  players. Reserve this window for FlaviBot; use your ordinary Chrome window
+  for YouTube and other sites. See the [short usage guide](docs/flavibot-browser.md).
 - The middle 4K music block uses
   [`now_playing_mpris`](dot_config/i3blocks/scripts/executable_now_playing_mpris)
-  to follow Chrome/Chromium media (including FlaviBot), with Spotify fallback.
-  Playing tracks take precedence over paused tracks; Chrome wins ties. It polls
-  every five seconds using Python 3 and systemd's `busctl` with JSON support
-  (both available on this Ubuntu desktop). No Discord bot or token is needed.
-  Chrome media qualifies when it has artist metadata or a title containing
-  nonempty text on both sides of `-`, `–`, or `—` (spaces optional). This lenient
-  format filter allows some non-music videos; songs with neither artist metadata
-  nor a matching title cannot be recognized. Spotify still accepts title-only
-  metadata. Nonmatching Chrome sessions allow another eligible player to appear;
-  with none, the block clears. Matching labels are shown in full, without truncation.
-  Chrome exposes its selected media session, so other tabs can replace FlaviBot.
+  to follow only the dedicated FlaviBot browser, with Spotify fallback.
+  Playing tracks take precedence over paused tracks; FlaviBot wins ties. It polls
+  every five seconds using Python 3 and systemd's `busctl` with JSON support.
+  The helper resolves each browser's D-Bus owner to its process and checks the
+  exact dedicated data directory. Ordinary Chrome media, including YouTube, is
+  ignored even when playing while FlaviBot is paused. If Spotify is playing and
+  FlaviBot is paused, Spotify appears; with both paused, FlaviBot appears.
+  No artist/title regex is required, so title-only songs remain eligible.
+  With no eligible player, the block clears. Titles are displayed in full.
+  This isolates the browser process, not websites within it: keep YouTube out
+  of the dedicated FlaviBot window. No Discord bot or token is needed.
   Left/middle/right clicks control the displayed player when supported; stale
   or changed-track clicks do nothing. Global media keys remain Spotify-specific.
   The helper has no CLI options; run

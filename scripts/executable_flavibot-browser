@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Keep FlaviBot in its own browser process for independent media identification.
+set -euo pipefail
+
+exec google-chrome \
+    "--user-data-dir=$HOME/.local/share/flavibot-chrome" \
+    --no-first-run \
+    --no-default-browser-check \
+    --new-window \
+    https://flavibot.xyz/music-player

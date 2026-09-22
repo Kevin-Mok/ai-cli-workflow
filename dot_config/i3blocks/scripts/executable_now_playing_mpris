@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Chrome/Chromium now-playing with Spotify fallback for the 4K i3blocks bar."""
+"""Dedicated FlaviBot Chrome now-playing with Spotify fallback for the 4K bar."""
 
 from dataclasses import dataclass
 import html
@@ -7,6 +7,7 @@ import json
 import os
 from pathlib import Path
 import re
+import shlex
 import subprocess
 import sys
 import tempfile
@@ -91,7 +92,38 @@ class Player:
         return [self.track_id, self.title, self.artist]
 
 
+def is_flavibot(bus, owner):
+    """Resolve the actual D-Bus owner; ordinary Chrome profiles share a process."""
+    result = bus.run("call", "org.freedesktop.DBus", "/org/freedesktop/DBus",
+                     "org.freedesktop.DBus", "GetConnectionUnixProcessID", "s", owner)
+    if (not isinstance(result, dict) or result.get("type") != "u"
+            or not isinstance(result.get("data"), list) or len(result["data"]) != 1):
+        return False
+    pid = result["data"][0]
+    if type(pid) is not int or pid <= 0:
+        return False
+    try:
+        args = Path(f"/proc/{pid}/cmdline").read_bytes().decode().rstrip("\0").split("\0")
+        # Chrome can rewrite argv into one space-separated process title.
+        if len(args) == 1:
+            args = shlex.split(args[0])
+    except (OSError, UnicodeError, ValueError):
+        return False
+    directories = []
+    for index, arg in enumerate(args):
+        if arg.startswith("--user-data-dir="):
+            directories.append(arg.split("=", 1)[1])
+        elif arg == "--user-data-dir":
+            if index + 1 >= len(args):
+                return False
+            directories.append(args[index + 1])
+    expected = Path.home() / ".local/share/flavibot-chrome"
+    return len(directories) == 1 and Path(directories[0]) == expected
+
+
 def read_player(bus, name, owner):
+    if source_rank(name) == 0 and not is_flavibot(bus, owner):
+        return None
     props = bus.properties(owner)
     metadata = value(props, "Metadata", "a{sv}", {})
     status = value(props, "PlaybackStatus", "s")
@@ -102,10 +134,6 @@ def read_player(bus, name, owner):
         return None
     artists = value(metadata, "xesam:artist", "as", [])
     artist = ", ".join(text(item) for item in artists if text(item)) if isinstance(artists, list) else ""
-    # Be lenient: structured artist metadata or an artist-title-looking string.
-    # Spotify remains eligible even when its artist metadata is missing.
-    if source_rank(name) == 0 and not artist and not re.search(r"\S.*[-–—].*\S", title):
-        return None
     # Spotify sometimes exposes its track ID as a string instead of an object path.
     track_id = text(value(metadata, "mpris:trackid", "o")
                     or value(metadata, "mpris:trackid", "s"))
