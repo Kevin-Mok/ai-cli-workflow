@@ -14,8 +14,11 @@ The Flavibot profile in Chrome's profile picker is **not** this separate window.
 
 The music block updates within five seconds:
 
-- FlaviBot playing: shows its song.
-- FlaviBot paused: keeps its song unless Spotify is playing.
+- Playing: prefixes the selected track with a small, raised `▶`, centered like
+  the paused marker.
+- Paused: prefixes the selected track with a small, optically raised `‖` so it
+  sits centered with breathing room; paused FlaviBot keeps its song unless
+  Spotify is playing.
 - No song loaded: FlaviBot’s generic “FlaviBot - Music Player” metadata is
   hidden, so Spotify is shown if available and the block clears otherwise.
 - FlaviBot closed: uses Spotify, or clears if Spotify is unavailable.

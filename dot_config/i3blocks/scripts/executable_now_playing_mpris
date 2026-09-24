@@ -20,6 +20,8 @@ SPOTIFY = "org.mpris.MediaPlayer2.spotify"
 BROWSERS = ("org.mpris.MediaPlayer2.chromium", "org.mpris.MediaPlayer2.chrome")
 FLAVIBOT_PAGE_TITLE = "FlaviBot - Music Player"
 FLAVIBOT_PAGE_METADATA = ("FlaviBot", "Music Player")
+PLAYING_GLYPH = "▶"
+PAUSED_GLYPH = "‖"
 
 
 class Bus:
@@ -249,10 +251,19 @@ def main():
     player = select_player(bus)
     remember(path, player)
     title = player.title if player else ""
-    full = f"{player.artist} - {title}" if player and player.artist else title
-    print(html.escape(full, quote=False))
-    # The bar prefers short_text when space is constrained; keep the artist there too.
-    print(html.escape(full, quote=False))
+    if player:
+        track = f"{player.artist} - {title}" if player.artist else title
+        track = html.escape(track, quote=False)
+        if player.status == "Playing":
+            state_glyph = f'<span size="x-small" rise="8192">{html.escape(PLAYING_GLYPH, quote=False)}</span>'
+        else:
+            state_glyph = f'<span size="x-small" rise="8192">{html.escape(PAUSED_GLYPH, quote=False)}</span>'
+        full = f"{state_glyph} {track}"
+    else:
+        full = ""
+    print(full)
+    # Track text is escaped above; retain trusted markup for compact state markers.
+    print(full)
     print(color())
 
 

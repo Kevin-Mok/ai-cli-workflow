@@ -7,9 +7,9 @@ the refresh function was first sought at a nonexistent script path, and `bash -n
 was run against a Python helper. The test-writing skill's referenced companion
 file and generic test configuration paths were also absent from this repo. The
 README skill was initially sought under the repo's `.agents` directory rather
-than the installed user skill path. Two later documentation patches had stale
-context and were rejected without changing files. These attempts did not change
-product state; they delayed final checks.
+than the installed user skill path. Several later documentation patches had
+stale context and were rejected without changing files. These attempts did not
+change product state; they delayed final checks.
 
 ## Evidence and root cause
 
@@ -17,9 +17,10 @@ The repository stores `refresh-config` as a Fish function at
 `dot_config/fish/functions/refresh-config.fish`. The i3 now-playing helper is
 Python, so `bash -n` reported a syntax error at its Python tuple declaration.
 The rejected patches expected wording that no longer existed after earlier
-documentation updates. The missing companion/config files reflect this repo's
-layout. The README skill lookup used the wrong root. These mistakes came from
-assuming paths and patch context before checking them.
+documentation updates, including a newly appended plan section. The missing
+companion/config files reflect this repo's layout. The README skill lookup used
+the wrong root. These mistakes came from assuming paths and patch context before
+checking them; the latest patch succeeded after reading the exact file tail.
 
 ## Resolution and verification
 

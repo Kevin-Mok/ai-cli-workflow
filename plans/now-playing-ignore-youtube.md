@@ -177,3 +177,91 @@ in `/tmp/refresh-config-20260924-111055-1306171.log`. Installed helper matches
 the tracked source. Its live output contains `Ariana Grande - twilight zone` in
 both text lines; a fresh live i3blocks status line also contains that label in
 both `full_text` and `short_text`. `git diff --check` exited 0.
+
+## Playback-state glyph follow-up — 2026-09-24
+
+- [x] Add RED regressions for playing and paused labels using the approved
+  `♫` and `‖` glyphs.
+- [x] Prefix both full and short text with the playback-state glyph and leave
+  the no-player output blank.
+- [x] Document the state indicators in the FlaviBot guide and manual smoke test.
+- [x] Run the now-playing and adjacent regressions, refresh configuration, and
+  inspect the installed helper and live status output.
+
+RED evidence: both new cases failed because the current output omitted the state
+marker. No player priority, metadata filtering, or click behavior changes.
+Rollback removes the glyph prefix and restores the unprefixed label expectations.
+
+Verification: `python3 -B -m unittest tests.test_i3blocks_now_playing_mpris -v`
+passed all 39 tests. Spotify and desktop layout regressions, Python AST syntax
+validation, and `git diff --check` passed. Snapshot dry-run passed and
+`fish -ic 'refresh-config'` printed `REFRESH COMPLETE`, exit 0; full log
+`/tmp/refresh-config-20260924-112812-1332655.log` showed no conflicts. The
+installed helper matches the tracked source. Live Spotify output while paused
+contains `‖ Ariana Grande - twilight zone` in both text lines; live i3blocks
+JSON likewise shows the pause mark in both `full_text` and `short_text`. Playing
+state is covered by the `♫` fixture. No player or click behavior was triggered.
+
+## Compact pause marker follow-up — 2026-09-24
+
+- [x] Render only the paused `‖` marker at x-small Pango size; keep track text
+  at its regular size and preserve the markup in both i3blocks label fields.
+- [x] Update paused-output assertions and document the compact marker.
+- [x] Re-run focused and adjacent checks, refresh configuration, and inspect
+  installed/live output.
+
+The first paused-size regression run exposed three verification failures: the
+short label escaped trusted Pango markup, and two existing paused assertions
+still expected a plain glyph. The correction escapes dynamic track text before
+adding markup, emits the same safe assembled label to both fields, and updates
+those assertions. Keep this follow-up in the implementation commit.
+
+Verification: `python3 -B -m unittest tests.test_i3blocks_now_playing_mpris -v`
+passed all 39 tests. Spotify and desktop layout regressions, Python AST syntax
+validation, `git diff --check`, and `fish -ic 'snapshot-codex-config --dry-run'`
+passed. `fish -ic 'refresh-config'` printed `REFRESH COMPLETE`, exit 0; full
+log `/tmp/refresh-config-20260924-113750-1347865.log` showed no conflicts. The
+installed helper matches source. Live helper and i3blocks status JSON both show
+the paused marker as an x-small Pango span before `Ariana Grande - twilight
+zone`. No player controls were invoked.
+
+## Pause marker vertical alignment follow-up — 2026-09-24
+
+- [x] Reproduce the low-hanging pause glyph in the user screenshot and capture
+  the expected baseline adjustment in a failing label regression.
+- [x] Raise only the small Pango pause mark while preserving track size and
+  label spacing; document the centered treatment.
+- [x] Run focused/full now-playing tests, refresh configuration, and inspect
+  installed/live output.
+
+The initial focused assertion failed because the helper emitted no `rise`
+attribute, confirming the missing vertical alignment. One combined patch had a
+stale test context and changed no files; the exact locations were re-read and
+patched successfully. Verification: the focused centered-glyph test and full
+`python3 -B -m unittest tests.test_i3blocks_now_playing_mpris -v` both passed
+(39 tests). Snapshot dry-run and `refresh-config` passed; full log
+`/tmp/refresh-config-20260924-114255-1355876.log` showed no conflicts. Installed
+helper matches source and live i3blocks JSON carries
+`<span size="x-small" rise="8192">‖</span>` in both labels. The raised compact
+marker has not been visually re-screenshot-tested; user confirmation is the
+remaining visual review. No playback controls were triggered.
+
+## Playing triangle follow-up — 2026-09-24
+
+- [x] Replace the playing music note with a compact right-pointing triangle.
+- [x] Match the triangle's Pango size and vertical rise to the paused marker;
+  update tests, README, guide, and smoke-test instructions.
+- [x] Run the focused/full suite, adjacent checks, refresh config, and inspect
+  installed/live output.
+
+RED: `test_playing_state_adds_compact_triangle_to_both_labels` failed against
+the existing note output. A mechanical fixture rewrite initially produced a
+Python syntax error from unescaped attribute quotes; escaping the quotes fixed
+collection. Verification: the focused test and all 39 now-playing tests passed;
+Spotify and desktop layout regressions, AST validation, snapshot dry-run, and
+`git diff --check` passed. `refresh-config` printed `REFRESH COMPLETE`, exit 0;
+log `/tmp/refresh-config-20260924-115151-1370829.log` had no conflicts. The
+installed helper matches source. Live player status was paused during final
+inspection; live JSON shows the compact raised pause marker in both labels.
+Playing triangle output is covered in the focused test. No playback controls
+were triggered.
