@@ -117,3 +117,63 @@ a revert of the atomic fix followed by refresh-config, preserving profile data.
 
 Independent delivery review found no blocking correctness, security, or documentation
 issue. Its stale authorization-note finding is corrected above.
+
+## Empty FlaviBot state follow-up — 2026-09-24
+
+- [x] Reproduce generic `FlaviBot - Music Player` metadata appearing as a song,
+  both as one title and as artist `FlaviBot` plus title `Music Player`; focused
+  regression tests failed against the old selection logic.
+- [x] Exclude those exact generic metadata values from the dedicated FlaviBot
+  source while retaining
+  real paused tracks, title-only tracks, and Spotify fallback.
+- [x] Update the user guide and manual smoke check for the empty-player state.
+- [x] Run focused and adjacent now-playing regressions; refresh the tracked
+  configuration and inspect the installed helper.
+
+Evidence: the generic-title tests failed before the fix, showing page metadata
+instead of Spotify and leaving the placeholder visible when Spotify was absent.
+The screenshot-shaped metadata regression also failed before its matching filter
+was added. The fresh
+`python3 -B -m unittest tests.test_i3blocks_now_playing_mpris -v` run passed all
+36 tests. `bash tests/test_i3blocks_spotify_mpris.sh`,
+`bash tests/test_desktop_display_layout.sh`, Python AST syntax validation, and
+`git diff --check` all exited 0. `fish -ic 'snapshot-codex-config --dry-run'`
+passed; `fish -ic 'refresh-config'` printed `REFRESH COMPLETE` and exited 0; its
+full log showed no conflicts. `cmp` confirmed the installed helper matches the
+tracked source. Running the installed helper produced the current live Spotify
+song, title, and pywal color on three lines. No manual FlaviBot metadata fixture
+was available in the live player, so placeholder behavior is verified by the
+three automated cases. Rollback is to remove the exact-placeholder predicate and
+its regression cases; no profile data changed.
+
+Review note: the filter is scoped to Chrome/Chromium (the isolated FlaviBot
+source); Spotify titles are unaffected. Exact match preserves legitimate
+title-only and paused songs. No i3 restart is needed because the block polls every
+five seconds. The final refresh log at
+`/tmp/refresh-config-20260924-110307-1293793.log` reported no conflicts. No
+unrelated tracked files appeared after refresh.
+
+## Spotify artist visibility follow-up — 2026-09-24
+
+- [x] Capture the live helper output and active i3blocks stream to confirm why
+  the artist was missing: full_text contained `Ariana Grande - twilight zone`,
+  while short_text contained only `twilight zone`.
+- [x] Add a regression requiring Spotify's short_text to retain its artist and
+  make both text fields use the same artist-title label.
+- [x] Run now-playing and adjacent regressions, refresh configuration, and
+  compare the installed helper and live i3blocks output.
+
+The short-text-only regression failed before implementation because it observed
+`Janice STFU` where the bar-visible label must include `Drake`. This changes no
+player selection or click routing. Rollback restores title-only short_text and
+the previous expectation; the artist remains present in full_text.
+
+Verification: the fresh `python3 -B -m unittest
+tests.test_i3blocks_now_playing_mpris -v` run passed all 37 tests. Spotify and
+desktop layout shell regressions and Python AST syntax validation exited 0.
+`fish -ic 'snapshot-codex-config --dry-run'` passed; the final
+`fish -ic 'refresh-config'` emitted `REFRESH COMPLETE`, exit 0, with no conflicts
+in `/tmp/refresh-config-20260924-111055-1306171.log`. Installed helper matches
+the tracked source. Its live output contains `Ariana Grande - twilight zone` in
+both text lines; a fresh live i3blocks status line also contains that label in
+both `full_text` and `short_text`. `git diff --check` exited 0.

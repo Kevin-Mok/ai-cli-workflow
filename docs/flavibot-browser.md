@@ -16,6 +16,8 @@ The music block updates within five seconds:
 
 - FlaviBot playing: shows its song.
 - FlaviBot paused: keeps its song unless Spotify is playing.
+- No song loaded: FlaviBot’s generic “FlaviBot - Music Player” metadata is
+  hidden, so Spotify is shown if available and the block clears otherwise.
 - FlaviBot closed: uses Spotify, or clears if Spotify is unavailable.
 - YouTube in normal Chrome: never appears.
 

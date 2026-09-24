@@ -130,7 +130,12 @@ class NowPlayingTest(unittest.TestCase):
                 if len(args) > 6 and args[6] == "org.mpris.MediaPlayer2.Player"]
 
     def test_playing_chrome_wins_over_spotify(self):
-        self.assertEqual(self.run_block(), ["Logic - Soul Food", "Soul Food", "#112233"])
+        self.assertEqual(self.run_block(), ["Logic - Soul Food", "Logic - Soul Food", "#112233"])
+
+    def test_spotify_short_text_includes_artist(self):
+        self.data["names"] = {SPOTIFY: ":1.649"}
+        self.assertEqual(self.run_block(), ["Drake - Janice STFU",
+                                            "Drake - Janice STFU", "#112233"])
 
     def test_browser_accepts_separate_artist_metadata_without_title_separator(self):
         self.data["players"][":1.50"] = player("I'm Gone", "Logic")
@@ -175,6 +180,20 @@ class NowPlayingTest(unittest.TestCase):
     def test_dedicated_browser_accepts_title_only_songs(self):
         self.data["players"][":1.50"] = player("Solo", "")
         self.assertEqual(self.run_block()[0], "Solo")
+
+    def test_flavibot_page_title_falls_back_to_spotify(self):
+        self.data["players"][":1.50"] = player("FlaviBot - Music Player", "")
+        self.assertEqual(self.run_block()[0], "Drake - Janice STFU")
+
+    def test_flavibot_page_metadata_falls_back_to_spotify(self):
+        self.data["players"][":1.50"] = player("Music Player", "FlaviBot")
+        self.assertEqual(self.run_block()[0], "Drake - Janice STFU")
+
+    def test_flavibot_page_title_without_spotify_clears_block(self):
+        self.data["names"] = {CHROME: ":1.50"}
+        self.data["players"][":1.50"] = player("FlaviBot - Music Player", "")
+        self.assertEqual(self.run_block(), ["", "", "#112233"])
+        self.assertFalse(self.cache.exists())
 
     def test_regular_browser_hides_and_clears_click_state(self):
         self.data["names"] = {CHROME: ":1.50"}

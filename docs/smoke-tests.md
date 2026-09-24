@@ -349,7 +349,9 @@ of stacking duplicates.
 - Action: ~/scripts/flavibot-browser
   Expected: After refresh-config, opens https://flavibot.xyz/music-player in a separate Chrome process using ~/.local/share/flavibot-chrome. Sign in once and start playback. Later launches reuse that directory; existing Chrome profiles are untouched. Follow the [short usage guide](flavibot-browser.md) for daily use. Reserve this window for FlaviBot and use ordinary Chrome for YouTube.
 - Action: ~/.config/i3blocks/scripts/now_playing_mpris
-  Expected: While FlaviBot plays in the dedicated window, emits its Artist - Title, title, and pywal color7 on three lines. The bar follows within five seconds with one music icon. Title-only songs are also eligible; artist/title regex matching is no longer used.
+  Expected: While FlaviBot or Spotify plays, emits its Artist - Title for both full_text and short_text plus pywal color7 on three lines. The bar follows within five seconds with one music icon and retains the artist even when space is constrained. Title-only songs are also eligible; artist/title regex matching is no longer used.
+- Action: Open the dedicated FlaviBot window with no song loaded while Spotify is available, then repeat with Spotify closed.
+  Expected: Generic “FlaviBot - Music Player” metadata never appears, whether exposed as a page-title string or artist “FlaviBot” plus title “Music Player”; the block shows Spotify when available and clears its text and click state otherwise. Real FlaviBot song titles, including title-only songs, remain eligible.
 - Action: Play YouTube in ordinary Chrome, pause FlaviBot in its dedicated window, and pause Spotify.
   Expected: The block retains the paused FlaviBot song and never shows YouTube. Ordinary Chrome is excluded by process identity, regardless of title, channel, or playback status. YouTube opened inside the dedicated FlaviBot window would still qualify; origin is not exposed by Chrome.
 - Action: Play Spotify with dedicated FlaviBot paused, then pause both; close the dedicated FlaviBot window and finally Spotify.

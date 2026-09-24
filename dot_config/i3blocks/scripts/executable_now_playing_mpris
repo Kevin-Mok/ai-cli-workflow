@@ -18,6 +18,8 @@ OBJECT = "/org/mpris/MediaPlayer2"
 INTERFACE = "org.mpris.MediaPlayer2.Player"
 SPOTIFY = "org.mpris.MediaPlayer2.spotify"
 BROWSERS = ("org.mpris.MediaPlayer2.chromium", "org.mpris.MediaPlayer2.chrome")
+FLAVIBOT_PAGE_TITLE = "FlaviBot - Music Player"
+FLAVIBOT_PAGE_METADATA = ("FlaviBot", "Music Player")
 
 
 class Bus:
@@ -134,6 +136,10 @@ def read_player(bus, name, owner):
         return None
     artists = value(metadata, "xesam:artist", "as", [])
     artist = ", ".join(text(item) for item in artists if text(item)) if isinstance(artists, list) else ""
+    is_flavibot_placeholder = (title == FLAVIBOT_PAGE_TITLE
+                               or (artist, title) == FLAVIBOT_PAGE_METADATA)
+    if source_rank(name) == 0 and is_flavibot_placeholder:
+        return None
     # Spotify sometimes exposes its track ID as a string instead of an object path.
     track_id = text(value(metadata, "mpris:trackid", "o")
                     or value(metadata, "mpris:trackid", "s"))
@@ -245,7 +251,8 @@ def main():
     title = player.title if player else ""
     full = f"{player.artist} - {title}" if player and player.artist else title
     print(html.escape(full, quote=False))
-    print(html.escape(title, quote=False))
+    # The bar prefers short_text when space is constrained; keep the artist there too.
+    print(html.escape(full, quote=False))
     print(color())
 
 
