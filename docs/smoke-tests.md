@@ -307,6 +307,15 @@ of stacking duplicates.
 - Action: Launch `codex` from a shell where `~/scripts` shadows the real Codex binary and Graphiti is installed at `/home/example/coding/graphiti/mcp_server`.
   Expected: The wrapper creates or reuses `${XDG_STATE_HOME:-$HOME/.local/state}/codex-launch/graphiti.pid`, appends Graphiti startup output to `graphiti.log`, and then hands off to the real Codex CLI with the original arguments intact.
 
+## USB SATA Disk Initialization
+
+- Action: bash scripts/hdd-init-wizard.sh --help
+  Expected: Usage describes the interactive command, explicit destructive confirmations, and dry-run mode without changing disk or mount state.
+- Action: bash scripts/hdd-init-wizard.sh --dry-run
+  Expected: Diagnostics show block devices, recent USB/storage messages when readable, USB devices when `lsusb` exists, and only whole disks in the selection list. When no USB disk is detected, the output suggests dock power, cable, switch, and port checks. No partition, filesystem, mount, or fstab write occurs.
+- Action: bash scripts/hdd-init-wizard.sh
+  Expected: On a host with a USB SATA disk, the wizard blocks the Ubuntu system disk and any disk with mounted children, requires the exact path and any required `ERASE <path>` phrase, then shows all destructive commands before the final `INITIALIZE <path>` confirmation. Cancel before that final phrase to leave the disk untouched. Do not enter the final phrase as part of this smoke check.
+
 ## Vim
 
 - Action: Open Vim in a terminal on a host using this repo's rendered `~/.vimrc`, then quit immediately with `:q`.

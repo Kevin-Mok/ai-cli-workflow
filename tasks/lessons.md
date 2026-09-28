@@ -1,5 +1,7 @@
 # Lessons
 
+- In Bash prompt helpers that assign caller variables with `printf -v`, keep the helper's own local input variable under a different name; Bash dynamic scoping can otherwise leave the caller unset under `set -u`. Exercise an interactive dry run, not only syntax and non-interactive help paths.
+
 - When a user widens README scope after an initial pass, update the documented surface to include every newly named repo entrypoint, not just the most obvious directories.
 - When a user says a README tech-stack section must be based on the repo, derive it from tracked repo evidence and named core layers instead of generic stack language.
 - When reframing the README, preserve requested navigation and coverage elements from the prior version, especially the hero screenshot, table of contents, and expanded non-AI dotfiles sections.
