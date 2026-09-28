@@ -264,6 +264,14 @@ of stacking duplicates.
   regular file sizes, largest first, using binary units such as
   `2026-08-21 30.5 GiB`. Nested files count, symlinks do not, and equal totals
   put the earlier date first. The command makes no changes and requires no sudo.
+- Action: ./scripts/executable_concat-timestamped-videos /mnt/usb-8tb/concerts/logic /tmp/logic-joined.mp4 --list-only
+  Expected: `/tmp/logic-joined.ffconcat.txt` lists top-level Pixel and iPhone clips in capture-time order, reading Pixel times from filenames and iPhone times from MOV metadata. Other top-level videos, including an existing `logic.mp4`, remain eligible and sort after timestamped clips. It omits the nested `juicy-j` folder, creates no output video, and needs no sudo.
+- Action: ./scripts/executable_concat-timestamped-videos /mnt/usb-8tb/concerts/logic /mnt/usb-8tb/concerts/logic/logic-pair.mp4 --clips PXL_20260928_011900910.mp4 IMG_1377.MOV --list-only
+  Expected: `logic-pair.ffconcat.txt` lists exactly the Pixel clip followed by `IMG_1377.MOV`; it excludes `logic.mp4` and all other clips. No output video is created. Remove the list file or use a fresh output name before repeating the check.
+- Action: ./scripts/executable_concat-timestamped-videos /mnt/usb-8tb/concerts/logic /mnt/usb-8tb/concerts/logic/logic-pair.mp4 --clips PXL_20260928_011900910.mp4 IMG_1377.MOV --reencode
+  Expected: Creates a new SDR H.264/AAC `logic-pair.mp4` with continuous playback and audio across the hard cut. The iPhone HLG source is tone-mapped to SDR, so HDR/Dolby Vision metadata is not retained. The original clips remain unchanged; the command refuses an existing output and needs no sudo.
+- Action: python3 tests/check_concat_boundary.py --directory /mnt/usb-8tb/concerts/logic --seconds 2
+  Expected: Uses `logic.ffconcat.txt` to select the original clips, excluding `logic.mp4` and unrelated camera files; makes a short stream-copy join and contact sheet for each adjacent pair under a printed `/tmp/concat-boundary-*` directory. Each sample decodes successfully. Review every `boundary.png` across the join and note any reported timestamp warnings; the contact sheets cannot assess audio continuity.
 
 ## Claude Code
 

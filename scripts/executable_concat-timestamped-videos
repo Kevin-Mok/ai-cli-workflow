@@ -1,0 +1,200 @@
+#!/usr/bin/env python3
+"""Join timestamp-named camera clips with FFmpeg."""
+
+import argparse
+from datetime import datetime, timezone
+from fractions import Fraction
+import json
+from pathlib import Path
+import re
+import shutil
+import subprocess
+import sys
+
+
+VIDEO_SUFFIXES = {".mp4", ".mov", ".m4v"}
+PIXEL_NAME = re.compile(r"PXL_(\d{8})_(\d{6})(\d{3})?")
+
+
+def fail(message):
+    print(f"concat-timestamped-videos: {message}", file=sys.stderr)
+    return 1
+
+
+def ffconcat_path(path):
+    name = str(path)
+    if "\n" in name or "\r" in name:
+        raise ValueError(f"filename contains a newline: {path}")
+    return "'" + name.replace("'", "'\\''") + "'"
+
+
+def capture_time(path):
+    match = PIXEL_NAME.fullmatch(path.stem)
+    if match:
+        captured = datetime.strptime("".join(match.group(1, 2)), "%Y%m%d%H%M%S")
+        return captured.replace(tzinfo=timezone.utc, microsecond=int(match.group(3) or 0) * 1000)
+
+    if not path.stem.startswith("IMG_"):
+        return datetime.max.replace(tzinfo=timezone.utc)
+
+    try:
+        probe = subprocess.run(
+            ["ffprobe", "-v", "error", "-show_entries", "format_tags=creation_time",
+             "-of", "default=noprint_wrappers=1:nokey=1", str(path)],
+            check=True, capture_output=True, text=True,
+        )
+        captured = datetime.fromisoformat(probe.stdout.strip().replace("Z", "+00:00"))
+    except (OSError, subprocess.CalledProcessError, ValueError) as exc:
+        raise ValueError(f"cannot read capture time for {path}: {exc}") from exc
+    if captured.tzinfo is None:
+        raise ValueError(f"capture time has no timezone for {path}")
+    return captured
+
+
+def media_info(path):
+    try:
+        probe = subprocess.run(
+            ["ffprobe", "-v", "error", "-show_entries",
+             "stream=codec_type,width,height,avg_frame_rate,color_transfer", "-of", "json",
+             str(path)], check=True, capture_output=True, text=True,
+        )
+        streams = json.loads(probe.stdout)["streams"]
+        video = next(stream for stream in streams if stream.get("codec_type") == "video")
+        if not any(stream.get("codec_type") == "audio" for stream in streams):
+            raise ValueError("no audio stream")
+        return video
+    except (OSError, subprocess.CalledProcessError, ValueError, KeyError, StopIteration) as exc:
+        raise ValueError(f"cannot inspect video and audio streams in {path}: {exc}") from exc
+
+
+def reencode_command(clips, output):
+    videos = [media_info(clip) for clip in clips]
+    try:
+        width, height = int(videos[0]["width"]), int(videos[0]["height"])
+        fps = round(Fraction(videos[0]["avg_frame_rate"]))
+    except (KeyError, TypeError, ValueError, ZeroDivisionError) as exc:
+        raise ValueError(f"invalid first-clip video properties: {exc}") from exc
+    if width < 1 or height < 1 or fps < 1:
+        raise ValueError("invalid first-clip dimensions or frame rate")
+    for index, video in enumerate(videos):
+        if video.get("color_transfer") not in (None, "bt709", "arib-std-b67"):
+            raise ValueError(
+                f"unsupported color transfer in {clips[index]}: {video['color_transfer']}"
+            )
+    filters = []
+    for index, video in enumerate(videos):
+        prefix = f"[{index}:v:0]"
+        if video.get("color_transfer") == "arib-std-b67":
+            prefix += (
+                "zscale=t=linear:npl=100,format=gbrpf32le,tonemap=mobius:desat=0,"
+                "zscale=p=bt709:t=bt709:m=bt709:r=tv,"
+            )
+        filters.append(
+            f"{prefix}fps={fps},scale={width}:{height}:force_original_aspect_ratio=decrease,"
+            f"pad={width}:{height}:(ow-iw)/2:(oh-ih)/2,format=yuv420p,"
+            f"setsar=1,setpts=PTS-STARTPTS[v{index}]"
+        )
+        filters.append(
+            f"[{index}:a:0]aresample=48000,asetpts=PTS-STARTPTS[a{index}]"
+        )
+    filters.append("[v0][a0][v1][a1]concat=n=2:v=1:a=1[v][a]")
+    return [
+        "ffmpeg", "-hide_banner", *[arg for clip in clips for arg in ("-i", str(clip))],
+        "-filter_complex", ";".join(filters), "-map", "[v]", "-map", "[a]",
+        "-c:v", "libx264", "-crf", "18", "-preset", "medium", "-pix_fmt", "yuv420p",
+        "-color_primaries", "bt709", "-color_trc", "bt709", "-colorspace", "bt709",
+        "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart", str(output),
+    ]
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Join top-level video clips in capture-time order."
+    )
+    parser.add_argument("directory", type=Path, help="directory containing timestamp-named clips")
+    parser.add_argument("output", type=Path, help="new output video path")
+    parser.add_argument(
+        "--list-only", action="store_true", help="write the FFmpeg concat list without joining clips"
+    )
+    parser.add_argument(
+        "--clips", nargs=2, metavar=("FIRST", "SECOND"),
+        help="join only these two top-level filenames from the directory",
+    )
+    parser.add_argument(
+        "--reencode", action="store_true",
+        help="normalize a selected pair to SDR H.264/AAC for a decodable join",
+    )
+    args = parser.parse_args()
+
+    if args.reencode and not args.clips:
+        return fail("--reencode requires --clips")
+
+    directory = args.directory.expanduser().resolve()
+    output = args.output.expanduser().resolve()
+    if not directory.is_dir():
+        return fail(f"directory does not exist: {directory}")
+    if not output.parent.is_dir():
+        return fail(f"output directory does not exist: {output.parent}")
+    if output.exists():
+        return fail(f"output already exists: {output}")
+
+    if args.clips:
+        if len(set(args.clips)) != 2:
+            return fail("--clips requires two different filenames")
+        if any(Path(name).name != name for name in args.clips):
+            return fail("--clips accepts filenames, not paths")
+        candidates = [directory / name for name in args.clips]
+        if any(
+            not path.is_file() or path.is_symlink() or path.suffix.lower() not in VIDEO_SUFFIXES
+            or path == output for path in candidates
+        ):
+            return fail("--clips requires two top-level regular video files")
+    else:
+        candidates = [
+            path for path in directory.iterdir()
+            if path.is_file() and not path.is_symlink() and path.suffix.lower() in VIDEO_SUFFIXES
+            and path != output
+        ]
+
+    try:
+        clips = sorted(
+            candidates,
+            key=lambda path: (capture_time(path), path.name),
+        )
+    except ValueError as exc:
+        return fail(str(exc))
+    if not clips:
+        return fail(f"no video files found in {directory}")
+
+    list_path = output.with_name(output.stem + ".ffconcat.txt")
+    try:
+        listing = "ffconcat version 1.0\n" + "".join(
+            f"file {ffconcat_path(clip)}\n" for clip in clips
+        )
+        list_path.write_text(listing, encoding="utf-8")
+    except (OSError, ValueError) as exc:
+        return fail(str(exc))
+
+    print(f"Listed {len(clips)} clip(s) in {list_path}")
+    if args.list_only:
+        return 0
+    if not shutil.which("ffmpeg"):
+        return fail("ffmpeg is required but unavailable")
+    if args.reencode:
+        try:
+            command = reencode_command(clips, output)
+        except (ValueError, ZeroDivisionError) as exc:
+            return fail(str(exc))
+    else:
+        command = [
+            "ffmpeg", "-hide_banner", "-f", "concat", "-safe", "0", "-i", str(list_path),
+            "-c", "copy", str(output),
+        ]
+    try:
+        return subprocess.run(command, check=False).returncode
+    except OSError as exc:
+        return fail(str(exc))
+
+
+if __name__ == "__main__":
+    sys.exit(main())
