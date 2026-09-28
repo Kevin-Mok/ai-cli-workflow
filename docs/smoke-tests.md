@@ -259,6 +259,11 @@ of stacking duplicates.
   Expected: The July 28 `.MOV`, `.MP4`, and `.M4V` originals beneath
   `/mnt/ipad/DCIM` copy directly into the J. Cole folder with rsync progress,
   overwriting same-named files and creating no DCIM subdirectories.
+- Action: ./scripts/executable_largest-day-file-size /mnt/usb-8tb/concerts
+  Expected: Three lines report the local dates with the largest combined
+  regular file sizes, largest first, using binary units such as
+  `2026-08-21 30.5 GiB`. Nested files count, symlinks do not, and equal totals
+  put the earlier date first. The command makes no changes and requires no sudo.
 
 ## Claude Code
 

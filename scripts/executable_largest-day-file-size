@@ -1,0 +1,70 @@
+#!/usr/bin/env python3
+"""Report the three local modification days with the largest file totals."""
+
+import argparse
+from collections import defaultdict
+from datetime import datetime
+import os
+from pathlib import Path
+import stat
+import sys
+
+
+def largest_days(root: Path) -> list[tuple[str, int]]:
+    totals: dict[str, int] = defaultdict(int)
+
+    def raise_walk_error(error: OSError) -> None:
+        raise error
+
+    for directory, _, filenames in os.walk(root, onerror=raise_walk_error):
+        for filename in filenames:
+            path = Path(directory) / filename
+            info = path.stat(follow_symlinks=False)
+            if not stat.S_ISREG(info.st_mode):
+                continue
+            day = datetime.fromtimestamp(info.st_mtime).date().isoformat()
+            totals[day] += info.st_size
+
+    if not totals:
+        raise ValueError(f"no regular files found in {root}")
+
+    return sorted(totals.items(), key=lambda item: (-item[1], item[0]))[:3]
+
+
+def human_size(size: int) -> str:
+    if size < 1024:
+        return f"{size} B"
+
+    value = float(size)
+    for unit in ("KiB", "MiB", "GiB", "TiB", "PiB", "EiB"):
+        value /= 1024
+        if value < 1024 or unit == "EiB":
+            return f"{value:.1f} {unit}"
+
+    raise AssertionError("unreachable size unit")
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(
+        description="Show the top three local modification days by total file size."
+    )
+    parser.add_argument("directory", type=Path, help="directory to scan recursively")
+    args = parser.parse_args()
+
+    if not args.directory.is_dir():
+        print(f"largest-day-file-size: not a directory: {args.directory}", file=sys.stderr)
+        return 1
+
+    try:
+        days = largest_days(args.directory)
+    except (OSError, ValueError) as error:
+        print(f"largest-day-file-size: {error}", file=sys.stderr)
+        return 1
+
+    for day, size in days:
+        print(f"{day} {human_size(size)}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
