@@ -579,6 +579,11 @@ video files otherwise. `--concat-list PATH` selects a specific list and
 It retains joined samples and boundary contact sheets under `/tmp` for visual
 review and reports FFmpeg timestamp warnings. No sudo is needed.
 
+For a full stream-copy join, inspect both output stream durations and decode
+frames across the join. FFmpeg can exit successfully while incompatible video
+time bases collapse later video frames into a fraction of a second; see the
+[Logic and iPhone join incident](docs/postmortem/2026-09-28-logic-1377-stream-copy-freeze.md).
+
 ## Reproducibility Through Chezmoi
 
 The productivity gain is not trapped inside one laptop.

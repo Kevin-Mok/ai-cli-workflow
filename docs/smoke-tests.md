@@ -270,6 +270,8 @@ of stacking duplicates.
   Expected: `logic-pair.ffconcat.txt` lists exactly the Pixel clip followed by `IMG_1377.MOV`; it excludes `logic.mp4` and all other clips. No output video is created. Remove the list file or use a fresh output name before repeating the check.
 - Action: ./scripts/executable_concat-timestamped-videos /mnt/usb-8tb/concerts/logic /mnt/usb-8tb/concerts/logic/logic-pair.mp4 --clips PXL_20260928_011900910.mp4 IMG_1377.MOV --reencode
   Expected: Creates a new SDR H.264/AAC `logic-pair.mp4` with continuous playback and audio across the hard cut. The iPhone HLG source is tone-mapped to SDR, so HDR/Dolby Vision metadata is not retained. The original clips remain unchanged; the command refuses an existing output and needs no sudo.
+- Action: ffprobe -v error -show_entries stream=codec_type,duration -of csv=p=0 /mnt/usb-8tb/concerts/logic/logic-pair.mp4
+  Expected: The re-encoded pair has video and audio durations close to the sum of the two source clips; neither stream ends at the first clip boundary. Decode or play frames across that boundary before treating a successful FFmpeg exit as proof of a good join.
 - Action: python3 tests/check_concat_boundary.py --directory /mnt/usb-8tb/concerts/logic --seconds 2
   Expected: Uses `logic.ffconcat.txt` to select the original clips, excluding `logic.mp4` and unrelated camera files; makes a short stream-copy join and contact sheet for each adjacent pair under a printed `/tmp/concat-boundary-*` directory. Each sample decodes successfully. Review every `boundary.png` across the join and note any reported timestamp warnings; the contact sheets cannot assess audio continuity.
 
