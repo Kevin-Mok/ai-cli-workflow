@@ -7,6 +7,29 @@ step or an obvious gap in smoke coverage. Keep entries grouped by area,
 write them as `Action` plus `Expected`, and update stale entries instead
 of stacking duplicates.
 
+## VPS Codex Updates
+
+- Action: ./scripts/executable_fix-vps-codex.sh --help
+  Expected: Usage shows the default VPS, SSH overrides, dry run, prerequisites,
+  and no sudo requirement; it does not connect.
+- Action: ./scripts/executable_fix-vps-codex.sh --dry-run
+  Expected: SSH diagnostics show paths, versions, ownership, inferred npm
+  prefix, and the current Codex Node requirement. No repair files or npm
+  caches are written; unrelated server login hooks remain outside the helper.
+- Action: ./scripts/executable_fix-vps-codex.sh
+  Expected: The helper installs into a user-owned prefix, prints a backup and
+  rollback command if configuration changes, then reports SUCCESS only after
+  a second SSH session runs the ordinary npm update and Codex version command.
+  Repeating this action succeeds without duplicate configuration blocks.
+  Fish cursor sequences or banners without trailing newlines do not cause
+  environment/command-type/version parsing errors. Missing desktop-path
+  warnings can still be printed by the existing VPS shell configuration.
+- Action: ssh example-user@192.0.2.10
+  Expected: In this new terminal, `command -v codex` resolves to the intended
+  user installation and `codex --version` runs. Restart an existing Codex
+  process to use its new executable. See the [repair guide](fix-vps-codex.md)
+  for shell conflicts and configuration rollback.
+
 ## Skills And Docs
 
 - Action: Add or change a repo-tracked skill under `dot_agents/skills/`.

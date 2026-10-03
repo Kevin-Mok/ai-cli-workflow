@@ -79,3 +79,5 @@
 - 2026-09-28: A short `ffmpeg -c copy` probe of an iPhone MOV can lose container `creation_time`; preserve that timestamp explicitly before testing capture-order logic on trimmed samples. See [concat sample metadata loss](../docs/postmortem/2026-09-28-concat-sample-metadata-loss.md).
 
 - 2026-09-28: Before using FFmpeg concat demuxer with `-c copy`, compare video time bases, codec parameters, color formats, and rotation. A zero FFmpeg exit can still produce a frozen second segment; verify video/audio durations and decode across the boundary. See [the Logic/iPhone join postmortem](../docs/postmortem/2026-09-28-logic-1377-stream-copy-freeze.md).
+
+- 2026-10-03: SSH helpers that parse login-shell output must establish a newline boundary after startup; fish can emit cursor-control bytes without a newline. Test every parsed shell command with noisy real fish startup, not only clean PATH fixtures. See [VPS shell handshake](../docs/postmortem/2026-10-03-vps-codex-shell-handshake.md).
