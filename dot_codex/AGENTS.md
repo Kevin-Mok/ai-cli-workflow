@@ -105,8 +105,8 @@ education work:
   `readme-recruiter-sync` skill (or
   `./scripts/executable_readme-recruiter-sync`). The gate requires truthful
   install/bootstrap, day-to-day use, documented command options, repo-grounded
-  tech-stack rationale, and recruiter value. Stop if satisfying it would mix
-  unrelated dirty README work.
+  tech-stack rationale, and recruiter value. Include safely separable README
+  repairs; report remaining findings without blocking eligible commits.
 - When a reusable manual check appears or changes, update
   `docs/smoke-tests.md` in the same change. Use grouped `Action` and
   `Expected` entries; update stale checks rather than duplicating them.
@@ -143,6 +143,14 @@ education work:
   entire vault into standing instructions.
 
 ## Git And Delivery
+
+- Authorized commit workflows make best-effort commits of every eligible change.
+  Prioritize session-touched files and favor including safe related files over
+  omitting them within the requested scope. Ordinary validation, README, or
+  scope-helper problems are warnings: use direct-write evidence when needed,
+  exclude only unsafe or unattributed hunks, and continue with eligible work.
+  Missing upstream or push failure leaves local commits intact. Planning-only
+  requests remain read-only; secrets and unrelated-work exclusions still apply.
 
 - Keep commits focused and chronologically ordered from oldest prerequisite to
   newest follow-up. Use concise Conventional Commit subjects and minimal bodies

@@ -19,7 +19,7 @@ the current repo state.
   source before documenting them.
 - Document only commands the README explicitly tells readers to run.
 - If a documented command has no meaningful flags to explain, say that plainly.
-- If the README cannot be aligned safely in the same change, return `blocked`.
+- If the README cannot be aligned safely in the same change, return `blocked` for that repair, record the finding, and continue eligible commits. README audit failures do not block safe delivery.
 
 ## Required Coverage
 

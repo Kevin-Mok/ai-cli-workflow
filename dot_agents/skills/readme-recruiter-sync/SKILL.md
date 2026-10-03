@@ -15,14 +15,14 @@ consolidated recruiter-facing hook.
 1. Read `references/readme-contract.md`.
 2. Inspect the root `README.md` and the files the current change touches.
 3. Verify whether the README still matches the repository and recruiter-readability bar.
-4. If any issue is fixable now, return `update_in_same_change` and block the commit unless README updates are included.
-5. Return `blocked` only when the README cannot safely be fixed inside the current change scope.
+4. If any issue is fixable now, return `update_in_same_change` and include safe README repairs in the matching commit.
+5. Return `blocked` only for the README repair when it cannot safely be included; report the finding and continue eligible commits.
 
 ## Outcome States
 
 - `pass_no_change`: README is accurate and passes the recruiter-first gate.
 - `update_in_same_change`: README can be made compliant in the same change and must be edited alongside the scope change.
-- `blocked`: README has required fixes but the current commit scope is not safe for in-scope edits.
+- `blocked`: the README repair cannot safely enter scope; report it while continuing eligible commits.
 
 ## Workflow
 
@@ -65,7 +65,7 @@ consolidated recruiter-facing hook.
 7. Choose the final outcome state:
    - `pass_no_change`: no issues.
    - `update_in_same_change`: any fixable README issue is present.
-   - `blocked`: README contract cannot be applied safely in this same change scope.
+   - `blocked`: README repair cannot safely enter this scope; continue other eligible commits.
 
 ## Default Order
 
@@ -78,10 +78,10 @@ Prefer this order unless the user explicitly asks for another order:
 
 ## Commit Flow Rules
 
-- Treat this skill as a hard gate for commit and push workflows in this repo.
+- Run this required check for commit and push workflows. Its non-safety findings are warnings; attempt safe repairs and continue committing eligible work.
 - Never waive the gate because the diff is small.
 - Never fabricate recruiter copy, installation steps, tech-stack claims, or CLI flags.
-- If `README.md` is already dirty for unrelated reasons and this scope needs README edits, call out the conflict and stop instead of guessing merge order.
+- If `README.md` contains unrelated dirty work, include only safely separable in-scope repairs. Report any remaining README conflict without blocking other eligible work.
 
 ## Output Contract
 

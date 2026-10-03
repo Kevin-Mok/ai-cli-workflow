@@ -189,6 +189,10 @@ main categories are more interesting than a flat list.
 
 Representative highlights:
 
+Delivery workflows favor complete coverage within the requested scope, prioritize
+session-touched files and safe companions, and report ordinary check failures
+without abandoning eligible commits. Planning-only requests remain read-only.
+
 - [`commit-plan-push`](dot_agents/skills/commit-plan-push/SKILL.md) makes a
   best-effort pass over the entire dirty worktree, separates safe changes into
   chronological commits, pushes once after the series, and reports residuals
@@ -203,7 +207,8 @@ Representative highlights:
   only the files owned by the current Codex session, with fallback logic
   when a session missed its pre-write baseline; after safe scoping, it
   records validation warnings and repairs truthful README-gate findings
-  before committing.
+  before committing. Missing session metadata falls back to directly observed
+  writes; mixed files contribute their safely separable session hunks.
 - [`open-pr`](dot_agents/skills/open-pr/SKILL.md) turns branch-vs-base
   evidence into reviewer-ready PR titles and bodies, including
   `docs/pr/` sync and ExampleProject DD/Reviewer A handoff context when those
@@ -269,9 +274,9 @@ Representative highlights:
   carries forward durable user corrections through a repo-tracked
   `feedback.log`.
 - [`readme-recruiter-sync`](dot_agents/skills/readme-recruiter-sync/SKILL.md)
-  hard-gates commit workflows on a README that is still truthful about
-  install, usage, command flags, stack rationale, and recruiter-facing
-  value.
+  checks install, usage, command flags, stack rationale, and recruiter-facing
+  value; safe repairs ship with the change and remaining findings are reported
+  without blocking eligible commits.
 - [`openai-docs`](dot_agents/skills/openai-docs/SKILL.md) answers
   OpenAI product and API questions from current official docs first.
 

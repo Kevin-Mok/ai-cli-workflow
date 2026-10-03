@@ -197,6 +197,11 @@ manual helper continues to support an alternate `LINUX_CONFIG_SOURCE`.
 
 ## Git Workflow
 
+Delivery skills make best-effort commits within their authorized scope, prioritize
+session-touched files, and favor including safe related files over omitting them.
+Ordinary validation, README, or helper problems become warnings; missing push
+targets leave local commits intact. Planning-only requests remain read-only.
+
 - [`commit-plan-push`](commit-plan-push/SKILL.md): Makes a best-effort pass over
   the entire dirty worktree on an explicit request, committing every safe,
   reviewable group in chronological order and pushing once after the series.
@@ -209,14 +214,16 @@ manual helper continues to support an alternate `LINUX_CONFIG_SOURCE`.
 - [`commit-dirty`](commit-dirty/SKILL.md): Verifies scope, runs the
   minimum relevant checks, then stages, commits, and pushes the
   intended dirty worktree in the current repository, including explicit
-  `commit dirty` and `commit all dirty` requests, after verification.
+  `commit dirty` and `commit all dirty` requests, reporting failed checks while
+  committing the eligible subset.
 - [`commit-session`](commit-session/SKILL.md): Ships only the files
   dirtied during the current Codex session by combining a pre-write git
   baseline with direct session-touch evidence, including an
   observed-touch-only fallback when the baseline is missing, then pushes
   the safely scoped commit unless the user requests another cadence. It
   records validation failures as warnings and repairs truthful
-  README-gate findings before committing.
+  README-gate findings before committing, using direct observed writes when
+  thread metadata or the scope helper is unavailable.
 - [`open-pr`](open-pr/SKILL.md): Drafts or publishes pull request
   titles and bodies from branch-vs-base evidence, keeps `docs/pr/`
   handoff docs aligned when a repo uses them, and preserves ExampleProject
@@ -252,9 +259,9 @@ manual helper continues to support an alternate `LINUX_CONFIG_SOURCE`.
   questions with current, citation-ready answers grounded in official
   OpenAI documentation.
 - [`readme-recruiter-sync`](readme-recruiter-sync/SKILL.md): Treats the
-  root `README.md` as a hard documentation gate for repo-surface changes,
+  root `README.md` as a required documentation check for repo-surface changes,
   keeping setup, usage, command flags, stack rationale, and recruiter
-  framing aligned with the repo.
+  framing aligned with the repo. Remaining findings do not block eligible commits.
 - [`metaprompt`](metaprompt/SKILL.md): Compiles and sharpens plain-language
   requests into target-aware prompts or reusable `{{variable}}` templates,
   preserving a strict standalone `go` gate for every execution and high-stakes

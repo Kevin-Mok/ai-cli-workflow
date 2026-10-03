@@ -11,6 +11,8 @@ Create a safe, reviewable commit plan for the current repository's dirty changes
 
 This skill is planning-only. It inspects the worktree and proposes commit boundaries, but it must not stage, commit, or push changes.
 
+Favor complete coverage of safe, reviewable dirty files and their related plans, documentation, tests, and companion files. Prioritize files touched during the current session for review without excluding other authorized dirty changes or reversing prerequisite chronology. Ordinary validation and README findings become execution warnings, not blockers for eligible commits. Planning-only requests still perform no Git writes.
+
 ## When to use
 
 Use this skill when the goal is to inspect the current git working tree and turn all dirty changes into a sensible commit plan.
@@ -93,7 +95,7 @@ For each proposed commit:
 - commit number
 - purpose
 - files to include
-- README impact (`include root README`, `no README change expected`, or `blocked by README gate`)
+- README impact (`include root README`, `no README change expected`, or `README warning; repair if safely separable`)
 - why these belong together
   - suggested commit message:
   - a concise Conventional Commit-style subject line
@@ -154,8 +156,8 @@ feat: add retry handling for webhook delivery
 - Prefer multiple small coherent commits over one giant mixed commit.
 - Order proposed commits from the oldest changes to the newest changes; never put a newer follow-up commit before the older change it depends on.
 - If all dirty changes clearly belong together, say so and propose a single commit.
-- If the diff is messy, propose a cleanup or split strategy before proposing final commits.
+- If the diff is messy, propose commits for every eligible group and list excluded items with reasons.
 - If a file is ambiguous, call out the ambiguity instead of guessing.
 - If validation matters, recommend the minimum relevant checks before commit.
-- If `readme-recruiter-sync` likely requires a README update, include it in the matching commit or call out the blocker explicitly.
+- If `readme-recruiter-sync` likely requires a README update, include the safe repair in the matching commit or record the residual warning while planning other eligible work.
 - When suggesting execution, apply the single-commit versus multi-commit delivery rule from Required workflow step 8.

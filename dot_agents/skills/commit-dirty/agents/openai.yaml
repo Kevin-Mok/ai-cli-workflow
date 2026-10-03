@@ -1,7 +1,7 @@
 interface:
   display_name: "Commit Dirty"
   short_description: "Verify, commit, and push the intended dirty git worktree"
-  default_prompt: "Use $commit-dirty to verify the current repo changes and create a clean commit. Single-commit workflows push after the commit passes verification; multi-commit workflows push once after the complete verified series, unless the user explicitly requests another cadence."
+  default_prompt: "Use $commit-dirty to make a best-effort commit of all eligible requested changes, prioritize session-touched files and safe companions, and report validation or README warnings without blocking eligible work. Attempt one upstream push after the local commit or complete commit series and best-effort checks, unless the user explicitly requests another cadence. Report failed checks and push failures accurately."
 
 policy:
   allow_implicit_invocation: false

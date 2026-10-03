@@ -52,7 +52,23 @@ of stacking duplicates.
   failure.
   Expected: The workflow records the failure as a warning, repairs any
   truthful in-scope README finding, and stages only the verified scoped files;
-  unsafe ownership, empty scope, or an unstageable README repair still stops it.
+  unsafe or unattributed hunks and inseparable README repairs are reported
+  residuals while other eligible files still commit.
+- Action: Invoke `commit-session` in a disposable test repository after a
+  directly observed edit, with missing `CODEX_THREAD_ID` or unavailable helper
+  logs, a baseline-dirty touched file, unrelated staged work, and no upstream.
+  Expected: It uses direct-write evidence, prioritizes touched files, includes
+  safe matching docs/plans, commits separable session hunks, preserves unrelated
+  working and staged changes, and reports the missing push target.
+- Action: Invoke `commit-dirty` or `commit-plan-push` with reviewable requested
+  changes, a deliberately failing check, an inseparable README conflict, and a
+  prohibited secret/cache file in a disposable repository.
+  Expected: It commits every eligible change in the requested scope, records
+  failed checks and README residuals, excludes prohibited files, and reports
+  the actual commit and push outcomes without bypassing hooks.
+- Action: Invoke `commit-plan` with the same mixed scope.
+  Expected: It plans every eligible group with warnings and companion docs,
+  preserves prerequisite chronology, and performs no Git writes.
 - Action: Finish a task that introduced a reusable manual verification
   step or exposed a missing smoke check.
   Expected: This document gains or updates a grouped `Action` +
