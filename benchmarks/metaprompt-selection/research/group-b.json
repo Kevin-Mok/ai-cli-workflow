@@ -1,0 +1,574 @@
+{
+  "group": "b",
+  "as_of": "2026-10-03",
+  "retrieved_at": "2026-10-03T22:36:08.317278+00:00",
+  "criteria": {
+    "repository_stars_minimum": 1000,
+    "window90_start": "2026-07-05T00:00:00Z",
+    "window180_start": "2026-04-06T00:00:00Z",
+    "maintenance_counts": "Distinct substantive post-introduction package changes only; initial additions,moves,metadata,formatting,branding and generic bulk boilerplate excluded",
+    "maintainer_count180": "Distinct authors of counted substantive changes; not repository-wide contributors"
+  },
+  "candidates": [
+    {
+      "id": "sentry-prompt-optimizer",
+      "repo": "getsentry/skills",
+      "skill_path": "skills/prompt-optimizer",
+      "entrypoint": "SKILL.md",
+      "revision": "d18b7aa8ba878354e5c348310230e652f7690f9c",
+      "license": "Apache-2.0",
+      "stars": 1034,
+      "stars_scope": "whole repository; no per-skill popularity count",
+      "retrieved_at": "2026-10-03T22:36:06.171123+00:00",
+      "archived": false,
+      "supported_workflows": [
+        "create",
+        "sharpen",
+        "templates",
+        "coding"
+      ],
+      "latest_substantive_change": {
+        "sha": "c190d369bcbaa6cfdd95e9edfdba040506b4db76",
+        "date": "2026-05-04T17:40:37Z",
+        "substantive": true,
+        "classification": "External-context inventory, new output section, runtime workflow and companion specification; not only compaction/formatting",
+        "author": "dcramer"
+      },
+      "changes90": 0,
+      "changes180": 2,
+      "maintainer_count180": 1,
+      "maintainers180": [
+        "dcramer"
+      ],
+      "eligibility": true,
+      "reasons": [
+        "Repository exceeds exact1000star threshold; licensed and nonarchived",
+        "Two inspected substantive post-introduction changes within180days; all four native authoring workflows covered"
+      ],
+      "files": {
+        "LICENSE": "96e78a9ce85795b117c8929887bdb78f88bf23f7b85a31f0872cde4dff7e92cd",
+        "SKILL.md": "b5ba1525d7964004d8664fea9d5028972cca599f346ff4662152479b94e25cb3",
+        "SOURCES.md": "2effb8172cb365ca7c6e0312c9ecb2aa6761ba00b3269637ada10daa284566a4",
+        "SPEC.md": "b56cdc168549dc916a29dc2c360fff95ecc0db8618eb43839c1eef9a11f1d499",
+        "references/core-patterns.md": "508199c575439e3d021848df67cb8a8be7675f0e1f2e8c77438e0e4734ca415c",
+        "references/meta-optimization-loop.md": "9489e6ee08a184319a3ac3e88de54ea9f91bc2da74e4ee2dd8ada662291a9e71",
+        "references/model-family-notes.md": "57a5292ec6e68c846136599c8a424e95330aecc3d2443831fa0a4283fa0f2f04",
+        "references/transformed-examples.md": "3cfb92aadc7b30ca4ad4e9bb02204a92c2366b0483b8023115ad2a1e614d235e"
+      },
+      "evidence_urls": [
+        "https://api.github.com/repos/getsentry/skills",
+        "https://github.com/getsentry/skills/tree/d18b7aa8ba878354e5c348310230e652f7690f9c/skills/prompt-optimizer",
+        "https://github.com/getsentry/skills/commits/d18b7aa8ba878354e5c348310230e652f7690f9c/skills/prompt-optimizer",
+        "https://github.com/getsentry/skills/commit/c190d369bcbaa6cfdd95e9edfdba040506b4db76",
+        "https://github.com/getsentry/skills/commit/6a844a09d7981594d510fc9b2d6b022b4ed2e246",
+        "https://github.com/getsentry/skills/commit/24361e7958f9644d11f1de100654e3b04a509192",
+        "https://github.com/getsentry/skills/commit/04f1e8301747ec34d01858176237349cd34e2779"
+      ],
+      "maintenance_history": [
+        {
+          "sha": "c190d369bcbaa6cfdd95e9edfdba040506b4db76",
+          "date": "2026-05-04T17:40:37Z",
+          "substantive": true,
+          "classification": "External-context inventory, new output section, runtime workflow and companion specification; not only compaction/formatting",
+          "author": "dcramer"
+        },
+        {
+          "sha": "6a844a09d7981594d510fc9b2d6b022b4ed2e246",
+          "date": "2026-04-24T19:00:34Z",
+          "substantive": true,
+          "classification": "Added instruction-layer ownership, marker semantics and provider-native tool schema guidance",
+          "author": "dcramer"
+        },
+        {
+          "sha": "24361e7958f9644d11f1de100654e3b04a509192",
+          "date": "2026-04-19T23:10:08Z",
+          "substantive": false,
+          "classification": "Path migration from plugins/sentry-skills/skills/prompt-optimizer; no maintenance credit",
+          "author": "dcramer"
+        },
+        {
+          "sha": "04f1e8301747ec34d01858176237349cd34e2779",
+          "date": "2026-04-19T21:31:15Z",
+          "substantive": false,
+          "classification": "Skill introduction; no maintenance credit",
+          "author": "dcramer"
+        }
+      ],
+      "source_lineage": "Native Sentry skill introduced Apr19; SOURCES.md records synthesis from local skill-writer, official OpenAI/Anthropic/Gemini guidance and prompt-optimization research. No duplicate finalist lineage identified.",
+      "required_runtime": {
+        "mandatory": [
+          "Read SKILL.md and context-selected package references",
+          "Author prompts and return structured optimization package"
+        ],
+        "external_api_or_extra_tool_required": false,
+        "compatible_with_fixture_mcp": true,
+        "notes": "API discussions and eval recommendations do not mandate SDK calls or a separate API key. Actual runtime/holdout evaluation must remain within approved harness limits; do not claim unexecuted inner evals."
+      },
+      "native_output_contract": {
+        "sections": [
+          "Target",
+          "Success Criteria",
+          "External Context",
+          "Optimized Prompt",
+          "Adapter Notes",
+          "Eval Set",
+          "Optimization Log",
+          "Residual Risks"
+        ],
+        "extraction": "Extract the Optimized Prompt section, preserving native contents. No fence is mandated by the native skill. For existing prompts the skill also asks for a concise diff-style note.",
+        "required_companion_references": [
+          "references/core-patterns.md",
+          "references/model-family-notes.md",
+          "references/transformed-examples.md",
+          "references/meta-optimization-loop.md"
+        ],
+        "provenance_only_files": [
+          "SOURCES.md",
+          "SPEC.md"
+        ],
+        "external_context_sources_in_provenance_only": "SOURCES.md cites local skill-writer sources, which are provenance rather than mandatory runtime loads."
+      },
+      "workflow_evidence": {
+        "create": "SKILL Step1 task new; new-prompt reference route and transformed example1",
+        "sharpen": "SKILL task refine, optimize candidate comparisons and existing-prompt diff note",
+        "templates": "Frontmatter explicitly reusable prompt templates; core-patterns separates dynamic variables and user payload",
+        "coding": "External-context AGENTS/spec inventory; transformed-examples example1 coding-agent system prompt"
+      },
+      "snapshot_path": "candidates/sentry-prompt-optimizer"
+    },
+    {
+      "id": "github-prompt-optimizer",
+      "repo": "github/awesome-copilot",
+      "skill_path": "skills/prompt-optimizer",
+      "entrypoint": "SKILL.md",
+      "revision": "143a3d976b3c1603cc8932984d5e1f28501cb5fc",
+      "license": "MIT",
+      "stars": 39667,
+      "stars_scope": "whole repository; no per-skill popularity count",
+      "retrieved_at": "2026-10-03T22:36:06.682521+00:00",
+      "archived": false,
+      "supported_workflows": [
+        "create",
+        "sharpen",
+        "coding"
+      ],
+      "latest_substantive_change": null,
+      "changes90": 0,
+      "changes180": 0,
+      "maintainer_count180": 0,
+      "maintainers180": [],
+      "eligibility": false,
+      "reasons": [
+        "Only path-history commit is introduction; no post-introduction substantive change",
+        "Native hard rule forbids every placeholder/template variable, so reusable variable templates are unsupported"
+      ],
+      "files": {
+        "LICENSE": "e32449d23085399adc1222f7a17408b730550258e51627c153cb108ca9955823",
+        "SKILL.md": "191e2544ccf5890c4d7134b116d5fc2b554571d596d1b8a43ef260d77168caab"
+      },
+      "evidence_urls": [
+        "https://api.github.com/repos/github/awesome-copilot",
+        "https://github.com/github/awesome-copilot/tree/143a3d976b3c1603cc8932984d5e1f28501cb5fc/skills/prompt-optimizer",
+        "https://github.com/github/awesome-copilot/commits/143a3d976b3c1603cc8932984d5e1f28501cb5fc/skills/prompt-optimizer",
+        "https://github.com/github/awesome-copilot/commit/b010c5ebfacdd78a45702481b77ec55ba033e373"
+      ],
+      "maintenance_history": [
+        {
+          "sha": "b010c5ebfacdd78a45702481b77ec55ba033e373",
+          "date": "2026-05-14T00:56:22Z",
+          "substantive": false,
+          "classification": "Skill introduction only"
+        }
+      ],
+      "source_lineage": "Native awesome-copilot prompt-optimizer; self-contained provider cookbook, distinct from Sentry optimizer despite same skill name.",
+      "required_runtime": {
+        "external_api_or_extra_tool_required": false,
+        "notes": "Chat-interface-only finished prompt in a single code fence; no templates."
+      },
+      "snapshot_path": null
+    },
+    {
+      "id": "neolab-prompt-engineering",
+      "repo": "NeoLabHQ/context-engineering-kit",
+      "skill_path": "plugins/customaize-agent/skills/prompt-engineering",
+      "entrypoint": "SKILL.md",
+      "revision": "23e2428e809d77717f8acc9659c374a3a1fcb93e",
+      "license": "GPL-3.0",
+      "stars": 1742,
+      "stars_scope": "whole repository; no per-skill popularity count",
+      "retrieved_at": "2026-10-03T22:36:07.094409+00:00",
+      "archived": false,
+      "supported_workflows": [
+        "create",
+        "sharpen",
+        "templates",
+        "coding"
+      ],
+      "latest_substantive_change": {
+        "sha": "3646a167e9508ca0d37cf36d588eae0de06c7b7f",
+        "date": "2025-11-15T23:08:22Z",
+        "classification": "Expanded expertise while renaming predecessor; outside180days"
+      },
+      "changes90": 0,
+      "changes180": 0,
+      "maintainer_count180": 0,
+      "maintainers180": [],
+      "eligibility": false,
+      "reasons": [
+        "No substantive native skill/reference/test change within180days",
+        "Aug7 root skills/prompt-engineering copy is byte-identical to native plugin path; it does not establish post-introduction maintenance"
+      ],
+      "files": {
+        "LICENSE": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+        "SKILL.md": "6280c7c8cc9e33b42ef69a326874cc80acc5bbe08859f4b79dc0fc69501e43a5"
+      },
+      "evidence_urls": [
+        "https://api.github.com/repos/NeoLabHQ/context-engineering-kit",
+        "https://github.com/NeoLabHQ/context-engineering-kit/tree/23e2428e809d77717f8acc9659c374a3a1fcb93e/plugins/customaize-agent/skills/prompt-engineering",
+        "https://github.com/NeoLabHQ/context-engineering-kit/commits/23e2428e809d77717f8acc9659c374a3a1fcb93e/plugins/customaize-agent/skills/prompt-engineering",
+        "https://github.com/NeoLabHQ/context-engineering-kit/commit/820f1dbefe3e7f81cac0004a85f0ca03a15aa8a5",
+        "https://github.com/NeoLabHQ/context-engineering-kit/commit/906c96801dd5b2e95b7fec9ddd419731d8345afd",
+        "https://github.com/NeoLabHQ/context-engineering-kit/commit/f91a62afaad2fc01e0cb91492d3383e4c66867ba",
+        "https://github.com/NeoLabHQ/context-engineering-kit/commit/3646a167e9508ca0d37cf36d588eae0de06c7b7f",
+        "https://github.com/NeoLabHQ/context-engineering-kit/commit/4da35f220983386b74f00287a94945126f4909ec"
+      ],
+      "maintenance_history": [
+        {
+          "sha": "820f1dbefe3e7f81cac0004a85f0ca03a15aa8a5",
+          "date": "2026-03-17T16:09:18Z",
+          "substantive": false,
+          "classification": "Frontmatter validation/name edits or old rename; no qualifying180day content change"
+        },
+        {
+          "sha": "906c96801dd5b2e95b7fec9ddd419731d8345afd",
+          "date": "2026-02-19T00:13:18Z",
+          "substantive": false,
+          "classification": "Frontmatter validation/name edits or old rename; no qualifying180day content change"
+        },
+        {
+          "sha": "f91a62afaad2fc01e0cb91492d3383e4c66867ba",
+          "date": "2026-02-08T07:13:17Z",
+          "substantive": false,
+          "classification": "Frontmatter validation/name edits or old rename; no qualifying180day content change"
+        },
+        {
+          "sha": "3646a167e9508ca0d37cf36d588eae0de06c7b7f",
+          "date": "2025-11-15T23:08:22Z",
+          "substantive": false,
+          "classification": "Frontmatter validation/name edits or old rename; no qualifying180day content change"
+        },
+        {
+          "sha": "4da35f220983386b74f00287a94945126f4909ec",
+          "date": "2026-08-07T19:04:15Z",
+          "substantive": false,
+          "classification": "Root package copy; exact SHA corrected below"
+        }
+      ],
+      "source_lineage": "Canonical plugin skill and Aug7 root copy have identical current SKILL.md bytes. The older skill merges general patterns, Anthropic agent guidance and persuasion principles.",
+      "required_runtime": {
+        "external_api_or_extra_tool_required": false,
+        "notes": "General native guidance; examples mention TodoWrite and subagents as prompting patterns, not a mandatory executable tool contract."
+      },
+      "snapshot_path": null
+    },
+    {
+      "id": "jeffallan-prompt-engineer",
+      "repo": "Jeffallan/claude-skills",
+      "skill_path": "skills/prompt-engineer",
+      "entrypoint": "SKILL.md",
+      "revision": "1be15d8064f88fc25216442406d40add8fd23b53",
+      "license": "MIT",
+      "stars": 11719,
+      "stars_scope": "whole repository; no per-skill popularity count",
+      "retrieved_at": "2026-10-03T22:36:07.433608+00:00",
+      "archived": false,
+      "supported_workflows": [
+        "create",
+        "sharpen",
+        "templates",
+        "coding"
+      ],
+      "latest_substantive_change": {
+        "sha": "791c7e41d2ca26b073407239b1237ac8f79762f8",
+        "date": "2026-03-23T20:37:02Z",
+        "classification": "Added context-management skill references and guidance; outside180days"
+      },
+      "changes90": 0,
+      "changes180": 0,
+      "maintainer_count180": 0,
+      "maintainers180": [],
+      "eligibility": false,
+      "reasons": [
+        "All three180day path changes are docs backlinks or branding",
+        "Latest substantive context-management change March23 precedes180day cutoff"
+      ],
+      "files": {
+        "LICENSE": "06dcddbb6908a0c6dd4a9e8ec822eea41d5a460a53089fecccc8a68049e99241",
+        "SKILL.md": "3b3f4fd1cc1498584194adb584920b3ec7637dd90285939e13695f3f84c6e785",
+        "references/context-management.md": "7baceb0abd3cbac9e911fa48bfbc97965f122fe53b93e9967c002bfbdcd1b66b",
+        "references/evaluation-frameworks.md": "0eff6ae070d12c0d62f2c9ce952e7e5225e5ec4197fcb8a717cd359c189b9d22",
+        "references/prompt-optimization.md": "ccc38e0e5816f1afd9e62dda4b7e0f14b8b57f5d79fea2f84d4f574ee4ec3bee",
+        "references/prompt-patterns.md": "b749ede7feb361c9f7ac0c729c19bce11c5d733c3a0e93d72b6f3e99f7b7f0cb",
+        "references/structured-outputs.md": "aa01c577ff3a23f281cc9385475293e9d46ded5ac99c712e318941fd5f4b9969",
+        "references/system-prompts.md": "18a3054c96edbc7f5cbbeba338898fc49fbfe56b3f07b004285da292acd22513"
+      },
+      "evidence_urls": [
+        "https://api.github.com/repos/Jeffallan/claude-skills",
+        "https://github.com/Jeffallan/claude-skills/tree/1be15d8064f88fc25216442406d40add8fd23b53/skills/prompt-engineer",
+        "https://github.com/Jeffallan/claude-skills/commits/1be15d8064f88fc25216442406d40add8fd23b53/skills/prompt-engineer",
+        "https://github.com/Jeffallan/claude-skills/commit/958e60fb998e008507c978b7943211f337def6a6",
+        "https://github.com/Jeffallan/claude-skills/commit/ec755b72e4500968ad7611dbe932ccc38118c5af",
+        "https://github.com/Jeffallan/claude-skills/commit/efebc44c90ae6eb3b36ff1c53802a765418481b9"
+      ],
+      "maintenance_history": [
+        {
+          "sha": "958e60fb998e008507c978b7943211f337def6a6",
+          "date": "2026-10-03T15:24:14Z",
+          "substantive": false,
+          "classification": "Canonical documentation backlink or company/maintainer branding; no runtime/reference/test improvement"
+        },
+        {
+          "sha": "ec755b72e4500968ad7611dbe932ccc38118c5af",
+          "date": "2026-10-03T15:20:58Z",
+          "substantive": false,
+          "classification": "Canonical documentation backlink or company/maintainer branding; no runtime/reference/test improvement"
+        },
+        {
+          "sha": "efebc44c90ae6eb3b36ff1c53802a765418481b9",
+          "date": "2026-04-29T03:32:32Z",
+          "substantive": false,
+          "classification": "Canonical documentation backlink or company/maintainer branding; no runtime/reference/test improvement"
+        }
+      ],
+      "source_lineage": "Native Jeffallan author package; no recent independent substantive maintenance found.",
+      "required_runtime": {
+        "external_api_or_extra_tool_required": false,
+        "notes": "Plain authored prompt workflow with examples/eval framework references; SDK examples do not mandate another provider."
+      },
+      "snapshot_path": null
+    },
+    {
+      "id": "davila-prompt-engineer",
+      "repo": "davila7/claude-code-templates",
+      "skill_path": "cli-tool/components/skills/ai-research/prompt-engineer",
+      "entrypoint": "SKILL.md",
+      "revision": "e36f584268cc860886642da4238c43b7a2d6a796",
+      "license": "MIT repository; skill source declares Apache-2.0",
+      "stars": 32353,
+      "stars_scope": "whole repository; no per-skill popularity count",
+      "retrieved_at": "2026-10-03T22:36:07.827772+00:00",
+      "archived": false,
+      "supported_workflows": [
+        "create",
+        "sharpen",
+        "coding"
+      ],
+      "latest_substantive_change": null,
+      "changes90": 0,
+      "changes180": 0,
+      "maintainer_count180": 0,
+      "maintainers180": [],
+      "eligibility": false,
+      "reasons": [
+        "Only introduction/migration Jan25; no later substantive change",
+        "Imported from antigravity/vibeship lineage; explicit reusable-variable template authoring is not evidenced"
+      ],
+      "files": {
+        "LICENSE": "15cc073ffa3a01bb7da145aeae2a842b473860d142c92485536ee9c91195a705",
+        "SKILL.md": "ea243270b70eb986dedd3c974f7ea6de5d91d6348c7827b005d3e7cde9f1681d"
+      },
+      "evidence_urls": [
+        "https://api.github.com/repos/davila7/claude-code-templates",
+        "https://github.com/davila7/claude-code-templates/tree/e36f584268cc860886642da4238c43b7a2d6a796/cli-tool/components/skills/ai-research/prompt-engineer",
+        "https://github.com/davila7/claude-code-templates/commits/e36f584268cc860886642da4238c43b7a2d6a796/cli-tool/components/skills/ai-research/prompt-engineer",
+        "https://github.com/davila7/claude-code-templates/commit/1deb97c72161528f6b7d84bc5117ae4be2e42735"
+      ],
+      "maintenance_history": [
+        {
+          "sha": "1deb97c72161528f6b7d84bc5117ae4be2e42735",
+          "date": "2026-01-25T15:01:14Z",
+          "substantive": false,
+          "classification": "Initial migration of244 skills"
+        }
+      ],
+      "source_lineage": "Frontmatter attributes vibeship-spawner-skills (Apache2); path introduced by migration from antigravity-awesome-skills. Repository MIT is not sufficient to erase imported Apache2 attribution.",
+      "required_runtime": {
+        "external_api_or_extra_tool_required": false,
+        "notes": "Prose-only prompt architect; no required API."
+      },
+      "snapshot_path": null
+    },
+    {
+      "id": "antigravity-prompt-engineer",
+      "repo": "sickn33/antigravity-awesome-skills",
+      "skill_path": "skills/prompt-engineer",
+      "entrypoint": "SKILL.md",
+      "revision": "082a1c091e01badee8853e69e21d620c2e21860f",
+      "license": "MIT",
+      "stars": 47224,
+      "stars_scope": "whole repository; no per-skill popularity count",
+      "retrieved_at": "2026-10-03T22:36:08.317278+00:00",
+      "archived": false,
+      "supported_workflows": [
+        "create",
+        "sharpen",
+        "coding"
+      ],
+      "latest_substantive_change": {
+        "sha": "2a76f3260fc1bfcea894ac47d105afb70430a1fb",
+        "date": "2026-04-20T17:49:09Z",
+        "classification": "Added conditional clarification triggers,3questioncap and example; authorxiaolai"
+      },
+      "changes90": 0,
+      "changes180": 1,
+      "maintainer_count180": 1,
+      "maintainers180": [
+        "xiaolai"
+      ],
+      "eligibility": false,
+      "reasons": [
+        "Verified substantive Apr20 repair passes maintenance criterion",
+        "Reusable variable-based prompt authoring is not natively directed; placeholder examples alone are weak evidence, so all-four criterion fails"
+      ],
+      "files": {
+        "LICENSE": "af98370a7edc0f00ec46979d049517833c9a7fa2ba74e3cf8cc42f7db557299d",
+        "SKILL.md": "db16673dbab9bd99e6d30f7d2057418b1e4ae147db1b991cda056d44cd407622"
+      },
+      "evidence_urls": [
+        "https://api.github.com/repos/sickn33/antigravity-awesome-skills",
+        "https://github.com/sickn33/antigravity-awesome-skills/tree/082a1c091e01badee8853e69e21d620c2e21860f/skills/prompt-engineer",
+        "https://github.com/sickn33/antigravity-awesome-skills/commits/082a1c091e01badee8853e69e21d620c2e21860f/skills/prompt-engineer",
+        "https://github.com/sickn33/antigravity-awesome-skills/commit/2a76f3260fc1bfcea894ac47d105afb70430a1fb",
+        "https://github.com/sickn33/antigravity-awesome-skills/commit/2138ff8fd03e70a03e116098923de0bdab3d2748",
+        "https://github.com/sickn33/antigravity-awesome-skills/commit/fc3c7ae8a2c4fc2b768ae50906d8c89f3d52f64b",
+        "https://github.com/sickn33/antigravity-awesome-skills/commit/aa71e76eb90480d1d734be7605975306ff8e6344",
+        "https://github.com/sickn33/antigravity-awesome-skills/commit/70ed8b2c8a8cf34423c14bc15d1dccbfb7e15cbc",
+        "https://github.com/sickn33/antigravity-awesome-skills/commit/96ffb7d759dededcdf2ba848a88c3a5d3945bf7a",
+        "https://github.com/sickn33/antigravity-awesome-skills/commit/801c8fa47555ac331b83ba3040c71ed075dea8c7",
+        "https://github.com/sickn33/antigravity-awesome-skills/commit/0ffee448285d6830e442b769f9002f7a9dba91b0",
+        "https://github.com/sickn33/antigravity-awesome-skills/commit/b5675d55ce5c7388ed05957f6c7bae23bf9db578"
+      ],
+      "maintenance_history": [
+        {
+          "sha": "2a76f3260fc1bfcea894ac47d105afb70430a1fb",
+          "date": "2026-04-20T17:49:09Z",
+          "substantive": true,
+          "classification": "Missing Step2 conditional clarification workflow repaired (+28lines)"
+        },
+        {
+          "sha": "2138ff8fd03e70a03e116098923de0bdab3d2748",
+          "date": "2026-04-13T22:13:41Z",
+          "substantive": false,
+          "classification": "Generic bulk limitations/frontmatter/initial import; no substantive-specific maintenance credit"
+        },
+        {
+          "sha": "fc3c7ae8a2c4fc2b768ae50906d8c89f3d52f64b",
+          "date": "2026-03-20T08:05:02Z",
+          "substantive": false,
+          "classification": "Generic bulk limitations/frontmatter/initial import; no substantive-specific maintenance credit"
+        },
+        {
+          "sha": "aa71e76eb90480d1d734be7605975306ff8e6344",
+          "date": "2026-02-27T08:19:41Z",
+          "substantive": false,
+          "classification": "Generic bulk limitations/frontmatter/initial import; no substantive-specific maintenance credit"
+        },
+        {
+          "sha": "70ed8b2c8a8cf34423c14bc15d1dccbfb7e15cbc",
+          "date": "2026-02-20T20:46:40Z",
+          "substantive": false,
+          "classification": "Generic bulk limitations/frontmatter/initial import; no substantive-specific maintenance credit"
+        },
+        {
+          "sha": "96ffb7d759dededcdf2ba848a88c3a5d3945bf7a",
+          "date": "2026-02-20T20:27:08Z",
+          "substantive": false,
+          "classification": "Generic bulk limitations/frontmatter/initial import; no substantive-specific maintenance credit"
+        },
+        {
+          "sha": "801c8fa47555ac331b83ba3040c71ed075dea8c7",
+          "date": "2026-02-04T20:37:45Z",
+          "substantive": false,
+          "classification": "Generic bulk limitations/frontmatter/initial import; no substantive-specific maintenance credit"
+        },
+        {
+          "sha": "0ffee448285d6830e442b769f9002f7a9dba91b0",
+          "date": "2026-01-28T16:15:26Z",
+          "substantive": false,
+          "classification": "Generic bulk limitations/frontmatter/initial import; no substantive-specific maintenance credit"
+        },
+        {
+          "sha": "b5675d55ce5c7388ed05957f6c7bae23bf9db578",
+          "date": "2026-01-19T11:18:43Z",
+          "substantive": false,
+          "classification": "Generic bulk limitations/frontmatter/initial import; no substantive-specific maintenance credit"
+        }
+      ],
+      "source_lineage": "Feb4 commit explicitly imports/enhances prompt-engineer from ericgandrade/cli-ai-skills, updating the earlier vibeship package; not an independent Sentry/Jeffallan optimizer.",
+      "required_runtime": {
+        "external_api_or_extra_tool_required": false,
+        "notes": "SKILL notes say platform-agnostic with Copilot CLI availability, but issue no Copilot commands and have no mandatory external API. Import commit explicitly names Codex support. Narrow candidate only."
+      },
+      "snapshot_path": null
+    },
+    {
+      "id": "antigravity-prompt-engineering",
+      "repo": "sickn33/antigravity-awesome-skills",
+      "skill_path": "skills/prompt-engineering",
+      "entrypoint": "SKILL.md",
+      "revision": "082a1c091e01badee8853e69e21d620c2e21860f",
+      "license": "MIT",
+      "stars": 47224,
+      "stars_scope": "whole repository; no per-skill popularity count",
+      "retrieved_at": "2026-10-03T22:36:08.317278+00:00",
+      "archived": false,
+      "supported_workflows": [
+        "create",
+        "sharpen",
+        "templates",
+        "coding"
+      ],
+      "latest_substantive_change": null,
+      "changes90": 0,
+      "changes180": 0,
+      "maintainer_count180": 0,
+      "maintainers180": [],
+      "eligibility": false,
+      "reasons": [
+        "Recent edits are generic3line boilerplate limitations and risk classification, with no prompt-specific improvement",
+        "General pattern text duplicates the opening NeoLab package; no reason to select another copy"
+      ],
+      "files": {
+        "LICENSE": "af98370a7edc0f00ec46979d049517833c9a7fa2ba74e3cf8cc42f7db557299d",
+        "SKILL.md": "d8be59f756c28532cff71d9401b414a5423ebf94c00959ecdf85015aff380d56"
+      },
+      "evidence_urls": [
+        "https://api.github.com/repos/sickn33/antigravity-awesome-skills",
+        "https://github.com/sickn33/antigravity-awesome-skills/tree/082a1c091e01badee8853e69e21d620c2e21860f/skills/prompt-engineering",
+        "https://github.com/sickn33/antigravity-awesome-skills/commits/082a1c091e01badee8853e69e21d620c2e21860f/skills/prompt-engineering",
+        "https://github.com/sickn33/antigravity-awesome-skills/commit/2138ff8fd03e70a03e116098923de0bdab3d2748",
+        "https://github.com/sickn33/antigravity-awesome-skills/commit/df08c3f9cad7dec3aff91914a3cf6fb1e810a52c"
+      ],
+      "maintenance_history": [
+        {
+          "sha": "2138ff8fd03e70a03e116098923de0bdab3d2748",
+          "date": "2026-04-13T22:13:41Z",
+          "substantive": false,
+          "classification": "Generic bulk limitations backfill; not prompt-specific improvement"
+        },
+        {
+          "sha": "df08c3f9cad7dec3aff91914a3cf6fb1e810a52c",
+          "date": "2026-07-29T16:24:34Z",
+          "substantive": false,
+          "classification": "Risk frontmatter unknown=>none"
+        }
+      ],
+      "source_lineage": "Community general-pattern collection; first core capabilities/examples overlap verbatim NeoLab prompt-engineering, not an independently maintained optimizer.",
+      "required_runtime": {
+        "external_api_or_extra_tool_required": false,
+        "notes": "Plain instructional pattern guide."
+      },
+      "snapshot_path": null
+    }
+  ]
+}

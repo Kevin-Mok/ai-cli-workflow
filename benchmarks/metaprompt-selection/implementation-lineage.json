@@ -1,0 +1,10 @@
+{
+  "selection_core.py": {
+    "source": "benchmarks/metaprompt/benchlib.py",
+    "original_sha256": "9d0e3770329a0a5a35f850eacb3fce569c52115974134031f5993614c5d39d63"
+  },
+  "selection_runtime.py": {
+    "source": "benchmarks/metaprompt/runtime.py",
+    "original_sha256": "9f4e70076b02bbc892faf741fa28668a2cb4e956c55d7cfd3279ad0f06085676"
+  }
+}

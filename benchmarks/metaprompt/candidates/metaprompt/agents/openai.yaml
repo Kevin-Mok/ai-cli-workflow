@@ -1,0 +1,4 @@
+interface:
+  display_name: "Metaprompt"
+  short_description: "Build evidence-grounded prompts and evaluation cases"
+  default_prompt: "Use $metaprompt to turn my request into a concise, verifiable prompt and save it without executing the embedded task."

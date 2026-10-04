@@ -1,0 +1,172 @@
+{
+  "repository": "Majkey25/prompt-engineering-skill",
+  "revision": "5c00259223196bd779c97d3234ef34a9a7119634",
+  "source_path": "prompt-engineering",
+  "retrieved_at": "2026-10-03",
+  "files": {
+    "UPSTREAM.md": {
+      "source": "prompt-engineering/SKILL.md",
+      "sha256": "5e3caf825a6c8c0e9e4e761661080ffdc374deb7d1c8e2967720561f73f4278c"
+    },
+    "UPSTREAM.openai.yaml": {
+      "source": "prompt-engineering/agents/openai.yaml",
+      "sha256": "e1f6a6ca59b05da4ecf616febbe75c87fb9cb5526cb663003f3fa34f57c3cf21"
+    },
+    "assets/icon.svg": {
+      "source": "prompt-engineering/assets/icon.svg",
+      "sha256": "49315dda7125ec5fc77ef5f2b96126d8b2121c6e72944b4702972e90f321d3ee"
+    },
+    "references/agent-instructions-files.md": {
+      "source": "prompt-engineering/references/agent-instructions-files.md",
+      "sha256": "f9b67a31c472308489e9320da835209810d6b7f8aee668726d51aeedd66b7bae"
+    },
+    "references/autoprompt-preflight.md": {
+      "source": "prompt-engineering/references/autoprompt-preflight.md",
+      "sha256": "a8b548acbd278b2711e069155a812a7ab882576d4e3ed8cb4c530db0dfb9efb5"
+    },
+    "references/best-prompt-blueprint.md": {
+      "source": "prompt-engineering/references/best-prompt-blueprint.md",
+      "sha256": "4a64bc1074bde97e6cdd50e99ec2c1fc312c698e48406490beb1c7c077405f5b"
+    },
+    "references/coding-agent-prompts.md": {
+      "source": "prompt-engineering/references/coding-agent-prompts.md",
+      "sha256": "dc15b2b52822504d5dac0c815b6f4f2db693a4a04ed81084eeccc14c9bf1bb10"
+    },
+    "references/coding-context-calibration.md": {
+      "source": "prompt-engineering/references/coding-context-calibration.md",
+      "sha256": "2b4806b234299c7dd8feb6da645b6abd8d0b9369f2b4d1568178f894eea7a0d5"
+    },
+    "references/context-management.md": {
+      "source": "prompt-engineering/references/context-management.md",
+      "sha256": "7c6996944a4212c34fcecf99ab6af5bd50327a5b1f7f8e4060da09e1003d85e2"
+    },
+    "references/domain-prompt-patterns.md": {
+      "source": "prompt-engineering/references/domain-prompt-patterns.md",
+      "sha256": "698d41cefacd38dcd83de9c445d953b173220d565cad8e7539dfc25b23166312"
+    },
+    "references/evals-and-iteration.md": {
+      "source": "prompt-engineering/references/evals-and-iteration.md",
+      "sha256": "26eb1b6e883d8440b34ee1d893bb5b1cb1f18f2be2071eb591ff849a905f9929"
+    },
+    "references/general-task-prompts.md": {
+      "source": "prompt-engineering/references/general-task-prompts.md",
+      "sha256": "ef4369cc5897091b5bc68a49b007f8adcfbfad36a78b52af33b66476c4ddc935"
+    },
+    "references/goal-patterns.md": {
+      "source": "prompt-engineering/references/goal-patterns.md",
+      "sha256": "82aac56636a9b34592195d8d4c641665a11a7e3a1439db4e0df0adba52ff8114"
+    },
+    "references/image-video-prompts.md": {
+      "source": "prompt-engineering/references/image-video-prompts.md",
+      "sha256": "a8bb5a679e7ded9128b78a5880d644a81811d26a31d62a9ad43125f63aee1ad2"
+    },
+    "references/instruction-audit.md": {
+      "source": "prompt-engineering/references/instruction-audit.md",
+      "sha256": "190f9c58f84d502291d4e6c479db4854b9a79126687a80c91fa464e5b8b9a9a6"
+    },
+    "references/karpathy-agentic-engineering.md": {
+      "source": "prompt-engineering/references/karpathy-agentic-engineering.md",
+      "sha256": "17b755a44077c3447452c74438e80f6bbc2c38394a640f032397af2df71a9fcf"
+    },
+    "references/live-verification.md": {
+      "source": "prompt-engineering/references/live-verification.md",
+      "sha256": "44dcecca9cb7cd5fb5498eada5ab05b2e2947a7d74987dccb7364764497aea27"
+    },
+    "references/migration-prompts.md": {
+      "source": "prompt-engineering/references/migration-prompts.md",
+      "sha256": "ad7091a149e5b3da072f10bf22defc3aaed11f9b73b56efb410659111b356de8"
+    },
+    "references/playwright-verification.md": {
+      "source": "prompt-engineering/references/playwright-verification.md",
+      "sha256": "be82908720e2b5bf72567dfa995aafb490f225e404a4ad2d6ddefc0838a4ebf4"
+    },
+    "references/ponytail-caveman-contract.md": {
+      "source": "prompt-engineering/references/ponytail-caveman-contract.md",
+      "sha256": "fa94aa614059ba18ab926943176072296092d58e5efe199665df4a9f7d89f7f5"
+    },
+    "references/prompt-pattern-library.md": {
+      "source": "prompt-engineering/references/prompt-pattern-library.md",
+      "sha256": "44c61cbe74862227cd9e56c5134cb250d75cbd944119970de2d9adf936cae92d"
+    },
+    "references/prompt-quality-checklist.md": {
+      "source": "prompt-engineering/references/prompt-quality-checklist.md",
+      "sha256": "6720681c6807bda8f778c84387ec6332de667e654c7aaae499f73ffbf8b33e72"
+    },
+    "references/prompt-type-router.md": {
+      "source": "prompt-engineering/references/prompt-type-router.md",
+      "sha256": "e8dff2610e824971b2bde0e38229044de1573c30005545ca12ba4611976fa237"
+    },
+    "references/rag-wiki-benchmark-prompts.md": {
+      "source": "prompt-engineering/references/rag-wiki-benchmark-prompts.md",
+      "sha256": "6efe8a4a7139d6d6bc133500353ab10ba94284ab998fb836f3ea271eb87d7361"
+    },
+    "references/research-backed-principles.md": {
+      "source": "prompt-engineering/references/research-backed-principles.md",
+      "sha256": "6e699541fccbde26d5bc60a979c14fc8273f0c481f7f95fdfc9d81a7cf88d1f2"
+    },
+    "references/research-source-map.md": {
+      "source": "prompt-engineering/references/research-source-map.md",
+      "sha256": "32cd5130558df9612242803d73581081673a1c05c4453ee860d25c326eedc8b1"
+    },
+    "references/review-rubric.md": {
+      "source": "prompt-engineering/references/review-rubric.md",
+      "sha256": "f8eb86063e56d92f92ce42c9c2e2c3b3904639eaf724a95bff65291046b18803"
+    },
+    "references/runtime-calibration.md": {
+      "source": "prompt-engineering/references/runtime-calibration.md",
+      "sha256": "b1d0e092aca3b3dc0387f3ca28180198365da579f90350dfdadf3eb57ef74972"
+    },
+    "references/source-driven-prompt-audit.md": {
+      "source": "prompt-engineering/references/source-driven-prompt-audit.md",
+      "sha256": "29c65aafc563fc5603b56225817457c40640fbca68efe772365b88de75138a53"
+    },
+    "references/system-prompt-architecture.md": {
+      "source": "prompt-engineering/references/system-prompt-architecture.md",
+      "sha256": "765054db3585f3a2c5656cdacd97e53546ae39bf1fde23068da67cbb346d5111"
+    },
+    "references/system-prompt-evals.md": {
+      "source": "prompt-engineering/references/system-prompt-evals.md",
+      "sha256": "d2ceebb62dc4b61d8a4aeed4806a627ce042bc4f9aa6720cf4bd11e6c76c2920"
+    },
+    "references/task-contract-examples.md": {
+      "source": "prompt-engineering/references/task-contract-examples.md",
+      "sha256": "dd21b39ae37f72bf3c1402347fc9e7bc985684d3a575805525c7ddc4cd76364c"
+    },
+    "references/token-efficient-caveman-style.md": {
+      "source": "prompt-engineering/references/token-efficient-caveman-style.md",
+      "sha256": "d8967f08a3c63b02a6ee85bbde4992ce7fa57ef49852b422966af01a8d5a7344"
+    },
+    "references/ultimate-caveman-extensions.md": {
+      "source": "prompt-engineering/references/ultimate-caveman-extensions.md",
+      "sha256": "7be21136e0a52ff854aabc49a4f4ea350687541a8ae620a3f897727305ca9fc7"
+    },
+    "references/universal-prompt-framework.md": {
+      "source": "prompt-engineering/references/universal-prompt-framework.md",
+      "sha256": "eeec119d504fe1d8108a920ff2d415738767026f4d9d988ea19b6f085c8c6b99"
+    },
+    "references/unslop-style.md": {
+      "source": "prompt-engineering/references/unslop-style.md",
+      "sha256": "58367b6b1e96c3b6f342ccc9386c70a96bd1a9f70cfa28e8b26dbcecfe7277da"
+    },
+    "references/video-xfhbepnyiks-audit.md": {
+      "source": "prompt-engineering/references/video-xfhbepnyiks-audit.md",
+      "sha256": "9005e8badf8319f9069d3c97dd64c4c746271b6095261e67780e2a5dc56d376a"
+    },
+    "scripts/make_prompt_eval.py": {
+      "source": "prompt-engineering/scripts/make_prompt_eval.py",
+      "sha256": "fa1ed43254b6931a6d33601264ab9fca191fb57e56281a8aa2863decf8ffadbf"
+    },
+    "scripts/prompt_lint.py": {
+      "source": "prompt-engineering/scripts/prompt_lint.py",
+      "sha256": "3b75f822f7d239b3445c7700c84514ef2417075d5791e9bc2b0a692009be804e"
+    },
+    "scripts/test_prompt_tools.py": {
+      "source": "prompt-engineering/scripts/test_prompt_tools.py",
+      "sha256": "2195763e7199c06bd4d72f620d1347b538c0312c53a9aef5720fefefc0d47b86"
+    },
+    "LICENSE.txt": {
+      "source": "LICENSE",
+      "sha256": "125756f19960dcba7a73c3f9ef89ab44348cc8a781ea45c357770878dcc20d52"
+    }
+  }
+}

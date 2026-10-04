@@ -6,7 +6,7 @@ from pathlib import Path
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-SKILL_ROOT = REPO_ROOT / "dot_agents" / "skills" / "metaprompt"
+SKILL_ROOT = REPO_ROOT / "dot_agents" / "skills" / "metaprompt-alxve"
 SKILL_PATH = SKILL_ROOT / "SKILL.md"
 REFERENCE_NAMES = (
     "compilation-rules.md",
@@ -298,9 +298,9 @@ class MetapromptContractTest(unittest.TestCase):
     def test_metadata_is_discoverable_and_no_redundant_research_policy_exists(self) -> None:
         metadata = read(SKILL_ROOT / "agents" / "openai.yaml")
         for required in (
-            'display_name: "Metaprompt"',
+            'display_name: "Metaprompt Alxve"',
             'short_description: "Compile, sharpen, and template prompts"',
-            'default_prompt: "Use $metaprompt to compile, sharpen, or template',
+            'default_prompt: "Use $metaprompt-alxve to compile, sharpen, or template',
             "wait for my standalone go",
         ):
             self.assertIn(required, metadata)

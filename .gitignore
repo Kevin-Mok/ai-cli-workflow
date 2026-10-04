@@ -2,3 +2,5 @@ commit-msg.txt
 .nvimlog
 __pycache__/
 *.py[cod]
+# Rebuilt from committed per-trial evidence; summary.json keeps aggregate scores.
+/benchmarks/metaprompt-selection/runs/selection-2026-10-03/results.json

@@ -80,4 +80,12 @@
 
 - 2026-09-28: Before using FFmpeg concat demuxer with `-c copy`, compare video time bases, codec parameters, color formats, and rotation. A zero FFmpeg exit can still produce a frozen second segment; verify video/audio durations and decode across the boundary. See [the Logic/iPhone join postmortem](../docs/postmortem/2026-09-28-logic-1377-stream-copy-freeze.md).
 
+- 2026-10-03: When retaining a skill under a new name, migrate its metadata assertions with its test root while keeping all behavioral assertions intact; inspect the complete contract suite before the first GREEN run. See [metaprompt integration validation](../docs/postmortem/2026-10-03-metaprompt-integration-validation.md).
+
 - 2026-10-03: SSH helpers that parse login-shell output must establish a newline boundary after startup; fish can emit cursor-control bytes without a newline. Test every parsed shell command with noisy real fish startup, not only clean PATH fixtures. See [VPS shell handshake](../docs/postmortem/2026-10-03-vps-codex-shell-handshake.md).
+
+- 2026-10-03: For Codex subscription benchmarks, count outbound inference requests rather than CLI sessions, verify real fixture tool execution with injected zero-inference responses before paid trials, and sum request-level usage even when an episode aborts. Report request-cap failures separately from wrong answers; preserve every development attempt and freeze scoring before held-out execution. See [benchmark runtime diagnosis](../docs/postmortem/2026-10-03-metaprompt-benchmark-trial-infrastructure.md).
+
+- 2026-10-03: Calibrate native skill handoffs before freezing a benchmark: explicit final Markdown links are valid artifacts, standard Python helpers need matching standard exceptions, and infrastructure readiness must not require every candidate to answer correctly. Preserve original development records and resume only unused stages, keeping all charges. See [selection validation](../docs/postmortem/2026-10-03-metaprompt-selection-validation.md).
+
+- 2026-10-03: Validate the rendered form of reusable benchmark templates with multiline bindings: a trailing instruction can become part of the last data line and invalidate exact-copy controls. After a freeze, preserve primary results and disclose an equal-arm omission sensitivity instead of silently repairing the scored fixture. See [selection validation](../docs/postmortem/2026-10-03-metaprompt-selection-validation.md).

@@ -1,4 +1,4 @@
 interface:
   display_name: "Metaprompt"
-  short_description: "Compile, sharpen, and template prompts"
-  default_prompt: "Use $metaprompt to compile, sharpen, or template my request, then wait for my standalone go before running any pass."
+  short_description: "Create and refine prompts with Sentry's eval workflow"
+  default_prompt: "Use $metaprompt to create or improve my prompt with Sentry's eight-section workflow, save the optimized prompt, and distinguish prepared evaluations from executed results."

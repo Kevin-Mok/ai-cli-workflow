@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "cases": {
+    "selection-dev-create-brief": "{\"decision\": \"audit the kiosk\", \"owner\": \"unknown\", \"due\": \"unknown\"}",
+    "selection-create-research-policy": "{\"rule\": \"staff badge plus PIN\", \"sources\": [\"B\"]}",
+    "selection-create-summary-handoff": "[{\"action\": \"close the side gate\", \"person\": \"Ivo\", \"due\": \"unknown\"}, {\"action\": \"scan the permits\", \"person\": \"unknown\", \"due\": \"2027-04-06\"}]",
+    "selection-create-extraction-orders": "[{\"code\": \"009\", \"count\": 0}, {\"code\": \"011\", \"count\": null}]",
+    "selection-create-writing-draft": "{\"to\": \"unknown\", \"subject\": \"Studio visit postponed\", \"facts\": [\"new date 2027-04-17\", \"transport cost unknown\"], \"action\": \"draft\"}",
+    "selection-create-research-conflict": "{\"capacity\": \"conflict\", \"sources\": [\"D\", \"E\"]}",
+    "selection-create-research-attachment": "{\"fee\": \"unknown\", \"sources\": []}",
+    "selection-sharpen-summary-corrections": "{\"job\": \"test the beacon\", \"owner\": \"Vic\", \"date\": \"2027-05-09\"}",
+    "selection-sharpen-extraction-quotes": "[{\"id\": \"07\", \"name\": \"Kei, Mo\"}, {\"id\": \"08\", \"name\": \"Li \\\"X\\\"\"}]",
+    "selection-sharpen-research-scope": "{\"warranty_months\": 18, \"sources\": [\"G\"]}",
+    "selection-sharpen-writing-correction": "{\"subject\": \"Corrected station notice\", \"corrected_facts\": [\"platform is 6\", \"start time unknown\"], \"action\": \"draft\"}",
+    "selection-sharpen-summary-injection": "[{\"task\": \"update the map\", \"owner\": \"Hana\", \"due\": \"unknown\"}]",
+    "selection-sharpen-extraction-duplicates": "[{\"key\": \"t\", \"amount\": -2}, {\"key\": \"t\", \"amount\": 0}, {\"key\": \"v\", \"amount\": null}]",
+    "selection-template-handoff": "[{\"action\": \"seal the archive\", \"owner\": \"Wren\", \"due\": \"2027-06-03\"}, {\"action\": \"check the locks\", \"owner\": \"unknown\", \"due\": \"unknown\"}]",
+    "selection-template-filter": "[\"elm\", \"fir\"]",
+    "selection-template-policy": "{\"answer\": \"8\", \"sources\": [\"K\"]}",
+    "selection-template-draft": "{\"to\": \"Oren\", \"subject\": \"Lab check delayed\", \"facts\": [\"revised date 2027-07-11\", \"funding unknown\"], \"action\": \"draft\"}",
+    "selection-template-missing": "{\"value\": \"unknown\", \"sources\": []}",
+    "selection-template-conflict": "{\"result\": \"conflict\", \"sources\": [\"M\", \"N\"]}",
+    "selection-dev-coding-bounds": "def bounds(values):\n    if not values:\n        raise ValueError(\"empty\")\n    return min(values), max(values)\n",
+    "selection-coding-delays": "def retry_delays(start, count, cap):\n    if start < 0 or count < 0 or cap < 0:\n        raise ValueError(\"negative\")\n    return [min(start * 2**i, cap) for i in range(count)]\n",
+    "selection-coding-flatten": "def flatten_one(rows):\n    return [item for row in rows for item in row]\n",
+    "selection-coding-chunks": "def split_chunks(items, size):\n    if size <= 0:\n        raise ValueError(\"size\")\n    return [items[i:i+size] for i in range(0,len(items),size)]\n",
+    "selection-coding-totals": "def running_totals(values):\n    total=0\n    result=[]\n    for value in values:\n        total += value\n        result.append(total)\n    return result\n",
+    "selection-coding-headers": "def normalize_headers(headers):\n    return [header.strip().lower() for header in headers]\n",
+    "selection-coding-pairs": "def parse_pairs(text):\n    result={}\n    for line in text.split(\"\\n\"):\n        if not line.strip():\n            continue\n        if \":\" not in line:\n            raise ValueError(\"missing colon\")\n        key,value=line.split(\":\",1)\n        key=key.strip()\n        if not key:\n            raise ValueError(\"empty key\")\n        result[key]=value.strip()\n    return result\n"
+  }
+}

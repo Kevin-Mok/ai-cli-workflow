@@ -1,0 +1,214 @@
+{
+  "schema_version": 1,
+  "candidates": [
+    {
+      "id": "metaprompt",
+      "revision": "5c00259223196bd779c97d3234ef34a9a7119634",
+      "repository": "Majkey25/prompt-engineering-skill",
+      "entrypoint": "candidates/metaprompt/SKILL.md",
+      "license": "MIT",
+      "files": {
+        "candidates/metaprompt/LICENSE.txt": "125756f19960dcba7a73c3f9ef89ab44348cc8a781ea45c357770878dcc20d52",
+        "candidates/metaprompt/SKILL.md": "90b876bdecd47aae8a56460b906035e18a9aa9c2047b03b459432568f4f76856",
+        "candidates/metaprompt/SOURCE.md": "f8cadb3ce07bd674effec6cf7884ef47f30b20270fa1196d46c036f812543f1f",
+        "candidates/metaprompt/UPSTREAM.json": "31328a6f17349f44af4ac44b9b25029ffb5a48f854a3cf00a0306350eea7af46",
+        "candidates/metaprompt/UPSTREAM.md": "5e3caf825a6c8c0e9e4e761661080ffdc374deb7d1c8e2967720561f73f4278c",
+        "candidates/metaprompt/UPSTREAM.openai.yaml": "e1f6a6ca59b05da4ecf616febbe75c87fb9cb5526cb663003f3fa34f57c3cf21",
+        "candidates/metaprompt/agents/openai.yaml": "d9b232e8330358c883add36fc412a55ce8373e7916f6e728ad2371a1e828ea0e",
+        "candidates/metaprompt/assets/icon.svg": "49315dda7125ec5fc77ef5f2b96126d8b2121c6e72944b4702972e90f321d3ee",
+        "candidates/metaprompt/references/agent-instructions-files.md": "f9b67a31c472308489e9320da835209810d6b7f8aee668726d51aeedd66b7bae",
+        "candidates/metaprompt/references/autoprompt-preflight.md": "a8b548acbd278b2711e069155a812a7ab882576d4e3ed8cb4c530db0dfb9efb5",
+        "candidates/metaprompt/references/best-prompt-blueprint.md": "4a64bc1074bde97e6cdd50e99ec2c1fc312c698e48406490beb1c7c077405f5b",
+        "candidates/metaprompt/references/coding-agent-prompts.md": "dc15b2b52822504d5dac0c815b6f4f2db693a4a04ed81084eeccc14c9bf1bb10",
+        "candidates/metaprompt/references/coding-context-calibration.md": "2b4806b234299c7dd8feb6da645b6abd8d0b9369f2b4d1568178f894eea7a0d5",
+        "candidates/metaprompt/references/compilation-rules.md": "552e00eb520686aff99d38602c3750dafc58ce4f36a6ebbeb5b469023ff86d86",
+        "candidates/metaprompt/references/context-management.md": "7c6996944a4212c34fcecf99ab6af5bd50327a5b1f7f8e4060da09e1003d85e2",
+        "candidates/metaprompt/references/domain-prompt-patterns.md": "698d41cefacd38dcd83de9c445d953b173220d565cad8e7539dfc25b23166312",
+        "candidates/metaprompt/references/evals-and-iteration.md": "26eb1b6e883d8440b34ee1d893bb5b1cb1f18f2be2071eb591ff849a905f9929",
+        "candidates/metaprompt/references/examples.md": "62317639b35865f128da1de2c60b9c1f31c10d3fb9ade211b74b42dfcfad08b0",
+        "candidates/metaprompt/references/execution-routing.md": "828d0bacf3839f7dfe1b67389307a116597d050b131e94dc5cf81a195763fcfb",
+        "candidates/metaprompt/references/general-task-prompts.md": "ef4369cc5897091b5bc68a49b007f8adcfbfad36a78b52af33b66476c4ddc935",
+        "candidates/metaprompt/references/goal-patterns.md": "82aac56636a9b34592195d8d4c641665a11a7e3a1439db4e0df0adba52ff8114",
+        "candidates/metaprompt/references/image-video-prompts.md": "a8bb5a679e7ded9128b78a5880d644a81811d26a31d62a9ad43125f63aee1ad2",
+        "candidates/metaprompt/references/instruction-audit.md": "190f9c58f84d502291d4e6c479db4854b9a79126687a80c91fa464e5b8b9a9a6",
+        "candidates/metaprompt/references/karpathy-agentic-engineering.md": "17b755a44077c3447452c74438e80f6bbc2c38394a640f032397af2df71a9fcf",
+        "candidates/metaprompt/references/live-verification.md": "44dcecca9cb7cd5fb5498eada5ab05b2e2947a7d74987dccb7364764497aea27",
+        "candidates/metaprompt/references/migration-prompts.md": "ad7091a149e5b3da072f10bf22defc3aaed11f9b73b56efb410659111b356de8",
+        "candidates/metaprompt/references/model-profiles.md": "ea522da5314a1d90331504fbc7bd8f2fbc5c7ad9dd62ab7856d7870a714a8d3e",
+        "candidates/metaprompt/references/playwright-verification.md": "be82908720e2b5bf72567dfa995aafb490f225e404a4ad2d6ddefc0838a4ebf4",
+        "candidates/metaprompt/references/ponytail-caveman-contract.md": "fa94aa614059ba18ab926943176072296092d58e5efe199665df4a9f7d89f7f5",
+        "candidates/metaprompt/references/prompt-pattern-library.md": "44c61cbe74862227cd9e56c5134cb250d75cbd944119970de2d9adf936cae92d",
+        "candidates/metaprompt/references/prompt-quality-checklist.md": "6720681c6807bda8f778c84387ec6332de667e654c7aaae499f73ffbf8b33e72",
+        "candidates/metaprompt/references/prompt-type-router.md": "e8dff2610e824971b2bde0e38229044de1573c30005545ca12ba4611976fa237",
+        "candidates/metaprompt/references/rag-wiki-benchmark-prompts.md": "6efe8a4a7139d6d6bc133500353ab10ba94284ab998fb836f3ea271eb87d7361",
+        "candidates/metaprompt/references/research-backed-principles.md": "6e699541fccbde26d5bc60a979c14fc8273f0c481f7f95fdfc9d81a7cf88d1f2",
+        "candidates/metaprompt/references/research-source-map.md": "32cd5130558df9612242803d73581081673a1c05c4453ee860d25c326eedc8b1",
+        "candidates/metaprompt/references/review-rubric.md": "f8eb86063e56d92f92ce42c9c2e2c3b3904639eaf724a95bff65291046b18803",
+        "candidates/metaprompt/references/runtime-calibration.md": "b1d0e092aca3b3dc0387f3ca28180198365da579f90350dfdadf3eb57ef74972",
+        "candidates/metaprompt/references/source-driven-prompt-audit.md": "29c65aafc563fc5603b56225817457c40640fbca68efe772365b88de75138a53",
+        "candidates/metaprompt/references/system-prompt-architecture.md": "765054db3585f3a2c5656cdacd97e53546ae39bf1fde23068da67cbb346d5111",
+        "candidates/metaprompt/references/system-prompt-evals.md": "d2ceebb62dc4b61d8a4aeed4806a627ce042bc4f9aa6720cf4bd11e6c76c2920",
+        "candidates/metaprompt/references/task-contract-examples.md": "dd21b39ae37f72bf3c1402347fc9e7bc985684d3a575805525c7ddc4cd76364c",
+        "candidates/metaprompt/references/token-efficient-caveman-style.md": "d8967f08a3c63b02a6ee85bbde4992ce7fa57ef49852b422966af01a8d5a7344",
+        "candidates/metaprompt/references/ultimate-caveman-extensions.md": "7be21136e0a52ff854aabc49a4f4ea350687541a8ae620a3f897727305ca9fc7",
+        "candidates/metaprompt/references/universal-prompt-framework.md": "eeec119d504fe1d8108a920ff2d415738767026f4d9d988ea19b6f085c8c6b99",
+        "candidates/metaprompt/references/unslop-style.md": "58367b6b1e96c3b6f342ccc9386c70a96bd1a9f70cfa28e8b26dbcecfe7277da",
+        "candidates/metaprompt/references/video-xfhbepnyiks-audit.md": "9005e8badf8319f9069d3c97dd64c4c746271b6095261e67780e2a5dc56d376a",
+        "candidates/metaprompt/scripts/make_prompt_eval.py": "fa1ed43254b6931a6d33601264ab9fca191fb57e56281a8aa2863decf8ffadbf",
+        "candidates/metaprompt/scripts/prompt_lint.py": "3b75f822f7d239b3445c7700c84514ef2417075d5791e9bc2b0a692009be804e",
+        "candidates/metaprompt/scripts/test_prompt_tools.py": "2195763e7199c06bd4d72f620d1347b538c0312c53a9aef5720fefefc0d47b86",
+        "candidates/metaprompt/scripts/update_upstream.py": "d017350b26144a69c839f0fb00ad2aa6712cc5750f629931805d6ef24e4b0265"
+      },
+      "supported_workflows": [
+        "sharpen",
+        "create",
+        "template",
+        "coding"
+      ],
+      "notes": {
+        "source_kind": "installed local adapter snapshot; revision identifies imported upstream, not local entrypoint",
+        "local_integrity": {
+          "tracked_equals_installed": false,
+          "tracked_file_count": 46,
+          "installed_file_count": 50,
+          "differences": [
+            "references/compilation-rules.md",
+            "references/examples.md",
+            "references/execution-routing.md",
+            "references/model-profiles.md"
+          ],
+          "local_snapshot_tree_sha256": "7fc0eb745b80412f21931234ec844f09412b91828a25bf91af5449535824d12a"
+        },
+        "native_interaction": "Local adapter disables upstream silent autoprompt execution; prompt-only compilation and repository prompt saving remain enabled. UPSTREAM.md is retained unmodified and referenced selectively.",
+        "local_additions": [
+          "references/compilation-rules.md",
+          "references/examples.md",
+          "references/execution-routing.md",
+          "references/model-profiles.md"
+        ],
+        "installed_extra_reference_risk": "Four stale legacy references remain installed but are not referenced by the maintained entrypoint. Full package inventory retains them to test the installed candidate exactly.",
+        "installed_snapshot_tree_sha256": "3cf9fde960ec740d2b416479cedb8aae30f739fe377e35abeb33b27c5c472d1e",
+        "snapshot_file_count": 50
+      }
+    },
+    {
+      "id": "metaprompt-alxve",
+      "revision": "4c30dda5754fe48ce3399c2379a7a370b652b155",
+      "repository": "Alxve99/metaprompt",
+      "entrypoint": "candidates/metaprompt-alxve/SKILL.md",
+      "license": "MIT",
+      "files": {
+        "candidates/metaprompt-alxve/LICENSE.txt": "fb3d1cf94dbd25af40177c401761ddf55c08ea41c91b410e5ab0d1229ede8dea",
+        "candidates/metaprompt-alxve/SKILL.md": "8663d29a49d3e1c9a6345bfdd90ee3044e14af8231dfa63f0e32da57eb5725d1",
+        "candidates/metaprompt-alxve/SOURCE.md": "9cdc2312bca20f5b05131d3da3ef4542c1755c304c0f67df109348afa6b572f1",
+        "candidates/metaprompt-alxve/agents/openai.yaml": "8c82cd400eb05f5fdba19b547f3ee21ba9725379c7e07cda43884cb7291ab95b",
+        "candidates/metaprompt-alxve/references/compilation-rules.md": "552e00eb520686aff99d38602c3750dafc58ce4f36a6ebbeb5b469023ff86d86",
+        "candidates/metaprompt-alxve/references/examples.md": "62317639b35865f128da1de2c60b9c1f31c10d3fb9ade211b74b42dfcfad08b0",
+        "candidates/metaprompt-alxve/references/execution-routing.md": "828d0bacf3839f7dfe1b67389307a116597d050b131e94dc5cf81a195763fcfb",
+        "candidates/metaprompt-alxve/references/model-profiles.md": "ea522da5314a1d90331504fbc7bd8f2fbc5c7ad9dd62ab7856d7870a714a8d3e"
+      },
+      "supported_workflows": [
+        "sharpen",
+        "create",
+        "template",
+        "coding"
+      ],
+      "notes": {
+        "source_kind": "local adapter snapshot; revision identifies conceptual/imported upstream, not local entrypoint",
+        "local_integrity": {
+          "tracked_equals_installed": true,
+          "tracked_file_count": 8,
+          "installed_file_count": 8,
+          "differences": [],
+          "local_snapshot_tree_sha256": "faf206ed872dec2bf99fe4007e28845240794fb7efc36928067e39e027881412"
+        },
+        "original_local_source": "/home/example/coding/metaprompt-alxve",
+        "native_interaction": "Strict fresh standalone go per pass; sharpening compiles a rewrite instruction rather than directly returning the rewritten draft. Snapshot is the repo-native adapted compiler, not raw upstream.",
+        "upstream_license_byte_match": true
+      }
+    },
+    {
+      "id": "talki",
+      "revision": "e5f5efe5925ce47073f143001d0a8e9de23b392a",
+      "repository": "talki-io/prompt-optimizer",
+      "entrypoint": "candidates/talki/SKILL.md",
+      "license": "MIT",
+      "files": {
+        "candidates/talki/LICENSE": "e1cbad27b1da2d7532fde904aeddb19038d3a107e9edad40f86d0ac7aa16cc6d",
+        "candidates/talki/README.md": "e9ea3168a4f069fb8ce5fce1d655e4f1c8152b4bbbd144c2049f15bfd76c8bc4",
+        "candidates/talki/SKILL.md": "529730aa060a6fb7db087cf153f0d2e9dcecd69f7c1be521005874dd166a2a2c"
+      },
+      "supported_workflows": [
+        "sharpen"
+      ],
+      "notes": {
+        "source_kind": "immutable upstream package",
+        "source_prefix": "",
+        "license_source": "LICENSE",
+        "unsupported_workflows": [
+          "create",
+          "template",
+          "coding"
+        ],
+        "native_interaction": "Direct explicit invocation displays the optimized prompt and immediately applies it; optimize-request mode returns prompt text only. Existing reusable/coding prompts can be edited without expanding scope.",
+        "github_git_blob_hashes_verified": 3
+      }
+    },
+    {
+      "id": "sentry",
+      "revision": "c190d369bcbaa6cfdd95e9edfdba040506b4db76",
+      "repository": "getsentry/skills",
+      "entrypoint": "candidates/sentry/SKILL.md",
+      "license": "Apache-2.0",
+      "files": {
+        "candidates/sentry/LICENSE": "96e78a9ce85795b117c8929887bdb78f88bf23f7b85a31f0872cde4dff7e92cd",
+        "candidates/sentry/SKILL.md": "b5ba1525d7964004d8664fea9d5028972cca599f346ff4662152479b94e25cb3",
+        "candidates/sentry/SOURCES.md": "2effb8172cb365ca7c6e0312c9ecb2aa6761ba00b3269637ada10daa284566a4",
+        "candidates/sentry/SPEC.md": "b56cdc168549dc916a29dc2c360fff95ecc0db8618eb43839c1eef9a11f1d499",
+        "candidates/sentry/references/core-patterns.md": "508199c575439e3d021848df67cb8a8be7675f0e1f2e8c77438e0e4734ca415c",
+        "candidates/sentry/references/meta-optimization-loop.md": "9489e6ee08a184319a3ac3e88de54ea9f91bc2da74e4ee2dd8ada662291a9e71",
+        "candidates/sentry/references/model-family-notes.md": "57a5292ec6e68c846136599c8a424e95330aecc3d2443831fa0a4283fa0f2f04",
+        "candidates/sentry/references/transformed-examples.md": "3cfb92aadc7b30ca4ad4e9bb02204a92c2366b0483b8023115ad2a1e614d235e"
+      },
+      "supported_workflows": [
+        "sharpen",
+        "create",
+        "template",
+        "coding"
+      ],
+      "notes": {
+        "source_kind": "immutable upstream package",
+        "source_prefix": "skills/prompt-optimizer/",
+        "license_source": "LICENSE",
+        "native_interaction": "Returns an eight-section prompt/eval package; extract only Optimized Prompt. Native baseline/candidate/holdout iteration can require extra model calls; a single compilation is a bounded adaptation, not evidence of executed native evals.",
+        "github_git_blob_hashes_verified": 8
+      }
+    },
+    {
+      "id": "github",
+      "revision": "b010c5ebfacdd78a45702481b77ec55ba033e373",
+      "repository": "github/awesome-copilot",
+      "entrypoint": "candidates/github/SKILL.md",
+      "license": "MIT",
+      "files": {
+        "candidates/github/LICENSE": "e32449d23085399adc1222f7a17408b730550258e51627c153cb108ca9955823",
+        "candidates/github/SKILL.md": "191e2544ccf5890c4d7134b116d5fc2b554571d596d1b8a43ef260d77168caab"
+      },
+      "supported_workflows": [
+        "sharpen",
+        "create",
+        "coding"
+      ],
+      "notes": {
+        "source_kind": "immutable upstream package",
+        "source_prefix": "skills/prompt-optimizer/",
+        "license_source": "LICENSE",
+        "unsupported_workflows": [
+          "template"
+        ],
+        "native_interaction": "One fenced chat prompt only; prohibits placeholders and strips API-only mechanics. Missing inputs become questions in the downstream interaction.",
+        "github_git_blob_hashes_verified": 2
+      }
+    }
+  ]
+}

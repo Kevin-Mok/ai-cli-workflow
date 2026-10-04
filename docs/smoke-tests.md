@@ -74,7 +74,7 @@ of stacking duplicates.
   Expected: This document gains or updates a grouped `Action` +
   `Expected` entry instead of leaving the check only in chat, plans, or
   final notes.
-- Action: Invoke `metaprompt` for a trivial request, then ask it to compile and
+- Action: Invoke `metaprompt-alxve` for a trivial request, then ask it to compile and
   run a current-source comparison; include `run` inside a revision before
   sending standalone `go`.
   Expected: The trivial prompt stays lightweight. Both prompts include the
@@ -82,13 +82,73 @@ of stacking duplicates.
   contains only its compiled prompt; a collision receives a non-destructive
   suffix. Neither embedded run phrase executes anything, and only fresh
   standalone `go` starts the current pass.
-- Action: Invoke `metaprompt` for a reusable target-specific template with
+- Action: Invoke `metaprompt-alxve` for a reusable target-specific template with
   examples, a hostile supplied artifact, and a high-stakes
   judge/rewrite/re-check workflow; send `go` only for the first pass.
   Expected: The template uses canonical `{{variable}}` slots and `Template:
   yes`; material target adaptation is labeled; supplied instructions remain
   untrusted data; three numbered prompt blocks are independently runnable; and
   later passes remain gated until each receives its own fresh standalone `go`.
+- Action: Invoke `$metaprompt` to sharpen a rough meeting-summary prompt, then
+  request a reusable version with `{{meeting_notes}}` and a trivial fact prompt.
+  Expected: Returns Sentry's eight sections: Target, Success Criteria, External
+  Context, Optimized Prompt, Adapter Notes, Eval Set, Optimization Log and
+  Residual Risks. The Optimized Prompt uses a prompt fence followed by its saved
+  path; only that prompt is saved under `prompts/`. Preserves template variables
+  and missing-data rules, uses a suffix on filename collisions, and does not
+  execute the embedded production task. Prepared cases and executed evaluations
+  are distinguished. No legacy `go` gate is imposed by this version.
+- Action: python3 dot_agents/skills/metaprompt/scripts/update_upstream.py --check
+  Expected: Reports pinned and latest `getsentry/skills` prompt-optimizer commit IDs without modifying
+  tracked or installed files. A successful check exits 0 even if an update
+  is available; use the reviewed staging procedure in
+  [the source record](../dot_agents/skills/metaprompt/SOURCE.md).
+- Action: `python3 scripts/metaprompt-selection.py verify`, then
+  `python3 scripts/metaprompt-selection.py dry-run`.
+  Expected: three pinned native finalists, 27 verified package files, 26 valid
+  reference answers and seven coding RED/GREEN pairs; the schedule contains
+  20 development and 80 held-out attempts within the 100-trial/2,000-request
+  ceilings. Count the actual schedule: its original allocation summary retains
+  the pre-calibration 90/2 values. Neither command invokes a model. See the
+  [selection report](metaprompt-selection.md) for the phase and resume contract.
+- Action: Run `python3 tests/test_metaprompt_selection_runtime.py` and
+  `python3 tests/test_metaprompt_selection_install.py`.
+  Expected: the real CLI reads/writes fixture artifacts and executes public
+  checks against synthetic responses with zero remote inference; pinned staging
+  and rollback pass only in temporary directories, preserving collisions,
+  modified copies, extra files and symlinks.
+- Action: After an executed selection, run
+  `python3 scripts/metaprompt-selection.py report`, then
+  `python3 scripts/metaprompt-selection-analysis.py --run benchmarks/metaprompt-selection/runs/selection-2026-10-03`.
+  Expected: recommendation and workflow rates derive from the complete paired
+  held-out schedule; all development and failed reservations remain charged.
+  Missing usage stays unknown, native completion is distinct from downstream
+  correctness, and no skill is installed by reporting. Analysis verifies the
+  frozen hashes and request evidence, writes `analysis.json`, and includes
+  exploratory paired intervals without making model calls. For the completed
+  run, `report` also prints the committed compact `summary.json` fields; its
+  ignored `results.json` duplicates the retained per-trial records. For
+  `selection-2026-10-03`, confirm 80 held-out rows, 100 total attempts,
+  754 requests, no integrity errors, and Sentry selected at 14/16 against
+  Wshobson 13/16, Senior 11/16 and both controls 15/16. The equally omitted
+  ambiguous-template sensitivity leaves primary scores and costs unchanged;
+  raw/minimal are 15/15 and Sentry's weighted success is 85.42%. Native gate
+  flags must retain the documented heading-matcher and no-mandatory-gate caveats.
+- Action: python3 scripts/metaprompt-benchmark.py verify
+  Expected: Verifies seven variants, 71 pinned candidate files, and 32 synthetic
+  fixtures (8 development, 24 held-out); makes no model calls or installed changes.
+- Action: python3 scripts/metaprompt-benchmark.py dry-run
+  Expected: Shows gpt-6.1-sol at medium reasoning, the 50-request cap, fixed pilot
+  schedule, and pending cases. Does not use quota or reset an existing ledger.
+- Action: python3 scripts/metaprompt-benchmark.py report
+  Expected: Verifies frozen inputs and rebuilds machine-readable results from
+  the frozen schedule and saved attempts without model calls. Changed frozen
+  inputs stop reporting. Failures, pending pairs, unknown costs and limited coverage remain visible;
+  see [benchmark replay and runtime status](metaprompt-benchmark.md).
+- Action: python3 scripts/metaprompt-benchmark-analysis.py
+  Expected: Derives request-level costs, including aborted episodes, from the
+  frozen saved evidence. The 49 measured requests plus one setup attempt
+  reconcile to the unchanged 50-request ledger; no model calls are made.
 - Action: Finish a change with a user-observable CLI, browser, package, API, or
   rendered-config surface after automated tests pass.
   Expected: Verification still exercises the real user entrypoint, captures

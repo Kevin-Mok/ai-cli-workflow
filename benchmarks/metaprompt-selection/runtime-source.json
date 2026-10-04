@@ -1,0 +1,14 @@
+{
+  "model": "gpt-6.1-sol",
+  "reasoning_effort": "medium",
+  "billing": "Codex subscription",
+  "codex_version": "codex-cli 0.160.0",
+  "launcher": "/home/example/.local/share/fnm/node-versions/v22.15.0/installation/lib/node_modules/@openai/codex/bin/codex.js",
+  "launcher_sha256": "61b0194f3bb6534439c8d26a3ed57d0805f84b884588b761795323eeb92fcf70",
+  "python": "3.12.3",
+  "platform": "Linux-6.8.0-142-generic-x86_64-with-glibc2.39",
+  "source_lineage": "implementation-lineage.json",
+  "host_instructions": "recognized injected AGENTS/installed-skill envelopes removed; source/task bytes preserved",
+  "native_tools": "fixture-only allowlist; scoped static helper; public batch evals share compiler allowance",
+  "monetary_cost": null
+}

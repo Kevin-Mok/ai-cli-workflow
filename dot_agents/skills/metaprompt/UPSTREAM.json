@@ -1,0 +1,41 @@
+{
+  "repository": "getsentry/skills",
+  "revision": "d18b7aa8ba878354e5c348310230e652f7690f9c",
+  "source_path": "skills/prompt-optimizer",
+  "retrieved_at": "2026-10-03T22:36:06.171123+00:00",
+  "imported_on": "2026-10-04",
+  "files": {
+    "LICENSE.txt": {
+      "source": "LICENSE",
+      "sha256": "96e78a9ce85795b117c8929887bdb78f88bf23f7b85a31f0872cde4dff7e92cd"
+    },
+    "SOURCES.md": {
+      "source": "skills/prompt-optimizer/SOURCES.md",
+      "sha256": "2effb8172cb365ca7c6e0312c9ecb2aa6761ba00b3269637ada10daa284566a4"
+    },
+    "SPEC.md": {
+      "source": "skills/prompt-optimizer/SPEC.md",
+      "sha256": "b56cdc168549dc916a29dc2c360fff95ecc0db8618eb43839c1eef9a11f1d499"
+    },
+    "UPSTREAM.md": {
+      "source": "skills/prompt-optimizer/SKILL.md",
+      "sha256": "b5ba1525d7964004d8664fea9d5028972cca599f346ff4662152479b94e25cb3"
+    },
+    "references/core-patterns.md": {
+      "source": "skills/prompt-optimizer/references/core-patterns.md",
+      "sha256": "508199c575439e3d021848df67cb8a8be7675f0e1f2e8c77438e0e4734ca415c"
+    },
+    "references/meta-optimization-loop.md": {
+      "source": "skills/prompt-optimizer/references/meta-optimization-loop.md",
+      "sha256": "9489e6ee08a184319a3ac3e88de54ea9f91bc2da74e4ee2dd8ada662291a9e71"
+    },
+    "references/model-family-notes.md": {
+      "source": "skills/prompt-optimizer/references/model-family-notes.md",
+      "sha256": "57a5292ec6e68c846136599c8a424e95330aecc3d2443831fa0a4283fa0f2f04"
+    },
+    "references/transformed-examples.md": {
+      "source": "skills/prompt-optimizer/references/transformed-examples.md",
+      "sha256": "3cfb92aadc7b30ca4ad4e9bb02204a92c2366b0483b8023115ad2a1e614d235e"
+    }
+  }
+}

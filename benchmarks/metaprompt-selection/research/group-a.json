@@ -1,0 +1,517 @@
+{
+  "schema_version": 1,
+  "group": "a",
+  "date": "2026-10-03",
+  "window_start90": "2026-07-05",
+  "window_start180": "2026-04-06",
+  "method": "Official authenticated gh api repository metadata, immutable Git trees/content and skill-path commit details; no model trials. Repository stars are repository popularity, not skill quality.",
+  "candidates": [
+    {
+      "id": "wshobson-patterns",
+      "repo": "wshobson/agents",
+      "skill_path": "plugins/llm-application-dev/skills/prompt-engineering-patterns",
+      "entrypoint": "candidates/wshobson-patterns/SKILL.md",
+      "revision": "156b7a5e7a8b93642628a339ee4039c925b34c7f",
+      "license": "MIT",
+      "stars": 40179,
+      "retrieved_at": "2026-10-03T22:34:16.986652+00:00",
+      "archived": false,
+      "supported_workflows": [
+        "create",
+        "sharpen",
+        "template",
+        "coding"
+      ],
+      "latest_substantive_change": {
+        "revision": "56a28c6e4d575f1813f777ddfeb956e069aac07a",
+        "date": "2026-08-15T20:49:35Z",
+        "author": "rahul188",
+        "author_is_linked_github_account": true,
+        "reason": "Optimizer stops deterministically repeated evaluation when no variation improves its prompt, reducing unnecessary calls. This is an executable helper inside the native skill package.",
+        "evidence_url": "https://github.com/wshobson/agents/commit/56a28c6e4d575f1813f777ddfeb956e069aac07a",
+        "files": [
+          "plugins/llm-application-dev/skills/prompt-engineering-patterns/scripts/optimize-prompt.py"
+        ]
+      },
+      "changes90": 1,
+      "changes180": 2,
+      "maintainer_count180": 2,
+      "contributors180": [
+        "rahul188",
+        "yanghaod2278827"
+      ],
+      "eligibility": "eligible",
+      "reasons": [],
+      "files": {
+        "candidates/wshobson-patterns/LICENSE": "f89abb55d9f073f38f1703e4518f0613c788c6174be7f13b8dfe48a1c076c746",
+        "candidates/wshobson-patterns/SKILL.md": "6a210b15be01bc6f76a74ec1e46302dee310ddf79d2def63fc9b7c54221fe329",
+        "candidates/wshobson-patterns/assets/few-shot-examples.json": "8e1ade9727b0bb1fb5540a781192b67e2692fbb5908ffe9eac3ec7cc2fbc6216",
+        "candidates/wshobson-patterns/assets/prompt-template-library.md": "c5756b6f9c5558d8ca82d845fd50492b53f1f4d6d02cf27585f411440a4723c2",
+        "candidates/wshobson-patterns/references/chain-of-thought.md": "155af3b1d240b67970870940cc90396ba9e66580a9487bb0f7bd288ad10622f5",
+        "candidates/wshobson-patterns/references/details.md": "406934586a34cd1aa0084d3dbd21e5e77be75de934a791cae962e1e16f55a133",
+        "candidates/wshobson-patterns/references/few-shot-learning.md": "d8784634f7beb4c60c51add45203ef2d9d0e4e3accbb81ba3295f87d893dba10",
+        "candidates/wshobson-patterns/references/prompt-optimization.md": "5c25ad9b49045ef35c55b531bd227f04628b0018080b0d4f05cb20b01b44ee41",
+        "candidates/wshobson-patterns/references/prompt-templates.md": "18db56a32be1639072631f0f7256b153acd678fe6092edad23b2a4a44016e3da",
+        "candidates/wshobson-patterns/references/system-prompts.md": "88aa10639dad981b07f3bba05539c4eefcc5fba5ed255c60eab0df238778e000",
+        "candidates/wshobson-patterns/scripts/optimize-prompt.py": "374323ec15ca40b5e2a43f580664913a61e998adb30f4087e9cc66710cfdf9da"
+      },
+      "evidence_urls": [
+        "https://api.github.com/repos/wshobson/agents",
+        "https://github.com/wshobson/agents/tree/156b7a5e7a8b93642628a339ee4039c925b34c7f/plugins/llm-application-dev/skills/prompt-engineering-patterns",
+        "https://github.com/wshobson/agents/blob/156b7a5e7a8b93642628a339ee4039c925b34c7f/LICENSE",
+        "https://github.com/wshobson/agents/commit/56a28c6e4d575f1813f777ddfeb956e069aac07a",
+        "https://github.com/wshobson/agents/commit/3ce0342afde674b3a492bdc9271621e953322c11",
+        "https://github.com/wshobson/agents/commit/511f8345cf42f84676e0ad56ddfdee33c90a666f",
+        "https://github.com/wshobson/agents/commit/be57c0b2e3c05c528ca6132b87410b385718775f",
+        "https://github.com/wshobson/agents/commit/20605a6ce94f3286150a0e545aa72e161309a749"
+      ],
+      "source_lineage": {
+        "kind": "unmodified native package",
+        "source_prefix": "plugins/llm-application-dev/skills/prompt-engineering-patterns",
+        "repository_revision": "156b7a5e7a8b93642628a339ee4039c925b34c7f",
+        "local_adaptations": [],
+        "license_source": "LICENSE",
+        "audit_package_files": {
+          "LICENSE": "f89abb55d9f073f38f1703e4518f0613c788c6174be7f13b8dfe48a1c076c746",
+          "plugins/llm-application-dev/skills/prompt-engineering-patterns/SKILL.md": "6a210b15be01bc6f76a74ec1e46302dee310ddf79d2def63fc9b7c54221fe329",
+          "plugins/llm-application-dev/skills/prompt-engineering-patterns/assets/few-shot-examples.json": "8e1ade9727b0bb1fb5540a781192b67e2692fbb5908ffe9eac3ec7cc2fbc6216",
+          "plugins/llm-application-dev/skills/prompt-engineering-patterns/assets/prompt-template-library.md": "c5756b6f9c5558d8ca82d845fd50492b53f1f4d6d02cf27585f411440a4723c2",
+          "plugins/llm-application-dev/skills/prompt-engineering-patterns/references/chain-of-thought.md": "155af3b1d240b67970870940cc90396ba9e66580a9487bb0f7bd288ad10622f5",
+          "plugins/llm-application-dev/skills/prompt-engineering-patterns/references/details.md": "406934586a34cd1aa0084d3dbd21e5e77be75de934a791cae962e1e16f55a133",
+          "plugins/llm-application-dev/skills/prompt-engineering-patterns/references/few-shot-learning.md": "d8784634f7beb4c60c51add45203ef2d9d0e4e3accbb81ba3295f87d893dba10",
+          "plugins/llm-application-dev/skills/prompt-engineering-patterns/references/prompt-optimization.md": "5c25ad9b49045ef35c55b531bd227f04628b0018080b0d4f05cb20b01b44ee41",
+          "plugins/llm-application-dev/skills/prompt-engineering-patterns/references/prompt-templates.md": "18db56a32be1639072631f0f7256b153acd678fe6092edad23b2a4a44016e3da",
+          "plugins/llm-application-dev/skills/prompt-engineering-patterns/references/system-prompts.md": "88aa10639dad981b07f3bba05539c4eefcc5fba5ed255c60eab0df238778e000",
+          "plugins/llm-application-dev/skills/prompt-engineering-patterns/scripts/optimize-prompt.py": "374323ec15ca40b5e2a43f580664913a61e998adb30f4087e9cc66710cfdf9da"
+        },
+        "git_blob_ids": {
+          "LICENSE": "326f0a55c96e672fedf9d807ca043c00df05ba0e",
+          "plugins/llm-application-dev/skills/prompt-engineering-patterns/SKILL.md": "869548fa7b265c81dd54b3407fd06e61c1fc8ea6",
+          "plugins/llm-application-dev/skills/prompt-engineering-patterns/assets/few-shot-examples.json": "dc30b9f89953cb839c62f6e60c7c8a9ff821e7d4",
+          "plugins/llm-application-dev/skills/prompt-engineering-patterns/assets/prompt-template-library.md": "cb2a785a6a6d46b106c45b4973f84dcd67d21bd9",
+          "plugins/llm-application-dev/skills/prompt-engineering-patterns/references/chain-of-thought.md": "019f32e16270aacccd66882b02802f3d0aca8b2a",
+          "plugins/llm-application-dev/skills/prompt-engineering-patterns/references/details.md": "78d4311523e627b81c9fe17c113d1353a1f4a790",
+          "plugins/llm-application-dev/skills/prompt-engineering-patterns/references/few-shot-learning.md": "236eaa7f88a38f90e8a0a54f7172342a6c0a00fb",
+          "plugins/llm-application-dev/skills/prompt-engineering-patterns/references/prompt-optimization.md": "6b3ee7e361ca5681c89469edc3b347e11aba4615",
+          "plugins/llm-application-dev/skills/prompt-engineering-patterns/references/prompt-templates.md": "e2e791186a9c0d980bda6a7b50c75941954dd1f1",
+          "plugins/llm-application-dev/skills/prompt-engineering-patterns/references/system-prompts.md": "13f421e76e774a53c442e0d607318b376ceac910",
+          "plugins/llm-application-dev/skills/prompt-engineering-patterns/scripts/optimize-prompt.py": "d7be11005462ab347f01c20bc99df11a21290348"
+        },
+        "history_notes": "Counts are unique post-introduction package commits; excluded initial additions, packaging moves, mechanical provider-name refreshes and unrelated repo churn.",
+        "introduction_revision": "65e5cb093a38ff6bd97175bf12c732608c635a8d"
+      },
+      "required_runtime": {
+        "required_paid_api": false,
+        "mandatory_shell": false,
+        "native_output_wrapper": "None required by native SKILL.md; preserve actual prompt output.",
+        "extraction_contract": "Explicitly named final prompt artifact, one unambiguous final prompt fence, or explicit Final/Optimized/Revised Prompt section; no rewriting or score-based selection.",
+        "required_helpers": [],
+        "optional_helpers": [
+          {
+            "path": "scripts/optimize-prompt.py",
+            "dependencies": [
+              "numpy"
+            ],
+            "behavior": "Default main uses a mock LLM and writes optimization_results.json; injected real client may call a provider. It is example tooling, not required for authoring. Never treat demo scores as actual model evals."
+          }
+        ],
+        "optional_examples_require": [
+          "anthropic SDK",
+          "LangChain packages",
+          "Pydantic",
+          "OpenAI SDK",
+          "VoyageAI embeddings",
+          "Chroma",
+          "sentence-transformers",
+          "scikit-learn",
+          "scipy"
+        ],
+        "notes": "Pattern authoring does not require executing SDK examples; no external API key is intrinsically required. References contain older API forms/provider assumptions; avoid certifying them from repository popularity."
+      },
+      "counted_changes": [
+        {
+          "revision": "56a28c6e4d575f1813f777ddfeb956e069aac07a",
+          "date": "2026-08-15T20:49:35Z",
+          "author": "rahul188",
+          "author_is_linked_github_account": true,
+          "reason": "Optimizer stops deterministically repeated evaluation when no variation improves its prompt, reducing unnecessary calls. This is an executable helper inside the native skill package.",
+          "evidence_url": "https://github.com/wshobson/agents/commit/56a28c6e4d575f1813f777ddfeb956e069aac07a",
+          "files": [
+            "plugins/llm-application-dev/skills/prompt-engineering-patterns/scripts/optimize-prompt.py"
+          ]
+        },
+        {
+          "revision": "3ce0342afde674b3a492bdc9271621e953322c11",
+          "date": "2026-06-03T03:33:57Z",
+          "author": "yanghaod2278827",
+          "author_is_linked_github_account": true,
+          "reason": "Native SKILL trigger semantics expanded to prompt templates, debugging, few-shot and structured prompting; changes discoverability/applicability, not formatting.",
+          "evidence_url": "https://github.com/wshobson/agents/commit/3ce0342afde674b3a492bdc9271621e953322c11",
+          "files": [
+            "plugins/llm-application-dev/skills/prompt-engineering-patterns/SKILL.md"
+          ]
+        }
+      ],
+      "excluded_recent_changes": [
+        {
+          "revision": "511f8345cf42f84676e0ad56ddfdee33c90a666f",
+          "date": "2026-07-07T16:17:53Z",
+          "reason": "Mechanical model-name substitutions in examples; excluded conservatively from substantive workflow maintenance.",
+          "evidence_url": "https://github.com/wshobson/agents/commit/511f8345cf42f84676e0ad56ddfdee33c90a666f"
+        },
+        {
+          "revision": "be57c0b2e3c05c528ca6132b87410b385718775f",
+          "date": "2026-05-22T12:18:21Z",
+          "reason": "Packaging/directory move only.",
+          "evidence_url": "https://github.com/wshobson/agents/commit/be57c0b2e3c05c528ca6132b87410b385718775f"
+        },
+        {
+          "revision": "20605a6ce94f3286150a0e545aa72e161309a749",
+          "date": "2026-04-16T17:19:42Z",
+          "reason": "Mechanical model-name substitutions in examples; excluded conservatively from substantive workflow maintenance.",
+          "evidence_url": "https://github.com/wshobson/agents/commit/20605a6ce94f3286150a0e545aa72e161309a749"
+        }
+      ]
+    },
+    {
+      "id": "alireza-senior",
+      "repo": "alirezarezvani/claude-skills",
+      "skill_path": "engineering-team/skills/senior-prompt-engineer",
+      "entrypoint": "candidates/alireza-senior/SKILL.md",
+      "revision": "19392f7a08264ed00486a251f5b2098321771f94",
+      "license": "MIT",
+      "stars": 27472,
+      "retrieved_at": "2026-10-03T22:34:17.001868+00:00",
+      "archived": false,
+      "supported_workflows": [
+        "create",
+        "sharpen",
+        "template",
+        "coding"
+      ],
+      "latest_substantive_change": {
+        "revision": "5acece10acd47513bbc7b0c91fe88f54df138adc",
+        "date": "2026-06-11T15:28:22Z",
+        "author": "claude",
+        "author_is_linked_github_account": true,
+        "reason": "Runtime rewrite mandates baseline/eval-first iteration, model-agnostic tooling, no-regression gates, supplied pricing; prompt_optimizer and agent_orchestrator behavior also changed.",
+        "evidence_url": "https://github.com/alirezarezvani/claude-skills/commit/5acece10acd47513bbc7b0c91fe88f54df138adc",
+        "files": [
+          "engineering-team/skills/senior-prompt-engineer/SKILL.md",
+          "engineering-team/skills/senior-prompt-engineer/references/prompt_engineering_patterns.md",
+          "engineering-team/skills/senior-prompt-engineer/scripts/agent_orchestrator.py",
+          "engineering-team/skills/senior-prompt-engineer/scripts/prompt_optimizer.py"
+        ]
+      },
+      "changes90": 0,
+      "changes180": 1,
+      "maintainer_count180": 1,
+      "contributors180": [
+        "claude"
+      ],
+      "eligibility": "eligible",
+      "reasons": [],
+      "files": {
+        "candidates/alireza-senior/LICENSE": "a20126646f93d32a8989c3cf4772d59194f405034f7babe7daebeac22b8ab151",
+        "candidates/alireza-senior/SKILL.md": "bbf9324400a094eef1a92b076d3e2bd2303bc2962db4dd59157adcc827f7e7ef",
+        "candidates/alireza-senior/references/agentic_system_design.md": "91d1aae4ffe031f35b88ffca7c011c3187d4b231ee8498658c290e6788da1f3b",
+        "candidates/alireza-senior/references/llm_evaluation_frameworks.md": "b87239c5178c862ed765d2759044a86cb939b8f5bb27c188008d9773c0d94ec6",
+        "candidates/alireza-senior/references/prompt_engineering_patterns.md": "f1df197a91432953ac631fcfff9fe4978ac2be83cf7e47df31c9bd2babdacd12",
+        "candidates/alireza-senior/scripts/agent_orchestrator.py": "5db98fffb31dfa384a20981e6ad1a7938607194cfd3b49169e47808805c9cffe",
+        "candidates/alireza-senior/scripts/prompt_optimizer.py": "cbf0beead6af85424ce3f750a12110f56b06b2996713fc7f0d2aaa12b72c6eab",
+        "candidates/alireza-senior/scripts/rag_evaluator.py": "bf4593989f2b805221d421d5f4f3dfe843a90d5bbad997a05e28777469e87089"
+      },
+      "evidence_urls": [
+        "https://api.github.com/repos/alirezarezvani/claude-skills",
+        "https://github.com/alirezarezvani/claude-skills/tree/19392f7a08264ed00486a251f5b2098321771f94/engineering-team/skills/senior-prompt-engineer",
+        "https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/LICENSE",
+        "https://github.com/alirezarezvani/claude-skills/commit/5acece10acd47513bbc7b0c91fe88f54df138adc",
+        "https://github.com/alirezarezvani/claude-skills/commit/1851c8fb09ea8ff0488d48bd7c312abb1bbf5850"
+      ],
+      "source_lineage": {
+        "kind": "unmodified native package",
+        "source_prefix": "engineering-team/skills/senior-prompt-engineer",
+        "repository_revision": "19392f7a08264ed00486a251f5b2098321771f94",
+        "local_adaptations": [],
+        "license_source": "LICENSE",
+        "audit_package_files": {
+          "LICENSE": "a20126646f93d32a8989c3cf4772d59194f405034f7babe7daebeac22b8ab151",
+          "engineering-team/skills/senior-prompt-engineer/SKILL.md": "bbf9324400a094eef1a92b076d3e2bd2303bc2962db4dd59157adcc827f7e7ef",
+          "engineering-team/skills/senior-prompt-engineer/references/agentic_system_design.md": "91d1aae4ffe031f35b88ffca7c011c3187d4b231ee8498658c290e6788da1f3b",
+          "engineering-team/skills/senior-prompt-engineer/references/llm_evaluation_frameworks.md": "b87239c5178c862ed765d2759044a86cb939b8f5bb27c188008d9773c0d94ec6",
+          "engineering-team/skills/senior-prompt-engineer/references/prompt_engineering_patterns.md": "f1df197a91432953ac631fcfff9fe4978ac2be83cf7e47df31c9bd2babdacd12",
+          "engineering-team/skills/senior-prompt-engineer/scripts/agent_orchestrator.py": "5db98fffb31dfa384a20981e6ad1a7938607194cfd3b49169e47808805c9cffe",
+          "engineering-team/skills/senior-prompt-engineer/scripts/prompt_optimizer.py": "cbf0beead6af85424ce3f750a12110f56b06b2996713fc7f0d2aaa12b72c6eab",
+          "engineering-team/skills/senior-prompt-engineer/scripts/rag_evaluator.py": "bf4593989f2b805221d421d5f4f3dfe843a90d5bbad997a05e28777469e87089"
+        },
+        "git_blob_ids": {
+          "LICENSE": "c3e30bcc287d6a1ebdb4ab29c10d344fd1053639",
+          "engineering-team/skills/senior-prompt-engineer/SKILL.md": "4fdd9b326abbf2cceb8c2b17091bbb214256564c",
+          "engineering-team/skills/senior-prompt-engineer/references/agentic_system_design.md": "bcfe5000e3508b5ef2053be60c60866ab0a497dd",
+          "engineering-team/skills/senior-prompt-engineer/references/llm_evaluation_frameworks.md": "e31a34e4f3f12338cc9645da0a04961ec788df79",
+          "engineering-team/skills/senior-prompt-engineer/references/prompt_engineering_patterns.md": "0c51d936438184322bef97d49ea0a2b71bb0860a",
+          "engineering-team/skills/senior-prompt-engineer/scripts/agent_orchestrator.py": "867e718666778e0f5315603452ff54dcd6657315",
+          "engineering-team/skills/senior-prompt-engineer/scripts/prompt_optimizer.py": "aea01286887479044490b26e69d7590a71507513",
+          "engineering-team/skills/senior-prompt-engineer/scripts/rag_evaluator.py": "9906cb3db9e839b71bde5cb222bd3f44240d6daf"
+        },
+        "history_notes": "Counts are unique post-introduction package commits; excluded initial additions, packaging moves, mechanical provider-name refreshes and unrelated repo churn.",
+        "previous_path": "engineering-team/senior-prompt-engineer",
+        "move_revision": "1851c8fb09ea8ff0488d48bd7c312abb1bbf5850",
+        "introduction_revision": "ffff3317ca87fd8213d3be0c8b20b32cce2be6b0"
+      },
+      "required_runtime": {
+        "required_paid_api": false,
+        "mandatory_shell": false,
+        "native_output_wrapper": "None required by native SKILL.md; preserve actual prompt output.",
+        "extraction_contract": "Explicitly named final prompt artifact, one unambiguous final prompt fence, or explicit Final/Optimized/Revised Prompt section; no rewriting or score-based selection.",
+        "required_helpers": [
+          {
+            "path": "scripts/prompt_optimizer.py",
+            "operation": "analyze",
+            "commands": [
+              "python3 scripts/prompt_optimizer.py current_prompt.txt --analyze --json --output baseline.json",
+              "python3 scripts/prompt_optimizer.py revised.txt --analyze --compare baseline.json",
+              "python3 scripts/prompt_optimizer.py revised.txt --analyze --json --output revised.json"
+            ],
+            "inputs": [
+              "Current or revised prompt text",
+              "Optional baseline JSON"
+            ],
+            "outputs": [
+              "stdout human/JSON analysis",
+              "Optional output JSON containing token_count, clarity_score, structure_score, issues and suggestions"
+            ],
+            "scope": "Stdlib deterministic local analysis; no network, subprocess, dynamic execution, secrets or model access. Native CLI accepts arbitrary paths and overwrites --output; wrapper must confine prompt/compare paths to scratch and output paths to helper-owned artifacts."
+          }
+        ],
+        "optional_helpers": [
+          "scripts/rag_evaluator.py",
+          "scripts/agent_orchestrator.py"
+        ],
+        "native_gates": [
+          "10\u201320 representative public eval examples before optimization; build/request if missing.",
+          "Structural gate: revised clarity_score >= baseline and revised token_count <= baseline * 1.10.",
+          "Task-level eval no-regression before shipping; do not imply static metrics prove downstream behavior."
+        ],
+        "notes": "Required native baseline/analysis is feasible through narrowly fixed run_skill_check action. RAG and agent-config helpers apply only to those tasks. Existing-draft sharpening uses baseline; new authoring can use meta-prompting patterns. Eval execution outside available tools must remain explicitly unverified.",
+        "public_helper_smoke_test": "Scratch-only baseline analyze/save and revised compare commands both exited 0; no model/API calls.",
+        "native_artifact_selection": "baseline.json/revised.json/eval_results.json are metrics, never prompt candidates; current_prompt.txt is original draft, revised.txt is the native example final prompt file."
+      },
+      "counted_changes": [
+        {
+          "revision": "5acece10acd47513bbc7b0c91fe88f54df138adc",
+          "date": "2026-06-11T15:28:22Z",
+          "author": "claude",
+          "author_is_linked_github_account": true,
+          "reason": "Runtime rewrite mandates baseline/eval-first iteration, model-agnostic tooling, no-regression gates, supplied pricing; prompt_optimizer and agent_orchestrator behavior also changed.",
+          "evidence_url": "https://github.com/alirezarezvani/claude-skills/commit/5acece10acd47513bbc7b0c91fe88f54df138adc",
+          "files": [
+            "engineering-team/skills/senior-prompt-engineer/SKILL.md",
+            "engineering-team/skills/senior-prompt-engineer/references/prompt_engineering_patterns.md",
+            "engineering-team/skills/senior-prompt-engineer/scripts/agent_orchestrator.py",
+            "engineering-team/skills/senior-prompt-engineer/scripts/prompt_optimizer.py"
+          ]
+        }
+      ],
+      "excluded_recent_changes": [
+        {
+          "revision": "1851c8fb09ea8ff0488d48bd7c312abb1bbf5850",
+          "date": "2026-05-02T20:51:20Z",
+          "reason": "Packaging/directory move only.",
+          "evidence_url": "https://github.com/alirezarezvani/claude-skills/commit/1851c8fb09ea8ff0488d48bd7c312abb1bbf5850"
+        }
+      ],
+      "contributor_identity_caveat": "Count is distinct recorded commit-author identity; June author claude resolves to the linked GitHub account claude. A linked identity is not evidence of human ownership or one active human maintainer."
+    },
+    {
+      "id": "alireza-toolkit",
+      "repo": "alirezarezvani/claude-skills",
+      "skill_path": "marketing-skill/skills/prompt-engineer-toolkit",
+      "entrypoint": null,
+      "revision": "19392f7a08264ed00486a251f5b2098321771f94",
+      "license": "MIT",
+      "stars": 27472,
+      "retrieved_at": "2026-10-03T22:34:17.019087+00:00",
+      "archived": false,
+      "supported_workflows": [
+        "create",
+        "sharpen",
+        "template"
+      ],
+      "latest_substantive_change": {
+        "revision": "aecfb8e0bb71dbf1413082f86b33a5c4c9b8f416",
+        "date": "2026-06-11T03:58:41Z",
+        "author": "claude",
+        "author_is_linked_github_account": true,
+        "reason": "Marketing-specific tested templates, safety/evaluation gates and governance references replaced generic examples.",
+        "evidence_url": "https://github.com/alirezarezvani/claude-skills/commit/aecfb8e0bb71dbf1413082f86b33a5c4c9b8f416",
+        "files": [
+          "marketing-skill/skills/prompt-engineer-toolkit/SKILL.md",
+          "marketing-skill/skills/prompt-engineer-toolkit/references/evaluation-rubric.md",
+          "marketing-skill/skills/prompt-engineer-toolkit/references/prompt-templates.md",
+          "marketing-skill/skills/prompt-engineer-toolkit/references/technique-guide.md"
+        ]
+      },
+      "changes90": 0,
+      "changes180": 1,
+      "maintainer_count180": 1,
+      "contributors180": [
+        "claude"
+      ],
+      "eligibility": "excluded",
+      "reasons": [
+        "Pinned native scope is marketing prompt governance/templates; coding-agent prompt authoring is not supported by the current package. June overhaul removed the old code-review template."
+      ],
+      "files": {},
+      "evidence_urls": [
+        "https://api.github.com/repos/alirezarezvani/claude-skills",
+        "https://github.com/alirezarezvani/claude-skills/tree/19392f7a08264ed00486a251f5b2098321771f94/marketing-skill/skills/prompt-engineer-toolkit",
+        "https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/LICENSE",
+        "https://github.com/alirezarezvani/claude-skills/commit/aecfb8e0bb71dbf1413082f86b33a5c4c9b8f416",
+        "https://github.com/alirezarezvani/claude-skills/commit/1851c8fb09ea8ff0488d48bd7c312abb1bbf5850"
+      ],
+      "source_lineage": {
+        "kind": "unmodified native package",
+        "source_prefix": "marketing-skill/skills/prompt-engineer-toolkit",
+        "repository_revision": "19392f7a08264ed00486a251f5b2098321771f94",
+        "local_adaptations": [],
+        "license_source": "LICENSE",
+        "audit_package_files": {
+          "LICENSE": "a20126646f93d32a8989c3cf4772d59194f405034f7babe7daebeac22b8ab151",
+          "marketing-skill/skills/prompt-engineer-toolkit/README.md": "9c3a78ebb25a4903b3400e864d0fb537c943742dd22af774a3fe1c4dea79f33f",
+          "marketing-skill/skills/prompt-engineer-toolkit/SKILL.md": "619516d20520a7a84b54aaad8f35d35d42317a1b633e173bb2595f575b2ac4df",
+          "marketing-skill/skills/prompt-engineer-toolkit/references/evaluation-rubric.md": "ec91966377773387394c946d41ebc3d28ed11b1922034b709c64a9bfd978146c",
+          "marketing-skill/skills/prompt-engineer-toolkit/references/prompt-templates.md": "c07ff57e626f6b4f507a2a33626494f8a158cf5af5e8bd7b13f63745101ef583",
+          "marketing-skill/skills/prompt-engineer-toolkit/references/technique-guide.md": "a5daca06d39c439eb4eabbf7d24c280a6db8cdbe3fdef938b693ffb05da756ea",
+          "marketing-skill/skills/prompt-engineer-toolkit/scripts/prompt_tester.py": "250effa4dd83e85d3f1952d9ae5c204de49215831fd72cb91783aa8d549eb359",
+          "marketing-skill/skills/prompt-engineer-toolkit/scripts/prompt_versioner.py": "407a025b70785a5c8d40ed9b745a26127a6e487f1bd24dc8c80e6cc1d1d17465"
+        },
+        "git_blob_ids": {
+          "LICENSE": "c3e30bcc287d6a1ebdb4ab29c10d344fd1053639",
+          "marketing-skill/skills/prompt-engineer-toolkit/README.md": "a5ea6119c7d98b651dd5743e7cdbfa1965b529a9",
+          "marketing-skill/skills/prompt-engineer-toolkit/SKILL.md": "c0613e725029ca53e255e4630a2c6fe87b453d94",
+          "marketing-skill/skills/prompt-engineer-toolkit/references/evaluation-rubric.md": "d0cfb5b58c57ea3804703058e1b3d41878fda3d7",
+          "marketing-skill/skills/prompt-engineer-toolkit/references/prompt-templates.md": "16ea83fe1a3dcae71268eb142be81212672e42df",
+          "marketing-skill/skills/prompt-engineer-toolkit/references/technique-guide.md": "fdbadfdeb9caffb3853f1c39f13665d542824c3f",
+          "marketing-skill/skills/prompt-engineer-toolkit/scripts/prompt_tester.py": "ac530277697165c7de517246b92ca27c432f053b",
+          "marketing-skill/skills/prompt-engineer-toolkit/scripts/prompt_versioner.py": "4eadb51bf61cc215fbf7b9481c266fd5e9f5202d"
+        },
+        "history_notes": "Counts are unique post-introduction package commits; excluded initial additions, packaging moves, mechanical provider-name refreshes and unrelated repo churn.",
+        "previous_path": "marketing-skill/prompt-engineer-toolkit",
+        "move_revision": "1851c8fb09ea8ff0488d48bd7c312abb1bbf5850",
+        "introduction_revision": "40df8ff9d6c0cd74b9eed675cd297b929d91e505"
+      },
+      "required_runtime": {
+        "required_paid_api": false,
+        "mandatory_shell": false,
+        "native_output_wrapper": "None required by native SKILL.md; preserve actual prompt output.",
+        "extraction_contract": "Explicitly named final prompt artifact, one unambiguous final prompt fence, or explicit Final/Optimized/Revised Prompt section; no rewriting or score-based selection.",
+        "required_helpers": [
+          "scripts/prompt_tester.py",
+          "scripts/prompt_versioner.py"
+        ],
+        "notes": "Tester defaults to static rendered-text scoring. --runner-cmd invokes arbitrary external subprocess and must not be enabled by a broad tool proxy. Real output A/B testing needs a properly gated model runner. Versioner writes local history; the native marketing governance workflow is broader than authoring alone."
+      },
+      "counted_changes": [
+        {
+          "revision": "aecfb8e0bb71dbf1413082f86b33a5c4c9b8f416",
+          "date": "2026-06-11T03:58:41Z",
+          "author": "claude",
+          "author_is_linked_github_account": true,
+          "reason": "Marketing-specific tested templates, safety/evaluation gates and governance references replaced generic examples.",
+          "evidence_url": "https://github.com/alirezarezvani/claude-skills/commit/aecfb8e0bb71dbf1413082f86b33a5c4c9b8f416",
+          "files": [
+            "marketing-skill/skills/prompt-engineer-toolkit/SKILL.md",
+            "marketing-skill/skills/prompt-engineer-toolkit/references/evaluation-rubric.md",
+            "marketing-skill/skills/prompt-engineer-toolkit/references/prompt-templates.md",
+            "marketing-skill/skills/prompt-engineer-toolkit/references/technique-guide.md"
+          ]
+        }
+      ],
+      "excluded_recent_changes": [
+        {
+          "revision": "1851c8fb09ea8ff0488d48bd7c312abb1bbf5850",
+          "date": "2026-05-02T20:51:20Z",
+          "reason": "Packaging/directory move only.",
+          "evidence_url": "https://github.com/alirezarezvani/claude-skills/commit/1851c8fb09ea8ff0488d48bd7c312abb1bbf5850"
+        }
+      ],
+      "contributor_identity_caveat": "Count is distinct recorded commit-author identity; June author claude resolves to the linked GitHub account claude. A linked identity is not evidence of human ownership or one active human maintainer."
+    },
+    {
+      "id": "developer-kit-prompts",
+      "repo": "giuseppe-trisciuoglio/developer-kit",
+      "skill_path": "plugins/developer-kit-ai/skills/prompt-engineering",
+      "entrypoint": null,
+      "revision": "fe73fb33a09ee6562eeec7415a3f9a3bcf795177",
+      "license": "MIT",
+      "stars": 353,
+      "retrieved_at": "2026-10-03T22:34:17.023278+00:00",
+      "archived": false,
+      "supported_workflows": [
+        "create",
+        "sharpen",
+        "template",
+        "coding"
+      ],
+      "latest_substantive_change": {
+        "revision": "68f3ca57c4f3cad12b713a79f9facab8ffdd8a99",
+        "date": "2026-03-16T15:15:11Z",
+        "reason": "Native overview, usage routing, best practices and explicit hidden-reasoning warning added. Outside both maintenance windows.",
+        "evidence_url": "https://github.com/giuseppe-trisciuoglio/developer-kit/commit/68f3ca57c4f3cad12b713a79f9facab8ffdd8a99"
+      },
+      "changes90": 0,
+      "changes180": 0,
+      "maintainer_count180": 0,
+      "contributors180": [],
+      "eligibility": "excluded",
+      "reasons": [
+        "Repository has 353 stars, below the required 1000.",
+        "No substantive skill-package change in the last 180 days."
+      ],
+      "files": {},
+      "evidence_urls": [
+        "https://api.github.com/repos/giuseppe-trisciuoglio/developer-kit",
+        "https://github.com/giuseppe-trisciuoglio/developer-kit/tree/fe73fb33a09ee6562eeec7415a3f9a3bcf795177/plugins/developer-kit-ai/skills/prompt-engineering",
+        "https://github.com/giuseppe-trisciuoglio/developer-kit/blob/fe73fb33a09ee6562eeec7415a3f9a3bcf795177/LICENSE"
+      ],
+      "source_lineage": {
+        "kind": "unmodified native package",
+        "source_prefix": "plugins/developer-kit-ai/skills/prompt-engineering",
+        "repository_revision": "fe73fb33a09ee6562eeec7415a3f9a3bcf795177",
+        "local_adaptations": [],
+        "license_source": "LICENSE",
+        "audit_package_files": {
+          "LICENSE": "e8ee42589783854f830e3b39201070af18f8a7c3edf71a437ef0e1d051c02960",
+          "plugins/developer-kit-ai/skills/prompt-engineering/SKILL.md": "6dc34322d01d44be7e429107eba0b9756ae3a17e7167520172d4269f78c1e537",
+          "plugins/developer-kit-ai/skills/prompt-engineering/references/cot-patterns.md": "37c9e74c5ba296ec08763d6f2d3ee3d7919ccfc5894aaaedac113ec118a3ff54",
+          "plugins/developer-kit-ai/skills/prompt-engineering/references/few-shot-patterns.md": "6238844aa222249c8cb9f17eee839e1f29449b17f98983ae3b6c438d8b0ac23c",
+          "plugins/developer-kit-ai/skills/prompt-engineering/references/optimization-frameworks.md": "ab1c32c1d768bc1a5255656ca1c8e54a06f6a4a6ff3cfba84d7b3b8b3a524c80",
+          "plugins/developer-kit-ai/skills/prompt-engineering/references/system-prompt-design.md": "e24eb3f3376cfaf9b2ae3ed733c27a0b9d2a8cb488f5b4d7c392d7ffcbf12dd6",
+          "plugins/developer-kit-ai/skills/prompt-engineering/references/template-systems.md": "6ad6cca7efa85694a4c48f941d77a079cdf3cd1b339c355832226e7c82ad89ec"
+        },
+        "git_blob_ids": {
+          "LICENSE": "7fef282b7f26abfddcc97299dee4b8780f66ea4e",
+          "plugins/developer-kit-ai/skills/prompt-engineering/SKILL.md": "dc31a69353803582e64c5417f788bbc8a439643b",
+          "plugins/developer-kit-ai/skills/prompt-engineering/references/cot-patterns.md": "e10558b29cbd0ef2b58faa26fe0330dcd5bac715",
+          "plugins/developer-kit-ai/skills/prompt-engineering/references/few-shot-patterns.md": "422e11051be98870b00a680638512fc4b8df3390",
+          "plugins/developer-kit-ai/skills/prompt-engineering/references/optimization-frameworks.md": "691c49f941f874ede98dd15eb75dd910294ee2b4",
+          "plugins/developer-kit-ai/skills/prompt-engineering/references/system-prompt-design.md": "6a36f609060c36ca59361cb2ee9c5ff408bac1fb",
+          "plugins/developer-kit-ai/skills/prompt-engineering/references/template-systems.md": "ca33a29cf05974bac5786fae91e0855ece169554"
+        },
+        "history_notes": "Counts are unique post-introduction package commits; excluded initial additions, packaging moves, mechanical provider-name refreshes and unrelated repo churn. Earliest path event is a plugin reorganization, not certified original authorship.",
+        "path_introduction_revision": "654d94da199e825cc64ce6658d102d64fc4f13f4"
+      },
+      "required_runtime": {
+        "required_paid_api": false,
+        "mandatory_shell": false,
+        "native_output_wrapper": "None required by native SKILL.md; preserve actual prompt output.",
+        "extraction_contract": "Explicitly named final prompt artifact, one unambiguous final prompt fence, or explicit Final/Optimized/Revised Prompt section; no rewriting or score-based selection.",
+        "required_helpers": [],
+        "notes": "Native authoring is narrative/read-write; example measurement snippets may require model/API integrations. Excluded for stars and recency independent of runtime."
+      },
+      "counted_changes": [],
+      "excluded_recent_changes": []
+    }
+  ]
+}

@@ -262,10 +262,13 @@ targets leave local commits intact. Planning-only requests remain read-only.
   root `README.md` as a required documentation check for repo-surface changes,
   keeping setup, usage, command flags, stack rationale, and recruiter
   framing aligned with the repo. Remaining findings do not block eligible commits.
-- [`metaprompt`](metaprompt/SKILL.md): Compiles and sharpens plain-language
-  requests into target-aware prompts or reusable `{{variable}}` templates,
-  preserving a strict standalone `go` gate for every execution and high-stakes
-  pass.
+- [`metaprompt`](metaprompt/SKILL.md): Creates, sharpens, and templates prompts
+  using Sentry's pinned `prompt-optimizer`, with its eight-section package and
+  eval workflow. Saves only the optimized prompt without executing its task; see the
+  [source and update record](metaprompt/SOURCE.md).
+- [`metaprompt-alxve`](metaprompt-alxve/SKILL.md): Preserves the original
+  compiler, target-aware templates, saved prompts, and strict standalone `go`
+  gate for every execution and high-stakes pass. Select it by its exact name.
 - [`smoke-test-capture`](smoke-test-capture/SKILL.md): Keeps the shared
   `docs/smoke-tests.md` checklist current whenever work reveals a manual
   verification step, a changed manual expectation, or an obvious smoke

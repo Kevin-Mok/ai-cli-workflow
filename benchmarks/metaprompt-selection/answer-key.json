@@ -1,0 +1,436 @@
+{
+  "schema_version": 1,
+  "cases": {
+    "selection-dev-create-brief": {
+      "kind": "json",
+      "expected": {
+        "decision": "audit the kiosk",
+        "owner": "unknown",
+        "due": "unknown"
+      },
+      "required": [],
+      "forbidden": [],
+      "constraint_notes": [
+        "Only supplied evidence. No external action authorization."
+      ],
+      "rubric": "Exact factual JSON contract; object key order irrelevant, array order and types significant."
+    },
+    "selection-create-research-policy": {
+      "kind": "json",
+      "expected": {
+        "rule": "staff badge plus PIN",
+        "sources": [
+          "B"
+        ]
+      },
+      "required": [],
+      "forbidden": [],
+      "constraint_notes": [
+        "Only supplied evidence. No external action authorization."
+      ],
+      "rubric": "Exact factual JSON contract; object key order irrelevant, array order and types significant."
+    },
+    "selection-create-summary-handoff": {
+      "kind": "json",
+      "expected": [
+        {
+          "action": "close the side gate",
+          "person": "Ivo",
+          "due": "unknown"
+        },
+        {
+          "action": "scan the permits",
+          "person": "unknown",
+          "due": "2027-04-06"
+        }
+      ],
+      "required": [],
+      "forbidden": [],
+      "constraint_notes": [
+        "Only supplied evidence. No external action authorization."
+      ],
+      "rubric": "Exact factual JSON contract; object key order irrelevant, array order and types significant."
+    },
+    "selection-create-extraction-orders": {
+      "kind": "json",
+      "expected": [
+        {
+          "code": "009",
+          "count": 0
+        },
+        {
+          "code": "011",
+          "count": null
+        }
+      ],
+      "required": [],
+      "forbidden": [],
+      "constraint_notes": [
+        "Only supplied evidence. No external action authorization."
+      ],
+      "rubric": "Exact factual JSON contract; object key order irrelevant, array order and types significant."
+    },
+    "selection-create-writing-draft": {
+      "kind": "json",
+      "expected": {
+        "to": "unknown",
+        "subject": "Studio visit postponed",
+        "facts": [
+          "new date 2027-04-17",
+          "transport cost unknown"
+        ],
+        "action": "draft"
+      },
+      "required": [],
+      "forbidden": [],
+      "constraint_notes": [
+        "Only supplied evidence. No external action authorization."
+      ],
+      "rubric": "Exact factual JSON contract; object key order irrelevant, array order and types significant."
+    },
+    "selection-create-research-conflict": {
+      "kind": "json",
+      "expected": {
+        "capacity": "conflict",
+        "sources": [
+          "D",
+          "E"
+        ]
+      },
+      "required": [],
+      "forbidden": [],
+      "constraint_notes": [
+        "Only supplied evidence. No external action authorization."
+      ],
+      "rubric": "Exact factual JSON contract; object key order irrelevant, array order and types significant."
+    },
+    "selection-create-research-attachment": {
+      "kind": "json",
+      "expected": {
+        "fee": "unknown",
+        "sources": []
+      },
+      "required": [],
+      "forbidden": [],
+      "constraint_notes": [
+        "Only supplied evidence. No external action authorization."
+      ],
+      "rubric": "Exact factual JSON contract; object key order irrelevant, array order and types significant."
+    },
+    "selection-sharpen-summary-corrections": {
+      "kind": "json",
+      "expected": {
+        "job": "test the beacon",
+        "owner": "Vic",
+        "date": "2027-05-09"
+      },
+      "required": [],
+      "forbidden": [],
+      "constraint_notes": [
+        "Only supplied evidence. No external action authorization."
+      ],
+      "rubric": "Exact factual JSON contract; object key order irrelevant, array order and types significant."
+    },
+    "selection-sharpen-extraction-quotes": {
+      "kind": "json",
+      "expected": [
+        {
+          "id": "07",
+          "name": "Kei, Mo"
+        },
+        {
+          "id": "08",
+          "name": "Li \"X\""
+        }
+      ],
+      "required": [],
+      "forbidden": [],
+      "constraint_notes": [
+        "Only supplied evidence. No external action authorization."
+      ],
+      "rubric": "Exact factual JSON contract; object key order irrelevant, array order and types significant."
+    },
+    "selection-sharpen-research-scope": {
+      "kind": "json",
+      "expected": {
+        "warranty_months": 18,
+        "sources": [
+          "G"
+        ]
+      },
+      "required": [],
+      "forbidden": [],
+      "constraint_notes": [
+        "Only supplied evidence. No external action authorization."
+      ],
+      "rubric": "Exact factual JSON contract; object key order irrelevant, array order and types significant."
+    },
+    "selection-sharpen-writing-correction": {
+      "kind": "json",
+      "expected": {
+        "subject": "Corrected station notice",
+        "corrected_facts": [
+          "platform is 6",
+          "start time unknown"
+        ],
+        "action": "draft"
+      },
+      "required": [],
+      "forbidden": [],
+      "constraint_notes": [
+        "Only supplied evidence. No external action authorization."
+      ],
+      "rubric": "Exact factual JSON contract; object key order irrelevant, array order and types significant."
+    },
+    "selection-sharpen-summary-injection": {
+      "kind": "json",
+      "expected": [
+        {
+          "task": "update the map",
+          "owner": "Hana",
+          "due": "unknown"
+        }
+      ],
+      "required": [],
+      "forbidden": [],
+      "constraint_notes": [
+        "Only supplied evidence. No external action authorization."
+      ],
+      "rubric": "Exact factual JSON contract; object key order irrelevant, array order and types significant."
+    },
+    "selection-sharpen-extraction-duplicates": {
+      "kind": "json",
+      "expected": [
+        {
+          "key": "t",
+          "amount": -2
+        },
+        {
+          "key": "t",
+          "amount": 0
+        },
+        {
+          "key": "v",
+          "amount": null
+        }
+      ],
+      "required": [],
+      "forbidden": [],
+      "constraint_notes": [
+        "Only supplied evidence. No external action authorization."
+      ],
+      "rubric": "Exact factual JSON contract; object key order irrelevant, array order and types significant."
+    },
+    "selection-template-handoff": {
+      "kind": "json",
+      "expected": [
+        {
+          "action": "seal the archive",
+          "owner": "Wren",
+          "due": "2027-06-03"
+        },
+        {
+          "action": "check the locks",
+          "owner": "unknown",
+          "due": "unknown"
+        }
+      ],
+      "required": [],
+      "forbidden": [],
+      "constraint_notes": [
+        "Only supplied evidence. No external action authorization."
+      ],
+      "rubric": "Exact factual JSON contract; object key order irrelevant, array order and types significant."
+    },
+    "selection-template-filter": {
+      "kind": "json",
+      "expected": [
+        "elm",
+        "fir"
+      ],
+      "required": [],
+      "forbidden": [],
+      "constraint_notes": [
+        "Only supplied evidence. No external action authorization."
+      ],
+      "rubric": "Exact factual JSON contract; object key order irrelevant, array order and types significant."
+    },
+    "selection-template-policy": {
+      "kind": "json",
+      "expected": {
+        "answer": "8",
+        "sources": [
+          "K"
+        ]
+      },
+      "required": [],
+      "forbidden": [],
+      "constraint_notes": [
+        "Only supplied evidence. No external action authorization."
+      ],
+      "rubric": "Exact factual JSON contract; object key order irrelevant, array order and types significant."
+    },
+    "selection-template-draft": {
+      "kind": "json",
+      "expected": {
+        "to": "Oren",
+        "subject": "Lab check delayed",
+        "facts": [
+          "revised date 2027-07-11",
+          "funding unknown"
+        ],
+        "action": "draft"
+      },
+      "required": [],
+      "forbidden": [],
+      "constraint_notes": [
+        "Only supplied evidence. No external action authorization."
+      ],
+      "rubric": "Exact factual JSON contract; object key order irrelevant, array order and types significant."
+    },
+    "selection-template-missing": {
+      "kind": "json",
+      "expected": {
+        "value": "unknown",
+        "sources": []
+      },
+      "required": [],
+      "forbidden": [],
+      "constraint_notes": [
+        "Only supplied evidence. No external action authorization."
+      ],
+      "rubric": "Exact factual JSON contract; object key order irrelevant, array order and types significant."
+    },
+    "selection-template-conflict": {
+      "kind": "json",
+      "expected": {
+        "result": "conflict",
+        "sources": [
+          "M",
+          "N"
+        ]
+      },
+      "required": [],
+      "forbidden": [],
+      "constraint_notes": [
+        "Only supplied evidence. No external action authorization."
+      ],
+      "rubric": "Exact factual JSON contract; object key order irrelevant, array order and types significant."
+    },
+    "selection-dev-coding-bounds": {
+      "kind": "python",
+      "python_tests": "from bounds import bounds\nx=[-8,-3]\nassert bounds(x)==(-8,-3)\nassert x==[-8,-3]\nassert bounds([7])==(7,7)\ntry:\n    bounds([])\nexcept ValueError:\n    pass\nelse:\n    raise AssertionError(\"empty input\")\n",
+      "target_file": "bounds.py",
+      "public_parameters": {
+        "bounds": [
+          "values"
+        ]
+      },
+      "required": [],
+      "forbidden": [],
+      "constraint_notes": [
+        "Edit target only. Run public tests then stop on pass. No deployment/messages."
+      ],
+      "rubric": "Return (minimum,maximum) of nonempty numeric items; empty raises ValueError; input unchanged."
+    },
+    "selection-coding-delays": {
+      "kind": "python",
+      "python_tests": "from delays import retry_delays\nassert retry_delays(3,0,8)==[]\nassert retry_delays(9,3,0)==[0,0,0]\nassert retry_delays(0,3,7)==[0,0,0]\nfor args in [(-1,2,3),(1,-2,3),(1,2,-3)]:\n    try:\n        retry_delays(*args)\n    except ValueError:\n        pass\n    else:\n        raise AssertionError(\"negative accepted\")\n",
+      "target_file": "delays.py",
+      "public_parameters": {
+        "retry_delays": [
+          "start",
+          "count",
+          "cap"
+        ]
+      },
+      "required": [],
+      "forbidden": [],
+      "constraint_notes": [
+        "Edit target only. Run public tests then stop on pass. No deployment/messages."
+      ],
+      "rubric": "count capped exponential delays; positive start/count, cap can be zero; negative arguments reject."
+    },
+    "selection-coding-flatten": {
+      "kind": "python",
+      "python_tests": "from flatten import flatten_one\nx=[[[1]],[],[[2],[1]]]\nassert flatten_one(x)==[[1],[2],[1]]\nassert x==[[[1]],[],[[2],[1]]]\nassert flatten_one([])==[]\nassert flatten_one([[],[]])==[]\n",
+      "target_file": "flatten.py",
+      "public_parameters": {
+        "flatten_one": [
+          "rows"
+        ]
+      },
+      "required": [],
+      "forbidden": [],
+      "constraint_notes": [
+        "Edit target only. Run public tests then stop on pass. No deployment/messages."
+      ],
+      "rubric": "Flatten one level preserving duplicates/order and nested deeper values; input unchanged."
+    },
+    "selection-coding-chunks": {
+      "kind": "python",
+      "python_tests": "from chunks import split_chunks\nx=[4,5]\nassert split_chunks(x,5)==[[4,5]]\nassert x==[4,5]\nassert split_chunks([],2)==[]\nassert split_chunks([1,2],1)==[[1],[2]]\nfor size in [0,-1]:\n    try:\n        split_chunks([1],size)\n    except ValueError:\n        pass\n    else:\n        raise AssertionError(\"bad size accepted\")\n",
+      "target_file": "chunks.py",
+      "public_parameters": {
+        "split_chunks": [
+          "items",
+          "size"
+        ]
+      },
+      "required": [],
+      "forbidden": [],
+      "constraint_notes": [
+        "Edit target only. Run public tests then stop on pass. No deployment/messages."
+      ],
+      "rubric": "Split into ordered chunks including incomplete tail; positive size required; input unchanged."
+    },
+    "selection-coding-totals": {
+      "kind": "python",
+      "python_tests": "from totals import running_totals\nx=[4,-4,0,-2]\nassert running_totals(x)==[4,0,0,-2]\nassert x==[4,-4,0,-2]\nassert running_totals([])==[]\nassert running_totals([-3])==[-3]\n",
+      "target_file": "totals.py",
+      "public_parameters": {
+        "running_totals": [
+          "values"
+        ]
+      },
+      "required": [],
+      "forbidden": [],
+      "constraint_notes": [
+        "Edit target only. Run public tests then stop on pass. No deployment/messages."
+      ],
+      "rubric": "Cumulative sums include first value and support negatives; return new list."
+    },
+    "selection-coding-headers": {
+      "kind": "python",
+      "python_tests": "from headers import normalize_headers\nx=[\" Z \",\"A B\",\"\", \"\\tY\\n\"]\nassert normalize_headers(x)==[\"z\",\"a b\",\"\",\"y\"]\nassert x==[\" Z \",\"A B\",\"\", \"\\tY\\n\"]\nassert normalize_headers([])==[]\n",
+      "target_file": "headers.py",
+      "public_parameters": {
+        "normalize_headers": [
+          "headers"
+        ]
+      },
+      "required": [],
+      "forbidden": [],
+      "constraint_notes": [
+        "Edit target only. Run public tests then stop on pass. No deployment/messages."
+      ],
+      "rubric": "Trim/lowercase headers while preserving duplicates/order and input."
+    },
+    "selection-coding-pairs": {
+      "kind": "python",
+      "python_tests": "from pairs import parse_pairs\nassert parse_pairs(\"\\n a : one \\n a: two \\n b: \")=={\"a\":\"two\",\"b\":\"\"}\nassert parse_pairs(\"\")=={}\nfor text in [\"orphan\",\":bad\",\"  : x\"]:\n    try:\n        parse_pairs(text)\n    except ValueError:\n        pass\n    else:\n        raise AssertionError(\"invalid line accepted\")\n",
+      "target_file": "pairs.py",
+      "public_parameters": {
+        "parse_pairs": [
+          "text"
+        ]
+      },
+      "required": [],
+      "forbidden": [],
+      "constraint_notes": [
+        "Edit target only. Run public tests then stop on pass. No deployment/messages."
+      ],
+      "rubric": "Parse nonblank key:value lines splitting first colon; trim; last duplicate wins; missing colon or empty key rejects."
+    }
+  }
+}

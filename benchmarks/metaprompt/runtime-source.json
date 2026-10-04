@@ -1,0 +1,21 @@
+{
+  "version": "codex-cli 0.160.0",
+  "wrapper_sha256": "61b0194f3bb6534439c8d26a3ed57d0805f84b884588b761795323eeb92fcf70",
+  "native_binaries": [
+    {
+      "sha256": "12eb3e81114588aca3b7998f4f19e8997b056aca08e57a7ca7c8a3ec8c652aad",
+      "platform": "x86_64-unknown-linux-musl"
+    }
+  ],
+  "source_status": "Official main/docs inspected; unpinned moving sources, runtime binary hash authoritative",
+  "sources": [
+    "https://learn.chatgpt.com/docs/config-schema.json",
+    "https://learn.chatgpt.com/docs/app-server",
+    "https://github.com/openai/codex/blob/main/codex-rs/model-provider-info/src/lib.rs",
+    "https://github.com/openai/codex/blob/main/codex-rs/model-provider/src/provider.rs",
+    "https://github.com/openai/codex/blob/main/codex-rs/core/src/context/user_instructions.rs",
+    "https://github.com/openai/codex/blob/main/codex-rs/core/src/agents_md.rs",
+    "https://github.com/openai/codex/blob/main/codex-rs/core/src/tools/handlers/mcp.rs",
+    "https://github.com/openai/codex/blob/main/codex-rs/codex-mcp/src/tools.rs"
+  ]
+}

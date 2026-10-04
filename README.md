@@ -265,11 +265,30 @@ Representative highlights:
   drift, and source provenance into deterministic text or JSON evidence. Its
   `--check` mode blocks objective errors while leaving semantic candidates for
   human review.
-- [`metaprompt`](dot_agents/skills/metaprompt/SKILL.md) compiles plain-language
-  intent into target-aware prompts and reusable `{{variable}}` templates behind
-  a strict per-pass `go` gate. Conditional references add hostile-input
-  hardening, agent boundaries, media guidance, and judge/rewrite/re-check flows
-  while keeping the entrypoint compact.
+- [`metaprompt`](dot_agents/skills/metaprompt/SKILL.md) creates and sharpens
+  prompts using Sentry's pinned `prompt-optimizer` workflow, with an eight-section
+  report and a separately saved optimized prompt. The original compiler remains available
+  as [`metaprompt-alxve`](dot_agents/skills/metaprompt-alxve/SKILL.md), including
+  its strict per-pass `go` gate. Both save prompt artifacts; the
+  [skill guide](docs/metaprompt-skills.md) records the upstream comparison,
+  usage, reviewed updates, and rollback. The
+  [benchmark report](docs/metaprompt-benchmark.md) separates maintenance evidence
+  from downstream trials and links the pinned fixtures and quota-limited replay
+  harness. `python3 scripts/metaprompt-benchmark.py dry-run` previews its schedule
+  without using model quota; `verify` checks source and fixture integrity.
+  The [maintained-repository selection](docs/metaprompt-selection.md) compares
+  three native skills from repositories with at least 1,000 stars, with linked
+  skill-level maintenance diffs and equal create/sharpen/template/coding cases.
+  Its completed benchmark recommends Sentry's `prompt-optimizer`: 14/16 versus
+  Wshobson's 13/16 and Senior's 11/16. Raw and minimal instructions both reached
+  15/16 at lower cost; the report includes adapter defects and a sensitivity
+  check for an ambiguous template. All 100 attempts used 754 inference requests.
+  `python3 scripts/metaprompt-selection.py dry-run` previews the new capped
+  schedule without inference; `verify` checks its pinned sources and fixtures.
+  Replay phases and `--jobs`/`--development-round` options are documented in the
+  report. The benchmark itself installed nothing; the later authorized
+  [replacement](plans/replace-metaprompt-with-sentry.md) puts Sentry behind
+  the existing `$metaprompt` invocation.
 - [`feedback-memory`](dot_agents/skills/feedback-memory/SKILL.md)
   carries forward durable user corrections through a repo-tracked
   `feedback.log`.
