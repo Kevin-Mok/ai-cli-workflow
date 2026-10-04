@@ -5,7 +5,11 @@ user-invokable: true
 argument-hint: [TARGET=<value>]
 ---
 
-Reduce visual intensity in designs that are too bold, aggressive, or overstimulating, creating a more refined and approachable aesthetic without losing effectiveness.
+# Quieter
+
+Reduce visual intensity while keeping an interface clear and distinctive.
+Identify competing colors, weight, motion, or decoration, plan what should
+recede, make the refinements, and check readability and usability.
 
 ## MANDATORY PREPARATION
 

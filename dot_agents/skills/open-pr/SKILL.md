@@ -5,10 +5,9 @@ description: Use when asked to draft, write, prepare, open, update, or improve a
 
 # Open PR
 
-## Purpose
-
-Draft or publish a strong pull request title and body from evidence in the
-current branch compared with the requested base branch.
+Draft or publish a pull request that gives reviewers the context they need.
+Compare the branch with its base, inspect the changes and verification
+evidence, then write the title and body and publish only when requested.
 
 Treat the PR body as the reviewer's central context hub: explain why the
 branch exists, what changed, how to verify it, what risks remain, and what

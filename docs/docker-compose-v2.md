@@ -1,5 +1,9 @@
 # Docker Compose V2 On This Machine
 
+Use this guide to make `docker compose` work when only the older
+`docker-compose` command is installed. Run the diagnostic helper, install
+the Compose V2 plugin, then check that Docker recognizes it.
+
 ## Observed Failure
 
 The current machine has Docker installed, but `docker compose` fails because the Compose v2 CLI plugin is missing.

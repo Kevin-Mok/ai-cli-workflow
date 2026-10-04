@@ -1,5 +1,9 @@
 # Execution Routing
 
+Choose how to run an accepted compiled prompt while preserving its execution
+gate. Require a fresh standalone `go` for the current pass, apply the routing
+order below, and carry out only the mode and actions the harness supports.
+
 <!-- metaprompt-reference: execution-routing-v1 -->
 
 ## Run-signal boundary

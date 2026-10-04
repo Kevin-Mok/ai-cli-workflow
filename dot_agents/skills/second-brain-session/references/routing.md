@@ -1,5 +1,10 @@
 # Second Brain Session Routing
 
+Save session information in its canonical home while preserving privacy and
+confirmation boundaries. Choose the owner for each fact, prepare the matching
+payload, obtain required confirmation, and use the relevant capture, focus,
+reminder, or closeout command.
+
 ## Memory Ownership
 
 Route one fact to one owner:

@@ -1,5 +1,9 @@
 # FlaviBot music window
 
+Use a dedicated FlaviBot window so the desktop music block follows its songs
+while ignoring YouTube in your normal browser. Open the launcher, sign in
+and play music, then reuse the same launcher whenever you return.
+
 Open it from a terminal:
 
 ```sh

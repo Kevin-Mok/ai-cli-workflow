@@ -1,9 +1,11 @@
 # Second Brain: How to Use the Examples
 
-This is a hands-on tour of the real examples in
-[`second-brain/`](../second-brain/). Second Brain is a Markdown map for
-context that should survive from one work session to the next. It is not a
-replacement for Git, Taskwarrior, Graphiti, or private journaling.
+This hands-on tour shows how to use the real examples in
+[`second-brain/`](../second-brain/) to carry useful context between work
+sessions. Check status, choose one outcome, capture discoveries, then save
+a reviewed closeout; the later examples cover health checks and approved
+migrations. Second Brain complements Git, Taskwarrior, Graphiti, and private
+journaling.
 
 ## The basic loop
 

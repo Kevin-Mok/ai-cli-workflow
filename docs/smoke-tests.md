@@ -1,11 +1,10 @@
 # Smoke Tests
 
-Shared manual smoke checklist for `/home/example/linux-config`.
-
-Update this file whenever work reveals a concrete manual verification
-step or an obvious gap in smoke coverage. Keep entries grouped by area,
-write them as `Action` plus `Expected`, and update stale entries instead
-of stacking duplicates.
+Use this checklist to confirm that a changed part of `/home/example/linux-config`
+works as expected. Find its section, carry out the `Action`, and compare the
+result with `Expected`. When a change adds a manual check or reveals a gap,
+update the relevant entry or add one under the right area, replacing stale
+checks rather than duplicating them.
 
 ## VPS Codex Updates
 
@@ -285,6 +284,10 @@ of stacking duplicates.
   Expected: It identifies `dot_codex/AGENTS.md` as the single policy body, treats the root AGENTS files as routing layers, and explains that a verified single-commit workflow pushes once while multi-commit work waits until the complete verified series; no Git write occurs.
 - Action: Add or change a standing workflow rule in `dot_codex/AGENTS.md`.
   Expected: The corresponding public docs and reusable verification guidance stay in sync with that rule in the same change.
+- Action: Ask a fresh Codex or Claude Code session to write a how-to guide.
+  Expected: Directly below the title, it gives a short, plain-language overview
+  of the purpose, intended outcome, and main steps before detailed instructions
+  or commands; the explanation is direct and easy to understand.
 - Action: In a disposable clone, ask a fresh Codex or Claude Code session to handle and then resolve an unexpected task failure.
   Expected: It immediately creates one dated postmortem under `docs/postmortem/`, records the initial symptom, impact, evidence, current status, and next steps, then updates that same file with root cause, resolution, verification, and follow-up; deliberate RED tests and intentionally exercised failure paths do not create one.
 - Action: Start non-trivial work from a plan under `plans/`, then inspect the plan before the related commit is prepared.

@@ -5,7 +5,11 @@ user-invokable: true
 argument-hint: [TARGET=<value>]
 ---
 
-Identify opportunities to add moments of joy, personality, and unexpected polish that transform functional interfaces into delightful experiences.
+# Delight
+
+Add personality and enjoyable details to an interface while keeping tasks
+easy to complete. Review the audience and context, choose suitable moments,
+implement the details, and check repeated use, accessibility, and performance.
 
 ## MANDATORY PREPARATION
 

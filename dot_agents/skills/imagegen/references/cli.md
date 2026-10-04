@@ -1,6 +1,9 @@
 # CLI reference (`scripts/image_gen.py`)
 
-This file contains the “command catalog” for the bundled image generation CLI. Keep `SKILL.md` as overview-first; put verbose CLI details here.
+Run the bundled CLI to generate, edit, or batch-process images. Set the
+script path, choose the command and input assets, then select output and
+quality options using the recipes below. Keep `SKILL.md` as overview-first;
+put verbose CLI details here.
 
 ## What this CLI does
 - `generate`: generate new images from a prompt

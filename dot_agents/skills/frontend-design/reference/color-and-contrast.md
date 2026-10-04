@@ -1,5 +1,9 @@
 # Color & Contrast
 
+Build a color system that communicates meaning and remains readable. Choose
+the palette roles and neutral shades, check contrast and color accessibility,
+then define semantic tokens for light and dark themes.
+
 ## Color Spaces: Use OKLCH
 
 **Stop using HSL.** Use OKLCH (or LCH) instead. It's perceptually uniform, meaning equal steps in lightness *look* equal—unlike HSL where 50% lightness in yellow looks bright while 50% in blue looks dark.

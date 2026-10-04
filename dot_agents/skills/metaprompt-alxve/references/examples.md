@@ -1,5 +1,9 @@
 # Examples And Failure Modes
 
+Use these examples to choose a prompt shape for a similar request. Match the
+input and complexity, follow the relevant output and gate pattern, then check
+the anti-patterns for common compilation mistakes.
+
 <!-- metaprompt-reference: examples-v1 -->
 
 ## Example 1 (Standard, role target)

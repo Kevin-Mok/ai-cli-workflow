@@ -5,6 +5,10 @@ description: Upgrades existing websites and apps to premium quality. Audits curr
 
 # Redesign Skill
 
+Improve the visual quality of an existing website or app while preserving
+its functionality. Scan the current stack and design, diagnose weak patterns
+and missing states, then apply targeted upgrades in the priority order below.
+
 ## How This Works
 
 When applied to an existing project, follow this sequence:

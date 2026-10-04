@@ -1,5 +1,10 @@
 # Repair Codex Updates On A VPS
 
+This guide repairs Codex update permissions on a VPS so you can update it
+normally from your own account. Preview the SSH diagnostics, run the repair
+from your PC, then reconnect and check the updated command; saved rollback
+instructions let you restore changed configuration if needed.
+
 Run the [repair helper](../scripts/executable_fix-vps-codex.sh) on your local
 PC. It connects using your existing SSH key or agent. **No sudo is needed
 locally or on the VPS.** The default target is `example-user@192.0.2.10`.

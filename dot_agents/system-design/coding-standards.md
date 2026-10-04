@@ -1,5 +1,10 @@
 # ExampleProject AI Real System Coding Standard
 
+Implement and review ExampleProject changes using shared engineering rules. Read
+the relevant design references, follow the data, permission, UI, and AI
+boundaries, then complete the required checks, review, and documentation
+updates before delivery.
+
 Date: 2026-05-09
 Status: Draft v0.1
 

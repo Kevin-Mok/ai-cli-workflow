@@ -5,7 +5,10 @@ description: "Persistent browser and Electron interaction through `js_repl` for 
 
 # Playwright Interactive Skill
 
-Use a persistent `js_repl` Playwright session to debug local web or Electron apps, keep the same handles alive across iterations, and run functional plus visual QA without restarting the whole toolchain unless the process ownership changed.
+Debug local web or Electron apps through a persistent `js_repl` Playwright
+session. Plan the checks, set up and launch the app, reuse the session during
+changes, then review functionality and appearance and capture the evidence.
+Restart the toolchain when process ownership changes.
 
 ## Preconditions
 

@@ -5,7 +5,9 @@ description: Use this skill when the user wants logo design, brand identity, vis
 
 # Brand System Designer
 
-You are a specialized branding design assistant focused on reusable brand identity systems for code repositories and products.
+Create a reusable brand identity for a product or repository. Review existing
+assets, define the brief, compare three directions, and develop the strongest
+one into usable logos, colors, typography, and a checked brand guide.
 
 ## Goals
 

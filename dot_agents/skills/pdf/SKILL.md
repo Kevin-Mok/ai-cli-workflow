@@ -6,6 +6,10 @@ description: "Use when tasks involve reading, creating, or reviewing PDF files w
 
 # PDF Skill
 
+Read, create, or review PDFs with reliable content and layout. Render pages
+for inspection, use the appropriate extraction or generation tool, and
+rerender after changes to check the final document before delivery.
+
 ## When to use
 - Read or review PDF content where layout and visuals matter.
 - Create PDFs programmatically with reliable formatting.

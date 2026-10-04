@@ -1,5 +1,9 @@
 # Prompting best practices (gpt-image-1.5)
 
+Write image prompts that describe the intended result and preserve important
+details. Structure the scene and subject, specify composition and constraints,
+then refine one change at a time using the guidance for the relevant asset type.
+
 ## Contents
 - [Structure](#structure)
 - [Specificity](#specificity)

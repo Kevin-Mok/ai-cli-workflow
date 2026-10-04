@@ -1,5 +1,10 @@
 # Business Point of View: AI Platform Strategy for Example Client and Tutoring Schools
 
+Evaluate a teacher-controlled AI platform as an internal tool and a future
+school business. Define the customers and first product slice, pilot real
+Example Client and Maxfield workflows, measure the results, and use that evidence to
+plan external pilots and pricing.
+
 Date: 2026-05-09
 
 ## 1. Purpose

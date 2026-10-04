@@ -5,9 +5,9 @@ description: Plan commits for all dirty git changes in the current repository. U
 
 # Commit Plan
 
-## Purpose
-
-Create a safe, reviewable commit plan for the current repository's dirty changes without making any write actions.
+Create a safe, reviewable commit plan for the current repository's dirty changes
+without making any write actions. Inspect the diffs, group related work from
+oldest to newest, and propose commit messages, checks, and exclusions.
 
 This skill is planning-only. It inspects the worktree and proposes commit boundaries, but it must not stage, commit, or push changes.
 

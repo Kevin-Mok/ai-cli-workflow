@@ -1,6 +1,10 @@
 # Upgrading to GPT-5.4
 
-Use this guide when the user explicitly asks to upgrade an existing integration to GPT-5.4. Pair it with current OpenAI docs lookups. The default target string is `gpt-5.4`.
+Use this guide when the user explicitly asks to upgrade an existing
+integration to GPT-5.4. Inventory model usages and related prompts, check
+compatibility, and recommend
+the smallest change with a validation plan. Pair it with current OpenAI docs
+lookups. The default target string is `gpt-5.4`.
 
 ## Upgrade posture
 

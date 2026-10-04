@@ -5,7 +5,11 @@ user-invokable: true
 argument-hint: "[TARGET=<value>] [CONTEXT=<value>]"
 ---
 
-Adapt existing designs to work effectively across different contexts - different screen sizes, devices, platforms, or use cases.
+# Adapt
+
+Make an existing design work across new screen sizes, devices, or contexts.
+Gather the design context, identify what breaks in the target setting, adapt
+the layout and interactions, and check the result on the relevant devices.
 
 ## MANDATORY PREPARATION
 

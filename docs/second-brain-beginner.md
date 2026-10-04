@@ -1,6 +1,8 @@
 # Second Brain Beginner Guide
 
-You already use this repo. This guide is only about learning the Second Brain workflow.
+Use Second Brain to keep enough context to continue a work session later.
+Check your current notes, capture useful discoveries privately, confirm one
+focus, then save a reviewed closeout and run the health check.
 
 ## What this is (in 30 seconds)
 

@@ -5,6 +5,10 @@ description: Commit and push only the git changes dirtied during the current Cod
 
 # Commit Session
 
+Commit and push the work attributable to the current Codex session. Establish
+that scope from the initial Git state and observed edits, review and check the
+eligible changes, then commit, push, and report what remains.
+
 Use this skill for explicit write requests that should ship only the files dirtied during the current Codex session. Treat the pre-write dirty baseline as the primary safety boundary, with an observed-touch fallback when session metadata or helper evidence is unavailable. Prioritize files touched during the current session and favor including safe related files over omitting them within session scope.
 
 ## Required Workflow

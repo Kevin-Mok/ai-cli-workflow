@@ -1,5 +1,9 @@
 # Interaction Design
 
+Design controls that clearly show their state and work across input methods.
+Cover the interaction states, add focus and form feedback, then apply the
+relevant loading, overlay, keyboard, and gesture patterns.
+
 ## The Eight Interactive States
 
 Every interactive element needs these states designed:

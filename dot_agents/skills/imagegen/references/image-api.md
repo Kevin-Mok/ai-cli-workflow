@@ -1,5 +1,9 @@
 # Image API quick reference
 
+Choose the Image API settings for a generation or edit request. Select the
+endpoint and model, set the output parameters, then check any input-image,
+mask, and fidelity requirements against the limits below.
+
 ## Endpoints
 - Generate: `POST /v1/images/generations` (`client.images.generate(...)`)
 - Edit: `POST /v1/images/edits` (`client.images.edit(...)`)

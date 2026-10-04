@@ -1,5 +1,9 @@
 # Model Profiles
 
+Adapt a compiled prompt to its named model or runtime using supported facts.
+Check the profile date and source tags, apply the relevant guidance, and keep
+unsupported behavior marked unknown.
+
 Cache stamp: 2026-07-14. Re-verify on a model-family or API behavior change, or
 when this file is older than 90 days.
 

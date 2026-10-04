@@ -6,9 +6,10 @@ description: "Use when a user asks to debug or fix failing GitHub PR checks that
 
 # Gh Pr Checks Plan Fix
 
-## Overview
+Use `gh` to locate failing PR checks, fetch GitHub Actions logs for actionable
+failures, summarize the failure snippet, then propose a fix plan and implement
+after explicit approval.
 
-Use gh to locate failing PR checks, fetch GitHub Actions logs for actionable failures, summarize the failure snippet, then propose a fix plan and implement after explicit approval.
 - If a plan-oriented skill (for example `create-plan`) is available, use it; otherwise draft a concise plan inline and request approval before implementing.
 
 Prereq: authenticate with the standard GitHub CLI once (for example, run `gh auth login`), then confirm with `gh auth status` (repo + workflow scopes are typically required).

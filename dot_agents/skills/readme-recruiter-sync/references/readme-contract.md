@@ -1,7 +1,9 @@
 # README Contract
 
 Use this file to decide whether the root `README.md` is ready to ship with
-the current repo state.
+the current repo state. Compare its claims with tracked files and command
+help, check the required coverage and opening structure, then select the
+appropriate outcome state for any repairs.
 
 ## Scope
 

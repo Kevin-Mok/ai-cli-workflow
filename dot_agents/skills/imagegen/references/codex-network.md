@@ -1,5 +1,10 @@
 # Codex network approvals / sandbox notes
 
+Understand network approval prompts when using the image-generation CLI.
+Check the current environment's network and approval rules, review the
+configuration options below, and weigh the access they grant before making
+any changes.
+
 This guidance is intentionally isolated from `SKILL.md` because it can vary by environment and may become stale. Prefer the defaults in your environment when in doubt.
 
 ## Why am I asked to approve every image generation call?

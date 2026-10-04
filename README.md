@@ -1,10 +1,10 @@
 # KM's Four-Codex Operating Environment
 
-This repo does not just configure Linux. It configures how
-AI-assisted engineering runs. Under the usual `chezmoi` dotfiles
-surface is a tracked operating layer for Codex: AGENTS files, runtime
-defaults, reusable local skills, Graphiti-backed memory, and ExecPlans
-designed for parallel terminal-agent work.
+A reproducible Linux workspace for AI-assisted engineering. This repo keeps
+desktop settings, Codex instructions and defaults, reusable skills, public-safe
+context notes, and work plans under version control. Review the workflow, install the
+prerequisites, preview and apply the configuration with `chezmoi`, then use
+the daily commands and checks to keep the environment consistent.
 
 For recruiters and AI-native engineers, the point is concrete: this
 repo is a public artifact of how I structure leverage. It shows
@@ -67,6 +67,8 @@ Those paths define how the AI layer behaves:
 - [`dot_codex/AGENTS.md`](dot_codex/AGENTS.md) is the canonical merged
   instruction document that pushes Codex toward plan-first,
   verification-heavy engineering behavior.
+  Procedural guides begin with a plain-language overview of their purpose
+  and main steps before commands.
 - [`dot_codex/config.toml`](dot_codex/config.toml) tracks model,
   reasoning, trust boundaries, MCP servers, and repo-specific developer
   instructions.

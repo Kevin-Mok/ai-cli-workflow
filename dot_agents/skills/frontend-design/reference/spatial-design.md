@@ -1,5 +1,9 @@
 # Spatial Design
 
+Use spacing and layout to make content priorities and relationships clear.
+Define a spacing scale and grid, establish visual hierarchy, then refine
+container behavior, alignment, touch targets, and elevation.
+
 ## Spacing Systems
 
 ### Use 4pt Base, Not 8pt

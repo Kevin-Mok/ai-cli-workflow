@@ -5,7 +5,11 @@ user-invokable: true
 argument-hint: [TARGET=<value>]
 ---
 
-Remove unnecessary complexity from designs, revealing the essential elements and creating clarity through ruthless simplification.
+# Distill
+
+Simplify an interface so users can reach their main goal more easily.
+Identify clutter and essential functions, plan what to combine or reveal
+later, make the changes, and check usability while documenting removed complexity.
 
 ## MANDATORY PREPARATION
 

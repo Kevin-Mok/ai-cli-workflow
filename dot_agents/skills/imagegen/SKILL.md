@@ -6,7 +6,9 @@ description: "Use when the user asks to generate or edit images via the OpenAI I
 
 # Image Generation Skill
 
-Generates or edits images for the current project (e.g., website assets, game assets, UI mockups, product mockups, wireframes, logo design, photorealistic images, infographics). Defaults to `gpt-image-1.5` and the OpenAI Image API, and prefers the bundled CLI for deterministic, reproducible runs.
+Generate or edit images for the current project. Gather the prompt and input
+assets, choose generation, editing, or batch mode, run the CLI, then inspect
+and refine the result before saving the final images. Defaults to `gpt-image-1.5` and the OpenAI Image API, and prefers the bundled CLI for deterministic, reproducible runs.
 
 ## When to use
 - Generate a new image (concept art, product shot, cover, website hero)

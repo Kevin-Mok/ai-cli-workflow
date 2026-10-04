@@ -5,7 +5,11 @@ user-invokable: true
 argument-hint: [TARGET=<value>]
 ---
 
-Identify and improve unclear, confusing, or poorly written interface text to make the product easier to understand and use.
+# Clarify
+
+Make interface text easier to understand and act on. Review the audience and
+current copy, identify unclear messages, rewrite them in consistent language,
+and check that users can tell what happened and what to do next.
 
 ## MANDATORY PREPARATION
 

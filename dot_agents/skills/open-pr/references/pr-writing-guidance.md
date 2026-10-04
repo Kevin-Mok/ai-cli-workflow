@@ -1,7 +1,9 @@
 # PR Writing Guidance
 
 Use this reference to ground `open-pr` output in broadly accepted PR-writing
-guidance. Keep the final PR specific to the branch evidence; do not cite these
+guidance. Gather branch evidence, explain the purpose and changes, then check
+that verification, reviewer focus, and risks are clear. Keep the final PR
+specific to the branch evidence; do not cite these
 sources inside a PR body unless the user asks for citations.
 
 ## Source Guidance To Encode

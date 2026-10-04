@@ -5,11 +5,9 @@ description: Use when work in this repo introduces a concrete manual verificatio
 
 # Smoke Test Capture
 
-## Purpose
-
-Keep the repo's manual smoke coverage in one shared document instead of
-leaving manual checks buried in chat, plans, or one-off verification
-notes.
+Keep reusable manual checks in the shared smoke-test document. Find the
+relevant section, update or add a concise Action and Expected pair, and keep
+that check aligned with the behavior changed in the same task.
 
 ## Canonical Document
 

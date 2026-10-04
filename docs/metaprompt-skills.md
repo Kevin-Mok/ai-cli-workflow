@@ -1,5 +1,10 @@
 # Metaprompt skills
 
+Use these skills to create, improve, and save a prompt for another task.
+Invoke `$metaprompt` or the original `$metaprompt-alxve` with your task or
+draft, then review the saved prompt. Follow the update and verification
+steps when changing the installed skill.
+
 The installed `$metaprompt` now uses the pinned **Sentry `prompt-optimizer`**
 workflow, replacing the Majkey adaptation at the user's request on October 4,
 2026. The completed [native skill selection](metaprompt-selection.md) chose it

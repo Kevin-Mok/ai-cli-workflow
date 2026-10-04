@@ -1,5 +1,10 @@
 # ExampleProject AI Real System UI Design
 
+Design the ExampleProject teacher and student portals around source review and
+approved learning content. Define the portal routes and shared layout, apply
+the screen and component patterns, then check permissions, responsive
+behavior, and the UI quality gates.
+
 Date: 2026-05-09
 Status: Draft v0.1
 Primary focus: Teacher/Admin Portal

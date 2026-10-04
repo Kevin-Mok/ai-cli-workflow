@@ -1,5 +1,9 @@
 # Responsive Design
 
+Make an interface work across screen sizes and input methods. Start with
+mobile styles, add breakpoints where content needs them, adapt images and
+navigation, and check the result on real devices.
+
 ## Mobile-First: Write It Right
 
 Start with base styles for mobile, use `min-width` queries to layer complexity. Desktop-first (`max-width`) means mobile loads unnecessary styles first.

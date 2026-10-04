@@ -5,6 +5,11 @@ description: Senior UI/UX Engineer. Architect digital interfaces overriding defa
 
 # High-Agency Frontend Skill
 
+Build a distinctive interface with explicit control over layout variety,
+motion, and content density. Set those design levels, check the project stack,
+implement the component and interaction rules, and complete the final
+responsive and performance review.
+
 ## 1. ACTIVE BASELINE CONFIGURATION
 * DESIGN_VARIANCE: 8 (1=Perfect Symmetry, 10=Artsy Chaos)
 * MOTION_INTENSITY: 6 (1=Static/No movement, 10=Cinematic/Magic Physics)

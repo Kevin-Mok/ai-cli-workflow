@@ -5,7 +5,11 @@ user-invokable: true
 argument-hint: [TARGET=<value>]
 ---
 
-Identify and fix performance issues to create faster, smoother user experiences.
+# Optimize
+
+Make an interface load and respond faster. Measure its current performance,
+identify the largest bottlenecks, apply targeted improvements, and compare
+before-and-after results across relevant devices and network conditions.
 
 ## Assess Performance Issues
 

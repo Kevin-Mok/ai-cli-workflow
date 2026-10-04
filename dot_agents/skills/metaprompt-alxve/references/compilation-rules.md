@@ -1,5 +1,9 @@
 # Compilation Rules
 
+Compile a prompt that matches the task, supplied inputs, and target system.
+Choose the input mode and complexity, build the prompt with the relevant
+recipe, then add the appropriate quality checks and completion conditions.
+
 <!-- metaprompt-reference: compilation-rules-v1 -->
 
 ## Two input modes and reusable branches

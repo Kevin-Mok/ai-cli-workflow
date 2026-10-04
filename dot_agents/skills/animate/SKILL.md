@@ -5,7 +5,11 @@ user-invokable: true
 argument-hint: [TARGET=<value>]
 ---
 
-Analyze a feature and strategically add animations and micro-interactions that enhance understanding, provide feedback, and create delight.
+# Animate
+
+Add motion that helps users understand actions and state changes. Gather
+design and performance constraints, choose useful animation moments, implement
+them, and check timing, responsiveness, and reduced-motion behavior.
 
 ## MANDATORY PREPARATION
 

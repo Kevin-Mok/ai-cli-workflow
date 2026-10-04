@@ -5,7 +5,9 @@ description: Use when starting, continuing, capturing, or closing a example-user
 
 # Second Brain Session
 
-Use targeted context and deterministic writes. The tracked vault is public-safe;
+Keep a work session connected to relevant personal and project context. Load
+targeted notes, confirm one ExampleProject outcome, route useful information to its
+owner, and prepare a confirmed closeout. The tracked vault is public-safe;
 private raw capture stays outside Git.
 
 ## Start

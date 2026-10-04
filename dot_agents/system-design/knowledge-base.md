@@ -1,5 +1,10 @@
 # ExampleProject Knowledge Base Design
 
+Plan a portable Knowledge Vault that teachers can inspect and approve.
+Define Markdown note storage and relationships, turn source evidence into
+draft notes, review those notes, and assemble approved knowledge into AI
+generation context.
+
 Date: 2026-05-09
 Status: Draft v0.1
 

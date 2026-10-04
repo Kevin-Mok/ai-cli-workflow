@@ -1,5 +1,9 @@
 # UX Writing
 
+Write interface text that helps users understand what happened and what to
+do next. Choose specific labels, explain errors and empty states, then check
+tone, terminology, accessibility, and translation needs.
+
 ## The Button Label Problem
 
 **Never use "OK", "Submit", or "Yes/No".** These are lazy and ambiguous. Use specific verb + object patterns:

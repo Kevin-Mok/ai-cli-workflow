@@ -1,5 +1,10 @@
 # ExampleProject PR Style
 
+Prepare a ExampleProject pull request that DD or Reviewer A can review in the right
+environment. Write the branch purpose and walkthrough, include reproducible
+checks and known limits, and keep the repository handoff document aligned
+with the GitHub PR.
+
 Use this reference only when working in `/home/example/coding/example-project`, a
 repository whose remote is `adminExample Clienteducation/example-project`, or a request that
 mentions ExampleProject, DD/Reviewer B, Reviewer A, local backend review, Gauss/CEMC,

@@ -5,7 +5,12 @@ user-invokable: true
 argument-hint: [AREA=<value>]
 ---
 
-Run systematic quality checks and generate a comprehensive audit report with prioritized issues and actionable recommendations. Don't fix issues - document them for other commands to address.
+# Audit
+
+Produce a prioritized report of interface quality problems. Review the
+design guidance, inspect accessibility, performance, theming, and responsive
+behavior, then document verified issues and recommended fixes. Do not fix
+issues during this audit.
 
 **First**: Use the frontend-design skill for design principles and anti-patterns.
 

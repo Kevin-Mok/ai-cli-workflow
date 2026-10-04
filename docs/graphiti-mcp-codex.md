@@ -1,5 +1,9 @@
 # Graphiti MCP Server For Codex
 
+Connect Codex to the local Graphiti memory server using this machine's Neo4j
+setup. Start Neo4j, configure Codex to launch Graphiti from its checkout,
+then restart Codex and verify the connection.
+
 Checked against the working local setup on 2026-03-17.
 
 ## Working Local Setup

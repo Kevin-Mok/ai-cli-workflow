@@ -5,6 +5,13 @@ user-invokable: true
 argument-hint: [AREA=<value>]
 ---
 
+# Critique
+
+Review how well an interface serves its users and communicate the most useful
+design improvements. Gather its purpose and context, examine the experience
+across the dimensions below, and report strengths, priority issues, and
+concrete next steps.
+
 ## MANDATORY PREPARATION
 
 Use the frontend-design skill — it contains design principles, anti-patterns, and the **Context Gathering Protocol**. Follow the protocol before proceeding — if no design context exists yet, you MUST run teach-impeccable first. Additionally gather: what the interface is trying to accomplish.

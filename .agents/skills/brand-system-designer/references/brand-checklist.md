@@ -1,5 +1,9 @@
 # Brand System Checklist
 
+Use this checklist to confirm that a brand system is ready for handoff.
+Check the discovery brief and chosen direction, review the visual assets and
+usage rules, then record validation results and remaining questions.
+
 ## Discovery
 - [ ] Product name and tagline confirmed
 - [ ] Audience and use case documented

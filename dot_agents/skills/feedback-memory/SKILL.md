@@ -5,9 +5,9 @@ description: Persist durable user corrections and preferences across sessions th
 
 # Feedback Memory
 
-## Purpose
-
-Carry forward reusable user feedback across sessions with one canonical append-only log.
+Carry forward reusable user feedback across sessions with one canonical
+append-only log. Read the existing preferences, apply them to the current
+work, and append new durable corrections when the user gives them.
 
 ## Log Path
 

@@ -95,6 +95,10 @@ education work:
 
 ## Documentation And Repo Surfaces
 
+- Start every how-to or procedural document with a short, plain-language
+  overview directly below the title. Explain what the document helps the
+  reader accomplish and summarize the main steps before detailed instructions
+  or commands. Keep it direct and easy to understand.
 - Documentation is part of the implementation. Update behavior, setup, usage,
   test instructions, known risks, and relevant plans in the same change.
 - Treat root `README.md` as the public operating surface. When instructions,

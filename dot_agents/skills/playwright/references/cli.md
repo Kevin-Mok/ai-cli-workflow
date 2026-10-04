@@ -1,5 +1,9 @@
 # Playwright CLI Reference
 
+Look up commands for browser navigation, interaction, capture, and debugging.
+Set up the wrapper or installed CLI, choose the relevant command group, and
+use a named session when work needs its own browser state.
+
 Use the wrapper script unless the CLI is already installed globally:
 
 ```bash

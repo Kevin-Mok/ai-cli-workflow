@@ -8,6 +8,10 @@ description: >-
 
 # Metaprompt
 
+Turn a request or existing prompt into a saved prompt with clear success
+criteria. Clarify the goal, follow the upstream optimization workflow, and
+return the compiled prompt with its evaluation plan and remaining risks.
+
 This is the prompt-authoring adapter for Sentry's pinned `prompt-optimizer`.
 Read [UPSTREAM.md](UPSTREAM.md) and follow its native workflow, loading only
 the references selected by its routing table. Reference paths are relative to

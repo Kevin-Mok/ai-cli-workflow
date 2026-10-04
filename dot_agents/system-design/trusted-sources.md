@@ -1,5 +1,10 @@
 # Trusted Sources and Categorization System
 
+Plan how ExampleProject selects and uses reliable teaching sources with clear
+permissions. Record each source's trust, rights, and academic tags, review it
+before generation, then validate and approve linked teaching material before
+release.
+
 Date: 2026-05-09
 
 ## 1. Purpose

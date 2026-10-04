@@ -6,6 +6,10 @@ description: "Use when the user explicitly asks for a desktop or system screensh
 
 # Screenshot Capture
 
+Capture a desktop, window, or screen region and save it in the right place.
+Choose the capture tool and destination, check any platform permissions, run
+the helper, and inspect or return the saved image paths.
+
 Follow these save-location rules every time:
 
 1) If the user specifies a path, save there.

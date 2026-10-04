@@ -5,6 +5,10 @@ description: Use when I explicitly want the current intended dirty git worktree 
 
 # Commit Dirty
 
+Commit and push the authorized dirty work in a repository. Review the scope
+and diffs, run relevant checks and the README gate, then commit eligible
+changes, attempt the push, and report any remaining work.
+
 Use this skill for explicit write requests to create a real git commit and push it from the current repository, including the "commit dirty" and "commit all dirty" cases where the intended scope is the current dirty worktree. Make a best-effort commit of every eligible change within the requested scope. Prioritize files touched during the current session and favor including safe related files over omitting them.
 
 ## Required Workflow

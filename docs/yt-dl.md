@@ -1,5 +1,10 @@
 # YouTube downloader
 
+Download one YouTube video with audio and check that its saved resolution
+and frame rate match the best formats reported by yt-dlp. Install the
+required tools, choose an output folder, run `yt-dl` with the video link,
+then read the download and verification result.
+
 Run `yt-dl` after chezmoi apply (Python 3.9+, current yt-dlp, ffmpeg, and ffprobe on
 PATH). No sudo is needed.
 The wrapper does not install or update dependencies. Follow the

@@ -5,6 +5,12 @@ user-invokable: true
 argument-hint: [TARGET=<value>]
 ---
 
+# Polish
+
+Finish a functionally complete interface with a consistent level of quality.
+Confirm the design context and release expectations, work through visual and
+interaction details, then check all states and relevant devices.
+
 ## MANDATORY PREPARATION
 
 Use the frontend-design skill — it contains design principles, anti-patterns, and the **Context Gathering Protocol**. Follow the protocol before proceeding — if no design context exists yet, you MUST run teach-impeccable first. Additionally gather: quality bar (MVP vs flagship).

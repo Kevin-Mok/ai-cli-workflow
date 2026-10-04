@@ -6,7 +6,9 @@ description: "Use when the task requires automating a real browser from the term
 
 # Playwright CLI Skill
 
-Drive a real browser from the terminal using `playwright-cli`. Prefer the bundled wrapper script so the CLI works even when it is not globally installed.
+Drive a real browser from the terminal using `playwright-cli`. Check the
+prerequisites, open the page, capture a snapshot, interact with the current
+element references, and capture the resulting state or artifacts. Prefer the bundled wrapper script so the CLI works even when it is not globally installed.
 Treat this skill as CLI-first automation. Do not pivot to `@playwright/test` unless the user explicitly asks for test files.
 
 ## Prerequisite check (required)

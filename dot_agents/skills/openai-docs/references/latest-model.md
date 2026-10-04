@@ -1,6 +1,8 @@
 # Latest model guide
 
-This file is a curated helper. Every recommendation here must be verified against current OpenAI docs before it is repeated to a user.
+Use this map to find candidate models for a task. Match the required kind of
+work, then verify the recommendation against current OpenAI documentation
+before presenting it to the user; this curated helper can become outdated.
 
 ## Current model map
 

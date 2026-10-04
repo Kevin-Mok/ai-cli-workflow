@@ -1,5 +1,8 @@
 # Playwright CLI Workflows
 
+Use these examples to complete common browser tasks and capture useful
+evidence. Open the page, snapshot its current state, perform the interaction,
+and inspect the result; use traces and session settings when troubleshooting.
 Use the wrapper script and snapshot often.
 Assume `PWCLI` is set and `pwcli` is an alias for `"$PWCLI"`.
 In this repo, run commands from `output/playwright/<label>/` to keep artifacts contained.

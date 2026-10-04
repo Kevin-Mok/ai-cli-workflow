@@ -5,6 +5,10 @@ description: Overrides default LLM truncation behavior. Enforces complete code g
 
 # Full-Output Enforcement
 
+Deliver every requested file, section, or answer in full. Count the required
+outputs, produce each one, and check for omissions; use the continuation
+format below when a complete response needs more than one message.
+
 ## Baseline
 
 Treat every task as production-critical. A partial output is a broken output. Do not optimize for brevity — optimize for completeness. If the user asks for a full file, deliver the full file. If the user asks for 5 components, deliver 5 components. No exceptions.

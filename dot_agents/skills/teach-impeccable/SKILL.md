@@ -4,7 +4,12 @@ description: One-time setup that gathers design context for your project and sav
 user-invokable: true
 ---
 
-Gather design context for this project, then persist it for all future sessions.
+# Teach Impeccable
+
+Gather design context for this project so future sessions share a clear
+audience, visual direction, and set of design principles. Inspect the
+codebase, ask about remaining gaps, and save the agreed context in
+`.impeccable.md`.
 
 ## Step 1: Explore the Codebase
 

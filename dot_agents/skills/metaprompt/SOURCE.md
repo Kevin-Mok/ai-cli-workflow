@@ -1,5 +1,10 @@
 # Source
 
+Use this guide to update the Sentry-based `$metaprompt` skill and recover the
+previous installation if needed. Check the pinned source, stage and review
+a candidate, back up the existing installation, then follow the checks and
+refresh steps before using the updated skill.
+
 - Upstream repository: [getsentry/skills](https://github.com/getsentry/skills).
 - Pinned revision: `d18b7aa8ba878354e5c348310230e652f7690f9c`.
 - Native path: `skills/prompt-optimizer`.

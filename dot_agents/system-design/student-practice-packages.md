@@ -1,5 +1,10 @@
 # ExampleProject Student Practice Package Storage Design
 
+Plan fast delivery of published practice and assessments to students.
+Separate database state from stored content, build immutable packages,
+authorize and cache student access, then save answers and grade against
+protected answer keys.
+
 Date: 2026-05-09
 Status: Draft v0.1
 

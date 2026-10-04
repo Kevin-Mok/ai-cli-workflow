@@ -1,5 +1,9 @@
 # Second Brain: the beginner version
 
+Second Brain helps you return to unfinished work with your goal, decisions,
+and next step written down. Check status, capture useful context, choose one
+outcome, and finish with a short handoff.
+
 You do not use Second Brain to store every thought or to make the computer think for you.
 
 You use it so that, when you return to work later, you do not have to remember:

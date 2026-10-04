@@ -1,5 +1,9 @@
 # Prompt: Backup Script for `ubuntu-h7` + Root Restore Plan
 
+Use this prompt to ask a coding agent to create a backup script and a root
+filesystem recovery procedure for `ubuntu-h7`. Provide the reference files
+below, then send the prompt to generate the script and its usage instructions.
+
 ## Reference Files To Provide
 
 Give the model these files as context:

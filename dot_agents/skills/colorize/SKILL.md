@@ -5,7 +5,11 @@ user-invokable: true
 argument-hint: [TARGET=<value>]
 ---
 
-Strategically introduce color to designs that are too monochromatic, gray, or lacking in visual warmth and personality.
+# Colorize
+
+Use color to make an interface clearer and more expressive. Review the brand
+and existing palette, decide where color should communicate meaning or
+priority, apply it consistently, and check contrast and accessibility.
 
 ## MANDATORY PREPARATION
 

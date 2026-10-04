@@ -1,5 +1,10 @@
 # ExampleProject AI Real System Design
 
+Plan the ExampleProject production platform around trusted sources and
+teacher-approved content. Start with hosting and service boundaries, trace
+the content-to-results workflows, then apply the security, operations, and
+delivery requirements before following the build milestones.
+
 Date: 2026-05-10
 Status: Draft v0.2
 

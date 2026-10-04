@@ -5,7 +5,11 @@ user-invokable: true
 argument-hint: [TARGET=<value>]
 ---
 
-Increase visual impact and personality in designs that are too safe, generic, or visually underwhelming, creating more engaging and memorable experiences.
+# Bolder
+
+Give an understated design a clearer visual identity while keeping it usable.
+Review the audience and constraints, choose a focal point and direction,
+strengthen the relevant visual elements, and check coherence and accessibility.
 
 ## MANDATORY PREPARATION
 

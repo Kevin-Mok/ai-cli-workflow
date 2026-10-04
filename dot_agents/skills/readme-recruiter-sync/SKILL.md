@@ -8,7 +8,8 @@ description: Use when handling commit or push requests, refreshing the root READ
 Keep the root `README.md` aligned with the repository before commit or docs
 workflows ship changes. Focus on truthfulness, recruiter-first information
 hierarchy, runnable onboarding, repo-based tech-stack explanation, and a
-consolidated recruiter-facing hook.
+consolidated recruiter-facing hook. Read the contract, compare README claims
+with the actual files and commands, and repair or report each gap.
 
 ## Quick Start
 

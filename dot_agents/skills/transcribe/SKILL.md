@@ -6,7 +6,9 @@ description: "Transcribe audio files to text with optional diarization and known
 
 # Audio Transcribe
 
-Transcribe audio using OpenAI, with optional speaker diarization when requested. Prefer the bundled CLI for deterministic, repeatable runs.
+Turn audio into text, with speaker labels when requested. Collect the files
+and output requirements, check the API key, run the bundled transcription
+CLI, then review and save the results.
 
 ## Workflow
 1. Collect inputs: audio file path(s), desired response format (text/json/diarized_json), optional language hint, and any known speaker references.

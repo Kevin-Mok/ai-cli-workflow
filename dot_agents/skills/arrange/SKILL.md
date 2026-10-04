@@ -5,7 +5,11 @@ user-invokable: true
 argument-hint: [TARGET=<value>]
 ---
 
-Assess and improve layout and spacing that feels monotonous, crowded, or structurally weak — turning generic arrangements into intentional, rhythmic compositions.
+# Arrange
+
+Improve layout and spacing so users can see what matters and how content
+is grouped. Review the current composition, plan a consistent spacing and
+layout system, apply it, and check hierarchy and responsive behavior.
 
 ## MANDATORY PREPARATION
 

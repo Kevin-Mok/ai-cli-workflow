@@ -5,7 +5,11 @@ user-invokable: true
 argument-hint: [TARGET=<value>]
 ---
 
-Identify reusable patterns, components, and design tokens, then extract and consolidate them into the design system for systematic reuse.
+# Extract
+
+Turn repeated UI patterns into reusable components and design tokens. Find
+the existing design system, choose worthwhile extractions, build and document
+the shared versions, then migrate existing uses and check that they still work.
 
 ## Discover
 

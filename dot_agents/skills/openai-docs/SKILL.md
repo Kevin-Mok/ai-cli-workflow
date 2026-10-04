@@ -6,6 +6,10 @@ description: "Use when the user asks how to build with OpenAI products or APIs a
 
 # OpenAI Docs
 
+Answer OpenAI product and API questions with current official documentation.
+Clarify the request, select the relevant reference, search and read the
+matching documentation, then give a concise answer with sources.
+
 Provide authoritative, current guidance from OpenAI developer docs using the developers.openai.com MCP server. Always prioritize the developer docs MCP tools over web.run for OpenAI-related questions. This skill may also load targeted files from `references/` for model-selection and GPT-5.4-specific requests, but current OpenAI docs remain authoritative. Only if the MCP server is installed and returns no meaningful results should you fall back to web search.
 
 ## Quick start

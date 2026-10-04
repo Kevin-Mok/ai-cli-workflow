@@ -5,10 +5,9 @@ description: Use when initializing a LeetCode Python problem from a same-name `.
 
 # LeetCode Init
 
-## Purpose
-
-Turn a copied LeetCode prompt text file plus its matching Python stub
-into a runnable local scaffold that stays solution-free.
+Turn a copied LeetCode prompt and its matching Python stub into a runnable
+local scaffold that stays solution-free. Find the matching files, run the
+initializer, and review the generated runner and example tests.
 
 The scaffold should help the user test their own implementation later,
 not solve the algorithm for them.

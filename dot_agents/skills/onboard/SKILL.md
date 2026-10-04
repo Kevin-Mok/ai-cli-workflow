@@ -5,6 +5,12 @@ user-invokable: true
 argument-hint: [TARGET=<value>]
 ---
 
+# Onboard
+
+Help new users reach a useful first result quickly. Gather their context,
+identify what they need to learn, design the onboarding or empty-state flow,
+and check whether users understand it and take the intended next step.
+
 ## MANDATORY PREPARATION
 
 Use the frontend-design skill — it contains design principles, anti-patterns, and the **Context Gathering Protocol**. Follow the protocol before proceeding — if no design context exists yet, you MUST run teach-impeccable first. Additionally gather: the "aha moment" you want users to reach, and users' experience level.

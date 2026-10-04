@@ -6,4 +6,5 @@
 - Original source path: `minimalist-skill/SKILL.md`
 - Imported on: `2026-03-19`
 - Import basis: imported into this repo with explicit permission.
-- Local modifications after import: renamed the folder to `minimalist-ui` and added `agents/openai.yaml`; `SKILL.md` content preserved from source.
+- Local modifications after import: renamed the folder to `minimalist-ui` and added `agents/openai.yaml`; `SKILL.md` content was preserved at import.
+- Local documentation update on `2026-10-04`: added a purpose-and-workflow overview to `SKILL.md`, with a title where missing; the original detailed instructions remain intact.

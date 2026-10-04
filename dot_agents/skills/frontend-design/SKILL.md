@@ -3,7 +3,12 @@ name: frontend-design
 description: Create distinctive, production-grade frontend interfaces with high design quality. Use this skill when the user asks to build web components, pages, artifacts, posters, or applications. Generates creative, polished code that avoids generic AI aesthetics.
 ---
 
-This skill guides creation of distinctive, production-grade frontend interfaces that avoid generic "AI slop" aesthetics. Implement real working code with exceptional attention to aesthetic details and creative choices.
+# Frontend Design
+
+Build a distinctive, working interface grounded in the project's audience and
+brand. Confirm the design context, choose a clear visual direction, implement
+it with the guidance below, and review the result for quality and generic
+design patterns.
 
 ## Context Gathering Protocol
 

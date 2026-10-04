@@ -5,7 +5,11 @@ user-invokable: true
 argument-hint: [TARGET=<value>]
 ---
 
-Strengthen interfaces against edge cases, errors, internationalization issues, and real-world usage scenarios that break idealized designs.
+# Harden
+
+Make an interface reliable with unusual data, errors, and real-world usage.
+Exercise difficult inputs and failure states, improve layout and recovery
+behavior, then check language support, accessibility, and the affected flows.
 
 ## Assess Hardening Needs
 

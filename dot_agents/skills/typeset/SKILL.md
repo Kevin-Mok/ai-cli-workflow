@@ -5,7 +5,11 @@ user-invokable: true
 argument-hint: [TARGET=<value>]
 ---
 
-Assess and improve typography that feels generic, inconsistent, or poorly structured — turning default-looking text into intentional, well-crafted type.
+# Typeset
+
+Make interface text readable, consistent, and appropriate for the brand.
+Review the current fonts and hierarchy, define a type scale and spacing rules,
+apply them, and check readability, loading behavior, and accessibility.
 
 ## MANDATORY PREPARATION
 

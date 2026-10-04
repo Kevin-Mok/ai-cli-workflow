@@ -1,5 +1,9 @@
 # Typography
 
+Build a readable typography system with clear hierarchy. Choose fonts and a
+size scale, set line length and spacing, plan loading and fallback behavior,
+and apply the accessibility and token guidance below.
+
 ## Classic Typography Principles
 
 ### Vertical Rhythm

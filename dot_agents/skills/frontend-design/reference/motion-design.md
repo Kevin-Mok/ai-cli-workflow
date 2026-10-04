@@ -1,5 +1,9 @@
 # Motion Design
 
+Choose interface motion that communicates changes clearly and runs smoothly.
+Set timing and easing for the action, use suitable animated properties, and
+provide reduced-motion behavior while checking perceived performance.
+
 ## Duration: The 100/300/500 Rule
 
 Timing matters more than easing. These durations feel right for most UI:

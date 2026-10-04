@@ -5,6 +5,13 @@ user-invokable: true
 argument-hint: [TARGET=<value>]
 ---
 
+# Overdrive
+
+Build an ambitious interaction or visual effect that fits the product.
+Understand the context, present directions for the user to choose, implement
+the confirmed approach with fallbacks, and refine it through browser,
+performance, and accessibility checks.
+
 Start your response with:
 
 ```

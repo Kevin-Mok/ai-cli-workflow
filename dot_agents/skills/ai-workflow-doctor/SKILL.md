@@ -5,6 +5,10 @@ description: Use when auditing a repository's AI instructions, skill catalog, lo
 
 # AI Workflow Doctor
 
+Check a repository's AI instructions for broken references, catalog drift, and
+conflicting guidance. Run the narrowest audit, review its findings, repair
+confirmed problems, and rerun it to report what changed.
+
 <!-- ai-workflow-doctor: adapted -->
 
 Run the installed doctor from any working directory instead of estimating workflow health from memory:

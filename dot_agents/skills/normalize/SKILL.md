@@ -5,7 +5,11 @@ user-invokable: true
 argument-hint: [FEATURE=<value>]
 ---
 
-Analyze and redesign the feature to perfectly match our design system standards, aesthetics, and established patterns.
+# Normalize
+
+Align a feature with the existing design system. Read its guidance and
+context, identify inconsistent components and styles, apply the established
+patterns, then clean up obsolete code and check for regressions.
 
 ## MANDATORY PREPARATION
 

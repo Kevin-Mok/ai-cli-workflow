@@ -1,6 +1,9 @@
 # Second Brain Operator Guide (Simplified)
 
-This guide is the practical entry point for using Second Brain in this repository.
+Use these commands to keep private work notes and save approved summaries
+that you can reuse next time. Check status, capture notes, confirm a focus,
+then close out and validate the vault; use the later sections for
+checkpoints, reminders, and migrations.
 
 ## What Second Brain is
 

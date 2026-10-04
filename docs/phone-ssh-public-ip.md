@@ -1,7 +1,9 @@
 # SSH From Your Phone Over Public IP
 
-This repo now includes `scripts/executable_setup-phone-ssh.sh` to harden an
-SSH server for direct phone access over a public IP.
+Use `scripts/executable_setup-phone-ssh.sh` to set up key-based SSH access
+from your phone over a public IP. Prepare the phone's key, configure SSH,
+forward the router port when needed, then test from cellular data. Add Mosh
+and extra hardening after SSH works.
 
 What it changes:
 

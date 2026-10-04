@@ -3,7 +3,9 @@
 An ExecPlan is a living, decision-complete implementation record for work that
 has three or more steps, changes multiple files, or requires an architecture
 decision. Store it at `plans/<task-slug>.md` and write it so another engineer
-can continue without reconstructing intent from chat.
+can continue without reconstructing intent from chat. Define the outcome and
+scope, plan the implementation and checks, then keep progress, evidence, and
+review notes current through delivery.
 
 ## Required Sections
 

@@ -1,7 +1,8 @@
 # Second Brain, explained like you are five
 
-Second Brain is a little notebook that helps future-you pick up where
-present-you stopped.
+Second Brain is a notebook that helps you pick up where you stopped. Start
+with one clear goal, save useful discoveries while you work, and leave a
+short handoff before you stop.
 
 It is not a place to save everything. It is a place to save the few things
 that would be annoying to rediscover: what you were trying to do, what you
