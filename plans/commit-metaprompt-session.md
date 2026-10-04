@@ -123,6 +123,26 @@ section. Aliases, phone SSH files, live configuration and historical benchmark
 request documents are absent from the commit delta. Commit and push are now
 authorized; no implementation or verification work remains before delivery.
 
+## Delivery receipt
+
+Committed the reviewed scope as
+`414b01ff887e7c2b5a264583f714c333ff109acd`
+(`feat(metaprompt): benchmark and adopt Sentry optimizer`) and pushed `main` to
+`origin/main`, both exit 0. Remote `refs/heads/main` and local HEAD match, with
+ahead/behind `0 0` and an empty index. All 299 originally staged session paths
+are included among the 332 changed paths. Phone SSH, aliases, unrelated notes
+and the original benchmark request/compilation files remain uncommitted.
+
+A post-push check detected Codex config updates made during the approval wait;
+both current files match each other, their timestamps precede the commit, and
+the committed config is unchanged from its parent. Preserve those local updates
+and the existing skip-worktree flag. The
+[verification postmortem](../docs/postmortem/2026-10-04-metaprompt-post-push-verification.md)
+records the stale baseline and attribution limits. This receipt and postmortem
+form a documentation-only follow-up; no implementation or config changes are
+needed. Verify and push that follow-up normally without rewriting the delivered
+commit.
+
 Cursor prompt: Read this plan, inspect the current index and remaining dirty
 state, and reconcile attribution with the recorded thread. Preserve unrelated
 changes and frozen files. Run the scoped checks, inspect the staged diff,
