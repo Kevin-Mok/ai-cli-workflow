@@ -27,6 +27,10 @@ Use this skill when:
 ## When not to use
 
 Do not log:
+- personal-context conversations, source facts, or life-derived learnings,
+  including workflow/communication preferences learned in that private setting;
+  their sole owner is `/home/example/coding/personal-context`, and this skill must
+  neither read that source implicitly nor mirror its contents into this log
 - task-specific instructions tied to the current ticket, branch, file, or investigation
 - one-off requests or temporary preferences
 - ephemeral facts that will age out quickly
@@ -37,7 +41,7 @@ Do not log:
 1. Resolve the canonical log path using the rules above.
 2. Before doing anything else in the session, read the canonical `feedback.log`.
 3. Treat the log as durable operating guidance. Apply it throughout the session unless the user overrides it explicitly.
-4. When the user gives new durable feedback, append it to the canonical log immediately before continuing.
+4. When the user gives new durable feedback outside the private personal-context boundary above, append it to the canonical log immediately before continuing. Only independently public-safe operating feedback belongs here.
 5. Do not create, update, or reconcile a second log when the repo-tracked path exists.
 6. Keep the file append-only. Do not rewrite, reformat, dedupe, or move old entries unless the user explicitly asks.
 7. If the feedback is ambiguous, log only the durable part that would still help in a different future task.

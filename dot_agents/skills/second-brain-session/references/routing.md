@@ -11,6 +11,7 @@ Route one fact to one owner:
 
 | Information | Canonical owner |
 |---|---|
+| Personal-context chatbot conversations, private source facts, and life-derived learnings (including workflow preferences) | `/home/example/coding/personal-context` only; read/update solely through explicitly invoked personal-context work |
 | Durable workflow or communication preference | dot_agents/skills/feedback-memory/feedback.log |
 | Repository-specific engineering lesson | tasks/lessons.md |
 | Implementation decision, state, or verification | plans/ |
@@ -19,6 +20,12 @@ Route one fact to one owner:
 | Profile, Inbox, daily summary, project context, curated knowledge | second-brain/ |
 
 Link to another owner when navigation improves; do not copy its full content.
+
+The private personal-context row takes precedence over overlapping categories.
+Do not mirror those facts or conversations into tracked profiles, feedback,
+Graphiti, raw session capture, or any other service. A personal-context
+invocation does not start a ExampleProject focus or session lifecycle. Other memory
+skills must not implicitly invoke it or load its private source.
 
 ## Raw Session Payload
 

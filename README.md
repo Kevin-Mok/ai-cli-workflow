@@ -294,6 +294,16 @@ Representative highlights:
 - [`feedback-memory`](dot_agents/skills/feedback-memory/SKILL.md)
   carries forward durable user corrections through a repo-tracked
   `feedback.log`.
+- [`personal-context`](dot_agents/skills/personal-context/SKILL.md) starts a
+  conversation when explicitly invoked with `$personal-context`. It follows
+  answers about motivations, design taste, and development experiences to help
+  make better choices. Try `$personal-context Let's discuss what makes a
+  project worth pursuing for me.` Relevant learnings and labeled interpretations
+  stay in `/home/example/coding/personal-context/ai-context/context.json`, alongside
+  the external source notes; they never enter tracked feedback or other memory
+  services. The skill is installed by the normal chezmoi apply; fresh sessions
+  discover its explicit-only metadata. The private directory is not distributed
+  with this repository, and the chatbot can still converse when it is absent.
 - [`readme-recruiter-sync`](dot_agents/skills/readme-recruiter-sync/SKILL.md)
   checks install, usage, command flags, stack rationale, and recruiter-facing
   value; safe repairs ship with the change and remaining findings are reported
@@ -387,6 +397,10 @@ resources, and daily summaries. Its PARA-style Markdown remains directly
 inspectable, while the shared
 [second-brain-session skill](dot_agents/skills/second-brain-session/SKILL.md)
 retrieves only the context relevant to the current session.
+
+Private personal-learning discussions use the explicitly invoked
+[`personal-context` chatbot](dot_agents/skills/personal-context/SKILL.md), whose
+external JSON store is separate from this vault and its session lifecycle.
 
 The engineering boundary matters more than the folder tree:
 

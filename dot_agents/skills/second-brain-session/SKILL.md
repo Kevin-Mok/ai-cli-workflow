@@ -1,6 +1,6 @@
 ---
 name: second-brain-session
-description: Use when starting, continuing, capturing, or closing a example-user work session that needs personal or project context, ExampleProject progress, persistent instructions, or Second Brain retrieval.
+description: Use when starting, continuing, capturing, or closing a example-user work session that needs established project/session context, ExampleProject progress, persistent instructions, or Second Brain retrieval. An explicitly invoked personal-context chatbot discussion is a separate private workflow.
 ---
 
 # Second Brain Session
@@ -9,6 +9,12 @@ Keep a work session connected to relevant personal and project context. Load
 targeted notes, confirm one ExampleProject outcome, route useful information to its
 owner, and prepare a confirmed closeout. The tracked vault is public-safe;
 private raw capture stays outside Git.
+
+Personal-context chatbot discussions and their learnings belong solely in
+`/home/example/coding/personal-context`. They do not trigger this skill's Start,
+Capture, Deferred Reminders, or Close workflows. Do not read that directory
+implicitly or copy its content into raw capture, tracked notes, or Graphiti.
+Use the separately requested session workflow for its established purpose.
 
 ## Start
 
@@ -27,7 +33,9 @@ private raw capture stays outside Git.
 
 ## Capture
 
-Capture every available session text event privately with:
+Capture available session text events within this session workflow privately
+with the command below. Exclude personal-context chatbot conversations and
+learnings under the private boundary above.
 
 second-brain capture --kind raw-session --payload -
 

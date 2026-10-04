@@ -132,6 +132,9 @@ education work:
 - Use `dot_agents/skills/feedback-memory/feedback.log` as the canonical
   append-only log for durable cross-task user preferences. Never rewrite,
   reorder, deduplicate, or reconcile old entries.
+- Personal-context conversations and their life-derived learnings belong only
+  in the external private store described below, including communication or
+  workflow preferences learned there; do not mirror them into tracked feedback.
 - Record a repo-specific failure pattern or correction in
   `tasks/lessons.md`; create it if missing. Do not copy the same note into both
   files: durable user preference belongs in `feedback.log`, while a local
@@ -141,10 +144,17 @@ education work:
 
 ### Conditional Session Memory
 
-- Use the `second-brain-session` skill when work needs personal/project
+- Use `personal-context` only when explicitly invoked for a discussion that
+  learns about example-user to improve development and design choices. Its private
+  source and structured memory stay in `/home/example/coding/personal-context`.
+  Ordinary coding requests do not activate it, including through other skills.
+  Keep its conversations and learnings out of repository artifacts, Second Brain,
+  Graphiti, and other services; do not start session capture from this invocation.
+- Use the `second-brain-session` skill for established project/session
   context, explicit session capture, a ExampleProject daily outcome, or natural-end
   closeout. Keep its detailed procedure in the skill instead of loading the
-  entire vault into standing instructions.
+  entire vault into standing instructions. A personal-context discussion alone
+  does not activate its capture, focus, reminders, or closeout workflows.
 
 ## Git And Delivery
 

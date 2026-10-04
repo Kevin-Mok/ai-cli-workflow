@@ -195,6 +195,29 @@ checks rather than duplicating them.
 - Action: setup-superpowers-release-timer --disable
   Expected: Cleanup remains idempotent: the timer stays stopped and disabled without sudo.
 
+## Personal-context chatbot
+
+The chatbot is explicitly invoked. These checks cover adaptive conversation,
+private structured learning, and installation. Automated checks use invented
+temporary data; real personal notes are not fixtures or repository artifacts.
+
+- Action: python3 -B -m unittest discover -s tests -p 'test_personal_context*.py' -v
+  Expected: Synthetic storage and installed-layout tests pass, including explicit-only metadata, selective reads, source/inference labels, corrections, retry safety, forgetting, declined questions, invalid JSON, containment, permissions, and concurrent updates.
+- Action: python3 -B tests/test_personal_context_skill.py
+  Expected: Frontmatter and explicit-only metadata parse, supporting references resolve, and a fresh installed layout links the complete skill. This check needs Python 3.12+ and PyYAML; it does not depend on a machine-local copy of the system skill validator.
+- Action: python3 ~/.agents/skills/personal-context/scripts/context_store.py validate
+  Expected: After initialization, the installed helper reports only safe schema/revision/count metadata. Missing or invalid private memory produces an actionable error without replacing it or printing its contents.
+- Action: In a fresh Codex session, invoke `$personal-context` without a topic.
+  Expected: It uses relevant private context, opens with one useful conversational question, and follows answers across turns. It does not require a ExampleProject goal or an implementation task.
+- Action: Invoke `$personal-context Let's discuss a development choice I'm struggling with.` and supply a real dilemma.
+  Expected: Follow-ups respond to the dilemma and connect learnings to concrete options and tradeoffs. Current project/audience requirements remain authoritative over personal visual taste.
+- Action: During an invoked discussion, state a preference, correct it, decline a question, and mark another answer temporary. Later invoke the skill again.
+  Expected: Durable updates are summarized and remembered privately; the correction supersedes old guidance, the declined question is not repeated by default, and the temporary answer was not persisted. Interpretations remain visibly unconfirmed.
+- Action: Ask the invoked skill to forget one structured learning, then resume that topic in a later invocation.
+  Expected: All structured versions of that key are removed and automatic reimport is suppressed. The chatbot explains when original source notes still contain it; those notes are not silently edited.
+- Action: Start a separate ordinary coding request without invoking the chatbot.
+  Expected: No personal-context read, write, check-in, or indirect invocation through Second Brain/feedback-memory occurs. Private discussions never enter tracked feedback, raw capture, Graphiti, or the vault.
+
 ## Second Brain
 
 - Action: python3 -B -m unittest tests.test_second_brain_command tests.test_second_brain_timer tests.test_second_brain_skill -v
