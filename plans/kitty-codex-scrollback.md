@@ -212,6 +212,13 @@ terminal regressions, fixture emission, README gate, and whitespace checks
 passed before staging. The commit uses the configured `main` → `origin/main`
 upstream and includes its matching plans and records.
 
+The implementation was committed as `c1326da`. Automatic review initially
+blocked the push pending destination trust evidence. Read-only GitHub API
+checks establish that authenticated `example-user` owns the private
+`example-user/ai-cli-dotfiles` repository with admin/push permission. Record the
+[push review](../docs/postmortem/2026-10-04-kitty-session-push-review.md) in the
+follow-up documentation commit before the normal push of the verified series.
+
 ## User test location and follow-up handoff
 
 Run `/home/example/scripts/kitty-scrollback-smoke` from any terminal; no sudo is
