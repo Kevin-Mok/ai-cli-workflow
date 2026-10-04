@@ -1,0 +1,62 @@
+#!/usr/bin/env python3
+"""Open an isolated Kitty window with long, streaming scrollback to inspect."""
+
+import argparse
+import math
+import os
+from pathlib import Path
+import shutil
+import subprocess
+import sys
+import time
+
+
+def emit_fixture(lines: int, stream_lines: int, interval: float) -> None:
+    while sys.stdout.isatty() and os.get_terminal_size(sys.stdout.fileno()).columns < 40:
+        input("Widen this window to at least 40 columns, then press Enter to generate history. ")
+    print("KITTY SCROLLBACK SMOKE TEST — start of history")
+    for number in range(1, lines + 1):
+        print(
+            f"HISTORY {number:06d} | Long Codex-style output: inspect wrapped text, "
+            "drag the rounded scrollbar, select an older line, and resize this window."
+        )
+    input(
+        "\nHistory ready. Try dragging, Shift+PageUp/PageDown, and Ctrl+Shift+End.\n"
+        "Press Enter to begin streaming, then scroll up while new lines arrive. "
+    )
+    for number in range(1, stream_lines + 1):
+        print(f"STREAM {number:06d} | New output arriving; older text should stay readable.", flush=True)
+        time.sleep(interval)
+    input("\nStream complete. Press Enter to close this test window. ")
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--lines", type=int, default=10000, help="initial history records (default: 10000)")
+    parser.add_argument("--stream-lines", type=int, default=300, help="streamed records (default: 300)")
+    parser.add_argument("--interval", type=float, default=0.1, help="seconds between streamed records (default: 0.1)")
+    parser.add_argument("--emit", action="store_true", help="emit the fixture in this terminal instead of opening Kitty")
+    args = parser.parse_args()
+    if args.lines < 1 or args.stream_lines < 0 or not math.isfinite(args.interval) or args.interval < 0:
+        parser.error("--lines must be positive; --stream-lines and finite --interval must be nonnegative")
+
+    if args.emit:
+        emit_fixture(args.lines, args.stream_lines, args.interval)
+        return 0
+
+    kitty = shutil.which("kitty")
+    if kitty is None:
+        parser.error("kitty is not installed or is missing from PATH")
+    return subprocess.call([
+        kitty, "--title", "Kitty scrollback smoke test",
+        sys.executable, str(Path(__file__).resolve()), "--emit",
+        "--lines", str(args.lines), "--stream-lines", str(args.stream_lines),
+        "--interval", str(args.interval),
+    ])
+
+
+if __name__ == "__main__":
+    try:
+        sys.exit(main())
+    except (EOFError, KeyboardInterrupt):
+        sys.exit(0)

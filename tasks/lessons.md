@@ -88,4 +88,10 @@
 
 - 2026-10-03: Calibrate native skill handoffs before freezing a benchmark: explicit final Markdown links are valid artifacts, standard Python helpers need matching standard exceptions, and infrastructure readiness must not require every candidate to answer correctly. Preserve original development records and resume only unused stages, keeping all charges. See [selection validation](../docs/postmortem/2026-10-03-metaprompt-selection-validation.md).
 
+- 2026-10-04: For Kitty diagnostics, load the explicit config path and inspect finalized `keyboard_modes`; avoid top-level generator scope assumptions in `kitty +runpy`. Run existing terminal regressions before editing so stale st-only launcher assertions are distinguishable from new failures. See [Kitty scrollbar inspection](../docs/postmortem/2026-10-04-kitty-scrollbar-inspection.md).
+
+- 2026-10-04: Verify an i3 Codex shortcut using its exact Node and CLI paths; fnm's default alias can select an older runtime than interactive fish. Do not change current model settings to accommodate the wrong diagnostic binary. See [the launcher mismatch](../docs/postmortem/2026-10-04-kitty-scrollbar-inspection.md).
+
+- 2026-10-04: A clean `git status` for `dot_codex/config.toml` may reflect skip-worktree, not committed content. Inspect `git ls-files -v` and HEAD before session scoping; ship only the authorized hunk while preserving the flag and unrelated live settings. See [the commit-scope probe](../docs/postmortem/2026-10-04-kitty-scrollbar-inspection.md).
+
 - 2026-10-03: Validate the rendered form of reusable benchmark templates with multiline bindings: a trailing instruction can become part of the last data line and invalidate exact-copy controls. After a freeze, preserve primary results and disclose an equal-arm omission sensitivity instead of silently repairing the scored fixture. See [selection validation](../docs/postmortem/2026-10-03-metaprompt-selection-validation.md).

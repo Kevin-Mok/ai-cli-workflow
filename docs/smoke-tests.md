@@ -483,8 +483,8 @@ of stacking duplicates.
   Expected: Supported actions are PlayPause, Previous, and Next on the last displayed player's unique D-Bus connection only. Stale state (over 15 seconds), changed tracks, unavailable players, or unsupported actions do nothing; clicks never redirect to another player. Global media-key behavior remains unchanged.
 - Action: Focus a workspace on the left monitor, press `Alt++` until it moves across the middle 4K monitor to the right monitor, then press `Alt+-` to move it back.
   Expected: Workspace movement follows the physical left-middle-right monitor order and reverses cleanly.
-- Action: Launch the primary terminal from an i3 binding that uses this repo's rendered config, then trigger the Codex launcher shortcut.
-  Expected: The normal terminal windows open in `kitty`, and the Codex shortcut also launches inside `kitty` instead of a separate terminal path with different UI chrome.
+- Action: Launch the primary terminal from an i3 binding that uses this repo's rendered config, then press Super+C to start a fresh Codex session.
+  Expected: The normal terminal windows open in `kitty`. The Codex shortcut also uses Kitty and passes --no-alt-screen so its transcript is retained in native terminal history.
 - Action: Keep one or more `kitty` windows open, run `/home/example/scripts/apply-pywal-theme <wallpaper>` or trigger one of the wallpaper-changing shortcuts, and then open one additional `kitty` window.
   Expected: The already-open `kitty` windows refresh to the new vivid `pywal` palette without a manual restart, the newly opened `kitty` window uses the same updated colors, and the terminal keeps the repo-configured light translucency without falling back to the earlier heavy wallpaper bleed-through.
 - Action: Run `/home/example/scripts/apply-pywal-theme <wallpaper>` with a bright or high-saturation wallpaper, then inspect the i3 workspace bar and focused window chrome.
@@ -495,6 +495,30 @@ of stacking duplicates.
   Expected: `st` keeps a deep local scrollback buffer so you can continue moving upward through old output instead of stopping after one screen.
 - Action: While still scrolled up in `st`, drag-select older output, press `Ctrl+Shift+C`, then paste it elsewhere with `Ctrl+Shift+V`.
   Expected: The copied text comes from the scrolled-back output, and the copy/paste shortcuts match the normal terminal habit without forcing tmux copy mode for basic selection.
+
+### Kitty and Codex scrolling
+
+Use a fresh Kitty window after refresh-config: a larger history cannot recover
+lines an older window already discarded. This checks one scrollbar per Kitty
+terminal window. Inside tmux, use its Alt+C copy mode for pane-owned history.
+The fixture uses the normal Kitty configuration without overrides. Ordinary
+Codex launches use the persistent tui.alternate_screen = "never" setting;
+restart or resume an existing Codex session to pick up that default.
+Keep the fixture at least 40 columns wide through the first history check so
+wrapping all 10,000 records fits inside the configured 50,000-line buffer.
+
+- Action: /home/example/scripts/kitty-scrollback-smoke
+  Expected: A separate window titled “Kitty scrollback smoke test” opens with 10,000 numbered history records and wrapped text. A narrow window first prompts you to widen it to at least 40 columns and press Enter. No sudo, model request, or configuration change is needed. The window keeps the current pywal colors and 0.9 opacity, with a thin rounded scrollbar at the right edge; hovering makes it wider and easier to grab.
+- Action: Drag the scrollbar thumb to the start, middle, and end of the fixture history.
+  Expected: You can reach HISTORY 000001, intermediate records, and HISTORY 010000. The thumb remains grabbable even with a long history; the track is unobtrusive until hovered.
+- Action: Press Shift+PageUp repeatedly, then Shift+PageDown, then Ctrl+Shift+End.
+  Expected: The view moves by pages through native history and returns to the newest output. These modified keys control Kitty; plain PageUp/PageDown remain available to the foreground application.
+- Action: Drag-select an older record, copy it with Ctrl+Shift+C, paste it into an editor, then resize the test window.
+  Expected: The copied number and text match the selected record. Wrapped text remains readable after resizing, and scrolling does not leave persistent rendering artifacts.
+- Action: Return to the bottom, press Enter to start streaming, then scroll several pages up while new lines arrive.
+  Expected: 300 STREAM records arrive over about 30 seconds. The older text stays in view while output continues; Ctrl+Shift+End returns to the live tail. Once the stream finishes, press Enter to close only the fixture window.
+- Action: Start Codex normally from a fresh Kitty window using codex or codex resume, let a normal task produce several screens of output, then drag its scrollbar and use Shift+PageUp/PageDown. Repeat with Super+C.
+  Expected: Earlier Codex transcript output remains reachable through Kitty's native history while the session runs. Plain launches use the persistent inline-mode default; Super+C also passes --no-alt-screen and uses the same Codex 0.160.0 installation as the current shell. Already-running sessions retain their original mode. The fixture checks terminal mechanics, while this step verifies actual Codex rendering and streaming behavior.
 
 ## YouTube Downloader
 

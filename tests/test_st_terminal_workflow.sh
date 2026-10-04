@@ -40,7 +40,11 @@ assert_contains 'static double minlatency = 8;' "$st_path"
 assert_contains 'static double maxlatency = 33;' "$st_path"
 
 assert_contains 'set $term kitty' "$i3_path"
-assert_contains 'bindsym Control+Shift+Return exec $term -A1' "$i3_path"
+# Kitty's default launcher must not inherit st's -A opacity flag.
+if ! rg -Fx 'bindsym Control+Shift+Return exec $term' "$i3_path" >/dev/null; then
+  printf 'expected the default Kitty binding without st-only flags\n' >&2
+  exit 1
+fi
 assert_contains 'bindsym Mod4+c exec "$term -e sh -lc' "$i3_path"
 assert_not_contains 'set $term /home/example/scripts/st-terminal' "$i3_path"
 
