@@ -434,6 +434,8 @@ startup_timeout_sec = 120
 tool_timeout_sec = 120
 
 [tui]
+# Show each agent's compact current-work summary in the i3 titlebar.
+terminal_title = ["activity", "thread-name"]
 # Keep Codex transcripts in Kitty's native, draggable scrollback.
 alternate_screen = "never"
 notifications = true

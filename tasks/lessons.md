@@ -101,3 +101,5 @@
 
 - Source coverage must compare discovered reports and selected-root ledger aliases in both directions; exclude actual template artifacts without skipping incidents that mention templates.
 - When checking source versus installed packages, compare the deployable file set and account for documented cache exclusions and concurrent shared-ledger updates. Preserve another task’s new evidence instead of restoring a stale deployment snapshot.
+
+- 2026-10-05: Validate i3 titlebars on a visible workspace using `actual_deco_rect` (with `deco_rect` fallback), not stale hidden-workspace geometry. Allow a compositor frame and use a unique screenshot path; scrot can suffix an existing filename. See [the overview probe investigation](../docs/postmortem/2026-10-05-kitty-overview-inspection.md).

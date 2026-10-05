@@ -691,7 +691,17 @@ this.
 
 - [`dot_config/kitty/kitty.conf`](dot_config/kitty/kitty.conf)
   is the default terminal config, and the i3 bindings now open `kitty`
-  first for normal shells and Codex. It retains 50,000 lines with a rounded,
+  first for normal shells and Codex. Each Kitty window has an i3 titlebar;
+  Codex shows its activity indicator and a live “what are we doing?” summary
+  (3–5 words, at most 36 characters), such as “Categorize card transactions”.
+  Agents update their own native task name at task starts, meaningful phase
+  changes, and completion; this also renames the saved conversation. Launch
+  a new Codex process after `refresh-config` (including `codex resume`)
+  to pick up the title settings/instructions; switching threads inside an existing
+  TUI does not establish that the startup settings reloaded.
+  If the native title tool is unavailable, use `/rename` manually. Fullscreen
+  hides i3 titlebars. See the [overview checks](docs/smoke-tests.md#kitty-and-codex-overviews).
+  It retains 50,000 lines with a rounded,
   draggable scrollbar and the existing 0.9 background opacity.
   Shift+PageUp/PageDown moves through history; Ctrl+Shift+End returns to the
   newest output. Codex defaults to `tui.alternate_screen = "never"`, so normal

@@ -534,6 +534,28 @@ temporary data; real personal notes are not fixtures or repository artifacts.
 - Action: While still scrolled up in `st`, drag-select older output, press `Ctrl+Shift+C`, then paste it elsewhere with `Ctrl+Shift+V`.
   Expected: The copied text comes from the scrolled-back output, and the copy/paste shortcuts match the normal terminal habit without forcing tmux copy mode for basic selection.
 
+### Kitty and Codex overviews
+
+Kitty's i3 titlebar displays Codex's activity indicator and a short summary of
+what the agent is doing now. After refresh-config, reload i3 and launch a new Codex
+process, including codex resume, to load the updated title settings and instructions.
+Switching threads inside an existing TUI is not a startup-config reload. Automatic
+summaries also rename saved conversations; they update at meaningful transitions, without
+periodic /btw requests. Fullscreen hides i3 titlebars. No sudo is needed.
+
+- Action: Inspect existing Kitty windows after deployment, then open a new Kitty terminal and start Codex using Super+C or codex.
+  Expected: Each Kitty window has one titlebar. New/resumed Codex shows an activity indicator and a short current-work summary without the project suffix; ordinary shells show their normal title. Other applications retain their existing border behavior.
+- Action: Run two independent Codex conversations in the same repository with different tasks, then change the objective or move to a meaningful new phase in one conversation.
+  Expected: Each agent uses its own 3–5-word summary (at most 36 characters). The changed conversation updates its title without renaming the other; the label describes the work rather than the most recent shell command.
+- Action: Narrow a split, switch between split and tabbed layouts, and toggle fullscreen on and off.
+  Expected: Titles stay within their available width without overlapping neighboring windows. Fullscreen hides the titlebar; leaving fullscreen restores it. No extra header appears inside the terminal transcript.
+- Action: Observe an agent while working, awaiting input, and after verified completion; then resume that conversation.
+  Expected: Codex's native activity/attention indicator remains available. The summary reflects the current phase or verified result, and its saved conversation name persists across resume.
+- Action: In a Codex environment without the native title tool, use /rename to set a short task name.
+  Expected: The existing native name remains until manually renamed. The titlebar displays the manual name without introducing a polling service or another model request.
+- Action: Repeat the existing Kitty scrolling checks below in a titled window.
+  Expected: The scrollbar, paging, selection and inline Codex history still behave as documented.
+
 ### Kitty and Codex scrolling
 
 Use a fresh Kitty window after refresh-config: a larger history cannot recover

@@ -68,6 +68,23 @@ education work:
   parallel or a non-trivial bug benefits from separate root-cause analysis.
   Give each agent one bounded task and independently verify its report.
 
+### Live Codex Task Titles
+
+- When the native `mcp__codex_tui__set_thread_title` tool is available and the
+  active mode permits title updates, keep the calling conversation's name as a
+  compact answer to “what are we doing?” Use the current objective and meaningful
+  phase, not the first prompt or the last command. Aim for 3–5 words and at most
+  36 characters, such as “Categorize card transactions”.
+- Set the title before substantive work on a new/resumed task, when the objective
+  or meaningful phase changes, and at completion. Skip unchanged titles. Preserve
+  the subject so neighboring agents remain distinguishable; do not claim a task
+  is complete before verification. Let Codex render its own activity indicator.
+- Call the tool with only `title`; omit `threadId` to update the calling task and
+  never rename another conversation for this automatic overview. This also updates
+  the saved conversation name. Reuse existing context without extra model calls,
+  periodic polling, or injected `/btw` requests. If the tool is unavailable, keep
+  the existing native name; `/rename` remains the manual fallback.
+
 ## Bugs, Tests, And Implementation
 
 - For a reported bug or unexpected task failure, read
