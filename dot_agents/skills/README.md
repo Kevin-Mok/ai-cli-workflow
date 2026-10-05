@@ -269,6 +269,9 @@ targets leave local commits intact. Planning-only requests remain read-only.
   using Sentry's pinned `prompt-optimizer`, with its eight-section package and
   eval workflow. Saves only the optimized prompt without executing its task; see the
   [source and update record](metaprompt/SOURCE.md).
+- [`Metaprompt & Run`](metaprompt-run/SKILL.md) (`$metaprompt-run`): Uses the
+  current metaprompt compiler to improve and save the original request, then
+  executes the saved prompt in the same turn within the user's authorized scope.
 - [`metaprompt-alxve`](metaprompt-alxve/SKILL.md): Preserves the original
   compiler, target-aware templates, saved prompts, and strict standalone `go`
   gate for every execution and high-stakes pass. Select it by its exact name.

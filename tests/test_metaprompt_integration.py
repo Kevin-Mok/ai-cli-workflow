@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Packaging and reviewed-update contracts for the two metaprompt skills."""
+"""Packaging and reviewed-update contracts for the metaprompt skills."""
 
 import hashlib
 import importlib.util
@@ -25,7 +25,7 @@ NATIVE_FILES = {
 
 class MetapromptIntegrationTest(unittest.TestCase):
     def test_independent_names_and_invocations(self):
-        for name in ("metaprompt", "metaprompt-alxve"):
+        for name in ("metaprompt", "metaprompt-alxve", "metaprompt-run"):
             with self.subTest(name=name):
                 root = SKILLS / name
                 self.assertTrue((root / "SKILL.md").is_file())

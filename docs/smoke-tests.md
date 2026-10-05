@@ -97,6 +97,18 @@ checks rather than duplicating them.
   and missing-data rules, uses a suffix on filename collisions, and does not
   execute the embedded production task. Prepared cases and executed evaluations
   are distinguished. No legacy `go` gate is imposed by this version.
+- Action: In a fresh session in a disposable workspace, invoke `$metaprompt-run Create result.txt containing exactly metaprompt-run-ok followed by one newline. Preserve existing prompts. Do not commit, push, deploy or contact anyone.`
+  Expected: **Metaprompt & Run** uses the current metaprompt workflow, presents
+  its compact eight-section package, saves only the compiled prompt under
+  `prompts/`, reads it back, then creates `result.txt` with exactly
+  `metaprompt-run-ok\n` in the same turn. The final result links the saved prompt
+  and reports actual verification. No extra `go` or permission question appears
+  solely because compilation finished.
+- Action: Invoke `$metaprompt-run` with a request whose prompt filename already exists, then request a summary of `{{meeting_notes}}` without supplying notes.
+  Expected: The collision uses a new suffix and preserves the original file.
+  Missing notes leave execution pending; the agent saves the compiled prompt
+  when feasible and asks for the notes without inventing a summary. Explicit
+  execution exclusions and normal tool permissions remain binding.
 - Action: python3 dot_agents/skills/metaprompt/scripts/update_upstream.py --check
   Expected: Reports pinned and latest `getsentry/skills` prompt-optimizer commit IDs without modifying
   tracked or installed files. A successful check exits 0 even if an update

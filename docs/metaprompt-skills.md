@@ -1,8 +1,9 @@
 # Metaprompt skills
 
 Use these skills to create, improve, and save a prompt for another task.
-Invoke `$metaprompt` or the original `$metaprompt-alxve` with your task or
-draft, then review the saved prompt. Follow the update and verification
+Invoke `$metaprompt` or the original `$metaprompt-alxve` to review a saved
+prompt, or invoke **Metaprompt & Run** (`$metaprompt-run`) to compile, save
+and execute the task in the same turn. Follow the update and verification
 steps when changing the installed skill.
 
 The installed `$metaprompt` now uses the pinned **Sentry `prompt-optimizer`**
@@ -23,12 +24,76 @@ directory with non-destructive collision suffixes.
 | Invocation | Behavior |
 | --- | --- |
 | `$metaprompt Make me a prompt to summarize meeting notes.` | Returns Sentry's eight-section package, saves only the Optimized Prompt, and reports its path. Labels prepared versus executed evals. Does not execute the embedded production task. |
+| `$metaprompt-run Summarize the supplied meeting notes into decisions, owners and deadlines; mark missing values unknown.` | Reuses the current metaprompt compiler and saved-prompt contract, then executes the saved prompt once in the same turn. Asks for absent notes before producing the summary. |
 | `$metaprompt-alxve Make me a prompt to summarize meeting notes.` | Preserves original weight selection, prompt/Saved/Run/Weight metadata, and fresh standalone `go` gate for every pass. |
 
 Tracked sources install through chezmoi to `~/.agents/skills/<name>`.
 The existing Claude installer links complete directories under
 `~/.claude/skills/`. Start a fresh agent session to reload the skill catalog;
 file verification alone does not prove a running session refreshed its picker.
+
+## Metaprompt & Run
+
+The [runner skill](../dot_agents/skills/metaprompt-run/SKILL.md) references its
+sibling compiler directly, including the parent's routed references. Install
+both directories together. Updates to the current compiler therefore apply to
+the runner without a second upstream copy. The original authoring-only
+`$metaprompt` and legacy `$metaprompt-alxve` contracts remain unchanged.
+
+An explicit runner invocation authorizes compilation and execution of the
+supplied task under normal session permissions. The optimized prompt preserves
+the original constraints and cannot authorize extra actions. The agent returns
+the parent's compact eight-section package as an intermediate update, saves
+only the compiled prompt, reads it back, then executes its contents once.
+Compilation does not introduce another approval question or a `go` gate.
+
+Missing material inputs and unresolved reusable `{{variables}}` leave execution
+pending until the user supplies them. An explicit execution exclusion remains
+binding. If the parent is missing or saving/read-back fails, the agent reports
+the problem before executing the task. The final response reports the actual
+result, saved prompt link, verification and remaining limitations.
+
+For a manual check, open a fresh session in a disposable workspace and submit:
+
+```text
+$metaprompt-run Create result.txt in this workspace containing exactly metaprompt-run-ok followed by one newline. Preserve existing prompts. Do not commit, push, deploy or contact anyone.
+```
+
+Expect a prompt-only artifact under `prompts/` and `result.txt` containing exactly
+`metaprompt-run-ok\n` in that same turn. Repeat with an existing prompt filename
+and verify the old file is preserved. For missing-input coverage, request a
+summary of `{{meeting_notes}}` without supplying notes; expect a saved prompt
+and a request for the notes before a summary is produced. Prepared cases are
+not executed evaluations. See the [runner plan](../plans/add-metaprompt-run.md)
+for observed trials and the [shared smoke checks](smoke-tests.md#skills-and-docs).
+
+### Runner verification
+
+On October 4, 2026, five independent compiler controls saved prompts without
+executing their tasks. Five fresh-context runner trials compiled and saved the
+same core file-creation task, then produced the exact 18-byte result in the same
+turn. One runner trial preserved an existing prompt and saved with a `-2`
+collision suffix. These are workflow checks on fixtures, not proof that the
+compiled wording outperforms direct instructions.
+
+Four additional fixture checks verified the stopping conditions: a missing
+sibling compiler stopped before compilation or execution; an ordinary file at
+`prompts` blocked saving without being overwritten; absent `{{meeting_notes}}`
+left the saved template pending without inventing a summary; and an explicit
+request to withhold execution preserved that exclusion without creating a result.
+
+On October 5, the installed bytes and existing trial artifacts were read back
+again, and all seven focused integration checks passed. No model trials were
+repeated during documentation closeout.
+
+The seven Sentry/runner integration checks, 12 legacy behavioral contracts,
+62 offline selection checks, metadata parsing, README gate and Claude-link
+test passed. The full integration suite retains four pre-existing checksum
+subtest failures in the legacy integrity test, reproduced using committed
+test/package bytes; see the [integrity record](postmortem/2026-10-04-metaprompt-run-legacy-integrity-check.md).
+The required refresh completed, and both installed runner files match source.
+The [runner plan](../plans/add-metaprompt-run.md) records exact commands,
+deployment scope, scratch artifact locations and completed verification.
 
 ## Selection evidence
 

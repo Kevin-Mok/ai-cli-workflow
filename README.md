@@ -291,6 +291,11 @@ Representative highlights:
   report. The benchmark itself installed nothing; the later authorized
   [replacement](plans/replace-metaprompt-with-sentry.md) puts Sentry behind
   the existing `$metaprompt` invocation.
+- [`Metaprompt & Run`](dot_agents/skills/metaprompt-run/SKILL.md)
+  (`$metaprompt-run`) uses that current compiler to improve and save the
+  original request, then executes the saved prompt in the same turn. It keeps
+  the task's supplied constraints and normal permissions; missing inputs leave
+  execution pending. `$metaprompt` remains available for prompt review alone.
 - [`feedback-memory`](dot_agents/skills/feedback-memory/SKILL.md)
   carries forward durable user corrections through a repo-tracked
   `feedback.log`.

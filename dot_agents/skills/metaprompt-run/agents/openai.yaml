@@ -1,0 +1,4 @@
+interface:
+  display_name: "Metaprompt & Run"
+  short_description: "Optimize a prompt, save it, and execute its task"
+  default_prompt: "Use $metaprompt-run to optimize my original request with the current $metaprompt skill, save the compiled prompt, and execute it in the same turn."
