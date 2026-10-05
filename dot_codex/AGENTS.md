@@ -70,6 +70,19 @@ education work:
 
 ## Bugs, Tests, And Implementation
 
+- For a reported bug or unexpected task failure, read
+  `/home/example/linux-config/dot_agents/skills/postmortem-memory/SKILL.md`
+  (installed `$postmortem-memory` as read-only fallback) and search relevant
+  symptoms before retries or remedial actions. Record applicability and evidence;
+  preserve immediate living-postmortem recording. Intentional RED tests and
+  deliberately exercised failure paths retain their existing exemptions.
+- Whenever a postmortem is created or materially updated, update its reviewed
+  hash/aliases and findings (or explicit no-new-learning decision) directly in
+  `/home/example/linux-config/dot_agents/skills/postmortem-memory/`, including
+  relevant guidance, during the same task. Run its helper `check --postmortem
+  /absolute/path/to/report.md`. Preserve unrelated dirty work and workspace
+  permissions; report exact blocked writes and outstanding learning updates.
+  Never make installed copies the source of truth.
 - Start every bug fix with a failing test or executable reproducer. Confirm it
   fails for the expected reason before implementing. If automation is
   impractical, explain why and create the closest reliable reproducer.

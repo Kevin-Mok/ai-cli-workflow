@@ -591,3 +591,38 @@ wrapping all 10,000 records fits inside the configured 50,000-line buffer.
   Expected: The script prints the installed and candidate Chrome versions, refreshes apt metadata, upgrades `google-chrome-stable` when needed, and ends with matching installed and candidate versions.
 - Action: Run `sudo ./scripts/executable_update-vesktop.sh` on a Debian or Ubuntu host with network access to Vesktop's official download endpoint.
   Expected: The script prints the installed and latest upstream Vesktop versions, downloads and installs the official amd64 `.deb` when needed, and ends with matching installed and latest versions.
+
+## Shared Postmortem Memory
+
+Use these checks to verify retrieval from another repository and learning from a
+changed report. The helper commands are read-only; the reusable smoke script writes
+only a disposable temporary fixture and requires no sudo.
+
+- Action: python3 -B tests/test_postmortem_memory.py
+  Expected: Discovery, aliases, privacy pruning, unreadable paths, changed/missing
+  sources, reference/schema contracts, retrieval, status scope and full reviewed
+  corpus coverage pass.
+- Action: cd /tmp && python3 -B /home/example/linux-config/dot_agents/skills/postmortem-memory/scripts/postmortem_memory.py search "bwrap loopback"
+  Expected: It prefers tracked knowledge and returns reference sections with
+  verified_workaround status, applicability and source links. Elevation success
+  does not claim a repaired sandbox.
+- Action: python3 -B scripts/smoke_postmortem_memory.py
+  Expected: A cross-repository lookup finds the known workaround; changing a
+  synthetic report fails targeted coverage until its reviewed hash and guidance
+  are updated. The result remains activation_pending after code verification.
+  The script prints PASS and removes its temporary fixture.
+- Action: python3 -B dot_agents/skills/postmortem-memory/scripts/postmortem_memory.py scan --root /home/example/coding --root /home/example/linux-config
+  Expected: All reviewed physical report aliases remain accounted for with no
+  new/changed/unregistered/missing sources or unreadable paths. Copied content is
+  one hash; personal-context/private material and dependency/build/git paths are
+  excluded before reads. Genuine incidents about template failures remain eligible.
+- Action: python3 -B dot_agents/skills/postmortem-memory/scripts/postmortem_memory.py check --postmortem /home/example/linux-config/docs/postmortem/2026-10-05-postmortem-memory-coverage-review.md
+  Expected: The current report hash/alias, reciprocal finding links and all
+  reference contracts validate. This targeted result does not imply full coverage.
+- Action: Ask a fresh agent in another repository to handle a reported bug, then create or materially update its postmortem.
+  Expected: It reads postmortem-memory, searches and records applicability before
+  retries/remedies; it keeps the immediate living report and directly updates
+  tracked linux-config knowledge in the same task, then runs targeted coverage.
+  If permissions block that tracked write, it reports the exact path and pending
+  learning instead of writing installed memory. A novel search miss leads to a
+  new reproducer and review, not an invented known fix.

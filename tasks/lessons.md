@@ -98,3 +98,6 @@
 
 - 2026-10-04: Validate an explicitly designated external data root against its current repository topology. A blanket no-Git guard can reject the authorized private destination; test a narrow exact-root exception while retaining ancestor, arbitrary-root, installed-skill, and link protections. See [private context root](../docs/postmortem/2026-10-04-personal-context-private-root.md).
 - 2026-10-04: Keep skill smoke checks reproducible from repository tests; managed system-skill helper paths can become unavailable after refresh. Locate an intact validator rather than rebuilding one from fragments, and rerun any checks skipped by a failed command chain. See [validator after refresh](../docs/postmortem/2026-10-04-personal-context-validator-after-refresh.md).
+
+- Source coverage must compare discovered reports and selected-root ledger aliases in both directions; exclude actual template artifacts without skipping incidents that mention templates.
+- When checking source versus installed packages, compare the deployable file set and account for documented cache exclusions and concurrent shared-ledger updates. Preserve another task’s new evidence instead of restoring a stale deployment snapshot.

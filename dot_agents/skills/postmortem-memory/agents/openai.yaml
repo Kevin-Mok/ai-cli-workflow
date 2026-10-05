@@ -1,0 +1,4 @@
+interface:
+  display_name: "Postmortem Memory"
+  short_description: "Find prior incident remedies and record shared learning"
+  default_prompt: "Use $postmortem-memory to search relevant incident findings before remediation, record applicability and evidence, and update the tracked linux-config ledger and guidance when the postmortem changes. Verify the update with the targeted coverage check."

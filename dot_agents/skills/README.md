@@ -242,6 +242,11 @@ targets leave local commits intact. Planning-only requests remain read-only.
 
 ## Docs, Knowledge, And Output Control
 
+- [`postmortem-memory`](postmortem-memory/SKILL.md): Retrieves reviewed incident
+  remedies before troubleshooting and records new learning in tracked shared
+  knowledge. Its read-only helper deduplicates copied reports, searches symptoms
+  and checks source coverage; fixes, workarounds, unresolved diagnoses and pending
+  live activation retain distinct status and evidence scope.
 - [`ai-workflow-doctor`](ai-workflow-doctor/SKILL.md): Measures active
   instruction context and audits duplicate policy, broken local references,
   plan contracts, skill-catalog drift, provenance, and semantic-review

@@ -140,6 +140,9 @@ engineering behavior:
   observed behavior instead of guesswork.
 - Living postmortems for unexpected task failures so the observed evidence,
   investigation, resolution, and verification remain reviewable in one record.
+  Shared [postmortem memory](dot_agents/skills/postmortem-memory/SKILL.md)
+  retrieves prior remedies before retries and keeps reviewed learning aligned
+  with new or changed reports.
 - Explicit verification before done so completion is demonstrated with
   tests, diffs, logs, or clear manual checks.
 - Docs updates with behavior changes so README, plans, setup steps, and
@@ -262,6 +265,13 @@ request into solution leakage.
 
 Representative highlights:
 
+- [`postmortem-memory`](dot_agents/skills/postmortem-memory/SKILL.md) searches
+  reviewed incident solutions before remediation and updates shared knowledge as
+  postmortems change. Its [read-only helper contract](dot_agents/skills/postmortem-memory/references/workflow.md)
+  documents `scan` with repeatable `--root`, `search QUERY`, and full or targeted
+  `check --postmortem PATH`, plus fixture `--knowledge` overrides. Exact copied
+  content retains source aliases; verified fixes, workarounds, unresolved causes
+  and changes awaiting live activation stay distinguishable.
 - [`ai-workflow-doctor`](dot_agents/skills/ai-workflow-doctor/SKILL.md)
   turns instruction size, duplicate policy, local references, skill-catalog
   drift, and source provenance into deterministic text or JSON evidence. Its
