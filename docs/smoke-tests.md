@@ -17,13 +17,25 @@ fixture below provides a repeatable picker check without using private history.
   Expected: Usage, flag descriptions, examples and documentation paths appear;
   exit status is 0, without indexing or launching Codex. `-h` and no arguments
   also show help. Help works without rg or fzf installed.
-- Action: codex-search -iF "tool output"
-  Expected: Matching sessions appear once per UUID,
-  newest activity first, with optional title, timestamp, original directory,
-  snippets and a copyable resume command. Run the same command again to confirm
+- Action: codex-search -F "root"
+  Expected: In a terminal, at most 20 newest matching sessions appear with a
+  numbered directory/date header, optional title, one short highlighted excerpt
+  and a complete copyable resume command. Untitled labels and standalone UUID
+  rows do not crowd this compact view. A stderr footer reports any hidden
+  matches and explains --limit 0/--pick. Resize the terminal to confirm excerpts
+  fit its width. Run the same command again to confirm
   it reuses the private cache;
   progress and malformed-data warnings go to stderr. `csg` expands to `codex-search`
   in fish and the existing `cs` abbreviation still clears the terminal.
+- Action: codex-search --details --limit 5 -F "root"
+  Expected: At most five full blocks show title, exact timestamp, complete
+  directory, UUID, up to five snippets and a quoted resume command. --limit 0
+  removes the result cap; the underlying search still considers all sessions.
+- Action: codex-search --limit 5 -F "root" | cat
+  Expected: The pipe receives at most five full blocks, with no color escapes.
+  Piped output without --limit includes all matching sessions.
+- Action: NO_COLOR=1 codex-search --limit 5 -F "root"
+  Expected: Compact terminal layout remains readable with color disabled.
 - Action: codex-search -F "tool-only phrase"
   Expected: After replacing the example with text present only in a saved tool
   result, no session matches (exit 1). Keep that exact phrase for the next check.

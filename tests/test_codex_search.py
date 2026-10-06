@@ -1,15 +1,23 @@
 """CLI contract tests; all session content is synthetic."""
 import concurrent.futures
+import errno
+import fcntl
 import hashlib
 import json
 import os
+import pty
+import re
 from pathlib import Path
 import shlex
 import shutil
 import stat
+import struct
 import subprocess
 import sys
 import tempfile
+import termios
+import threading
+import unicodedata
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -70,6 +78,38 @@ class CodexSearchTest(unittest.TestCase):
         self.assertEqual(result.returncode, expected, result.stderr + result.stdout)
         return result
 
+    def run_terminal(self, *args, width=80, env=None):
+        master, slave = pty.openpty()
+        fcntl.ioctl(slave, termios.TIOCSWINSZ, struct.pack('HHHH', 24, width, 0, 0))
+        chunks = []
+        def read_output():
+            try:
+                while True:
+                    chunk = os.read(master, 65536)
+                    if not chunk:
+                        break
+                    chunks.append(chunk)
+            except OSError as error:
+                if error.errno != errno.EIO:
+                    raise
+        try:
+            with subprocess.Popen([sys.executable, str(SCRIPT), *args], cwd=self.base,
+                                  env=env or self.env, stdout=slave, stderr=subprocess.PIPE) as process:
+                os.close(slave)
+                slave = None
+                reader = threading.Thread(target=read_output, daemon=True)
+                reader.start()
+                _, errors = process.communicate(timeout=30)
+                reader.join(timeout=5)
+                self.assertFalse(reader.is_alive(), 'terminal reader did not finish')
+                output = b''.join(chunks).decode().replace('\r\n', '\n')
+                self.assertEqual(process.returncode, 0, errors.decode() + output)
+                return output, errors.decode()
+        finally:
+            os.close(master)
+            if slave is not None:
+                os.close(slave)
+
     def manifest(self):
         manifests = list(self.cache.glob('codex-search/*/manifest.json'))
         self.assertEqual(len(manifests), 1)
@@ -98,6 +138,85 @@ class CodexSearchTest(unittest.TestCase):
                 self.assertEqual('', result.stderr)
                 self.assertFalse(self.cache.exists())
                 self.assertFalse(self.log.exists())
+
+    def test_terminal_broad_search_is_bounded_and_compact(self):
+        for i in range(24):
+            sid = '00000000-0000-4000-8000-' + str(i).zfill(12)
+            self.session(sid=sid, text='root first snippet\nroot extra snippet',
+                         stamp=f'2026-10-{i + 1:02d}T12:00:00Z', name=str(i) + '.jsonl')
+        output, errors = self.run_terminal('root')
+        self.assertEqual(output.count('codex resume -C'), 20)
+        self.assertIn('20 of 24', errors)
+        self.assertIn('--limit 0', errors)
+        self.assertIn('--pick', errors)
+        self.assertNotIn('Title: (untitled)', output)
+        self.assertNotIn('root extra snippet', output)
+        self.assertIn('2026-10-24 12:00 UTC', output)
+        self.assertNotIn('2026-10-24T12:00:00Z', output)
+        self.assertIn('00000000-0000-4000-8000-000000000023', output)
+        self.assertNotIn('00000000-0000-4000-8000-000000000000', output)
+        self.assertLess(len(output.splitlines()), 100)
+        self.assertEqual(self.run_cli('root').stdout.count('Resume: '), 24)
+
+    def test_terminal_excerpt_fits_unicode_width_and_highlights_rg_match(self):
+        self.session(text='漢字 😀 ' * 30 + 'Café [x]' + ' trailing' * 50)
+        env = {**self.env, 'TERM': 'xterm-256color'}
+        env.pop('NO_COLOR', None)
+        output, _ = self.run_terminal('-iF', 'café [x]', width=54, env=env)
+        self.assertRegex(output, r'\x1b\[[0-9;]+mCafé \[x\]\x1b\[0m')
+        plain = re.sub(r'\x1b\[[0-9;]*m', '', output)
+        line = next(x for x in plain.splitlines() if 'Café [x]' in x)
+        cells = sum(0 if unicodedata.combining(c) else 2 if unicodedata.east_asian_width(c) in ('W', 'F') else 1 for c in line)
+        self.assertLessEqual(cells, 54)
+        disabled, _ = self.run_terminal('-iF', 'café [x]', width=54, env={**env, 'NO_COLOR': '1'})
+        self.assertNotIn('\x1b', disabled)
+        self.assertIn('Café [x]', disabled)
+        self.assertNotIn('\x1b', self.run_cli('-iF', 'café [x]', env=env).stdout)
+
+    def test_trailing_carriage_return_match_keeps_safe_snippet_offsets(self):
+        self.session(text='carriage\r')
+        result = self.run_cli(r'\r')
+        self.assertIn(ID1, result.stdout)
+        self.assertIn(r'carriage\r', result.stdout)
+        output, _ = self.run_terminal(r'\r')
+        self.assertIn(r'carriage\r', output)
+
+    def test_dense_matches_outside_excerpt_do_not_delay_search(self):
+        self.session(text='x' * 160000)
+        self.run_cli('--rebuild-index')
+        try:
+            result = subprocess.run([sys.executable, str(SCRIPT), 'x'], cwd=self.base,
+                                    env=self.env, capture_output=True, text=True, timeout=5)
+        except subprocess.TimeoutExpired:
+            self.fail('Dense matches outside the displayed excerpt delayed search beyond 5 seconds')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn(ID1, result.stdout)
+        self.assertLess(len(result.stdout), 1000)
+
+    def test_very_narrow_terminal_header_does_not_wrap(self):
+        self.session()
+        output, _ = self.run_terminal('Needle', width=20)
+        header = output.splitlines()[0]
+        self.assertLessEqual(len(header), 20)
+
+    def test_details_limits_and_picker_keep_complete_matches(self):
+        self.session(text='root first\nroot second')
+        self.session(ID2, text='root other', stamp='2026-10-05T12:00:00Z', name='two.jsonl')
+        output, _ = self.run_terminal('--details', '--limit', '0', 'root')
+        self.assertIn('Title: (untitled)', output)
+        self.assertIn('Session: ' + ID1, output)
+        self.assertIn('root second', output)
+        self.assertEqual(output.count('Resume: '), 2)
+        limited = self.run_cli('--limit', '1', 'root')
+        self.assertIn(ID2, limited.stdout)
+        self.assertNotIn(ID1, limited.stdout)
+        self.assertIn('1 of 2', limited.stderr)
+        self.assertEqual(self.run_terminal('--limit', '0', 'root')[0].count('codex resume -C'), 2)
+        self.run_cli('--limit', '-1', 'root', expected=2)
+        self.picker(cancel=True)
+        self.run_cli('--pick', '--limit', '1', 'root')
+        self.assertEqual(len((self.base / 'pick.txt').read_text().splitlines()), 2)
+        self.assertFalse(self.log.exists())
 
     def test_default_conversation_excludes_instructions_tools_and_reasoning(self):
         self.session(extra=[message('system', 'SystemUnique'), message('developer', 'DeveloperUnique'),

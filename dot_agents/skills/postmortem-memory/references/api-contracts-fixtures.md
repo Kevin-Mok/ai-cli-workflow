@@ -370,6 +370,18 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
   - [2026-08-19-design-skills-timer-copy-rename.md](/home/example/linux-config/.worktrees/vps-aws-bootstrap-prompt/docs/postmortem/2026-08-19-design-skills-timer-copy-rename.md) (SHA-256 `ff6f1e5780cc`; 2 alias(es), all retained in [sources.json](../sources.json)).
   - [2026-10-03-metaprompt-integration-validation.md](/home/example/linux-config/.worktrees/vps-aws-bootstrap-prompt/docs/postmortem/2026-10-03-metaprompt-integration-validation.md) (SHA-256 `21c81fbdab07`; 2 alias(es), all retained in [sources.json](../sources.json)).
 
+## local-rg-windowed-match-highlighting
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **runtime**.
+- Symptoms: a bounded highlighted excerpt still takes seconds on a dense single-line match; a matched trailing carriage return disappears from the displayed text.
+- Applicability: CLI search renderers consuming ripgrep JSON byte offsets for a clipped decoded excerpt.
+- Diagnostic checks: Benchmark a warm 160,000-match synthetic line; inspect which submatches trigger UTF-8 prefix decoding. Exercise a matched trailing CR and a long Unicode prefix in a real PTY.
+- Remedy: Calculate the excerpt's byte boundaries once, stop ordered submatch processing past the window and decode only window-relative slices. Remove only the added newline, preserve decoded CR, and remap offsets after escaping controls before adding ANSI.
+- Verification evidence: Dense-match defining test timed out at 5s before correction; afterward 160,000 matches took 0.392s (independent review 0.354s). All 29 tests and six installed PTY/option/performance checks pass; real picker Enter/Esc preserve safe selection/cancellation.
+- Limitations: This bounds highlight-offset work, not rg scanning/JSON parsing. Terminal emoji-cell widths vary by font; complete resume commands can wrap. Runtime evidence uses synthetic histories.
+- Sources:
+  - [2026-10-06-codex-search-output-readability.md](/home/example/linux-config/docs/postmortem/2026-10-06-codex-search-output-readability.md) (current reviewed hash retained in [sources.json](../sources.json)).
+
 ## local-codex-search-json-boundary
 
 - Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **code**.

@@ -186,3 +186,101 @@ then stage candidate blobs. Recorded this in the existing refresh-audit report
 and updated its reviewed hash/explicit no-new-learning decision. Applicable
 lookup: shared ledger changed staging baseline; matching
 local-stale-preservation-baseline/local-deployable-file-set-verification guidance.
+
+## Follow-up: readable broad searches
+
+2026-10-06: user reported unbounded codex-search "root" output unreadable.
+This is a bounded correction to the existing renderer. Current status captured
+before edits; preserve all unrelated backup/SSH/feedback/learning work. The
+earlier feature commit eedef80 was pushed; this follow-up is a new uncommitted
+change until separately requested. Apply debugging/TDD to the reported output
+problem. Existing user authorization for the usability fix governs routine
+format choices; no renewed design permission is needed.
+
+Decision: terminal output shows 20 newest matching sessions, one width-aware
+excerpt with rg-supplied match spans, emphasized directory, human-readable UTC
+date and a correctly quoted resume command. Omit redundant untitled/UUID labels
+in the compact view; UUID remains in the command. --details selects the full
+metadata/snippet block; --limit N controls output count (0 means all). Piped
+output defaults to all existing full blocks without ANSI. --pick always sees
+all matching candidates. Respect NO_COLOR and TERM=dumb. Indexing and matching
+semantics, cache contents/version and original logs remain unchanged.
+
+- [x] Capture status, inspect renderer/prefs/docs and consult relevant learning.
+- [x] Add defining broad-query TTY, narrow Unicode, highlight/NO_COLOR,
+  details/limit and complete-picker tests; observe RED.
+- [x] Implement the smallest rendering/options change and align help/docs.
+- [x] Run focused and launcher regressions, synthetic real-terminal review,
+  README gate, targeted learning check and protected refresh-config.
+
+Risks: terminal width differs for emoji/combining text; command lines must never
+be clipped. ANSI must use rg byte offsets converted to decoded text positions,
+not a second regex engine. Explicit limiting must be clearly announced. Raw
+metadata stays available in --details and pipes. Rollback: restore only these
+renderer/options/test/doc/plan additions and refresh; no cache or session reset.
+
+RED: bounded terminal reproduction printed 24/24 results instead of 20;
+Unicode/match-color reproduction had no highlight; details/limit reproduction
+exited 2 for unrecognized options. All expected defining failures before code.
+GREEN: 26 tests in 8.226s, exit 0. Existing 23 contracts remain unchanged for
+pipes; three new contracts cover real PTY rendering and options/picker scope.
+Runtime review and independent code review remain pending.
+
+Review corrections: dense match span processing was quadratic despite the short
+excerpt. Defining 160,000-match test observed RED (5s timeout), then windowed
+byte-offset conversion achieved GREEN. New synthetic timings: 20k 0.130s,
+80k 0.217s, 160k 0.392s; same 553-byte output. Trailing-CR match and 20-column
+header tests also observed RED then GREEN. Full suite now 29 tests in 9.525s;
+independent review 29 tests in 9.171s, dense case 0.354s, no remaining Important
+issues. Real fzf Enter smoke returned exact stub args, exit 0, fixture unchanged;
+installed activation/cancellation and final learning registration are pending.
+
+Final runtime: scoped actual refresh-config returned 0/REFRESH COMPLETE (log
+/tmp/codex-search-readable-refresh-t6n6o6hp.log), and installed/source bytes match.
+Six defining contracts against the installed executable passed in 1.742s.
+Real 80-column colored synthetic display showed header/date/title/excerpt/command
+hierarchy; fzf Esc exited 0 and launched nothing, source unchanged. Earlier
+real Enter returned exact stub resume args. All picker candidates remain
+available under --limit. No private history or model calls used for these checks.
+Known limits: complete copyable commands can wrap in narrow terminals; emoji
+cell width can vary by font. Full blocks/pipes and --limit 0 retain all data.
+The prior release remains pushed; this new follow-up is installed and uncommitted.
+
+Learning registration complete: readability report SHA-256 9777098eb77e… linked
+to local-rg-windowed-match-highlighting in tracked API guidance/sources.json;
+targeted check exit 0 with no errors. Repo-specific lesson appended separately
+from durable feedback. Final README gate pass_no_change and git diff --check
+exit 0; staging remains empty. Follow-up achieved with no deferred Important
+findings. Suggested next commit: fix(codex): make session search output readable;
+include implementation, tests, matching docs/prompt/plan and this incident's
+guidance/ledger/lesson additions together, preserving all unrelated dirty hunks.
+
+## Readability follow-up delivery
+
+2026-10-06: user invoked commit-session for this follow-up. Branch main tracks
+origin/main; the index is empty. The required scope helper returned unsafe:
+No successful repo-writing actions were detected in the current Codex session.
+Use directly observed edits in session 01a11213-5551-74a0-af33-7be3e2a34b5a
+and the captured status as the authorized fallback. Commit six complete owned
+files plus only the search README/smoke section, highlight lesson, API guidance
+section and corresponding single finding/report ledger entries. Preserve all
+unrelated work and test the separated candidate before staging.
+
+- [x] Verify the exact 11-file candidate and README/incident-learning gates.
+- [x] Prepare the scoped delivery and confirm main's origin/main upstream.
+
+Fresh separated-candidate evidence: python3 -m unittest discover -s tests
+-p 'test_codex_search*.py' passed all 29 tests in 9.747s, exit 0. Launcher
+regression and README gate pass_no_change returned 0. Targeted learning check
+on candidate guidance/ledger returned 0 with no errors and the expected report
+hash; git diff --check and CLI --help returned 0. Reviewed all five projected
+mixed-file diffs plus complete source/test/guide/prompt differences. No unrelated
+backup/SSH/feedback/ledger additions are in the candidate. Six complete files
+and five scoped shared-file additions total 11 files. Source remains identical
+to the installed executable; prior actual refresh and PTY evidence apply.
+
+The final Git operations are the authorized scoped commit and one upstream push.
+Report the resulting SHA and remote status after execution; this milestone
+records the tested contents before committing. Rollback needs no cache/schema
+change. The renderer/options remain a single cohesive script and this is the
+smallest reviewed correction to the original output problem.

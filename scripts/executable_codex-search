@@ -16,6 +16,7 @@ import stat
 import subprocess
 import sys
 import tempfile
+import unicodedata
 import uuid
 
 CACHE_VERSION = 1
@@ -407,12 +408,29 @@ def search(root, entries, args):
                     continue
                 snippets = results.setdefault(entry['id'], [])
                 if len(snippets) < SNIPPETS:
-                    text = rg_text(data['lines']).rstrip('\r\n')
+                    text = rg_text(data['lines']).removesuffix('\n')
                     # Submatch offsets are bytes, while presentation widths are characters.
                     first = data['submatches'][0]['start'] if data['submatches'] else 0
-                    start = max(0, len(text.encode('utf-8')[:first].decode('utf-8', 'ignore')) - 80)
-                    snippet = ('…' if start else '') + text[start:start + 240] + ('…' if len(text) > start + 240 else '')
-                    if snippet not in snippets:
+                    encoded = text.encode('utf-8')
+                    start = max(0, len(encoded[:first].decode('utf-8', 'ignore')) - 80)
+                    end = start + 240
+                    start_byte = len(text[:start].encode('utf-8'))
+                    end_byte = len(text[:end].encode('utf-8'))
+                    prefix = '…' if start else ''
+                    snippet_text = prefix + text[start:end] + ('…' if len(text) > end else '')
+                    spans = []
+                    for match in data['submatches']:
+                        # rg orders submatches by byte position. Decode only this
+                        # display window, never every prefix of a dense long line.
+                        if match['start'] >= end_byte:
+                            break
+                        if match['end'] <= start_byte:
+                            continue
+                        left = len(encoded[start_byte:max(match['start'], start_byte)].decode('utf-8', 'ignore'))
+                        right = len(encoded[start_byte:min(match['end'], end_byte)].decode('utf-8', 'ignore'))
+                        spans.append((left + len(prefix), right + len(prefix)))
+                    snippet = {'text': snippet_text, 'spans': spans}
+                    if all(item['text'] != snippet_text for item in snippets):
                         snippets.append(snippet)
             code = process.wait()
         if code not in (0, 1):
@@ -434,18 +452,113 @@ def resume_args(entry):
     return ['codex', 'resume', '-C', cwd, entry['id']]
 
 
-def print_results(results, names):
-    for entry, snippets in results:
+def cell_width(char):
+    if unicodedata.combining(char) or unicodedata.category(char) in ('Mn', 'Me'):
+        return 0
+    return 2 if unicodedata.east_asian_width(char) in ('W', 'F') else 1
+
+
+def shorten(text, width):
+    if sum(map(cell_width, text)) <= width:
+        return text
+    used = 0
+    for end, char in enumerate(text):
+        used += cell_width(char)
+        if used > max(0, width - 1):
+            return text[:end] + '…'
+    return text
+
+
+def paint(text, color, style):
+    return f'\x1b[{style}m{text}\x1b[0m' if color else text
+
+
+def render_snippet(snippet, color=False, width=None):
+    # Escape terminal controls while retaining rg's byte-derived match locations.
+    parts = [visible(char) for char in snippet['text']]
+    offsets = [0]
+    for part in parts:
+        offsets.append(offsets[-1] + len(part))
+    text = ''.join(parts)
+    spans = [(offsets[left], offsets[right]) for left, right in snippet['spans']]
+    start, end = 0, len(text)
+    if width is not None and sum(map(cell_width, text)) > width:
+        start = spans[0][0] if spans else 0
+        context = 0
+        while start > 0 and context + cell_width(text[start - 1]) <= min(30, width // 3):
+            start -= 1
+            context += cell_width(text[start])
+        budget = max(0, width - int(start > 0) - 1)
+        end, used = start, 0
+        while end < len(text) and used + cell_width(text[end]) <= budget:
+            used += cell_width(text[end])
+            end += 1
+    chunks = ['…'] if start else []
+    cursor = start
+    for left, right in spans:
+        left, right = max(left, start), min(right, end)
+        if right > left:
+            chunks.extend([text[cursor:left], paint(text[left:right], color, '1;33')])
+            cursor = right
+    chunks.append(text[cursor:end])
+    if end < len(text):
+        chunks.append('…')
+    return ''.join(chunks)
+
+
+def display_date(value):
+    try:
+        stamp = datetime.fromisoformat(value.replace('Z', '+00:00'))
+        if stamp.tzinfo is None:
+            stamp = stamp.replace(tzinfo=timezone.utc)
+        return stamp.astimezone(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')
+    except (ValueError, OverflowError):
+        return '(date unknown)'
+
+
+def print_results(results, names, args):
+    terminal = sys.stdout.isatty()
+    compact = terminal and not args.details
+    color = terminal and not os.environ.get('NO_COLOR') and os.environ.get('TERM') != 'dumb'
+    try:
+        width = os.get_terminal_size(sys.stdout.fileno()).columns
+    except OSError:
+        width = 100
+    limit = args.limit if args.limit is not None else 20 if terminal else 0
+    shown = results[:limit] if limit else results
+    if len(shown) < len(results):
+        warn(f'showing {len(shown)} of {len(results)} matches, newest first; '
+             '--limit 0 shows all; --pick browses all')
+    for number, (entry, snippets) in enumerate(shown, 1):
         sid = entry['id']
-        print('Title: ' + visible(names.get(sid, '(untitled)')))
-        print('Timestamp: ' + visible(entry['timestamp'] or '(unknown)'))
-        print('Directory: ' + visible(entry['cwd'] or '(not recorded)'))
-        print('Session: ' + sid)
-        for snippet in snippets:
-            print('  ' + visible(snippet))
+        if compact:
+            directory = entry['cwd'] or '(directory not recorded)'
+            home = str(Path.home())
+            if directory == home or directory.startswith(home + os.sep):
+                directory = '~' + directory[len(home):]
+            prefix = f'{number:02d}  '
+            date = display_date(entry['timestamp'])
+            if width < len(prefix) + len(date) + 15:
+                print(paint(prefix + shorten(visible(directory), max(1, width - len(prefix))), color, '1;36'))
+                print('    ' + paint(shorten(date, max(1, width - 4)), color, '2'))
+            else:
+                path_width = width - len(prefix) - len(date) - 3
+                print(paint(prefix + shorten(visible(directory), path_width), color, '1;36') +
+                      ' · ' + paint(date, color, '2'))
+            if names.get(sid):
+                print('    ' + paint(shorten(visible(names[sid]), max(1, width - 4)), color, '1'))
+            for snippet in snippets[:1]:
+                print('    ' + render_snippet(snippet, color, max(1, width - 4)))
+        else:
+            print('Title: ' + visible(names.get(sid, '(untitled)')))
+            print('Timestamp: ' + visible(entry['timestamp'] or '(unknown)'))
+            print('Directory: ' + visible(entry['cwd'] or '(not recorded)'))
+            print('Session: ' + sid)
+            for snippet in snippets:
+                print('  ' + render_snippet(snippet, color))
         command = resume_args(entry)
         if command:
-            print('Resume: ' + shlex.join(command))
+            print(paint(('    ↳ ' if compact else 'Resume: ') + shlex.join(command), color, '2'))
         else:
             print('Resume unavailable: recorded directory is missing or invalid')
         print()
@@ -458,7 +571,7 @@ def pick(results, names):
         sid = entry['id']
         by_id[sid] = entry
         rows.append('\t'.join([sid, visible(entry['timestamp']), visible(names.get(sid, '(untitled)')),
-                               visible(entry['cwd'] or '(not recorded)'), visible(snippets[0] if snippets else '')]))
+                               visible(entry['cwd'] or '(not recorded)'), visible(snippets[0]['text'] if snippets else '')]))
     env = dict(os.environ)
     # A user default --bind/--multi must not execute another action or add selections.
     env.pop('FZF_DEFAULT_OPTS', None)
@@ -483,17 +596,19 @@ def pick(results, names):
 def parser():
     result = argparse.ArgumentParser(
         prog='codex-search',
-        usage='%(prog)s [-i] [-F] [--all-text] [--pick] PATTERN\n'
+        usage='%(prog)s [-i] [-F] [--all-text] [--pick] [--details] [--limit N] PATTERN\n'
               '       %(prog)s (--rebuild-index | --clear-cache)\n'
               '       %(prog)s --help',
         description='Search local Codex user messages and assistant replies across projects.\n'
-                    'The private local cache refreshes automatically before each search.',
+                    'Terminal: newest 20 matches with a short highlighted excerpt.\n'
+                    'Pipes: all matches with full metadata. The private cache refreshes automatically.',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog='Examples:\n'
                '  codex-search "cache.*refresh"\n'
                '  codex-search -iF "café"\n'
                '  codex-search --all-text -F "tool output"\n'
                '  codex-search --pick "bug"\n'
+               '  codex-search --details --limit 0 "root"\n'
                '  codex-search -- "-flag"\n\n'
                'Requires Python 3 and rg; --pick also needs fzf. No sudo to run.\n'
                'CODEX_HOME selects sessions; XDG_CACHE_HOME selects cache storage.\n'
@@ -504,6 +619,8 @@ def parser():
     result.add_argument('-F', '--fixed-strings', action='store_true', help='match literal text instead of a regex')
     result.add_argument('--all-text', action='store_true', help='also search decoded tool calls and output')
     result.add_argument('--pick', action='store_true', help='select with fzf and resume; Esc launches nothing')
+    result.add_argument('--details', action='store_true', help='show full metadata and up to five snippets per match')
+    result.add_argument('--limit', type=int, metavar='N', help='max results to print; 0 means all (default: 20 in terminal, all in pipes); picker always sees all')
     maintenance = result.add_mutually_exclusive_group()
     maintenance.add_argument('--rebuild-index', action='store_true', help='reparse all sources (optionally search afterward)')
     maintenance.add_argument('--clear-cache', action='store_true', help='remove this Codex home cache; leave its lock and sessions intact')
@@ -513,6 +630,8 @@ def parser():
 def main():
     cli = parser()
     args = cli.parse_args()
+    if args.limit is not None and args.limit < 0:
+        cli.error('--limit must be 0 (all) or a positive integer')
     if args.clear_cache and (args.pattern is not None or args.pick):
         cli.error('--clear-cache cannot be combined with a search or --pick')
     if args.pattern is None and not (args.rebuild_index or args.clear_cache):
@@ -543,7 +662,7 @@ def main():
         return 1
     if args.pick:
         return pick(results, names)
-    print_results(results, names)
+    print_results(results, names, args)
     return 0
 
 

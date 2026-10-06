@@ -20,18 +20,32 @@ codex-search -i "resume"
 codex-search -F "literal [brackets]"
 codex-search --all-text -F "tool output phrase"
 codex-search --pick "deployment"
+codex-search --limit 5 "root"
+codex-search --details --limit 0 "root"
 codex-search -- "-flag"
 ```
 
 In fish, `csg` expands to `codex-search`; `cs` retains its existing terminal-clear command. `--help`, `-h` or no arguments print usage, option descriptions, examples and documentation paths without indexing or requiring rg/fzf. Ordinary results go to stdout and can be piped; progress and warnings go to stderr. Exit codes are 0 for help, matches, completed maintenance or picker cancellation; 1 for no matches; 2 for invalid options, dependencies or runtime errors; 130 for interruption.
 
-Each block shows the optional title, newest recorded activity timestamp, recorded working directory, UUID, up to five distinct matching line snippets and a shell-quoted command:
+In a terminal, searches show the newest 20 matching sessions with an emphasized
+directory, a readable UTC date, an optional title, one short excerpt and a
+shell-quoted resume command. Actual ripgrep matches are highlighted; excerpts
+fit the terminal width. `NO_COLOR=1` or `TERM=dumb` disables color. Long resume
+commands stay complete so they can be copied. A footer on stderr announces any
+limit and points to `--limit 0` (all results) or `--pick` (browse all matches).
+
+Use `--limit N` to choose the result count; 0 means all. `--details` shows the
+full block: optional title, exact activity timestamp, recorded working directory,
+UUID, up to five distinct matching snippets and resume command. For every full
+block, use `codex-search --details --limit 0 "pattern"`. Piped output defaults
+to all full blocks with no ANSI escapes; `--limit` can also bound a pipe.
+The printed resume command remains:
 
 ```bash
 codex resume -C '/path/with spaces/project' 00000000-0000-4000-8000-000000000001
 ```
 
-`--pick` lists the same sessions with directory and a snippet. Enter hands the exact UUID and directory to the normal `codex` executable on PATH, preserving the existing launcher. Esc or Ctrl-C in fzf launches nothing. A missing, relative, unrecorded or non-printable directory makes resume unavailable; restore that directory before trying again. No initial prompt is supplied. Selection defaults from FZF_DEFAULT_OPTS/FZF_DEFAULT_OPTS_FILE are ignored so custom binds or multi-selection cannot change this action.
+`--pick` lists all matching sessions with directory and a snippet, regardless of `--limit`. Enter hands the exact UUID and directory to the normal `codex` executable on PATH, preserving the existing launcher. Esc or Ctrl-C in fzf launches nothing. A missing, relative, unrecorded or non-printable directory makes resume unavailable; restore that directory before trying again. No initial prompt is supplied. Selection defaults from FZF_DEFAULT_OPTS/FZF_DEFAULT_OPTS_FILE are ignored so custom binds or multi-selection cannot change this action.
 
 ## What is searched
 
@@ -80,4 +94,4 @@ binaries under `/tmp` and may append lifecycle data to its own synthetic log.
 
 Follow the grouped [smoke tests](smoke-tests.md#codex-session-search) for ordinary printing, tool opt-in, incremental refresh, cancellation and interactive resume. `/status` is a local UI command; confirm the selected directory without sending a new prompt. Evidence, measured timings and remaining interactive checks are maintained in the [implementation plan](../plans/codex-session-search.md).
 
-To roll back, run `codex-search --clear-cache`, remove only the session-search executable and `csg` addition from chezmoi source, and remove the installed `~/scripts/codex-search` if chezmoi retains it after source removal. Run the same protected `refresh-config` procedure to regenerate abbreviations. Preserve other alias/doc edits. Original session files are unchanged and need no restoration. If Git delivery is requested later, include implementation, tests, docs and the matching plan together; suggested subject: `feat(codex): add cached session search and resume`.
+To roll back, run `codex-search --clear-cache`, remove only the session-search executable and `csg` addition from chezmoi source, and remove the installed `~/scripts/codex-search` if chezmoi retains it after source removal. Run the same protected `refresh-config` procedure to regenerate abbreviations. Preserve other alias/doc edits. Original session files are unchanged and need no restoration. To restore the full display without removing the tool, use `--details --limit 0`. Reverting only the readability change requires no cache rebuild.

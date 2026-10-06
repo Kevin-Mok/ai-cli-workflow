@@ -3395,6 +3395,29 @@
         "9646e1b4d92a098a828a3b24db554c4922377a7539ee47914fcff652b7361b94"
       ],
       "topic": "api-contracts-fixtures"
+    },
+    {
+      "id": "local-rg-windowed-match-highlighting",
+      "reference": "references/api-contracts-fixtures.md#local-rg-windowed-match-highlighting",
+      "status": "verified_fix",
+      "symptoms": [
+        "a bounded highlighted excerpt still takes seconds on a dense single-line match",
+        "a matched trailing carriage return disappears from displayed text"
+      ],
+      "applicability": "CLI search renderers consuming ripgrep JSON byte offsets for a clipped decoded excerpt.",
+      "diagnostics": [
+        "Benchmark a warm 160,000-match synthetic line and inspect which submatches trigger UTF-8 prefix decoding.",
+        "Exercise a matched trailing CR and long Unicode prefix in a real PTY."
+      ],
+      "confidence": "confirmed",
+      "remedy": "Calculate excerpt byte boundaries once, stop ordered submatches past the window and decode only window-relative slices. Remove only the added newline, preserve decoded CR and remap offsets after escaping controls before ANSI.",
+      "verification": "Dense-match RED timed out at 5s; after correction 160,000 matches took 0.392s (independent review 0.354s). All 29 tests and six installed PTY/option/performance checks pass; real picker Enter/Esc preserve safe selection/cancellation.",
+      "verification_scope": "runtime",
+      "limitations": "This bounds highlight-offset work, not rg scanning/JSON parsing. Emoji-cell widths vary by font; complete commands can wrap. Runtime evidence uses synthetic histories.",
+      "sources": [
+        "9777098eb77ea8554b1960081840ece0c3bae9d66d336af3979e3ea49a926380"
+      ],
+      "topic": "api-contracts-fixtures"
     }
   ],
   "reports": [
@@ -5417,6 +5440,16 @@
       "reviewed_on": "2026-10-06",
       "findings": [],
       "decision": "No new learning: existing snapshot-ownership and stale-baseline findings cover intentional live capture, invalid HEAD-based attribution, and unrelated source drift during refresh or staging review. Search records stayed unchanged and staging stopped before index writes; preserve unrelated ledger/backup work and verify scoped candidate blobs independently."
+    },
+    {
+      "sha256": "9777098eb77ea8554b1960081840ece0c3bae9d66d336af3979e3ea49a926380",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-06-codex-search-output-readability.md"
+      ],
+      "reviewed_on": "2026-10-06",
+      "findings": [
+        "local-rg-windowed-match-highlighting"
+      ]
     }
   ],
   "review": {
