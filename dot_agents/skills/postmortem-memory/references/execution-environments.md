@@ -77,6 +77,7 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
   - [2026-10-03-sandbox-initialization.md](/home/example/coding/twitter-cap-bot/docs/postmortem/2026-10-03-sandbox-initialization.md) (SHA-256 `dd1bd38a1680`; 1 alias(es), all retained in [sources.json](../sources.json)).
   - [2026-10-04-overnight-reader-jump.md](/home/example/coding/twitter-cap-bot/docs/postmortem/2026-10-04-overnight-reader-jump.md) (SHA-256 `e44b69235005`; 1 alias(es), all retained in [sources.json](../sources.json)).
   - [2026-08-17-preview-lead-submission-diagnostics.md](/home/example/coding/example-client-app/docs/postmortem/2026-08-17-preview-lead-submission-diagnostics.md) (SHA-256 `552f9e8c9851`; 1 alias(es), all retained in [sources.json](../sources.json)).
+  - [2026-10-06-count-update-latency.md](/home/example/coding/twitter-cap-bot/docs/postmortem/2026-10-06-count-update-latency.md) (SHA-256 `e20c6026f866`; 1 alias(es), all retained in [sources.json](../sources.json)).
 
 ## local-embedded-python-diagnostic-scope
 

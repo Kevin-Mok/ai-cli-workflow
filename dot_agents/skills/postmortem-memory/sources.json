@@ -1226,7 +1226,8 @@
         "1942248bc40c34202ee55481ac74211336a79e0f01f455a23c53e91997d20fa9",
         "dd1bd38a168022fc7870e512e87b4e549986eecb6c77c75c61fe173288cf00e0",
         "e44b692350053932c60e482b50164cddf90cd5a23412f73e33ebfee647f8ac8a",
-        "552f9e8c98515e898e2dd75d21b6962362205c30cc93befd1e37571af8ccede4"
+        "552f9e8c98515e898e2dd75d21b6962362205c30cc93befd1e37571af8ccede4",
+        "e20c6026f8664c033c118df292e2d6064251176700dc233ff05adb458f9d3aa6"
       ],
       "status": "verified_workaround",
       "symptoms": [
@@ -3418,6 +3419,33 @@
         "9777098eb77ea8554b1960081840ece0c3bae9d66d336af3979e3ea49a926380"
       ],
       "topic": "api-contracts-fixtures"
+    },
+    {
+      "applicability": "Discord reader features sharing accounting/routing coordination with bounded REST scans and sticky status publication.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Measure history, fetch and membership requests on cold/warm/live-event paths.",
+        "Hold history/fetch while applying reader additions/removals/deletions and selection changes.",
+        "Advance the clock during a successful scan beyond the reconciliation interval.",
+        "Verify live accounting and another server progress during network waits."
+      ],
+      "id": "ext-reader-event-cache-latency",
+      "limitations": "No live API or runtime restart performed. One-second publication is a healthy-path target, not a Discord latency guarantee. Periodic reconciliation still needs REST work and a request exceeding its two-minute budget can prevent progress.",
+      "reference": "references/operational-drift.md#ext-reader-event-cache-latency",
+      "remedy": "Keep scoped ID-only membership across successful warm updates, apply targeted events and treat persisted state as provisional after offline gaps. Run scans/publication outside routing and accounting locks; fence history snapshots and results with mutation versions. Start reconciliation cooldown at successful completion; merge complete quota history with live-send protection, deletion tombstones and reset guards. Separate fast edits from post-driven sticky relocation.",
+      "sources": [
+        "e20c6026f8664c033c118df292e2d6064251176700dc233ff05adb458f9d3aa6"
+      ],
+      "status": "activation_pending",
+      "symptoms": [
+        "Daily count publication waits for reaction/history scans",
+        "Successful scans erase cached positive reactions",
+        "Reader removal during history is overwritten by stale membership",
+        "Slow successful reconciliation immediately rescans"
+      ],
+      "topic": "operational-drift",
+      "verification": "Defining RED-to-GREEN cache, live recovery and independent-review race regressions; 187 offline tests and cached Pyright passed. Synthetic warm and reader-add paths dropped from 51/52 reads to zero; cold work unchanged.",
+      "verification_scope": "code"
     }
   ],
   "reports": [
@@ -5450,6 +5478,17 @@
       "findings": [
         "local-rg-windowed-match-highlighting"
       ]
+    },
+    {
+      "aliases": [
+        "/home/example/coding/twitter-cap-bot/docs/postmortem/2026-10-06-count-update-latency.md"
+      ],
+      "findings": [
+        "ext-reader-event-cache-latency",
+        "ext-sandbox-loopback"
+      ],
+      "reviewed_on": "2026-10-06",
+      "sha256": "e20c6026f8664c033c118df292e2d6064251176700dc233ff05adb458f9d3aa6"
     }
   ],
   "review": {

@@ -137,3 +137,15 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Limitations: The incident proves the stated historical schedule correction, not the current external schedule. Future values require current authoritative evidence.
 - Sources:
   - [2026-08-04-fn-progress-stale-season-date.md](/home/example/linux-config/.worktrees/vps-aws-bootstrap-prompt/docs/postmortem/2026-08-04-fn-progress-stale-season-date.md) (SHA-256 `6151f4584b44`; 2 alias(es), all retained in [sources.json](../sources.json)).
+
+## ext-reader-event-cache-latency
+
+- Status: **activation_pending**; root-cause confidence: **confirmed**; verification scope: **code**.
+- Symptoms: Daily count publication waits for reaction/history scans; Successful scans erase cached positive reactions; Reader removal during history is overwritten by stale membership; Slow successful reconciliation immediately rescans
+- Applicability: Discord reader features sharing accounting/routing coordination with bounded REST scans and sticky status publication.
+- Diagnostic checks: Measure history, fetch and membership requests on cold/warm/live-event paths.; Hold history/fetch while applying reader additions/removals/deletions and selection changes.; Advance the clock during a successful scan beyond the reconciliation interval.; Verify live accounting and another server progress during network waits.
+- Remedy: Keep scoped ID-only membership across successful warm updates, apply targeted events and treat persisted state as provisional after offline gaps. Run scans/publication outside routing and accounting locks; fence history snapshots and results with mutation versions. Start reconciliation cooldown at successful completion; merge complete quota history with live-send protection, deletion tombstones and reset guards. Separate fast edits from post-driven sticky relocation.
+- Verification evidence: Defining RED-to-GREEN cache, live recovery and independent-review race regressions; 187 offline tests and cached Pyright passed. Synthetic warm and reader-add paths dropped from 51/52 reads to zero; cold work unchanged.
+- Limitations: No live API or runtime restart performed. One-second publication is a healthy-path target, not a Discord latency guarantee. Periodic reconciliation still needs REST work and a request exceeding its two-minute budget can prevent progress.
+- Sources:
+  - [2026-10-06-count-update-latency.md](/home/example/coding/twitter-cap-bot/docs/postmortem/2026-10-06-count-update-latency.md) (SHA-256 `e20c6026f866`; 1 alias(es), all retained in [sources.json](../sources.json)).
