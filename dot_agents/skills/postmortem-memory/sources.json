@@ -3347,6 +3347,54 @@
       "topic": "paths-ownership",
       "verification": "22 isolated tests passed for permissions, routing, rollback, archive rejection and recovery; Bash syntax passed.",
       "verification_scope": "code"
+    },
+    {
+      "id": "local-codex-search-json-boundary",
+      "reference": "references/api-contracts-fixtures.md#local-codex-search-json-boundary",
+      "status": "verified_fix",
+      "symptoms": [
+        "malformed payload type causes TypeError",
+        "JSON unpaired surrogate causes UnicodeEncodeError",
+        "raw cwd terminal controls",
+        "BrokenPipeError caught as OSError"
+      ],
+      "applicability": "Streaming local JSONL search caches and terminal resume commands.",
+      "diagnostics": [
+        "Inject non-string discriminants and isolated surrogates next to valid records.",
+        "Exercise cwd controls and an early-closing output consumer."
+      ],
+      "confidence": "confirmed",
+      "remedy": "Validate discriminant types, skip per-record encoding errors, reject non-printable resume paths, and catch/flush BrokenPipeError before OSError.",
+      "verification": "All four defining regressions observed RED then passed; complete suite 22/22 GREEN.",
+      "verification_scope": "code",
+      "limitations": "Synthetic code evidence does not establish support for every historical Codex format.",
+      "sources": [
+        "5d3fefff323897f552d80d5c2b9f78e693587cc8eb6b6bb9ae09b6760fd833b5"
+      ],
+      "topic": "api-contracts-fixtures"
+    },
+    {
+      "id": "local-fzf-ui-stream-and-resume-fixture",
+      "reference": "references/api-contracts-fixtures.md#local-fzf-ui-stream-and-resume-fixture",
+      "status": "verified_fix",
+      "symptoms": [
+        "real fzf picker is invisible while selection stubs pass",
+        "real-resume fixture wrongly asserts source byte immutability"
+      ],
+      "applicability": "CLI wrappers capturing a selected row from an interactive fzf subprocess.",
+      "diagnostics": [
+        "Emit stderr from a defining picker stub.",
+        "Run real fzf Escape/Enter on synthetic history and inspect real Codex /status without a prompt."
+      ],
+      "confidence": "confirmed",
+      "remedy": "Capture fzf stdout only; inherit stderr for the UI. Assert source immutability for search, not for the actual resumed application lifecycle.",
+      "verification": "Stderr regression RED/GREEN; 22 tests pass; live fzf cancel/select exit 0; actual saved messages and correct UUID/cwd shown in Codex with zero token use.",
+      "verification_scope": "runtime",
+      "limitations": "Live checks use synthetic logs and temporary fzf, not private history or a permanently installed fzf.",
+      "sources": [
+        "9646e1b4d92a098a828a3b24db554c4922377a7539ee47914fcff652b7361b94"
+      ],
+      "topic": "api-contracts-fixtures"
     }
   ],
   "reports": [
@@ -5322,6 +5370,53 @@
       ],
       "reviewed_on": "2026-10-05",
       "sha256": "ff6f1e5780cc432e11e8547d78d7da310abde7252ce34ebba02efd6bac4cb9fa"
+    },
+    {
+      "sha256": "06fb01c47c65e65b242e8ad66571ec8fb279e5e41ef423fbff04973c4bd70092",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-06-codex-search-sandbox-startup.md"
+      ],
+      "reviewed_on": "2026-10-06",
+      "findings": [],
+      "decision": "No new learning: local-sandbox-loopback-approved-route already covers pre-execution failure and approved scoped workaround; host sandbox remains unresolved."
+    },
+    {
+      "sha256": "d774479226c77ef72f0832131745c64de4838120d6dad4aa97a6c122f3b909f3",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-06-codex-search-source-lookups.md"
+      ],
+      "reviewed_on": "2026-10-06",
+      "findings": [],
+      "decision": "No new learning: local-current-source-retrieval already covers stale public paths; bounded JSON output should use complete parsing rather than early-closing pipes."
+    },
+    {
+      "sha256": "5d3fefff323897f552d80d5c2b9f78e693587cc8eb6b6bb9ae09b6760fd833b5",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-06-codex-search-malformed-records.md"
+      ],
+      "reviewed_on": "2026-10-06",
+      "findings": [
+        "local-codex-search-json-boundary"
+      ]
+    },
+    {
+      "sha256": "9646e1b4d92a098a828a3b24db554c4922377a7539ee47914fcff652b7361b94",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-06-codex-search-picker-ui.md"
+      ],
+      "reviewed_on": "2026-10-06",
+      "findings": [
+        "local-fzf-ui-stream-and-resume-fixture"
+      ]
+    },
+    {
+      "sha256": "700285acb5c7f8c9fae676221113fd624dd930cef195a55da57828a8f66a6932",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-06-codex-search-refresh-audit.md"
+      ],
+      "reviewed_on": "2026-10-06",
+      "findings": [],
+      "decision": "No new learning: existing snapshot-ownership and stale-baseline findings cover intentional live capture, invalid HEAD-based attribution, and unrelated source drift during refresh or staging review. Search records stayed unchanged and staging stopped before index writes; preserve unrelated ledger/backup work and verify scoped candidate blobs independently."
     }
   ],
   "review": {

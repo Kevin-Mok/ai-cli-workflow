@@ -103,3 +103,6 @@
 - When checking source versus installed packages, compare the deployable file set and account for documented cache exclusions and concurrent shared-ledger updates. Preserve another task’s new evidence instead of restoring a stale deployment snapshot.
 
 - 2026-10-05: Validate i3 titlebars on a visible workspace using `actual_deco_rect` (with `deco_rect` fallback), not stale hidden-workspace geometry. Allow a compositor frame and use a unique screenshot path; scrot can suffix an existing filename. See [the overview probe investigation](../docs/postmortem/2026-10-05-kitty-overview-inspection.md).
+
+- 2026-10-06: Local Codex JSONL indexing must validate discriminant types and UTF-8 text after JSON decoding; syntax-valid records can still contain arrays in type fields or lone surrogates. Preserve good neighboring records and cover terminal-control cwd plus early-closing pipe behavior. See [search record validation](../docs/postmortem/2026-10-06-codex-search-malformed-records.md).
+- 2026-10-06: fzf selection wrappers should capture stdout only and inherit stderr for the UI. Verify real picker presentation as well as stubbed argv; real resumed Codex may append lifecycle records even with zero prompts. See [picker stream verification](../docs/postmortem/2026-10-06-codex-search-picker-ui.md).

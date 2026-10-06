@@ -6,6 +6,59 @@ result with `Expected`. When a change adds a manual check or reveals a gap,
 update the relevant entry or add one under the right area, replacing stale
 checks rather than duplicating them.
 
+## Codex Session Search
+
+Run the installed command from any directory; before installation, use
+`./scripts/executable_codex-search` from the repo root. Replace example search
+phrases with text known to occur in your saved conversations. The synthetic
+fixture below provides a repeatable picker check without using private history.
+
+- Action: codex-search --help
+  Expected: Usage, flag descriptions, examples and documentation paths appear;
+  exit status is 0, without indexing or launching Codex. `-h` and no arguments
+  also show help. Help works without rg or fzf installed.
+- Action: codex-search -iF "tool output"
+  Expected: Matching sessions appear once per UUID,
+  newest activity first, with optional title, timestamp, original directory,
+  snippets and a copyable resume command. Run the same command again to confirm
+  it reuses the private cache;
+  progress and malformed-data warnings go to stderr. `csg` expands to `codex-search`
+  in fish and the existing `cs` abbreviation still clears the terminal.
+- Action: codex-search -F "tool-only phrase"
+  Expected: After replacing the example with text present only in a saved tool
+  result, no session matches (exit 1). Keep that exact phrase for the next check.
+- Action: codex-search --all-text -F "tool-only phrase"
+  Expected: The tool-result phrase now matches; system/developer instructions and
+  reasoning stay excluded. Matching flags follow ripgrep behavior.
+- Action: codex-search --pick -iF "tool output"
+  Expected: The matching rows appear in fzf. Press Esc, then rerun and select a
+  session whose recorded directory still exists.
+  Esc launches nothing. Enter opens the selected history in its original
+  directory through the normal Codex launcher. Inspect `/status` to confirm the
+  directory without submitting a prompt. A missing or invalid recorded directory
+  prevents resume. If fzf is absent, the error explains installation.
+- Action: python3 tests/scripts/codex_search_live_check.py
+  Expected: From the repo root, synthetic results and a real fzf picker appear.
+  Press Esc to verify cancellation; rerun and press Enter to verify the stub
+  receives the exact resume UUID and directory containing spaces. Exit 0;
+  no real conversation opens.
+- Action: python3 tests/scripts/codex_search_live_check.py --real-resume
+  Expected: Enter opens the synthetic saved history in the installed Codex CLI.
+  Inspect `/status` for its synthetic UUID and temporary original directory,
+  then exit without submitting a prompt. This fixture uses a localhost-only
+  provider and copies no private history.
+- Action: codex-search -iF "tool output"
+  Expected: After an ordinary Codex message adds this phrase, the matching log
+  refreshes automatically; deleted source logs disappear from results.
+- Action: codex-search --rebuild-index
+  Expected: All local session logs are reparsed, with progress on stderr and
+  exit 0. Large histories can take a minute or more. Original sessions stay
+  unchanged; private cache directories are 0700 and files 0600.
+- Action: codex-search --clear-cache
+  Expected: Only this resolved Codex home's index is removed, retaining its
+  lock and original sessions. Exit 0; the next search recreates the cache. See
+  the [operator guide](codex-session-search.md) for tests, timings and rollback.
+
 ## VPS Codex Updates
 
 - Action: ./scripts/executable_fix-vps-codex.sh --help

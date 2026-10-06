@@ -1,0 +1,564 @@
+#!/usr/bin/env python3
+"""Search local Codex JSONL conversations through a private incremental rg cache."""
+import argparse
+import base64
+from contextlib import contextmanager
+from datetime import datetime, timezone
+import fcntl
+import hashlib
+import json
+import os
+from pathlib import Path
+import re
+import shlex
+import shutil
+import stat
+import subprocess
+import sys
+import tempfile
+import uuid
+
+CACHE_VERSION = 1
+SNIPPETS = 5
+TOOL_ITEMS = {'function_call', 'function_call_output', 'custom_tool_call',
+              'custom_tool_call_output', 'local_shell_call', 'mcp_tool_call',
+              'mcp_tool_call_output', 'web_search_call', 'tool_search_call', 'tool_search_output'}
+TOOL_EVENTS = {'exec_command_begin', 'exec_command_end', 'mcp_tool_call_begin',
+               'mcp_tool_call_end', 'web_search_begin', 'web_search_end'}
+CONTEXT_PREFIXES = ('# AGENTS.md instructions', '<user_instructions>', '<environment_context>',
+                    '<environments_instructions>', '<permissions instructions>',
+                    '<developer_instructions>', '<system_instructions>', '<skills_instructions>',
+                    '<apps_instructions>', '<plugins_instructions>')
+
+
+class SearchError(Exception):
+    pass
+
+
+def visible(text):
+    """Keep terminal controls in private logs from becoming terminal commands."""
+    return ''.join(c if c.isprintable() else ('\\t' if c == '\t' else '\\n' if c == '\n'
+                   else '\\r' if c == '\r' else f'\\x{ord(c):02x}') for c in text)
+
+
+def warn(text):
+    print('codex-search: ' + visible(text), file=sys.stderr)
+
+
+def session_id(value):
+    if not isinstance(value, str):
+        return None
+    try:
+        return str(uuid.UUID(value))
+    except ValueError:
+        return None
+
+
+def epoch(value):
+    try:
+        dt = datetime.fromisoformat(value.replace('Z', '+00:00'))
+        return dt.replace(tzinfo=timezone.utc).timestamp() if dt.tzinfo is None else dt.timestamp()
+    except (ValueError, OverflowError):
+        return 0.0
+
+
+def signature(path):
+    info = path.stat()
+    return [info.st_size, info.st_mtime_ns, info.st_ctime_ns, info.st_dev, info.st_ino]
+
+
+def secure_directory(path):
+    path.mkdir(mode=0o700, parents=True, exist_ok=True)
+    info = path.lstat()
+    if not stat.S_ISDIR(info.st_mode) or info.st_uid != os.getuid():
+        raise SearchError(f'unsafe cache directory: {path} (must be owned by you, without symlinks)')
+    path.chmod(0o700)
+
+
+def secure_file(path):
+    info = path.lstat()
+    if not stat.S_ISREG(info.st_mode) or info.st_uid != os.getuid() or info.st_nlink != 1:
+        raise SearchError(f'unsafe cache file: {path}')
+    path.chmod(0o600)
+
+
+@contextmanager
+def cache_lock(home):
+    base = Path(os.environ.get('XDG_CACHE_HOME') or Path.home() / '.cache') / 'codex-search'
+    secure_directory(base)
+    root = base / hashlib.sha256(os.fsencode(home)).hexdigest()
+    secure_directory(root)
+    lock_path = root / '.lock'
+    fd = os.open(lock_path, os.O_RDWR | os.O_CREAT | os.O_NOFOLLOW, 0o600)
+    try:
+        secure_file(lock_path)
+        with os.fdopen(fd, 'r+') as lock:
+            fd = None
+            fcntl.flock(lock, fcntl.LOCK_EX)
+            yield root
+    finally:
+        if fd is not None:
+            os.close(fd)
+
+
+@contextmanager
+def private_temp(root, suffix):
+    fd, name = tempfile.mkstemp(dir=root, suffix=suffix)
+    try:
+        with os.fdopen(fd, 'w+', encoding='utf-8') as out:
+            yield Path(name), out
+    finally:
+        Path(name).unlink(missing_ok=True)
+
+
+def atomic_json(path, value):
+    with private_temp(path.parent, '.tmp') as (tmp, out):
+        json.dump(value, out, ensure_ascii=True, separators=(',', ':'))
+        out.flush()
+        os.fsync(out.fileno())
+        os.replace(tmp, path)
+
+
+def records(path, problems):
+    """Malformed input never leaks its payload through diagnostics."""
+    with path.open('rb') as source:
+        for raw in source:
+            if not raw.strip():
+                continue
+            try:
+                row = json.loads(raw)
+                if not isinstance(row, dict):
+                    raise ValueError('not an object')
+                yield row
+            except (ValueError, UnicodeError, RecursionError):
+                problems[0] += 1
+
+
+def conversation_text(role, text):
+    if role not in ('user', 'assistant') or not isinstance(text, str):
+        return ''
+    if role == 'user':
+        # The IDE prepends context using this documented delimiter.
+        marker = '## My request for Codex:'
+        if marker in text:
+            text = text.split(marker, 1)[1].strip()
+        if text.lstrip().startswith(CONTEXT_PREFIXES):
+            return ''
+    return text
+
+
+def tool_strings(value, depth=0):
+    """Decode text and JSON-encoded arguments, excluding binary/opaque content."""
+    if depth > 24:
+        return
+    if isinstance(value, str):
+        if value.lstrip().startswith(('{', '[')):
+            try:
+                decoded = json.loads(value)
+            except (ValueError, RecursionError):
+                pass
+            else:
+                yield from tool_strings(decoded, depth + 1)
+                return
+        yield value
+    elif isinstance(value, list):
+        for child in value:
+            yield from tool_strings(child, depth + 1)
+    elif isinstance(value, dict):
+        if value.get('type') in ('image', 'input_image', 'audio', 'input_audio'):
+            return
+        for key, child in value.items():
+            if key not in ('data', 'image_url', 'audio_url', 'encrypted_content', 'call_id', 'id'):
+                yield from tool_strings(child, depth + 1)
+
+
+def extract(path, root, source_signature):
+    token = uuid.uuid4().hex
+    conversation = root / (token + '.conversation.txt')
+    tools = root / (token + '.tools.txt')
+    metadata = {'id': None, 'cwd': '', 'timestamp': '', 'signature': source_signature,
+                'conversation': conversation.name, 'tools': tools.name, 'skipped': 0}
+    problems = [0]
+    response_digests = set()
+    try:
+        with private_temp(root, '.tmp') as (conv_tmp, conv), \
+                private_temp(root, '.tmp') as (tool_tmp, tool), \
+                private_temp(root, '.tmp') as (_, events):
+            for row in records(path, problems):
+                kind, payload = row.get('type'), row.get('payload')
+                if not isinstance(payload, dict):
+                    problems[0] += 1
+                    continue
+                if not isinstance(kind, str) or (kind in ('response_item', 'event_msg') and
+                                                not isinstance(payload.get('type'), str)):
+                    problems[0] += 1
+                    continue
+                try:
+                    timestamp = row.get('timestamp')
+                    if isinstance(timestamp, str) and timestamp > metadata['timestamp']:
+                        metadata['timestamp'] = timestamp
+                    if kind == 'session_meta':
+                        sid = session_id(payload.get('id'))
+                        if sid:
+                            if metadata['id'] and sid != metadata['id']:
+                                problems[0] += 1
+                                continue
+                            metadata['id'] = sid
+                            cwd = payload.get('cwd')
+                            if isinstance(cwd, str):
+                                metadata['cwd'] = cwd
+                            timestamp = payload.get('timestamp')
+                            if isinstance(timestamp, str) and timestamp > metadata['timestamp']:
+                                metadata['timestamp'] = timestamp
+                    elif kind == 'response_item' and payload.get('type') == 'message':
+                        role, content = payload.get('role'), payload.get('content')
+                        if not isinstance(content, list):
+                            problems[0] += 1
+                            continue
+                        parts = []
+                        for part in content:
+                            if not isinstance(part, dict):
+                                problems[0] += 1
+                            elif part.get('type') in ('input_text', 'output_text'):
+                                if isinstance(part.get('text'), str):
+                                    parts.append(part['text'])
+                                else:
+                                    problems[0] += 1
+                        text = conversation_text(role, '\n'.join(parts))
+                        if text:
+                            digest = hashlib.sha256((role + '\0' + text).encode()).hexdigest()
+                            response_digests.add(digest)
+                            conv.write(text + '\n')
+                    elif kind == 'event_msg' and payload.get('type') in ('user_message', 'agent_message'):
+                        role = 'user' if payload['type'] == 'user_message' else 'assistant'
+                        text = conversation_text(role, payload.get('message'))
+                        if text:
+                            digest = hashlib.sha256((role + '\0' + text).encode()).hexdigest()
+                            events.write(json.dumps([digest, text], ensure_ascii=True) + '\n')
+                    elif (kind == 'response_item' and payload.get('type') in TOOL_ITEMS) or \
+                            (kind == 'event_msg' and payload.get('type') in TOOL_EVENTS):
+                        for text in tool_strings(payload):
+                            tool.write(text + '\n')
+                except UnicodeError:
+                    # JSON permits isolated surrogates; UTF-8 cache text does not.
+                    problems[0] += 1
+            events.flush()
+            events.seek(0)
+            for line in events:
+                digest, text = json.loads(line)
+                if digest not in response_digests:
+                    conv.write(text + '\n')
+            for out in (conv, tool):
+                out.flush()
+                os.fsync(out.fileno())
+            os.replace(conv_tmp, conversation)
+            os.replace(tool_tmp, tools)
+    except BaseException:
+        conversation.unlink(missing_ok=True)
+        tools.unlink(missing_ok=True)
+        raise
+    metadata['skipped'] = problems[0]
+    if not metadata['id']:
+        warn(f'skipped session without valid session_meta UUID: {path}')
+    return metadata
+
+
+def load_manifest(root, home):
+    path = root / 'manifest.json'
+    if not path.exists():
+        return {}
+    secure_file(path)
+    try:
+        data = json.loads(path.read_text())
+        if not isinstance(data, dict) or data.get('version') != CACHE_VERSION or data.get('home') != str(home):
+            warn('cache format changed; rebuilding index')
+            return {}
+        entries = data['sources']
+        if not isinstance(entries, dict):
+            raise ValueError('sources')
+        for source, entry in entries.items():
+            if not isinstance(source, str) or not isinstance(entry, dict):
+                raise ValueError('source entry')
+            if not isinstance(entry['signature'], list) or len(entry['signature']) != 5 or \
+                    any(type(n) is not int for n in entry['signature']):
+                raise ValueError('signature')
+            if entry['id'] is not None and session_id(entry['id']) != entry['id']:
+                raise ValueError('UUID')
+            if any(not isinstance(entry[k], str) for k in ('cwd', 'timestamp')) or \
+                    type(entry['skipped']) is not int or entry['skipped'] < 0:
+                raise ValueError('metadata')
+            for field in ('conversation', 'tools'):
+                if not isinstance(entry[field], str) or not re.fullmatch(r'[0-9a-f]{32}\.' + field + r'\.txt', entry[field]):
+                    raise ValueError('cache filename')
+        return entries
+    except (ValueError, KeyError, TypeError, RecursionError):
+        warn('invalid cache manifest; rebuilding index')
+        return {}
+
+
+def cleanup(root, keep=()):
+    keep = set(keep) | {'.lock'}
+    for path in root.iterdir():
+        if path.name not in keep:
+            if path.is_dir() and not path.is_symlink():
+                raise SearchError(f'unexpected directory in cache: {path}')
+            path.unlink()
+
+
+def refresh(root, home, rebuild=False):
+    entries = {} if rebuild else load_manifest(root, home)
+    sources = home / 'sessions'
+    current = {}
+    updated = 0
+    if not sources.exists():
+        warn(f'sessions directory does not exist: {sources}')
+    def walk_error(error):
+        # Do not discard cached sources when discovery is incomplete.
+        raise SearchError(f'cannot discover sessions: {error}')
+    for folder, _, names in os.walk(sources, onerror=walk_error, followlinks=False):
+        for name in sorted(names):
+            if not name.endswith('.jsonl'):
+                continue
+            path = Path(folder) / name
+            if path.is_symlink() or not path.is_file():
+                warn(f'skipped non-regular session source: {path}')
+                continue
+            key = str(path)
+            try:
+                sig = signature(path)
+                entry = entries.get(key)
+                valid_files = entry and all((root / entry[field]).exists() for field in ('conversation', 'tools'))
+                if valid_files:
+                    for field in ('conversation', 'tools'):
+                        secure_file(root / entry[field])
+                if not valid_files or entry['signature'] != sig:
+                    if updated == 0:
+                        warn('refreshing local session index...')
+                    entry = extract(path, root, sig)
+                    # An append during parsing must be retried on the next invocation.
+                    if signature(path) != sig:
+                        entry['signature'] = [0, 0, 0, 0, 0]
+                        warn(f'session changed while indexing; will refresh next search: {path}')
+                    updated += 1
+                    if updated % 100 == 0:
+                        warn(f'indexed {updated} changed sessions')
+                current[key] = entry
+                if entry['skipped']:
+                    warn(f"skipped {entry['skipped']} malformed/incomplete records in {path}")
+            except FileNotFoundError:
+                warn(f'session disappeared during indexing: {path}')
+            except OSError as error:
+                warn(f'cannot index session {path}: {error.strerror}')
+                # Preserve existing data for recovery, but exclude stale matches.
+    changed = rebuild or current != entries or not (root / 'manifest.json').exists()
+    if changed:
+        atomic_json(root / 'manifest.json', {'version': CACHE_VERSION, 'home': str(home), 'sources': current})
+    keep = ['manifest.json'] + [entry[field] for entry in current.values() for field in ('conversation', 'tools')]
+    cleanup(root, keep)
+    if updated:
+        warn(f'index ready: {updated} refreshed, {len(current)} sources')
+    return current
+
+
+def titles(home):
+    result = {}
+    problems = [0]
+    path = home / 'session_index.jsonl'
+    if not path.exists():
+        return result
+    try:
+        for row in records(path, problems):
+            sid, title = session_id(row.get('id')), row.get('thread_name')
+            if sid and isinstance(title, str) and title.strip():
+                result[sid] = title.strip()
+    except OSError as error:
+        warn(f'cannot read optional title index: {error.strerror}')
+    if problems[0]:
+        warn(f'skipped {problems[0]} malformed/incomplete title index records')
+    return result
+
+
+def rg_text(value):
+    return value['text'] if 'text' in value else base64.b64decode(value['bytes']).decode('utf-8', 'replace')
+
+
+def search(root, entries, args):
+    by_file = {entry[field]: entry for entry in entries.values() if entry['id']
+               for field in ('conversation', 'tools') if field == 'conversation' or args.all_text}
+    results = {}
+    command = ['rg', '--no-config', '--json', '--text', '--color=never', '--glob', '*.conversation.txt']
+    if args.all_text:
+        command += ['--glob', '*.tools.txt']
+    if args.ignore_case:
+        command.append('-i')
+    if args.fixed_strings:
+        command.append('-F')
+    command += ['-e', args.pattern, '--', str(root)]
+    with tempfile.TemporaryFile(mode='w+', encoding='utf-8') as errors:
+        with subprocess.Popen(command, stdout=subprocess.PIPE, stderr=errors, text=True, encoding='utf-8') as process:
+            for line in process.stdout:
+                event = json.loads(line)
+                if event['type'] != 'match':
+                    continue
+                data = event['data']
+                name = Path(rg_text(data['path'])).name
+                entry = by_file.get(name)
+                if entry is None:
+                    continue
+                snippets = results.setdefault(entry['id'], [])
+                if len(snippets) < SNIPPETS:
+                    text = rg_text(data['lines']).rstrip('\r\n')
+                    # Submatch offsets are bytes, while presentation widths are characters.
+                    first = data['submatches'][0]['start'] if data['submatches'] else 0
+                    start = max(0, len(text.encode('utf-8')[:first].decode('utf-8', 'ignore')) - 80)
+                    snippet = ('…' if start else '') + text[start:start + 240] + ('…' if len(text) > start + 240 else '')
+                    if snippet not in snippets:
+                        snippets.append(snippet)
+            code = process.wait()
+        if code not in (0, 1):
+            errors.seek(0)
+            raise SearchError('rg search failed: ' + errors.read().strip())
+    # Resolve duplicates against all discovered copies, using the newest recorded activity.
+    metadata = {}
+    for entry in entries.values():
+        sid = entry['id']
+        if sid in results and (sid not in metadata or epoch(entry['timestamp']) > epoch(metadata[sid]['timestamp'])):
+            metadata[sid] = entry
+    return [(metadata[sid], results[sid]) for sid in sorted(metadata, key=lambda sid: (epoch(metadata[sid]['timestamp']), sid), reverse=True)]
+
+
+def resume_args(entry):
+    cwd = entry['cwd']
+    if not cwd or any(not c.isprintable() for c in cwd) or not Path(cwd).is_absolute() or not Path(cwd).is_dir():
+        return None
+    return ['codex', 'resume', '-C', cwd, entry['id']]
+
+
+def print_results(results, names):
+    for entry, snippets in results:
+        sid = entry['id']
+        print('Title: ' + visible(names.get(sid, '(untitled)')))
+        print('Timestamp: ' + visible(entry['timestamp'] or '(unknown)'))
+        print('Directory: ' + visible(entry['cwd'] or '(not recorded)'))
+        print('Session: ' + sid)
+        for snippet in snippets:
+            print('  ' + visible(snippet))
+        command = resume_args(entry)
+        if command:
+            print('Resume: ' + shlex.join(command))
+        else:
+            print('Resume unavailable: recorded directory is missing or invalid')
+        print()
+
+
+def pick(results, names):
+    rows = []
+    by_id = {}
+    for entry, snippets in results:
+        sid = entry['id']
+        by_id[sid] = entry
+        rows.append('\t'.join([sid, visible(entry['timestamp']), visible(names.get(sid, '(untitled)')),
+                               visible(entry['cwd'] or '(not recorded)'), visible(snippets[0] if snippets else '')]))
+    env = dict(os.environ)
+    # A user default --bind/--multi must not execute another action or add selections.
+    env.pop('FZF_DEFAULT_OPTS', None)
+    env.pop('FZF_DEFAULT_OPTS_FILE', None)
+    result = subprocess.run(['fzf', '--no-multi', '--delimiter=\t', '--with-nth=2..',
+                             '--prompt=Resume Codex> ', '--header=Enter resumes; Esc cancels'],
+                            input='\n'.join(rows) + '\n', text=True, stdout=subprocess.PIPE, env=env)
+    if result.returncode in (1, 130):
+        return 0
+    if result.returncode != 0:
+        raise SearchError(f'fzf failed (exit {result.returncode}); see its terminal error above')
+    selected = result.stdout.rstrip('\n')
+    if selected not in rows:
+        raise SearchError('fzf returned an invalid selection; nothing was launched')
+    entry = by_id[selected.split('\t', 1)[0]]
+    command = resume_args(entry)
+    if command is None:
+        raise SearchError('cannot resume: recorded directory is missing or invalid; restore it before resuming')
+    os.execvp('codex', command)
+
+
+def parser():
+    result = argparse.ArgumentParser(
+        prog='codex-search',
+        usage='%(prog)s [-i] [-F] [--all-text] [--pick] PATTERN\n'
+              '       %(prog)s (--rebuild-index | --clear-cache)\n'
+              '       %(prog)s --help',
+        description='Search local Codex user messages and assistant replies across projects.\n'
+                    'The private local cache refreshes automatically before each search.',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog='Examples:\n'
+               '  codex-search "cache.*refresh"\n'
+               '  codex-search -iF "café"\n'
+               '  codex-search --all-text -F "tool output"\n'
+               '  codex-search --pick "bug"\n'
+               '  codex-search -- "-flag"\n\n'
+               'Requires Python 3 and rg; --pick also needs fzf. No sudo to run.\n'
+               'CODEX_HOME selects sessions; XDG_CACHE_HOME selects cache storage.\n'
+               'Guide: ~/linux-config/docs/codex-session-search.md\n'
+               'Smoke tests: ~/linux-config/docs/smoke-tests.md#codex-session-search')
+    result.add_argument('pattern', nargs='?', help='rg regex (use -- before patterns beginning with -)')
+    result.add_argument('-i', '--ignore-case', action='store_true', help='ignore case when matching')
+    result.add_argument('-F', '--fixed-strings', action='store_true', help='match literal text instead of a regex')
+    result.add_argument('--all-text', action='store_true', help='also search decoded tool calls and output')
+    result.add_argument('--pick', action='store_true', help='select with fzf and resume; Esc launches nothing')
+    maintenance = result.add_mutually_exclusive_group()
+    maintenance.add_argument('--rebuild-index', action='store_true', help='reparse all sources (optionally search afterward)')
+    maintenance.add_argument('--clear-cache', action='store_true', help='remove this Codex home cache; leave its lock and sessions intact')
+    return result
+
+
+def main():
+    cli = parser()
+    args = cli.parse_args()
+    if args.clear_cache and (args.pattern is not None or args.pick):
+        cli.error('--clear-cache cannot be combined with a search or --pick')
+    if args.pattern is None and not (args.rebuild_index or args.clear_cache):
+        if len(sys.argv) > 1:
+            cli.error('a search pattern is required')
+        # Keep the no-argument surface concise and readable, with a capitalized heading.
+        print(cli.format_help().replace('usage:', 'Usage:', 1))
+        return 0
+    if args.pick and args.pattern is None:
+        cli.error('--pick requires a search pattern')
+    if args.pattern is not None and not shutil.which('rg'):
+        raise SearchError('install ripgrep (rg) to search, for example: sudo apt install ripgrep')
+    if args.pick and not shutil.which('fzf'):
+        raise SearchError('install fzf to use --pick, for example: sudo apt install fzf; ordinary search works without it')
+    home = Path(os.environ.get('CODEX_HOME') or Path.home() / '.codex').expanduser().resolve()
+    with cache_lock(home) as root:
+        if args.clear_cache:
+            cleanup(root)
+            warn('cache cleared for ' + str(home))
+            return 0
+        entries = refresh(root, home, args.rebuild_index)
+        if args.pattern is None:
+            return 0
+        results = search(root, entries, args)
+        names = titles(home)
+    # Never retain the cache lock across an interactive picker or resumed Codex process.
+    if not results:
+        return 1
+    if args.pick:
+        return pick(results, names)
+    print_results(results, names)
+    return 0
+
+
+if __name__ == '__main__':
+    try:
+        code = main()
+        sys.stdout.flush()
+        sys.exit(code)
+    except BrokenPipeError:
+        # Redirect the final interpreter flush too when a consumer closes early.
+        with open(os.devnull, 'w') as sink:
+            os.dup2(sink.fileno(), sys.stdout.fileno())
+        sys.exit(0)
+    except (SearchError, OSError) as error:
+        warn(str(error))
+        sys.exit(2)
+    except KeyboardInterrupt:
+        sys.exit(130)

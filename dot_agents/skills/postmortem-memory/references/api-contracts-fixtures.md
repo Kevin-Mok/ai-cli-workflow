@@ -369,3 +369,27 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Sources:
   - [2026-08-19-design-skills-timer-copy-rename.md](/home/example/linux-config/.worktrees/vps-aws-bootstrap-prompt/docs/postmortem/2026-08-19-design-skills-timer-copy-rename.md) (SHA-256 `ff6f1e5780cc`; 2 alias(es), all retained in [sources.json](../sources.json)).
   - [2026-10-03-metaprompt-integration-validation.md](/home/example/linux-config/.worktrees/vps-aws-bootstrap-prompt/docs/postmortem/2026-10-03-metaprompt-integration-validation.md) (SHA-256 `21c81fbdab07`; 2 alias(es), all retained in [sources.json](../sources.json)).
+
+## local-codex-search-json-boundary
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **code**.
+- Symptoms: malformed payload type causes TypeError; JSON unpaired surrogate causes UnicodeEncodeError; raw cwd terminal controls; BrokenPipeError caught as OSError
+- Applicability: Streaming local JSONL search caches and terminal resume commands.
+- Diagnostic checks: Inject non-string discriminants and isolated surrogates next to valid records.; Exercise cwd controls and an early-closing output consumer.
+- Remedy: Validate discriminant types, skip per-record encoding errors, reject non-printable resume paths, and catch/flush BrokenPipeError before OSError.
+- Verification evidence: All four defining regressions observed RED then passed; complete suite 22/22 GREEN.
+- Limitations: Synthetic code evidence does not establish support for every historical Codex format.
+- Sources:
+  - [2026-10-06-codex-search-malformed-records.md](/home/example/linux-config/docs/postmortem/2026-10-06-codex-search-malformed-records.md) (SHA-256 `5d3fefff3238`; reviewed in [sources.json](../sources.json)).
+
+## local-fzf-ui-stream-and-resume-fixture
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **runtime**.
+- Symptoms: real fzf picker is invisible while selection stubs pass; real-resume fixture wrongly asserts source byte immutability
+- Applicability: CLI wrappers capturing a selected row from an interactive fzf subprocess.
+- Diagnostic checks: Emit stderr from a defining picker stub.; Run real fzf Escape/Enter on synthetic history and inspect real Codex /status without a prompt.
+- Remedy: Capture fzf stdout only; inherit stderr for the UI. Assert source immutability for search, not for the actual resumed application lifecycle.
+- Verification evidence: Stderr regression RED/GREEN; 22 tests pass; live fzf cancel/select exit 0; actual saved messages and correct UUID/cwd shown in Codex with zero token use.
+- Limitations: Live checks use synthetic logs and temporary fzf, not private history or a permanently installed fzf.
+- Sources:
+  - [2026-10-06-codex-search-picker-ui.md](/home/example/linux-config/docs/postmortem/2026-10-06-codex-search-picker-ui.md) (SHA-256 `9646e1b4d92a`; reviewed in [sources.json](../sources.json)).
