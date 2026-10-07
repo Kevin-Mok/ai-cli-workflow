@@ -17,6 +17,35 @@ fixture below provides a repeatable picker check without using private history.
   Expected: Usage, flag descriptions, examples and documentation paths appear;
   exit status is 0, without indexing or launching Codex. `-h` and no arguments
   also show help. Help works without rg or fzf installed.
+- Action: codex-search --recent --limit 5
+  Expected: Up to five latest-active local conversations across directories,
+  with title, directory, activity and cached recap/status. No model calls;
+  `--recent` defaults to 20 even in pipes and `--limit 0` lists all.
+- Action: codex-search --recent --pick --no-summaries
+  Expected: All discovered sessions appear immediately after indexing with cached
+  recaps or local dialogue previews. Ctrl-G makes no model call. Esc/Ctrl-C
+  cancels; Enter resumes exactly the highlighted UUID in its recorded directory
+  without an initial prompt. In fish, `crg` expands to `codex-search --recent --pick`.
+- Action: python3 tests/scripts/codex_recent_live_check.py
+  Expected: A disposable real-fzf PTY with deterministic synthetic recap workers
+  verifies live rows/previews, unchanged query/highlight, Ctrl-G outside the
+  automatic batch, selection and cancellation cleanup. Exit 0; no real model
+  calls or private history copies. `--fzf /absolute/path` selects a trusted binary.
+- Action: python3 tests/scripts/codex_recap_isolation_check.py
+  Expected: The actual installed CLI passes effective config/hooks/MCP and tool
+  catalog checks using one deliberately rejected localhost-only request, zero
+  upstream requests and an MCP canary that never starts. No private history.
+- Action: python3 tests/scripts/codex_recap_live_check.py --live
+  Expected: Only when a live account smoke is intended, one synthetic conversation
+  produces a validated recap using the configured model/login. No original
+  dialogue changes and no browsable recap session files. This consumes account
+  allowance; do not repeat as a batch. Without --live it only prints help.
+- Action: codex-search --recent --pick --summary-count 0
+  Expected: No automatic generation. Ctrl-G on a missing/stale selected recap
+  runs one isolated ephemeral Codex request using the configured model/login;
+  other rows remain usable. `--summary-model MODEL` overrides the model.
+  Authentication/rate-limit failure stops generation for this opening; malformed
+  output or timeout labels that recap unavailable. Exit cancels pending work.
 - Action: codex-search -F "root"
   Expected: In a terminal, at most 20 newest matching sessions appear with a
   numbered directory/date header, optional title, one short highlighted excerpt
@@ -67,8 +96,9 @@ fixture below provides a repeatable picker check without using private history.
   exit 0. Large histories can take a minute or more. Original sessions stay
   unchanged; private cache directories are 0700 and files 0600.
 - Action: codex-search --clear-cache
-  Expected: Only this resolved Codex home's index is removed, retaining its
-  lock and original sessions. Exit 0; the next search recreates the cache. See
+  Expected: Only this resolved Codex home's index and recaps are removed, retaining
+  stable lock files, maintenance metadata and original sessions. In-flight
+  generation cannot repopulate a cleared cache. Exit 0; the next search recreates the cache. See
   the [operator guide](codex-session-search.md) for tests, timings and rollback.
 
 ## VPS Codex Updates

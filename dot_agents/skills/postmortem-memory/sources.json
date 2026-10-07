@@ -3446,6 +3446,94 @@
       "topic": "operational-drift",
       "verification": "Defining RED-to-GREEN cache, live recovery and independent-review race regressions; 187 offline tests and cached Pyright passed. Synthetic warm and reader-add paths dropped from 51/52 reads to zero; cold work unchanged.",
       "verification_scope": "code"
+    },
+    {
+      "applicability": "Private caches that call chmod during validation or reuse.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Compare content and each stat signature field; inspect permission-hardening calls before claiming a rewrite."
+      ],
+      "id": "local-cache-chmod-ctime-fixture",
+      "limitations": "This does not permit ignoring source-file changes or omitting permission assertions.",
+      "reference": "references/api-contracts-fixtures.md#local-cache-chmod-ctime-fixture",
+      "remedy": "Test unchanged bytes, mtime and inode plus required permissions for cache reuse; keep full source immutability checks.",
+      "sources": [
+        "22d069c4d4bd683757daf82e9ea20c976205b89b0ee9fc5a3892c910c3af1920"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "Cache reuse assertion fails only on ctime while bytes, mtime and inode stay unchanged."
+      ],
+      "verification": "Eight index tests and 29 legacy CLI tests pass after correcting the cache-only assertion.",
+      "verification_scope": "code"
+    },
+    {
+      "applicability": "Installed Codex CLI 0.160.1 configuration probes and isolated recap execution.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Read installed CLI help and inspect effective config/read output.",
+        "Check hooks/list, MCP enabled flags and all effective tool-catalog carriers.",
+        "Use validated plain dotted MCP names; fail closed for unsupported names.",
+        "Use a regular model instructions file; /dev/null is rejected.",
+        "ConfigRead ToolsV2 projects update_plan out; verify that one supplementary field in the highest-priority raw layer."
+      ],
+      "id": "local-codex-effective-isolation-overrides",
+      "limitations": "Generic Code Mode wrappers remain advertised but their disabled host reports fail-closed. Existing bubblewrap warning remains; no real model generation was performed by this subtask.",
+      "reference": "references/api-contracts-fixtures.md#local-codex-effective-isolation-overrides",
+      "remedy": "Disable each effective MCP server explicitly, disable hooks/integrations/shell/web/Code Mode host, and verify the effective configuration before inference. Do not quote path segments inside CLI -c key strings or assume an empty table clears inherited configuration.",
+      "sources": [
+        "85c19fb97675912eebcd7aec57e3e59d6bc5f4d3deb95256b4c9fb4d58b8aa17"
+      ],
+      "status": "verified_workaround",
+      "symptoms": [
+        "Codex -c quoted dotted MCP key reports invalid transport",
+        "Empty MCP table retains inherited enabled servers"
+      ],
+      "topic": "api-contracts-fixtures",
+      "verification": "Seventeen defining runtime tests, Pyright and scoped diff check passed. Actual installed config/hook/MCP probes verified configured model and final cwd; local actual-CLI sink/canary proved zero MCP startup and zero upstream inference.",
+      "verification_scope": "runtime"
+    },
+    {
+      "applicability": "Tests and diagnostics operating on inherited environment mappings that can contain credentials.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Check assertion failure formatting before passing sensitive mappings as assertion operands.",
+        "Use synthetic cleared environments for subprocess fixtures and report only safe variable names."
+      ],
+      "id": "local-inherited-environment-assertion-output",
+      "limitations": "Mitigation prevents recurrence in the fixture but cannot remove prior transcript exposure; credential rotation was not attempted or verified.",
+      "reference": "references/state-security.md#local-inherited-environment-assertion-output",
+      "remedy": "Use a cleared synthetic fixture environment and boolean membership assertions so a RED diagnostic cannot print inherited values. Record actual disclosure without repeating values and inform the user.",
+      "sources": [
+        "85c19fb97675912eebcd7aec57e3e59d6bc5f4d3deb95256b4c9fb4d58b8aa17"
+      ],
+      "status": "verified_workaround",
+      "symptoms": [
+        "unittest assertion renders inherited environment and credential values"
+      ],
+      "topic": "state-security",
+      "verification": "Fixture changed to patch.dict(..., clear=True) and boolean membership assertions; all seventeen runtime tests passed. No diagnostic environment dump was written to a repository artifact or separate temporary log.",
+      "verification_scope": "code"
+    },
+    {
+      "applicability": "Local recap caches with asynchronous generation, concurrent readers and cache maintenance.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Exercise deletion between exists and read, release a competing lock without saving, and leave a safe atomic temporary file after writer termination."
+      ],
+      "id": "local-recap-cache-concurrent-lifecycle",
+      "limitations": "Synthetic local subprocess verification does not establish provider availability; unsafe cache paths still fail closed.",
+      "reference": "references/state-security.md#local-recap-cache-concurrent-lifecycle",
+      "remedy": "Treat disappearing files as missing, reconcile competing-lock liveness without consuming an attempt, and clean owned regular atomic temporary files under maintenance lock; preserve lock inodes.",
+      "sources": [
+        "2d24a1b01892e2ab5f6c8fd881c03204e5af03fc5847284570b2e54e6401fcfd"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "Concurrent clear aborts recap reads; lock contention leaves generating forever; interrupted atomic recap writes block maintenance."
+      ],
+      "verification": "Expected RED for all three findings; 17 recap tests, seven picker tests and eight integrated recent CLI tests pass, including active-inference index-lock and cancellation checks.",
+      "verification_scope": "code"
     }
   ],
   "reports": [
@@ -5561,6 +5649,64 @@
       "reviewed_on": "2026-10-07",
       "findings": [],
       "decision": "No new reusable learning: confirmed pre-existing legacy byte-pin mismatch outside task scope; ASCII handoff verified workaround for task-local TextEncoder harness error."
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-07-codex-recent-index-fixture.md"
+      ],
+      "findings": [
+        "local-cache-chmod-ctime-fixture"
+      ],
+      "reviewed_on": "2026-10-07",
+      "sha256": "22d069c4d4bd683757daf82e9ea20c976205b89b0ee9fc5a3892c910c3af1920"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-07-codex-recent-cache-races.md"
+      ],
+      "findings": [
+        "local-recap-cache-concurrent-lifecycle"
+      ],
+      "reviewed_on": "2026-10-07",
+      "sha256": "2d24a1b01892e2ab5f6c8fd881c03204e5af03fc5847284570b2e54e6401fcfd"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-07-codex-recap-runtime-probe.md"
+      ],
+      "findings": [
+        "local-codex-effective-isolation-overrides",
+        "local-inherited-environment-assertion-output"
+      ],
+      "reviewed_on": "2026-10-07",
+      "sha256": "85c19fb97675912eebcd7aec57e3e59d6bc5f4d3deb95256b4c9fb4d58b8aa17"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-07-codex-recent-fzf-source-lookup.md"
+      ],
+      "decision": "No new reusable learning. local-current-source-retrieval already covers failed guessed public version paths and using packaged installed-version documentation as the verified fallback; the report does not establish changed fzf behavior.",
+      "findings": [],
+      "reviewed_on": "2026-10-07",
+      "sha256": "a4bf97998b9bc3e3e12e5bf49c34b4ed0d4ac4aa383decde847b4fef75143c63"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-07-codex-recent-typecheck-launch.md"
+      ],
+      "decision": "Verified workaround: direct cached Pyright needs its explicit bundled typeshed path; no new product behavior. Abbreviation fixture uses effective runtime expansion instead of duplicate source counts.",
+      "findings": [],
+      "reviewed_on": "2026-10-07",
+      "sha256": "b584ed8465ba20e9aa06392e2047ab99fec39527db4cdb3d4452391aacc9f4c2"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-07-codex-recent-implementation-sandbox.md"
+      ],
+      "decision": "No new learning: repeats local-sandbox-loopback-approved-route; scoped approved reads work, underlying sandbox startup remains unresolved.",
+      "findings": [],
+      "reviewed_on": "2026-10-07",
+      "sha256": "bbf65b11877a8cb120587c0880f8243b4444642237480004491d3f5008e7bb71"
     }
   ],
   "review": {
