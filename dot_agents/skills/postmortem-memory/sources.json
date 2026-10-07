@@ -5534,6 +5534,15 @@
       "reviewed_on": "2026-10-06",
       "findings": [],
       "decision": "No new general finding: existing source-ownership guidance covers mixed-file staging. Preserve original ledger key order and verify structural HEAD-plus-session equality; index-only repair leaves worktree edits intact."
+    },
+    {
+      "sha256": "d4e578a0defef1bddbf723c29a7e4d80edd9d83cb493ff9e1d814f313592cd8a",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-06-context-private-push-host-key.md"
+      ],
+      "reviewed_on": "2026-10-06",
+      "findings": [],
+      "decision": "No new general finding: existing endpoint fingerprint guidance applies. Private push remains unresolved pending independent server-key verification; local commit retained and strict checking preserved."
     }
   ],
   "review": {
