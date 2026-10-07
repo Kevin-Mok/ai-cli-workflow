@@ -5489,6 +5489,51 @@
       ],
       "reviewed_on": "2026-10-06",
       "sha256": "e20c6026f8664c033c118df292e2d6064251176700dc233ff05adb458f9d3aa6"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-06-context-foundation-shell-startup.md"
+      ],
+      "decision": "No new learning: runner startup and approved scoped host-shell workaround match existing local-sandbox-loopback-approved-route; underlying host policy remains unresolved.",
+      "findings": [],
+      "reviewed_on": "2026-10-06",
+      "sha256": "6698f3ed1d443f48be2860ce254bda47e705263f37d85dfd865ad371ec93560c"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-06-context-helper-sibling-import.md"
+      ],
+      "decision": "No new general finding: direct file loading needs __file__-relative sibling resolution and consistent injected storage policy; existing regression tests now pass (43 tests), portable code scope only.",
+      "findings": [],
+      "reviewed_on": "2026-10-06",
+      "sha256": "e6be692fa4a238ebf5abc92cbe25be959b14f73f24c2bde141fda4bddc344503"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-06-context-index-review.md"
+      ],
+      "decision": "No new general finding: existing path/descriptor guidance applies. Reviewed edge cases have executable RED/GREEN regressions; actual authored foundation, sampled provenance and installed-file comparison now pass. Broad permission probe included three unmanaged pre-existing files; all managed modes pass.",
+      "findings": [],
+      "reviewed_on": "2026-10-06",
+      "sha256": "6b125c72c32ce890b927ea01949803d4e31dc7ad53d418db2dcf90857602e742"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-06-context-helper-type-boundary.md"
+      ],
+      "decision": "No new general finding: explicit typed boundaries for dynamically loaded validated JSON/CLI helpers follow existing boundary-interface guidance. basedpyright zero errors/warnings/notes and 59+12 regression tests pass; refresh exit0.",
+      "findings": [],
+      "reviewed_on": "2026-10-06",
+      "sha256": "ed7e25167770ab09958d48f2c6dd3cb04d0ed094d6826cc7c7b3451a17a9fa8c"
+    },
+    {
+      "sha256": "af555044bda3f04fe1135492dfd05942a2581e93e2b918d5ef7291e929f0e431",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-06-context-session-ledger-staging.md"
+      ],
+      "reviewed_on": "2026-10-06",
+      "findings": [],
+      "decision": "No new general finding: existing source-ownership guidance covers mixed-file staging. Preserve original ledger key order and verify structural HEAD-plus-session equality; index-only repair leaves worktree edits intact."
     }
   ],
   "review": {

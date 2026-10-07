@@ -27,10 +27,12 @@ Use this skill when:
 ## When not to use
 
 Do not log:
-- personal-context conversations, source facts, or life-derived learnings,
+- personal-context conversations, automatic private learning, project knowledge,
+  source facts, or life-derived learnings,
   including workflow/communication preferences learned in that private setting;
-  their sole owner is `/home/example/coding/personal-context`, and this skill must
-  neither read that source implicitly nor mirror its contents into this log
+  their sole owner is `/home/example/coding/personal-context`; use the
+  personal-context skill for relevant compact retrieval and never mirror its
+  contents into this log
 - task-specific instructions tied to the current ticket, branch, file, or investigation
 - one-off requests or temporary preferences
 - ephemeral facts that will age out quickly

@@ -254,9 +254,11 @@ targets leave local commits intact. Planning-only requests remain read-only.
 - [`second-brain-session`](second-brain-session/SKILL.md): Retrieves targeted
   project and session context, routes durable memory to its canonical owner,
   and prepares confirmation-gated ExampleProject session closeouts.
-- [`personal-context`](personal-context/SKILL.md): An explicitly invoked chatbot
-  that learns through discussion to improve development and design choices,
-  keeping structured learnings in an external private directory.
+- [`personal-context`](personal-context/SKILL.md): Automatically retrieves small
+  personal and source-backed project briefs for relevant development choices,
+  indexing only qualifying committed contributions authored by example-user Mok.
+  learns privately, and supports explicit `$personal-context` conversations.
+  Records, project knowledge, and caches stay in an external private directory.
 - [`feedback-memory`](feedback-memory/SKILL.md): Stores durable user
   corrections and working preferences in a repo-tracked `feedback.log`
   so later sessions can honor them.

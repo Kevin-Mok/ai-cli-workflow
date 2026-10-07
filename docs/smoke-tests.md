@@ -272,28 +272,41 @@ fixture below provides a repeatable picker check without using private history.
 - Action: setup-superpowers-release-timer --disable
   Expected: Cleanup remains idempotent: the timer stays stopped and disabled without sudo.
 
-## Personal-context chatbot
+## Personal context and project knowledge
 
-The chatbot is explicitly invoked. These checks cover adaptive conversation,
-private structured learning, and installation. Automated checks use invented
-temporary data; real personal notes are not fixtures or repository artifacts.
+The skill automatically informs relevant development choices and preserves an
+explicit conversational entry point. These checks cover compact retrieval,
+source-backed project knowledge, private learning, and installation. Automated
+checks use invented temporary data; real notes are never repository fixtures.
 
 - Action: python3 -B -m unittest discover -s tests -p 'test_personal_context*.py' -v
-  Expected: Synthetic storage and installed-layout tests pass, including explicit-only metadata, selective reads, source/inference labels, corrections, retry safety, forgetting, declined questions, invalid JSON, containment, permissions, and concurrent updates.
+  Expected: Synthetic discovery, source-level example-user Mok commit evidence, HEAD matching, nested Git ownership, summaries, provenance, bounded retrieval, source changes, cache rebuilds, correction/forgetting suppression, concurrency, containment, permissions, absent/corrupt storage, and installed-layout checks pass.
+- Action: basedpyright dot_agents/skills/personal-context/scripts/context_store.py
+  Expected: The installed basedpyright checker reports zero errors and warnings for the typed JSON/CLI and dynamically loaded knowledge interface; runtime tests remain necessary for storage and privacy behavior.
+- Action: python3 -B -m unittest discover -s tests -p 'test_second_brain_skill.py' -v
+  Expected: Automatic private retrieval and explicit discussions remain outside session capture, tracked feedback, Second Brain, and Graphiti. Session focus and closeout retain their own confirmation boundaries.
 - Action: python3 -B tests/test_personal_context_skill.py
-  Expected: Frontmatter and explicit-only metadata parse, supporting references resolve, and a fresh installed layout links the complete skill. This check needs Python 3.12+ and PyYAML; it does not depend on a machine-local copy of the system skill validator.
+  Expected: Frontmatter and implicit metadata parse, relevant choice triggers and mechanical-work exclusion are documented, supporting references resolve, and a fresh layout links the whole skill. Python 3.12+ and PyYAML are required.
 - Action: python3 ~/.agents/skills/personal-context/scripts/context_store.py validate
-  Expected: After initialization, the installed helper reports only safe schema/revision/count metadata. Missing or invalid private memory produces an actionable error without replacing it or printing its contents.
-- Action: In a fresh Codex session, invoke `$personal-context` without a topic.
-  Expected: It uses relevant private context, opens with one useful conversational question, and follows answers across turns. It does not require a ExampleProject goal or an implementation task.
-- Action: Invoke `$personal-context Let's discuss a development choice I'm struggling with.` and supply a real dilemma.
-  Expected: Follow-ups respond to the dilemma and connect learnings to concrete options and tradeoffs. Current project/audience requirements remain authoritative over personal visual taste.
-- Action: During an invoked discussion, state a preference, correct it, decline a question, and mark another answer temporary. Later invoke the skill again.
-  Expected: Durable updates are summarized and remembered privately; the correction supersedes old guidance, the declined question is not repeated by default, and the temporary answer was not persisted. Interpretations remain visibly unconfirmed.
-- Action: Ask the invoked skill to forget one structured learning, then resume that topic in a later invocation.
-  Expected: All structured versions of that key are removed and automatic reimport is suppressed. The chatbot explains when original source notes still contain it; those notes are not silently edited.
-- Action: Start a separate ordinary coding request without invoking the chatbot.
-  Expected: No personal-context read, write, check-in, or indirect invocation through Second Brain/feedback-memory occurs. Private discussions never enter tracked feedback, raw capture, Graphiti, or the vault.
+  Expected: Initialized storage reports safe validation/revision/count metadata only. Missing or invalid authoritative storage produces an actionable error without replacing it or printing private records.
+- Action: python3 ~/.agents/skills/personal-context/scripts/context_store.py topics
+  Expected: A compact topic index supports selective retrieval. Missing storage reads empty without creating directories.
+- Action: python3 ~/.agents/skills/personal-context/scripts/context_store.py projects --query python
+  Expected: The searchable catalog defaults to eight records and 6,000 serialized characters, indicates omissions, supplies bounded detail references, and qualifies summaries as contributions supported by example-user Mok authored commits rather than exclusive ownership.
+- Action: python3 ~/.agents/skills/personal-context/scripts/context_store.py brief --topic design
+  Expected: A bounded relevant brief preserves scope, basis, confirmation status, evidence dates, implications, and IDs. Missing/stale/malformed caches rebuild; unavailable cache writes fall back to direct projections; invalid authoritative records remain preserved.
+- Action: python3 ~/.agents/skills/personal-context/scripts/context_store.py foundation --coding-root /home/example/coding --batch-size 8
+  Expected: An explicitly authorized read-only foundation pass discovers Git/manifest roots, including nested projects; skips dependencies, generated/cache/VCS internals, personal-context, sensitive payloads, and symlink escapes; indexes only relevant tracked sources whose latest modifying commit author matches example-user Mok exactly, case-insensitive; rejects email inference, untracked files, modified working-tree bytes, and projects without source author evidence; resolves nested manifest Git owners; records author_evidence, committed blob hashes, evidence dates, qualified summaries, gaps, and cross-project findings privately. Historical unavailable/deleted records cannot support current recurring findings. Reports counts and safe coverage metadata. Later relevant refreshes use --project ID and fingerprints.
+- Action: In a fresh Codex session, ask for a development architecture or design direction with a plausible personal or cross-project connection, without invoking the skill by name.
+  Expected: It uses topics and selected briefs, continues the active task, and asks only about consequential gaps/conflicts. Current project/audience requirements govern; source patterns establish technical observations rather than confirmed personal preferences.
+- Action: In another fresh session, request a mechanical file rename with all choices supplied.
+  Expected: No unnecessary personal-context lookup or check-in occurs.
+- Action: In a fresh Codex session, invoke `$personal-context` without a topic, then supply a real development dilemma.
+  Expected: It uses compact relevant context, opens with one useful conversational question, follows answers, and connects learnings to concrete tradeoffs without requiring a ExampleProject goal or implementation task.
+- Action: During relevant work or an explicit discussion, state a durable preference, correct it, decline a question, and mark another answer temporary; retrieve the topic later.
+  Expected: Meaningful saved updates are briefly reported. Corrections supersede older guidance and invalidate caches; declined questions are not repeated by default; temporary/excluded answers are not persisted; interpretations remain unconfirmed.
+- Action: Ask to forget a structured learning or project record, then refresh the relevant foundation and retrieve it again.
+  Expected: Matching records, related retaining questions, dependent findings, and cache content are removed; key/ID-only suppression prevents restoration. Original source notes remain unless explicitly included in the forget request. Private learning and retrieval contents never enter raw capture, tracked feedback, the vault, Graphiti, or other services.
 
 ## Second Brain
 

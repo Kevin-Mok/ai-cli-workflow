@@ -74,6 +74,17 @@ class SecondBrainSkillTest(unittest.TestCase):
         ):
             self.assertIn(required, combined)
 
+    def test_automatic_personal_context_stays_out_of_session_capture(self) -> None:
+        skill = read_required(SKILL_PATH)
+        routing = read_required(ROUTING_PATH)
+        combined = " ".join((skill + "\n" + routing).split())
+        self.assertIn("automatic personal-context", combined)
+        self.assertIn("project knowledge", combined)
+        self.assertIn("personal-context skill", combined)
+        self.assertIn("raw session capture", combined)
+        self.assertNotIn("solely through explicitly invoked", combined)
+        self.assertNotIn("Other memory skills must not implicitly invoke it", combined)
+
     def test_skill_routes_private_someday_reminders_only_on_opt_in(self) -> None:
         skill = read_required(SKILL_PATH)
         routing = read_required(ROUTING_PATH)

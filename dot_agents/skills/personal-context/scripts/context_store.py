@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Read and atomically update explicitly invoked, private personal context.
+"""Read and atomically update relevant private personal and project context.
 
-Only ``read`` returns profile content. All other output is safe metadata.
+Retrieval commands return private content; update/foundation/validate return counters.
 Only the designated external root may own its own Git marker; alternate
 repository roots, ancestor repositories, and installed skills stay forbidden.
 """
@@ -13,13 +13,16 @@ import copy
 from datetime import date, datetime, timezone
 import fcntl
 import json
+import importlib.util
+from types import ModuleType, SimpleNamespace
 import os
 from pathlib import Path
 import re
 import secrets
 import stat
 import sys
-from typing import NoReturn, cast, override
+from typing import NoReturn, Protocol, TypedDict, cast, override
+from contextlib import AbstractContextManager
 
 
 DEFAULT_ROOT = Path("/home/example/coding/personal-context")
@@ -182,9 +185,9 @@ def _reject_constant(_: str) -> NoReturn:
     raise StoreError("Nonfinite JSON values are not allowed.")
 
 
-def _decode(raw: bytes) -> object:
-    if len(raw) > MAX_BYTES:
-        raise StoreError("The JSON input exceeds the 2 MiB store limit.")
+def _decode(raw: bytes, *, max_bytes: int = MAX_BYTES) -> object:
+    if len(raw) > max_bytes:
+        raise StoreError("The JSON input exceeds its documented storage limit.")
     try:
         return cast(object, json.loads(raw, object_pairs_hook=_pairs, parse_constant=_reject_constant))
     except (ValueError, UnicodeError, RecursionError):
@@ -373,11 +376,11 @@ def _merge(record: dict[str, object], incoming: list[dict[str, object]], questio
     return result
 
 
-def _write(directory: int, record: dict[str, object]) -> None:
+def _write(directory: int, record: dict[str, object], *, name: str = STORE_NAME, max_bytes: int = MAX_BYTES) -> None:
     temporary = ".context-" + secrets.token_hex(12) + ".tmp"
     raw = (json.dumps(record, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
-    if len(raw) > MAX_BYTES:
-        raise StoreError("The updated context exceeds the 2 MiB store limit.")
+    if len(raw) > max_bytes:
+        raise StoreError("The updated context exceeds its documented storage limit.")
     try:
         descriptor = _regular_fd(directory, temporary, os.O_WRONLY | os.O_CREAT | os.O_EXCL, private=False)
         with os.fdopen(descriptor, "wb") as handle:
@@ -387,12 +390,12 @@ def _write(directory: int, record: dict[str, object]) -> None:
             os.fsync(handle.fileno())
         # Recheck the destination immediately before replacement.
         try:
-            previous = _regular_fd(directory, STORE_NAME, os.O_RDONLY, private=False)
+            previous = _regular_fd(directory, name, os.O_RDONLY, private=False)
         except FileNotFoundError:
             previous = None
         if previous is not None:
             os.close(previous)
-        os.replace(temporary, STORE_NAME, src_dir_fd=directory, dst_dir_fd=directory)
+        os.replace(temporary, name, src_dir_fd=directory, dst_dir_fd=directory)
         os.fsync(directory)
     finally:
         try:
@@ -404,6 +407,39 @@ def _write(directory: int, record: dict[str, object]) -> None:
 def metadata(record: dict[str, object]) -> dict[str, object]:
     """Return counters only; keys, topics, statements, and questions are private."""
     return {"ok": True, "schema_version": 1, "revision": record["revision"], "entries": len(cast(list[object], record["entries"])), "questions": len(cast(list[object], record["questions"])), "forgotten_keys": len(cast(list[object], record["forgotten_keys"])), "forgotten_question_ids": len(cast(list[object], record["forgotten_question_ids"]))}
+
+
+class ProjectEnvelope(TypedDict):
+    schema_version: int
+    revision: int
+    updated_at: str | None
+    projects: list[dict[str, object]]
+    findings: list[dict[str, object]]
+
+
+class _Knowledge(Protocol):
+    """Typed boundary for a bundled module loaded by its absolute file path."""
+    def load_projects(self, directory: int | None, *, private: bool = True) -> ProjectEnvelope: ...
+    def after_personal_update(self, directory: int, personal: dict[str, object], projects: ProjectEnvelope) -> None: ...
+    def locked(self, root: Path, *, write: bool) -> AbstractContextManager[int | None]: ...
+    def foundation(self, root: Path, coding_root: Path, *, batch_size: int = 8, project: str | None = None) -> dict[str, object]: ...
+    def retrieve(self, root: Path, command: str, *, topic: str | None = None, project: str | None = None, query: str | None = None, identifier: str | None = None, limit: int = 8, char_budget: int = 6000) -> dict[str, object]: ...
+
+
+def _sibling(name: str) -> ModuleType:
+    """Load portable bundled code by file path, independent of cwd/sys.path."""
+    spec = importlib.util.spec_from_file_location(name, Path(__file__).with_name(name + ".py"))
+    if spec is None or spec.loader is None:
+        raise StoreError("A bundled helper is missing; reinstall the complete skill.")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def _knowledge() -> _Knowledge:
+    module = _sibling("knowledge_store")
+    setattr(module, "c", SimpleNamespace(**globals()))
+    return cast(_Knowledge, cast(object, module))
 
 
 def update_store(root: Path, payload: object) -> dict[str, object]:
@@ -418,6 +454,8 @@ def update_store(root: Path, payload: object) -> dict[str, object]:
         os.fchmod(lock, 0o600)
         fcntl.flock(lock, fcntl.LOCK_EX)
         record = _load(directory, required=False, private=False)
+        knowledge = _knowledge()
+        projects = knowledge.load_projects(directory, private=False)
         now = datetime.now(timezone.utc).isoformat(timespec="microseconds").replace("+00:00", "Z")
         result = _merge(record, incoming, questions, forgotten, forgotten_questions, now)
         changed = result != record
@@ -432,6 +470,7 @@ def update_store(root: Path, payload: object) -> dict[str, object]:
                 os.fchmod(existing, 0o600)
             finally:
                 os.close(existing)
+        knowledge.after_personal_update(directory, result, projects)
         return {**metadata(result), "changed": changed}
     except OSError:
         raise StoreError("Private storage update failed; check access, ownership, symlinks, and free space. Re-read before retrying.") from None
@@ -453,6 +492,13 @@ class _Arguments(argparse.Namespace):
     command: str = ""
     topic: str | None = None
     include_inactive: bool = False
+    coding_root: Path = Path("/home/example/coding")
+    batch_size: int = 8
+    project: str | None = None
+    query: str | None = None
+    id: str | None = None
+    limit: int = 8
+    char_budget: int = 6000
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -466,20 +512,50 @@ def main(argv: list[str] | None = None) -> int:
     _ = subparsers.add_parser("validate")
     update = subparsers.add_parser("update")
     _ = update.add_argument("--payload", choices=["-"], required=True, help="Read the operation JSON from standard input.")
+    for command in ("topics", "projects", "brief"):
+        compact = subparsers.add_parser(command)
+        _ = compact.add_argument("--limit", type=int, default=8)
+        _ = compact.add_argument("--char-budget", type=int, default=6000)
+        if command == "projects": _ = compact.add_argument("--query")
+        if command == "brief":
+            _ = compact.add_argument("--topic")
+            _ = compact.add_argument("--project")
+    detail = subparsers.add_parser("detail")
+    _ = detail.add_argument("--id", required=True)
+    foundation = subparsers.add_parser("foundation")
+    _ = foundation.add_argument("--coding-root", type=Path, default=Path("/home/example/coding"))
+    _ = foundation.add_argument("--batch-size", type=int, default=8)
+    _ = foundation.add_argument("--project")
     try:
         args = parser.parse_args(argv, namespace=_Arguments())
         if args.command == "update":
             output = update_store(args.root, _decode(sys.stdin.buffer.read(MAX_BYTES + 1)))
         elif args.command == "validate":
-            output = metadata(read_store(args.root, include_inactive=True, required=True))
+            knowledge = _knowledge()
+            with knowledge.locked(args.root, write=False) as directory:
+                personal = _load(directory, required=False)
+                projects = knowledge.load_projects(directory)
+                if personal["revision"] == 0 and projects["revision"] == 0:
+                    raise StoreError("No authoritative private store exists; initialize through update or foundation.")
+                output = {**metadata(personal), "projects": len(projects["projects"]), "findings": len(projects["findings"])}
+        elif args.command == "foundation":
+            knowledge = _knowledge()
+            output = knowledge.foundation(args.root, args.coding_root, batch_size=args.batch_size, project=args.project)
+        elif args.command in ("topics", "projects", "brief", "detail"):
+            knowledge = _knowledge()
+            output = knowledge.retrieve(args.root, args.command, topic=args.topic, project=args.project, query=args.query, identifier=args.id, limit=args.limit, char_budget=args.char_budget)
         else:
             output = read_store(args.root, topic=args.topic, include_inactive=args.include_inactive)
-        print(json.dumps(output, ensure_ascii=False, indent=2))
+        print(json.dumps(output, ensure_ascii=False, separators=(",", ":")) if args.command in ("topics", "projects", "brief") else json.dumps(output, ensure_ascii=False, indent=2))
         return 0
+    except (OSError, ValueError):
+        print(json.dumps({"ok": False, "error": "Cannot safely inspect source evidence; check root access, containment and readable project files."}), file=sys.stderr)
+        return 1
     except StoreError as error:
         print(json.dumps({"ok": False, "error": str(error)}), file=sys.stderr)
         return 1
 
 
 if __name__ == "__main__":
+    _ = sys.modules.setdefault("context_store", sys.modules[__name__])
     raise SystemExit(main())
