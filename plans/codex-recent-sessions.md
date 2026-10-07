@@ -111,3 +111,7 @@ Final post-learning refresh also returned REFRESH COMPLETE with five installed f
 - [x] Prepare the verified atomic commit, keeping matching plan/docs/learning records together. Delivery target is `origin/feat/codex-recent-sessions` in user@example.invalid:example-user/ai-cli-dotfiles.git`; Git history and upstream tracking record the ensuing commit/push result. Original workspace dirty changes remain in place.
 
 The implementation bytes match the final installed/refresh-verified source snapshot. Moving those same bytes into this worktree adds no new configuration behavior and requires no repeat global refresh. No further live model request is authorized by the original validation limit.
+
+### Delivery result
+
+Implementation committed as `ce90d62` (`feat(codex): browse recent sessions with cached AI recaps`). The sole normal push to origin was rejected by GitHub with Internal Server Error; no upstream is configured. Local commits are preserved and publication remains unresolved. A separate documentation commit records the push incident and reviewed learning without rewriting the implementation commit. The original main workspace and its dirty work are preserved. See `docs/postmortem/2026-10-07-codex-recent-branch-push.md`.

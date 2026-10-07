@@ -5707,6 +5707,15 @@
       "findings": [],
       "reviewed_on": "2026-10-07",
       "sha256": "bbf65b11877a8cb120587c0880f8243b4444642237480004491d3f5008e7bb71"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/.worktrees/codex-recent-sessions/docs/postmortem/2026-10-07-codex-recent-branch-push.md"
+      ],
+      "decision": "No new reusable product remedy: GitHub rejected the push with Internal Server Error and no remote fix was attempted. Existing sequential-result/evidence-before-completion instructions cover the premature upstream check and title; safe optional-upstream inspection confirms local-only delivery.",
+      "findings": [],
+      "reviewed_on": "2026-10-07",
+      "sha256": "6060619d12ade86fa840e752b6695cc42aab021f7bd3ef96401064890083d149"
     }
   ],
   "review": {
