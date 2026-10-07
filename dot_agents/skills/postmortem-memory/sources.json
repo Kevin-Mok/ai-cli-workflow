@@ -3446,6 +3446,51 @@
       "topic": "operational-drift",
       "verification": "Defining RED-to-GREEN cache, live recovery and independent-review race regressions; 187 offline tests and cached Pyright passed. Synthetic warm and reader-add paths dropped from 51/52 reads to zero; cold work unchanged.",
       "verification_scope": "code"
+    },
+    {
+      "id": "local-dbus-readiness-no-activation",
+      "topic": "execution-environments",
+      "status": "verified_fix",
+      "confidence": "confirmed",
+      "symptoms": [
+        "Private Dunst fixture autoactivated default daemon during dunstctl readiness",
+        "Name acquisition conflict before defining integration RED"
+      ],
+      "applicability": "Private DBus service fixtures whose readiness commands address an activatable service.",
+      "diagnostics": [
+        "Compare daemon PID/ownership with DBus activation logs.",
+        "Check whether readiness targets the service before it owns its name."
+      ],
+      "remedy": "Poll org.freedesktop.DBus.NameHasOwner without addressing the service, then verify the explicitly launched daemon is alive before service calls.",
+      "verification": "Corrected RED contained no competing activation; private Xvfb/DBus integration passed and cleaned its own daemon.",
+      "verification_scope": "runtime",
+      "limitations": "This proves fixture startup ownership, not live desktop audio or production daemon repair.",
+      "reference": "references/execution-environments.md#local-dbus-readiness-no-activation",
+      "sources": [
+        "0ecc5a5310acd454d6eb3e8205aed3a6861c0031a606074646465e01b78cf498"
+      ]
+    },
+    {
+      "id": "local-dunst-stacked-script-state",
+      "topic": "api-contracts-fixtures",
+      "status": "verified_workaround",
+      "confidence": "confirmed",
+      "symptoms": [
+        "Dunst history recall played after a silent duplicate despite always_run_script=false"
+      ],
+      "applicability": "Dunst 1.9.2 scripts with native duplicate stacking and notification history.",
+      "diagnostics": [
+        "Inspect queues_stack_duplicate transfers of script_run.",
+        "Separate ordinary sounded history from a silently replaced duplicate object."
+      ],
+      "remedy": "Preserve native stacking and global false; test/document that silently stacked replacements may sound once on later display instead of promising all history is silent or deduplicating text.",
+      "verification": "Actual private-daemon tests passed completion/approval, immediate duplicate, ordinary history and stacked-history cases with fake mpv.",
+      "verification_scope": "workaround",
+      "limitations": "Native state is unchanged; a previously silent stacked object can sound on history recall or restoration. Audio acceptance remains manual.",
+      "reference": "references/api-contracts-fixtures.md#local-dunst-stacked-script-state",
+      "sources": [
+        "0ecc5a5310acd454d6eb3e8205aed3a6861c0031a606074646465e01b78cf498"
+      ]
     }
   ],
   "reports": [
@@ -5561,6 +5606,26 @@
       "reviewed_on": "2026-10-07",
       "findings": [],
       "decision": "No new reusable learning: confirmed pre-existing legacy byte-pin mismatch outside task scope; ASCII handoff verified workaround for task-local TextEncoder harness error."
+    },
+    {
+      "sha256": "9bc612a634334486ba2affd56e7c1eda1e377a2acc3109113d4e1c1f541cb1fd",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-07-codex-notification-sound-environment.md"
+      ],
+      "reviewed_on": "2026-10-07",
+      "findings": [],
+      "decision": "No new learning: ext-sandbox-loopback, local-ledger-missing-source, local-session-attribution-direct-evidence and ext-stale-patch-context cover runner, corpus, nested-write attribution and concurrent-context safeguards. The shared smoke document writer/cause remains unresolved; stage only observed session content without overwriting its worktree."
+    },
+    {
+      "sha256": "0ecc5a5310acd454d6eb3e8205aed3a6861c0031a606074646465e01b78cf498",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-07-dunst-fixture-startup.md"
+      ],
+      "reviewed_on": "2026-10-07",
+      "findings": [
+        "local-dbus-readiness-no-activation",
+        "local-dunst-stacked-script-state"
+      ]
     }
   ],
   "review": {

@@ -643,6 +643,53 @@ periodic /btw requests. Fullscreen hides i3 titlebars. No sudo is needed.
 - Action: Repeat the existing Kitty scrolling checks below in a titled window.
   Expected: The scrollbar, paging, selection and inline Codex history still behave as documented.
 
+### Codex notification sound
+
+Apply the [notification sources](codex-notification-sound.md), restart Dunst
+(which clears its history/queue), and start a fresh Kitty process. No sudo is
+needed. Activation is a one-time installation/update step; afterward open Kitty
+normally. Changing the clip needs only `set`. Live audio acceptance requires
+the included `scripts/can-i-ask-you-a-question.mp3` or another short MP3.
+
+- Action: `~/scripts/codex-notification-activate --open-kitty`
+  Expected: Your notification-bus Dunst restarts and a fresh Kitty process opens;
+  existing terminals remain open. Its history/queue clears; the sound setting is
+  unchanged (disabled on a fresh installation).
+- Action: `~/scripts/codex-notification-sound status`
+  Expected: A fresh installation reports disabled and the machine-local JSON
+  and error-log paths. The repo includes the selected MP3; no local sound-path
+  setting is bundled. An already configured machine reports its selected path.
+- Action: `~/scripts/codex-notification-sound set "$HOME/linux-config/scripts/can-i-ask-you-a-question.mp3"`
+  Expected: With an existing clip at that path, sound is enabled through local
+  mode-0600 JSON. The included MP3 stays in the repo; `set` only stores its path.
+  Selecting another filename with spaces preserves the entire path.
+- Action: `~/scripts/codex-notification-sound preview`
+  Expected: One clip plays without a popup; exit 0 on success. Invalid/missing
+  files or unavailable mpv report errors and exit 1 without affecting popups.
+- Action: `~/scripts/codex-notification-sound smoke tagged`
+  Expected: One synthetic Dunst popup and one playback. This checks the Dunst
+  rule/player; it does not establish real Codex origin detection.
+- Action: `~/scripts/codex-notification-sound smoke kitty`
+  Expected: An ordinary Kitty popup with Codex-looking text and no sound.
+- Action: In a fresh local Kitty/Codex session with notifications enabled,
+  submit a normal task and focus another app before the turn completes.
+  Expected: One completion popup and one playback. Clicking its existing
+  action focuses the originating Codex terminal, even if another Kitty
+  terminal was active. Content and expiry remain unchanged.
+- Action: In that session, exercise an ordinary task that requires approval,
+  then focus another app while Codex awaits the approval.
+  Expected: One approval popup and one playback; approval still works normally.
+- Action: Complete another task while keeping its Codex terminal focused.
+  Expected: Existing focus suppression is unchanged. When no popup is emitted,
+  there is no audio. Do not use synthetic OSC 9 emission for this check.
+- Action: `~/scripts/codex-notification-sound disable`
+  Expected: Local setting is removed, MP3 stays intact, and subsequent popups
+  remain visible and silent. Invalid sound config never breaks popup delivery.
+
+The automated private-daemon check also covers queued display, duplicate
+stacking, suppression and history. Dunst 1.9.2 may sound once on recall of a
+silently stacked duplicate; normal already-sounded history stays silent.
+
 ### Kitty and Codex scrolling
 
 Use a fresh Kitty window after refresh-config: a larger history cannot recover

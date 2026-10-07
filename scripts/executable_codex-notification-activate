@@ -1,0 +1,93 @@
+#!/usr/bin/env python3
+"""Restart this session's Dunst and optionally open fresh Kitty; no sudo needed."""
+import argparse
+import os
+from pathlib import Path
+import re
+import shutil
+import signal
+import subprocess
+import sys
+import time
+
+BUS_COMMAND = ['dbus-send', '--session', '--print-reply', '--dest=org.freedesktop.DBus',
+               '/org/freedesktop/DBus']
+BUS_NAME = 'string:org.freedesktop.Notifications'
+
+
+def daemon_pid() -> int | None:
+    # Query the bus itself: contacting Dunst during readiness can autoactivate
+    # a second daemon, which races the explicitly configured process.
+    result = subprocess.run([*BUS_COMMAND, 'org.freedesktop.DBus.NameHasOwner', BUS_NAME],
+                            capture_output=True, text=True, timeout=5, check=True)
+    if 'boolean false' in result.stdout:
+        return None
+    if 'boolean true' not in result.stdout:
+        raise ValueError('could not determine notification daemon ownership')
+    result = subprocess.run([*BUS_COMMAND, 'org.freedesktop.DBus.GetConnectionUnixProcessID', BUS_NAME],
+                            capture_output=True, text=True, timeout=5, check=True)
+    match = re.search(r'uint32 (\d+)', result.stdout)
+    if not match:
+        raise ValueError('could not identify the notification daemon PID')
+    return int(match.group(1))
+
+
+def restart_dunst() -> None:
+    config_root = Path(os.environ.get('XDG_CONFIG_HOME') or Path.home() / '.config')
+    config = config_root / 'dunst/dunstrc'
+    for path in (config, config_root / 'kitty/notifications.py', Path(__file__).resolve().with_name('codex-notification-sound')):
+        if not path.is_file():
+            raise ValueError(f'apply notification files first; missing {path}')
+    executable = shutil.which('dunst')
+    if not executable or not shutil.which('dbus-send'):
+        raise ValueError('dunst and dbus-send must be available on PATH')
+    pid = daemon_pid()
+    if pid is not None:
+        process = Path(f'/proc/{pid}')
+        if process.stat().st_uid != os.getuid() or Path(os.readlink(process / 'exe')).name != 'dunst':
+            raise ValueError('notification bus belongs to another user or daemon; leaving it running')
+        os.kill(pid, signal.SIGTERM)
+        deadline = time.monotonic() + 5
+        while daemon_pid() is not None:
+            if time.monotonic() >= deadline:
+                raise ValueError('Dunst did not release the notification bus within 5 seconds')
+            time.sleep(0.05)
+    state_root = Path(os.environ.get('XDG_STATE_HOME') or Path.home() / '.local/state')
+    log = state_root / 'codex-notification-sound/dunst.log'
+    log.parent.mkdir(parents=True, exist_ok=True)
+    with log.open('a', encoding='utf-8') as output:
+        daemon = subprocess.Popen([executable, '-config', str(config)], stdin=subprocess.DEVNULL,
+                                  stdout=output, stderr=output, start_new_session=True)
+    try:
+        deadline = time.monotonic() + 5
+        while daemon_pid() != daemon.pid:
+            if daemon.poll() is not None or time.monotonic() >= deadline:
+                raise ValueError(f'Dunst failed to acquire the notification bus; see {log}')
+            time.sleep(0.05)
+    except Exception:
+        daemon.terminate()
+        daemon.wait(timeout=5)
+        raise
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--open-kitty', action='store_true', help='also open a fresh Kitty process, preserving existing terminals')
+    options = parser.parse_args()
+    try:
+        kitty = shutil.which('kitty') if options.open_kitty else None
+        if options.open_kitty and kitty is None:
+            raise ValueError('kitty is unavailable on PATH')
+        restart_dunst()
+        if kitty:
+            subprocess.run([kitty, '--detach'], timeout=10, check=True)
+        print('Notification configuration active in Dunst; sound setting unchanged. '
+              + ('Fresh Kitty opened.' if kitty else 'Start a fresh Kitty process to load the callback.'))
+        return 0
+    except (OSError, ValueError, subprocess.SubprocessError) as error:
+        print(f'codex-notification-activate: {error}', file=sys.stderr)
+        return 1
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())

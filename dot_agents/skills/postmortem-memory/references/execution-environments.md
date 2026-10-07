@@ -205,3 +205,14 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Limitations: Static source validity does not establish installed executable availability.
 - Sources:
   - [2026-08-19-design-skills-systemd-predeploy-verify.md](/home/example/linux-config/.worktrees/vps-aws-bootstrap-prompt/docs/postmortem/2026-08-19-design-skills-systemd-predeploy-verify.md) (SHA-256 `884bacd6e8bf`; 2 alias(es), all retained in [sources.json](../sources.json)).
+
+## local-dbus-readiness-no-activation
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **runtime**.
+- Symptoms: Private Dunst fixture autoactivated default daemon during dunstctl readiness; Name acquisition conflict before defining integration RED
+- Applicability: Private DBus service fixtures whose readiness commands address an activatable service.
+- Diagnostic checks: Compare daemon PID/ownership with DBus activation logs. Check whether readiness targets the service before it owns its name.
+- Remedy: Poll org.freedesktop.DBus.NameHasOwner without addressing the service, then verify the explicitly launched daemon is alive before service calls.
+- Verification evidence: Corrected RED contained no competing activation; private Xvfb/DBus integration passed and cleaned its own daemon.
+- Limitations: This proves fixture startup ownership, not live desktop audio or production daemon repair.
+- Source: [Dunst fixture startup](/home/example/linux-config/docs/postmortem/2026-10-07-dunst-fixture-startup.md) (SHA-256 `0ecc5a5310ac`).

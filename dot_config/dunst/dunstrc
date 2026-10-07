@@ -185,8 +185,8 @@
     # Browser for opening urls in context menu.
     browser = /usr/bin/firefox -new-tab
 
-    # Always run rule-defined scripts, even if the notification is suppressed
-    always_run_script = true
+    # Avoid repeated scripts for already-sounded notification objects.
+    always_run_script = false
 
     # Define the title of the windows spawned by dunst
     title = Dunst
@@ -325,3 +325,8 @@
 #    urgency = normal
 #
 # vim: ft=cfg
+
+# Kitty tags only notifications from a local foreground Codex executable.
+[codex_notification_sound]
+    appname = codex-kitty
+    script = ~/scripts/codex-notification-sound

@@ -405,3 +405,14 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Limitations: Live checks use synthetic logs and temporary fzf, not private history or a permanently installed fzf.
 - Sources:
   - [2026-10-06-codex-search-picker-ui.md](/home/example/linux-config/docs/postmortem/2026-10-06-codex-search-picker-ui.md) (SHA-256 `9646e1b4d92a`; reviewed in [sources.json](../sources.json)).
+
+## local-dunst-stacked-script-state
+
+- Status: **verified_workaround**; root-cause confidence: **confirmed**; verification scope: **workaround**.
+- Symptoms: Dunst history recall played after a silent duplicate despite always_run_script=false
+- Applicability: Dunst 1.9.2 scripts with native duplicate stacking and notification history.
+- Diagnostic checks: Inspect queues_stack_duplicate transfers of script_run. Separate ordinary sounded history from a silently replaced duplicate object.
+- Remedy: Preserve native stacking and global false; test/document that silently stacked replacements may sound once on later display instead of promising all history is silent or deduplicating text.
+- Verification evidence: Actual private-daemon tests passed completion/approval, immediate duplicate, ordinary history and stacked-history cases with fake mpv.
+- Limitations: Native state is unchanged; a previously silent stacked object can sound on history recall or restoration. Audio acceptance remains manual.
+- Source: [Dunst fixture startup](/home/example/linux-config/docs/postmortem/2026-10-07-dunst-fixture-startup.md) (SHA-256 `0ecc5a5310ac`).

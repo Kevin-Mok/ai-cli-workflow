@@ -1,0 +1,125 @@
+"""Real Dunst check; run under xvfb-run and a private dbus-run-session."""
+import json
+import os
+import re
+import signal
+from pathlib import Path
+import shutil
+import subprocess
+import tempfile
+import time
+import unittest
+
+ROOT = Path(__file__).resolve().parents[2]
+
+
+class DaemonTests(unittest.TestCase):
+    def test_rule_display_queue_duplicates_history_and_suppression(self):
+        with tempfile.TemporaryDirectory() as directory:
+            base = Path(directory)
+            setting = base / 'config/codex-notification-sound/sound.json'
+            setting.parent.mkdir(parents=True)
+            clip = base / 'clip with spaces; $(bad).mp3'
+            clip.write_bytes(b'fixture; fake player only')
+            setting.write_text(json.dumps({'path': str(clip)}))
+            helper = base / 'codex-notification-sound'
+            shutil.copy2(ROOT / 'scripts/executable_codex-notification-sound', helper)
+            helper.chmod(0o755)
+            binary = base / 'bin'
+            binary.mkdir()
+            events = base / 'events.jsonl'
+            player = binary / 'mpv'
+            player.write_text('#!/usr/bin/python3\nimport json, os, sys\nwith open(os.environ["SOUND_TEST_EVENTS"], "a") as f: f.write(json.dumps(sys.argv[1:])+"\\n")\n')
+            player.chmod(0o755)
+            env = {**os.environ, 'PATH': f'{binary}:{os.environ["PATH"]}', 'XDG_CONFIG_HOME': str(base / 'config'), 'XDG_STATE_HOME': str(base / 'state'), 'SOUND_TEST_EVENTS': str(events)}
+            config = base / 'config/dunst/dunstrc'
+            config.parent.mkdir(parents=True)
+            content = (ROOT / 'dot_config/dunst/dunstrc').read_text().replace('~/scripts/codex-notification-sound', str(helper))
+            config.write_text(content + '\n[sound_test_suppression]\nappname = codex-kitty\nsummary = suppressed\nformat = ""\n')
+            log = base / 'dunst.log'
+            with log.open('w') as output:
+                daemon = subprocess.Popen(['dunst', '-config', str(config)], env=env, stdout=output, stderr=output)
+                restarted_pid = None
+                try:
+                    deadline = time.monotonic() + 5
+                    while time.monotonic() < deadline:
+                        ready = subprocess.run(['dbus-send', '--session', '--print-reply', '--dest=org.freedesktop.DBus', '/org/freedesktop/DBus', 'org.freedesktop.DBus.NameHasOwner', 'string:org.freedesktop.Notifications'], env=env, capture_output=True, text=True)
+                        if ready.returncode == 0 and 'boolean true' in ready.stdout:
+                            break
+                        time.sleep(0.05)
+                    self.assertEqual(ready.returncode, 0, log.read_text())
+                    self.assertIn('boolean true', ready.stdout, log.read_text())
+                    self.assertIsNone(daemon.poll(), 'The explicitly configured daemon must own the private bus')
+
+                    def call(*argv):
+                        result = subprocess.run(list(argv), env=env, capture_output=True, text=True, timeout=5)
+                        self.assertEqual(result.returncode, 0, result.stderr)
+                        return result.stdout.strip()
+
+                    def count():
+                        return len(events.read_text().splitlines()) if events.exists() else 0
+
+                    def expect_count(expected):
+                        deadline = time.monotonic() + 3
+                        while count() < expected and time.monotonic() < deadline:
+                            time.sleep(0.05)
+                        time.sleep(0.15)
+                        self.assertEqual(count(), expected, log.read_text())
+
+                    def notify(app, title):
+                        return call('notify-send', '--app-name', app, '--expire-time', '15000', '--print-id', title)
+
+                    notify('kitty', 'Codex approval requested')
+                    notify('codex-kitty-other', 'Codex turn complete')
+                    expect_count(0)
+                    notify('codex-kitty', 'completion fixture')
+                    expect_count(1)
+                    notify('codex-kitty', 'approval fixture')
+                    expect_count(2)
+                    call('dunstctl', 'close-all')
+                    call('dunstctl', 'history-pop')
+                    expect_count(2)  # an already-sounded notification is silent
+                    notify('codex-kitty', 'approval fixture')  # coalesced duplicate
+                    expect_count(2)
+                    call('dunstctl', 'close-all')
+                    call('dunstctl', 'history-pop')
+                    expect_count(3)  # Dunst's unsounded stacked object first displays
+                    call('dunstctl', 'close-all')
+                    call('dunstctl', 'set-paused', 'true')
+                    notify('codex-kitty', 'queued fixture')
+                    expect_count(3)
+                    call('dunstctl', 'set-paused', 'false')
+                    expect_count(4)
+                    call('dunstctl', 'set-paused', 'true')
+                    call('dunstctl', 'set-paused', 'false')
+                    expect_count(4)
+                    notify('codex-kitty', 'suppressed')
+                    expect_count(4)
+                    for line in events.read_text().splitlines():
+                        argv = json.loads(line)
+                        self.assertEqual(argv[-2:], ['--', str(clip)])
+                    activation_source = ROOT / 'scripts/executable_codex-notification-activate'
+                    self.assertTrue(activation_source.is_file(), 'Reusable activation helper not implemented')
+                    activation = base / 'codex-notification-activate'
+                    shutil.copy2(activation_source, activation)
+                    activation.chmod(0o755)
+                    callback = base / 'config/kitty/notifications.py'
+                    callback.parent.mkdir(parents=True)
+                    shutil.copy2(ROOT / 'dot_config/kitty/notifications.py', callback)
+                    call(str(activation))
+                    pid_reply = call('dbus-send', '--session', '--print-reply', '--dest=org.freedesktop.DBus', '/org/freedesktop/DBus', 'org.freedesktop.DBus.GetConnectionUnixProcessID', 'string:org.freedesktop.Notifications')
+                    restarted_pid = int(re.search(r'uint32 (\d+)', pid_reply).group(1))
+                    self.assertNotEqual(restarted_pid, daemon.pid)
+                    self.assertEqual(call('dunstctl', 'count', 'history'), '0')
+                    notify('codex-kitty', 'after activation fixture')
+                    expect_count(5)
+                    print('Private Dunst: completion/approval=one each; unrelated/duplicates/normal history/suppressed=silent; queued=plays on display; recalled duplicate stack=one sound')
+                finally:
+                    if restarted_pid is not None:
+                        os.kill(restarted_pid, signal.SIGTERM)
+                    daemon.terminate()
+                    daemon.wait(timeout=5)
+
+
+if __name__ == '__main__':
+    unittest.main()

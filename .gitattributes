@@ -18,3 +18,4 @@
 "second-brain/07 Attachments/**/*.mkv" filter=lfs diff=lfs merge=lfs -text
 "second-brain/07 Attachments/**/*.webm" filter=lfs diff=lfs merge=lfs -text
 "second-brain/07 Attachments/**/*.avi" filter=lfs diff=lfs merge=lfs -text
+scripts/can-i-ask-you-a-question.mp3 filter=lfs diff=lfs merge=lfs -text
