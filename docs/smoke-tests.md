@@ -21,8 +21,10 @@ fixture below provides a repeatable picker check without using private history.
   Expected: Up to five latest-active local conversations across directories,
   with title, directory, activity and cached recap/status. No model calls;
   `--recent` defaults to 20 even in pipes and `--limit 0` lists all.
+  Untitled and Guardian sessions are hidden in both listing and picker;
+  only visible sessions count toward the limit or automatic recap batch.
 - Action: codex-search --recent --pick --no-summaries
-  Expected: All discovered sessions appear immediately after indexing with cached
+  Expected: All visible titled sessions appear immediately after indexing with cached
   recaps or local dialogue previews. Ctrl-G makes no model call. Esc/Ctrl-C
   cancels; Enter resumes exactly the highlighted UUID in its recorded directory
   without an initial prompt. In fish, `crg` expands to `codex-search --recent --pick`.

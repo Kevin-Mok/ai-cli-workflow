@@ -9,7 +9,13 @@ import test_codex_search as fixture
 class RecentCLITest(unittest.TestCase):
     setUp = fixture.CodexSearchTest.setUp
     stub = fixture.CodexSearchTest.stub
-    session = fixture.CodexSearchTest.session
+    def session(self, *args, **kwargs):
+        path = fixture.CodexSearchTest.session(self, *args, **kwargs)
+        sid = json.loads(path.read_text().splitlines()[0])['payload']['id']
+        with (self.home / 'session_index.jsonl').open('a') as index:
+            index.write(json.dumps({'id': sid, 'thread_name': 'Synthetic task ' + sid}) + '\n')
+        return path
+
     run_cli = fixture.CodexSearchTest.run_cli
     manifest = fixture.CodexSearchTest.manifest
 
@@ -28,7 +34,8 @@ class RecentCLITest(unittest.TestCase):
         self.session(stamp='2025-01-01T00:00:00Z', extra=[fixture.record('event_msg', {'type':'task_complete'}, '2026-10-07T10:00:00Z')])
         self.session(fixture.ID2, name='two.jsonl', cwd=str(other), stamp='2026-10-06T10:00:00Z')
         self.session(name='copy.jsonl', stamp='2026-10-02T10:00:00Z')
-        (self.home/'session_index.jsonl').write_text(json.dumps({'id':fixture.ID1,'thread_name':'Recent synthetic task'})+'\n')
+        with (self.home/'session_index.jsonl').open('a') as index:
+            index.write(json.dumps({'id':fixture.ID1,'thread_name':'Recent synthetic task'})+'\n')
         output = self.run_cli('--recent').stdout
         self.assertEqual(output.count('Session: '+fixture.ID1), 1)
         self.assertLess(output.index('Session: '+fixture.ID1), output.index('Session: '+fixture.ID2))
@@ -41,6 +48,39 @@ class RecentCLITest(unittest.TestCase):
             with self.subTest(args=args):
                 self.run_cli(*args)
                 self.assertFalse(self.log.exists())
+
+    def test_recent_hides_untitled_and_guardian_before_limit_and_picker(self):
+        titles = [None, '', ' Untitled ', '(UNTITLED)', 'Guardian review', 'guardian safety check', 'Visible task']
+        ids = []
+        for i, title in enumerate(titles):
+            sid = '00000000-0000-4000-8000-' + str(i + 10).zfill(12)
+            ids.append(sid)
+            fixture.CodexSearchTest.session(self, sid=sid, name=f'filter-{i}.jsonl', stamp=f'2026-10-{20-i:02d}T12:00:00Z')
+            if title is not None:
+                with (self.home / 'session_index.jsonl').open('a') as index:
+                    index.write(json.dumps({'id': sid, 'thread_name': title}) + '\n')
+        before = {p: p.read_bytes() for p in self.sessions.rglob('*.jsonl')}
+        output = self.run_cli('--recent', '--limit', '1').stdout
+        self.assertEqual(output.count('Session: '), 1)
+        self.assertIn(ids[-1], output)
+        for sid in ids[:-1]:
+            self.assertNotIn(sid, output)
+        self.stub('fzf', "import sys,os\nfrom pathlib import Path\nrows=sys.stdin.read().splitlines()\nPath(os.environ['PICK_LOG']).write_text('\\n'.join(rows))\nprint(rows[0])")
+        self.run_cli('--recent', '--pick', '--no-summaries')
+        rows = (self.base / 'pick.txt').read_text().splitlines()
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0].split('\t')[0], ids[-1])
+        self.assertEqual(json.loads(self.log.read_text()), ['resume', '-C', str(self.project), ids[-1]])
+        for path, original in before.items():
+            self.assertEqual(path.read_bytes(), original)
+
+    def test_recent_all_hidden_skips_picker_but_pattern_search_still_finds_them(self):
+        fixture.CodexSearchTest.session(self)
+        self.run_cli('--recent', expected=1)
+        self.stub('fzf', "raise AssertionError('empty recent results must not open picker')")
+        self.run_cli('--recent', '--pick', '--no-summaries', expected=1)
+        self.assertFalse(self.log.exists())
+        self.assertIn(fixture.ID1, self.run_cli('-F', 'Needle').stdout)
 
     def test_recent_help_and_invalid_combinations(self):
         for args in [(),('--help',)]:

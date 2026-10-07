@@ -115,3 +115,11 @@ The implementation bytes match the final installed/refresh-verified source snaps
 ### Delivery result
 
 Implementation committed as `ce90d62` (`feat(codex): browse recent sessions with cached AI recaps`). The sole normal push to origin was rejected by GitHub with Internal Server Error; no upstream is configured. Local commits are preserved and publication remains unresolved. A separate documentation commit records the push incident and reviewed learning without rewriting the implementation commit. The original main workspace and its dirty work are preserved. See `docs/postmortem/2026-10-07-codex-recent-branch-push.md`.
+
+## Follow-up: hide untitled and Guardian sessions
+
+User explicitly requested hiding both categories from recent browsing, including otherwise ordinary untitled conversations. Filter missing/blank titles, case-insensitive `untitled`/`(untitled)` labels, and case-insensitive titles beginning with `Guardian`, before listing, picker input and automatic recap scheduling. Keep source files and pattern search available.
+
+- [x] Two defining CLI tests observed RED: untitled sessions were printed and consumed the visible limit; all-hidden history incorrectly opened recent browsing.
+- [x] Apply the shared recent-results filter before manager construction; update the guide, README and grouped smoke check.
+- [x] Full regressions: 91 tests pass in 15.330s; shell regression exits 0; Pyright reports zero errors/warnings; README gate, incident-learning check and diff whitespace check pass. Actual protected refresh-config returns REFRESH COMPLETE (log `/tmp/refresh-config-20261007-130831-3088899.log`), applying only this worktree executable as the remaining deployment target. All 80 captured main source files are preserved except the required live Codex config snapshot. Installed executable is byte-identical; both defining visibility tests pass against the installed command in 0.393s. The subsequent `$commit-session` request authorizes this verified follow-up and a normal push of the complete feature branch to origin. The helper again reports no detected writes; direct conversation write evidence establishes all eight changed files. Git history and upstream tracking record the delivery outcome.

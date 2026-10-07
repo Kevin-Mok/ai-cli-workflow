@@ -5716,6 +5716,15 @@
       "findings": [],
       "reviewed_on": "2026-10-07",
       "sha256": "6060619d12ade86fa840e752b6695cc42aab021f7bd3ef96401064890083d149"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/.worktrees/codex-recent-sessions/docs/postmortem/2026-10-07-codex-recent-title-filter-source-lookup.md"
+      ],
+      "decision": "No new reusable learning: local-discover-paths-before-reads explicitly distinguishes the Fish refresh function from the external Python snapshot executable. Exact inventory and successful executable read resolved the guessed-path lookup; no configuration mutation occurred.",
+      "findings": [],
+      "reviewed_on": "2026-10-07",
+      "sha256": "47e58f97880e14a051e0a73fb987aae0da46273385646a3183a69f28702f81f1"
     }
   ],
   "review": {

@@ -133,6 +133,11 @@ def print_results(results, names, args):
         print()
 
 
+def recent_title_visible(title: str) -> bool:
+    title = title.strip().casefold()
+    return bool(title) and title not in ('untitled', '(untitled)') and not title.startswith('guardian')
+
+
 def print_recent(results, names, args, manager):
     """Reuse ordinary output formatting with a cached recap instead of a match."""
     if args.limit is None:
@@ -261,6 +266,9 @@ def main():
             return 0
         results = recent_entries(entries) if args.recent else search(root, entries, args)
         names = titles(home)
+        if args.recent:
+            results = [(entry, snippets) for entry, snippets in results
+                       if recent_title_visible(names.get(entry['id'], ''))]
     # Never retain the cache lock across an interactive picker or resumed Codex process.
     if not results:
         return 1

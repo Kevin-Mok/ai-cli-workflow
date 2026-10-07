@@ -62,9 +62,12 @@ and recap-cache modification time do not determine order. Duplicate UUIDs follow
 the existing newest-activity rule. Listing prints the newest 20 even in a pipe;
 `--limit N` changes the count and `--limit 0` prints all. It reads cached recaps
 without calling a model. `--recent` cannot be combined with a search pattern.
+Recent browsing hides sessions without a saved title, `untitled` labels, and
+titles beginning with `Guardian` (case-insensitive). This applies before limits
+and automatic recap scheduling. These sessions remain available through pattern search.
 
 `--recent --pick` opens fzf after discovery/index refresh, without waiting for
-inference. All discovered sessions appear regardless of `--limit`. Each row has
+inference. All visible titled sessions appear regardless of `--limit`. Each row has
 activity time, directory, title and cached recap headline/status. The preview
 shows the goal, reported progress, current state and remaining work, or bounded
 local user/assistant dialogue when there is no recap. Missing, generating, stale,
