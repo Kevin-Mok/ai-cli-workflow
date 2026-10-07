@@ -198,6 +198,10 @@ education work:
 
 ## Git And Delivery
 
+- Any file larger than 3 MB must be committed using Git LFS. Configure its
+  Git LFS tracking in `.gitattributes` before staging it, and commit the
+  matching `.gitattributes` change with the file.
+
 - Authorized commit workflows make best-effort commits of every eligible change.
   Prioritize session-touched files and favor including safe related files over
   omitting them within the requested scope. Ordinary validation, README, or

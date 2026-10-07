@@ -5626,6 +5626,15 @@
         "local-dbus-readiness-no-activation",
         "local-dunst-stacked-script-state"
       ]
+    },
+    {
+      "sha256": "3083ac9938d5f428ee46ad2d5cca4de87b7172fefe93e24ae1ca697d660c8785",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-07-git-lfs-instructions-sandbox.md"
+      ],
+      "reviewed_on": "2026-10-07",
+      "findings": [],
+      "decision": "No new reusable learning: existing local-sandbox-loopback-approved-route covers the verified scoped execution workaround; locate helpers before assuming their path."
     }
   ],
   "review": {
