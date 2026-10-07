@@ -3,8 +3,8 @@
 Use these skills to create, improve, and save a prompt for another task.
 Invoke `$metaprompt` or the original `$metaprompt-alxve` to review a saved
 prompt, or invoke **Metaprompt & Run** (`$metaprompt-run`) to compile, save
-and execute the task in the same turn. Follow the update and verification
-steps when changing the installed skill.
+and immediately start a fresh Codex conversation to execute the task. Follow
+the update and verification steps when changing the installed skill.
 
 The installed `$metaprompt` now uses the pinned **Sentry `prompt-optimizer`**
 workflow, replacing the Majkey adaptation at the user's request on October 4,
@@ -24,7 +24,7 @@ directory with non-destructive collision suffixes.
 | Invocation | Behavior |
 | --- | --- |
 | `$metaprompt Make me a prompt to summarize meeting notes.` | Returns Sentry's eight-section package, saves only the Optimized Prompt, and reports its path. Labels prepared versus executed evals. Does not execute the embedded production task. |
-| `$metaprompt-run Summarize the supplied meeting notes into decisions, owners and deadlines; mark missing values unknown.` | Reuses the current metaprompt compiler and saved-prompt contract, then executes the saved prompt once in the same turn. Asks for absent notes before producing the summary. |
+| `$metaprompt-run Summarize the supplied meeting notes into decisions, owners and deadlines; mark missing values unknown.` | Reuses the current metaprompt compiler and saved-prompt contract, then immediately starts a new conversation to execute the saved prompt once with fresh context. Asks for absent notes before producing the summary. |
 | `$metaprompt-alxve Make me a prompt to summarize meeting notes.` | Preserves original weight selection, prompt/Saved/Run/Weight metadata, and fresh standalone `go` gate for every pass. |
 
 Tracked sources install through chezmoi to `~/.agents/skills/<name>`.
@@ -44,8 +44,23 @@ An explicit runner invocation authorizes compilation and execution of the
 supplied task under normal session permissions. The optimized prompt preserves
 the original constraints and cannot authorize extra actions. The agent returns
 the parent's compact eight-section package as an intermediate update, saves
-only the compiled prompt, reads it back, then executes its contents once.
-Compilation does not introduce another approval question or a `go` gate.
+only the compiled prompt including the supplied facts and exclusions, reads it
+back, then immediately calls `mcp__codex_tui__create_thread` to start one new
+conversation. The executor reads the absolute saved-file path and runs its
+contents once without inheriting the compiler’s chat history. Normal runtime
+instructions and repository rules still apply. Compilation does not introduce
+another approval question or a `go` gate.
+
+The creation tool accepts at most 1,000 UTF-8 bytes of launch instructions, so
+the handoff points to the file instead of copying a long prompt. It inherits
+the working directory and model. The compiler reports the saved prompt and
+returned task identifier/link; that confirms launch, while the new conversation
+verifies completion. A fork, resume or same-conversation fallback does not meet
+the fresh-context requirement. If the native creation tool is unavailable, or
+creation fails, report the precise limitation and keep execution pending.
+If even the shortened file-path handoff exceeds the byte limit, report that
+limit rather than truncating the path or task content.
+Inspect task state before retrying an ambiguous launch to avoid duplicates.
 
 Missing material inputs and unresolved reusable `{{variables}}` leave execution
 pending until the user supplies them. An explicit execution exclusion remains
@@ -60,7 +75,10 @@ $metaprompt-run Create result.txt in this workspace containing exactly metapromp
 ```
 
 Expect a prompt-only artifact under `prompts/` and `result.txt` containing exactly
-`metaprompt-run-ok\n` in that same turn. Repeat with an existing prompt filename
+`metaprompt-run-ok\n` produced by the automatically started new conversation.
+Verify its returned task identifier differs from the compiler’s and its initial
+instruction points to the saved file. A launch alone is not a completed result.
+Repeat with an existing prompt filename
 and verify the old file is preserved. For missing-input coverage, request a
 summary of `{{meeting_notes}}` without supplying notes; expect a saved prompt
 and a request for the notes before a summary is produced. Prepared cases are
@@ -277,3 +295,19 @@ prompt for a future update:
 > dirty work and report unverified surfaces.
 
 Suggested replacement commit: `feat(skills): use Sentry for metaprompt`.
+
+### Fresh-conversation runner verification
+
+On October 7, 2026, a native new task read a complete 2,789-byte prompt through
+a 299-byte file-path handoff and produced the expected 33-byte output. The
+parent independently read the bytes and checksum, and observed the native
+task’s completed state. Five read-only application scenarios were reviewed
+before and after the change; these were simulated interpretations, not five
+executed trials. Metadata validation, the 12 legacy contract tests and Claude
+link validation passed. The eight-test integration suite retained four
+pre-existing legacy-reference hash assertion failures confirmed in HEAD.
+
+`refresh-config` completed and both installed runner files matched tracked
+source. See the [fresh-context plan](../plans/update-metaprompt-run-fresh-context.md)
+for evidence, scope, rollback and handoff. This verifies the native handoff and
+one harmless executor task; it does not benchmark downstream task quality.

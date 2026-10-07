@@ -165,10 +165,19 @@ fixture below provides a repeatable picker check without using private history.
 - Action: In a fresh session in a disposable workspace, invoke `$metaprompt-run Create result.txt containing exactly metaprompt-run-ok followed by one newline. Preserve existing prompts. Do not commit, push, deploy or contact anyone.`
   Expected: **Metaprompt & Run** uses the current metaprompt workflow, presents
   its compact eight-section package, saves only the compiled prompt under
-  `prompts/`, reads it back, then creates `result.txt` with exactly
-  `metaprompt-run-ok\n` in the same turn. The final result links the saved prompt
-  and reports actual verification. No extra `go` or permission question appears
+  `prompts/`, reads it back, then immediately starts exactly one new Codex
+  conversation to create `result.txt` with exactly `metaprompt-run-ok\n`.
+  The returned task identifier differs from the compiler’s; its initial
+  instruction reads the saved prompt by absolute path without the old transcript.
+  The compiler reports launch and the prompt link; the execution conversation
+  reports the verified result. No extra `go` or permission question appears
   solely because compilation finished.
+- Action: Run the same runner check with supplied task data large enough that the compiled prompt exceeds 1,000 UTF-8 bytes, then try it in a runtime without `mcp__codex_tui__create_thread`.
+  Expected: The full saved prompt preserves the data; the native launch uses a
+  file-path handoff of at most 1,000 UTF-8 bytes without truncating task content.
+  If the tool is unavailable, execution stays pending and the compiler reports
+  the limitation with the saved prompt link. It does not execute locally or fork
+  a conversation. An ambiguous creation result is checked before any retry.
 - Action: Invoke `$metaprompt-run` with a request whose prompt filename already exists, then request a summary of `{{meeting_notes}}` without supplying notes.
   Expected: The collision uses a new suffix and preserves the original file.
   Missing notes leave execution pending; the agent saves the compiled prompt

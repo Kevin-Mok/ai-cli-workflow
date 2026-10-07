@@ -1,4 +1,4 @@
 interface:
   display_name: "Metaprompt & Run"
-  short_description: "Optimize a prompt, save it, and execute its task"
-  default_prompt: "Use $metaprompt-run to optimize my original request with the current $metaprompt skill, save the compiled prompt, and execute it in the same turn."
+  short_description: "Optimize, save, and run in a fresh conversation"
+  default_prompt: "Use $metaprompt-run to optimize my original request with the current $metaprompt skill, save the compiled prompt, then immediately start a new conversation with fresh context to execute it without another go or confirmation."

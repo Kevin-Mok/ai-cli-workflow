@@ -5543,6 +5543,24 @@
       "reviewed_on": "2026-10-06",
       "findings": [],
       "decision": "No new general finding: existing endpoint fingerprint guidance applies. Private push remains unresolved pending independent server-key verification; local commit retained and strict checking preserved."
+    },
+    {
+      "sha256": "87ee4edc34405d4413f1513ec459d146e4b19d1642f0834eb63d8f13670bb5e0",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-07-metaprompt-run-sandbox-startup.md"
+      ],
+      "reviewed_on": "2026-10-07",
+      "findings": [],
+      "decision": "No new reusable learning: confirms ext-sandbox-loopback approved-execution workaround; default sandbox remains unrepaired."
+    },
+    {
+      "sha256": "f5502c281934e88f25b5f0e65ebde89d2644a96511bed3c6b72313fb21cee599",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-07-metaprompt-run-verification-baseline.md"
+      ],
+      "reviewed_on": "2026-10-07",
+      "findings": [],
+      "decision": "No new reusable learning: confirmed pre-existing legacy byte-pin mismatch outside task scope; ASCII handoff verified workaround for task-local TextEncoder harness error."
     }
   ],
   "review": {

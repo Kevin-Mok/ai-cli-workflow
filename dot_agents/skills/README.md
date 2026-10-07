@@ -278,7 +278,8 @@ targets leave local commits intact. Planning-only requests remain read-only.
   [source and update record](metaprompt/SOURCE.md).
 - [`Metaprompt & Run`](metaprompt-run/SKILL.md) (`$metaprompt-run`): Uses the
   current metaprompt compiler to improve and save the original request, then
-  executes the saved prompt in the same turn within the user's authorized scope.
+  immediately starts a new Codex conversation with fresh context to execute
+  the saved prompt within the user's authorized scope, without an extra `go`.
 - [`metaprompt-alxve`](metaprompt-alxve/SKILL.md): Preserves the original
   compiler, target-aware templates, saved prompts, and strict standalone `go`
   gate for every execution and high-stakes pass. Select it by its exact name.
