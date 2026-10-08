@@ -65,3 +65,7 @@ Completed: specify controlled downstream evaluation and replayable results. Veri
 ### Milestone 3 — docs(ssh): clarify phone endpoints and password prompts
 
 Completed: document host identity and distinguish key passphrases from account passwords. Verified: fresh scoped checks recorded above plus staged whitespace and incident-link contracts. Remaining: 12 planned groups, then one upstream push. Blockers: none for this milestone; documented broader vault inventory warning and manual acceptance limits remain. Next: docs: record Codex configuration inspection incidents.
+
+### Milestone 4 — docs: record Codex configuration inspection incidents
+
+Completed: record sandbox recovery and executable snapshot lookup. Verified: fresh scoped checks recorded above plus staged whitespace and incident-link contracts. Remaining: 11 planned groups, then one upstream push. Blockers: none for this milestone; documented broader vault inventory warning and manual acceptance limits remain. Next: chore(aliases): update log and backup shortcuts.
