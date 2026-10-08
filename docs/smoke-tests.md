@@ -436,6 +436,8 @@ checks use invented temporary data; real notes are never repository fixtures.
 
 ## Keyboard And Input
 
+- Action: After `refresh-config` and an i3 reload, hold Alt+Super and press the number-row keys `1` through `9`, then `0`; press Alt+Super+grave to reset.
+  Expected: Redshift selects 1000K, 2000K, …, 9000K, 10000K in even steps from warm to cool; grave restores the default color temperature.
 - Action: Start a fresh X session on a desktop host that applies this repo's shell and `Xmodmap` config, open a terminal, type a short word, and press Backspace once.
   Expected: Exactly one character is deleted and opening a new bash shell does not rewrite the active keyboard remap.
 - Action: Open Neovim with the tracked config, enter the command-line window with `q:`, wait long enough for `CursorHold`, then exit back to the file.

@@ -5808,6 +5808,24 @@
       "reviewed_on": "2026-10-08",
       "findings": [],
       "decision": "No new learning: an assumed documentation path was absent; use observed installed --help and executable terminal tests. No data changed by the failed read."
+    },
+    {
+      "sha256": "ca87edd52d92d348be5dc95fded787efdba774e7b64e56e58a568c353b64d0f1",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-08-redshift-bindings-sandbox.md"
+      ],
+      "reviewed_on": "2026-10-08",
+      "findings": [],
+      "decision": "No new learning: recurring loopback startup failure; scoped approved execution works, default sandbox remains unresolved."
+    },
+    {
+      "sha256": "9717ba1edf5a8a7174f624c4dd2a2ef41fc2a05d360ae98e3fe3eb8be2253afe",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-08-redshift-live-config-output.md"
+      ],
+      "reviewed_on": "2026-10-08",
+      "findings": [],
+      "decision": "No new learning: explicit raw CLI JSON resolves the diagnostic output-contract mismatch; live i3 mapping verified, exit 0."
     }
   ],
   "review": {

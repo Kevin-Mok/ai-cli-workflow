@@ -818,6 +818,8 @@ this.
 - [`dot_config/i3/config.tmpl`](dot_config/i3/config.tmpl) is the main
   desktop control plane for workspace movement, app assignments,
   launcher bindings, display and audio shortcuts, and layout control.
+  Hold **Alt+Super** and press **1–9, then 0** for Redshift temperatures
+  from **1000K to 10000K** in even 1000K steps; **Alt+Super+grave** resets.
 - [`dot_config/i3blocks/`](dot_config/i3blocks/) plus
   [`dot_config/dunst/dunstrc`](dot_config/dunst/dunstrc) and
   [`dot_config/picom/picom.conf`](dot_config/picom/picom.conf) cover the
