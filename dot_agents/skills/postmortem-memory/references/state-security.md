@@ -206,3 +206,26 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Limitations: This approval setting applies only to the controlled fixture, not arbitrary MCP tools. The original failed attempts stayed archived and charged.
 - Sources:
   - [2026-10-03-metaprompt-benchmark-trial-infrastructure.md](/home/example/linux-config/.worktrees/vps-aws-bootstrap-prompt/docs/postmortem/2026-10-03-metaprompt-benchmark-trial-infrastructure.md) (SHA-256 `8e4453378c36`; 2 alias(es), all retained in [sources.json](../sources.json)).
+
+## local-recap-cache-concurrent-lifecycle
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **code**.
+- Symptoms: Concurrent clear aborts reads, lock contention leaves stale generating state, or interrupted atomic writes block maintenance.
+- Applicability: Asynchronous local recap caches with concurrent read/maintenance/generation.
+- Diagnostic checks: Delete between exists/read, release a competing lock without a save, and leave a safe atomic temporary file after writer termination.
+- Remedy: Treat disappearing files as missing, reconcile lock liveness without consuming attempts, and clean owned regular atomic temporaries under the maintenance lock. Preserve lock inodes and reject unsafe paths.
+- Verification: All three defining cases observed RED; 17 recap, seven picker and eight recent CLI tests pass, with active-inference index-lock and cancellation checks.
+- Limitations: Synthetic subprocess coverage is not provider availability evidence.
+- Source: [Recent cache races](../../../../docs/postmortem/2026-10-07-codex-recent-cache-races.md).
+
+## local-inherited-environment-assertion-output
+
+- Status: **verified_workaround**; root-cause confidence: **confirmed**; verification scope: **code**.
+- Symptoms: unittest assertion prints a whole inherited environment, including credential-bearing values.
+- Applicability: tests or diagnostics whose assertion operands include sensitive mappings.
+- Diagnostic checks: inspect failure formatting; use synthetic cleared fixture environments and safe variable-name-only reporting.
+- Remedy: use `patch.dict(..., clear=True)` for the fixture environment and boolean membership assertions, then record any actual disclosure without values and inform the user.
+- Verification evidence: all seventeen runtime tests passed after fixture hardening; no environment dump was written to repo artifacts or a separate temporary log.
+- Limitations: this prevents recurrence in the fixture but cannot erase transcript exposure. Credential rotation was not attempted or verified.
+- Sources:
+  - [2026-10-07-codex-recap-runtime-probe.md](/home/example/linux-config/docs/postmortem/2026-10-07-codex-recap-runtime-probe.md) (SHA-256 `85c19fb97675`; see [sources.json](../sources.json)).

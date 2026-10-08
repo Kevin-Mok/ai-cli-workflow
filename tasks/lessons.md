@@ -111,3 +111,5 @@
 - 2026-10-06: When splitting a portable skill helper, load siblings relative to __file__ and describe the dynamic callable/validated JSON boundary with an explicit Protocol and TypedDict. Preserve direct-file-import tests and rerun basedpyright as well as CLI tests. See [context helper imports](../docs/postmortem/2026-10-06-context-helper-sibling-import.md) and [typed boundary](../docs/postmortem/2026-10-06-context-helper-type-boundary.md).
 
 - 2026-10-07: For notification integration fixtures, poll DBus NameHasOwner before dunstctl to avoid autoactivating a competing daemon; verify duplicate-object script_run transfer before promising silence on all history recalls. See [Dunst fixture investigation](../docs/postmortem/2026-10-07-dunst-fixture-startup.md).
+
+- 2026-10-07: Recent-session recap reads must tolerate concurrent cache clearing; count attempts after acquiring generation ownership and clean safe orphan atomic files under the maintenance lock. Verify the actual CLI index lock during a sleeping inference, not only after the batch. See [cache lifecycle review](../docs/postmortem/2026-10-07-codex-recent-cache-races.md).

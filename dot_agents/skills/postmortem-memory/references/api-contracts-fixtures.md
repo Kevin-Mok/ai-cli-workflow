@@ -416,3 +416,31 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Verification evidence: Actual private-daemon tests passed completion/approval, immediate duplicate, ordinary history and stacked-history cases with fake mpv.
 - Limitations: Native state is unchanged; a previously silent stacked object can sound on history recall or restoration. Audio acceptance remains manual.
 - Source: [Dunst fixture startup](/home/example/linux-config/docs/postmortem/2026-10-07-dunst-fixture-startup.md) (SHA-256 `0ecc5a5310ac`).
+
+## local-codex-effective-isolation-overrides
+
+- Status: **verified_workaround**; root-cause confidence: **confirmed**; verification scope: **runtime**.
+- Symptoms: quoted CLI dotted MCP keys report invalid transport; empty MCP table retains inherited servers.
+- Applicability: installed Codex CLI 0.160.1 isolated recap and configuration probes.
+- Diagnostic checks: inspect effective config/read, hooks/list, per-server enabled flags, and every effective tool-catalog carrier.
+- Remedy: use validated plain dotted MCP names, disable each server and all execution/integration features explicitly, then verify before inference. Never assume an empty table replaces inherited configuration.
+- Verification evidence: strict no-inference probe exited 0; no hooks; all servers disabled. Synthetic localhost catalog contained no shell/web/MCP tools and made zero upstream requests.
+- Limitations: generic Code Mode wrapper remains advertised, but its disabled host reports fail-closed. Existing bubblewrap warning is unresolved; no real generation verified here.
+- Sources:
+  - [2026-10-07-codex-recap-runtime-probe.md](/home/example/linux-config/docs/postmortem/2026-10-07-codex-recap-runtime-probe.md) (SHA-256 `85c19fb97675`; see [sources.json](../sources.json)).
+
+Codex also requires a regular model instructions file and projects
+`tools.update_plan` out of its typed config response. Verify that supplementary
+field in the highest-priority raw layer; never replace direct effective
+security checks with the arguments you passed.
+
+## local-cache-chmod-ctime-fixture
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **code**.
+- Symptoms: Cache reuse assertions fail only on ctime, with bytes, mtime and inode unchanged.
+- Applicability: Private caches that call chmod while validating reusable files.
+- Diagnostic checks: Compare each stat field and content; inspect permission-hardening calls.
+- Remedy: Assert stable bytes, mtime and inode and required permissions for cache reuse; retain full source immutability assertions.
+- Verification: Eight new index tests and 29 legacy CLI tests pass after correcting the cache-only assertion.
+- Limitations: Does not permit ignoring changed source metadata or skipping permission checks.
+- Source: [Recent index fixture](../../../../docs/postmortem/2026-10-07-codex-recent-index-fixture.md).

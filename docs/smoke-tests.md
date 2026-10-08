@@ -71,6 +71,16 @@ fixture below provides a repeatable picker check without using private history.
   lock and original sessions. Exit 0; the next search recreates the cache. See
   the [operator guide](codex-session-search.md) for tests, timings and rollback.
 
+### Codex recent picker layout
+
+- Action: Run `crg`, select a session in `/mnt/usb-8tb/`, and resize the terminal between narrow and wide windows. Press Ctrl-/ twice, then Enter or Esc.
+  Expected: The directory appears as `/m/usb-8tb>` beside the complete title when space permits, followed by the short timestamp, without large tab gaps. The full title wraps in the preview; the original directory remains there. The preview is on the right in wide windows and below in narrow ones; Ctrl-/ toggles it for full-width list reading. Enter resumes the original directory and UUID; Esc cancels.
+
+### Codex recent picker timezone
+
+- Action: Run `crg` and inspect a session's activity timestamp in its row and preview.
+  Expected: Both show the same Toronto time. For source `2026-10-08T16:17:14.030Z`, the row shows `Oct 8 12:17` and the preview shows `2026-10-08 12:17:14.030-04:00 (EDT)`. Winter timestamps use EST (-05:00); Enter resumes the selected session normally.
+
 ## VPS Codex Updates
 
 - Action: ./scripts/executable_fix-vps-codex.sh --help
