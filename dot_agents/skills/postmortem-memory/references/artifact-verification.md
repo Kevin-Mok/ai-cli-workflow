@@ -249,3 +249,140 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Limitations: Time-base remux alone still produced codec errors. Re-encoding loses HDR/Dolby Vision metadata; subjective audio cut acceptance remained manual. Window decode is not a full replacement decode.
 - Sources:
   - [2026-09-28-logic-1377-stream-copy-freeze.md](/home/example/linux-config/.worktrees/vps-aws-bootstrap-prompt/docs/postmortem/2026-09-28-logic-1377-stream-copy-freeze.md) (SHA-256 `d42e44190bf1`; 2 alias(es), all retained in [sources.json](../sources.json)).
+
+## local-ods-view-namespace-preservation
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **runtime**.
+- Symptoms: generated ODS calculates correctly but real reload reports missing frozen headings; headless conversion discards view metadata; hidden controller cannot establish freeze state; oversized inherited page header/footer clips sheet exports.
+- Applicability: Generated ODS edited with ElementTree and recalculated through headless LibreOffice, requiring persistent sheet views and readable PDF previews.
+- Diagnostic checks: Compare `settings.xml` with Calc-saved view IDs, positions and short-typed split modes. Retain declarations referenced only inside formula/configuration-name strings. Reload with a real controller and assert freezes before manual freeze calls. Inspect exported pages and header/footer dimensions separately from formula checks.
+- Remedy: Explicitly retain `of`/`ooo` prefix declarations used in strings; preserve the valid per-workbook view map after calculation; verify `Hidden=False` in an isolated headless process; define disabled bounded page headers/footers for complete exports.
+- Verification evidence: `/usr/bin/python3 scripts/verify_tracker.py --render-dir /tmp/finance-tracker-preview` exited 0: all six controllers reported freezes before manual calls, no formula errors, fixed-expense edits changed runway, and all six complete PDF/PNG previews were visually inspected. Original workbook SHA-256 remained unchanged.
+- Limitations: `Hidden=True` behavior was observed in the inspected LibreOffice runtime; do not assume every UNO build behaves identically. ODS settings differ from XLSX pane XML. Preserve unrelated ZIP entries, current user view choices and calculated caches; use an isolated profile without changing global settings.
+- Sources:
+  - [2026-10-05-tracker-frozen-headings.md](/home/example/Documents/expenses/docs/postmortem/2026-10-05-tracker-frozen-headings.md) (SHA-256 `6a91398f4b50`; 1 alias, retained in [sources.json](../sources.json)).
+
+## ext-xlsx-row-offset-scalar-array
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **code**.
+- Symptoms: inserted rows select the wrong latest balance; scalar array formula assignment becomes text; a missing After reading has a misleading range warning.
+- Applicability: XLSX ROW-helper/INDEX lookups and Google-exported scalar array formulas edited through UNO.
+- Diagnostic checks: compare actual range start with the helper index; inspect UNO's outer `{=...}` wrapper; compare typed inputs before edits and after fresh reload.
+- Remedy: use `latestRow-ROW(firstReferencedCell)+1`; strip only the scalar-array wrapper before Formula assignment; name missing fields explicitly. Preserve original views and input data.
+- Verification: expected RED tests became GREEN;25 real-spreadsheet tests passed, separate repaired export had no formula errors, original SHA-256 was unchanged, and all five sheetViews fragments matched. Timestamp export rounding was confined to<4microseconds; other inputs matched exactly.
+- Limitations: live Google Sheets reimport remains unverified. The requested chronological-row copy is current-week only. Original strict pacing is historical and superseded for the repaired copy by ext-independent-personal-pacing.
+- Source: [2026-10-06-google-sheets-budget-withheld.md](/home/example/coding/codex-usage/docs/postmortem/2026-10-06-google-sheets-budget-withheld.md); reviewed hash/alias in sources.json.
+
+## ext-independent-personal-pacing
+
+- Status: **verified_fix**; confidence: **confirmed**; scope: **code**.
+- Symptoms: another person's overage or valid unfinished session hides all personal suggestions.
+- Applicability: shared allowance spreadsheets with per-person budgets.
+- Diagnostic checks: trace personal pacing to the shared readiness guard; test missing After separately from invalid Before with missing After.
+- Remedy: retain strict status separately, calculate personal estimates from valid completed data, cap by nonnegative personal entitlement and actual pool, and label unfinished usage as excluded. Unknown attribution, accounting gaps and invalid values still withhold pacing.
+- Verification: RED/GREEN regression and25 tests passed; zero exported formula errors; rendered Today shows positive Pistol suggestions and Dom0.
+- Limitations: live import remains unverified; current-week repaired copy only. Actual After must update ongoing usage.
+- Source: [2026-10-06-personal-suggestions-blocked-by-other-overage.md](/home/example/coding/codex-usage/docs/postmortem/2026-10-06-personal-suggestions-blocked-by-other-overage.md); reviewed hash in sources.json.
+
+## local-duration-microsecond-conservation
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **code**.
+- Symptoms: Float sums change when a counted interval is partitioned by model.
+- Applicability: Working-time reports and display projections using UTC datetime spans.
+- Diagnostic checks: Reproduce 0.3 seconds split at 0.1; compare split and unsplit totals and exact exported units.
+- Remedy: Aggregate integer elapsed microseconds before converting seconds; expose additive integer fields and keep picker totals on original intervals.
+- Verification evidence: Fractional RED→GREEN regressions, native record-byte invariance, full 86-test suite and strict typing passed.
+- Limitations: Decimal seconds remain convenience fields; binary float row sums can differ. Human waiting accuracy still depends on evidence.
+- Sources: [2026-10-06-model-report-subsecond-conservation.md](/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-06-model-report-subsecond-conservation.md) (SHA-256 `2335855b28b3`).
+
+## local-pending-context-metadata-join
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **code**.
+- Symptoms: Model evidence remains queued when SQLite creates historical timing after rollout scan.
+- Applicability: Incremental adapters joining rollout contexts to stable turns supplied by another read-only timing source.
+- Diagnostic checks: Fixture rollout context without lifecycle start plus SQLite thread_turns creates a turn with no attached model evidence.
+- Remedy: Reconcile pending contexts after metadata refresh and on every scan, using stable session/turn IDs and idempotent timestamp evidence.
+- Verification evidence: Actual SQLite fixture import/reimport passed; database bytes unchanged; full 86-test suite passed.
+- Limitations: Missing or unresolvable source IDs remain Unknown; never use SQLite current settings to infer history.
+- Sources: [2026-10-06-model-report-subsecond-conservation.md](/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-06-model-report-subsecond-conservation.md) (SHA-256 `2335855b28b3`).
+
+## local-uv-source-tool-reinstall
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **runtime**.
+- Symptoms: uv tool install --force reinstalls a cached local wheel after source-only edits under the same package version.
+- Applicability: Updating a uv-installed local tool whose metadata/version stays unchanged.
+- Diagnostic checks: Compare installed source/module behavior against local files; inspect uv reinstall/refresh flags.
+- Remedy: Use --reinstall-package for the local tool, then verify the installed entry point and exact deployable source set.
+- Verification evidence: Isolated real-uv repeated setup test RED→GREEN; real setup rebuilt package, models help and v2 schema passed, 14 installed source modules matched.
+- Limitations: Cache behavior is uv-version dependent; successful package installation does not prove service backfill or live heartbeat health.
+- Sources: [2026-10-06-model-report-install-cache.md](/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-06-model-report-install-cache.md) (SHA-256 `fd015e631db0`).
+
+## local-history-journal-observer-hot-path
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **runtime**.
+- Symptoms: Embedding 268k quota snapshots grows timing ledger to 84.6 MB and burdens observer cadence.; Timing ledger read takes 4.01 seconds with stale-heartbeat and sampling-gap risk.
+- Applicability: Observers repeatedly loading/saving timing state while accumulating large append-only historical telemetry.
+- Diagnostic checks: Measure real history count and ledger bytes plus read, incremental scan and serialization latency.; Verify installed cadence with multiple heartbeat samples after source tests; audit migration loss and duplicates.
+- Remedy: Separate validated append-only history into a journal with cached deduplication and keep history off the hot timing-ledger path. Validate legacy migration, restart, corruption refusal and cached restore behavior.
+- Verification evidence: 114 tests, mypy 16 modules, Ruff/build and 60 smoke checks passed. Installed 16 modules matched; journal retained 268,207 old observations plus 6 new, 0 lost/duplicates. Steady scan .691886s and serialization .580391s; 10 heartbeat samples showed 5 distinct, maximum age 2.129663s, no live diagnostic.
+- Limitations: Runtime evidence covers the measured installed workload; it does not guarantee all future load. Timing ledger remains 37.7 MB; quota is account-wide and burn comparisons remain uncertain.
+- Sources:
+  - [2026-10-06-burn-ledger-observation-latency.md](/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-06-burn-ledger-observation-latency.md) (SHA-256 `5ff8ecec867b`; 1 alias retained in [sources.json](../sources.json)).
+
+## local-terminal-report-readable-projection
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **runtime**.
+- Symptoms: Burn report prints dense unaligned rows, raw epoch resets and quality flags; model mix is hard to scan.
+- Applicability: Human terminal reports backed by structured accounting or diagnostic exports.
+- Diagnostic checks: Inspect actual rendered output at normal and narrow widths. Distinguish display hierarchy defects from accounting defects; inspect color-free and piped output.
+- Remedy: Project the same report data into a responsive summary with aligned model rows, human dates/durations, visible exclusions and progressive technical details. Keep monochrome distinction and an ASCII fallback; separate parallel streams from reset runs.
+- Verification evidence: 126 tests, mypy across 16 modules, Ruff/build and 72 smoke checks passed; actual 80-column PTY inspected; installed 40-column ASCII and NO_COLOR checks passed, installed 16 modules matched source and service health was fresh.
+- Limitations: Emoji width depends on terminal/font support. Runtime checks prove presentation behavior, not user aesthetic acceptance or quota-rate accuracy.
+- Sources:
+  - [2026-10-06-burn-terminal-readability.md](/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-06-burn-terminal-readability.md) (SHA-256 `74fdcb77a95a`; 1 alias, retained in [sources.json](../sources.json)).
+
+## local-xlsx-owned-inputs-and-expiry
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **runtime**.
+- Symptoms: preservation checks count newly authored helper formulas as altered user input; exported exact deadline creates a tiny positive duration and enormous pacing; an opening-row AND evaluates an invalid prior-row INDEX.
+- Applicability: formula-driven XLSX migrations preserving saved raw values and user formulas, with datetime-based pacing.
+- Diagnostic checks: compare declared input ownership against expanded used-area snapshots; exercise opening-row and exact-deadline behavior after XLSX export/reload; verify consistent numerator/denominator final-day durations.
+- Remedy: snapshot declared input columns, retain their formulas, reject helper collisions, and restrict export tolerance to timestamps. Guard INDEX with IF before eager logical evaluation. Treat positive residue under1e-9 days as expired, while keeping raw positive duration elsewhere for consistent proration.
+- Verification evidence: all47 local unittest checks passed; builder export/reload found zero formula errors and preserved saved session inputs/formulas and original workbook hashes.
+- Limitations: local LibreOffice evidence does not establish Google Sheets import. The sub0.1ms cutoff is conservative for the inspected serial rounding; it does not change stored observations. Host sandbox startup remains unresolved.
+- Source: [History migration input-preservation guard](/home/example/coding/codex-usage/docs/postmortem/2026-10-07-history-input-preservation-guard.md) (SHA-256 `366444a5cf50`; reviewed alias in [sources.json](../sources.json)).
+
+## local-sheets-scalar-latest-observation
+
+- Status: **verified_fix**; confidence: **confirmed**; verification scope: **runtime** (local repaired export/reload).
+- Symptoms: Google import selects the first completed row or zero, leaving personal shares correct but shared balances wrong and pacing withheld; a snapshot guard can reject its own normalized clock reference.
+- Applicability: spreadsheet history with numeric completed-row helpers and cycle-based latest-reading selection.
+- Diagnostic checks: inspect actual imported cached results before another engine recalculates; compare selected rows, shared balance and reconciliation separately from personal shares; check effective clock and normalized formula spelling independently.
+- Remedy: use native scalar MAXIFS rather than implicit array arithmetic inside LOOKUP; retain explicit reconciliation on formula failure. Repair a separate snapshot and verify owned inputs, Events, reset evidence, allocation snapshots, Setup and source hash. Refuse custom display content, allowing only equivalent known simple clock references. Show effective clock and exact future-Finished warning while retaining validation.
+- Verification: actual Google export cached rows7/0 and shared84/100; repaired local export/reload restored10/11 and51/91, preserved owned inputs/source hash and had zero formula errors. All51 local tests passed; normal/future warning renders were inspected.
+- Limitations: native repaired Google reimport/shared editing remain pending; local checks do not establish live activation. Account timezone text does not set application clock. A downloaded snapshot excludes later online edits. No live sheet was written.
+- Source: [Imported history pacing incident](/home/example/coding/codex-usage/docs/postmortem/2026-10-07-imported-history-pacing-blank.md) (SHA-256 `4edb2f5d8d82`; reviewed alias in [sources.json](../sources.json)).
+
+## local-workbook-owned-row-formula-loss
+
+- Status: **verified_fix**; confidence: **confirmed**; verification scope: **runtime** (local repair/export/reload).
+- Symptoms: completed row shows Used3 but blank Check, counted0/blocking1 and unchanged allowance; older pasted row formulas differ from prepared calculations; migration tests depend on a mutable Drive download.
+- Applicability: history workbooks where owned Check formulas govern counted usage; authoritative row order applies only under an explicit user instruction.
+- Diagnostics: inspect native cached Check, counted-row/points and blocker values separately from displayed Used; compare owned formulas with prepared rows; establish chronology contract without changing dates or legacy cutoffs; use immutable test sources.
+- Remedy: share Used/Check formula generators between fresh builds and snapshot repairs, restore only owned columns, and verify entered formulas/values, Events, reset evidence, allocations, Setup and source hash. Fill declared input columns rather than whole-row pastes. Under explicit row-order authority, remove cross-row time blockers while retaining same-row, future-clock, balance and reset validation. Pin migration fixtures independently of user downloads.
+- Verification: actual six-session Google cache reproduced missingJ12/olderG12 exclusion; defining tests failed then passed. Separate repaired export/reload preserved inputs/source, latest10/12 and shared51/88, remaining63.67/24.33 and zero formula errors. All53 local tests passed.
+- Limitations: native repaired Google reimport/shared editing remain pending. Explicit row-order authority is task-specific, not a general workaround for ambiguous overlap. Future-clock validation remains; repair is not automatic live restoration. No live sheet or source download was edited.
+- Source: [New session formula-loss incident](/home/example/coding/codex-usage/docs/postmortem/2026-10-07-new-session-check-formula-missing.md) (SHA-256 `35b84027c35f`; reviewed alias in [sources.json](../sources.json)).
+
+## local-native-sheet-clock-vs-import-engine
+
+- Status: verified_fix
+- Confidence: confirmed
+- Verification scope: runtime
+- Symptoms: Native sheet has reconciled balances but blank pacing and a clock hours behind the account timezone; LibreOffice reload turns valid Google cached MAXIFS results into unknown-function error525
+- Applicability: Cross-application spreadsheet diagnosis with time-dependent eligibility and native exported formula caches.
+- Diagnostics: Read native cached row checks, shared balance, reconciliation, effective clock and future-time count before another engine recalculates.; Compare the sheet clock with the account timezone and confirm any as-of override is blank.; Distinguish native application behavior from imported function parsing failures in the verification engine.
+- Remedy: Correct application timezone/recalculation settings; a timezone text label cannot set the clock. For a local probe of Google bare MAXIFS imports, reparse the same function name through Calc with every argument unchanged before comparing clocks. Preserve source hash, inputs and accounting guards; do not create another formula repair when native cached accounting is valid.
+- Verification: Native caches showed shared86, remaining61.67/24.33, Reconciled and two future finishes at09:42. After local function-name reparsing, the09:42:38 guard reproduced; changing only effective clock to12:42:38 restored daily9.50/3.75 and rest-of-today4.47/1.76 with balances/input values/source hash unchanged and zero formula errors.
+- Limitations: The configured Google timezone was inferred from a three-hour clock difference, not read directly. Actual shared-sheet setting activation remains pending. Local Calc function reparsing is a verification adapter and does not prove an import defect in Google.
+- Source: [Sheet clock incident](/home/example/coding/codex-usage/docs/postmortem/2026-10-07-sheet-clock-behind-toronto.md) (SHA-256 `ac8154fdd3d4`; reviewed alias in [sources.json](../sources.json)).

@@ -370,6 +370,30 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
   - [2026-08-19-design-skills-timer-copy-rename.md](/home/example/linux-config/.worktrees/vps-aws-bootstrap-prompt/docs/postmortem/2026-08-19-design-skills-timer-copy-rename.md) (SHA-256 `ff6f1e5780cc`; 2 alias(es), all retained in [sources.json](../sources.json)).
   - [2026-10-03-metaprompt-integration-validation.md](/home/example/linux-config/.worktrees/vps-aws-bootstrap-prompt/docs/postmortem/2026-10-03-metaprompt-integration-validation.md) (SHA-256 `21c81fbdab07`; 2 alias(es), all retained in [sources.json](../sources.json)).
 
+## local-malformed-persistence-fixture
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **code**.
+- Symptoms: schema-drift rejection test fails during fixture setup before the loader assertion; guarded writer correctly rejects a malformed column intended as loader input.
+- Applicability: Tests that must manufacture invalid persisted input to exercise a loader or migration rejection boundary.
+- Diagnostic checks: Locate the first failing stack frame and check whether fixture setup reaches the intended loader assertion. Separate guarded production writes from isolated test-only invalid-input construction.
+- Remedy: Construct deliberately malformed persisted input through a raw serializer in the isolated fixture, then assert that the production loader rejects it; retain the guarded writer for normal use.
+- Verification evidence: The corrected schema-drift fixture reaches `Book.load` and its rejection assertion passes; `python3 -m unittest discover -s tests -p test_finance.py -v` passed all 15 tests.
+- Limitations: Use a raw serializer only in disposable test fixtures designed to produce invalid persisted data. Do not weaken production writes or loader validation. Unit-test evidence does not establish LibreOffice calculation or live workbook behavior.
+- Sources:
+  - [2026-10-05-tracker-schema-test.md](/home/example/Documents/expenses/docs/postmortem/2026-10-05-tracker-schema-test.md) (SHA-256 `3c206245e81d`; 1 alias, retained in [sources.json](../sources.json)).
+
+## local-validated-fixture-assignment-order
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **code**.
+- Symptoms: Pydantic validate_assignment fixture fails with turn end precedes start before intended DST assertion.
+- Applicability: Test fixtures changing interdependent fields on models with assignment-time cross-field validation.
+- Diagnostic checks: Check validate_assignment and the first failing fixture assignment.; Evaluate intermediate field combinations against the model invariant.
+- Remedy: Keep every intermediate assignment valid: clear an optional end before moving start, then set the new end, or construct a fully validated replacement. Preserve production validators and intended assertions.
+- Verification evidence: Corrected DST fixture reaches elapsed-time and Unknown-mix assertions. Final frozen-tree verification: 101 pytest tests, mypy 16 modules, Ruff/build and 47 smoke checks passed.
+- Limitations: This verifies fixture construction and the tested report behavior; it does not establish live service activation. Optional-field clearing applies only where the model contract allows None.
+- Sources:
+  - [2026-10-06-burn-dst-fixture-order.md](/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-06-burn-dst-fixture-order.md) (SHA-256 `8f9b4252cb91`; 1 alias retained in [sources.json](../sources.json)).
+
 ## local-rg-windowed-match-highlighting
 
 - Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **runtime**.
@@ -406,16 +430,17 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Sources:
   - [2026-10-06-codex-search-picker-ui.md](/home/example/linux-config/docs/postmortem/2026-10-06-codex-search-picker-ui.md) (SHA-256 `9646e1b4d92a`; reviewed in [sources.json](../sources.json)).
 
-## local-dunst-stacked-script-state
+## local-terminal-color-test-environment
 
-- Status: **verified_workaround**; root-cause confidence: **confirmed**; verification scope: **workaround**.
-- Symptoms: Dunst history recall played after a silent duplicate despite always_run_script=false
-- Applicability: Dunst 1.9.2 scripts with native duplicate stacking and notification history.
-- Diagnostic checks: Inspect queues_stack_duplicate transfers of script_run. Separate ordinary sounded history from a silently replaced duplicate object.
-- Remedy: Preserve native stacking and global false; test/document that silently stacked replacements may sound once on later display instead of promising all history is silent or deduplicating text.
-- Verification evidence: Actual private-daemon tests passed completion/approval, immediate duplicate, ordinary history and stacked-history cases with fake mpv.
-- Limitations: Native state is unchanged; a previously silent stacked object can sound on history recall or restoration. Audio acceptance remains manual.
-- Source: [Dunst fixture startup](/home/example/linux-config/docs/postmortem/2026-10-07-dunst-fixture-startup.md) (SHA-256 `0ecc5a5310ac`).
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **code**.
+- Symptoms: Forced ANSI assertion fails when the test runner inherits NO_COLOR although product correctly suppresses color.
+- Applicability: Terminal renderer tests whose output is controlled by inherited color environment variables.
+- Diagnostic checks: Inspect NO_COLOR before interpreting an ANSI assertion failure. Exercise forced color and explicit no-color as independently controlled test environments.
+- Remedy: Clear NO_COLOR in the color-enabled fixture; retain a separate NO_COLOR suppression test. Do not weaken production environment handling to satisfy a contaminated fixture.
+- Verification evidence: The corrected fixture and separate NO_COLOR case passed in 28 focused tests and the 126-test full suite; installed NO_COLOR also suppressed explicit color requests.
+- Limitations: A fixture repair does not alone prove terminal readability or live activation; those require separate rendered and installed checks.
+- Sources:
+  - [2026-10-06-burn-terminal-readability.md](/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-06-burn-terminal-readability.md) (SHA-256 `74fdcb77a95a`; 1 alias, retained in [sources.json](../sources.json)).
 
 ## local-codex-effective-isolation-overrides
 
@@ -445,6 +470,17 @@ security checks with the arguments you passed.
 - Limitations: Does not permit ignoring changed source metadata or skipping permission checks.
 - Source: [Recent index fixture](../../../../docs/postmortem/2026-10-07-codex-recent-index-fixture.md).
 
+## local-dunst-stacked-script-state
+
+- Status: **verified_workaround**; root-cause confidence: **confirmed**; verification scope: **workaround**.
+- Symptoms: Dunst history recall played after a silent duplicate despite always_run_script=false
+- Applicability: Dunst 1.9.2 scripts with native duplicate stacking and notification history.
+- Diagnostic checks: Inspect queues_stack_duplicate transfers of script_run. Separate ordinary sounded history from a silently replaced duplicate object.
+- Remedy: Preserve native stacking and global false; test/document that silently stacked replacements may sound once on later display instead of promising all history is silent or deduplicating text.
+- Verification evidence: Actual private-daemon tests passed completion/approval, immediate duplicate, ordinary history and stacked-history cases with fake mpv.
+- Limitations: Native state is unchanged; a previously silent stacked object can sound on history recall or restoration. Audio acceptance remains manual.
+- Source: [Dunst fixture startup](/home/example/linux-config/docs/postmortem/2026-10-07-dunst-fixture-startup.md) (SHA-256 `0ecc5a5310ac`).
+
 ## local-second-brain-runtime-module-inventory
 
 - Status: **verified_fix**; confidence: **confirmed**; verification scope: **code**.
@@ -456,16 +492,6 @@ security checks with the arguments you passed.
 - Limitations: Synthetic installation does not establish live activation.
 - Source: [Session review module manifest](/home/example/linux-config/docs/postmortem/2026-10-08-session-review-module-manifest.md).
 
-## local-digest-provider-check-contract
-
-- Status: **verified_fix**; confidence: **supported**; verification scope: **runtime**.
-- Symptoms: Repeated `invalid_summary` classified as `invalid digest check`, with other recaps succeeding.
-- Applicability: Provider schemas that permit values rejected by the local output validator.
-- Diagnostics: Inspect safe field types/counts and the local error category. Compare emitted schema constraints with validation; do not log private model text.
-- Remedy: Apply the existing lowercase kebab-case check-key pattern and nonblank bounded check-text contract to generation; state key rules in the prompt. Keep local validation strict.
-- Verification: The inference-boundary contract test failed before repair; 80 session tests pass afterward. Installed default review exited 0 with five recaps, including the previously failing recap.
-- Limitations: The exact earlier private invalid value was not retained, so its field-level cause is supported rather than independently reconstructed; unrelated model failures remain possible.
-- Source: [Live session recap validation](/home/example/linux-config/docs/postmortem/2026-10-08-recent-session-review-live-check.md).
 
 ## local-shortcut-stored-text-verification
 
@@ -477,6 +503,17 @@ security checks with the arguments you passed.
 - Verification: defining RED regressions preceded fixes; 19 shortcut tests, syntax and installed-file checks passed.
 - Limitations: mapped commands were never executed; conditions remain host-specific and template-delimiter input has its own guard.
 - Source: [Fish alias completion checks](/home/example/linux-config/docs/postmortem/2026-10-08-fish-alias-completion-checks.md).
+
+## local-digest-provider-check-contract
+
+- Status: **verified_fix**; confidence: **supported**; verification scope: **runtime**.
+- Symptoms: Repeated `invalid_summary` classified as `invalid digest check`, with other recaps succeeding.
+- Applicability: Provider schemas that permit values rejected by the local output validator.
+- Diagnostics: Inspect safe field types/counts and the local error category. Compare emitted schema constraints with validation; do not log private model text.
+- Remedy: Apply the existing lowercase kebab-case check-key pattern and nonblank bounded check-text contract to generation; state key rules in the prompt. Keep local validation strict.
+- Verification: The inference-boundary contract test failed before repair; 80 session tests pass afterward. Installed default review exited 0 with five recaps, including the previously failing recap.
+- Limitations: The exact earlier private invalid value was not retained, so its field-level cause is supported rather than independently reconstructed; unrelated model failures remain possible.
+- Source: [Live session recap validation](/home/example/linux-config/docs/postmortem/2026-10-08-recent-session-review-live-check.md).
 
 ## local-picker-live-headline-integration
 

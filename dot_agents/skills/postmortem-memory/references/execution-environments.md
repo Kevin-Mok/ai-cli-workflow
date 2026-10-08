@@ -206,6 +206,78 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Sources:
   - [2026-08-19-design-skills-systemd-predeploy-verify.md](/home/example/linux-config/.worktrees/vps-aws-bootstrap-prompt/docs/postmortem/2026-08-19-design-skills-systemd-predeploy-verify.md) (SHA-256 `884bacd6e8bf`; 2 alias(es), all retained in [sources.json](../sources.json)).
 
+## local-managed-backup-preflight
+
+- Status: **verified_workaround**; root-cause confidence: **confirmed**; verification scope: **workaround**.
+- Symptoms: System Python cannot import a uv-managed application while deriving backup path.; Shell continues installation after backup preflight failure.
+- Applicability: Operational backup/install sequences for applications managed by an isolated Python environment.
+- Diagnostic checks: Check which interpreter executes application imports.; Verify backup bytes, schema version and timing relative to the first upgrade save; do not infer success from subsequent setup.
+- Remedy: Use standard-library-only path derivation or explicit managed uv execution, make backup success a checked fail-fast precondition, and verify actual backup metadata before install. Recovery secured the still-version-2 ledger before first upgrade save.
+- Verification evidence: Independent backup read confirmed version 2, 37,678,191 bytes, mode 0600 and recorded SHA-256. Later checked version-3 backup retained 268,207 quota observations; installed service and 16 modules verified healthy.
+- Limitations: Recovery occurred after restart and is not a successful original pre-install backup. It preserved pre-upgrade state; it does not retroactively repair the original unchecked shell sequence.
+- Sources:
+  - [2026-10-06-burn-install-backup-preflight.md](/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-06-burn-install-backup-preflight.md) (SHA-256 `86f1c43db1e7`; 1 alias retained in [sources.json](../sources.json)).
+
+
+## local-codex-nonfatal-exec-metadata
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **runtime**.
+- Symptoms: Restricted Codex inference reports unexpected tool activity although only error metadata and an agent message were emitted.
+- Applicability: Pinned native Codex 0.160.1 exec JSON event consumers that reject tool activity.
+- Diagnostic checks: Inspect only sanitized event and item type counts, not raw provider diagnostics. Check released exec_events.rs semantics for each candidate metadata type.
+- Remedy: Permit the documented nonfatal error item alongside reasoning/agent_message; continue rejecting every actual tool and unknown item. Preserve raw error text privately.
+- Verification evidence: Defining metadata regression failed before correction; 16 learning tests and full 203 suite passed. Real saved-login strict-schema inference then passed in 4.145s with usage counts.
+- Limitations: This is specific to the reviewed release. Nonfatal metadata is not success by itself; require successful process completion and schema validation. Actual systemd execution remains unverified.
+- Source: [AI alpha integration validation](/home/example/coding/ai-twitter-alpha/docs/postmortem/2026-10-06-integration-validation.md) (SHA-256 `c11665ca0e0c`; reviewed alias in [sources.json](../sources.json)).
+
+
+## local-cancellable-terminal-browser-owner
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **runtime**.
+- Symptoms: Cancelled asyncio.to_thread(input/getpass) leaves an executor thread blocking asyncio.run shutdown.; Child human timeout does not bound a parent still awaiting terminal input.
+- Applicability: Linux asyncio CLI setup with visible-browser handoffs and hidden token prompts.
+- Diagnostic checks: Exercise cancellation in a real PTY subprocess and require timely process exit. Check terminal echo is disabled before the prompt appears and restored after cancellation. Use distinct parent human and whole-worker deadlines.
+- Remedy: Use cancellable fd readiness for terminal input; disable echo before hidden prompts and restore it in finally. Bound parent human waits, sanitize worker events, and terminate only the child process group created by the supervisor.
+- Verification evidence: Real PTY and subprocess RED/GREEN regressions passed; 11 worker tests and full 203 suite passed. CLI sandboxed Chrome fixture shut down cleanly.
+- Limitations: TTY behavior was verified on Linux. This does not establish live X/MFA, human takeover, or Discord account setup.
+- Source: [AI alpha integration validation](/home/example/coding/ai-twitter-alpha/docs/postmortem/2026-10-06-integration-validation.md) (SHA-256 `c11665ca0e0c`; reviewed alias in [sources.json](../sources.json)).
+
+
+## local-model-thread-lock-lifetime
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **code**.
+- Symptoms: Cancelling to_thread releases the app run lock while model subprocess work continues.
+- Applicability: Async pipelines calling a bounded synchronous model/fetch engine while holding a process lock.
+- Diagnostic checks: Cancel after the model thread starts; verify a second owner cannot acquire the run lock until bounded cleanup completes.
+- Remedy: Shield the model task and retain the run lock while its own deadline-limited work drains after cancellation; keep unacknowledged evidence queued and propagate cancellation afterward.
+- Verification evidence: Executable cancellation regression failed before the change and passed after it; pipeline 11 and full 203 tests passed, with no delivery or tweet acknowledgement after cancellation.
+- Limitations: The synchronous engine must really enforce deadlines. First cancellation may wait for bounded cleanup; do not apply this to unbounded workers.
+- Source: [AI alpha integration validation](/home/example/coding/ai-twitter-alpha/docs/postmortem/2026-10-06-integration-validation.md) (SHA-256 `c11665ca0e0c`; reviewed alias in [sources.json](../sources.json)).
+
+
+## local-playwright-explicit-sandboxed-channel
+
+- Status: **verified_workaround**; root-cause confidence: **confirmed**; verification scope: **workaround**.
+- Symptoms: Downloaded Playwright Chromium reports No usable sandbox on a host where packaged Chrome can run sandboxed.
+- Applicability: Local Playwright 1.63.0 persistent-profile workflows on this inspected Linux host.
+- Diagnostic checks: Run a synthetic-only launch with chromium_sandbox=True and inspect the failure privately. Test the same complete fixture with an explicitly selected installed channel, including persisted cookies and headless restart.
+- Remedy: Keep the sandbox enabled. Allow an explicit configured chrome channel only after its fixture passes; do not silently fallback or alter OS sandbox policy. Give synthetic persistent cookies future expiry and test expiration separately.
+- Verification evidence: Default Chromium 153 remained blocked. Installed Chrome 146 passed headed/headless persistence, private synthetic twscrape import, collision, expiry, renewal and shutdown through the completed CLI.
+- Limitations: The bundled-browser host defect remains. Chrome 146/Playwright 1.63 compatibility is demonstrated only for this fixture; live accounts, future versions and real human takeover remain unverified.
+- Source: [AI alpha integration validation](/home/example/coding/ai-twitter-alpha/docs/postmortem/2026-10-06-integration-validation.md) (SHA-256 `c11665ca0e0c`; reviewed alias in [sources.json](../sources.json)).
+
+
+## local-systemd-venv-runtime-paths
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **runtime**.
+- Symptoms: systemd rejects a quoted WorkingDirectory as non-absolute.; Resolving a venv Python symlink can remove its installed-package context.
+- Applicability: Rendered systemd user units for a Python application installed in a virtual environment.
+- Diagnostic checks: Run actual systemd-analyze --user verify, including path quoting/expansion edge cases. Exercise the installed package and unit command outside the source checkout.
+- Remedy: Use a neutral WorkingDirectory=/ with absolute app/config arguments when cwd is unnecessary. Prefer the regular installed console script so its shebang retains the venv, and escape systemd arguments according to each field semantics.
+- Verification evidence: Actual unit parser caught WorkingDirectory and executable-dollar defects before fixes; 7 service fixtures plus temporary installed-wheel help/status/rendering and systemd verification passed.
+- Limitations: Unit parsing and equivalent manager environment tests do not prove an activated user-service process. Activation still requires its own reviewed live check.
+- Source: [AI alpha integration validation](/home/example/coding/ai-twitter-alpha/docs/postmortem/2026-10-06-integration-validation.md) (SHA-256 `c11665ca0e0c`; reviewed alias in [sources.json](../sources.json)).
+
 ## local-dbus-readiness-no-activation
 
 - Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **runtime**.

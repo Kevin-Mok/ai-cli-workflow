@@ -207,6 +207,18 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Sources:
   - [2026-10-03-metaprompt-benchmark-trial-infrastructure.md](/home/example/linux-config/.worktrees/vps-aws-bootstrap-prompt/docs/postmortem/2026-10-03-metaprompt-benchmark-trial-infrastructure.md) (SHA-256 `8e4453378c36`; 2 alias(es), all retained in [sources.json](../sources.json)).
 
+## local-quota-reset-chronological-replay
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **code**.
+- Symptoms: Old reset cohort returns after manual reset and bridges work across the reset.; Raw latest stale quota reading overstates remaining allowance.
+- Applicability: Allowance-report replay joining account-wide quota snapshots to counted working time across manual resets.
+- Diagnostic checks: Replay A, B, stale A chronological reset sequence; assert no elapsed-work duplication.; Replay rising used-percent followed by a stale lower reading; compare latest to accepted evidence.; Record distinct reset identities at one timestamp; verify conflict excludes attribution instead of relying on sort order.
+- Remedy: Replay chronological reset retirement; ignore stale returns and choose latest from accepted non-stale evidence. Group each stream timestamp before retirement: conflicting same-timestamp reset identities clear pair baselines and add explicit quality. Preserve jitter and gap exclusions.
+- Verification evidence: Three defining counterexamples failed intentionally before their corrections; 15 focused tests and final 101-test suite passed, with mypy 16 modules, Ruff/build and 47 smoke checks green.
+- Limitations: Checks cover sanitized local fixtures; quota remains account-wide and model mix cannot identify intrinsic model cost. Live installation is a separate verification.
+- Sources:
+  - [2026-10-06-burn-reset-cohort-review.md](/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-06-burn-reset-cohort-review.md) (SHA-256 `7301d78866bb`; 1 alias retained in [sources.json](../sources.json)).
+
 ## local-recap-cache-concurrent-lifecycle
 
 - Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **code**.

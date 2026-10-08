@@ -73,3 +73,7 @@ Completed: record sandbox recovery and executable snapshot lookup. Verified: fre
 ### Milestone 5 — chore(aliases): update log and backup shortcuts
 
 Completed: expand gl history and point tb at the USB backup drive. Verified: fresh scoped checks recorded above plus staged whitespace and incident-link contracts. Remaining: 10 planned groups, then one upstream push. Blockers: none for this milestone; documented broader vault inventory warning and manual acceptance limits remain. Next: docs(postmortems): expand reviewed cross-project guidance.
+
+### Milestone 6 — docs(postmortems): expand reviewed cross-project guidance
+
+Completed: register reviewed accounting, runtime and artifact verification findings. Verified: fresh scoped checks recorded above plus staged whitespace and incident-link contracts. Remaining: 9 planned groups, then one upstream push. Blockers: none for this milestone; documented broader vault inventory warning and manual acceptance limits remain. Next: feat(backup): add guarded recovery and live backup workflows.

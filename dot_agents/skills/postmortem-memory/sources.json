@@ -2618,6 +2618,29 @@
       "verification_scope": "runtime"
     },
     {
+      "applicability": "Tests that must manufacture invalid persisted input to exercise a loader or migration rejection boundary.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Locate the first failing stack frame and check whether fixture setup reaches the intended loader assertion.",
+        "Separate guarded production writes from isolated test-only invalid-input construction."
+      ],
+      "id": "local-malformed-persistence-fixture",
+      "limitations": "Use a raw serializer only in disposable test fixtures designed to produce invalid persisted data. Do not weaken production writes or loader validation. Unit-test evidence does not establish LibreOffice calculation or live workbook behavior.",
+      "reference": "references/api-contracts-fixtures.md#local-malformed-persistence-fixture",
+      "remedy": "Construct deliberately malformed persisted input through a raw serializer in the isolated fixture, then assert that the production loader rejects it; retain the guarded writer for normal use.",
+      "sources": [
+        "3c206245e81d9475419c91710e264232ce3ce04c56c8884217ceb49cb352a353"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "Schema-drift rejection test fails during fixture setup before the loader assertion.",
+        "Guarded writer correctly rejects a malformed column intended as loader input."
+      ],
+      "topic": "api-contracts-fixtures",
+      "verification": "The corrected schema-drift fixture reaches Book.load and its rejection assertion passes; python3 -m unittest discover -s tests -p test_finance.py -v passed all 15 tests.",
+      "verification_scope": "code"
+    },
+    {
       "applicability": "Media status helpers selecting from real tracks and generic dashboard metadata.",
       "confidence": "confirmed",
       "diagnostics": [
@@ -2805,6 +2828,33 @@
       "topic": "execution-environments",
       "verification": "Mode 100644 matched neighboring tests; focused and existing refresh tests both passed through bash.",
       "verification_scope": "workaround"
+    },
+    {
+      "applicability": "Generated ODS files edited with ElementTree and recalculated through headless LibreOffice, with persistent sheet views and readable PDF previews.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Compare settings.xml with a Calc-saved workbook, including view ID, position fields and short-typed split modes.",
+        "Retain namespace declarations used only inside formula or configuration-name string values.",
+        "Reload the generated artifact with a real controller and assert frozen panes before calling freezeAtPosition.",
+        "Inspect exported pages and page-header/footer dimensions separately from numeric formula checks."
+      ],
+      "id": "local-ods-view-namespace-preservation",
+      "limitations": "Hidden=True controller behavior was observed in the inspected LibreOffice runtime; do not assume every UNO build behaves identically. ODS view settings differ from XLSX pane XML. Preserve unrelated ZIP entries, current user view choices and calculated caches; use an isolated profile without changing global settings.",
+      "reference": "references/artifact-verification.md#local-ods-view-namespace-preservation",
+      "remedy": "Explicitly retain of/ooo prefix declarations used in strings, preserve the valid per-workbook view map after headless calculation, verify using Hidden=False in an isolated headless process, and define disabled bounded page headers/footers for complete exports.",
+      "sources": [
+        "6a91398f4b50bd3a737457f9ad6091ef61a37a54df7a60ca5a30f5b9bfc48551"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "Generated ODS calculates correctly but real reload reports missing frozen headings.",
+        "Headless conversion discards per-workbook view metadata.",
+        "Hidden document controller returns false for freezeAtPosition/hasFrozenPanes.",
+        "Inherited oversized page header/footer clips otherwise correct sheet exports."
+      ],
+      "topic": "artifact-verification",
+      "verification": "The same executable verifier exited 0 after correction: six sheet controllers reported frozen panes before manual freeze calls, formulas contained no errors, a fixed-expense edit changed runway, and six complete PDF/PNG previews were visually inspected; original workbook SHA-256 was unchanged.",
+      "verification_scope": "runtime"
     },
     {
       "applicability": "Ad hoc diagnostics inspecting optional downloader metadata fields.",
@@ -3350,8 +3400,193 @@
       "verification_scope": "code"
     },
     {
+      "applicability": "XLSX session trackers using ROW helpers with fixed INDEX offsets; Google-exported scalar array formulas edited through UNO.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Compare helper row number with referenced range start and actual selected cell.",
+        "Inspect UNO Formula for an outer {=...} array wrapper before scalar assignment.",
+        "Compare typed user inputs before edits and after fresh export reload; distinguish tiny timestamp serialization rounding."
+      ],
+      "id": "ext-xlsx-row-offset-scalar-array",
+      "limitations": "Native Google Sheets reimport unverified. Original strict-pacing behavior is historical and superseded for the repaired copy by ext-independent-personal-pacing; row-order copy remains current-week only.",
+      "reference": "references/artifact-verification.md#ext-xlsx-row-offset-scalar-array",
+      "remedy": "Derive INDEX offset with ROW(first referenced cell); normalize only the outer scalar-array wrapper before assignment; distinguish missing readings from invalid ranges. Preserve original views and inputs.",
+      "sources": [
+        "5f1ac0fbcce78a7f188371b5bf70f30a129ad8272a7d98e101ff3382c3e40f49"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "Inserted spreadsheet rows make INDEX select a different session balance",
+        "UNO scalar array Formula assignment becomes literal text",
+        "Generic range warning hides a missing After reading"
+      ],
+      "topic": "artifact-verification",
+      "verification": "Three expected RED regressions became GREEN; 25 real-spreadsheet tests passed. Separate saved-history export had zero formula errors and preserved source, input data and views.",
+      "verification_scope": "code"
+    },
+    {
+      "applicability": "Shared allowance spreadsheets offering per-person spending suggestions.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Trace personal pacing to shared readiness guards.",
+        "Distinguish completed invalid rows from a valid unfinished row; test invalid Before with missing After."
+      ],
+      "id": "ext-independent-personal-pacing",
+      "limitations": "Live Sheets import unverified; unfinished usage is excluded until actual After is entered. Applies to the repaired current-week copy; fresh template remains strict.",
+      "reference": "references/artifact-verification.md#ext-independent-personal-pacing",
+      "remedy": "Separate strict shared status from personal estimate validity; cap pace by nonnegative personal entitlement and actual shared pool; label estimates as completed-session-only and preserve unknown/gap/invalid-data guards.",
+      "sources": [
+        "5f9b6a22e9a0f770f89dd70da05a399c601db1d2e63e50b275942ea9428b27a5"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "Shared strict readiness hides valid personal pacing when another user is over budget or a session is unfinished"
+      ],
+      "topic": "artifact-verification",
+      "verification": "RED/GREEN saved-export regression; all25 tests passed; exported formulas had no errors and Today visibly showed positive Pistol pacing and Dom zero.",
+      "verification_scope": "code"
+    },
+    {
+      "applicability": "Working-time reports and display projections using UTC datetime spans.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Reproduce 0.3 seconds split at 0.1; compare split and unsplit totals and exact exported units."
+      ],
+      "id": "local-duration-microsecond-conservation",
+      "limitations": "Decimal seconds remain convenience fields; binary float row sums can differ. Human waiting accuracy still depends on evidence.",
+      "reference": "references/artifact-verification.md#local-duration-microsecond-conservation",
+      "remedy": "Aggregate integer elapsed microseconds before converting seconds; expose additive integer fields and keep picker totals on original intervals.",
+      "sources": [
+        "2335855b28b38c44d6f06e404699ce8fe3fbfd0f507bd02bbafd3f347e0db97f"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "Float sums change when a counted interval is partitioned by model."
+      ],
+      "verification": "Fractional RED\u2192GREEN regressions, native record-byte invariance, full 86-test suite and strict typing passed.",
+      "verification_scope": "code"
+    },
+    {
+      "applicability": "Incremental adapters joining rollout contexts to stable turns supplied by another read-only timing source.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Fixture rollout context without lifecycle start plus SQLite thread_turns creates a turn with no attached model evidence."
+      ],
+      "id": "local-pending-context-metadata-join",
+      "limitations": "Missing or unresolvable source IDs remain Unknown; never use SQLite current settings to infer history.",
+      "reference": "references/artifact-verification.md#local-pending-context-metadata-join",
+      "remedy": "Reconcile pending contexts after metadata refresh and on every scan, using stable session/turn IDs and idempotent timestamp evidence.",
+      "sources": [
+        "2335855b28b38c44d6f06e404699ce8fe3fbfd0f507bd02bbafd3f347e0db97f"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "Model evidence remains queued when SQLite creates historical timing after rollout scan."
+      ],
+      "verification": "Actual SQLite fixture import/reimport passed; database bytes unchanged; full 86-test suite passed.",
+      "verification_scope": "code"
+    },
+    {
+      "applicability": "Updating a uv-installed local tool whose metadata/version stays unchanged.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Compare installed source/module behavior against local files; inspect uv reinstall/refresh flags."
+      ],
+      "id": "local-uv-source-tool-reinstall",
+      "limitations": "Cache behavior is uv-version dependent; successful package installation does not prove service backfill or live heartbeat health.",
+      "reference": "references/artifact-verification.md#local-uv-source-tool-reinstall",
+      "remedy": "Use --reinstall-package for the local tool, then verify the installed entry point and exact deployable source set.",
+      "sources": [
+        "fd015e631db0f34051618f5a6034009779e4f00e4fa850394dab72e26eaf7d4d"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "uv tool install --force reinstalls a cached local wheel after source-only edits under the same package version."
+      ],
+      "verification": "Isolated real-uv repeated setup test RED\u2192GREEN; real setup rebuilt package, models help and v2 schema passed, 14 installed source modules matched.",
+      "verification_scope": "runtime"
+    },
+    {
+      "applicability": "Test fixtures changing interdependent fields on models with assignment-time cross-field validation.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Check validate_assignment and the first failing fixture assignment.",
+        "Evaluate intermediate field combinations against the model invariant."
+      ],
+      "id": "local-validated-fixture-assignment-order",
+      "limitations": "This verifies fixture construction and the tested report behavior; it does not establish live service activation. Optional-field clearing applies only where the model contract allows None.",
+      "reference": "references/api-contracts-fixtures.md#local-validated-fixture-assignment-order",
+      "remedy": "Keep every intermediate assignment valid: clear an optional end before moving start, then set the new end, or construct a fully validated replacement. Preserve production validators and intended assertions.",
+      "sources": [
+        "8f9b4252cb9189e68a7d5e2ca7a3dc1d82a4cf0b7865bd4ab6a213ec8dde48e2"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "Pydantic validate_assignment fixture fails with turn end precedes start before intended DST assertion."
+      ],
+      "verification": "Corrected DST fixture reaches elapsed-time and Unknown-mix assertions. Final frozen-tree verification: 101 pytest tests, mypy 16 modules, Ruff/build and 47 smoke checks passed.",
+      "verification_scope": "code"
+    },
+    {
+      "applicability": "Allowance-report replay joining account-wide quota snapshots to counted working time across manual resets.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Replay A, B, stale A chronological reset sequence; assert no elapsed-work duplication.",
+        "Replay rising used-percent followed by a stale lower reading; compare latest to accepted evidence.",
+        "Record distinct reset identities at one timestamp; verify conflict excludes attribution instead of relying on sort order."
+      ],
+      "id": "local-quota-reset-chronological-replay",
+      "limitations": "Checks cover sanitized local fixtures; quota remains account-wide and model mix cannot identify intrinsic model cost. Live installation is a separate verification.",
+      "reference": "references/state-security.md#local-quota-reset-chronological-replay",
+      "remedy": "Replay chronological reset retirement; ignore stale returns and choose latest from accepted non-stale evidence. Group each stream timestamp before retirement: conflicting same-timestamp reset identities clear pair baselines and add explicit quality. Preserve jitter and gap exclusions.",
+      "sources": [
+        "7301d78866bb0840ce0cf611a1c2bcf225a8b5a9e98db5c721ac1a45ca9bf21d"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "Old reset cohort returns after manual reset and bridges work across the reset.",
+        "Raw latest stale quota reading overstates remaining allowance."
+      ],
+      "verification": "Three defining counterexamples failed intentionally before their corrections; 15 focused tests and final 101-test suite passed, with mypy 16 modules, Ruff/build and 47 smoke checks green.",
+      "verification_scope": "code"
+    },
+    {
+      "applicability": "CLI search renderers consuming ripgrep JSON byte offsets for a clipped decoded excerpt.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Benchmark a warm 160,000-match synthetic line and inspect which submatches trigger UTF-8 prefix decoding.",
+        "Exercise a matched trailing CR and long Unicode prefix in a real PTY."
+      ],
+      "id": "local-rg-windowed-match-highlighting",
+      "limitations": "This bounds highlight-offset work, not rg scanning/JSON parsing. Emoji-cell widths vary by font; complete commands can wrap. Runtime evidence uses synthetic histories.",
+      "reference": "references/api-contracts-fixtures.md#local-rg-windowed-match-highlighting",
+      "remedy": "Calculate excerpt byte boundaries once, stop ordered submatches past the window and decode only window-relative slices. Remove only the added newline, preserve decoded CR and remap offsets after escaping controls before ANSI.",
+      "sources": [
+        "9777098eb77ea8554b1960081840ece0c3bae9d66d336af3979e3ea49a926380"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "a bounded highlighted excerpt still takes seconds on a dense single-line match",
+        "a matched trailing carriage return disappears from displayed text"
+      ],
+      "topic": "api-contracts-fixtures",
+      "verification": "Dense-match RED timed out at 5s; after correction 160,000 matches took 0.392s (independent review 0.354s). All 29 tests and six installed PTY/option/performance checks pass; real picker Enter/Esc preserve safe selection/cancellation.",
+      "verification_scope": "runtime"
+    },
+    {
+      "applicability": "Streaming local JSONL search caches and terminal resume commands.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Inject non-string discriminants and isolated surrogates next to valid records.",
+        "Exercise cwd controls and an early-closing output consumer."
+      ],
       "id": "local-codex-search-json-boundary",
+      "limitations": "Synthetic code evidence does not establish support for every historical Codex format.",
       "reference": "references/api-contracts-fixtures.md#local-codex-search-json-boundary",
+      "remedy": "Validate discriminant types, skip per-record encoding errors, reject non-printable resume paths, and catch/flush BrokenPipeError before OSError.",
+      "sources": [
+        "5d3fefff323897f552d80d5c2b9f78e693587cc8eb6b6bb9ae09b6760fd833b5"
+      ],
       "status": "verified_fix",
       "symptoms": [
         "malformed payload type causes TypeError",
@@ -3359,66 +3594,225 @@
         "raw cwd terminal controls",
         "BrokenPipeError caught as OSError"
       ],
-      "applicability": "Streaming local JSONL search caches and terminal resume commands.",
-      "diagnostics": [
-        "Inject non-string discriminants and isolated surrogates next to valid records.",
-        "Exercise cwd controls and an early-closing output consumer."
-      ],
-      "confidence": "confirmed",
-      "remedy": "Validate discriminant types, skip per-record encoding errors, reject non-printable resume paths, and catch/flush BrokenPipeError before OSError.",
+      "topic": "api-contracts-fixtures",
       "verification": "All four defining regressions observed RED then passed; complete suite 22/22 GREEN.",
-      "verification_scope": "code",
-      "limitations": "Synthetic code evidence does not establish support for every historical Codex format.",
-      "sources": [
-        "5d3fefff323897f552d80d5c2b9f78e693587cc8eb6b6bb9ae09b6760fd833b5"
-      ],
-      "topic": "api-contracts-fixtures"
+      "verification_scope": "code"
     },
     {
+      "applicability": "CLI wrappers capturing a selected row from an interactive fzf subprocess.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Emit stderr from a defining picker stub.",
+        "Run real fzf Escape/Enter on synthetic history and inspect real Codex /status without a prompt."
+      ],
       "id": "local-fzf-ui-stream-and-resume-fixture",
+      "limitations": "Live checks use synthetic logs and temporary fzf, not private history or a permanently installed fzf.",
       "reference": "references/api-contracts-fixtures.md#local-fzf-ui-stream-and-resume-fixture",
+      "remedy": "Capture fzf stdout only; inherit stderr for the UI. Assert source immutability for search, not for the actual resumed application lifecycle.",
+      "sources": [
+        "9646e1b4d92a098a828a3b24db554c4922377a7539ee47914fcff652b7361b94"
+      ],
       "status": "verified_fix",
       "symptoms": [
         "real fzf picker is invisible while selection stubs pass",
         "real-resume fixture wrongly asserts source byte immutability"
       ],
-      "applicability": "CLI wrappers capturing a selected row from an interactive fzf subprocess.",
-      "diagnostics": [
-        "Emit stderr from a defining picker stub.",
-        "Run real fzf Escape/Enter on synthetic history and inspect real Codex /status without a prompt."
-      ],
-      "confidence": "confirmed",
-      "remedy": "Capture fzf stdout only; inherit stderr for the UI. Assert source immutability for search, not for the actual resumed application lifecycle.",
+      "topic": "api-contracts-fixtures",
       "verification": "Stderr regression RED/GREEN; 22 tests pass; live fzf cancel/select exit 0; actual saved messages and correct UUID/cwd shown in Codex with zero token use.",
-      "verification_scope": "runtime",
-      "limitations": "Live checks use synthetic logs and temporary fzf, not private history or a permanently installed fzf.",
-      "sources": [
-        "9646e1b4d92a098a828a3b24db554c4922377a7539ee47914fcff652b7361b94"
-      ],
-      "topic": "api-contracts-fixtures"
+      "verification_scope": "runtime"
     },
     {
-      "id": "local-rg-windowed-match-highlighting",
-      "reference": "references/api-contracts-fixtures.md#local-rg-windowed-match-highlighting",
+      "applicability": "Operational backup/install sequences for applications managed by an isolated Python environment.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Check which interpreter executes application imports.",
+        "Verify backup bytes, schema version and timing relative to the first upgrade save; do not infer success from subsequent setup."
+      ],
+      "id": "local-managed-backup-preflight",
+      "limitations": "Recovery occurred after restart and is not a successful original pre-install backup. It preserved pre-upgrade state; it does not retroactively repair the original unchecked shell sequence.",
+      "reference": "references/execution-environments.md#local-managed-backup-preflight",
+      "remedy": "Use standard-library-only path derivation or explicit managed uv execution, make backup success a checked fail-fast precondition, and verify actual backup metadata before install. Recovery secured the still-version-2 ledger before first upgrade save.",
+      "sources": [
+        "86f1c43db1e7bdb9dc917d191c6c135fb806b34fdbfc4945d532203ff3523820"
+      ],
+      "status": "verified_workaround",
+      "symptoms": [
+        "System Python cannot import a uv-managed application while deriving backup path.",
+        "Shell continues installation after backup preflight failure."
+      ],
+      "verification": "Independent backup read confirmed version 2, 37,678,191 bytes, mode 0600 and recorded SHA-256. Later checked version-3 backup retained 268,207 quota observations; installed service and 16 modules verified healthy.",
+      "verification_scope": "workaround"
+    },
+    {
+      "applicability": "Observers repeatedly loading/saving timing state while accumulating large append-only historical telemetry.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Measure real history count and ledger bytes plus read, incremental scan and serialization latency.",
+        "Verify installed cadence with multiple heartbeat samples after source tests; audit migration loss and duplicates."
+      ],
+      "id": "local-history-journal-observer-hot-path",
+      "limitations": "Runtime evidence covers the measured installed workload; it does not guarantee all future load. Timing ledger remains 37.7 MB; quota is account-wide and burn comparisons remain uncertain.",
+      "reference": "references/artifact-verification.md#local-history-journal-observer-hot-path",
+      "remedy": "Separate validated append-only history into a journal with cached deduplication and keep history off the hot timing-ledger path. Validate legacy migration, restart, corruption refusal and cached restore behavior.",
+      "sources": [
+        "5ff8ecec867b6e9a874ef758e2b1c247f20e88021adb0f7ce372b7c042c2b395"
+      ],
       "status": "verified_fix",
       "symptoms": [
-        "a bounded highlighted excerpt still takes seconds on a dense single-line match",
-        "a matched trailing carriage return disappears from displayed text"
+        "Embedding 268k quota snapshots grows timing ledger to 84.6 MB and burdens observer cadence.",
+        "Timing ledger read takes 4.01 seconds with stale-heartbeat and sampling-gap risk."
       ],
-      "applicability": "CLI search renderers consuming ripgrep JSON byte offsets for a clipped decoded excerpt.",
-      "diagnostics": [
-        "Benchmark a warm 160,000-match synthetic line and inspect which submatches trigger UTF-8 prefix decoding.",
-        "Exercise a matched trailing CR and long Unicode prefix in a real PTY."
-      ],
+      "verification": "114 tests, mypy 16 modules, Ruff/build and 60 smoke checks passed. Installed 16 modules matched; journal retained 268,207 old observations plus 6 new, 0 lost/duplicates. Steady scan .691886s and serialization .580391s; 10 heartbeat samples showed 5 distinct, maximum age 2.129663s, no live diagnostic.",
+      "verification_scope": "runtime"
+    },
+    {
+      "applicability": "Human terminal reports backed by structured accounting or diagnostic exports.",
       "confidence": "confirmed",
-      "remedy": "Calculate excerpt byte boundaries once, stop ordered submatches past the window and decode only window-relative slices. Remove only the added newline, preserve decoded CR and remap offsets after escaping controls before ANSI.",
-      "verification": "Dense-match RED timed out at 5s; after correction 160,000 matches took 0.392s (independent review 0.354s). All 29 tests and six installed PTY/option/performance checks pass; real picker Enter/Esc preserve safe selection/cancellation.",
-      "verification_scope": "runtime",
-      "limitations": "This bounds highlight-offset work, not rg scanning/JSON parsing. Emoji-cell widths vary by font; complete commands can wrap. Runtime evidence uses synthetic histories.",
-      "sources": [
-        "9777098eb77ea8554b1960081840ece0c3bae9d66d336af3979e3ea49a926380"
+      "diagnostics": [
+        "Inspect actual rendered output at normal and narrow widths.",
+        "Distinguish display hierarchy defects from accounting defects; inspect color-free and piped output."
       ],
-      "topic": "api-contracts-fixtures"
+      "id": "local-terminal-report-readable-projection",
+      "limitations": "Emoji width depends on terminal/font support. Runtime checks prove presentation behavior, not user aesthetic acceptance or quota-rate accuracy.",
+      "reference": "references/artifact-verification.md#local-terminal-report-readable-projection",
+      "remedy": "Project the same report data into a responsive summary with aligned model rows, human dates/durations, visible exclusions and progressive technical details. Keep monochrome distinction and an ASCII fallback; separate parallel streams from reset runs.",
+      "sources": [
+        "74fdcb77a95ac264eeca4a8dff326d361c54414889ffee4bbd4ed1692fb08e16"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "Burn report prints dense unaligned rows, raw epoch resets and quality flags; model mix is hard to scan."
+      ],
+      "verification": "126 tests, mypy across 16 modules, Ruff/build and 72 smoke checks passed; actual 80-column PTY inspected; installed 40-column ASCII and NO_COLOR checks passed, installed 16 modules matched source and service health was fresh.",
+      "verification_scope": "runtime"
+    },
+    {
+      "applicability": "Terminal renderer tests whose output is controlled by inherited color environment variables.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Inspect NO_COLOR before interpreting an ANSI assertion failure.",
+        "Exercise forced color and explicit no-color as independently controlled test environments."
+      ],
+      "id": "local-terminal-color-test-environment",
+      "limitations": "A fixture repair does not alone prove terminal readability or live activation; those require separate rendered and installed checks.",
+      "reference": "references/api-contracts-fixtures.md#local-terminal-color-test-environment",
+      "remedy": "Clear NO_COLOR in the color-enabled fixture; retain a separate NO_COLOR suppression test. Do not weaken production environment handling to satisfy a contaminated fixture.",
+      "sources": [
+        "74fdcb77a95ac264eeca4a8dff326d361c54414889ffee4bbd4ed1692fb08e16"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "Forced ANSI assertion fails when the test runner inherits NO_COLOR although product correctly suppresses color."
+      ],
+      "verification": "The corrected fixture and separate NO_COLOR case passed in 28 focused tests and the 126-test full suite; installed NO_COLOR also suppressed explicit color requests.",
+      "verification_scope": "code"
+    },
+    {
+      "applicability": "Pinned native Codex 0.160.1 exec JSON event consumers that reject tool activity.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Inspect only sanitized event and item type counts, not raw provider diagnostics.",
+        "Check released exec_events.rs semantics for each candidate metadata type."
+      ],
+      "id": "local-codex-nonfatal-exec-metadata",
+      "limitations": "This is specific to the reviewed release. Nonfatal metadata is not success by itself; require successful process completion and schema validation. Actual systemd execution remains unverified.",
+      "reference": "references/execution-environments.md#local-codex-nonfatal-exec-metadata",
+      "remedy": "Permit the documented nonfatal error item alongside reasoning/agent_message; continue rejecting every actual tool and unknown item. Preserve raw error text privately.",
+      "sources": [
+        "c11665ca0e0c327d7fb087e610621342dceb1566d9fb3eb25f2fd29611d1be7e"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "Restricted Codex inference reports unexpected tool activity although only error metadata and an agent message were emitted."
+      ],
+      "verification": "Defining metadata regression failed before correction; 16 learning tests and full 203 suite passed. Real saved-login strict-schema inference then passed in 4.145s with usage counts.",
+      "verification_scope": "runtime"
+    },
+    {
+      "applicability": "Linux asyncio CLI setup with visible-browser handoffs and hidden token prompts.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Exercise cancellation in a real PTY subprocess and require timely process exit.",
+        "Check terminal echo is disabled before the prompt appears and restored after cancellation.",
+        "Use distinct parent human and whole-worker deadlines."
+      ],
+      "id": "local-cancellable-terminal-browser-owner",
+      "limitations": "TTY behavior was verified on Linux. This does not establish live X/MFA, human takeover, or Discord account setup.",
+      "reference": "references/execution-environments.md#local-cancellable-terminal-browser-owner",
+      "remedy": "Use cancellable fd readiness for terminal input; disable echo before hidden prompts and restore it in finally. Bound parent human waits, sanitize worker events, and terminate only the child process group created by the supervisor.",
+      "sources": [
+        "c11665ca0e0c327d7fb087e610621342dceb1566d9fb3eb25f2fd29611d1be7e"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "Cancelled asyncio.to_thread(input/getpass) leaves an executor thread blocking asyncio.run shutdown.",
+        "Child human timeout does not bound a parent still awaiting terminal input."
+      ],
+      "verification": "Real PTY and subprocess RED/GREEN regressions passed; 11 worker tests and full 203 suite passed. CLI sandboxed Chrome fixture shut down cleanly.",
+      "verification_scope": "runtime"
+    },
+    {
+      "applicability": "Async pipelines calling a bounded synchronous model/fetch engine while holding a process lock.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Cancel after the model thread starts; verify a second owner cannot acquire the run lock until bounded cleanup completes."
+      ],
+      "id": "local-model-thread-lock-lifetime",
+      "limitations": "The synchronous engine must really enforce deadlines. First cancellation may wait for bounded cleanup; do not apply this to unbounded workers.",
+      "reference": "references/execution-environments.md#local-model-thread-lock-lifetime",
+      "remedy": "Shield the model task and retain the run lock while its own deadline-limited work drains after cancellation; keep unacknowledged evidence queued and propagate cancellation afterward.",
+      "sources": [
+        "c11665ca0e0c327d7fb087e610621342dceb1566d9fb3eb25f2fd29611d1be7e"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "Cancelling to_thread releases the app run lock while model subprocess work continues."
+      ],
+      "verification": "Executable cancellation regression failed before the change and passed after it; pipeline 11 and full 203 tests passed, with no delivery or tweet acknowledgement after cancellation.",
+      "verification_scope": "code"
+    },
+    {
+      "applicability": "Local Playwright 1.63.0 persistent-profile workflows on this inspected Linux host.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Run a synthetic-only launch with chromium_sandbox=True and inspect the failure privately.",
+        "Test the same complete fixture with an explicitly selected installed channel, including persisted cookies and headless restart."
+      ],
+      "id": "local-playwright-explicit-sandboxed-channel",
+      "limitations": "The bundled-browser host defect remains. Chrome 146/Playwright 1.63 compatibility is demonstrated only for this fixture; live accounts, future versions and real human takeover remain unverified.",
+      "reference": "references/execution-environments.md#local-playwright-explicit-sandboxed-channel",
+      "remedy": "Keep the sandbox enabled. Allow an explicit configured chrome channel only after its fixture passes; do not silently fallback or alter OS sandbox policy. Give synthetic persistent cookies future expiry and test expiration separately.",
+      "sources": [
+        "c11665ca0e0c327d7fb087e610621342dceb1566d9fb3eb25f2fd29611d1be7e"
+      ],
+      "status": "verified_workaround",
+      "symptoms": [
+        "Downloaded Playwright Chromium reports No usable sandbox on a host where packaged Chrome can run sandboxed."
+      ],
+      "verification": "Default Chromium 153 remained blocked. Installed Chrome 146 passed headed/headless persistence, private synthetic twscrape import, collision, expiry, renewal and shutdown through the completed CLI.",
+      "verification_scope": "workaround"
+    },
+    {
+      "applicability": "Rendered systemd user units for a Python application installed in a virtual environment.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Run actual systemd-analyze --user verify, including path quoting/expansion edge cases.",
+        "Exercise the installed package and unit command outside the source checkout."
+      ],
+      "id": "local-systemd-venv-runtime-paths",
+      "limitations": "Unit parsing and equivalent manager environment tests do not prove an activated user-service process. Activation still requires its own reviewed live check.",
+      "reference": "references/execution-environments.md#local-systemd-venv-runtime-paths",
+      "remedy": "Use a neutral WorkingDirectory=/ with absolute app/config arguments when cwd is unnecessary. Prefer the regular installed console script so its shebang retains the venv, and escape systemd arguments according to each field semantics.",
+      "sources": [
+        "c11665ca0e0c327d7fb087e610621342dceb1566d9fb3eb25f2fd29611d1be7e"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "systemd rejects a quoted WorkingDirectory as non-absolute.",
+        "Resolving a venv Python symlink can remove its installed-package context."
+      ],
+      "verification": "Actual unit parser caught WorkingDirectory and executable-dollar defects before fixes; 7 service fixtures plus temporary installed-wheel help/status/rendering and systemd verification passed.",
+      "verification_scope": "runtime"
     },
     {
       "applicability": "Discord reader features sharing accounting/routing coordination with bounded REST scans and sticky status publication.",
@@ -3448,49 +3842,29 @@
       "verification_scope": "code"
     },
     {
-      "id": "local-dbus-readiness-no-activation",
-      "topic": "execution-environments",
+      "applicability": "Formula-driven XLSX migrations that preserve saved input values/formulas and pace usage to a local datetime deadline.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Compare declared input ownership with expanded used-area snapshots.",
+        "Test the opening row and exact deadline after actual XLSX export and engine reload.",
+        "Compare final-day numerator and denominator rather than rounding only one duration."
+      ],
+      "id": "local-xlsx-owned-inputs-and-expiry",
+      "limitations": "Evidence covers local LibreOffice calculation/export, not Google Sheets import. The conservative1e-9-day cutoff is specific to the inspected date-serial tolerance; recorded timestamps remain unchanged. Host sandbox startup remains unresolved.",
+      "reference": "references/artifact-verification.md#local-xlsx-owned-inputs-and-expiry",
+      "remedy": "Snapshot declared raw input columns including user formulas; reject collisions in new helper columns. Tolerate export rounding only in date values. Guard prior-row INDEX with IF before eager logical evaluation. Treat sub0.1ms positive deadline residue as expired while retaining the raw positive duration elsewhere.",
+      "sources": [
+        "366444a5cf50abbf4b684ed9de9408ee653b0ac28b8095b96f4e057f3474c1f1"
+      ],
       "status": "verified_fix",
-      "confidence": "confirmed",
       "symptoms": [
-        "Private Dunst fixture autoactivated default daemon during dunstctl readiness",
-        "Name acquisition conflict before defining integration RED"
+        "Workbook preservation guard counts newly added helper formulas as changed user input",
+        "Exact exported reset deadline leaves tiny positive serial residue and enormous suggested rate",
+        "Opening-row AND evaluation reaches invalid previous-row INDEX"
       ],
-      "applicability": "Private DBus service fixtures whose readiness commands address an activatable service.",
-      "diagnostics": [
-        "Compare daemon PID/ownership with DBus activation logs.",
-        "Check whether readiness targets the service before it owns its name."
-      ],
-      "remedy": "Poll org.freedesktop.DBus.NameHasOwner without addressing the service, then verify the explicitly launched daemon is alive before service calls.",
-      "verification": "Corrected RED contained no competing activation; private Xvfb/DBus integration passed and cleaned its own daemon.",
-      "verification_scope": "runtime",
-      "limitations": "This proves fixture startup ownership, not live desktop audio or production daemon repair.",
-      "reference": "references/execution-environments.md#local-dbus-readiness-no-activation",
-      "sources": [
-        "0ecc5a5310acd454d6eb3e8205aed3a6861c0031a606074646465e01b78cf498"
-      ]
-    },
-    {
-      "id": "local-dunst-stacked-script-state",
-      "topic": "api-contracts-fixtures",
-      "status": "verified_workaround",
-      "confidence": "confirmed",
-      "symptoms": [
-        "Dunst history recall played after a silent duplicate despite always_run_script=false"
-      ],
-      "applicability": "Dunst 1.9.2 scripts with native duplicate stacking and notification history.",
-      "diagnostics": [
-        "Inspect queues_stack_duplicate transfers of script_run.",
-        "Separate ordinary sounded history from a silently replaced duplicate object."
-      ],
-      "remedy": "Preserve native stacking and global false; test/document that silently stacked replacements may sound once on later display instead of promising all history is silent or deduplicating text.",
-      "verification": "Actual private-daemon tests passed completion/approval, immediate duplicate, ordinary history and stacked-history cases with fake mpv.",
-      "verification_scope": "workaround",
-      "limitations": "Native state is unchanged; a previously silent stacked object can sound on history recall or restoration. Audio acceptance remains manual.",
-      "reference": "references/api-contracts-fixtures.md#local-dunst-stacked-script-state",
-      "sources": [
-        "0ecc5a5310acd454d6eb3e8205aed3a6861c0031a606074646465e01b78cf498"
-      ]
+      "topic": "artifact-verification",
+      "verification": "All47 unittest engine checks passed, including preservation, exported opening-row errors, exact expiry, the33-minute final day and independent-review regressions. Builder export/reload found zero formula errors and preserved source session inputs/formulas and original workbook hashes.",
+      "verification_scope": "runtime"
     },
     {
       "applicability": "Installed Codex CLI 0.160.1 configuration probes and isolated recap execution.",
@@ -3539,6 +3913,32 @@
       "verification_scope": "code"
     },
     {
+      "applicability": "Formula-driven history workbooks imported between spreadsheet applications, selecting the last completed row by cycle.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Read actual Google export cached values before another engine recalculates them.",
+        "Compare numeric completed-row helpers, selected cycle rows, shared balances and reconciliation status independently of personal shares.",
+        "Inspect application clock separately from account timezone labels and future-session guards.",
+        "Inspect normalized UNO formula spelling when guarding owned display cells."
+      ],
+      "id": "local-sheets-scalar-latest-observation",
+      "limitations": "Local LibreOffice repair and export are verified; native corrected Google reimport and shared editing remain pending. Timezone label does not configure the application clock. Downloaded snapshots omit subsequent online edits. No live sheet was written.",
+      "reference": "references/artifact-verification.md#local-sheets-scalar-latest-observation",
+      "remedy": "Use native scalar MAXIFS over numeric completed-row helpers rather than implicit array arithmetic in LOOKUP. Expose formula failures as reconciliation instead of silently falling back to zero. Repair a separate downloaded snapshot, preserving entries, Events, reset evidence, allocation snapshots and Setup; refuse custom display content while accepting only equivalent known simple clock references. Display effective time and exact future-Finished warning without weakening validation.",
+      "sources": [
+        "4edb2f5d8d8259a7ee39a277bf054dd83613afe707de39b552edbb0fc339e113"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "Google imported cycle lookup selects first matching session or zero while personal shares remain correct",
+        "Pacing is blank because incorrect shared readings fail reconciliation",
+        "Snapshot repair rejects its own clock reference after XLSX normalization"
+      ],
+      "topic": "artifact-verification",
+      "verification": "Actual Google cached latest rows7/0 and shared84/100 reproduced the defect. Separate repaired XLSX export/reload restored10/11 and51/91, preserved owned inputs/source hash, and had zero formula errors. All51 local unittest checks passed; normal/future Today renders were inspected.",
+      "verification_scope": "runtime"
+    },
+    {
       "applicability": "Local recap caches with asynchronous generation, concurrent readers and cache maintenance.",
       "confidence": "confirmed",
       "diagnostics": [
@@ -3581,81 +3981,166 @@
       "verification_scope": "code"
     },
     {
-      "id": "local-second-brain-runtime-module-inventory",
-      "reference": "references/api-contracts-fixtures.md#local-second-brain-runtime-module-inventory",
+      "applicability": "Spreadsheet history with owned per-row checks driving counted spending; row-order authority applies only when explicitly confirmed by the user.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Inspect cached Check, counted-row/points/blocking helpers and cycle totals separately from displayed Used.",
+        "Compare missing Check and older Used formulas with prepared neighboring rows.",
+        "Confirm the chronology contract rather than changing dates or expanding legacy exemptions.",
+        "Pin source fixtures independently of mutable user downloads."
+      ],
+      "id": "local-workbook-owned-row-formula-loss",
+      "limitations": "Native repaired Google reimport/shared editing remain pending. Row-order assumptions are task-specific explicit user instructions, not permission to ignore actual ambiguity in other trackers. Future-clock guard remains active; snapshot repair is not automatic live formula restoration. No live sheet or source file was edited.",
+      "reference": "references/artifact-verification.md#local-workbook-owned-row-formula-loss",
+      "remedy": "Extract shared Used/Check generators and reinstall owned columns in a separate snapshot, preserving entered values/formulas, Events, reset evidence, cycle allocations and Setup. Fill only declared input columns; whole-row pastes can replace calculations. When the user explicitly establishes top-to-bottom chronological order, remove cross-row timestamp blockers while retaining same-row, future-clock, balance continuity and reset validation. Use a stable source fixture for migration regressions.",
+      "sources": [
+        "35b84027c35fcceeec771d2cee17bca80b39a7f36ad58ba900ff14f8c34421e0"
+      ],
       "status": "verified_fix",
       "symptoms": [
-        "chezmoi runtime package source is incomplete after adding a Second Brain module"
+        "Completed row shows Used3 but blank Check and unchanged cycle totals",
+        "Pasted session retains an older Used formula and loses owned validation",
+        "Tests depend on mutable Drive source that now already contains Cycles"
       ],
+      "topic": "artifact-verification",
+      "verification": "Actual Google cache had blankJ12, oldG12, counted0/blocking1 and unchanged current91. Defining formula-loss and row-order tests failed then passed. Actual six-session repair/export/reload preserved source hash and owned inputs, restored latest10/12 and shared51/88, remaining63.67/24.33 and zero formula errors. All53 local tests passed.",
+      "verification_scope": "runtime"
+    },
+    {
+      "applicability": "Cross-application spreadsheet diagnosis with time-dependent eligibility and native exported formula caches.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Read native cached row checks, shared balance, reconciliation, effective clock and future-time count before another engine recalculates.",
+        "Compare the sheet clock with the account timezone and confirm any as-of override is blank.",
+        "Distinguish native application behavior from imported function parsing failures in the verification engine."
+      ],
+      "id": "local-native-sheet-clock-vs-import-engine",
+      "limitations": "The configured Google timezone was inferred from a three-hour clock difference, not read directly. Actual shared-sheet setting activation remains pending. Local Calc function reparsing is a verification adapter and does not prove an import defect in Google.",
+      "reference": "references/artifact-verification.md#local-native-sheet-clock-vs-import-engine",
+      "remedy": "Correct application timezone/recalculation settings; a timezone text label cannot set the clock. For a local probe of Google bare MAXIFS imports, reparse the same function name through Calc with every argument unchanged before comparing clocks. Preserve source hash, inputs and accounting guards; do not create another formula repair when native cached accounting is valid.",
+      "sources": [
+        "ac8154fdd3d4b51a517daedcc24beaef9788cf2d9eeb794d394aa20aac865d77"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "Native sheet has reconciled balances but blank pacing and a clock hours behind the account timezone",
+        "LibreOffice reload turns valid Google cached MAXIFS results into unknown-function error525"
+      ],
+      "topic": "artifact-verification",
+      "verification": "Native caches showed shared86, remaining61.67/24.33, Reconciled and two future finishes at09:42. After local function-name reparsing, the09:42:38 guard reproduced; changing only effective clock to12:42:38 restored daily9.50/3.75 and rest-of-today4.47/1.76 with balances/input values/source hash unchanged and zero formula errors.",
+      "verification_scope": "runtime"
+    },
+    {
+      "applicability": "Private DBus service fixtures whose readiness commands address an activatable service.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Compare daemon PID/ownership with DBus activation logs.",
+        "Check whether readiness targets the service before it owns its name."
+      ],
+      "id": "local-dbus-readiness-no-activation",
+      "limitations": "This proves fixture startup ownership, not live desktop audio or production daemon repair.",
+      "reference": "references/execution-environments.md#local-dbus-readiness-no-activation",
+      "remedy": "Poll org.freedesktop.DBus.NameHasOwner without addressing the service, then verify the explicitly launched daemon is alive before service calls.",
+      "sources": [
+        "0ecc5a5310acd454d6eb3e8205aed3a6861c0031a606074646465e01b78cf498"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "Private Dunst fixture autoactivated default daemon during dunstctl readiness",
+        "Name acquisition conflict before defining integration RED"
+      ],
+      "topic": "execution-environments",
+      "verification": "Corrected RED contained no competing activation; private Xvfb/DBus integration passed and cleaned its own daemon.",
+      "verification_scope": "runtime"
+    },
+    {
+      "applicability": "Dunst 1.9.2 scripts with native duplicate stacking and notification history.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Inspect queues_stack_duplicate transfers of script_run.",
+        "Separate ordinary sounded history from a silently replaced duplicate object."
+      ],
+      "id": "local-dunst-stacked-script-state",
+      "limitations": "Native state is unchanged; a previously silent stacked object can sound on history recall or restoration. Audio acceptance remains manual.",
+      "reference": "references/api-contracts-fixtures.md#local-dunst-stacked-script-state",
+      "remedy": "Preserve native stacking and global false; test/document that silently stacked replacements may sound once on later display instead of promising all history is silent or deduplicating text.",
+      "sources": [
+        "0ecc5a5310acd454d6eb3e8205aed3a6861c0031a606074646465e01b78cf498"
+      ],
+      "status": "verified_workaround",
+      "symptoms": [
+        "Dunst history recall played after a silent duplicate despite always_run_script=false"
+      ],
+      "topic": "api-contracts-fixtures",
+      "verification": "Actual private-daemon tests passed completion/approval, immediate duplicate, ordinary history and stacked-history cases with fake mpv.",
+      "verification_scope": "workaround"
+    },
+    {
       "applicability": "Second Brain module additions and extractions under scripts/second_brain.",
+      "confidence": "confirmed",
       "diagnostics": [
         "Compare .py source inventory with RUNTIME_MODULE_NAMES and source directives in executable_setup-second-brain-timer.",
         "Run sessions timer enable/check fixtures."
       ],
-      "confidence": "confirmed",
-      "remedy": "Add required modules to the explicit runtime inventory in the same change; preserve strict source validation.",
-      "verification": "72 session tests pass after the manifest addition; four installer tests failed beforehand.",
-      "verification_scope": "code",
+      "id": "local-second-brain-runtime-module-inventory",
       "limitations": "Fixture installation evidence does not prove live activation or unrelated timer behavior.",
+      "reference": "references/api-contracts-fixtures.md#local-second-brain-runtime-module-inventory",
+      "remedy": "Add required modules to the explicit runtime inventory in the same change; preserve strict source validation.",
       "sources": [
         "1134d2147abd68bf08c58c6e650f8ee222e5f36a222aae13dbf334a55aaccd85"
-      ]
-    },
-    {
-      "id": "local-digest-provider-check-contract",
-      "reference": "references/api-contracts-fixtures.md#local-digest-provider-check-contract",
+      ],
       "status": "verified_fix",
       "symptoms": [
-        "Repeated invalid_summary from invalid digest check while other recaps succeed"
+        "chezmoi runtime package source is incomplete after adding a Second Brain module"
       ],
-      "applicability": "Schema-constrained model output followed by stricter local check-key/text validation.",
-      "diagnostics": [
-        "Inspect safe field shapes and validator error category without printing private response values.",
-        "Compare provider key patterns and string bounds with local validation; exercise the emitted schema through the inference boundary."
-      ],
-      "confidence": "supported",
-      "remedy": "Constrain provider check keys/text to the existing local contract and state the format in the prompt; preserve strict local validation.",
-      "verification": "Defining provider-contract test failed before repair; 80 session tests pass after repair; installed default review exited 0 with five recaps including the previously failing one.",
-      "verification_scope": "runtime",
-      "limitations": "The earlier private invalid value was not retained; other inference or schema failures remain possible and must retain per-recap error handling.",
-      "sources": [
-        "e3fa3bd9952c79a5ddea41e1319772a80682c2bfb02d1ee354897c7168beee2d"
-      ]
+      "verification": "72 session tests pass after the manifest addition; four installer tests failed beforehand.",
+      "verification_scope": "code"
     },
     {
-      "id": "local-shortcut-stored-text-verification",
-      "reference": "references/api-contracts-fixtures.md#local-shortcut-stored-text-verification",
-      "status": "verified_fix",
-      "symptoms": [
-        "Absolute executables with arguments route as file paths; generated fish abbreviation text contains extra backslashes before backticks."
-      ],
       "applicability": "Shortcut request routing and string encoding across template and fish syntax.",
+      "confidence": "confirmed",
       "diagnostics": [
         "Compare stored abbreviation text using fish --no-config and abbr --show on isolated fixtures; do not execute mapped commands.",
         "Exercise absolute executable paths with arguments and quoted/spaced path fixtures."
       ],
-      "confidence": "confirmed",
-      "remedy": "Treat multiple words as a command unless the complete value is an existing path; do not escape backticks in fish double-quoted command values.",
-      "verification": "RED routing and stored-backtick regressions preceded the minimum fixes; all 19 shortcut tests, generated syntax and installed-byte checks passed.",
-      "verification_scope": "code",
+      "id": "local-shortcut-stored-text-verification",
       "limitations": "No mapped command was executed. Condition activation still follows current host; unsupported template requests are rejected separately.",
+      "reference": "references/api-contracts-fixtures.md#local-shortcut-stored-text-verification",
+      "remedy": "Treat multiple words as a command unless the complete value is an existing path; do not escape backticks in fish double-quoted command values.",
       "sources": [
         "2c0f5d18179756b22b7ac8ac470d9cad3d36b245464e147703f742d6dbc63652"
-      ]
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "Absolute executables with arguments route as file paths; generated fish abbreviation text contains extra backslashes before backticks."
+      ],
+      "verification": "RED routing and stored-backtick regressions preceded the minimum fixes; all 19 shortcut tests, generated syntax and installed-byte checks passed.",
+      "verification_scope": "code"
     },
     {
-      "id": "local-picker-live-headline-integration",
-      "topic": "api-contracts-fixtures",
-      "reference": "references/api-contracts-fixtures.md#local-picker-live-headline-integration",
-      "status": "verified_fix",
-      "confidence": "confirmed",
-      "verification_scope": "runtime",
-      "symptoms": [
-        "Guardian review persists after recap arrives",
-        "ready headline exists but live row keeps fallback title",
-        "static rendering passes while active rows stay generic"
+      "applicability": "Schema-constrained model output followed by stricter local check-key/text validation.",
+      "confidence": "supported",
+      "diagnostics": [
+        "Inspect safe field shapes and validator error category without printing private response values.",
+        "Compare provider key patterns and string bounds with local validation; exercise the emitted schema through the inference boundary."
       ],
+      "id": "local-digest-provider-check-contract",
+      "limitations": "The earlier private invalid value was not retained; other inference or schema failures remain possible and must retain per-recap error handling.",
+      "reference": "references/api-contracts-fixtures.md#local-digest-provider-check-contract",
+      "remedy": "Constrain provider check keys/text to the existing local contract and state the format in the prompt; preserve strict local validation.",
+      "sources": [
+        "e3fa3bd9952c79a5ddea41e1319772a80682c2bfb02d1ee354897c7168beee2d"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "Repeated invalid_summary from invalid digest check while other recaps succeed"
+      ],
+      "verification": "Defining provider-contract test failed before repair; 80 session tests pass after repair; installed default review exited 0 with five recaps including the previously failing one.",
+      "verification_scope": "runtime"
+    },
+    {
       "applicability": "Recent-session pickers substituting AI headlines for generic native titles.",
+      "confidence": "confirmed",
       "diagnostics": [
         "Compare active row title with current recap metadata and installed source.",
         "Exercise actual reload path with synthetic workers before relying on static rendering.",
@@ -3663,58 +4148,95 @@
         "Compare picker start and recap completion time before treating a transient generic label as a failed update.",
         "Ensure synthetic startup preserves ready cached states; cached-title verification must not start inference workers."
       ],
-      "remedy": "Publish current headlines on each status update. Retain the query and track selection while it still matches; allow normal re-filtering and safely return no selection at zero matches. Preserve ready cache states in synthetic managers; exercise cached opening and uncached live refresh in separate modes.",
-      "verification": "Defining live replacement RED preceded fix; 93 search tests and source/installed real-fzf fixtures pass, including exact UUID resume, zero-match Enter and worker cleanup. Read-only authenticated live state also confirmed the exact reported row updated after its recap completed 28 seconds from opening. Commit verification exposed a synthetic cached-state startup race; the corrected zero-worker cached opening and uncached live fixtures pass, followed by all 98 search tests in 38.034 seconds.",
+      "id": "local-picker-live-headline-integration",
       "limitations": "Synthetic workers make no provider calls. Already-open processes require one reopen to load code; missing recaps retain native titles.",
+      "reference": "references/api-contracts-fixtures.md#local-picker-live-headline-integration",
+      "remedy": "Publish current headlines on each status update. Retain the query and track selection while it still matches; allow normal re-filtering and safely return no selection at zero matches. Preserve ready cache states in synthetic managers; exercise cached opening and uncached live refresh in separate modes.",
       "sources": [
         "a9b03fd41f6dc748201a96e5023a19874cd9e111cf363da9283fc5f0a4cd6dff",
         "f342d3f52cdfb78f0db728999f1faf60bb37d782c3830eaa7751524b663d3d0b",
         "9abbb622d990f840246c249ff9071f283343fb5fe8ffd8794b0994272255cb38"
-      ]
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "Guardian review persists after recap arrives",
+        "ready headline exists but live row keeps fallback title",
+        "static rendering passes while active rows stay generic"
+      ],
+      "topic": "api-contracts-fixtures",
+      "verification": "Defining live replacement RED preceded fix; 93 search tests and source/installed real-fzf fixtures pass, including exact UUID resume, zero-match Enter and worker cleanup. Read-only authenticated live state also confirmed the exact reported row updated after its recap completed 28 seconds from opening. Commit verification exposed a synthetic cached-state startup race; the corrected zero-worker cached opening and uncached live fixtures pass, followed by all 98 search tests in 38.034 seconds.",
+      "verification_scope": "runtime"
     },
     {
-      "id": "local-descendant-exit-observation",
-      "topic": "api-contracts-fixtures",
-      "reference": "references/api-contracts-fixtures.md#local-descendant-exit-observation",
-      "status": "verified_fix",
-      "confidence": "confirmed",
-      "verification_scope": "runtime",
-      "symptoms": [
-        "descendant still R immediately after group cancellation",
-        "leader reaped while descendant proc-state assertion fails"
-      ],
       "applicability": "Linux cancellation fixtures observing an owned process group after asynchronous signals.",
+      "confidence": "confirmed",
       "diagnostics": [
         "Confirm SIGTERM/SIGKILL target the owned process group and leader is reaped.",
         "Distinguish an immediate proc-state race from a child surviving a bounded deadline.",
         "Read proc-state directly and handle disappearance between checks."
       ],
-      "remedy": "Keep immediate leader absence; bound observation of the owned child disappearing or becoming Z and fail with last state if it survives. Do not assume leader wait reaps descendants.",
-      "verification": "Focused real subprocess cancellation passes; full98 search suite passes after correcting the immediate observation race. A running child remains a failure after one second.",
+      "id": "local-descendant-exit-observation",
       "limitations": "Synthetic Linux subprocesses only; fixture correction does not claim production wait reaps grandchildren or establish live provider shutdown.",
+      "reference": "references/api-contracts-fixtures.md#local-descendant-exit-observation",
+      "remedy": "Keep immediate leader absence; bound observation of the owned child disappearing or becoming Z and fail with last state if it survives. Do not assume leader wait reaps descendants.",
       "sources": [
         "cd1f19005235b7a969d3372bd42a4c58d75e30163107d91acdd239726ddf2c8f"
-      ]
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "descendant still R immediately after group cancellation",
+        "leader reaped while descendant proc-state assertion fails"
+      ],
+      "topic": "api-contracts-fixtures",
+      "verification": "Focused real subprocess cancellation passes; full98 search suite passes after correcting the immediate observation race. A running child remains a failure after one second.",
+      "verification_scope": "runtime"
     }
   ],
   "reports": [
     {
-      "sha256": "3382c298129dcb4231dd0b486483d275a7fa6f785970099e8c766bce0bc73647",
       "aliases": [
         "/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-08-model-report-presentation.md"
       ],
-      "reviewed_on": "2026-10-08",
+      "decision": "No new reusable learning: local-terminal-report-readable-projection covers responsive layouts, human labels and width checks; existing discovery guidance covers absent optional probes. Final 180 tests, 126 smoke checks, strict mypy/Ruff/build and installed day/week/month conservation/source-freshness/plain/details checks passed. The specific percentage-formatting lesson is recorded in project tasks/lessons.md. Session commit uses directly observed Python-write evidence; README gate repairs are source-grounded. No new learning beyond existing gate/discovery/scope guidance.",
       "findings": [],
-      "decision": "No new reusable learning: local-terminal-report-readable-projection covers responsive layouts, human labels and width checks; existing discovery guidance covers absent optional probes. Final 180 tests, 126 smoke checks, strict mypy/Ruff/build and installed day/week/month conservation/source-freshness/plain/details checks passed. The specific percentage-formatting lesson is recorded in project tasks/lessons.md. Session commit uses directly observed Python-write evidence; README gate repairs are source-grounded. No new learning beyond existing gate/discovery/scope guidance."
+      "reviewed_on": "2026-10-08",
+      "sha256": "3382c298129dcb4231dd0b486483d275a7fa6f785970099e8c766bce0bc73647"
     },
     {
-      "sha256": "3d75887bc180c290466f0c2772ac5d3355a7fde413f9dc0c5295684dead2d68c",
       "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-10-08-model-command-lookup-sandbox.md"
       ],
-      "reviewed_on": "2026-10-08",
+      "decision": "No new reusable learning: ext-sandbox-loopback covers the identical pre-execution error. Approved source reads and installed model report help exited 0; host sandbox remains unrepaired.",
       "findings": [],
-      "decision": "No new reusable learning: ext-sandbox-loopback covers the identical pre-execution error. Approved source reads and installed model report help exited 0; host sandbox remains unrepaired."
+      "reviewed_on": "2026-10-08",
+      "sha256": "3d75887bc180c290466f0c2772ac5d3355a7fde413f9dc0c5295684dead2d68c"
+    },
+    {
+      "aliases": [
+        "/home/example/coding/example-client-app/docs/postmortem/2026-10-08-directory-cli-execution.md"
+      ],
+      "decision": "No new reusable learning: existing local-sandbox-loopback-approved-route and discovered-path lookup guidance cover the failures. Elevated task-scoped reads and seven CLI fixture tests succeeded; the underlying sandbox remains unavailable. Optional browser acceptance remains pending.",
+      "findings": [],
+      "reviewed_on": "2026-10-08",
+      "sha256": "8cabe73d121a761dde5e08300e3cb61c8dbca3773117de528b724358a9bffae7"
+    },
+    {
+      "aliases": [
+        "/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-06-daily-report-rerun-preflight.md"
+      ],
+      "decision": "No new reusable finding: identical Bubblewrap loopback startup failure is covered by local-sandbox-loopback-approved-route; approved bounded reads exited 0 while underlying host policy remains unresolved. Root AGENTS.md path assumptions were corrected with source inventory. A guarded JSON reserialization refused before mutation; a narrow report-entry insertion preserves unrelated dirty ledger formatting. Existing discovery/ownership guidance covers these process errors. No product/tracking data changed from preflight.",
+      "findings": [],
+      "reviewed_on": "2026-10-06",
+      "sha256": "ca61651eac63dcaa3c0c4c5a2c4d1ba7e5b87eea8f2004bed0ec1abbe5a2698f"
+    },
+    {
+      "aliases": [
+        "/home/example/coding/weather/docs/postmortem/2026-10-06-desktop-grid-verification-environment.md"
+      ],
+      "decision": "Reviewed; repeats ext-sandbox-loopback and local-sandbox-loopback-approved-route. Approved command execution and bash-invoked Playwright CLI enabled verified layout checks. Optional local tooling and port discovery failures add no new reusable remedy. After explicit deployment authorization, the configured Vercel GitHub integration successfully deployed the pushed commit and real production layout checks passed; direct CLI authentication remained unnecessary.",
+      "findings": [],
+      "reviewed_on": "2026-10-06",
+      "sha256": "e151cf18a790d775c34d024841b3c1718d323297a4c27e6389e3a5865b8b166c"
     },
     {
       "aliases": [
@@ -4272,6 +4794,16 @@
     },
     {
       "aliases": [
+        "/home/example/Documents/expenses/docs/postmortem/2026-10-05-tracker-schema-test.md"
+      ],
+      "findings": [
+        "local-malformed-persistence-fixture"
+      ],
+      "reviewed_on": "2026-10-05",
+      "sha256": "3c206245e81d9475419c91710e264232ce3ce04c56c8884217ceb49cb352a353"
+    },
+    {
+      "aliases": [
         "/home/example/coding/twitter-cap-bot/docs/postmortem/2026-10-03-prompt-save-sandbox-initialization.md"
       ],
       "findings": [
@@ -4279,6 +4811,15 @@
       ],
       "reviewed_on": "2026-10-05",
       "sha256": "3de23b848b998b98edf060a46f0440c4b51ea7bb6634fa9c5d4d038ab077c10c"
+    },
+    {
+      "aliases": [
+        "/home/example/Documents/expenses/docs/postmortem/2026-10-05-sandbox-loopback.md"
+      ],
+      "decision": "No new reusable learning: identical pre-execution loopback failure repeats ext-sandbox-loopback; failed browser/403 source retrieval and alternate primary-source lookup repeat the existing source-evidence caution. Scoped approved commands worked, but default sandbox and restricted research surfaces remain unrepaired; do not infer consumer route quotes or broaden prior finding remedies.",
+      "findings": [],
+      "reviewed_on": "2026-10-05",
+      "sha256": "3e6f2d435cb357043fdd72734bf96938e1195b6319432d21f05f95d42daecf37"
     },
     {
       "aliases": [
@@ -4630,6 +5171,16 @@
       ],
       "reviewed_on": "2026-10-05",
       "sha256": "6975b9209434b650b46fc9df558a092002e7951e707d2e8c333a4aa16dd59fd3"
+    },
+    {
+      "aliases": [
+        "/home/example/Documents/expenses/docs/postmortem/2026-10-05-tracker-frozen-headings.md"
+      ],
+      "findings": [
+        "local-ods-view-namespace-preservation"
+      ],
+      "reviewed_on": "2026-10-05",
+      "sha256": "6a91398f4b50bd3a737457f9ad6091ef61a37a54df7a60ca5a30f5b9bfc48551"
     },
     {
       "aliases": [
@@ -5690,61 +6241,302 @@
       "sha256": "ff6f1e5780cc432e11e8547d78d7da310abde7252ce34ebba02efd6bac4cb9fa"
     },
     {
-      "sha256": "06fb01c47c65e65b242e8ad66571ec8fb279e5e41ef423fbff04973c4bd70092",
+      "aliases": [
+        "/home/example/coding/codex-usage/docs/postmortem/2026-10-06-command-sandbox-unavailable.md"
+      ],
+      "decision": "No new reusable learning: recurrence of ext-sandbox-loopback; approved scoped execution verified, default sandbox remains unavailable.",
+      "findings": [],
+      "reviewed_on": "2026-10-06",
+      "sha256": "e7010d916250a58c3b6fa9f999a4aed3f86174929aa595fe991178d195a11868"
+    },
+    {
+      "aliases": [
+        "/home/example/coding/codex-usage/docs/postmortem/2026-10-06-google-sheets-budget-withheld.md"
+      ],
+      "findings": [
+        "ext-xlsx-row-offset-scalar-array"
+      ],
+      "reviewed_on": "2026-10-06",
+      "sha256": "5f1ac0fbcce78a7f188371b5bf70f30a129ad8272a7d98e101ff3382c3e40f49"
+    },
+    {
+      "aliases": [
+        "/home/example/coding/codex-usage/docs/postmortem/2026-10-06-personal-suggestions-blocked-by-other-overage.md"
+      ],
+      "findings": [
+        "ext-independent-personal-pacing"
+      ],
+      "reviewed_on": "2026-10-06",
+      "sha256": "5f9b6a22e9a0f770f89dd70da05a399c601db1d2e63e50b275942ea9428b27a5"
+    },
+    {
+      "aliases": [
+        "/home/example/coding/example-client-app/docs/postmortem/2026-10-06-ovh-runbook-context.md"
+      ],
+      "decision": "No new reusable learning: existing ext-sandbox-loopback guidance covers denied runner startup; the repository lesson already requires checking inherited cross-repository paths. Scoped approved reads succeeded; no application or VPS action failed.",
+      "findings": [],
+      "reviewed_on": "2026-10-06",
+      "sha256": "35bab259d11dda21258f1789dd3d524af441f28d8cbc63082d2cc54552e732a5"
+    },
+    {
+      "aliases": [
+        "/home/example/coding/example-client-app/docs/postmortem/2026-10-06-rescue-command-terminal.md"
+      ],
+      "decision": "Isolated operator preparation errors: wrong terminal followed by a visibly split path. Instructions/local lesson now use prompt boundaries and short quoted-path helpers. Key installation was verified by strict batch SSH and read-only disk checks; no new cross-repository finding is warranted. Actual backup remains pending.",
+      "findings": [],
+      "reviewed_on": "2026-10-06",
+      "sha256": "7dce65e236d1461d9f542ec27dceebad38025712b377e8626e782518781b8076"
+    },
+    {
+      "aliases": [
+        "/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-06-model-report-workspace-preflight.md"
+      ],
+      "decision": "No new reusable learning: non-Git workspace already documented in base plan; read-only preflight had no implementation impact.",
+      "findings": [],
+      "reviewed_on": "2026-10-06",
+      "sha256": "7ee99f28217c8fa5d571ea7708e70d74f7bf08e3ddf6e0a8c147dcaa03ebf65c"
+    },
+    {
+      "aliases": [
+        "/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-06-model-report-style-check.md"
+      ],
+      "decision": "No new reusable learning: routine import/line-length lint corrections; final full suite, typing, lint, build and smoke passed.",
+      "findings": [],
+      "reviewed_on": "2026-10-06",
+      "sha256": "df847706eaf2227fc3e9ae9b4c88f446582ce374a475a4c03772e4c98bd13b87"
+    },
+    {
+      "aliases": [
+        "/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-06-model-report-subsecond-conservation.md"
+      ],
+      "findings": [
+        "local-duration-microsecond-conservation",
+        "local-pending-context-metadata-join"
+      ],
+      "reviewed_on": "2026-10-06",
+      "sha256": "2335855b28b38c44d6f06e404699ce8fe3fbfd0f507bd02bbafd3f347e0db97f"
+    },
+    {
+      "aliases": [
+        "/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-06-model-report-install-cache.md"
+      ],
+      "findings": [
+        "local-uv-source-tool-reinstall"
+      ],
+      "reviewed_on": "2026-10-06",
+      "sha256": "fd015e631db0f34051618f5a6034009779e4f00e4fa850394dab72e26eaf7d4d"
+    },
+    {
+      "aliases": [
+        "/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-06-model-report-preservation-audit.md"
+      ],
+      "decision": "No new reusable learning: strict equality audit rejected lawful added wait evidence and precise SQLite-to-rollout reconciliation already covered by base regressions; corrected content-free evidence containment audit passed with no data loss.",
+      "findings": [],
+      "reviewed_on": "2026-10-06",
+      "sha256": "d1bc6ab4b5a9989ce1dde39d288d47b779db17b14aed087c5f28f37f1f633e65"
+    },
+    {
       "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-10-06-codex-search-sandbox-startup.md"
       ],
-      "reviewed_on": "2026-10-06",
+      "decision": "No new learning: local-sandbox-loopback-approved-route already covers pre-execution failure and approved scoped workaround; host sandbox remains unresolved.",
       "findings": [],
-      "decision": "No new learning: local-sandbox-loopback-approved-route already covers pre-execution failure and approved scoped workaround; host sandbox remains unresolved."
+      "reviewed_on": "2026-10-06",
+      "sha256": "06fb01c47c65e65b242e8ad66571ec8fb279e5e41ef423fbff04973c4bd70092"
     },
     {
-      "sha256": "d774479226c77ef72f0832131745c64de4838120d6dad4aa97a6c122f3b909f3",
       "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-10-06-codex-search-source-lookups.md"
       ],
-      "reviewed_on": "2026-10-06",
+      "decision": "No new learning: local-current-source-retrieval already covers stale public paths; bounded JSON output should use complete parsing rather than early-closing pipes.",
       "findings": [],
-      "decision": "No new learning: local-current-source-retrieval already covers stale public paths; bounded JSON output should use complete parsing rather than early-closing pipes."
+      "reviewed_on": "2026-10-06",
+      "sha256": "d774479226c77ef72f0832131745c64de4838120d6dad4aa97a6c122f3b909f3"
     },
     {
-      "sha256": "5d3fefff323897f552d80d5c2b9f78e693587cc8eb6b6bb9ae09b6760fd833b5",
       "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-10-06-codex-search-malformed-records.md"
       ],
-      "reviewed_on": "2026-10-06",
       "findings": [
         "local-codex-search-json-boundary"
-      ]
+      ],
+      "reviewed_on": "2026-10-06",
+      "sha256": "5d3fefff323897f552d80d5c2b9f78e693587cc8eb6b6bb9ae09b6760fd833b5"
     },
     {
-      "sha256": "9646e1b4d92a098a828a3b24db554c4922377a7539ee47914fcff652b7361b94",
+      "aliases": [
+        "/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-06-burn-dst-fixture-order.md"
+      ],
+      "findings": [
+        "local-validated-fixture-assignment-order"
+      ],
+      "reviewed_on": "2026-10-06",
+      "sha256": "8f9b4252cb9189e68a7d5e2ca7a3dc1d82a4cf0b7865bd4ab6a213ec8dde48e2"
+    },
+    {
+      "aliases": [
+        "/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-06-burn-reset-cohort-review.md"
+      ],
+      "findings": [
+        "local-quota-reset-chronological-replay"
+      ],
+      "reviewed_on": "2026-10-06",
+      "sha256": "7301d78866bb0840ce0cf611a1c2bcf225a8b5a9e98db5c721ac1a45ca9bf21d"
+    },
+    {
       "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-10-06-codex-search-picker-ui.md"
       ],
-      "reviewed_on": "2026-10-06",
       "findings": [
         "local-fzf-ui-stream-and-resume-fixture"
-      ]
-    },
-    {
-      "sha256": "700285acb5c7f8c9fae676221113fd624dd930cef195a55da57828a8f66a6932",
-      "aliases": [
-        "/home/example/linux-config/docs/postmortem/2026-10-06-codex-search-refresh-audit.md"
       ],
       "reviewed_on": "2026-10-06",
-      "findings": [],
-      "decision": "No new learning: existing snapshot-ownership and stale-baseline findings cover intentional live capture, invalid HEAD-based attribution, and unrelated source drift during refresh or staging review. Search records stayed unchanged and staging stopped before index writes; preserve unrelated ledger/backup work and verify scoped candidate blobs independently."
+      "sha256": "9646e1b4d92a098a828a3b24db554c4922377a7539ee47914fcff652b7361b94"
     },
     {
-      "sha256": "9777098eb77ea8554b1960081840ece0c3bae9d66d336af3979e3ea49a926380",
+      "aliases": [
+        "/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-06-burn-install-backup-preflight.md"
+      ],
+      "findings": [
+        "local-managed-backup-preflight"
+      ],
+      "reviewed_on": "2026-10-06",
+      "sha256": "86f1c43db1e7bdb9dc917d191c6c135fb806b34fdbfc4945d532203ff3523820"
+    },
+    {
       "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-10-06-codex-search-output-readability.md"
       ],
-      "reviewed_on": "2026-10-06",
       "findings": [
         "local-rg-windowed-match-highlighting"
-      ]
+      ],
+      "reviewed_on": "2026-10-06",
+      "sha256": "9777098eb77ea8554b1960081840ece0c3bae9d66d336af3979e3ea49a926380"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-06-codex-search-refresh-audit.md"
+      ],
+      "decision": "No new learning: existing snapshot-ownership and stale-baseline findings cover intentional live capture, invalid HEAD-based attribution, and unrelated source drift during refresh or staging review. Search records stayed unchanged and staging stopped before index writes; preserve unrelated ledger/backup work and verify scoped candidate blobs independently.",
+      "findings": [],
+      "reviewed_on": "2026-10-06",
+      "sha256": "700285acb5c7f8c9fae676221113fd624dd930cef195a55da57828a8f66a6932"
+    },
+    {
+      "aliases": [
+        "/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-06-burn-ledger-observation-latency.md"
+      ],
+      "findings": [
+        "local-history-journal-observer-hot-path"
+      ],
+      "reviewed_on": "2026-10-06",
+      "sha256": "5ff8ecec867b6e9a874ef758e2b1c247f20e88021adb0f7ce372b7c042c2b395"
+    },
+    {
+      "aliases": [
+        "/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-06-burn-preservation-audit.md"
+      ],
+      "decision": "No new learning: repeats the prior verified additive historical-evidence audit principle. All 42,472 completed turns retain start/end/coverage/model contexts; every old wait preserved and merged wait unions equal. New redundant historical wait lies within existing wait, so counted time unchanged; raw equality audit corrected, not product.",
+      "findings": [],
+      "reviewed_on": "2026-10-06",
+      "sha256": "c61428a076efd9be1ad46d7e1bc58bdac1ca92c10c05f8477b3efc11a068b198"
+    },
+    {
+      "aliases": [
+        "/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-06-quota-storage-test-insertion.md"
+      ],
+      "decision": "No new learning: repeats ext-python-integration-syntax enclosing-block guidance. Restored test body, observed intended duplicate-union RED, corrected dedup and minor style. Fresh 114 pytest tests, mypy 16 modules and Ruff passed; source verification only.",
+      "findings": [],
+      "reviewed_on": "2026-10-06",
+      "sha256": "57a7db64ee5325c2743d2d83636c820390d10febab581da428e9028982bb75e1"
+    },
+    {
+      "aliases": [
+        "/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-06-burn-terminal-readability.md"
+      ],
+      "findings": [
+        "local-terminal-report-readable-projection",
+        "local-terminal-color-test-environment"
+      ],
+      "reviewed_on": "2026-10-06",
+      "sha256": "74fdcb77a95ac264eeca4a8dff326d361c54414889ffee4bbd4ed1692fb08e16"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/.worktrees/ai-twitter-alpha/docs/postmortem/2026-10-06-ai-twitter-alpha-sandbox-startup.md"
+      ],
+      "decision": "No new learning: repeated pre-command bwrap loopback failure; existing local-sandbox-loopback-approved-route guidance applies. Approved scoped reads and worktree creation succeeded; default sandbox remains unresolved.",
+      "findings": [],
+      "reviewed_on": "2026-10-06",
+      "sha256": "2faa44a8bcdf3273ef3a8801952ab5dd29f76b77d25ed3050ddace4d9e0726ae"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/.worktrees/ai-twitter-alpha/docs/postmortem/2026-10-06-ai-twitter-alpha-concurrent-baseline.md"
+      ],
+      "decision": "No new learning: concurrent main-checkout and ledger edits invalidate exclusive-writer baseline assumptions; existing local-deployable-file-set-verification guidance applies. Preserve concurrent entries and verify scoped task artifacts; do not claim historical byte identity.",
+      "findings": [],
+      "reviewed_on": "2026-10-06",
+      "sha256": "0cbc28a2acf4a74e458fff92a48dd4ea2903b82286bec8a142d4e4dec8c82632"
+    },
+    {
+      "aliases": [
+        "/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-06-publication-path-discovery.md"
+      ],
+      "decision": "No new learning: path recovery repeats ext-optional-path-discovery. Automatic approval review rejected shell rm -rf cleanup before execution; Python TemporaryDirectory with explicit subprocess cwd provided a verified workaround. Fresh staged checkout sync installed 22 packages, CLI help and all 72 smoke checks passed, exit 0. Existing task-owned temporary-directory and ownership guidance applies; original command remains rejected.",
+      "findings": [],
+      "reviewed_on": "2026-10-06",
+      "sha256": "e0e28aee3f78dc8b8a3803a28aef35ed37ca2dbd7b758f5841a45c63d9ba3e3d"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/.worktrees/ai-twitter-alpha/docs/postmortem/2026-10-06-ai-alpha-build-sandbox.md"
+      ],
+      "decision": "Repeated known shell startup issue; scoped execution verified the existing workaround, no new learning.",
+      "findings": [],
+      "reviewed_on": "2026-10-06",
+      "sha256": "b2c2816b3bb5d924dc117559578b210431047339fbca1518221ed782f1da2777"
+    },
+    {
+      "aliases": [
+        "/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-06-readme-shell-sandbox.md"
+      ],
+      "decision": "No new learning: the observed pre-execution loopback error and approved scoped workaround are already covered by ext-sandbox-loopback. Default sandbox repair remains outside README scope.",
+      "findings": [],
+      "reviewed_on": "2026-10-06",
+      "sha256": "4f29f051fa4d178731057a8678365a1ebae78425bddb8326f5c5f98574a76b11"
+    },
+    {
+      "aliases": [
+        "/home/example/coding/ai-twitter-alpha/docs/postmortem/2026-10-06-build-validation.md"
+      ],
+      "decision": "Build inspection/validation evidence reviewed; existing sandbox/path guidance applies. Live source and credential checks remain separately scoped; no new reusable learning.",
+      "findings": [],
+      "reviewed_on": "2026-10-06",
+      "sha256": "e02ffe746e2160dfe22bfa92a7fd6342e1eee7b50855dcfe1230caa8502f9c1e"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/.worktrees/ai-twitter-alpha/docs/postmortem/2026-10-06-ai-alpha-browser-research-sandbox.md"
+      ],
+      "decision": "No new reusable learning: exact pre-command Bubblewrap loopback failure and scoped approved execution are already covered by local-sandbox-loopback-approved-route and ext-sandbox-loopback; verified workaround only, no host repair or browser validation.",
+      "findings": [],
+      "reviewed_on": "2026-10-06",
+      "sha256": "2a2b97927bbe24c7ee48339e00859dd5550b5ede837269229ccee63eeb42567c"
+    },
+    {
+      "aliases": [
+        "/home/example/coding/ai-twitter-alpha/docs/postmortem/2026-10-06-integration-validation.md"
+      ],
+      "findings": [
+        "local-codex-nonfatal-exec-metadata",
+        "local-cancellable-terminal-browser-owner",
+        "local-model-thread-lock-lifetime",
+        "local-playwright-explicit-sandboxed-channel",
+        "local-systemd-venv-runtime-paths"
+      ],
+      "reviewed_on": "2026-10-06",
+      "sha256": "c11665ca0e0c327d7fb087e610621342dceb1566d9fb3eb25f2fd29611d1be7e"
     },
     {
       "aliases": [
@@ -5794,69 +6586,86 @@
       "sha256": "ed7e25167770ab09958d48f2c6dd3cb04d0ed094d6826cc7c7b3451a17a9fa8c"
     },
     {
-      "sha256": "af555044bda3f04fe1135492dfd05942a2581e93e2b918d5ef7291e929f0e431",
+      "aliases": [
+        "/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-06-daily-report-preflight.md"
+      ],
+      "decision": "No new reusable finding: approved scoped execution reproduces the existing local-sandbox-loopback-approved-route workaround (default bwrap remains unresolved). The assumed helper filename was corrected using the already documented store-format.md contract; documented topics and design brief both exited 0. Source discovery/read-before-execution guidance already covers this path mistake.",
+      "findings": [],
+      "reviewed_on": "2026-10-06",
+      "sha256": "73c25eb22a671d57918243d37548677a2bd0c44dcd86e2f91398b2b45286d0ec"
+    },
+    {
       "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-10-06-context-session-ledger-staging.md"
       ],
-      "reviewed_on": "2026-10-06",
+      "decision": "No new general finding: existing source-ownership guidance covers mixed-file staging. Preserve original ledger key order and verify structural HEAD-plus-session equality; index-only repair leaves worktree edits intact.",
       "findings": [],
-      "decision": "No new general finding: existing source-ownership guidance covers mixed-file staging. Preserve original ledger key order and verify structural HEAD-plus-session equality; index-only repair leaves worktree edits intact."
+      "reviewed_on": "2026-10-06",
+      "sha256": "af555044bda3f04fe1135492dfd05942a2581e93e2b918d5ef7291e929f0e431"
     },
     {
-      "sha256": "d4e578a0defef1bddbf723c29a7e4d80edd9d83cb493ff9e1d814f313592cd8a",
       "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-10-06-context-private-push-host-key.md"
       ],
-      "reviewed_on": "2026-10-06",
+      "decision": "No new general finding: existing endpoint fingerprint guidance applies. Private push remains unresolved pending independent server-key verification; local commit retained and strict checking preserved.",
       "findings": [],
-      "decision": "No new general finding: existing endpoint fingerprint guidance applies. Private push remains unresolved pending independent server-key verification; local commit retained and strict checking preserved."
+      "reviewed_on": "2026-10-06",
+      "sha256": "d4e578a0defef1bddbf723c29a7e4d80edd9d83cb493ff9e1d814f313592cd8a"
     },
     {
-      "sha256": "87ee4edc34405d4413f1513ec459d146e4b19d1642f0834eb63d8f13670bb5e0",
+      "aliases": [
+        "/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-06-daily-report-import-order.md"
+      ],
+      "decision": "No new general finding: a local extra blank line in test standard-library imports was removed using the direct Ruff I001 diagnostic. Final repository lint and six-file format check passed, strict mypy passed (17 source files), full suite passed 163 tests and isolated smoke passed 109. Existing source-language validation/read-before-remedy guidance covers the process; no runtime or installed configuration changed for this lint repair.",
+      "findings": [],
+      "reviewed_on": "2026-10-06",
+      "sha256": "7102a6e7ac8317bf057f67a1f4272b7d79ce7d99df3dedf4b9d40c9546d758eb"
+    },
+    {
       "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-10-07-metaprompt-run-sandbox-startup.md"
       ],
-      "reviewed_on": "2026-10-07",
+      "decision": "No new reusable learning: confirms ext-sandbox-loopback approved-execution workaround; default sandbox remains unrepaired.",
       "findings": [],
-      "decision": "No new reusable learning: confirms ext-sandbox-loopback approved-execution workaround; default sandbox remains unrepaired."
+      "reviewed_on": "2026-10-07",
+      "sha256": "87ee4edc34405d4413f1513ec459d146e4b19d1642f0834eb63d8f13670bb5e0"
     },
     {
-      "sha256": "f5502c281934e88f25b5f0e65ebde89d2644a96511bed3c6b72313fb21cee599",
+      "aliases": [
+        "/home/example/coding/codex-usage/docs/postmortem/2026-10-07-prompt-authoring-command-environment.md"
+      ],
+      "decision": "No new reusable learning: ext-sandbox-loopback already covers this runner startup symptom, approved scoped execution, and repository-presence checks. Prompt save and read-back passed; underlying sandbox remains unresolved.",
+      "findings": [],
+      "reviewed_on": "2026-10-07",
+      "sha256": "ca2911e29fac9d6668a87b66b144237a63bca8d7137c897fe2a1f5ee21fd0894"
+    },
+    {
       "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-10-07-metaprompt-run-verification-baseline.md"
       ],
-      "reviewed_on": "2026-10-07",
+      "decision": "No new reusable learning: confirmed pre-existing legacy byte-pin mismatch outside task scope; ASCII handoff verified workaround for task-local TextEncoder harness error.",
       "findings": [],
-      "decision": "No new reusable learning: confirmed pre-existing legacy byte-pin mismatch outside task scope; ASCII handoff verified workaround for task-local TextEncoder harness error."
+      "reviewed_on": "2026-10-07",
+      "sha256": "f5502c281934e88f25b5f0e65ebde89d2644a96511bed3c6b72313fb21cee599"
     },
     {
-      "sha256": "9bc612a634334486ba2affd56e7c1eda1e377a2acc3109113d4e1c1f541cb1fd",
       "aliases": [
-        "/home/example/linux-config/docs/postmortem/2026-10-07-codex-notification-sound-environment.md"
+        "/home/example/coding/codex-usage/docs/postmortem/2026-10-07-history-reset-command-environment.md"
       ],
-      "reviewed_on": "2026-10-07",
+      "decision": "No new reusable learning: ext-sandbox-loopback and ext-patch-operation-contract already cover approved scoped execution, non-repository discovery and Update-only patch recovery. Scoped workbook export/verification passed; default sandbox remains unresolved.",
       "findings": [],
-      "decision": "No new learning: ext-sandbox-loopback, local-ledger-missing-source, local-session-attribution-direct-evidence and ext-stale-patch-context cover runner, corpus, nested-write attribution and concurrent-context safeguards. The shared smoke document writer/cause remains unresolved; stage only observed session content without overwriting its worktree."
+      "reviewed_on": "2026-10-07",
+      "sha256": "ea6b9aa5ca07ac01188475b2ad3186292379422dc0d3304fb488f8b9b6e89b3e"
     },
     {
-      "sha256": "0ecc5a5310acd454d6eb3e8205aed3a6861c0031a606074646465e01b78cf498",
       "aliases": [
-        "/home/example/linux-config/docs/postmortem/2026-10-07-dunst-fixture-startup.md"
+        "/home/example/coding/codex-usage/docs/postmortem/2026-10-07-history-input-preservation-guard.md"
       ],
-      "reviewed_on": "2026-10-07",
       "findings": [
-        "local-dbus-readiness-no-activation",
-        "local-dunst-stacked-script-state"
-      ]
-    },
-    {
-      "sha256": "3083ac9938d5f428ee46ad2d5cca4de87b7172fefe93e24ae1ca697d660c8785",
-      "aliases": [
-        "/home/example/linux-config/docs/postmortem/2026-10-07-git-lfs-instructions-sandbox.md"
+        "local-xlsx-owned-inputs-and-expiry"
       ],
       "reviewed_on": "2026-10-07",
-      "findings": [],
-      "decision": "No new reusable learning: existing local-sandbox-loopback-approved-route covers the verified scoped execution workaround; locate helpers before assuming their path."
+      "sha256": "366444a5cf50abbf4b684ed9de9408ee653b0ac28b8095b96f4e057f3474c1f1"
     },
     {
       "aliases": [
@@ -5908,6 +6717,16 @@
     },
     {
       "aliases": [
+        "/home/example/coding/codex-usage/docs/postmortem/2026-10-07-imported-history-pacing-blank.md"
+      ],
+      "findings": [
+        "local-sheets-scalar-latest-observation"
+      ],
+      "reviewed_on": "2026-10-07",
+      "sha256": "4edb2f5d8d8259a7ee39a277bf054dd83613afe707de39b552edbb0fc339e113"
+    },
+    {
+      "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-10-07-codex-recent-cache-races.md"
       ],
       "findings": [
@@ -5926,209 +6745,312 @@
       "sha256": "b584ed8465ba20e9aa06392e2047ab99fec39527db4cdb3d4452391aacc9f4c2"
     },
     {
-      "sha256": "9cec6a9e27f1279b8c737d2ad0ea5c9d64cd38c4e08cfddd125cff3a83d67340",
+      "aliases": [
+        "/home/example/coding/codex-usage/docs/postmortem/2026-10-07-new-session-check-formula-missing.md"
+      ],
+      "findings": [
+        "local-workbook-owned-row-formula-loss"
+      ],
+      "reviewed_on": "2026-10-07",
+      "sha256": "35b84027c35fcceeec771d2cee17bca80b39a7f36ad58ba900ff14f8c34421e0"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-07-codex-notification-sound-environment.md"
+      ],
+      "decision": "No new learning: ext-sandbox-loopback, local-ledger-missing-source, local-session-attribution-direct-evidence and ext-stale-patch-context cover runner, corpus, nested-write attribution and concurrent-context safeguards. The shared smoke document writer/cause remains unresolved; stage only observed session content without overwriting its worktree.",
+      "findings": [],
+      "reviewed_on": "2026-10-07",
+      "sha256": "9bc612a634334486ba2affd56e7c1eda1e377a2acc3109113d4e1c1f541cb1fd"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-07-dunst-fixture-startup.md"
+      ],
+      "findings": [
+        "local-dbus-readiness-no-activation",
+        "local-dunst-stacked-script-state"
+      ],
+      "reviewed_on": "2026-10-07",
+      "sha256": "0ecc5a5310acd454d6eb3e8205aed3a6861c0031a606074646465e01b78cf498"
+    },
+    {
+      "aliases": [
+        "/home/example/coding/codex-usage/docs/postmortem/2026-10-07-sheet-clock-behind-toronto.md"
+      ],
+      "findings": [
+        "local-native-sheet-clock-vs-import-engine"
+      ],
+      "reviewed_on": "2026-10-07",
+      "sha256": "ac8154fdd3d4b51a517daedcc24beaef9788cf2d9eeb794d394aa20aac865d77"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-07-git-lfs-instructions-sandbox.md"
+      ],
+      "decision": "No new reusable learning: existing local-sandbox-loopback-approved-route covers the verified scoped execution workaround; locate helpers before assuming their path.",
+      "findings": [],
+      "reviewed_on": "2026-10-07",
+      "sha256": "3083ac9938d5f428ee46ad2d5cca4de87b7172fefe93e24ae1ca697d660c8785"
+    },
+    {
+      "aliases": [
+        "/home/example/coding/twitter-cap-bot/docs/postmortem/2026-10-07-saucybot-prompt-sandbox.md"
+      ],
+      "decision": "No new reusable learning: same pre-execution bwrap loopback denial as ext-sandbox-loopback. Scoped approved reads, prompt saves and content/diff checks succeeded; default sandbox startup remains unresolved.",
+      "findings": [],
+      "reviewed_on": "2026-10-07",
+      "sha256": "72ec07c4097c39cc8b7686fb6162e0394cab16a0164bdef3989fc6fab64d3b9f"
+    },
+    {
+      "aliases": [
+        "/home/example/coding/example-client-app/docs/postmortem/2026-10-08-metaprompt-handoff-byte-check.md"
+      ],
+      "decision": "Narrow orchestration runtime assumption: TextEncoder was unavailable, so an explicitly ASCII-only 302-byte handoff used character count safely. Native task launch succeeded once after task-state inspection; task execution remains pending. No new reusable finding or Unicode byte-count claim is warranted.",
+      "findings": [],
+      "reviewed_on": "2026-10-08",
+      "sha256": "0fdd7f4f62a70da721ae64b06e3e5ca81f8f18caa77aee6d7f42b2d9d08e8bbd"
+    },
+    {
+      "aliases": [
+        "/home/example/coding/example-client-app/docs/postmortem/2026-10-08-vps-smoke-local-execution.md"
+      ],
+      "decision": "No new learning: existing sandbox approved-route and fixture-contract guidance covers these issues. Monitor syntax and receipt mock-contract regression corrected; parent monitor19, entrypoint9 and full infrastructure suite passed. Default sandbox remains unavailable; no live extraction issue introduced.",
+      "findings": [],
+      "reviewed_on": "2026-10-08",
+      "sha256": "8121ef18651b5cbc03eeebefa8fb2e6914bbe2161d8b30065fbbad96afcc49f3"
+    },
+    {
       "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-10-08-codex-picker-tmp-lookup.md"
       ],
-      "reviewed_on": "2026-10-08",
+      "decision": "No new learning: narrow discovery to exact returned paths and inspect actual ledger schema before mutation. Exact read and installed picker verification passed; permissions unchanged.",
       "findings": [],
-      "decision": "No new learning: narrow discovery to exact returned paths and inspect actual ledger schema before mutation. Exact read and installed picker verification passed; permissions unchanged."
+      "reviewed_on": "2026-10-08",
+      "sha256": "9cec6a9e27f1279b8c737d2ad0ea5c9d64cd38c4e08cfddd125cff3a83d67340"
     },
     {
-      "sha256": "11f420dde875089a23d44c4eeb8da1628c87d6b602c175d1d95e5dbafa09709e",
+      "aliases": [
+        "/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-08-session-plan-staging-whitespace.md"
+      ],
+      "decision": "No new general finding: slicing the shared plan at its next section retained a separator blank line at staged EOF. The direct git diff --cached --check diagnostic identified it; index-only rstrip plus one newline verified exit 0 without altering excluded working-tree content. The local staging lesson belongs in this project's tasks/lessons.md, while existing preserve-unrelated-work and artifact-verification guidance covers the general process.",
+      "findings": [],
+      "reviewed_on": "2026-10-08",
+      "sha256": "d208cd15b9f6f0ab72ca5c10459cee56e21968b7f529efd5caff30a46318cec8"
+    },
+    {
       "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-10-08-picker-layout-manpage-lookup.md"
       ],
-      "reviewed_on": "2026-10-08",
+      "decision": "No new learning: an assumed documentation path was absent; use observed installed --help and executable terminal tests. No data changed by the failed read.",
       "findings": [],
-      "decision": "No new learning: an assumed documentation path was absent; use observed installed --help and executable terminal tests. No data changed by the failed read."
+      "reviewed_on": "2026-10-08",
+      "sha256": "11f420dde875089a23d44c4eeb8da1628c87d6b602c175d1d95e5dbafa09709e"
     },
     {
-      "sha256": "ca87edd52d92d348be5dc95fded787efdba774e7b64e56e58a568c353b64d0f1",
-      "aliases": [
-        "/home/example/linux-config/docs/postmortem/2026-10-08-redshift-bindings-sandbox.md"
-      ],
-      "reviewed_on": "2026-10-08",
-      "findings": [],
-      "decision": "No new learning: recurring loopback startup failure; scoped approved execution works, default sandbox remains unresolved."
-    },
-    {
-      "sha256": "9717ba1edf5a8a7174f624c4dd2a2ef41fc2a05d360ae98e3fe3eb8be2253afe",
-      "aliases": [
-        "/home/example/linux-config/docs/postmortem/2026-10-08-redshift-live-config-output.md"
-      ],
-      "reviewed_on": "2026-10-08",
-      "findings": [],
-      "decision": "No new learning: explicit raw CLI JSON resolves the diagnostic output-contract mismatch; live i3 mapping verified, exit 0."
-    },
-    {
-      "sha256": "f3e70ebb4ffe8cf52b9d59eebe7275d988548bb8648e07237f850eb5a2b37af4",
       "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-10-08-recent-session-review-sandbox.md"
       ],
-      "reviewed_on": "2026-10-08",
+      "decision": "No new learning: existing local-sandbox-loopback-approved-route fully covers the startup failure and verified scoped workaround.",
       "findings": [],
-      "decision": "No new learning: existing local-sandbox-loopback-approved-route fully covers the startup failure and verified scoped workaround."
+      "reviewed_on": "2026-10-08",
+      "sha256": "f3e70ebb4ffe8cf52b9d59eebe7275d988548bb8648e07237f850eb5a2b37af4"
     },
     {
-      "sha256": "1134d2147abd68bf08c58c6e650f8ee222e5f36a222aae13dbf334a55aaccd85",
       "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-10-08-session-review-module-manifest.md"
       ],
-      "reviewed_on": "2026-10-08",
       "findings": [
         "local-second-brain-runtime-module-inventory"
-      ]
+      ],
+      "reviewed_on": "2026-10-08",
+      "sha256": "1134d2147abd68bf08c58c6e650f8ee222e5f36a222aae13dbf334a55aaccd85"
     },
     {
-      "sha256": "089a99b8fc4e36018913865ea5e2cc0267fa23e5089b0eff05090a608995e778",
       "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-10-08-session-review-doc-edit.md"
       ],
-      "reviewed_on": "2026-10-08",
+      "decision": "No new learning: ext-stale-patch-context applies; inspected partial writes and current destination marker before retry.",
       "findings": [],
-      "decision": "No new learning: ext-stale-patch-context applies; inspected partial writes and current destination marker before retry."
+      "reviewed_on": "2026-10-08",
+      "sha256": "089a99b8fc4e36018913865ea5e2cc0267fa23e5089b0eff05090a608995e778"
     },
     {
-      "sha256": "970d166038c5189a9f244a2f442cc3d8c7b56df539ccd8bd71916da33e676366",
       "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-10-08-session-review-verification-drift.md"
       ],
-      "reviewed_on": "2026-10-08",
+      "decision": "Unresolved external source reversion and unavailable native title transport; no new reusable causal claim. Existing preservation/deployable-file guidance applies to hash verification.",
       "findings": [],
-      "decision": "Unresolved external source reversion and unavailable native title transport; no new reusable causal claim. Existing preservation/deployable-file guidance applies to hash verification."
-    },
-    {
-      "sha256": "e3fa3bd9952c79a5ddea41e1319772a80682c2bfb02d1ee354897c7168beee2d",
-      "aliases": [
-        "/home/example/linux-config/docs/postmortem/2026-10-08-recent-session-review-live-check.md"
-      ],
       "reviewed_on": "2026-10-08",
-      "findings": [
-        "local-digest-provider-check-contract"
-      ]
+      "sha256": "970d166038c5189a9f244a2f442cc3d8c7b56df539ccd8bd71916da33e676366"
     },
     {
-      "sha256": "2d60d30cbd63785f10714040b171fee122aa0b59a1aabd91d88ed095e6fa1b32",
-      "aliases": [
-        "/home/example/linux-config/docs/postmortem/2026-10-08-session-review-commit-tree-check.md"
-      ],
-      "reviewed_on": "2026-10-08",
-      "findings": [],
-      "decision": "No new reusable learning: extracted index lacks Git metadata and safe repository location required by broader fixtures; focused staged runtime checks pass. Normal repository verification remains authoritative."
-    },
-    {
-      "sha256": "947b48a3cbbde16c4eefbddcac16dd265cb863536e641b62a0aa146961f2e1e4",
-      "aliases": [
-        "/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-08-overview-command-environment.md"
-      ],
-      "reviewed_on": "2026-10-08",
-      "findings": [],
-      "decision": "No new reusable learning: ext-sandbox-loopback and local-discover-paths-before-reads cover runner startup and path discovery. Approved scoped execution succeeded; default bwrap remains unresolved. Earlier task commits changed the dirty set during snapshot capture; committed pre-overview CLI comparisons passed. Documentation probe excludes illustrative prose and shell operators; 51 actual examples parse."
-    },
-    {
-      "sha256": "3932d8cbe0d03022446648758dd5d784696a26f04d81a5ed3c7ca1c2fbcb4daa",
-      "aliases": [
-        "/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-08-overview-test-fixture.md"
-      ],
-      "reviewed_on": "2026-10-08",
-      "findings": [],
-      "decision": "No new reusable learning: existing realistic-fixture/schema guidance covers required Session timestamps, storage writer side effects and distinguishing help command entries from descriptive words. Production validation and single-writer guards are unchanged. Corrected defining tests and complete 224-test suite pass."
-    },
-    {
-      "sha256": "feb1129396b1011d16e7ae6a08c0f167ff59cc08d4074a00657f1b95710b30fc",
-      "aliases": [
-        "/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-08-overview-verification.md"
-      ],
-      "reviewed_on": "2026-10-08",
-      "findings": [],
-      "decision": "No new reusable learning: local-terminal-report-readable-projection covers responsive width/plain/runtime checks, with the specific Rich Rule-title ASCII trap recorded only in project tasks/lessons.md. Strict TypedDict loop naming and explicit literal/import formatting are ordinary check cleanup. 224 tests, strict mypy/Ruff, build and installed-source/export/alias/read-only/runtime verification pass."
-    },
-    {
-      "sha256": "904e26fdfc5205360ac918393ddfd8cfcddb8b7d7d80e0d0a5bf6b5ed6e05970",
-      "aliases": [
-        "/home/example/linux-config/docs/postmortem/2026-10-08-cli-progress-policy-sandbox.md"
-      ],
-      "reviewed_on": "2026-10-08",
-      "findings": [],
-      "decision": "No new reusable learning: identical pre-execution Bubblewrap loopback failure and approved scoped workaround already covered by local-sandbox-loopback-approved-route; host repair remains unresolved."
-    },
-    {
-      "sha256": "9e092ff246092966300e4560a1f4c63bfd216738f0efc37815c6407d14a11740",
       "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-10-08-fish-alias-resume-sandbox.md"
       ],
-      "reviewed_on": "2026-10-08",
+      "decision": "No new learning: recurrence of reviewed local-sandbox-loopback-approved-route; approved bounded reads passed while default sandbox remains unresolved.",
       "findings": [],
-      "decision": "No new learning: recurrence of reviewed local-sandbox-loopback-approved-route; approved bounded reads passed while default sandbox remains unresolved."
+      "reviewed_on": "2026-10-08",
+      "sha256": "9e092ff246092966300e4560a1f4c63bfd216738f0efc37815c6407d14a11740"
     },
     {
-      "sha256": "2c0f5d18179756b22b7ac8ac470d9cad3d36b245464e147703f742d6dbc63652",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-08-recent-session-review-live-check.md"
+      ],
+      "findings": [
+        "local-digest-provider-check-contract"
+      ],
+      "reviewed_on": "2026-10-08",
+      "sha256": "e3fa3bd9952c79a5ddea41e1319772a80682c2bfb02d1ee354897c7168beee2d"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-08-redshift-bindings-sandbox.md"
+      ],
+      "decision": "No new learning: recurring loopback startup failure; scoped approved execution works, default sandbox remains unresolved.",
+      "findings": [],
+      "reviewed_on": "2026-10-08",
+      "sha256": "ca87edd52d92d348be5dc95fded787efdba774e7b64e56e58a568c353b64d0f1"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-08-redshift-live-config-output.md"
+      ],
+      "decision": "No new learning: explicit raw CLI JSON resolves the diagnostic output-contract mismatch; live i3 mapping verified, exit 0.",
+      "findings": [],
+      "reviewed_on": "2026-10-08",
+      "sha256": "9717ba1edf5a8a7174f624c4dd2a2ef41fc2a05d360ae98e3fe3eb8be2253afe"
+    },
+    {
       "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-10-08-fish-alias-completion-checks.md"
       ],
-      "reviewed_on": "2026-10-08",
       "findings": [
         "local-shortcut-stored-text-verification"
-      ]
+      ],
+      "reviewed_on": "2026-10-08",
+      "sha256": "2c0f5d18179756b22b7ac8ac470d9cad3d36b245464e147703f742d6dbc63652"
     },
     {
-      "sha256": "39ceb669c476e21145783e846e7f7475df4781c7566184ee5f2635dc0bc8e6e9",
       "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-10-08-guardian-title-review-sandbox.md"
       ],
-      "reviewed_on": "2026-10-08",
+      "decision": "No new learning: known default sandbox startup failure and absent guessed manual-page path. Approved scoped source review and installed help/capability checks succeeded; infrastructure unchanged.",
       "findings": [],
-      "decision": "No new learning: known default sandbox startup failure and absent guessed manual-page path. Approved scoped source review and installed help/capability checks succeeded; infrastructure unchanged."
+      "reviewed_on": "2026-10-08",
+      "sha256": "39ceb669c476e21145783e846e7f7475df4781c7566184ee5f2635dc0bc8e6e9"
     },
     {
-      "sha256": "a9b03fd41f6dc748201a96e5023a19874cd9e111cf363da9283fc5f0a4cd6dff",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-08-session-review-commit-tree-check.md"
+      ],
+      "decision": "No new reusable learning: extracted index lacks Git metadata and safe repository location required by broader fixtures; focused staged runtime checks pass. Normal repository verification remains authoritative.",
+      "findings": [],
+      "reviewed_on": "2026-10-08",
+      "sha256": "2d60d30cbd63785f10714040b171fee122aa0b59a1aabd91d88ed095e6fa1b32"
+    },
+    {
+      "aliases": [
+        "/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-08-overview-command-environment.md"
+      ],
+      "decision": "No new reusable learning: ext-sandbox-loopback and local-discover-paths-before-reads cover runner startup and path discovery. Approved scoped execution succeeded; default bwrap remains unresolved. Earlier task commits changed the dirty set during snapshot capture; committed pre-overview CLI comparisons passed. Documentation probe excludes illustrative prose and shell operators; 51 actual examples parse.",
+      "findings": [],
+      "reviewed_on": "2026-10-08",
+      "sha256": "947b48a3cbbde16c4eefbddcac16dd265cb863536e641b62a0aa146961f2e1e4"
+    },
+    {
+      "aliases": [
+        "/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-08-overview-test-fixture.md"
+      ],
+      "decision": "No new reusable learning: existing realistic-fixture/schema guidance covers required Session timestamps, storage writer side effects and distinguishing help command entries from descriptive words. Production validation and single-writer guards are unchanged. Corrected defining tests and complete 224-test suite pass.",
+      "findings": [],
+      "reviewed_on": "2026-10-08",
+      "sha256": "3932d8cbe0d03022446648758dd5d784696a26f04d81a5ed3c7ca1c2fbcb4daa"
+    },
+    {
+      "aliases": [
+        "/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-08-overview-verification.md"
+      ],
+      "decision": "No new reusable learning: local-terminal-report-readable-projection covers responsive width/plain/runtime checks, with the specific Rich Rule-title ASCII trap recorded only in project tasks/lessons.md. Strict TypedDict loop naming and explicit literal/import formatting are ordinary check cleanup. 224 tests, strict mypy/Ruff, build and installed-source/export/alias/read-only/runtime verification pass.",
+      "findings": [],
+      "reviewed_on": "2026-10-08",
+      "sha256": "feb1129396b1011d16e7ae6a08c0f167ff59cc08d4074a00657f1b95710b30fc"
+    },
+    {
       "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-10-08-guardian-titles-frozen-after-recap.md"
       ],
-      "reviewed_on": "2026-10-08",
       "findings": [
         "local-picker-live-headline-integration"
-      ]
+      ],
+      "reviewed_on": "2026-10-08",
+      "sha256": "a9b03fd41f6dc748201a96e5023a19874cd9e111cf363da9283fc5f0a4cd6dff"
     },
     {
-      "sha256": "f342d3f52cdfb78f0db728999f1faf60bb37d782c3830eaa7751524b663d3d0b",
       "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-10-08-guardian-title-generation-delay.md"
       ],
-      "reviewed_on": "2026-10-08",
       "findings": [
         "local-picker-live-headline-integration"
-      ]
+      ],
+      "reviewed_on": "2026-10-08",
+      "sha256": "f342d3f52cdfb78f0db728999f1faf60bb37d782c3830eaa7751524b663d3d0b"
     },
     {
-      "sha256": "ca414e9851ac7bd71d1bd14f311e8876a297a47de91db1a2f08de4775d48b0f3",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-08-cli-progress-policy-sandbox.md"
+      ],
+      "decision": "No new reusable learning: identical pre-execution Bubblewrap loopback failure and approved scoped workaround already covered by local-sandbox-loopback-approved-route; host repair remains unresolved.",
+      "findings": [],
+      "reviewed_on": "2026-10-08",
+      "sha256": "904e26fdfc5205360ac918393ddfd8cfcddb8b7d7d80e0d0a5bf6b5ed6e05970"
+    },
+    {
+      "aliases": [
+        "/home/example/coding/codex-usage/docs/postmortem/2026-10-08-session-metrics-command-environment.md"
+      ],
+      "decision": "No new reusable learning: ext-sandbox-loopback covers approved scoped execution after repeated pre-execution loopback failures. Optional XML dimension handling applies to the review-only AttributeError; corrected read inspection succeeded. Workbook metric checks passed in LibreOffice, which does not prove online Sheets activation. Automatic review timeout allowed one retry; the same scoped docs write succeeded. No safety rejection or new learning.",
+      "findings": [],
+      "reviewed_on": "2026-10-08",
+      "sha256": "f2506267c1bc0337d3337a36eabd7f675b4320c26650360e9cf323d703feed20"
+    },
+    {
       "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-10-08-title-progress-patch-context.md"
       ],
-      "reviewed_on": "2026-10-08",
+      "decision": "No new learning: reviewed local-stale-patch-context covers the unnecessary out-of-order hunk and scoped exact-context retry. Full98 search regressions pass; unrelated work and permissions preserved.",
       "findings": [],
-      "decision": "No new learning: reviewed local-stale-patch-context covers the unnecessary out-of-order hunk and scoped exact-context retry. Full98 search regressions pass; unrelated work and permissions preserved."
+      "reviewed_on": "2026-10-08",
+      "sha256": "ca414e9851ac7bd71d1bd14f311e8876a297a47de91db1a2f08de4775d48b0f3"
     },
     {
-      "sha256": "cd1f19005235b7a969d3372bd42a4c58d75e30163107d91acdd239726ddf2c8f",
       "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-10-08-title-progress-descendant-exit-race.md"
       ],
-      "reviewed_on": "2026-10-08",
       "findings": [
         "local-descendant-exit-observation"
-      ]
+      ],
+      "reviewed_on": "2026-10-08",
+      "sha256": "cd1f19005235b7a969d3372bd42a4c58d75e30163107d91acdd239726ddf2c8f"
     },
     {
-      "sha256": "9abbb622d990f840246c249ff9071f283343fb5fe8ffd8794b0994272255cb38",
       "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-10-08-title-progress-cached-fixture-race.md"
       ],
-      "reviewed_on": "2026-10-08",
       "findings": [
         "local-picker-live-headline-integration"
-      ]
+      ],
+      "reviewed_on": "2026-10-08",
+      "sha256": "9abbb622d990f840246c249ff9071f283343fb5fe8ffd8794b0994272255cb38"
+    },
+    {
+      "aliases": [
+        "/home/example/coding/codex-usage/docs/postmortem/2026-10-08-sheets-test-edit-quoting.md"
+      ],
+      "decision": "No new reusable learning: local-nested-language-literal-emission covers nested delimiters in the failed temporary snippet. The source/test overlap causing a stale USER_ENTERED expectation is a local engineering lesson in codex-usage/tasks/lessons.md. Literal fragment correction and11 focused tests passed; stable full suite passed67 tests in209.264s, actual Google access unverified.",
+      "findings": [],
+      "reviewed_on": "2026-10-08",
+      "sha256": "4b37a31b474f46483712c6512352c27f3f9aeebc81bf5bbc52042a5eb129b373"
     }
   ],
   "review": {
