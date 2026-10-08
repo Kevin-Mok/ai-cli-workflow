@@ -57,3 +57,7 @@ Each milestone below records completed work, verification, remaining work, block
 ### Milestone 1 — docs: record secret audit sandbox failure
 
 Completed: document sandbox startup and the approved inspection workaround. Verified: fresh scoped checks recorded above plus staged whitespace and incident-link contracts. Remaining: 14 planned groups, then one upstream push. Blockers: none for this milestone; documented broader vault inventory warning and manual acceptance limits remain. Next: docs(prompts): define reproducible metaprompt benchmark.
+
+### Milestone 2 — docs(prompts): define reproducible metaprompt benchmark
+
+Completed: specify controlled downstream evaluation and replayable results. Verified: fresh scoped checks recorded above plus staged whitespace and incident-link contracts. Remaining: 13 planned groups, then one upstream push. Blockers: none for this milestone; documented broader vault inventory warning and manual acceptance limits remain. Next: docs(ssh): clarify phone endpoints and password prompts.
