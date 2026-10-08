@@ -4206,6 +4206,28 @@
       "verification_scope": "code"
     },
     {
+      "applicability": "Codex notification event resolution using session metadata and conservative title fallback.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Reproduce same identity with guardian and CLI metadata in separate contained transcripts.",
+        "Reproduce ordinary thread_spawn worker with reserved-looking nickname."
+      ],
+      "id": "local-notification-provenance-before-fallback",
+      "limitations": "Transcript format can drift; live hook trust and subjective speech acceptance remain manual.",
+      "reference": "references/state-security.md#local-notification-provenance-before-fallback",
+      "remedy": "Collect internal exclusions before ambiguous identity fallback; classify source discriminants and explicit roles, not arbitrary serialized metadata values. Include nested subagent.other internal provenance.",
+      "sources": [
+        "ab49bc9e58d8329338b01c3d8ad8f426c2fc83132d13c84ff23f2549ba7e4e3b"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "internal notification audio leaks through ambiguous duplicate metadata",
+        "worker nickname review mistaken for internal provenance"
+      ],
+      "verification": "Two defining tests observed RED, then 35 notification tests pass and changed helpers type-check without errors.",
+      "verification_scope": "code"
+    },
+    {
       "applicability": "Shortcut request routing and string encoding across template and fish syntax.",
       "confidence": "confirmed",
       "diagnostics": [
@@ -4245,6 +4267,28 @@
         "Repeated invalid_summary from invalid digest check while other recaps succeed"
       ],
       "verification": "Defining provider-contract test failed before repair; 80 session tests pass after repair; installed default review exited 0 with five recaps including the previously failing one.",
+      "verification_scope": "runtime"
+    },
+    {
+      "applicability": "Codex notification event policy changes with completion notify and loaded PermissionRequest hooks.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Compare task_complete event counts with reviewed escalation-request counts.",
+        "Inspect only same-UID exact helper event-play workers and their children."
+      ],
+      "id": "local-notification-approval-event-queue",
+      "limitations": "Subjective future completion playback remains manual; loaded sessions may retain old hook definitions, so runtime gating is required.",
+      "reference": "references/operational-drift.md#local-notification-approval-event-queue",
+      "remedy": "Gate speech on agent-turn-complete before identity resolution, remove permission handler, stop enqueueing and cancel only revalidated owned detached audio groups; restore prior activation.",
+      "sources": [
+        "a75ba67aec3c724ea67e257c75f7c95966e599632ec51887523a555c688124ee"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "spoken task title repeats while top-level task has no completion event",
+        "detached notification workers queue behind playback lock"
+      ],
+      "verification": "37 focused and 138 broader tests pass, private Dunst and type checks pass; refreshed deployed bridge handles ten permission calls silently with zero queued workers.",
       "verification_scope": "runtime"
     },
     {
@@ -7155,6 +7199,15 @@
     },
     {
       "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-08-notification-speech-sandbox.md"
+      ],
+      "decision": "No new learning: ext-sandbox-loopback covers pre-execution failure and verified scoped approved-route workaround.",
+      "findings": [],
+      "reviewed_on": "2026-10-08",
+      "sha256": "03156ee18810475b837ed06274392a98c0dd08f1165d8e2651e0aa9c79540514"
+    },
+    {
+      "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-10-08-session-review-module-manifest.md"
       ],
       "findings": [
@@ -7165,12 +7218,31 @@
     },
     {
       "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-08-notification-speech-tooling.md"
+      ],
+      "decision": "No new learning: existing Python helper scope and typed argparse/JSON boundary guidance covers incidental editing and strict checker issues.",
+      "findings": [],
+      "reviewed_on": "2026-10-08",
+      "sha256": "9aeae26080c69eeab14c35729c58022a663fa715945422ea6771939bfe1ca33d"
+    },
+    {
+      "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-10-08-session-review-doc-edit.md"
       ],
       "decision": "No new learning: ext-stale-patch-context applies; inspected partial writes and current destination marker before retry.",
       "findings": [],
       "reviewed_on": "2026-10-08",
       "sha256": "089a99b8fc4e36018913865ea5e2cc0267fa23e5089b0eff05090a608995e778"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-08-notification-speech-provenance.md"
+      ],
+      "findings": [
+        "local-notification-provenance-before-fallback"
+      ],
+      "reviewed_on": "2026-10-08",
+      "sha256": "ab49bc9e58d8329338b01c3d8ad8f426c2fc83132d13c84ff23f2549ba7e4e3b"
     },
     {
       "aliases": [
@@ -7199,6 +7271,16 @@
       ],
       "reviewed_on": "2026-10-08",
       "sha256": "e3fa3bd9952c79a5ddea41e1319772a80682c2bfb02d1ee354897c7168beee2d"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-08-notification-permission-audio-flood.md"
+      ],
+      "findings": [
+        "local-notification-approval-event-queue"
+      ],
+      "reviewed_on": "2026-10-08",
+      "sha256": "a75ba67aec3c724ea67e257c75f7c95966e599632ec51887523a555c688124ee"
     },
     {
       "aliases": [

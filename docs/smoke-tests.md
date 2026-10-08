@@ -710,7 +710,7 @@ periodic /btw requests. Fullscreen hides i3 titlebars. No sudo is needed.
 Apply the [notification sources](codex-notification-sound.md), restart Dunst
 (which clears its history/queue), and start a fresh Kitty process. No sudo is
 needed. Activation is a one-time installation/update step; afterward open Kitty
-normally. Changing the clip needs only `set`. Live audio acceptance requires
+normally. Changing the clip needs only `set`. The popup checks below assume `speech disable`; optional speech is checked afterward. Live audio acceptance requires
 the included `scripts/can-i-ask-you-a-question.mp3` or another short MP3.
 
 - Action: `~/scripts/codex-notification-activate --open-kitty`
@@ -718,8 +718,8 @@ the included `scripts/can-i-ask-you-a-question.mp3` or another short MP3.
   existing terminals remain open. Its history/queue clears; the sound setting is
   unchanged (disabled on a fresh installation).
 - Action: `~/scripts/codex-notification-sound status`
-  Expected: A fresh installation reports disabled and the machine-local JSON
-  and error-log paths. The repo includes the selected MP3; no local sound-path
+  Expected: A fresh installation reports aligned sound/speech state and voice readiness.
+  `status --plain --details` uses ASCII and reveals machine-local JSON/error-log paths. The repo includes the selected MP3; no local sound-path
   setting is bundled. An already configured machine reports its selected path.
 - Action: `~/scripts/codex-notification-sound set "$HOME/linux-config/scripts/can-i-ask-you-a-question.mp3"`
   Expected: With an existing clip at that path, sound is enabled through local
@@ -751,6 +751,17 @@ the included `scripts/can-i-ask-you-a-question.mp3` or another short MP3.
 The automated private-daemon check also covers queued display, duplicate
 stacking, suppression and history. Dunst 1.9.2 may sound once on recall of a
 silently stacked duplicate; normal already-sounded history stays silent.
+
+- Action: Run `~/scripts/setup-codex-notification-speech --install`, then `--check` and `~/scripts/codex-notification-sound preview --title "Smoke-test VPS backup"`.
+  Expected: Pinned Piper 1.8.0 and English voice verify without sudo; preview plays exactly one MP3 followed by that title. Repeating check/preview without internet succeeds, and temporary WAVs disappear.
+- Action: After deployment, start/resume affected conversations, then run `~/scripts/codex-notification-sound speech enable`.
+  Expected: Status shows enabled and ready. No hook trust is required. A tagged Dunst smoke popup is silent; existing popup actions and content remain unchanged.
+- Action: Use two named conversations sharing a terminal. Complete focused/background turns, rename one and complete again, then request permission including an automatically reviewed request while the task continues. Also complete an ordinary spawned agent with its own saved title.
+  Expected: Each completed turn plays exactly one MP3 then its exact current saved title, never the visible or parent conversation's title. Permission requests/reviews during work stay silent. Focused completion sounds without forcing a popup. Internal reviewers stay silent. Unknown/mismatched identity or missing title plays MP3 only.
+- Action: Trigger simultaneous completions and preview a Unicode title with quoted shell-sensitive text. Temporarily make the Piper environment unavailable and repeat, then restore it.
+  Expected: Complete audio sequences never overlap; text is spoken literally. Unavailable synthesis retains one MP3, logs the failure and does not delay Codex or change permission decisions.
+- Action: Run `~/scripts/codex-notification-sound speech disable`, then repeat a displayed completion/approval and a focused completion.
+  Expected: Displayed popups regain their original single MP3. Focus suppression again suppresses audio, and the selected MP3 remains configured.
 
 ### Kitty and Codex scrolling
 

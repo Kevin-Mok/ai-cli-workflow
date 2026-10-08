@@ -241,3 +241,15 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Limitations: this prevents recurrence in the fixture but cannot erase transcript exposure. Credential rotation was not attempted or verified.
 - Sources:
   - [2026-10-07-codex-recap-runtime-probe.md](/home/example/linux-config/docs/postmortem/2026-10-07-codex-recap-runtime-probe.md) (SHA-256 `85c19fb97675`; see [sources.json](../sources.json)).
+
+## local-notification-provenance-before-fallback
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **code**.
+- Symptoms: internal notification audio leaks through ambiguous duplicate metadata; worker nickname review mistaken for internal provenance.
+- Applicability: Codex notification event resolution using session metadata and conservative title fallback.
+- Diagnostic checks: Reproduce one identity with guardian and CLI transcript metadata; test an ordinary worker with a reserved-looking nickname.
+- Remedy: Collect internal exclusions before ambiguity fallback; classify source discriminants (including nested subagent.other) and explicit roles instead of arbitrary serialized metadata values.
+- Verification evidence: Two defining tests observed RED, then 35 notification tests passed; changed helpers type-checked without errors.
+- Limitations: Transcript format can drift; live hook trust and subjective speech acceptance remain manual.
+- Sources:
+  - [2026-10-08-notification-speech-provenance.md](/home/example/linux-config/docs/postmortem/2026-10-08-notification-speech-provenance.md) (SHA-256 `ab49bc9e58d8`; 1 alias, retained in sources.json).

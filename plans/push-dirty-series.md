@@ -93,3 +93,7 @@ Completed: wrap pinned Dust with allocated reports and incomplete-scan guards ve
 ### Milestone 10 — fix(codex): reconcile titles with current work
 
 Completed: require live-request title checkpoints and document the recap regression. Verified: fresh scoped checks recorded above plus staged whitespace and incident-link contracts. Remaining: 5 planned groups, then one upstream push. Blockers: none for this milestone; documented broader vault inventory warning and manual acceptance limits remain. Next: feat(notifications): speak completed Codex task titles.
+
+### Milestone 11 — feat(notifications): speak completed Codex task titles
+
+Completed: add offline title speech with serialized playback and fallback suppress permission and internal-review audio. Verified: fresh scoped checks recorded above plus staged whitespace and incident-link contracts. Remaining: 4 planned groups, then one upstream push. Blockers: none for this milestone; documented broader vault inventory warning and manual acceptance limits remain. Next: feat(skills): add fish shortcut workflow.

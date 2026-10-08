@@ -95,6 +95,13 @@ class DaemonTests(unittest.TestCase):
                     expect_count(4)
                     notify('codex-kitty', 'suppressed')
                     expect_count(4)
+                    speech = setting.with_name('speech.json')
+                    speech.write_text(json.dumps({'enabled': True}))
+                    notify('codex-kitty', 'speech-enabled silent popup')
+                    expect_count(4)
+                    speech.write_text(json.dumps({'enabled': False}))
+                    notify('codex-kitty', 'speech-disabled restored popup')
+                    expect_count(5)
                     for line in events.read_text().splitlines():
                         argv = json.loads(line)
                         self.assertEqual(argv[-2:], ['--', str(clip)])
@@ -112,8 +119,8 @@ class DaemonTests(unittest.TestCase):
                     self.assertNotEqual(restarted_pid, daemon.pid)
                     self.assertEqual(call('dunstctl', 'count', 'history'), '0')
                     notify('codex-kitty', 'after activation fixture')
-                    expect_count(5)
-                    print('Private Dunst: completion/approval=one each; unrelated/duplicates/normal history/suppressed=silent; queued=plays on display; recalled duplicate stack=one sound')
+                    expect_count(6)
+                    print('Private Dunst: completion/approval=one each; unrelated/duplicates/normal history/suppressed=silent; queued=plays on display; recalled duplicate stack=one sound; speech-enable=silent; disable=MP3 restored')
                 finally:
                     if restarted_pid is not None:
                         os.kill(restarted_pid, signal.SIGTERM)

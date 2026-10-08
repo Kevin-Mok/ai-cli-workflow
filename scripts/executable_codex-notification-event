@@ -1,0 +1,157 @@
+#!/usr/bin/env python3
+"""Resolve exact Codex event identity, snapshot its saved title, detach audio."""
+import json
+import os
+from pathlib import Path
+import re
+import subprocess
+import sys
+from uuid import UUID
+from typing import cast
+
+
+def codex_home() -> Path:
+    return Path(os.environ.get('CODEX_HOME') or Path.home() / '.codex').resolve()
+
+
+def speech_enabled() -> bool:
+    path = Path(os.environ.get('XDG_CONFIG_HOME') or Path.home() / '.config') / 'codex-notification-sound/speech.json'
+    try:
+        data = json.loads(path.read_text(encoding='utf-8'))
+        return isinstance(data, dict) and data.get('enabled') is True
+    except (OSError, ValueError, UnicodeError):
+        return False
+
+
+def valid_id(value: object) -> str | None:
+    if not isinstance(value, str):
+        return None
+    try:
+        return str(UUID(value)) if str(UUID(value)) == value.lower() else None
+    except ValueError:
+        return None
+
+
+def metadata(path: Path) -> dict[str, object] | None:
+    try:
+        resolved = path.resolve(strict=True)
+        if not resolved.is_relative_to(codex_home()) or not resolved.is_file():
+            return None
+        with resolved.open(encoding='utf-8') as transcript:
+            # First session_meta is authoritative; later copied records never override it.
+            for _ in range(32):
+                line = transcript.readline(1024 * 1024)
+                if not line:
+                    break
+                record = json.loads(line)
+                if isinstance(record, dict) and record.get('type') == 'session_meta':
+                    payload = record.get('payload')
+                    return cast(dict[str, object], payload) if isinstance(payload, dict) else None
+    except (OSError, ValueError, UnicodeError, RuntimeError):
+        pass
+    return None
+
+
+def internal(meta: dict[str, object]) -> bool:
+    # Classify provenance discriminants/roles, never nicknames or parent IDs.
+    def reserved(value: object) -> bool:
+        return isinstance(value, str) and bool(re.search(
+            r'(^|[^a-z])(system|review|reviewer|guardian|session_review)([^a-z]|$)', value.lower()))
+
+    def source_reserved(value: object) -> bool:
+        if isinstance(value, str):
+            return reserved(value)
+        if isinstance(value, dict):
+            source = cast(dict[str, object], value)
+            for key, child in source.items():
+                if reserved(key):
+                    return True
+                if key in ('subagent', 'thread_spawn') and source_reserved(child):
+                    return True
+                if key in ('other', 'agent_role', 'agent_type') and reserved(child):
+                    return True
+        return False
+
+    return source_reserved(meta.get('source')) or any(
+        reserved(meta.get(key)) for key in ('agent_role', 'agent_type'))
+
+
+def latest_title(identity: str) -> str | None:
+    title = None
+    try:
+        with (codex_home() / 'session_index.jsonl').open(encoding='utf-8') as index:
+            for line in index:
+                try:
+                    record = json.loads(line)
+                except ValueError:
+                    continue  # Concurrent append may leave a partial last record.
+                if isinstance(record, dict) and record.get('id') == identity:
+                    value = record.get('thread_name')
+                    title = value if isinstance(value, str) and value.strip() and not any(ord(c) < 32 for c in value) else None
+    except (OSError, UnicodeError):
+        return None
+    return title
+
+
+def resolve_event(event: object) -> tuple[bool, str | None]:
+    if not isinstance(event, dict):
+        return False, None
+    meta = None
+    if event.get('hook_event_name') == 'PermissionRequest':
+        path = event.get('transcript_path')
+        meta = metadata(Path(path)) if isinstance(path, str) and Path(path).is_absolute() else None
+        identity = valid_id(meta.get('id')) if meta else None
+        if meta and internal(meta):
+            return False, None
+        if 'agent_id' in event and valid_id(event['agent_id']) != identity:
+            return True, None
+    elif event.get('type') == 'agent-turn-complete':
+        identity = valid_id(event.get('thread-id'))
+        if identity:
+            ambiguous = False
+            excluded = False
+            # Filenames may hold a rollout UUID distinct from the conversation UUID.
+            for folder in ('sessions', 'archived_sessions'):
+                for path in (codex_home() / folder).rglob('*.jsonl'):
+                    candidate = metadata(path)
+                    if candidate and valid_id(candidate.get('id')) == identity:
+                        excluded = excluded or internal(candidate)
+                        ambiguous = ambiguous or (meta is not None and candidate != meta)
+                        meta = candidate
+            if excluded:
+                return False, None
+            if ambiguous:
+                return True, None
+    else:
+        return False, None
+    return True, latest_title(identity) if identity and meta else None
+
+
+def main(argv: list[str] | None = None) -> int:
+    try:
+        if not speech_enabled():
+            return 0
+        args = sys.argv[1:] if argv is None else argv
+        event = json.loads(args[0]) if args else json.load(sys.stdin)
+        # Loaded PermissionRequest hooks may survive config changes in active
+        # sessions. Keep these calls silent even after the hook is removed.
+        if not isinstance(event, dict) or event.get('type') != 'agent-turn-complete':
+            return 0
+        eligible, title = resolve_event(event)
+        if eligible:
+            helper = Path(__file__).with_name('codex-notification-sound')
+            if not helper.exists():
+                helper = helper.with_name('executable_codex-notification-sound')
+            child = subprocess.Popen([sys.executable, str(helper), 'event-play'],
+                                     stdin=subprocess.PIPE, stdout=subprocess.DEVNULL,
+                                     stderr=subprocess.DEVNULL, start_new_session=True, text=True)
+            if child.stdin is not None:
+                child.stdin.write(json.dumps(title))
+                child.stdin.close()
+        return 0
+    except (OSError, ValueError, UnicodeError, RuntimeError, subprocess.SubprocessError):
+        return 0  # No stdout, approval decision, or failure propagated into Codex.
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())

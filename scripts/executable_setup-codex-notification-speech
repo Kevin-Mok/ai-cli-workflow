@@ -1,0 +1,137 @@
+#!/usr/bin/env python3
+"""Install and check isolated, offline Codex title speech. No sudo required."""
+import argparse
+import json
+import os
+from pathlib import Path
+import subprocess
+import sys
+import tempfile
+from typing import cast
+import wave
+
+PIPER_VERSION = '1.8.0'
+VOICE = 'en_US-lessac-medium'
+SYNTHESIS_TIMEOUT = 30
+_plain = False
+_details = False
+
+
+def data_directory() -> Path:
+    return Path(os.environ.get('XDG_DATA_HOME') or Path.home() / '.local/share') / 'codex-notification-speech'
+
+
+def validate_voice(model: Path, config: Path) -> None:
+    if not model.is_file() or model.stat().st_size == 0:
+        raise ValueError(f'voice model missing or empty: {model}')
+    if not config.is_file():
+        raise ValueError(f'voice config missing: {config}')
+    try:
+        data = cast(object, json.loads(config.read_text(encoding='utf-8')))
+    except (ValueError, UnicodeError) as error:
+        raise ValueError(f'invalid voice config: {config}') from error
+    audio = cast(dict[str, object], data).get('audio') if isinstance(data, dict) else None
+    rate = cast(dict[str, object], audio).get('sample_rate') if isinstance(audio, dict) else None
+    if not isinstance(rate, int) or isinstance(rate, bool) or rate <= 0:
+        raise ValueError(f'invalid audio sample_rate in voice config: {config}')
+
+
+def check() -> None:
+    """Check version and synthesize a real WAV without contacting any service."""
+    root = data_directory()
+    python = root / 'venv/bin/python'
+    if not python.is_file() or not os.access(python, os.X_OK):
+        raise ValueError(f'Piper environment missing: {python}')
+    model = root / 'voices' / f'{VOICE}.onnx'
+    config = model.with_suffix('.onnx.json')
+    validate_voice(model, config)
+    result = subprocess.run(
+        [str(python), '-c', 'from importlib.metadata import version; print(version("piper-tts"))'],
+        check=True, capture_output=True, text=True, timeout=SYNTHESIS_TIMEOUT,
+    )
+    if result.stdout.strip() != PIPER_VERSION:
+        raise ValueError(f'Piper {PIPER_VERSION} required; found {result.stdout.strip()!r}')
+    with tempfile.TemporaryDirectory(prefix='speech-check-', dir=root) as directory:
+        wav = Path(directory) / 'check.wav'
+        _ = subprocess.run(
+            [str(python), '-m', 'piper', '--model', str(model), '--config', str(config), '--output-file', str(wav)],
+            input='Codex title speech is ready.\n', text=True, capture_output=True,
+            check=True, timeout=SYNTHESIS_TIMEOUT,
+        )
+        with wave.open(str(wav), 'rb') as audio:
+            if audio.getnframes() <= 0 or audio.getframerate() <= 0:
+                raise ValueError('Piper produced empty speech audio')
+    prefix = '' if _plain else '✅ '
+    print(prefix + 'Offline speech is ready.')
+    print('  Voice   English / Lessac medium')
+    print(f'  Piper   {PIPER_VERSION}')
+    if _details:
+        print(f'Voice: {model}')
+
+
+def install() -> None:
+    """Download Piper and its voice under XDG data, then verify offline speech."""
+    print(('' if _plain else '⬇️ ') + 'Installing the English voice...', flush=True)
+    root = data_directory()
+    root.mkdir(parents=True, exist_ok=True)
+    cache = root / 'cache'
+    temporary = root / 'tmp'
+    cache.mkdir(exist_ok=True)
+    temporary.mkdir(exist_ok=True)
+    environment = {**os.environ, 'PIP_CACHE_DIR': str(cache), 'TMPDIR': str(temporary)}
+    python = root / 'venv/bin/python'
+    _ = subprocess.run([sys.executable, '-m', 'venv', str(root / 'venv')], check=True, env=environment, timeout=120, stdout=None if _details else subprocess.DEVNULL, stderr=None if _details else subprocess.DEVNULL)
+    _ = subprocess.run(
+        [str(python), '-m', 'pip', 'install', '--disable-pip-version-check', f'piper-tts=={PIPER_VERSION}'],
+        check=True, env=environment, timeout=600, stdout=None if _details else subprocess.DEVNULL, stderr=None if _details else subprocess.DEVNULL,
+    )
+    # Publish only completed downloads. Interrupted downloads stay temporary.
+    voices = root / 'voices'
+    voices.mkdir(exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix='voice-download-', dir=root) as directory:
+        _ = subprocess.run(
+            [str(python), '-m', 'piper.download_voices', VOICE, '--data-dir', directory],
+            check=True, env=environment, timeout=600, stdout=None if _details else subprocess.DEVNULL, stderr=None if _details else subprocess.DEVNULL,
+        )
+        model = Path(directory) / f'{VOICE}.onnx'
+        config = model.with_suffix('.onnx.json')
+        validate_voice(model, config)
+        _ = model.replace(voices / model.name)
+        _ = config.replace(voices / config.name)
+    check()
+    print('Speech activation remains a separate machine-local setting.')
+
+
+class SetupArguments(argparse.Namespace):
+    install: bool = False
+    check: bool = False
+    plain: bool = False
+    details: bool = False
+
+
+def main(argv: list[str] | None = None) -> int:
+    global _plain, _details
+    parser = argparse.ArgumentParser(description=__doc__)
+    _ = parser.add_argument('--plain', action='store_true', help='use ASCII output')
+    _ = parser.add_argument('--details', action='store_true', help='show installation logs, paths and diagnostics')
+    commands = parser.add_mutually_exclusive_group(required=True)
+    _ = commands.add_argument('--install', action='store_true', help='install Piper 1.8.0 and the English voice; requires internet')
+    _ = commands.add_argument('--check', action='store_true', help='verify the installed voice by offline synthesis')
+    args = SetupArguments()
+    _ = parser.parse_args(argv, namespace=args)
+    _plain, _details = args.plain, args.details
+    try:
+        if args.install:
+            install()
+        else:
+            check()
+    except (OSError, ValueError, subprocess.SubprocessError, wave.Error, EOFError) as error:
+        prefix = 'Warning: ' if _plain else '⚠️ '
+        message = str(error) if _details else f'Piper {PIPER_VERSION} voice config/runtime check failed'
+        print(f'{prefix}{message}; run setup-codex-notification-speech --install (use --details for diagnostics)', file=sys.stderr)
+        return 1
+    return 0
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())

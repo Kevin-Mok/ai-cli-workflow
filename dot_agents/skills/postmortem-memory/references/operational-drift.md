@@ -160,3 +160,15 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Verification evidence: Native rename returned `Verify Second Brain sessions`; Kitty ls showed the same name with its activity glyph, exit 0. Strengthened instructions were deployed by refresh-config (exit 0), matched installed bytes, and passed independent reasoning review.
 - Limitations: Title transport is verified; future instruction compliance remains a manual smoke check. Existing processes may retain old instructions. No polling or independent enforcement was added.
 - Source: [Stale Codex title from a pasted session report](../../../../docs/postmortem/2026-10-08-stale-codex-task-title.md).
+
+## local-notification-approval-event-queue
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **runtime**.
+- Symptoms: spoken task titles repeat during work without completion events; detached workers queue behind the playback lock.
+- Applicability: Codex notification event-policy changes involving completion notify and already-loaded permission hooks.
+- Diagnostic checks: Correlate task-complete counts with escalation requests; inspect same-user exact helper event-play workers only.
+- Remedy: Gate on agent-turn-complete before resolving identity, remove the permission handler, stop enqueueing before cancelling revalidated owned detached audio groups, then restore prior activation. Loaded old hooks need the runtime gate.
+- Verification evidence: 37 focused and 138 broader tests pass; private Dunst and type checks pass. Refreshed bridge handled ten permission calls silently with zero workers left queued.
+- Limitations: Subjective future completion playback remains manual. A serialization lock prevents overlap but does not suppress obsolete event queues.
+- Sources:
+  - [2026-10-08-notification-permission-audio-flood.md](/home/example/linux-config/docs/postmortem/2026-10-08-notification-permission-audio-flood.md) (SHA-256 `a75ba67aec3c`; one alias retained in sources.json).
