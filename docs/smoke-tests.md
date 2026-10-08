@@ -76,6 +76,12 @@ fixture below provides a repeatable picker check without using private history.
 - Action: Run `crg`, select a session in `/mnt/usb-8tb/`, and resize the terminal between narrow and wide windows. Press Ctrl-/ twice, then Enter or Esc.
   Expected: The directory appears as `/m/usb-8tb>` beside the complete title when space permits, followed by the short timestamp, without large tab gaps. The full title wraps in the preview; the original directory remains there. The preview is on the right in wide windows and below in narrow ones; Ctrl-/ toggles it for full-width list reading. Enter resumes the original directory and UUID; Esc cancels.
 
+- Action: Run `crg`, filter by directory and select an uncached Guardian review or untitled row. Request Ctrl-G on it and another waiting row; keep the picker open until ready. Repeat using only `Guardian` as the query, then clear it after the title changes.
+  Expected: Generic rows show waiting position/time such as `[queued #2 12s]`, then a ticking `[generating 8s]` timer. Manual priority changes queue position while retaining waiting time; generation starts a fresh timer. Once ready, the AI headline replaces either placeholder and its timer without reopening. Preview retains Original title, recap state and elapsed phase time. Directory query/UUID stay stable; an old-title-only query re-filters normally. Enter with no matches resumes nothing; meaningful native titles stay unchanged.
+
+- Action: Run `codex-search --recent --pick --summary-count 0`, select a missing `[Ctrl-G]` row and request Ctrl-G. Then run `codex-search --recent --pick --no-summaries` and inspect uncached/cached generic rows; press Ctrl-G, then Esc.
+  Expected: Count zero starts no automatic work but allows manual queue/generation progress. Disabled generation starts no model calls or timers, marks missing titles `[recaps off]` and shows cached AI titles immediately. Failed recaps show `[unavailable]` and explain why in preview. Esc cancels and stops workers.
+
 ### Codex recent picker timezone
 
 - Action: Run `crg` and inspect a session's activity timestamp in its row and preview.

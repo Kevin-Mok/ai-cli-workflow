@@ -83,6 +83,70 @@ class RecentPickerTest(unittest.TestCase):
                                      'FZF_DEFAULT_OPTS_FILE': '/missing'}):
             return self.module.pick_recent([(self.entry, [])], {ID1: 'Synthetic title'}, self.cache, manager)
 
+    def test_guardian_review_uses_cached_ai_headline_in_row_and_preview(self):
+        for state in ('ready', 'stale'):
+            with self.subTest(state=state):
+                status = {'status': state, 'recap': {'headline': 'Review parser edge cases'}, 'partial': False}
+                row, preview = self.module.render_session(self.entry, 'Guardian review', status)
+                self.assertEqual(row.split('\t')[3], 'Review parser edge cases')
+                self.assertTrue(preview.startswith('Review parser edge cases\n'))
+                self.assertIn('Original title: Guardian review', preview)
+                self.assertIn('AI recap: ' + state, preview)
+
+    def test_guardian_title_fallback_and_meaningful_titles_are_preserved(self):
+        for title, headline, expected in (
+            ('Guardian review', '', 'Guardian review'),
+            ('Guardian review', None, 'Guardian review'),
+            ('Guardian review', ['Bad headline'], 'Guardian review'),
+            ('Guardian review', '   ', 'Guardian review'),
+            (' Guardian review ', 'Audit shell quoting', 'Audit shell quoting'),
+            ('guardian REVIEW', 'Audit shell quoting', 'Audit shell quoting'),
+            ('Implement fast directory sizes', 'Review parser', 'Implement fast directory sizes'),
+        ):
+            with self.subTest(title=title, headline=headline):
+                status = {'status': 'ready', 'recap': {'headline': headline}}
+                row, preview = self.module.render_session(self.entry, title, status)
+                self.assertEqual(row.split('\t')[3], expected)
+                self.assertTrue(preview.startswith(expected + '\n'))
+
+    def test_untitled_rows_adopt_ai_headlines(self):
+        for title in ('', '   ', '(untitled)', ' (UNTITLED) '):
+            with self.subTest(title=title):
+                row, preview = self.module.render_session(self.entry, title,
+                    {'status': 'ready', 'recap': {'headline': 'Inspect pending title progress'}})
+                self.assertEqual(row.split('\t')[3], 'Inspect pending title progress')
+                self.assertIn('Original title:', preview)
+
+    def test_generic_rows_show_queue_position_and_elapsed_generation(self):
+        for title in ('Guardian review', '', '(untitled)'):
+            for state, elapsed, suffix in (
+                ('queued', 12, 'queued #2 12s'),
+                ('generating', 65, 'generating 1m05s'),
+            ):
+                with self.subTest(title=title, state=state):
+                    status = {'status': state, 'recap': None, 'elapsed_seconds': elapsed,
+                              'queue_position': 2}
+                    row, preview = self.module.render_session(self.entry, title, status)
+                    self.assertEqual(row.split('\t')[3], (title or '(untitled)') + ' [' + suffix + ']')
+                    self.assertIn('Recap progress: ' + suffix, preview)
+                    self.assertIn('AI recap: ' + state, preview)
+        row, preview = self.module.render_session(self.entry, 'Meaningful task title',
+            {'status': 'generating', 'elapsed_seconds': 12})
+        self.assertEqual(row.split('\t')[3], 'Meaningful task title')
+        self.assertIn('Recap progress: generating 12s', preview)
+
+    def test_generic_rows_explain_missing_disabled_and_failed_titles(self):
+        for title in ('Guardian review', ''):
+            for state, enabled, suffix in (
+                ('missing', True, 'Ctrl-G'),
+                ('missing', False, 'recaps off'),
+                ('unavailable', True, 'unavailable'),
+            ):
+                with self.subTest(title=title, state=state, enabled=enabled):
+                    row, _ = self.module.render_session(self.entry, title,
+                        {'status': state, 'generation_enabled': enabled, 'recap': None})
+                    self.assertEqual(row.split('\t')[3], (title or '(untitled)') + ' [' + suffix + ']')
+
     def test_directory_abbreviation_keeps_basename_and_full_preview(self):
         for directory, short in (
             ('/mnt/usb-8tb/', '/m/usb-8tb>'),

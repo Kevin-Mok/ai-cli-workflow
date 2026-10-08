@@ -128,13 +128,71 @@ Path(sys.argv[1]).write_text(sys.argv[4])
         manager.close()
         other=self.make_entry('00000000-0000-4000-8000-000000000002')
         disabled=self.manager(count=20,enabled=False);disabled.start([other]);disabled.request(other);time.sleep(.05)
-        self.assertEqual(disabled.status(other)['status'],'missing');self.assertEqual(len(self.calls()),1)
+        status = disabled.status(other)
+        self.assertEqual(status['status'],'missing');self.assertEqual(len(self.calls()),1)
+        self.assertNotIn('elapsed_seconds', status)
+        self.assertNotIn('queue_position', status)
+
+    def test_queue_progress_reports_position_and_phase_elapsed_time(self):
+        import threading
+        entered = threading.Event(); release = threading.Event()
+        prepare = self.runtime.prepare
+        def slow_prepare():
+            entered.set()
+            release.wait(5)
+            return prepare()
+        self.runtime.prepare = slow_prepare
+        entries = [self.entry, self.make_entry('00000000-0000-4000-8000-000000000002'),
+                   self.make_entry('00000000-0000-4000-8000-000000000003')]
+        manager = self.manager(count=3)
+        self.addCleanup(release.set)
+        started = time.monotonic()
+        with patch.object(self.m.time, 'monotonic', return_value=started) as clock:
+            manager.start(entries)
+            self.assertTrue(entered.wait(2), 'controlled preflight did not start')
+            clock.return_value = started + 12.8
+            waiting = manager.status(entries[1])
+            self.assertEqual(waiting['status'], 'queued')
+            self.assertEqual(waiting.get('queue_position'), 1)
+            self.assertEqual(waiting.get('elapsed_seconds'), 12)
+            self.assertEqual(manager.status(entries[2]).get('queue_position'), 2)
+            active = manager.status(entries[0])
+            self.assertEqual(active['status'], 'generating')
+            self.assertEqual(active.get('elapsed_seconds'), 12)
+            manager.request(entries[2])
+            clock.return_value = started + 17.2
+            self.assertEqual(manager.status(entries[2]).get('queue_position'), 1)
+            self.assertEqual(manager.status(entries[2]).get('elapsed_seconds'), 17)
+            self.assertEqual(manager.status(entries[1]).get('queue_position'), 2)
+        release.set()
+        for entry in entries:
+            ready = self.wait_status(manager, entry)
+            self.assertEqual(ready['status'], 'ready')
+            self.assertNotIn('elapsed_seconds', ready)
+            self.assertNotIn('queue_position', ready)
 
     def test_malformed_output_and_one_attempt_per_opening(self):
         manager=self.manager(runtime=self.runtime_for('bad'));manager.start([self.entry])
         self.assertEqual(self.wait_status(manager,self.entry)['status'],'unavailable')
+        self.assertNotIn('elapsed_seconds', manager.status(self.entry))
         manager.request(self.entry);time.sleep(.05);self.assertEqual(len(self.calls()),1)
         self.assertEqual(self.m.RecapCache(self.root,'synthetic-model').status(self.entry)['status'],'missing')
+
+    def test_closing_manager_ends_active_and_queued_progress(self):
+        other = self.make_entry('00000000-0000-4000-8000-000000000002')
+        manager = self.manager(count=2, runtime=self.runtime_for('sleep'))
+        manager.start([self.entry, other])
+        end = time.monotonic() + 3
+        while not self.calls() and time.monotonic() < end:
+            time.sleep(.02)
+        self.assertTrue(self.calls(), 'controlled generation did not start')
+        self.assertEqual(manager.status(other)['status'], 'queued')
+        manager.close()
+        for entry in (self.entry, other):
+            status = manager.status(entry)
+            self.assertNotIn(status['status'], ('generating', 'queued'))
+            self.assertNotIn('elapsed_seconds', status)
+            self.assertNotIn('queue_position', status)
 
     def test_auth_and_rate_failures_stop_batch(self):
         for mode in ('auth','rate'):
@@ -145,6 +203,8 @@ Path(sys.argv[1]).write_text(sys.argv[4])
                 self.assertEqual(self.wait_status(manager,entries[0])['status'],'unavailable')
                 time.sleep(.08);self.assertEqual(len(self.calls()),1)
                 self.assertEqual(manager.status(entries[1])['status'],'unavailable')
+                self.assertNotIn('elapsed_seconds', manager.status(entries[1]))
+                self.assertNotIn('queue_position', manager.status(entries[1]))
                 manager.close()
 
     def test_timeout_and_cancel_reap_process_before_return(self):
@@ -230,6 +290,7 @@ Path(sys.argv[1]).write_text(sys.argv[4])
             self.wait_status(manager,self.entry,states=('generating',))
             time.sleep(.05)
         self.assertEqual(manager.status(self.entry)['status'],'missing')
+        self.assertNotIn('elapsed_seconds', manager.status(self.entry))
         manager.request(self.entry)
         self.assertEqual(self.wait_status(manager,self.entry)['status'],'ready')
         self.assertEqual(len(self.calls()),1)
@@ -251,7 +312,17 @@ Path(sys.argv[1]).write_text(sys.argv[4])
         leader=self.calls()[0]['pid'];manager.close()
         with self.assertRaises(ProcessLookupError):os.kill(leader,0)
         stat_file=Path(f'/proc/{child}/stat')
-        if stat_file.exists():self.assertEqual(stat_file.read_text().split()[2],'Z','descendant still running')
+        end = time.monotonic() + 1
+        while True:
+            try:
+                state = stat_file.read_text().split()[2]
+            except FileNotFoundError:
+                break
+            if state == 'Z':
+                break
+            if time.monotonic() >= end:
+                self.fail('descendant still running after cancellation: ' + state)
+            time.sleep(.01)
 
     def test_close_during_runtime_construction_never_starts_prepare(self):
         import threading

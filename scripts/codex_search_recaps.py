@@ -244,9 +244,10 @@ class SummaryManager:
         self.cache = RecapCache(root, self.model)
         self._condition = threading.Condition()
         self._queue = deque()
+        self._queued_since = {}
         self._attempted = set()
         self._states = {}
-        self._busy = set()
+        self._busy = {}
         self._stop = threading.Event()
         self._thread = None
         self._process = None
@@ -255,21 +256,37 @@ class SummaryManager:
 
     def status(self, entry: dict) -> dict:
         cached = self.cache.status(entry)
-        with self._condition:
-            state = self._states.get(entry['id'])
-            halt = self._halt
+        cached['generation_enabled'] = self.enabled
         if cached['status'] == 'ready':
             return cached
-        if entry['id'] in self._busy:
+        sid = entry['id']
+        with self._condition:
+            state = self._states.get(sid)
+            halt = self._halt
+            busy_since = self._busy.get(sid)
+            queue_position = next((position for position, queued in enumerate(self._queue, 1)
+                                   if queued['id'] == sid), None)
+            queued_since = self._queued_since.get(sid)
+        now = time.monotonic()
+        if busy_since is not None:
             with self.cache.generation_lock(entry) as lease:
                 if lease is None:
-                    return {**cached, 'status': 'generating', 'detail': 'Another picker is generating this recap.'}
+                    return {**cached, 'status': 'generating',
+                            'elapsed_seconds': max(0, int(now - busy_since)),
+                            'detail': 'Another picker is generating this recap; elapsed time is observed in this picker.'}
             with self._condition:
-                self._busy.discard(entry['id'])
+                self._busy.pop(sid, None)
         if state:
-            return {**cached, 'status': state[0], 'detail': state[1]}
+            result = {**cached, 'status': state[0], 'detail': state[1]}
+            if state[0] == 'generating':
+                result['elapsed_seconds'] = max(0, int(now - state[2]))
+            return result
         if halt and self.enabled:
             return {**cached, 'status': 'unavailable', 'detail': halt}
+        if queue_position is not None and queued_since is not None:
+            return {**cached, 'status': 'queued', 'queue_position': queue_position,
+                    'elapsed_seconds': max(0, int(now - queued_since)),
+                    'detail': 'Waiting for earlier recap requests to finish.'}
         if self.config_error:
             cached['detail'] = self.config_error
         if not self.enabled:
@@ -297,6 +314,7 @@ class SummaryManager:
             self._queue.appendleft(entry)
         else:
             self._queue.append(entry)
+        self._queued_since.setdefault(entry['id'], time.monotonic())
         self._condition.notify_all()
 
     def request(self, entry: dict) -> None:
@@ -306,7 +324,7 @@ class SummaryManager:
 
     def _state(self, entry: dict, status: str, detail: str = '') -> None:
         with self._condition:
-            self._states[entry['id']] = (status, detail)
+            self._states[entry['id']] = (status, detail, time.monotonic())
 
     def _work(self) -> None:
         while not self._stop.is_set():
@@ -316,6 +334,7 @@ class SummaryManager:
                 if self._stop.is_set():
                     return
                 entry = self._queue.popleft()
+                self._queued_since.pop(entry['id'], None)
             try:
                 self._generate(entry)
             except Exception:
@@ -327,12 +346,15 @@ class SummaryManager:
         with self.cache.generation_lock(entry) as lease:
             if lease is None:
                 with self._condition:
-                    self._busy.add(entry['id'])
+                    self._busy.setdefault(entry['id'], time.monotonic())
                 return
             if self.cache.status(entry)['status'] == 'ready':
+                with self._condition:
+                    self._states.pop(entry['id'], None)
+                    self._busy.pop(entry['id'], None)
                 return
             with self._condition:
-                self._busy.discard(entry['id'])
+                self._busy.pop(entry['id'], None)
                 self._attempted.add(entry['id'])
             self._state(entry, 'generating', 'Generating recap…')
             if not self._prepared:
@@ -359,6 +381,8 @@ class SummaryManager:
                 return
             # A preflight can resolve an inherited profile more precisely than local parsing.
             if self.cache.status(entry)['status'] == 'ready':
+                with self._condition:
+                    self._states.pop(entry['id'], None)
                 return
             dialogue, partial = bounded_dialogue(self.root, entry)
             if not dialogue.strip():
@@ -431,11 +455,13 @@ class SummaryManager:
         with self._condition:
             self._halt = detail
             self._queue.clear()
+            self._queued_since.clear()
 
     def close(self) -> None:
         self._stop.set()
         with self._condition:
             self._queue.clear()
+            self._queued_since.clear()
             self._condition.notify_all()
         with self._condition:
             runtime = self.runtime
@@ -445,3 +471,7 @@ class SummaryManager:
         if self._thread is not None:
             self._thread.join()
             self._thread = None
+        with self._condition:
+            self._busy.clear()
+            self._states = {sid: state for sid, state in self._states.items()
+                            if state[0] != 'generating'}

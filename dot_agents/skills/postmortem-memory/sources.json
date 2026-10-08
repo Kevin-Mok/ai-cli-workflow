@@ -3642,6 +3642,59 @@
       "sources": [
         "2c0f5d18179756b22b7ac8ac470d9cad3d36b245464e147703f742d6dbc63652"
       ]
+    },
+    {
+      "id": "local-picker-live-headline-integration",
+      "topic": "api-contracts-fixtures",
+      "reference": "references/api-contracts-fixtures.md#local-picker-live-headline-integration",
+      "status": "verified_fix",
+      "confidence": "confirmed",
+      "verification_scope": "runtime",
+      "symptoms": [
+        "Guardian review persists after recap arrives",
+        "ready headline exists but live row keeps fallback title",
+        "static rendering passes while active rows stay generic"
+      ],
+      "applicability": "Recent-session pickers substituting AI headlines for generic native titles.",
+      "diagnostics": [
+        "Compare active row title with current recap metadata and installed source.",
+        "Exercise actual reload path with synthetic workers before relying on static rendering.",
+        "Test stable-directory filtering and old-title-only filtering separately.",
+        "Compare picker start and recap completion time before treating a transient generic label as a failed update.",
+        "Ensure synthetic startup preserves ready cached states; cached-title verification must not start inference workers."
+      ],
+      "remedy": "Publish current headlines on each status update. Retain the query and track selection while it still matches; allow normal re-filtering and safely return no selection at zero matches. Preserve ready cache states in synthetic managers; exercise cached opening and uncached live refresh in separate modes.",
+      "verification": "Defining live replacement RED preceded fix; 93 search tests and source/installed real-fzf fixtures pass, including exact UUID resume, zero-match Enter and worker cleanup. Read-only authenticated live state also confirmed the exact reported row updated after its recap completed 28 seconds from opening. Commit verification exposed a synthetic cached-state startup race; the corrected zero-worker cached opening and uncached live fixtures pass, followed by all 98 search tests in 38.034 seconds.",
+      "limitations": "Synthetic workers make no provider calls. Already-open processes require one reopen to load code; missing recaps retain native titles.",
+      "sources": [
+        "a9b03fd41f6dc748201a96e5023a19874cd9e111cf363da9283fc5f0a4cd6dff",
+        "f342d3f52cdfb78f0db728999f1faf60bb37d782c3830eaa7751524b663d3d0b",
+        "9abbb622d990f840246c249ff9071f283343fb5fe8ffd8794b0994272255cb38"
+      ]
+    },
+    {
+      "id": "local-descendant-exit-observation",
+      "topic": "api-contracts-fixtures",
+      "reference": "references/api-contracts-fixtures.md#local-descendant-exit-observation",
+      "status": "verified_fix",
+      "confidence": "confirmed",
+      "verification_scope": "runtime",
+      "symptoms": [
+        "descendant still R immediately after group cancellation",
+        "leader reaped while descendant proc-state assertion fails"
+      ],
+      "applicability": "Linux cancellation fixtures observing an owned process group after asynchronous signals.",
+      "diagnostics": [
+        "Confirm SIGTERM/SIGKILL target the owned process group and leader is reaped.",
+        "Distinguish an immediate proc-state race from a child surviving a bounded deadline.",
+        "Read proc-state directly and handle disappearance between checks."
+      ],
+      "remedy": "Keep immediate leader absence; bound observation of the owned child disappearing or becoming Z and fail with last state if it survives. Do not assume leader wait reaps descendants.",
+      "verification": "Focused real subprocess cancellation passes; full98 search suite passes after correcting the immediate observation race. A running child remains a failure after one second.",
+      "limitations": "Synthetic Linux subprocesses only; fixture correction does not claim production wait reaps grandchildren or establish live provider shutdown.",
+      "sources": [
+        "cd1f19005235b7a969d3372bd42a4c58d75e30163107d91acdd239726ddf2c8f"
+      ]
     }
   ],
   "reports": [
@@ -6017,6 +6070,64 @@
       "reviewed_on": "2026-10-08",
       "findings": [
         "local-shortcut-stored-text-verification"
+      ]
+    },
+    {
+      "sha256": "39ceb669c476e21145783e846e7f7475df4781c7566184ee5f2635dc0bc8e6e9",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-08-guardian-title-review-sandbox.md"
+      ],
+      "reviewed_on": "2026-10-08",
+      "findings": [],
+      "decision": "No new learning: known default sandbox startup failure and absent guessed manual-page path. Approved scoped source review and installed help/capability checks succeeded; infrastructure unchanged."
+    },
+    {
+      "sha256": "a9b03fd41f6dc748201a96e5023a19874cd9e111cf363da9283fc5f0a4cd6dff",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-08-guardian-titles-frozen-after-recap.md"
+      ],
+      "reviewed_on": "2026-10-08",
+      "findings": [
+        "local-picker-live-headline-integration"
+      ]
+    },
+    {
+      "sha256": "f342d3f52cdfb78f0db728999f1faf60bb37d782c3830eaa7751524b663d3d0b",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-08-guardian-title-generation-delay.md"
+      ],
+      "reviewed_on": "2026-10-08",
+      "findings": [
+        "local-picker-live-headline-integration"
+      ]
+    },
+    {
+      "sha256": "ca414e9851ac7bd71d1bd14f311e8876a297a47de91db1a2f08de4775d48b0f3",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-08-title-progress-patch-context.md"
+      ],
+      "reviewed_on": "2026-10-08",
+      "findings": [],
+      "decision": "No new learning: reviewed local-stale-patch-context covers the unnecessary out-of-order hunk and scoped exact-context retry. Full98 search regressions pass; unrelated work and permissions preserved."
+    },
+    {
+      "sha256": "cd1f19005235b7a969d3372bd42a4c58d75e30163107d91acdd239726ddf2c8f",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-08-title-progress-descendant-exit-race.md"
+      ],
+      "reviewed_on": "2026-10-08",
+      "findings": [
+        "local-descendant-exit-observation"
+      ]
+    },
+    {
+      "sha256": "9abbb622d990f840246c249ff9071f283343fb5fe8ffd8794b0994272255cb38",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-08-title-progress-cached-fixture-race.md"
+      ],
+      "reviewed_on": "2026-10-08",
+      "findings": [
+        "local-picker-live-headline-integration"
       ]
     }
   ],

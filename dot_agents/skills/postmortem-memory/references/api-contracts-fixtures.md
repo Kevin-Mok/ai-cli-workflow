@@ -477,3 +477,33 @@ security checks with the arguments you passed.
 - Verification: defining RED regressions preceded fixes; 19 shortcut tests, syntax and installed-file checks passed.
 - Limitations: mapped commands were never executed; conditions remain host-specific and template-delimiter input has its own guard.
 - Source: [Fish alias completion checks](/home/example/linux-config/docs/postmortem/2026-10-08-fish-alias-completion-checks.md).
+
+## local-picker-live-headline-integration
+
+- Cached-fixture diagnostic: preserve ready cached states during synthetic startup. Verify opening titles and exact resume with zero inference workers; retain uncached live replacement checks separately.
+- Cached-fixture evidence: startup previously overwrote ready ID1 and raced the initial assertion. Corrected real-fzf fixture and all 98 search tests pass (38.034s, exit 0).
+- Additional source: [Cached fixture startup race](/home/example/linux-config/docs/postmortem/2026-10-08-title-progress-cached-fixture-race.md).
+
+- Additional diagnostic: compare picker start and cache completion time before treating a transient generic label as a missed update.
+- Additional runtime evidence: authenticated fzf state confirmed the exact reported row had its AI title after a recap completed 28 seconds from opening. No provider calls or selection changes were made during diagnosis.
+- Additional source: [Guardian generation delay](/home/example/linux-config/docs/postmortem/2026-10-08-guardian-title-generation-delay.md).
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **runtime**.
+- Symptoms: Guardian review persists after recap arrives; ready headline exists while live row keeps its fallback; static rendering passes.
+- Applicability: Recent-session pickers substituting AI headlines for generic native titles.
+- Diagnostic checks: Compare active rows, recap metadata and installed source. Exercise real reloads with synthetic workers. Test stable-directory and old-title-only queries separately.
+- Remedy: Publish current headlines on each status update. Retain query text and track selection while matching; allow normal re-filtering and safe zero-match Enter.
+- Verification evidence: Defining live replacement RED preceded correction; 93 search tests and source/installed real-fzf fixtures pass, including exact UUID resume and worker cleanup.
+- Limitations: Synthetic workers make no provider calls. Already-open processes need one reopen; missing recaps retain native titles.
+- Source: [Guardian titles frozen after recap](/home/example/linux-config/docs/postmortem/2026-10-08-guardian-titles-frozen-after-recap.md).
+
+## local-descendant-exit-observation
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **runtime**.
+- Symptoms: owned descendant remains R immediately after group cancellation while its leader is already reaped.
+- Applicability: Linux cancellation fixtures observing process-group signals.
+- Diagnostic checks: confirm owned group receives SIGTERM/SIGKILL and the leader is reaped; distinguish an immediate proc-state race from a surviving child; handle disappearance around the direct read.
+- Remedy: retain immediate leader absence and bound observation of the owned child disappearing or becoming Z. Fail at the deadline with its last state; leader wait cannot reap grandchildren.
+- Verification evidence: focused real subprocess cancellation and all98 search tests pass with a one-second observation bound that still rejects a running child.
+- Limitations: synthetic Linux subprocesses; fixture correction does not establish live provider teardown or change production wait semantics.
+- Source: [Descendant exit observation race](/home/example/linux-config/docs/postmortem/2026-10-08-title-progress-descendant-exit-race.md).

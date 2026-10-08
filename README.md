@@ -613,7 +613,9 @@ Use `codex-search --recent` for the newest 20 sessions without a pattern, or
 `crg` (`codex-search --recent --pick`) for all sessions with background AI recaps.
 Picker rows use compact Toronto timestamps (`Oct 8 12:24`), with full timestamps
 in the preview. Abbreviated paths and tight spacing keep titles visible; Ctrl-/
-toggles the responsive preview.
+toggles the responsive preview. Guardian review and untitled rows use AI recap headlines,
+updating in the list as recaps arrive. Waiting rows show queue position and elapsed
+time; generating rows show a ticking timer. The query filters the updated titles.
 `--no-summaries` keeps cached recaps and local previews without model calls;
 Ctrl-G requests a recap for the highlighted session when generation is enabled.
 Use `codex-search --help` for options and examples, and the grouped

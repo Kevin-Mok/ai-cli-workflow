@@ -67,7 +67,7 @@ without calling a model. `--recent` cannot be combined with a search pattern.
 inference. All discovered sessions appear regardless of `--limit`. Each row shows
 an abbreviated directory, title and activity time. The preview labels recap
 status and shows the goal, reported progress, current state and remaining work, or bounded
-local user/assistant dialogue when there is no recap. Missing, generating, stale,
+local user/assistant dialogue when there is no recap. Missing, queued, generating, stale,
 unavailable and partial recaps are labelled explicitly; a stale recap remains
 visible as older evidence. AI recaps describe reported conversation state and
 are not independent verification of completed work.
@@ -98,9 +98,29 @@ stays in the preview and resume command. The preview wraps the full title and
 recap, sits on the right in wide windows, and moves below in narrow windows.
 Ctrl-/ toggles the preview to give the list the full window width when needed.
 
-Typing filters activity/abbreviated directory/title, not changing recap text. The picker
-freezes discovery order for that opening and updates recaps in place, preserving
-the query and highlighted session. Reopen to discover new activity or sessions.
+Rows named `Guardian review` or `(untitled)`, including missing names, use their cached AI recap headline as the title,
+including stale cached headlines; the preview keeps the original native title
+and recap status. Meaningful native titles stay unchanged. Without a cached
+headline, the row keeps its native title until a recap arrives; the new headline
+then appears in the list and preview without reopening.
+Generation runs in the background. Generic rows show `[queued #2 12s]` for their
+position in the waiting queue and time spent waiting, then `[generating 8s]` with
+a fresh timer when generation starts. Timers update in whole seconds, including
+configuration verification, and disappear when the current AI title is ready.
+The queue position excludes the active request; Ctrl-G moves a waiting session
+ahead without resetting its waiting time. Total provider work is unknown, so no
+percentage or ETA is invented. The preview shows phase and elapsed time for every
+session; another picker's elapsed time is measured from first observation here.
+Missing titles outside the active queue show `[Ctrl-G]`; disabled generation
+shows `[recaps off]`, and failures show `[unavailable]` with the reason in preview.
+`--no-summaries` can still use cached headlines without generating new ones.
+
+Typing filters activity/abbreviated directory/title, not the recap body. The picker
+freezes discovery order for that opening and updates recaps in place. The query
+stays entered, and the highlighted session stays selected while it still matches.
+A query matching only `Guardian review` may lose that row when its AI title arrives;
+clear the query to see the updated title. Enter with no matches resumes nothing.
+Reopen to discover new activity or sessions.
 This uses fzf's local authenticated control listener; fzf 0.44.1 is verified.
 Enter always resumes `codex resume -C DIR UUID`, with no initial prompt.
 
@@ -175,7 +195,22 @@ model calls. For an explicitly chosen single live synthetic recap using the
 current login/model, run `python3 tests/scripts/codex_recap_live_check.py --live`;
 this consumes normal account allowance and must not be repeated as a batch.
 
-The recent fixture drives real fzf in a disposable PTY with deterministic local recap subprocesses. It checks live previews, query/highlight preservation, Ctrl-G, selection and cancellation cleanup without sending anything to a model. It exits 0 on success.
+The recent fixture drives real fzf in a disposable PTY with deterministic local recap subprocesses. Its progress case uses the real SummaryManager and private cache, replacing only the external runtime. It checks visible timer ticks, queue-to-generation timer reset, Guardian/untitled title adoption, query/highlight preservation, Ctrl-G, selection and cancellation cleanup without sending anything to a model. It exits 0 on success.
+
+For manual title-progress checks, run these reusable commands from the repo;
+no sudo is needed:
+
+```bash
+./scripts/executable_codex-search --recent --pick
+./scripts/executable_codex-search --recent --pick --summary-count 0
+./scripts/executable_codex-search --recent --pick --no-summaries
+```
+
+The first shows automatic queued/generating timers on uncached generic rows.
+In the second, select a `[Ctrl-G]` row and press Ctrl-G to see manual progress;
+cached titles appear immediately. The third starts no inference, shows cached
+AI titles and marks missing ones `[recaps off]`. Esc cancels each picker. Filtering
+by directory keeps the selected UUID matching during title and timer updates.
 
 The search and recent-picker fixtures accept `--fzf /absolute/path/to/fzf`
 for a temporary trusted binary. `codex_search_live_check.py` uses a resume stub;

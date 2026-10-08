@@ -1,5 +1,6 @@
 """Asynchronous recent-session picker; inference belongs to the recap manager."""
 import json
+import math
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 import os
@@ -19,7 +20,7 @@ import urllib.request
 
 from codex_search_index import SearchError, atomic_json, secure_file, session_id, visible
 
-STATUSES = {'missing', 'stale', 'generating', 'unavailable', 'ready'}
+STATUSES = {'missing', 'queued', 'stale', 'generating', 'unavailable', 'ready'}
 
 
 def paragraph(value):
@@ -58,6 +59,33 @@ def compact_directory(value):
     return prefix + '/'.join([part[0] for part in parts[:-1]] + parts[-1:]) + '>'
 
 
+def generic_title(title):
+    return title.strip().casefold() in ('', '(untitled)', 'guardian review')
+
+
+def recap_title(title, status):
+    """Give generic rows a descriptive cached headline."""
+    recap = status.get('recap')
+    headline = recap.get('headline') if isinstance(recap, dict) else None
+    if (generic_title(title) and
+            isinstance(headline, str) and headline.strip()):
+        return headline.strip()
+    return title if title.strip() else '(untitled)'
+
+
+def recap_progress(status):
+    state = status.get('status')
+    seconds = status.get('elapsed_seconds')
+    if (state not in ('queued', 'generating') or type(seconds) not in (int, float) or
+            not math.isfinite(seconds) or seconds < 0):
+        return ''
+    minutes, seconds = divmod(int(seconds), 60)
+    elapsed = f'{minutes}m{seconds:02}s' if minutes else f'{seconds}s'
+    position = status.get('queue_position')
+    queued = f' #{position}' if state == 'queued' and type(position) is int and position > 0 else ''
+    return state + queued + ' ' + elapsed
+
+
 def render_session(entry, title, status, local_dialogue=''):
     """All variable display text is escaped before it reaches the terminal."""
     state = status.get('status', 'missing')
@@ -67,14 +95,33 @@ def render_session(entry, title, status, local_dialogue=''):
     label = state + ('; partial' if partial else '')
     recap = status.get('recap')
     headline = recap.get('headline', '') if isinstance(recap, dict) else ''
+    display_title = recap_title(title, status)
+    progress = recap_progress(status)
+    row_title = display_title
+    if generic_title(title):
+        badge = progress
+        if state == 'unavailable':
+            badge = 'unavailable'
+        elif state == 'missing':
+            if status.get('generation_enabled') is True:
+                badge = 'Ctrl-G'
+            elif status.get('generation_enabled') is False:
+                badge = 'recaps off'
+        if badge:
+            row_title += ' [' + badge + ']'
     activity = activity_time(entry.get('timestamp', ''))
     short_activity = activity_time(entry.get('timestamp', ''), compact=True)
     row = '\t'.join((entry['id'], visible(short_activity or '(activity unknown)'),
                      visible(compact_directory(entry.get('cwd', ''))),
-                     visible(title or '(untitled)'),
+                     visible(row_title),
                      visible('[' + label + '] ' + str(headline))))
-    lines = [visible(title or '(untitled)'), 'Directory: ' + visible(entry.get('cwd', '')),
-             'Activity: ' + visible(activity), 'AI recap: ' + label]
+    lines = [visible(display_title)]
+    if display_title != (title or '(untitled)'):
+        lines.append('Original title: ' + visible(title if title.strip() else '(untitled)'))
+    lines.extend(['Directory: ' + visible(entry.get('cwd', '')),
+                  'Activity: ' + visible(activity), 'AI recap: ' + label])
+    if progress:
+        lines.append('Recap progress: ' + progress)
     if status.get('detail'):
         lines.append(visible(str(status['detail'])))
     if isinstance(recap, dict):
@@ -266,8 +313,8 @@ def pick_recent(results, names, root, manager):
                         manager.request(by_id[sid])
                 pending_refresh = publish() or pending_refresh
                 if port is not None and pending_refresh:
-                    # The query searches only immutable fields. A changed recap
-                    # therefore cannot remove or reorder the highlighted result.
+                    # Keep the query and track the highlighted input index while
+                    # it still matches. Updated titles are re-filtered normally.
                     action = 'reload-sync(cat ' + shlex.quote(str(directory / 'rows')) + ')+refresh-preview'
                     try:
                         send_action(port, token, action)

@@ -125,3 +125,5 @@
   module inventory and exercise installer fixtures before activation.
 - Keep provider output schema constraints aligned with the strict local
   validator; diagnose private recap failures using field shapes, not raw text.
+- 2026-10-08: In fzf 0.44, --nth searches the --with-nth display. Publish current AI headlines instead of freezing fallback titles. Retain query text and track selection while it still matches; test normal re-filtering and safe zero-match Enter. Static rendering checks alone cannot establish live row updates.
+- 2026-10-08: Group signals are asynchronous and process.wait() reaps only its leader. Cancellation fixtures should bound observation of an owned descendant disappearing or becoming Z, retain immediate leader absence, and fail if the child survives the deadline.
