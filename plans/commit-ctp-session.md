@@ -16,8 +16,8 @@ This follow-up includes only this plan, docs/postmortem/2026-10-08-ctp-session-s
 - [x] Obtain user decision: keep published history intact.
 - [x] Run README gate (pass_no_change); use direct-write scope fallback.
 - [x] Run fresh focused checks and inspect exact follow-up diff.
-- [x] Prepared commit milestone: docs: record ctp session staging incident.
-- [ ] Push focused follow-up to origin/main and verify remote equality.
+- [x] Commit milestone: docs: record ctp session staging incident.
+- [x] Push focused follow-up to origin/main and verify remote equality.
 
 ## Verification
 
@@ -33,4 +33,4 @@ Shared index is mutable: commit with --only and the four explicit reviewed paths
 
 f8f044e — another session published fish verification and the preceding mixed commit; kept intact by user request.
 
-Follow-up docs: record ctp session staging incident — completed documentation, ledger and guidance reconciliation. Verified: README gate pass_no_change; fish syntax exit 0; installed expansion codex-time projects; repeat preview changed false with conflicts 0; targeted incident check errors empty; scoped diff passes whitespace checks and contains only the intended documentation. Remaining: create and push the focused follow-up. Blockers: none for authorized delivery. Next: verify, commit explicit paths and push normally.
+Follow-up docs: record ctp session staging incident — completed documentation, ledger and guidance reconciliation. Verified: README gate pass_no_change; fish syntax exit 0; installed expansion codex-time projects; repeat preview changed false with conflicts 0; targeted incident check errors empty; scoped diff passes whitespace checks and contains only the intended documentation. 847e99b was pushed successfully to origin/main. HEAD, origin/main and git ls-remote all returned 847e99b1597d17e9e581aa777a0c7f4e2c84f4d6; git status --short was empty. Remaining task work: none. Blockers: none for delivery; staging-race prevention remains unverified as documented. Next: retain this verified delivery record.
