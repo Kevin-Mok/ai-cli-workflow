@@ -199,6 +199,9 @@ Representative highlights:
 Delivery workflows favor complete coverage within the requested scope, prioritize
 session-touched files and safe companions, and report ordinary check failures
 without abandoning eligible commits. Planning-only requests remain read-only.
+After each commit, Codex reports a [high-level status overview](docs/commit-status-overviews.md)
+in both the active plan (or `docs/task-status.md`) and its response, alongside
+smoke-test commands, verified results, remaining work, blockers and the next step.
 
 - [`commit-plan-push`](dot_agents/skills/commit-plan-push/SKILL.md) makes a
   best-effort pass over the entire dirty worktree, separates safe changes into

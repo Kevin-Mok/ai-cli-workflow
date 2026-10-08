@@ -35,7 +35,7 @@ Shared documentation and learning are staged by content using reviewed index sna
 - [x] Isolate notify configuration and preserve machine-local model settings.
 - [x] Register all current execution incidents with reviewed evidence.
 - [x] Run refresh-config and inspect incidental changes before staging.
-- [ ] Review each staged group and commit matching docs/plans.
+- [x] Review the staged groups; commit matching docs/plans with each milestone.
 - [ ] Push the complete verified series once and verify upstream equality.
 
 ## Verification
@@ -109,3 +109,17 @@ Completed: select recent directories and revise privacy screening show full page
 ### Milestone 14 — feat(aliases): add Codex time overview shortcut
 
 Completed: map cto to codex-time overview and document activation. Verified: fresh scoped checks recorded above plus staged whitespace and incident-link contracts. Remaining: 1 planned groups, then one upstream push. Blockers: none for this milestone; documented broader vault inventory warning and manual acceptance limits remain. Next: docs: require commit status overviews and smoke commands.
+
+## Final delivery verification and protected residuals
+
+Fresh terminal regressions test_st_terminal_workflow.sh and test_i3_speechnotes_dictation_binding.sh each exited 0. Staged reference/source contracts pass at every boundary after complete-section snapshot correction. The temporary helper and its private snapshots remain outside Git. Completion speech config contains exactly one added notify line; original HEAD model settings were retained in the commit while local runtime drift remains skip-worktree.
+
+Concurrent fish home-path normalization arrived after the frozen review and is excluded: fish-alias skill/helper, fish tests, newer README/smoke hunks, its plan/report and ledger registration, plus any tcs mapping subsequently written by that task. Do not overwrite or include these changes. Our final documentation snapshots contain only reviewed reporting guidance and our own incident registrations.
+
+Manual acceptance still pending: cellular SSH, real restored guest boot/Secure Boot and subjective audio. No such acceptance was required or claimed for this push. No paid inference or destructive disk operation ran. Suggested continuation prompt: verify the committed delivery using the focused fixture commands in docs/smoke-tests.md, preserve the concurrent fish task and hidden local config, and report the known vault-note baseline separately from scoped checks.
+
+Final required refresh: fish -c refresh-config printed REFRESH COMPLETE, exit 0; log /tmp/refresh-config-20261008-152736-2186274.log. Final delivery incident targeted check exited 0 with no errors/new/changed/missing sources. scripts/smoke_postmortem_memory.py exited 0, confirmed stale-hash rejection/review update and removed its disposable fixture. Root README gate remains pass_no_change. Push remains the next step after the reporting commit.
+
+### Milestone 15 — docs: require commit status overviews and smoke commands
+
+Completed: define maintained milestones and smoke-command handoffs record delivery verification and remaining manual acceptance. Verified: fresh scoped checks recorded above plus staged whitespace and incident-link contracts. Remaining: 0 planned groups, then one upstream push. Blockers: none for this milestone; documented broader vault inventory warning and manual acceptance limits remain. Next: verify the complete series and push origin/main.

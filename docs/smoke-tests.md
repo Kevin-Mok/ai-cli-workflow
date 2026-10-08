@@ -494,6 +494,9 @@ checks use invented temporary data; real notes are never repository fixtures.
 
 ## Repo Instructions
 
+- Action: In a disposable clone, ask Codex to make two small authorized commits and follow the commit-status overview policy.
+  Expected: After each commit, Codex promptly reports a high-level overview of completed work, verified results, remaining work, blockers and the next step, links the maintained active plan or `docs/task-status.md`, and includes 5–10 copy-pasteable smoke-test commands with the working directory, expected results and sudo requirement. Each commit includes its matching status-document update; earlier milestones remain available. Intermediate reports use commentary and the final response repeats the current overview and commands. Push cadence is unchanged.
+
 - Action: Start a fresh Codex or Claude Code session in this repo and ask it to describe the canonical instruction file and delivery cadence without creating or pushing commits.
   Expected: It identifies `dot_codex/AGENTS.md` as the single policy body, treats the root AGENTS files as routing layers, and explains that a verified single-commit workflow pushes once while multi-commit work waits until the complete verified series; no Git write occurs.
 - Action: Review a newly created or changed CLI report in its default view, then use `--details` and `--plain` when supported.

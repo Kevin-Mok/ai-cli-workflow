@@ -7457,6 +7457,15 @@
     },
     {
       "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-08-smoke-handoff-helper-discovery.md"
+      ],
+      "decision": "No new learning: use discovered fish helper rather than a guessed scripts path; successful exact-path read verified. No product defect or data mutation.",
+      "findings": [],
+      "reviewed_on": "2026-10-08",
+      "sha256": "7235e231d548f5d7cbdc5112bc0a3ebfbaedfd62cfaa1ad240ec3de4469b8c2c"
+    },
+    {
+      "aliases": [
         "/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-08-overview-command-environment.md"
       ],
       "decision": "No new reusable learning: ext-sandbox-loopback and local-discover-paths-before-reads cover runner startup and path discovery. Approved scoped execution succeeded; default bwrap remains unresolved. Earlier task commits changed the dirty set during snapshot capture; committed pre-overview CLI comparisons passed. Documentation probe excludes illustrative prose and shell operators; 51 actual examples parse.",
@@ -7569,6 +7578,15 @@
     },
     {
       "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-08-commit-overview-shell-startup.md"
+      ],
+      "decision": "No new reusable learning: reviewed sandbox approved-route and path-discovery guidance already cover the observed startup and guessed-path failures; only a scoped workaround is verified.",
+      "findings": [],
+      "reviewed_on": "2026-10-08",
+      "sha256": "eadcbde56d38d2ac1a721292a1a2e2ffd6f1af4b5b70360c3cb92b978ec4ac12"
+    },
+    {
+      "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-10-08-title-progress-cached-fixture-race.md"
       ],
       "findings": [
@@ -7604,6 +7622,24 @@
       "findings": [],
       "reviewed_on": "2026-10-08",
       "sha256": "4b37a31b474f46483712c6512352c27f3f9aeebc81bf5bbc52042a5eb129b373"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-08-push-delivery-verification.md"
+      ],
+      "decision": "No new reusable learning: approved sandbox route, documented unrelated vault baseline and supported-command inspection cover the observed failures; fresh scoped checks passed.",
+      "findings": [],
+      "reviewed_on": "2026-10-08",
+      "sha256": "4337ccdadafcb4bcbb996a5cc5783261ef8785da0011b6d957e10146eb1c4419"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-08-push-tools-verification-sandbox.md"
+      ],
+      "decision": "No new reusable learning: approved sandbox route, documented unrelated vault baseline and supported-command inspection cover the observed failures; fresh scoped checks passed.",
+      "findings": [],
+      "reviewed_on": "2026-10-08",
+      "sha256": "f295a5909db3aefaff1a3f5ef3373fc4d89b72eeca4f66a2f02b15e5c6c66982"
     },
     {
       "aliases": [

@@ -249,6 +249,19 @@ education work:
 - Keep relevant documentation and ExecPlan updates in the same commit as their
   implementation. Stage only intended files or hunks and inspect the staged diff
   before committing.
+- After each commit, promptly report the result in Codex output with a high-level
+  overview of where the task stands: completed work, verified results, remaining
+  work, blockers (or none), and the next step. Maintain the same overview in the
+  active plan, or `docs/task-status.md` when no plan exists, retaining prior commit
+  milestones. Update the document before committing and include it with the
+  related work; identify the milestone by subject or sequence, then report the
+  resulting commit hash in Codex output. Link the status document in the response.
+- Alongside each commit overview, and immediately after reporting a push result,
+  include 5–10 copy-pasteable smoke-test commands in the same Codex response,
+  with expected results and required working directory. Use commentary for
+  intermediate commits and include the overview and commands in the final
+  handoff. Prefer the reusable smoke script when available; state whether sudo
+  is needed. Do not wait for the user to ask. Preserve the configured push cadence.
 - Single-commit workflows push after the commit passes verification; multi-commit workflows push once after the complete verified series, unless the user explicitly requests another cadence.
 - Push the configured upstream only when the target is clear. Do not amend,
   rebase, squash, reset, force-push, or rewrite history unless explicitly asked.
@@ -272,6 +285,12 @@ education work:
 - Before committing, check that another engineer can reproduce the result,
   review the rollback path, and ask whether the solution remains the simplest
   robust option.
+- After implementing new or changed features, always provide 5–10 concrete,
+  copy-pasteable smoke-test commands in the final handoff so the user can try
+  the features immediately. Cover the changed features and relevant edge cases.
+  State the required working directory, whether sudo is needed, and the expected
+  result for each command or clearly grouped commands. Prefer reusable smoke
+  scripts and documented commands. Do not wait for the user to ask.
 - For coding-task handoff, include the atomic plan, a paste-ready Cursor prompt,
   exact automated and manual test plan, docs updates, a Conventional Commit
   suggestion, and any additional validation notes.
