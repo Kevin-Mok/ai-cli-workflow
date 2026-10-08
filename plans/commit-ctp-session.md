@@ -1,29 +1,36 @@
 # Commit ctp shortcut session
 
-Ship the ctp shortcut and its verification documentation as one focused commit, then push main to origin/main while preserving other sessions' work.
+Record delivery of the ctp shortcut and the shared-index incident, preserving published history as the user requested. Verify the installed shortcut, check incident knowledge, then push a focused documentation follow-up.
 
-## Scope and decisions
+## Context and scope
 
-Session: 01a11cfa-b056-7ef0-b9e9-dbde91247324. The scope helper returned unsafe because it detected no successful writes; direct conversation write evidence establishes ownership. The initial status was captured before edits. Include aliases/key_aliases.tmpl's single ctp line, only the ctp paragraph in docs/smoke-tests.md, the ctp incident and only its ledger record, and this plan. README, directory aliases, fish skill/tests, fish-home plan/incident, and unrelated ledger/smoke hunks remain protected. No command mapped by ctp is executed.
+Session 01a11cfa-b056-7ef0-b9e9-dbde91247324 used direct observed-write attribution because the scope helper detected no writes. Initial status was captured before modifications. Mapping ctp to codex-time projects, its smoke check and inspection incident were intended for one scoped commit. Concurrent staging added other-session content to 5451db5. Another session then published it and follow-up f8f044e. The user explicitly chose to keep that history intact.
 
-## Ordered checklist
+This follow-up includes only this plan, docs/postmortem/2026-10-08-ctp-session-staging-race.md, and its ledger/reference additions. Existing commits, README, fish skill/tests, directory mapping, and other-session documents remain unchanged. The mapped command is never executed.
 
-- [x] Read instructions, scope helper, baseline, diff, upstream, and README contract.
-- [x] Add ctp to work with zero conflicts; refresh-config exits 0.
-- [x] README gate: pass_no_change; no README repair needed.
-- [x] Run fresh syntax, expansion, no-op and targeted incident checks.
-- [x] Stage only reviewed session hunks and inspect staged diff.
-- [x] Prepared commit milestone: feat(aliases): add Codex time projects shortcut.
-- [ ] Push the verified commit to origin/main and report residual dirty state.
+## Decisions and ordered checklist
+
+- [x] Add ctp in work with zero conflicts and run refresh-config (exit 0).
+- [x] Verify syntax, installed expansion and repeat-request no-op.
+- [x] Record mixed commit 5451db5 and subsequent remote publication f8f044e.
+- [x] Obtain user decision: keep published history intact.
+- [x] Run README gate (pass_no_change); use direct-write scope fallback.
+- [x] Run fresh focused checks and inspect exact follow-up diff.
+- [x] Prepared commit milestone: docs: record ctp session staging incident.
+- [ ] Push focused follow-up to origin/main and verify remote equality.
 
 ## Verification
 
-fish -n ~/.config/fish/key_abbr.fish must exit 0. Inspect abbr --show filtered to ctp: codex-time projects. Repeat helper preview with JSON input ctp codex-time projects: changed false, conflicts 0. Run targeted postmortem check: errors empty. git diff --cached --check must pass. Verify staged JSON independently of other dirty records. README gate returned pass_no_change.
+Run fish -n ~/.config/fish/key_abbr.fish (exit 0). Filter fish abbr --show to ctp (codex-time projects). Repeat installed fish-alias JSON preview (changed false, conflicts 0). Run postmortem_memory.py check --postmortem against the staging report (errors empty). Run git diff --check and inspect only the four follow-up paths. Verify resulting commit changes exactly those paths and final HEAD equals origin/main and remote main.
 
-## Risks and review
+## Risks, rollback and review
 
-Shared working tree contains concurrent edits. Stage mixed files from HEAD plus explicit session additions; never stage entire mixed files. Ordinary sandbox is unavailable; approved scoped execution works. No code logic changed, so syntax and exact source/runtime assertions provide proportionate verification. Rollback is removal of the single mapping followed by refresh-config; retain incident evidence. No history rewrite is authorized.
+Shared index is mutable: commit with --only and the four explicit reviewed paths so other staged files cannot enter. Preserve all existing work. No history rewrite, reset or force-push is performed. This is a documentation follow-up; no tracked configuration changes require another refresh. Rollback would remove follow-up documentation through a new reviewed commit while retaining published application changes. Staging-race prevention remains unverified; delivery is closed by user decision, not a claim that the race was repaired.
 
-## Commit milestone overview
+## Commit milestones and current overview
 
-Completed: ctp expansion installed; smoke documentation and incident learning recorded. Verified: refresh-config exit 0, prior syntax/expansion and no-op checks, README gate. Fresh verification: fish syntax exits 0; installed ctp equals codex-time projects; repeat preview changed false with zero conflicts; targeted incident check errors empty. Staged diff and JSON reviewed; no unrelated hunks included. Milestone is ready for commit and upstream push; push result is reported in the final handoff. Blockers: none for delivery; sandbox workaround remains necessary. Next: stage scoped additions and deliver one commit.
+5451db5 — ctp installed and verified; commit also contains concurrent session changes, an acknowledged scope error.
+
+f8f044e — another session published fish verification and the preceding mixed commit; kept intact by user request.
+
+Follow-up docs: record ctp session staging incident — completed documentation, ledger and guidance reconciliation. Verified: README gate pass_no_change; fish syntax exit 0; installed expansion codex-time projects; repeat preview changed false with conflicts 0; targeted incident check errors empty; scoped diff passes whitespace checks and contains only the intended documentation. Remaining: create and push the focused follow-up. Blockers: none for authorized delivery. Next: verify, commit explicit paths and push normally.

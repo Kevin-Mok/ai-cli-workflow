@@ -4426,6 +4426,26 @@
       ],
       "verification": "Defining missing-sidecar test failed before the fix; 4 VM tests and full 67-test backup suite passed after it.",
       "verification_scope": "code"
+    },
+    {
+      "applicability": "Concurrent sessions using one Git index during scoped commits.",
+      "confidence": "supported",
+      "diagnostics": [
+        "Compare reviewed staged paths/blobs with final commit tree and upstream hash."
+      ],
+      "id": "local-shared-index-commit-race",
+      "limitations": "Concurrent actor identity is unknown; no recovery or prevention test has passed.",
+      "reference": "references/paths-ownership.md#local-shared-index-commit-race",
+      "remedy": "Enforce explicit reviewed path scope at commit creation. If scope contamination has already been published, pause and obtain the user decision; here the user chose to preserve history and document the incident. Prevention remains unverified.",
+      "sources": [
+        "80a19a4bbc8805f0f7be65008bfa3976212559566772978389eaad090b78fbe1"
+      ],
+      "status": "unresolved",
+      "symptoms": [
+        "Reviewed session-only staged paths expand before commit in a shared working tree."
+      ],
+      "verification": "Five reviewed files became twelve in commit 5451db5. It was local at the initial remote check, but another session subsequently published it and follow-up f8f044e; fresh HEAD, origin/main and ls-remote agree on f8f044e. Recovery not attempted. User chose to keep published history intact and close delivery with a documentation follow-up.",
+      "verification_scope": "none"
     }
   ],
   "reports": [
@@ -7677,6 +7697,16 @@
       "findings": [],
       "reviewed_on": "2026-10-08",
       "sha256": "35f284d583903b41df7015ca018754c1f6c6f20c5a3957bfe1184b66f3a35fec"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-08-ctp-session-staging-race.md"
+      ],
+      "findings": [
+        "local-shared-index-commit-race"
+      ],
+      "reviewed_on": "2026-10-08",
+      "sha256": "80a19a4bbc8805f0f7be65008bfa3976212559566772978389eaad090b78fbe1"
     }
   ],
   "review": {

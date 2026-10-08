@@ -220,3 +220,14 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Limitations: Existing root-owned bundle repair and fresh real-archive read require local sudo authentication. No restored boot verification.
 - Sources:
   - [2026-10-07-backup-owner-access.md](/home/example/linux-config/docs/postmortem/2026-10-07-backup-owner-access.md) (SHA-256 `595e229ca8d6`; 1 alias).
+
+## local-shared-index-commit-race
+
+- Status: **unresolved**; root-cause confidence: **supported**; verification scope: **none**.
+- Symptoms: Reviewed session-only staged paths expand before commit in a shared working tree.
+- Applicability: Concurrent sessions using one Git index during scoped commits.
+- Diagnostic checks: Compare reviewed staged paths/blobs with final commit tree and upstream hash.
+- Remedy: Enforce explicit reviewed path scope at commit creation. If scope contamination has already been published, pause and obtain the user decision; here the user chose to preserve history and document the incident. Prevention remains unverified.
+- Verification evidence: Five reviewed files became twelve in commit 5451db5. It was local at the initial remote check, but another session subsequently published it and follow-up f8f044e; fresh HEAD, origin/main and ls-remote agree on f8f044e. Recovery not attempted. User chose to keep published history intact and close delivery with a documentation follow-up.
+- Limitations: Concurrent actor identity is unknown; no recovery or prevention test has passed.
+- Source: [ctp staging race](/home/example/linux-config/docs/postmortem/2026-10-08-ctp-session-staging-race.md).
