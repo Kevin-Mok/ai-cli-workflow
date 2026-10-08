@@ -61,3 +61,7 @@ Completed: document sandbox startup and the approved inspection workaround. Veri
 ### Milestone 2 — docs(prompts): define reproducible metaprompt benchmark
 
 Completed: specify controlled downstream evaluation and replayable results. Verified: fresh scoped checks recorded above plus staged whitespace and incident-link contracts. Remaining: 13 planned groups, then one upstream push. Blockers: none for this milestone; documented broader vault inventory warning and manual acceptance limits remain. Next: docs(ssh): clarify phone endpoints and password prompts.
+
+### Milestone 3 — docs(ssh): clarify phone endpoints and password prompts
+
+Completed: document host identity and distinguish key passphrases from account passwords. Verified: fresh scoped checks recorded above plus staged whitespace and incident-link contracts. Remaining: 12 planned groups, then one upstream push. Blockers: none for this milestone; documented broader vault inventory warning and manual acceptance limits remain. Next: docs: record Codex configuration inspection incidents.

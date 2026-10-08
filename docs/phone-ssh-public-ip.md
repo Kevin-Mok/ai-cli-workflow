@@ -86,6 +86,33 @@ ssh -p 22229 example-user@PUBLIC_IP
 4. If you used `--keep-port-22`, rerun the script without that flag after the
    custom port works.
 
+## Wrong Endpoint Or Password Prompt
+
+As verified on October 3, 2026, the PC endpoint is:
+
+```bash
+ssh -p 22229 user@192.0.2.10
+```
+
+The fish shortcut `scu` uses this endpoint. The `sso` and `ssop` shortcuts use
+`192.0.2.10` on port 22; do not assume those reach this PC. The PC's public
+IP can change, so recheck it with the host-side doctor when an old endpoint
+stops working.
+
+For a new connection, compare the ED25519 host fingerprint against the PC's
+local `ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub` output. The verified
+fingerprint on that date is
+`SHA256:Ga9LbSmPJsQ5+XRk4hmMsakRzuLzCHuBtczD7jNIXdQ`.
+
+Test from cellular data with phone Wi-Fi disabled, then repeat on Wi-Fi.
+`Enter passphrase for key ...` asks to unlock the phone's private key locally;
+`example-user@HOST's password:` asks for the remote account password. A key installed
+on one server does not automatically authorize it on another. If the corrected
+endpoint still prompts, report the exact prompt before changing server settings.
+Never share the private key. This PC currently has one authorized ED25519 key
+labeled `u0_a417@termux`; its public fingerprint is
+`SHA256:zyK3ixHEmEVfW8HMzFZ6mYTjRB9h2ZaJWnuIVnsCCKc`.
+
 ## Mosh From Termux
 
 Mosh uses the existing SSH connection only to start a session. After that,
