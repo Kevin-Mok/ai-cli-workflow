@@ -891,6 +891,7 @@ only a disposable temporary fixture and requires no sudo.
   If permissions block that tracked write, it reports the exact path and pending
   learning instead of writing installed memory. A novel search miss leads to a
   new reproducer and review, not an invented known fix.
+
 ## Fish Alias Skill
 
 Check the shortcut skill using disposable fixture sources before making a live
@@ -918,6 +919,9 @@ changed mappings; file source keys gain `n` in fish.
 - Action: fish -n ~/.config/fish/key_abbr.fish
   Expected: Exit 0 after refresh; syntax only, no supplied commands execute.
 
+- Action: From `/home/example/linux-config`, run `rg -n '^cto ' aliases/key_aliases.tmpl` and `fish --no-config -c 'source ~/.config/fish/key_abbr.fish; abbr --show' | rg '^abbr .* -- cto '`.
+  Expected: The work template maps `cto` to `codex-time overview`, and the live
+  fish definition has the same expansion. These checks do not execute the command.
 
 Live Codex usage: `$fish-alias cbn codex-time burn day`. To create the mapping,
 invoke this as an actual request, inspect the reported source/section/conflicts,

@@ -105,3 +105,7 @@ Completed: route shortcut requests safely and preserve generated-name conflicts 
 ### Milestone 13 — fix(second-brain): restore recent directory reviews
 
 Completed: select recent directories and revise privacy screening show full paged reports with elapsed progress and r refresh. Verified: fresh scoped checks recorded above plus staged whitespace and incident-link contracts. Remaining: 2 planned groups, then one upstream push. Blockers: none for this milestone; documented broader vault inventory warning and manual acceptance limits remain. Next: feat(aliases): add Codex time overview shortcut.
+
+### Milestone 14 — feat(aliases): add Codex time overview shortcut
+
+Completed: map cto to codex-time overview and document activation. Verified: fresh scoped checks recorded above plus staged whitespace and incident-link contracts. Remaining: 1 planned groups, then one upstream push. Blockers: none for this milestone; documented broader vault inventory warning and manual acceptance limits remain. Next: docs: require commit status overviews and smoke commands.

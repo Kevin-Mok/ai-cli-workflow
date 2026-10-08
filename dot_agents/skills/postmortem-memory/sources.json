@@ -7523,6 +7523,15 @@
     },
     {
       "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-08-cto-alias-sandbox-startup.md"
+      ],
+      "decision": "No new learning: existing approved-route and exact-target ownership guidance applies. Private content comparison proved only cto placement differed; scoped apply and authorized full refresh exited 0; syntax and live mapping passed. Host sandbox remains unresolved.",
+      "findings": [],
+      "reviewed_on": "2026-10-08",
+      "sha256": "57feaa7993883e2a551dcb0c45bba1eee24967bc93278e89ca0f89198bbdeb45"
+    },
+    {
+      "aliases": [
         "/home/example/coding/codex-usage/docs/postmortem/2026-10-08-session-metrics-command-environment.md"
       ],
       "decision": "No new reusable learning: ext-sandbox-loopback covers approved scoped execution after repeated pre-execution loopback failures. Optional XML dimension handling applies to the review-only AttributeError; corrected read inspection succeeded. Workbook metric checks passed in LibreOffice, which does not prove online Sheets activation. Automatic review timeout allowed one retry; the same scoped docs write succeeded. No safety rejection or new learning.",
