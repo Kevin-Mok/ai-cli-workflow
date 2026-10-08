@@ -544,3 +544,14 @@ security checks with the arguments you passed.
 - Verification evidence: focused real subprocess cancellation and all98 search tests pass with a one-second observation bound that still rejects a running child.
 - Limitations: synthetic Linux subprocesses; fixture correction does not establish live provider teardown or change production wait semantics.
 - Source: [Descendant exit observation race](/home/example/linux-config/docs/postmortem/2026-10-08-title-progress-descendant-exit-race.md).
+
+## local-less-prompt-control-syntax
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **runtime**.
+- Symptoms: less prompt hides refresh/search labels while the key works and CLI unit tests pass.
+- Applicability: custom less prompts, including bat-wrapped viewers.
+- Diagnostic checks: inspect the actual rendered PTY prompt; consult the less PROMPTS grammar.
+- Remedy: escape reserved prompt characters or use fixed text without question marks, colons, periods, percent signs and backslashes. Assert visible controls in a real PTY.
+- Verification evidence: source and installed real bat/less fixture pass after RED prompt assertion; r discovers new work and generates a missing recap after zero preview; Space/q remain normal. All109 session tests pass.
+- Limitations: disposable sources and fake inference; provider availability/live recap generation are not claimed.
+- Source: [Refresh controls disappeared from less prompt](/home/example/linux-config/docs/postmortem/2026-10-08-review-refresh-less-prompt.md).

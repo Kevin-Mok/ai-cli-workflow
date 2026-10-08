@@ -264,3 +264,14 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Verification evidence: Defining RED test observed acceptance; guarded helper rejects the request with unchanged fixture bytes. Final 15-test suite passes; installed helper matches guarded source.
 - Limitations: Trusted existing chezmoi directives remain intentional. The guard covers newly supplied requests, not arbitrary existing untrusted templates.
 - Sources: [fish alias validation fixtures](/home/example/linux-config/docs/postmortem/2026-10-08-fish-alias-validation-fixtures.md).
+
+## local-digest-private-tool-provenance
+
+- Status: **verified_fix**; confidence: **confirmed**; verification scope: **runtime**.
+- Symptoms: newest real conversations disappear as private_context while old recaps remain; public AGENTS or skill output mentions private-context guidance.
+- Applicability: Private conversation digests that exclude tool results from model input.
+- Diagnostics: Compare safe record types, call identities and arguments with exclusion reasons; do not log tool-result prose or private conversation text.
+- Remedy: Screen actual private invocation identities (top-level and nested), executable arguments and private session/turn working directories. Do not scan irrelevant public tool-result mentions. Keep unknown executable input conservative, protect actual private access, and revise metadata screening fingerprints so old exclusions are rechecked without losing summary freshness or dispositions.
+- Verification: Native-shape regressions reproduced false exclusions and private invocation gaps before fixes. 92 session tests pass; installed fixture verifies fifteen sessions, and live default exits 0 with five directories and thirteen recaps. An active conversation changing during inference remains explicitly stale.
+- Limitations: Unknown source-edit scripts containing inert private-path literals can remain excluded; report incomplete coverage. Fixture inference does not establish provider availability.
+- Source: [Missing recent directory sessions](../../../../docs/postmortem/2026-10-08-recent-directory-review-missing-sessions.md).

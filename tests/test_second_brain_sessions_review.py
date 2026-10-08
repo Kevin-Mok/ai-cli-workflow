@@ -204,4 +204,133 @@ class RecentReviewTests(unittest.TestCase):
         result=sessions.review()
         self.assertEqual(result['model_calls'],1)
 
+    def test_five_recent_directories_each_have_their_three_latest_sessions(self):
+        for directory in range(1, 7):
+            for index in range(1, 5):
+                number = directory * 10 + index
+                path = self.source(number, f'2026-10-07T{directory+10:02d}:{index:02d}:00Z')
+                rows = [json.loads(line) for line in path.read_text().splitlines()]
+                rows[0]['payload']['cwd'] = f'/directory/{directory}'
+                path.write_text(''.join(json.dumps(row)+'\n' for row in rows))
+        result = sessions.review()
+        self.assertEqual([entry['title'] for entry in result['sessions']],
+                         [f'Task {directory*10+index}' for directory in range(6,1,-1) for index in (4,3,2)])
+        self.assertEqual(result['model_calls'], 15)
+        self.assertEqual(sessions.review()['model_calls'], 0)
+        self.assertEqual(len(sessions.review(limit=1, refresh_limit=0)['sessions']), 3)
+        self.assertEqual(len(sessions.review(all_sessions=True, refresh_limit=0)['sessions']), 24)
+
+    def test_inference_uses_global_activity_even_though_display_groups_directories(self):
+        for number, date in [(1,'2026-10-07T19:00:00Z'), (2,'2026-10-07T12:00:00Z'),
+                             (3,'2026-10-07T18:00:00Z')]:
+            path=self.source(number,date)
+            if number==2:
+                rows=[json.loads(line) for line in path.read_text().splitlines()]
+                rows[0]['payload']['cwd']='/project/1'
+                path.write_text(''.join(json.dumps(row)+'\n' for row in rows))
+        result=sessions.review(limit=2,refresh_limit=2)
+        self.assertEqual([entry['title'] for entry in result['sessions']], ['Task 1','Task 2','Task 3'])
+        self.assertEqual([entry['summary'] is not None for entry in result['sessions']], [True,False,True])
+
+    def test_public_policy_tool_output_and_skill_read_are_not_private_retrieval(self):
+        source=self.source(1,'2026-10-07T12:00:00Z')
+        rows=[{'type':'response_item','timestamp':'2026-10-08T15:00:00Z',
+               'payload':{'type':'function_call','name':'exec_command','call_id':'public',
+                          'arguments':json.dumps({'cmd':'cat /home/example/.agents/skills/personal-context/SKILL.md'})}},
+              {'type':'response_item','payload':{'type':'function_call_output','call_id':'public',
+                         'output':'Policy: use personal-context automatically; private data lives at /home/example/coding/personal-context'}},
+              {'type':'response_item','payload':{'type':'function_call_output','call_id':'code',
+                         'output':'PRIVATE_TOOL = personal-context; example private store path'}}]
+        with source.open('a') as stream:
+            stream.write(''.join(json.dumps(row)+'\n' for row in rows))
+        result=sessions.review(refresh_limit=0)
+        self.assertEqual(len(result['sessions']),1)
+        self.assertEqual(result['sessions'][0]['last_activity'],'2026-10-08T15:00:00Z')
+        self.assertEqual(len(self.calls),0)
+
+    def test_private_tool_invocation_still_excludes_session(self):
+        source=self.source(1,'2026-10-07T12:00:00Z')
+        with source.open('a') as stream:
+            stream.write(json.dumps({'type':'response_item','payload':{'type':'function_call',
+                'name':'exec_command','arguments':json.dumps({'cmd':'cat /home/example/coding/personal-context/brief.md'})}})+'\n')
+        self.assertEqual(sessions.review()['sessions'],[])
+        self.assertEqual(len(self.calls),0)
+
+    def test_old_screening_fingerprint_is_revalidated_without_losing_disposition(self):
+        self.source(1,'2026-10-07T12:00:00Z'); first=sessions.review()
+        cid=first['open_checks'][0]['id']
+        sessions.resolve({'schema_version':1,'check_id':cid,'disposition':'checked','confirmed':True})
+        path=self.base/'state/second-brain/sessions/state.json'; old=self.state()
+        for key,stamp in old['screened'].items(): old['screened'][key]=stamp[-5:]
+        path.write_text(json.dumps(old))
+        with patch('second_brain.session_review.parse', wraps=sessions.parse) as parse:
+            result=sessions.review()
+        self.assertTrue(parse.called)
+        self.assertEqual(result['model_calls'],0)
+        self.assertEqual(result['sessions'][0]['checks'][0]['disposition'],'checked')
+
+    def test_native_root_agent_message_is_dialogue_not_tool_output(self):
+        source=self.source(1,'2026-10-07T12:00:00Z')
+        with source.open('a') as stream:
+            stream.write(json.dumps({'type':'response_item','timestamp':'2026-10-08T15:00:00Z',
+                'payload':{'type':'agent_message','author':'/root','content':[
+                    {'type':'input_text','text':'Implemented newest directory grouping.'},
+                    {'type':'encrypted_content','encrypted_content':'opaque'}]}})+'\n')
+        sessions.review()
+        self.assertIn('Implemented newest directory grouping.', ''.join(self.calls))
+        self.assertNotIn('opaque', ''.join(self.calls))
+
+    def test_private_directory_and_wrapped_private_callable_are_excluded(self):
+        source=self.source(1,'2026-10-07T12:00:00Z')
+        rows=[json.loads(line) for line in source.read_text().splitlines()]
+        rows[0]['payload']['cwd']='/home/example/coding/personal-context'
+        source.write_text(''.join(json.dumps(row)+'\n' for row in rows))
+        self.source(2,'2026-10-07T13:00:00Z')
+        with (self.home/'sessions/2.jsonl').open('a') as stream:
+            stream.write(json.dumps({'type':'response_item','payload':{'type':'function_call',
+                'name':'functions.exec','arguments':'await tools.mcp__personal_context__lookup({topic: "private"})'}})+'\n')
+        self.assertEqual(sessions.review()['sessions'],[])
+        self.assertEqual(len(self.calls),0)
+
+    def test_nested_mcp_private_invocation_and_private_turn_cwd_are_excluded(self):
+        source=self.source(1,'2026-10-07T12:00:00Z')
+        with source.open('a') as stream:
+            stream.write(json.dumps({'type':'event_msg','payload':{'type':'mcp_tool_call_begin',
+                'invocation':{'server':'personal_context','tool':'retrieve','arguments':{'topic':'private'}}}})+'\n')
+        source=self.source(2,'2026-10-07T13:00:00Z')
+        with source.open('a') as stream:
+            stream.write(json.dumps({'type':'turn_context','payload':{'cwd':'/home/example/coding/personal-context'}})+'\n')
+        self.assertEqual(sessions.review()['sessions'],[])
+        self.assertEqual(len(self.calls),0)
+
+    def test_public_patch_fixture_literal_is_not_private_store_access(self):
+        source=self.source(1,'2026-10-07T12:00:00Z')
+        with source.open('a') as stream:
+            stream.write(json.dumps({'type':'response_item','payload':{'type':'custom_tool_call',
+                'name':'apply_patch','input':'*** Begin Patch\n*** Update File: tests/test_privacy.py\n+fixture = "/home/example/coding/personal-context/brief.md"\n*** End Patch'}})+'\n')
+        self.assertEqual(len(sessions.review(refresh_limit=0)['sessions']),1)
+        with source.open('a') as stream:
+            stream.write(json.dumps({'type':'response_item','payload':{'type':'custom_tool_call',
+                'name':'apply_patch','input':'*** Begin Patch\n*** Update File: /home/example/coding/personal-context/brief.md\n+private\n*** End Patch'}})+'\n')
+        self.assertEqual(sessions.review(refresh_limit=0)['sessions'],[])
+
+    def test_cached_false_private_exclusion_is_rechecked_after_parser_revision(self):
+        self.source(1,'2026-10-07T12:00:00Z'); sessions.review(refresh_limit=0)
+        path=self.base/'state/second-brain/sessions/state.json'; v=self.state()
+        for entry in v['sessions'].values():
+            entry.update(status='skipped',reason='private_context',id='',cwd='',title='',source='')
+        for key,stamp in v['screened'].items():v['screened'][key]=stamp[-5:]
+        path.write_text(json.dumps(v))
+        result=sessions.review(refresh_limit=0)
+        self.assertEqual([entry['title'] for entry in result['sessions']],['Task 1'])
+
+    def test_top_level_private_name_is_not_hidden_by_nested_arguments(self):
+        for number, kind in ((1,'response_item'),(2,'event_msg')):
+            source=self.source(number,'2026-10-07T12:00:00Z')
+            with source.open('a') as stream:
+                stream.write(json.dumps({'type':kind,'payload':{'type':'mcp_tool_call' if kind=='response_item' else 'mcp_tool_call_end',
+                    'name':'personal_context_retrieve','invocation':{'arguments':{'topic':'private'}}}})+'\n')
+        self.assertEqual(sessions.review()['sessions'],[])
+        self.assertEqual(len(self.calls),0)
+
 if __name__=='__main__': unittest.main()

@@ -4341,6 +4341,26 @@
       "verification_scope": "runtime"
     },
     {
+      "applicability": "Conversation digests where tool results never enter inference.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Compare record shapes, invocation metadata, safe source counts and parser exclusion reasons; do not print private content."
+      ],
+      "id": "local-digest-private-tool-provenance",
+      "limitations": "Inert private-path literals in unknown executable input remain conservative exclusions; fixture inference does not prove model service availability.",
+      "reference": "references/state-security.md#local-digest-private-tool-provenance",
+      "remedy": "Separate actual private tool identity/arguments and private working directories from result prose; revision screening cache, preserve summaries and dispositions, and warn about conservative uncertain exclusions.",
+      "sources": [
+        "a0d7c87f2f076c68c37d209a707f32aa554098da92fd4ec3b15796042bf634b5"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "Newest work sessions hidden by broad private_context regex on public tool results"
+      ],
+      "verification": "92 session tests pass after expected RED; installed live review exited 0 with five directories and thirteen recaps. Installed fixture passes fifteen synthetic sessions, zero-inference repeat and preserved dispositions. One live active conversation remains explicitly stale after concurrent changes.",
+      "verification_scope": "runtime"
+    },
+    {
       "applicability": "Linux cancellation fixtures observing an owned process group after asynchronous signals.",
       "confidence": "confirmed",
       "diagnostics": [
@@ -4362,6 +4382,29 @@
       ],
       "topic": "api-contracts-fixtures",
       "verification": "Focused real subprocess cancellation passes; full98 search suite passes after correcting the immediate observation race. A running child remains a failure after one second.",
+      "verification_scope": "runtime"
+    },
+    {
+      "applicability": "CLI reports providing custom less prompts, including bat-wrapped less.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Inspect the actual PTY prompt rather than only argv.",
+        "Consult less PROMPTS grammar for reserved punctuation."
+      ],
+      "id": "local-less-prompt-control-syntax",
+      "limitations": "Disposable source/fake inference runtime evidence; provider availability and live recap generation are not claimed.",
+      "reference": "references/api-contracts-fixtures.md#local-less-prompt-control-syntax",
+      "remedy": "Escape less prompt metacharacters or use fixed text without reserved syntax; keep a real rendered-prompt assertion.",
+      "sources": [
+        "09ad6253ea70a7d3345f44f72a238f35dc73cac1cdca96ae05e56792e0584eef"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "less prompt drops refresh/search labels although key binding works",
+        "CLI unit tests pass while visible pager controls are truncated"
+      ],
+      "topic": "api-contracts-fixtures",
+      "verification": "Source and installed real bat/less PTY smoke pass after RED prompt assertion; r discovers a new fixture source, generates its missing recap, and Space/q remain normal. All109 session tests pass.",
       "verification_scope": "runtime"
     },
     {
@@ -7127,12 +7170,30 @@
     },
     {
       "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-08-sessions-review-sandbox-startup.md"
+      ],
+      "decision": "Existing ext-sandbox-loopback guidance applies; no new learning. Scoped approved reads verified the workaround; default sandbox remains unavailable.",
+      "findings": [],
+      "reviewed_on": "2026-10-08",
+      "sha256": "d78834784e7fff233935ad1e754b4a82458e1f2f69c52a29a6f0c32f637c86f8"
+    },
+    {
+      "aliases": [
         "/home/example/coding/example-client-app/docs/postmortem/2026-10-08-vps-smoke-local-execution.md"
       ],
       "decision": "No new learning: existing sandbox approved-route and fixture-contract guidance covers these issues. Monitor syntax and receipt mock-contract regression corrected; parent monitor19, entrypoint9 and full infrastructure suite passed. Default sandbox remains unavailable; no live extraction issue introduced.",
       "findings": [],
       "reviewed_on": "2026-10-08",
       "sha256": "8121ef18651b5cbc03eeebefa8fb2e6914bbe2161d8b30065fbbad96afcc49f3"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-08-sessions-review-verification-fixtures.md"
+      ],
+      "decision": "Local fixture correction, unrelated vault/corpus baseline failures and approval-blocked activation; no new reusable guidance. Task-specific ledger checks pass; unrelated user work preserved.",
+      "findings": [],
+      "reviewed_on": "2026-10-08",
+      "sha256": "bd8e7949e5630717e4ee50c312b1435fdd1b8f3e8040fc2c482c2b10ed4e3617"
     },
     {
       "aliases": [
@@ -7171,6 +7232,15 @@
       ],
       "reviewed_on": "2026-10-08",
       "sha256": "45925bf17c9fe949f06c9e347bec71f3354f83f7d7bec6ec1fcaca380f4b11d3"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-08-session-review-actionable-filter.md"
+      ],
+      "decision": "Local default-rendering correction documented in tasks/lessons.md; no additional cross-project finding. Runtime fixture verifies activation; archive/JSON/state unchanged.",
+      "findings": [],
+      "reviewed_on": "2026-10-08",
+      "sha256": "d4c39471cf741699742ee8e53d186e05a2338902a662cd031b8a21eee909a94a"
     },
     {
       "aliases": [
@@ -7414,6 +7484,16 @@
     },
     {
       "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-08-recent-directory-review-missing-sessions.md"
+      ],
+      "findings": [
+        "local-digest-private-tool-provenance"
+      ],
+      "reviewed_on": "2026-10-08",
+      "sha256": "a0d7c87f2f076c68c37d209a707f32aa554098da92fd4ec3b15796042bf634b5"
+    },
+    {
+      "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-10-08-guardian-titles-frozen-after-recap.md"
       ],
       "findings": [
@@ -7452,6 +7532,15 @@
     },
     {
       "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-08-full-review-smoke-fixture.md"
+      ],
+      "decision": "No new learning: fixture checks and output comparisons must reflect the actual stored state, repeating ext-realistic-fixture-boundaries; source smoke with real PTY now passes without weakening production.",
+      "findings": [],
+      "reviewed_on": "2026-10-08",
+      "sha256": "9b7500724b7297b7414ce6370c507c01b108aba0d34aa8fce25c4edaf2c25dcd"
+    },
+    {
+      "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-10-08-title-progress-patch-context.md"
       ],
       "decision": "No new learning: reviewed local-stale-patch-context covers the unnecessary out-of-order hunk and scoped exact-context retry. Full98 search regressions pass; unrelated work and permissions preserved.",
@@ -7478,6 +7567,25 @@
       ],
       "reviewed_on": "2026-10-08",
       "sha256": "9abbb622d990f840246c249ff9071f283343fb5fe8ffd8794b0994272255cb38"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-08-review-refresh-installer-lookup.md"
+      ],
+      "decision": "No new learning: absent guessed installer resolved by rg --files inventory and successful actual path read, repeating local-discover-paths-before-reads; no product defect or new module inventory change.",
+      "findings": [],
+      "reviewed_on": "2026-10-08",
+      "sha256": "e71c716fc82341e7ae35dc8e6d8ad25efe3c6d817c4628e17c8571b6bb573b29"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-08-review-refresh-less-prompt.md"
+      ],
+      "findings": [
+        "local-less-prompt-control-syntax"
+      ],
+      "reviewed_on": "2026-10-08",
+      "sha256": "09ad6253ea70a7d3345f44f72a238f35dc73cac1cdca96ae05e56792e0584eef"
     },
     {
       "aliases": [

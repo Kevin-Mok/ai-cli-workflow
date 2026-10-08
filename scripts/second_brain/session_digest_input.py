@@ -16,7 +16,9 @@ MAX_SOURCE_BYTES = 64 * 1024 * 1024
 MAX_LINE_BYTES = 2 * 1024 * 1024
 INPUT_BYTES = 32768
 PRIVATE_USE = re.compile(r'(?i)(\$personal-context\b|/personal-context\b|\b(?:use|using|invoke|invoking|run|running)\s+(?:the\s+)?(?:`|\$)?personal-context\b)')
-PRIVATE_TOOL = re.compile(r'(?i)(personal[-_]context|/coding/personal-context)')
+PRIVATE_TOOL = re.compile(r'(?i)(?:/coding/personal-context(?:/|\b)|(?:~|\$HOME)/coding/personal-context(?:/|\b))')
+PRIVATE_TOOL_NAME = re.compile(r'(?i)personal[-_]context')
+PRIVATE_CALL = re.compile(r'(?i)\btools\.[\w]*personal[_-]context[\w]*\s*\(')
 
 
 def clean(value: str) -> str:
@@ -66,6 +68,23 @@ def helper_origin(payload: dict) -> bool:
     return any(helper(payload.get(field)) for field in ('source', 'thread_source', 'originator'))
 
 
+def private_tool(payload, strings):
+    """Check invocation identity and executable inputs, never result prose."""
+    invocation = payload.get('invocation')
+    identities = [payload, invocation] if isinstance(invocation, dict) else [payload]
+    if any(PRIVATE_TOOL_NAME.search(str(identity.get(field, '')))
+           for identity in identities for field in ('name', 'server', 'tool')):
+        return True
+    name = str(payload.get('name', ''))
+    if name.split('.')[-1] == 'apply_patch':
+        patch = payload.get('input')
+        if isinstance(patch, str) and patch.startswith('*** Begin Patch') and patch.rstrip().endswith('*** End Patch'):
+            targets = re.findall(r'^\*\*\* (?:Add File|Update File|Delete File|Move to): (.+)$', patch, re.M)
+            if targets:
+                return any(PRIVATE_TOOL.search(target) for target in targets)
+    return any(PRIVATE_TOOL.search(value) or PRIVATE_CALL.search(value) for value in strings(payload))
+
+
 def parse(path: Path, home: Path, *, exclude_helpers=False) -> dict[str, object]:
     """Screen every record before building bounded, redacted inference input.
 
@@ -103,22 +122,40 @@ def parse(path: Path, home: Path, *, exclude_helpers=False) -> dict[str, object]
                     sid=session_id(p.get('id'))
                     if result['id'] and sid and sid!=result['id']: raise ValueError()
                     result['id']=sid or result['id']
-                    if isinstance(p.get('cwd'),str): result['cwd']=clean(p['cwd'])
+                    if isinstance(p.get('cwd'),str):
+                        result['cwd']=clean(p['cwd'])
+                        if PRIVATE_TOOL.search(p['cwd']): privacy=True
                     if epoch(p.get('timestamp'))>epoch(result['last_activity']): result['last_activity']=p['timestamp']
+                if kind == 'turn_context' and isinstance(p.get('cwd'), str) and PRIVATE_TOOL.search(p['cwd']):
+                    privacy=True
                 role=''; text=''; response=False
-                if kind=='response_item' and p.get('type')=='message':
-                    role=p.get('role'); response=True
+                if kind=='response_item' and p.get('type') in ('message', 'agent_message'):
+                    if p['type']=='agent_message':
+                        # Root-authored native output is conversation. Helper
+                        # dispatch records remain outside recap dialogue.
+                        if p.get('author') != '/root': continue
+                        role='assistant'
+                    else:
+                        role=p.get('role')
+                    response=True
                     content=p.get('content')
                     if not isinstance(content,list): raise ValueError()
                     text='\n'.join(x['text'] for x in content if isinstance(x,dict) and x.get('type') in ('input_text','output_text') and isinstance(x.get('text'),str))
                 elif kind=='event_msg' and p.get('type') in ('user_message','agent_message'):
                     role='user' if p['type']=='user_message' else 'assistant'; text=p.get('message')
-                elif kind=='response_item' and p.get('type') not in ('message','reasoning'):
-                    # Tool arguments or retrieval output from the private store.
-                    if PRIVATE_TOOL.search(str(p.get('name',''))) or any(PRIVATE_TOOL.search(x) for x in tool_strings(p)):
+                elif kind=='response_item' and p.get('type') in ('function_call', 'custom_tool_call', 'local_shell_call', 'mcp_tool_call'):
+                    # Tool output is never summarized. Screen actual invocation
+                    # names/arguments, not public policy or source-code mentions
+                    # echoed in results. Reading the public skill is not retrieval.
+                    if private_tool(p, tool_strings):
                         privacy=True
                 elif kind=='event_msg' and p.get('type') in tool_events:
-                    if any(PRIVATE_TOOL.search(x) for x in tool_strings(p)): privacy=True
+                    invocation = p.get('invocation')
+                    identities = [p, invocation] if isinstance(invocation, dict) else [p]
+                    if any(PRIVATE_TOOL_NAME.search(str(identity.get(field, '')))
+                            for identity in identities for field in ('name', 'server', 'tool')): privacy=True
+                    if p['type'] in ('exec_command_begin', 'mcp_tool_call_begin') and private_tool(p, tool_strings):
+                        privacy=True
                 if role in ('user','assistant'):
                     text=conversation_text(role,text)
                     if text:

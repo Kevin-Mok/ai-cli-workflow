@@ -8,7 +8,8 @@ from pathlib import Path
 import re
 import shutil
 import stat
-import textwrap
+import shlex
+import unicodedata
 from zoneinfo import ZoneInfo
 
 from . import sessions
@@ -21,7 +22,7 @@ LEGACY_HELPER = re.compile(r'^(?:guardian\s+review\b|(?:spawned\s+)?(?:subagent|
 
 
 def fingerprint(metadata):
-    return [metadata.st_size, metadata.st_mtime_ns, metadata.st_ctime_ns,
+    return [2, metadata.st_size, metadata.st_mtime_ns, metadata.st_ctime_ns,
             metadata.st_dev, metadata.st_ino]
 
 
@@ -123,7 +124,13 @@ def select(v, paths, limit):
     unique = {}
     for entry in entries:
         unique.setdefault(entry['id'], entry)
-    return list(unique.values())[:limit]
+    directories = {}
+    for entry in unique.values():
+        directories.setdefault(entry['cwd'], []).append(entry)
+    selected = list(directories.values())[:limit]
+    # --all preserves complete eligible history. Ordinary review caps each
+    # directory at three sessions; insertion order follows its latest activity.
+    return [entry for group in selected for entry in (group if limit is None else group[:3])]
 
 
 def discover(v, home, titles):
@@ -159,7 +166,7 @@ def review(limit=None, refresh_limit=None, *, all_sessions=False):
     if type(all_sessions) is not bool or (all_sessions and limit is not None):
         raise ValueError('--all cannot be combined with an explicit display limit')
     display_limit = None if all_sessions else (5 if limit is None else limit)
-    budget = refresh_limit if refresh_limit is not None else (display_limit or 20)
+    budget = refresh_limit if refresh_limit is not None else min((display_limit or 20) * 3, 20)
     if type(budget) is not int or not 0 <= budget <= 20:
         raise ValueError('review refresh limit must be between 0 and 20')
     with sessions.lock() as (root, directory):
@@ -172,7 +179,7 @@ def review(limit=None, refresh_limit=None, *, all_sessions=False):
         v['error'] = 'scan' if scan_failed else None
         selected = select(v, paths, display_limit)
         calls = 0
-        for entry in selected:
+        for entry in sorted(selected, key=lambda entry: (-epoch(entry['last_activity']), entry['id'], entry['key'])):
             key = entry['key']
             if entry['summary'] is not None and v['summary_hashes'].get(key) == entry['hash']:
                 continue
@@ -212,6 +219,7 @@ def review(limit=None, refresh_limit=None, *, all_sessions=False):
             'unknown': sum(entry['summary'] is None and entry['status'] != 'skipped' for entry in all_entries),
             'stale': sum(entry['status'] == 'stale' for entry in all_entries),
             'hidden': len(all_entries) - len(selected),
+            'restricted': sum(entry['reason'] == 'private_context' for entry in all_entries),
         }
         sessions.save(root, directory, v)
         return sessions.report(v, calls, entries=selected)
@@ -238,40 +246,155 @@ def next_step(entry):
 
 
 def render_terminal(report, width=None, *, plain=False):
+    """Render the complete selected report for a terminal, without Markdown."""
     width = max(40, min(88, width if width is not None else shutil.get_terminal_size((88, 24)).columns))
     lines = []
-    def add(text, prefix='', max_lines=None):
-        text = ' '.join(clean(str(text)).split())
+
+    def cells(text):
+        total = 0
+        previous = 0
+        for char in text:
+            if char == '\ufe0f':
+                # VS16 promotes a text-width symbol (e.g. sun) to emoji width.
+                total += int(previous == 1)
+            elif unicodedata.combining(char) or char == '\ufe0e':
+                continue
+            else:
+                previous = 2 if unicodedata.east_asian_width(char) in ('W', 'F') else 1
+                total += previous
+        return total
+
+    def add(text, prefix=''):
+        # Preserve spaces in quoted paths/commands while removing terminal controls.
+        text = re.sub(r'[\n\t\r]', ' ', clean(str(text))).strip()
         if plain:
             text = text.encode('ascii', errors='backslashreplace').decode()
-        lines.extend(textwrap.wrap(text, width=width,
-                     initial_indent=prefix, subsequent_indent=' ' * len(prefix),
-                     max_lines=max_lines, placeholder='...' if plain else '…'))
-    add('Recent work sessions' if plain else '🗂️ Recent work sessions')
-    add('Conversation reports; not independently verified.')
-    for number, entry in enumerate(report.get('sessions', []), 1):
+        continuation = ' ' * cells(prefix)
+        line = prefix
+        spacing = ''
+        for token in re.findall(r' +|[^ ]+', text):
+            if token.isspace():
+                spacing = token
+                continue
+            if cells(line + spacing + token) <= width:
+                line += spacing + token
+            else:
+                if line != prefix and line != continuation:
+                    lines.append(line.rstrip())
+                    line = continuation
+                for char in re.findall(r'.[\ufe0e\ufe0f]?', token):
+                    if cells(line + char) > width:
+                        lines.append(line)
+                        line = continuation
+                    line += char
+            spacing = ''
+        lines.append(line.rstrip())
+
+    def section(label, emoji):
         lines.append('')
+        add(label + ':', prefix='      ' + ('' if plain else emoji + ' '))
+
+    def field(label, value):
+        add(value, prefix=f'      {label + ":":<15} ')
+
+    def items(label, emoji, values):
+        section(label, emoji)
+        for value in values or ['None reported.']:
+            add(value, prefix='        - ' if plain else '        • ')
+
+    def checks(label, values):
+        if not values:
+            return
+        section(label, '☑')
+        for check in values:
+            disposition = check['disposition'].capitalize()
+            add(disposition + ' · ' + check['text'] if not plain else
+                disposition + ' - ' + check['text'], prefix='        ')
+            add(check['id'], prefix='          ID: ')
+            if check.get('resolved_at'):
+                add(activity_label(check['resolved_at']), prefix='          Resolved: ')
+
+    add('Recent work directories' if plain else '🗂️ Recent work directories')
+    add('Conversation reports; not independently verified.')
+    coverage = report.get('coverage', {})
+    if coverage.get('restricted'):
+        add('Private or uncertain sessions are excluded; recent work may be incomplete.',
+            prefix='' if plain else '⚠ ')
+
+    def render_entry(number, entry):
         summary = entry['summary']
         title = entry['title'] or (summary['title'] if summary else 'Untitled session')
-        add(title, prefix=f'{number}. ')
-        add(entry['cwd'] or 'Unknown project', prefix='   ')
-        add(activity_label(entry['last_activity']), prefix='   ')
-        if summary:
-            progress = '; '.join(summary.get('accomplishments', [])) or summary['goal']
-            add(progress, prefix='   Recap: ', max_lines=2)
-            step = next_step(entry)
-            if step:
-                add(step, prefix='   Next: ', max_lines=1)
-        else:
-            add('Recap not generated.', prefix='   ')
+        add(title, prefix=f'   {number}. ' + ('' if plain else '💬 '))
+        add(activity_label(entry['last_activity']), prefix='      ' + ('' if plain else '🕒 '))
         if entry['status'] in ('failed', 'stale'):
             label = 'Recap stale' if summary else 'Recap unavailable'
-            add(label + ': ' + (entry['reason'] or entry['status']).replace('_', ' '), prefix='   ' if plain else '   ⚠ ')
-        elif entry.get('partial', entry['status'] == 'partial'):
-            add('Recap based on partial conversation.', prefix='   ')
+            add(label + ': ' + (entry['reason'] or entry['status']).replace('_', ' '),
+                prefix='      ' if plain else '      ⚠ ')
+        if entry.get('partial', entry['status'] == 'partial'):
+            add('Recap based on partial conversation.', prefix='      ' if plain else '      ⚠ ')
+        if summary:
+            section('Goal', '🎯')
+            add(summary['goal'], prefix='        ')
+            items('Intentions', '🧭', summary.get('intentions', []))
+            items('Recap', '📝', summary.get('accomplishments', []))
+            step = next_step(entry)
+            if step:
+                lines.append('')
+                add(step, prefix='      Next: ' if plain else '      🔜 Next: ')
+            items('Remaining work', '📌', summary.get('remaining', []))
+            items('Blockers', '🚧', summary.get('blockers', []))
+            items('Verification reports', '🧪', summary.get('verification', []))
+        else:
+            lines.append('')
+            add('Recap not generated.', prefix='      ' if plain else '      📝 ')
+
+        current = {check['key'] for check in summary.get('checks', [])} if summary else set()
+        checks('Current checks', [check for check in entry['checks'] if check['key'] in current])
+        checks('Earlier checks', [check for check in entry['checks'] if check['key'] not in current])
+        if not entry['checks']:
+            section('Checks', '☑')
+            add('None reported.', prefix='        ')
+        section('Session details', '🔎')
+        statuses = {'ready': 'Recap current', 'partial': 'Partial conversation',
+                    'pending': 'Recap pending', 'stale': 'Recap stale',
+                    'failed': 'Refresh failed'}
+        field('Status', statuses.get(entry['status'], entry['status'].replace('_', ' ')))
+        field('Summarized', activity_label(entry['summarized_at']) if entry.get('summarized_at') else 'Never')
+        if summary and summary['title'] != title:
+            field('Recap title', summary['title'])
+        field('Session', entry['id'] or 'Unavailable')
+        if entry.get('reason'):
+            field('Reason', entry['reason'].replace('_', ' '))
+        field('Source', entry.get('source') or 'Unavailable')
+        cwd = entry['cwd']
+        if entry['id'] and re.fullmatch(r'[0-9a-fA-F-]{36}', entry['id']) and isinstance(cwd, str) and cwd.startswith('/'):
+            field('Resume', shlex.join(['codex', '-C', cwd, 'resume', entry['id']]))
+
+    groups = {}
+    for entry in report.get('sessions', []):
+        groups.setdefault(entry['cwd'], []).append(entry)
+    for directory_number, (cwd, entries) in enumerate(groups.items(), 1):
+        lines.extend(['', ('-' if plain else '─') * width])
+        add(cwd or 'Unknown directory', prefix=f'{directory_number}. ' + ('' if plain else '📁 '))
+        lines.append('')
+        for number, entry in enumerate(entries, 1):
+            if number > 1:
+                lines.extend(['', '   ' + ('-' if plain else '─') * (width - 3), ''])
+            render_entry(number, entry)
     if not report.get('sessions'):
         lines.append('')
         add('No work sessions available.')
-    lines.append('')
-    add('Full evidence and check IDs: use --details.')
+    lines.extend(['', ('-' if plain else '─') * width])
+    add('Review coverage' if plain else '📊 Review coverage')
+    field('Displayed', f"{len(groups)} directories · {len(report.get('sessions', []))} sessions" if not plain else
+          f"{len(groups)} directories / {len(report.get('sessions', []))} sessions")
+    field('Reviewed', activity_label(report['refreshed_at']) if report.get('refreshed_at') else 'Never')
+    field('Latest recap', activity_label(report['summary_updated_at']) if report.get('summary_updated_at') else 'Never')
+    field('Open checks', report.get('pending_count', 0))
+    field('Queued', report.get('backlog_count', 0))
+    field('Model calls', report.get('model_calls', 0))
+    for key, count in coverage.items():
+        field(key.replace('_', ' ').capitalize(), count)
+    if report.get('error'):
+        field('Refresh issue', report['error'].replace('_', ' '))
     return '\n'.join(lines) + '\n'

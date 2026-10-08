@@ -435,9 +435,11 @@ The engineering boundary matters more than the folder tree:
 
 - raw session events stay in private XDG state with 0700/0600 permissions
 - a private Codex work digest covers projects and persistent open checks;
-  `second-brain sessions review` recaps the five most recently active work
-  conversations across projects, including completed work and excluding helpers;
-  `--details` expands that selection and `--all` shows eligible history.
+  `second-brain sessions review` shows the five most recently active directories,
+  each with recaps of its three newest work conversations, including completed work and excluding helpers;
+  the full emoji report includes evidence, checks and resume commands by default;
+  `--details` is compatible with that view and `--all` shows eligible history,
+  while its independent opt-in timer refreshes daily at 16:00 Toronto time
 - explicit deferred reminders can remain private in an unscheduled someday queue until example-user assigns a future local date
 - confirmed tracked writes use exact versioned JSON schemas and stable event IDs
 - the first confirmed ExampleProject focus is reused for the day instead of silently
@@ -669,6 +671,7 @@ source in this repo.
 | `"$HOME/scripts/codex"` or `codex` when that wrapper wins on `PATH` | Start Codex in the repo so the tracked instruction chain and config take effect. The repo wrapper also ensures the Graphiti sidecar command is running first. | `-C` / `--cd` sets the repo root when you launch from another directory. `--search` enables live web search for tasks that need current external information. `CODEX_WRAPPER_GRAPHITI_CWD` and `CODEX_WRAPPER_STATE_DIR` override the wrapper's Graphiti checkout path and state directory. |
 | `codex mcp list --json` | Verify which MCP servers Codex is loading from the tracked config. | `--json` emits machine-readable output that is easier to inspect or diff. |
 | `second-brain status` plus `capture`, `focus`, and `closeout` | Retrieve targeted context, keep raw session text private, and persist only explicitly confirmed public-safe focus or closeout records. | `status --format text\|json`; `capture --kind raw-session\|personal-decision --payload PATH_OR_DASH`; `focus --payload PATH_OR_DASH`; `closeout --payload PATH_OR_DASH`. Payload shapes live in the [routing reference](dot_agents/skills/second-brain-session/references/routing.md). |
+| `second-brain sessions` | Refresh the private cross-project Codex digest or review it on request; preserve unresolved checks and explicit dispositions outside Git. | `review` defaults to five recent directories with three sessions each; `--limit 1..20` changes the directory count, `--refresh-limit 0..20` caps recap generation (default three per directory, capped at 20), full recaps, evidence, check history, session metadata and coverage are shown by default (`--details` is compatible); interactive text opens in `bat`/less with emoji cues (`r` refreshes discovery/recaps; `q` quits) and ongoing elapsed progress on stderr; `--no-pager` prints directly, `--plain` provides ASCII text, and `--all` selects eligible history (cannot combine with `--limit`; default refresh budget 20). `refresh --limit 1..20` remains a background queue budget (default 20). Both accept `--format text\|json`; `resolve --payload -` accepts confirmed checked/dismissed JSON on stdin. Review requires no ExampleProject outcome; see [the digest guide](docs/second-brain.md#private-daily-codex-work-digest). |
 | `setup-second-brain-sessions-timer` | Independently manage the persistent 16:00 America/Toronto private digest refresh with no notifications. | Exactly one of `--check`, `--enable`, or `--disable`; no sudo. Does not activate checkpoint or deferred timers. Disable retains private state. |
 | `second-brain doctor` | Audit the tracked vault for structure, privacy, ownership, import-frontmatter, hard-link, and Git LFS errors without mutating it. | `--format text\|json` selects output. `--check` exits 1 when objective errors exist. |
 | `second-brain migrate` | Inventory and plan selected external text, copy one explicitly approved batch into the archive, or verify its private resume ledger. | Subcommands are `inventory --source PATH` with repeatable absolute roots, `plan --inventory PATH`, `apply --plan PATH --approve SHA256`, and `verify --ledger PATH`. Follow [the copy-first procedure](docs/second-brain.md#copy-first-text-migration); no initial migration is automatic. |

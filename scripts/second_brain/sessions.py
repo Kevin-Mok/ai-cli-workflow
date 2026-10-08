@@ -71,10 +71,15 @@ def load(root,d):
                 }
                 v['schema_version'] = STATE_VERSION
         if not isinstance(v,dict) or set(v)!=set(empty()) or type(v['schema_version']) is not int or v['schema_version']!=STATE_VERSION: raise ValueError()
+        # Parser revisions invalidate only metadata screening, not successful
+        # recap hashes or explicit check dispositions.
+        if isinstance(v.get('screened'), dict):
+            v['screened'] = {key: stamp for key, stamp in v['screened'].items()
+                             if not (isinstance(stamp, list) and len(stamp) == 5)}
         for field in ('fingerprints', 'screened'):
             if not isinstance(v[field],dict) or len(v[field])>100000: raise ValueError()
             for key, stamp in v[field].items():
-                if not isinstance(key,str) or not HEX.fullmatch(key) or not isinstance(stamp,list) or len(stamp)!=5 or any(type(n) is not int or n<0 for n in stamp): raise ValueError()
+                if not isinstance(key,str) or not HEX.fullmatch(key) or not isinstance(stamp,list) or len(stamp)!=(6 if field == 'screened' else 5) or any(type(n) is not int or n<0 for n in stamp): raise ValueError()
         if not isinstance(v['summary_hashes'],dict) or len(v['summary_hashes'])>20000: raise ValueError()
         for key, digest in v['summary_hashes'].items():
             if not isinstance(key,str) or not HEX.fullmatch(key) or key not in v['sessions'] or not isinstance(digest,str) or not HEX.fullmatch(digest): raise ValueError()

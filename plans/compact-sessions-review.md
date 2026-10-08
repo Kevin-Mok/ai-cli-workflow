@@ -1,6 +1,57 @@
-# Review five recent work sessions
+# Compact sessions review
 
-Implement and verify the newest-five conversation recap, preserving private state and unrelated work.
+Make the explicit terminal review readable by showing project, title, goal, coverage gaps and outstanding checks in wrapped text. Keep full Markdown evidence behind `--details` and preserve stored digest and JSON contracts.
+
+## Context and scope
+The existing CLI calls the archival Markdown renderer directly. `--limit` bounds changed-source processing, not display. Source files sessions.py and associated tests are pre-existing untracked work; cli.py, README.md and docs/second-brain.md are already dirty. Preserve all their existing contents and changes; do not stage or commit.
+
+## Decisions
+Use plain text with no ANSI or Markdown syntax; width follows terminal with an 88-column maximum and a 40-column minimum. Group sessions by project, show goal and open checks, summarize unsummarized sessions as compact title/status rows. Do not display raw source paths, UUIDs, hashes or evidence paragraphs by default. Full details retain the existing render output. JSON remains complete and unchanged. Refresh remains metadata-only. Keep --limit semantics explicit in help and docs. No interactive selection or resolution behavior change.
+
+## Checklist
+- [x] Capture initial dirty state and locate root cause.
+- [x] Write defining renderer/CLI tests and observe RED.
+- [x] Implement compact renderer and --details integration.
+- [x] Update README, usage docs and grouped smoke check.
+- [x] Run focused and broader session regressions; inspect representative output.
+- [x] Record final evidence and review.
+
+## Risks and rollback
+Long paths and check text must wrap; missing summaries and empty reports must be meaningful. Stale/partial coverage and refresh errors must remain visible. Stored private digest must keep full evidence and stable check IDs. Roll back only session-authored additions; extensive unrelated dirty state is protected.
+
+## Verification
+RED/GREEN: python3 -B tests/test_second_brain_sessions_render.py and python3 -B tests/test_second_brain_sessions_cli.py. Regression: python3 -B -m unittest discover -s tests -p 'test_second_brain_sessions*.py'. Manual: render representative long evidence with a 64-column width; inspect compact and detailed CLI help. No live inference needed for formatting validation.
+
+## Progress and review
+Root cause confirmed in sessions.render and cli.main. Sandbox startup failure has a dedicated reviewed postmortem; use approved scoped commands. Plan Mode is not available in the current harness; this living plan records the decisions.
+
+## Handoff
+Cursor prompt: Review plans/compact-sessions-review.md, preserve pre-existing dirty work, run the listed regressions and inspect default/--details/JSON rendering without live inference. Suggested commit: fix(second-brain): make session review compact. Keep this plan with matching implementation if committing later.
+
+RED evidence: renderer tests failed 3 assertions because compact renderer was absent; CLI default emitted archival Markdown and --details was unrecognized. Intentional RED only.
+
+## Final evidence and review
+- Fresh session regression: python3 -B -m unittest discover -s tests -p 'test_second_brain_sessions*.py': 60 tests passed, exit 0. Renderer checks cover width 40/64, semantic content, archival noise omission, missing summaries/errors, retained open checks on skipped sessions, and resolved-check omission. CLI tests cover --details, complete JSON, refresh privacy and limit forwarding.
+- Broader Second Brain run: 310 tests, one unrelated failure test_exact_sanitized_tree_exists_without_unapproved_files due to pre-existing 05 Daily Notes/2026-07-22.md. User vault preserved. Postmortem-memory run: 26 tests, one unrelated whole-corpus coverage failure; both task-specific targeted ledger checks pass.
+- CLI help and synthetic 72-column compact output inspected; git diff --check exited 0. No live inference or private state changes needed.
+- Independent reviewer confirmed archive/JSON compatibility and found skipped entries could retain checks. New RED test failed as expected; minimum inclusion fix passed.
+- refresh-config was rejected by automatic approval review because this CLI/docs task did not clearly authorize broad home/Git writes. Safer alternative explicitly approved: confirmed installed cli.py and sessions.py match pre-change sources, saved rollback copies in /tmp/sessions-review-rollback-q3ad2j93, atomically installed only these two files. Installed CLI help and compact/details dispatch tested with a fixture, exit 0 and zero model calls. Broader refresh remains unexecuted; CLI activation is verified.
+- No commits or staging performed. All prior dirty work retained; README and usage changes only extend the relevant session-review documentation. Rollback installed files from the two named backups, without touching private digest state.
+
+## Follow-up: actionable default, 2026-10-08
+User live output shows hundreds of empty/Guardian session rows. Root cause: terminal renderer includes every non-skipped entry, then prints archival goal/blocker context. Default must include only non-Guardian sessions with open checks; retain skipped sessions with open checks, state and detailed/JSON inventory. Count visible checks accurately, summarize omitted sessions once, and keep only status next to each title. Guardian detection uses the native title or inferred summary title, case-insensitively; no source parsing or state mutation. This supersedes the prior goal/blocker default.
+
+- [x] RED tests for a large unsummarized/Guardian inventory, accurate visible count, and details preservation.
+- [x] Filter default rows and omit goals/blocker paragraphs; align docs.
+- [x] GREEN session regression, installed fixture verification and renderer smoke script.
+
+Lookup: search `session review noise guardian` returned unrelated title/attribution/destination guidance; no matching filtering remedy. Fresh reproducer uses pasted-output structure. Extensive initial dirty state remains protected. No Plan Mode tool available; maintain this decision-complete plan.
+
+Follow-up RED: tests/test_second_brain_sessions_render.py failed four assertions as expected: goal/blocker paragraphs remained, Guardian/empty rows remained, and visible count used total checks.
+
+Follow-up GREEN: 61 session tests and 5 renderer tests pass (exit 0). Installed CLI fixture displays one check and one hidden count for 100 empty rows; details preserves the inventory. Independent review found no regressions. Only sessions.py installed, after comparing untouched source outside renderer; rollback /tmp/session-review-filter-rollback-x4vj4ifj/sessions.py. No broad refresh-config attempted: previous auto-review scope restriction remains; no configuration changed.
+
+Follow-up broader verification: 312 Second Brain tests, 311 passed; unchanged unrelated vault-inventory failure due to pre-existing 05 Daily Notes/2026-07-22.md. Exit 1. No user vault files changed.
 
 ## Follow-up: five most recent work sessions, 2026-10-08
 

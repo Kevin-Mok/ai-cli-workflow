@@ -3,6 +3,15 @@
 from __future__ import annotations
 
 import argparse
+from contextlib import contextmanager
+from pathlib import Path
+import os
+import shlex
+import shutil
+import subprocess
+import tempfile
+import threading
+import time
 import json
 import sys
 from typing import Any, Sequence
@@ -85,7 +94,7 @@ def build_parser() -> argparse.ArgumentParser:
             selection = operation_parser.add_mutually_exclusive_group()
             selection.add_argument(
                 "--limit", type=int, choices=range(1, 21), default=None, metavar="N",
-                help="Show the N most recently active work sessions (1 to 20; default 5).",
+                help="Show the N most recently active directories, with three sessions each (1 to 20; default 5).",
             )
             selection.add_argument(
                 "--all", dest="all_sessions", action="store_true",
@@ -93,15 +102,19 @@ def build_parser() -> argparse.ArgumentParser:
             )
             operation_parser.add_argument(
                 "--refresh-limit", type=int, choices=range(0, 21), default=None, metavar="N",
-                help="Generate at most N selected recaps (0 to 20; default display limit, or 20 with --all).",
+                help="Generate at most N selected recaps (0 to 20; default three per directory, capped at 20).",
             )
             operation_parser.add_argument(
                 "--plain", action="store_true",
                 help="Use ASCII text without emoji; escape non-ASCII content (JSON unchanged).",
             )
             operation_parser.add_argument(
+                "--no-pager", action="store_true",
+                help="Print text directly instead of opening bat/less.",
+            )
+            operation_parser.add_argument(
                 "--details", action="store_true",
-                help="Expand the selected sessions with full evidence, source paths and check IDs.",
+                help="Show the full prettified report (also the default).",
             )
         else:
             operation_parser.add_argument(
@@ -197,6 +210,75 @@ def _print_status_text(report: dict[str, Any]) -> None:
     print("Latest Daily Notes: " + ", ".join(report["latest_daily_notes"]))
 
 
+@contextmanager
+def _review_progress(*, interval: float = 5.0, plain: bool = False):
+    """Keep slow discovery/inference visible without polluting report stdout."""
+    stopped = threading.Event()
+    started = time.monotonic()
+    stream = sys.stderr
+    def update():
+        while not stopped.wait(interval):
+            elapsed = int(time.monotonic() - started)
+            prefix = '' if plain else '⏳ '
+            separator = ' - ' if plain else ' · '
+            try:
+                print(f'{prefix}Reviewing work sessions{separator}{elapsed}s elapsed', file=stream, flush=True)
+            except (OSError, ValueError):
+                return  # A closed diagnostic stream must not leak a thread traceback.
+    worker = threading.Thread(target=update, daemon=True)
+    worker.start()
+    try:
+        yield
+    finally:
+        stopped.set()
+        worker.join()
+
+
+def _write_review(output: str, *, plain: bool, no_pager: bool) -> bool:
+    """Return True only when the interactive viewer explicitly requests refresh."""
+    if not plain and not no_pager and sys.stdout.isatty() and sys.stdin.isatty():
+        less = shutil.which('less')
+        bat = shutil.which('bat') or shutil.which('batcat')
+        if less:
+            try:
+                with tempfile.TemporaryDirectory(prefix='second-brain-review-pager-') as directory:
+                    root = Path(directory)
+                    keymap = root / 'keys'
+                    status_file = root / 'status'
+                    keymap.write_text('#command\nr quit R\nq quit\n')
+                    pager = [less, '-R', '-+F', '--lesskey-src=' + str(keymap),
+                             '-P r refresh recaps | Space scroll | / search | q quit']
+                    argv = pager
+                    if bat:
+                        # bat discards less's exit status. A private wrapper records
+                        # the refresh request; no report content enters control files.
+                        wrapper = root / 'pager.py'
+                        wrapper.write_text(
+                            'import pathlib, subprocess, sys\n'
+                            'try:\n'
+                            '    code = subprocess.run(sys.argv[2:], check=False).returncode\n'
+                            'except OSError:\n'
+                            '    code = 1\n'
+                            'pathlib.Path(sys.argv[1]).write_text(str(code))\n'
+                            'raise SystemExit(0 if code == 82 else code)\n'
+                        )
+                        argv = [bat, '--style=plain', '--language=txt', '--paging=always',
+                                '--color=never' if 'NO_COLOR' in os.environ else '--color=always',
+                                '--pager', shlex.join([sys.executable, str(wrapper), str(status_file), *pager])]
+                    result = subprocess.run(argv, input=output, text=True, check=False)
+                    code = int(status_file.read_text()) if status_file.exists() else result.returncode
+                    if code == 82:
+                        return True
+                    if code in (0, 141, -13, 130, -2):
+                        return False
+            except (BrokenPipeError, KeyboardInterrupt):
+                return False  # q/interrupt must not redisplay or regenerate the report.
+            except OSError:
+                pass  # Missing/broken viewer still leaves the recap readable.
+    sys.stdout.write(output)
+    return False
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
@@ -219,7 +301,20 @@ def main(argv: Sequence[str] | None = None) -> int:
                         options["refresh_limit"] = args.refresh_limit
                     if args.all_sessions:
                         options["all_sessions"] = True
-                    report = operation(**options)
+                    while True:
+                        with _review_progress(plain=args.plain):
+                            report = operation(**options)
+                        if args.format == "json":
+                            _print_json(report)
+                            break
+                        output = sessions.render_terminal(report, plain=args.plain)
+                        if not _write_review(output, plain=args.plain, no_pager=args.no_pager):
+                            break
+                        # r is an explicit request to fill missing recaps even if
+                        # the first snapshot used the zero-inference preview flag.
+                        if options.get("refresh_limit") == 0:
+                            options.pop("refresh_limit")
+                    return 1 if report.get("error") else 0
                 if args.sessions_command == "refresh":
                     # Timer stdout may enter the journal; review content stays opt-in.
                     report = {
@@ -242,14 +337,6 @@ def main(argv: Sequence[str] | None = None) -> int:
                     ))
                     if report.get("error"):
                         print("Refresh issue: " + report["error"])
-                else:
-                    if args.details:
-                        output = sessions.render(report)
-                        if args.plain:
-                            output = output.encode("ascii", errors="backslashreplace").decode()
-                    else:
-                        output = sessions.render_terminal(report, plain=args.plain)
-                    sys.stdout.write(output)
                 return 1 if report.get("error") else 0
             return 0
         if args.command == "status":

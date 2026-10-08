@@ -101,3 +101,7 @@ Completed: add offline title speech with serialized playback and fallback suppre
 ### Milestone 12 — feat(skills): add fish shortcut workflow
 
 Completed: route shortcut requests safely and preserve generated-name conflicts retain spaced paths and quoted hashes during generation. Verified: fresh scoped checks recorded above plus staged whitespace and incident-link contracts. Remaining: 3 planned groups, then one upstream push. Blockers: none for this milestone; documented broader vault inventory warning and manual acceptance limits remain. Next: fix(second-brain): restore recent directory reviews.
+
+### Milestone 13 — fix(second-brain): restore recent directory reviews
+
+Completed: select recent directories and revise privacy screening show full paged reports with elapsed progress and r refresh. Verified: fresh scoped checks recorded above plus staged whitespace and incident-link contracts. Remaining: 2 planned groups, then one upstream push. Blockers: none for this milestone; documented broader vault inventory warning and manual acceptance limits remain. Next: feat(aliases): add Codex time overview shortcut.

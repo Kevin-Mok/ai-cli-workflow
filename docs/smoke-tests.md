@@ -350,30 +350,66 @@ checks use invented temporary data; real notes are never repository fixtures.
 
 ## Second Brain
 
-- Action: Run `second-brain sessions review`, then
-  `second-brain sessions review --limit 1 --refresh-limit 0` in a narrow terminal.
-  Expected: The latest five eligible real work conversations appear newest first
-  (fewer when unavailable), including sessions without checks. Guardian/spawned
-  helpers do not occupy slots. The second command shows only the newest session
-  and makes zero model calls. Entries wrap title/project, show Toronto-local
-  activity, at most two recap lines and one current next step; no global backlog
-  or coverage dump appears. Repeat with `--plain` for ASCII text without emoji;
-  `NO_COLOR=1` keeps output free of ANSI sequences, and JSON remains clean.
-- Action: Run `second-brain sessions review --limit 1 --details`, then the same
-  command with `--format json`. Run
-  `second-brain sessions review --all --refresh-limit 0 --details`.
-  Expected: Details and JSON expand the same selected sessions with full evidence,
-  source/resume data, retained check IDs and global diagnostics. `--all` exposes
-  the eligible historical inventory. `--all --limit 1` is rejected. Unchanged
-  recaps need no inference, and formatting does not resolve any checks.
-- Action: Run `second-brain sessions refresh --limit 1 --format json`.
-  Expected: The background queue processes at most one changed source and outputs
-  only safe metadata; its limit remains independent of review display size.
-- Action: Run `python3 -B tests/scripts/second_brain_sessions_review_check.py`.
-  Expected: Disposable sources exercise the installed CLI's default five, limits,
-  refresh budgets, details/JSON, helpers, old checks, preserved resolutions and
-  zero-inference repeats. Only model responses are simulated; real private state
-  and native conversations are untouched. No sudo is required.
+- Action: second-brain sessions review --refresh-limit 0
+  Expected: Interactive bat/less viewer with folder, session, time, recap and
+  next-step emoji cues. Space/Page Down scrolls, /text searches, q quits with
+  success. No inference occurs; privacy/stale warnings remain local and readable.
+- Action: Run `second-brain sessions review --limit 1 --refresh-limit 0`, then press `r` inside the pager.
+  Expected: The complete selected report reloads, discovering newer sessions and
+  generating missing/stale recaps with the normal bounded budget. Slow refresh
+  emits elapsed progress; q exits after the new report opens. Positive explicit
+  --refresh-limit budgets persist; unchanged recaps are reused without inference.
+- Action: second-brain sessions review --refresh-limit 0 --no-pager
+  Expected: The same emoji report prints directly, without opening a viewer.
+- Action: second-brain sessions review --refresh-limit 0 | cat
+  Expected: Clean text through the pipe; no pager subprocess or ANSI sequences.
+- Action: NO_COLOR=1 second-brain sessions review --refresh-limit 0
+  Expected: Pager navigation and emoji layout remain; bat emits no ANSI colors.
+- Action: second-brain sessions review --limit 1
+  Expected: Slow discovery/inference emits ongoing elapsed activity to stderr
+  every five seconds; then bat/less opens the newest directory's three recaps.
+  Fast cached reviews emit no progress noise; no percentage or ETA is invented.
+  Missing/stale recaps are generated before the report opens. The pager is a
+  snapshot: press r to rediscover sessions, refresh recaps and reopen the report;
+  q exits. Unchanged recaps require no new inference.
+- Action: second-brain sessions review
+  Expected: Five most recently worked-in eligible directories, each with up to
+  three newest session recaps. Directory and within-directory order follow
+  native activity; completed work is included, Guardian/helpers excluded. Public
+  policy/skill reads do not hide recent sessions. Rows show Toronto-local times,
+  complete wrapped recap/evidence sections, a current next step, check history
+  with dispositions/IDs, aligned session/source/resume data and coverage footer.
+- Action: second-brain sessions review --limit 1 --refresh-limit 0 --plain
+  Expected: The newest directory with up to three sessions; zero model calls,
+  wrapped ASCII text, no ANSI sequences. A missing recap remains “Recap not
+  generated” because --refresh-limit 0 disables generation. Rerun without that
+  flag to generate it. ASCII output has no pager; the interactive emoji view
+  also supports r to enable the normal budget after a zero-preview launch.
+  No sudo is required.
+- Action: second-brain sessions review --limit 1 --details
+  Expected: The same full emoji report as the default for the three selected
+  sessions, with evidence, source/resume data, check IDs and coverage footer;
+  no raw Markdown headings, truncation or dense semicolon lists.
+- Action: second-brain sessions review --limit 1 --refresh-limit 0 --format json
+  Expected: Clean existing JSON structure, with flat selected sessions grouped
+  by directory and ordered newest first within it.
+- Action: second-brain sessions review --all --refresh-limit 0 --details
+  Expected: Complete eligible historical inventory; explicit --limit conflicts
+  with --all. Formatting never resolves checks or regenerates unchanged recaps.
+- Action: second-brain sessions refresh --limit 1 --format json
+  Expected: At most one queued changed source, metadata-only output; scheduled
+  refresh keeps its independent processing budget.
+- Action: python3 -B tests/scripts/second_brain_sessions_review_check.py --pager-check
+  Expected: Disposable fixture adds a new source while bat/less is open, presses
+  r and verifies discovery plus missing recap generation after zero preview;
+  Space scrolling and q exit remain normal,
+  plus normal five-directory/three-session, JSON/plain and no-pager contracts.
+  Real conversations/private digest are untouched. Requires less, no sudo.
+- Action: python3 -B tests/scripts/second_brain_sessions_review_check.py
+  Expected: Disposable sources verify five directories with three recaps each,
+  independent refresh budgets, details/JSON, helpers, privacy, old checks,
+  preserved resolutions and zero-inference repeats. No real private state or
+  native conversations are modified; no sudo is required.
 
 - Action: python3 -B -m unittest tests.test_second_brain_command tests.test_second_brain_timer tests.test_second_brain_skill -v
   Expected: Fixture-only deferred reminders support private `someday` records, future-date scheduling, 04:00 persistent promotion, count-only status, opt-in private listing, and no tracked-vault reminder text.

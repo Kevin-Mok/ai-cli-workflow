@@ -120,14 +120,24 @@
 
 - 2026-10-07: Sudo backup artifacts must be readable by the invoking account, including incomplete runs. Resolve the account via pwd and assign only the bundle and known generated regular files; skip symlinks and never recursively chown copied home data, whose owners/ACLs are restore metadata.
 
+- 2026-10-07: Recent-session recap reads must tolerate concurrent cache clearing; count attempts after acquiring generation ownership and clean safe orphan atomic files under the maintenance lock. Verify the actual CLI index lock during a sleeping inference, not only after the batch. See [cache lifecycle review](../docs/postmortem/2026-10-07-codex-recent-cache-races.md).
 
 - 2026-10-07: For notification integration fixtures, poll DBus NameHasOwner before dunstctl to avoid autoactivating a competing daemon; verify duplicate-object script_run transfer before promising silence on all history recalls. See [Dunst fixture investigation](../docs/postmortem/2026-10-07-dunst-fixture-startup.md).
 
+- 2026-10-08: Give terminal session review its own width-aware renderer; keep archival Markdown and stable IDs available through explicit details/JSON. Test wrapped semantic content separately from line-width bounds.
+
 - 2026-10-08: Diagnose a wrong Kitty/Codex summary by comparing the native conversation name with the terminal title before editing terminal configuration. Matching stale names indicate metadata selection/update trouble; in the pasted-review incident, native rename immediately propagated to Kitty. See [the title incident](../docs/postmortem/2026-10-08-stale-codex-task-title.md).
+
 - 2026-10-08: Keep disk-usage metrics explicit: Dust logical mode includes directory st_size and all hardlink names; GNU du apparent mode omits directory sizes. Require allocated equality independently. See [fixture accounting](../docs/postmortem/2026-10-08-directory-sizes-accounting.md).
+
+- 2026-10-08: Compact review needs an actionable inclusion filter, not just wrapping. Hide Guardian reviews and sessions without open checks by default; retain full details/state and count only displayed checks.
+
 - 2026-10-08: Notification eligibility must collect internal provenance before ambiguous metadata falls back to MP3. Classify source discriminants and explicit agent roles; a reserved-looking worker nickname is user data. See [notification provenance](../docs/postmortem/2026-10-08-notification-speech-provenance.md).
+
 - 2026-10-08: Shortcut conflicts must compare generated fish names: file source key bn becomes nbn, while command/directory keys are unchanged. Use real template markers in fixture injection and test effective names rather than source keys. See [fish alias fixture corrections](../docs/postmortem/2026-10-08-fish-alias-validation-fixtures.md).
+
 - 2026-10-08: Detached notification workers can outlive an event-policy change. Stop enqueueing before clearing only revalidated same-user audio process groups; restore prior activation afterward and test already-loaded hook calls against the new runtime gate. See [permission audio flood](../docs/postmortem/2026-10-08-notification-permission-audio-flood.md).
+
 
 ## 2026-10-08: Recent session review boundaries
 
@@ -142,4 +152,7 @@
   validator; diagnose private recap failures using field shapes, not raw text.
 
 - 2026-10-08: In fzf 0.44, --nth searches the --with-nth display. Publish current AI headlines instead of freezing fallback titles. Retain query text and track selection while it still matches; test normal re-filtering and safe zero-match Enter. Static rendering checks alone cannot establish live row updates.
+
+- 2026-10-08: Session privacy screening must use actual invocation provenance, not arbitrary public tool-result mentions. A parser correction needs a screening-cache revision; otherwise unchanged false exclusions persist. Group recent directories separately from recap inference order.
+
 - 2026-10-08: Group signals are asynchronous and process.wait() reaps only its leader. Cancellation fixtures should bound observation of an owned descendant disappearing or becoming Z, retain immediate leader absence, and fail if the child survives the deadline.
