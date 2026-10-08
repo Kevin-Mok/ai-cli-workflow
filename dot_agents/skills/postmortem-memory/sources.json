@@ -7659,6 +7659,24 @@
       "findings": [],
       "reviewed_on": "2026-10-08",
       "sha256": "8f1ac36ccc6139134feb9e95cffc60b0b11da2ef1d7aa686cd832b5fc9d0f808"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-08-fish-home-path-sandbox.md"
+      ],
+      "decision": "No new learning: established sandbox alternate route, helper-discovery lookup and fixture section heuristic limits; normalization checks remain intact.",
+      "findings": [],
+      "reviewed_on": "2026-10-08",
+      "sha256": "a35b8a5037f4b8cefb0d6d48d80648ba8039d120859c2cdc0ea45ee5cc161029"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-08-fish-session-concurrent-index.md"
+      ],
+      "decision": "No new learning beyond existing direct-evidence scoped-state guidance: observed concurrent shared index commit; preserve history and inspect exact remaining scope. Full prevention is outside this task.",
+      "findings": [],
+      "reviewed_on": "2026-10-08",
+      "sha256": "35f284d583903b41df7015ca018754c1f6c6f20c5a3957bfe1184b66f3a35fec"
     }
   ],
   "review": {

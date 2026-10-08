@@ -909,7 +909,10 @@ changed mappings; file source keys gain `n` in fish.
   and unrelated bytes remain intact, identical requests are no-ops, missing or
   ambiguous inputs fail before edits, and generated fish syntax passes. Absolute
   executables with arguments remain commands; stored backticks retain their exact
-  text. Template delimiters in new requests are rejected before rendering.
+  text. Pasted `/home/example` directory prefixes become `~`, including quoted
+  or escaped spaces; repeated absolute requests are no-ops. Similar usernames,
+  embedded home strings, commands and file mappings remain unchanged. Template
+  delimiters in new requests are rejected before rendering.
 - Action: python3 /home/example/.agents/skills/fish-alias/scripts/fish_alias.py --help
   Expected: Installed helper describes JSON-stdin input, `--repo` and preview
   default; `--apply` is required to write. Readable output is the default;
@@ -929,6 +932,10 @@ changed mappings; file source keys gain `n` in fish.
 - Action: From `/home/example/linux-config`, run `rg -n '^ctp ' aliases/key_aliases.tmpl` and `fish --no-config -c 'source ~/.config/fish/key_abbr.fish; abbr --show' | rg '^abbr .* -- ctp '`.
   Expected: The work template and installed fish abbreviation map `ctp` to
   `codex-time projects`; inspection does not execute the mapped command.
+
+- Action: From `/home/example/linux-config`, run `rg -n '^tcs ' aliases/key_dirs.tmpl` and `fish --no-config -c 'source ~/.config/fish/key_abbr.fish; abbr --show' | rg '^abbr .* -- tcs '`.
+  Expected: Source has `tcs ~/coding/track-codex-sessions` in cdn; installed fish
+  expands tcs to `cd ~/coding/track-codex-sessions`. Inspect only; no cd executes.
 
 Live Codex usage: `$fish-alias cbn codex-time burn day`. To create the mapping,
 invoke this as an actual request, inspect the reported source/section/conflicts,
