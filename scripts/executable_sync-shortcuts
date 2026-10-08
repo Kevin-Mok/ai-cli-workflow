@@ -34,41 +34,61 @@ key_dirs="$HOME/aliases/key_dirs"
 key_files="$HOME/aliases/key_files"
 key_aliases="$HOME/aliases/key_aliases"
 
-# Remove, prepare files
-rm -f "$ranger_mappings" 2>/dev/null
-printf "# vim: filetype=sh\\n" > "$fish_abbr"
-printf "# vim: filetype=sh\\nalias " > "$aliases"
+# Preserve quoted hashes and complete path expressions. Parsing does not execute mappings.
+python3 - "$key_dirs" "$key_files" "$key_aliases" "$aliases" "$fish_abbr" "$ranger_mappings" <<'PYTHON'
+from pathlib import Path
+import re
+import shlex
+import sys
 
-# Format the key file in the correct syntax and sent it to all configs.
-sed "s/\s*#.*$//;/^\s*$/d" "$key_dirs" | tee \
-	>(awk '{print $1"=\"cd "$2" && lsd -a\" \\"}' >> "$aliases") \
-	>(awk '{print "abbr", $1, "\"cd", $2, "\""}' >> "$fish_abbr") \
-	| awk '{print "map f"$1, "cd", $2;
-		print "map t"$1, "tab_new", $2;
-		print "map m"$1, "shell mv -v %f", $2;
-		print "map Y"$1, "shell cp -rv %f", $2;
-	}' >> "$ranger_mappings"
 
-sed "s/\s*#.*$//;/^\s*$/d"  "$key_files" | tee \
-	>(awk '{print n$1"=\"$EDITOR "$2"\" \\"}' >> "$aliases") \
-	>(awk '{print "abbr n"$1, "\"$EDITOR "$2"\""}' >> "$fish_abbr") \
-	| awk '{print "map n"$1" shell $EDITOR "$2}' >> "$ranger_mappings"
+def strip_comment(text):
+    quote = ''
+    escape = False
+    for i, char in enumerate(text):
+        if escape:
+            escape = False
+        elif char == '\\' and quote != "'":
+            escape = True
+        elif quote:
+            if char == quote: quote = ''
+        elif char in "\"'": quote = char
+        elif char == '#' and (i == 0 or text[i-1].isspace()): return text[:i].rstrip()
+    return text.rstrip()
 
-#sed -e '/^$/d' -e '/[ ]*#.*/d' "$key_aliases" | sort | tee \
-	#>(awk '{printf "abbr " $1; $1 = ""; print $0; }' >> "$fish_abbr") \
-	#| awk '{
-		#printf $1;
-		#$1 = "";
-		#printf "=";
-		#printf gensub(" ", "", 1, $0);
-		#print " \\";
-    #}' >> "$aliases"
-sed "s/\s*#.*$//;/^\s*$/d" "$key_aliases" | sort | tee \
-    >(awk 'NF {printf "abbr " $1; $1 = ""; print $0; }' >> "$fish_abbr") \
-    | awk 'NF {
-        printf $1 "=";
-        $1 = "";
-        # Remove leading space
-        sub(/^ /, "", $0);
-        print $0 " \\";
-    }' >> "$aliases"
+
+def rows(path, sort=False):
+    lines = Path(path).read_text().splitlines()
+    if sort: lines.sort()
+    for line in lines:
+        clean = strip_comment(line).strip()
+        if not clean: continue
+        match = re.match(r'(\S+)\s+(.+)', clean)
+        if not match: raise ValueError(f'Malformed shortcut in {path}: {line}')
+        yield match[1], match[2]
+
+
+def fish_quote(value):
+    return "'" + value.replace('\\', '\\\\').replace("'", "\\'") + "'"
+
+
+dirs, files, commands, alias_path, fish_path, ranger_path = sys.argv[1:]
+bash = []
+fish = []
+ranger = []
+for key, path in rows(dirs):
+    bash.append(f'{key}={shlex.quote("cd " + path + " && lsd -a")} \\')
+    fish.append(f'abbr {key} {fish_quote("cd " + path)}')
+    ranger.extend(f'map {prefix}{key} {command} {path}' for prefix, command in
+                  [('f', 'cd'), ('t', 'tab_new'), ('m', 'shell mv -v %f'), ('Y', 'shell cp -rv %f')])
+for key, path in rows(files):
+    bash.append(f'n{key}={shlex.quote("$EDITOR " + path)} \\')
+    fish.append(f'abbr n{key} {fish_quote("$EDITOR " + path)}')
+    ranger.append(f'map n{key} shell $EDITOR {path}')
+for key, value in rows(commands, sort=True):
+    bash.append(f'{key}={value} \\')
+    fish.append(f'abbr {key} {value}')
+Path(alias_path).write_text('# vim: filetype=sh\nalias ' + '\n'.join(bash) + '\n')
+Path(fish_path).write_text('# vim: filetype=sh\n' + '\n'.join(fish) + '\n')
+Path(ranger_path).write_text('\n'.join(ranger) + '\n')
+PYTHON

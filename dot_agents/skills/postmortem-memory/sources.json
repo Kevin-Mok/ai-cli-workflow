@@ -4228,6 +4228,26 @@
       "verification_scope": "code"
     },
     {
+      "applicability": "Helpers inserting user command/path text into executable template sources.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Preview a harmless template expression in an isolated fixture; confirm whether delimiters are interpreted before applying."
+      ],
+      "id": "local-shortcut-template-input-execution",
+      "limitations": "Current raw sources still intentionally use trusted chezmoi directives; this guard applies to newly supplied shortcut text, not arbitrary untrusted existing templates.",
+      "reference": "references/state-security.md#local-shortcut-template-input-execution",
+      "remedy": "Reject request template delimiters before rendering or writing; do not invoke output functions to test the boundary.",
+      "sources": [
+        "a285c912b7b0becf112aabc0e1ea3e833a47cd898209c19700fd9e9e76ff5e01"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "Literal shortcut request text reaches chezmoi template evaluation during preview."
+      ],
+      "verification": "Defining test first observed acceptance (RED), then rejected input with unchanged fixture bytes; final 15-test suite passes and guarded installed helper matches source.",
+      "verification_scope": "code"
+    },
+    {
       "applicability": "Shortcut request routing and string encoding across template and fish syntax.",
       "confidence": "confirmed",
       "diagnostics": [
@@ -7227,6 +7247,24 @@
     },
     {
       "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-08-fish-alias-prompt-sandbox-startup.md"
+      ],
+      "decision": "No new reusable learning: repeats local-sandbox-loopback-approved-route; scoped approved execution verified prompt preparation, without host sandbox repair.",
+      "findings": [],
+      "reviewed_on": "2026-10-08",
+      "sha256": "3ca9cf3fb04b7e4ad93321b90cc73dadbe7a0aaefe540fc45a4d56692ff51383"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-08-fish-alias-skill-sandbox.md"
+      ],
+      "decision": "No new learning: repeats local-sandbox-loopback-approved-route; approved scoped reads succeed while default sandbox remains unresolved.",
+      "findings": [],
+      "reviewed_on": "2026-10-08",
+      "sha256": "36e4f592c1917b22766deab82da898e92cefdc04d953e2741edf4876a1d32e8f"
+    },
+    {
+      "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-10-08-session-review-doc-edit.md"
       ],
       "decision": "No new learning: ext-stale-patch-context applies; inspected partial writes and current destination marker before retry.",
@@ -7243,6 +7281,16 @@
       ],
       "reviewed_on": "2026-10-08",
       "sha256": "ab49bc9e58d8329338b01c3d8ad8f426c2fc83132d13c84ff23f2549ba7e4e3b"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-08-fish-alias-validation-fixtures.md"
+      ],
+      "findings": [
+        "local-shortcut-template-input-execution"
+      ],
+      "reviewed_on": "2026-10-08",
+      "sha256": "a285c912b7b0becf112aabc0e1ea3e833a47cd898209c19700fd9e9e76ff5e01"
     },
     {
       "aliases": [
@@ -7299,6 +7347,15 @@
       "findings": [],
       "reviewed_on": "2026-10-08",
       "sha256": "9717ba1edf5a8a7174f624c4dd2a2ef41fc2a05d360ae98e3fe3eb8be2253afe"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-08-fish-alias-handoff-transport.md"
+      ],
+      "decision": "No new learning: native optional handoff HTTP transport failed; no remedy attempted, task verified independently; endpoint remains unresolved.",
+      "findings": [],
+      "reviewed_on": "2026-10-08",
+      "sha256": "0d32f5b5a6c0f2fd3688b5630a1b9f60413c6fcd7a12901e0991b319e661167c"
     },
     {
       "aliases": [

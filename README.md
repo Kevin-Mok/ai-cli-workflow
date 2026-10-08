@@ -732,6 +732,14 @@ this.
   shortcut layer. [`scripts/executable_sync-shortcuts`](scripts/executable_sync-shortcuts)
   regenerates shell aliases, fish abbreviations, and ranger mappings
   from those sources.
+- [`fish-alias`](dot_agents/skills/fish-alias/SKILL.md) accepts an abbreviation
+  followed by a command or path: `$fish-alias cbn codex-time burn day` adds
+  `cbn "codex-time burn day"` in the existing work section. It previews the
+  diff, comments active conflicts in place, preserves quoted hashes and spaced
+  paths, and refreshes changed mappings. File source keys gain an `n` prefix
+  in fish (`re README.md` becomes `nre`); activation follows current chezmoi
+  conditions. The example is not installed automatically. See the
+  [isolated checks](docs/smoke-tests.md#fish-alias-skill).
 - [`dot_config/fish/config.fish.tmpl`](dot_config/fish/config.fish.tmpl)
   is the main interactive shell setup and loads the large helper surface
   under [`dot_config/fish/functions/`](dot_config/fish/functions/).

@@ -298,3 +298,10 @@ targets leave local commits intact. Planning-only requests remain read-only.
 - [`transcribe`](transcribe/SKILL.md): Transcribes audio or video into
   text, with optional diarization and known-speaker hints when speaker
   labeling matters.
+
+## Fish Shortcuts
+
+- [`fish-alias`](fish-alias/SKILL.md): Accepts a source abbreviation followed by
+  its command or path, infers the existing section, comments active conflicts
+  across generated fish names, then applies and refreshes changed mappings.
+  File keys receive the existing `n` prefix in fish.

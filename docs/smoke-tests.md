@@ -855,6 +855,41 @@ only a disposable temporary fixture and requires no sudo.
   If permissions block that tracked write, it reports the exact path and pending
   learning instead of writing installed memory. A novel search miss leads to a
   new reproducer and review, not an invented known fix.
+## Fish Alias Skill
+
+Check the shortcut skill using disposable fixture sources before making a live
+request. The fixture suite does not execute mapped commands or install the cbn
+example. Live requests preserve active conflicts with exactly `# ` and refresh
+changed mappings; file source keys gain `n` in fish.
+
+- Action: python3 -B tests/test_fish_alias.py
+  Expected: Command `cbn codex-time burn day` lands in the work section; directory
+  and file paths, including spaces/quotes, route correctly. Active cross-source
+  conflicts use effective fish names (`bn` file becomes `nbn`), inactive branches
+  and unrelated bytes remain intact, identical requests are no-ops, missing or
+  ambiguous inputs fail before edits, and generated fish syntax passes. Absolute
+  executables with arguments remain commands; stored backticks retain their exact
+  text. Template delimiters in new requests are rejected before rendering.
+- Action: python3 /home/example/.agents/skills/fish-alias/scripts/fish_alias.py --help
+  Expected: Installed helper describes JSON-stdin input, `--repo` and preview
+  default; `--apply` is required to write. Readable output is the default;
+  `--plain` selects ASCII, `--details` exposes diffs/error evidence, and
+  `--json` exports structured results. No mapped command executes.
+- Action: python3 -c 'import json,subprocess; r=subprocess.run(["python3","/home/example/.agents/skills/fish-alias/scripts/fish_alias.py","--json"],input=json.dumps({"input":"cbn codex-time burn day"}),text=True); raise SystemExit(r.returncode)'
+  Expected: JSON preview reports command routing and work section, showing
+  `cbn "codex-time burn day"` and any active conflicts without changing sources.
+  If the mapping is already installed, reports a no-op instead.
+- Action: fish -n ~/.config/fish/key_abbr.fish
+  Expected: Exit 0 after refresh; syntax only, no supplied commands execute.
+
+
+Live Codex usage: `$fish-alias cbn codex-time burn day`. To create the mapping,
+invoke this as an actual request, inspect the reported source/section/conflicts,
+then verify the refresh result. Repeating it must produce a no-op. Directory
+example: `$fish-alias pj ~/coding/my-project/`. File example:
+`$fish-alias re README.md` produces `nre` under existing generator conventions.
+
+
 ## Full-system Backup And Guarded Recovery
 
 Run these checks from `/home/example/linux-config`. The automated and help checks

@@ -253,3 +253,14 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Limitations: Transcript format can drift; live hook trust and subjective speech acceptance remain manual.
 - Sources:
   - [2026-10-08-notification-speech-provenance.md](/home/example/linux-config/docs/postmortem/2026-10-08-notification-speech-provenance.md) (SHA-256 `ab49bc9e58d8`; 1 alias, retained in sources.json).
+
+## local-shortcut-template-input-execution
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **code**.
+- Symptoms: Literal command/path request text is evaluated as chezmoi template code during shortcut preview.
+- Applicability: Helpers inserting user text into executable template sources.
+- Diagnostic checks: Use an isolated harmless hostname expression; check whether delimiters are interpreted before apply. Do not execute output functions as probes.
+- Remedy: Reject request template delimiters before any rendering or writing, unless a separately validated literal-escaping path exists.
+- Verification evidence: Defining RED test observed acceptance; guarded helper rejects the request with unchanged fixture bytes. Final 15-test suite passes; installed helper matches guarded source.
+- Limitations: Trusted existing chezmoi directives remain intentional. The guard covers newly supplied requests, not arbitrary existing untrusted templates.
+- Sources: [fish alias validation fixtures](/home/example/linux-config/docs/postmortem/2026-10-08-fish-alias-validation-fixtures.md).

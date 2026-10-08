@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fish Alias"
+  short_description: "Add fish command, directory, and file shortcuts"
+  default_prompt: "Use $fish-alias to add the abbreviation and command or path I provide."
