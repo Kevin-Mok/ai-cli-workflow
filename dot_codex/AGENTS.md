@@ -119,6 +119,12 @@ education work:
 - Keep modules cohesive. Split files that cross multiple concerns or grow beyond
   roughly 1,000 lines; avoid adding features to an already oversized file
   without organizing it.
+- CLI output must be prettified and easy to understand by default: use helpful
+  emojis, clear hierarchy, plain-language labels, aligned values, and readable
+  dates and durations. Keep raw diagnostics and technical evidence behind
+  `--details`; retain a concise, actionable warning when accuracy is limited.
+  Provide `--plain` for ASCII output and preserve clean JSON/CSV exports when
+  supported. Respect terminal width and `NO_COLOR`.
 - When a user must run commands manually, create a reusable script instead of a
   chat-only command list. State when it requires `sudo` and provide the exact
   invocation.

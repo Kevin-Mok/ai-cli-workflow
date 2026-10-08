@@ -136,6 +136,8 @@ engineering behavior:
 
 - Plan mode for non-trivial work so larger tasks move through explicit
   steps, assumptions, risks, and verification.
+- Readable CLI output by default, with helpful emojis, plain-language labels,
+  and compact summaries; detailed diagnostics and plain output remain available.
 - Failing reproducers before bug fixes so changes are grounded in
   observed behavior instead of guesswork.
 - Living postmortems for unexpected task failures so the observed evidence,

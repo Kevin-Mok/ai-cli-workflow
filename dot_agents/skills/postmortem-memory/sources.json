@@ -3583,6 +3583,24 @@
   ],
   "reports": [
     {
+      "sha256": "3382c298129dcb4231dd0b486483d275a7fa6f785970099e8c766bce0bc73647",
+      "aliases": [
+        "/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-08-model-report-presentation.md"
+      ],
+      "reviewed_on": "2026-10-08",
+      "findings": [],
+      "decision": "No new reusable learning: local-terminal-report-readable-projection covers responsive layouts, human labels and width checks; existing discovery guidance covers absent optional probes. Final 180 tests, 126 smoke checks, strict mypy/Ruff/build and installed day/week/month conservation/source-freshness/plain/details checks passed. The specific percentage-formatting lesson is recorded in project tasks/lessons.md. Session commit uses directly observed Python-write evidence; README gate repairs are source-grounded. No new learning beyond existing gate/discovery/scope guidance."
+    },
+    {
+      "sha256": "3d75887bc180c290466f0c2772ac5d3355a7fde413f9dc0c5295684dead2d68c",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-08-model-command-lookup-sandbox.md"
+      ],
+      "reviewed_on": "2026-10-08",
+      "findings": [],
+      "decision": "No new reusable learning: ext-sandbox-loopback covers the identical pre-execution error. Approved source reads and installed model report help exited 0; host sandbox remains unrepaired."
+    },
+    {
       "aliases": [
         "/home/example/coding/twitter-cap-bot/docs/postmortem/2026-10-02-dashboard-format-patch.md"
       ],

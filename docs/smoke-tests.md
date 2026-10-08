@@ -414,6 +414,8 @@ checks use invented temporary data; real notes are never repository fixtures.
 
 - Action: Start a fresh Codex or Claude Code session in this repo and ask it to describe the canonical instruction file and delivery cadence without creating or pushing commits.
   Expected: It identifies `dot_codex/AGENTS.md` as the single policy body, treats the root AGENTS files as routing layers, and explains that a verified single-commit workflow pushes once while multi-commit work waits until the complete verified series; no Git write occurs.
+- Action: Review a newly created or changed CLI report in its default view, then use `--details` and `--plain` when supported.
+  Expected: Default output has helpful emojis, plain-language labels, clear hierarchy, aligned values and readable dates/durations. Raw diagnostics appear under details; narrow output stays readable, plain is ASCII, `NO_COLOR` suppresses ANSI, and JSON/CSV remain clean. Accuracy limits keep a short actionable warning.
 - Action: Add or change a standing workflow rule in `dot_codex/AGENTS.md`.
   Expected: The corresponding public docs and reusable verification guidance stay in sync with that rule in the same change.
 - Action: Ask a fresh Codex or Claude Code session to write a how-to guide.
