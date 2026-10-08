@@ -743,8 +743,11 @@ this.
   first for normal shells and Codex. Each Kitty window has an i3 titlebar;
   Codex shows its activity indicator and a live “what are we doing?” summary
   (3–5 words, at most 36 characters), such as “Categorize card transactions”.
-  Agents update their own native task name at task starts, meaningful phase
-  changes, and completion; this also renames the saved conversation. Launch
+  Agents check their own native task name at each turn, resume, compaction
+  recovery and before progress updates; they change it when the current task
+  or phase differs. Pasted historical session reports do not define the active
+  title. This also renames the saved conversation. These summaries depend on
+  agent instruction compliance. Launch
   a new Codex process after `refresh-config` (including `codex resume`)
   to pick up the title settings/instructions; switching threads inside an existing
   TUI does not establish that the startup settings reloaded.

@@ -4142,6 +4142,28 @@
       "verification_scope": "workaround"
     },
     {
+      "applicability": "Native Codex thread-name terminal titles after pasted historical session output or a changed task.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Compare native thread name with Kitty title and actual current work.",
+        "Inspect the live user request and title-call records; distinguish quoted tasks from the active objective."
+      ],
+      "id": "local-native-title-current-intent",
+      "limitations": "Native title propagation is verified; future model instruction compliance remains a manual smoke check. Existing processes may retain old instructions. No independent automatic enforcement or polling was added.",
+      "reference": "references/operational-drift.md#local-native-title-current-intent",
+      "remedy": "Correct the native title for the identified task. Require current-intent title checkpoints at turn/resume/compaction entry and before substantive progress updates; discover deferred title tools.",
+      "sources": [
+        "3d58bcbfb00ef05aa522cc41fca946cd3e7a06259f391de4aeba56f8e8f875c5"
+      ],
+      "status": "verified_workaround",
+      "symptoms": [
+        "Kitty title describes a historical task quoted inside session-review output while Codex works on the review itself"
+      ],
+      "topic": "operational-drift",
+      "verification": "Explicit user-requested native rename returned Verify Second Brain sessions; Kitty ls showed that name with the native activity glyph, exit 0. Strengthened instructions were deployed by refresh-config (exit 0); installed instructions match source; independent reasoning probe chose the current review task.",
+      "verification_scope": "workaround"
+    },
+    {
       "applicability": "Linux Dust v1.2.6 logical-size comparisons with GNU du 9.4.",
       "confidence": "confirmed",
       "diagnostics": [
@@ -7050,12 +7072,31 @@
     },
     {
       "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-08-kitty-title-sandbox-startup.md"
+      ],
+      "decision": "No new learning: known sandbox-loopback startup failure; approved scoped reads succeeded without repairing the default sandbox.",
+      "findings": [],
+      "reviewed_on": "2026-10-08",
+      "sha256": "ca8b92619fe74a36a8df33c6507d84d7c754179f0883d988e6a6257be47fe062"
+    },
+    {
+      "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-10-08-directory-sizes-implementation-sandbox.md"
       ],
       "decision": "No new learning: identical pre-execution sandbox startup failure; existing local-sandbox-loopback-approved-route covers the verified approved workaround. Native title transport failure is incidental availability, not implementation failure; no remedy attempted.",
       "findings": [],
       "reviewed_on": "2026-10-08",
       "sha256": "2a8a7a4f79b68d78cef2b6b32a2bc66f70e0777a290d7f11178967f673c8e536"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-08-stale-codex-task-title.md"
+      ],
+      "findings": [
+        "local-native-title-current-intent"
+      ],
+      "reviewed_on": "2026-10-08",
+      "sha256": "3d58bcbfb00ef05aa522cc41fca946cd3e7a06259f391de4aeba56f8e8f875c5"
     },
     {
       "aliases": [

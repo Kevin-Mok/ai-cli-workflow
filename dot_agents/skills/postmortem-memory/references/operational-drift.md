@@ -149,3 +149,14 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Limitations: No live API or runtime restart performed. One-second publication is a healthy-path target, not a Discord latency guarantee. Periodic reconciliation still needs REST work and a request exceeding its two-minute budget can prevent progress.
 - Sources:
   - [2026-10-06-count-update-latency.md](/home/example/coding/twitter-cap-bot/docs/postmortem/2026-10-06-count-update-latency.md) (SHA-256 `e20c6026f866`; 1 alias(es), all retained in [sources.json](../sources.json)).
+
+## local-native-title-current-intent
+
+- Status: **verified_workaround**; root-cause confidence: **confirmed**; verification scope: **workaround**.
+- Symptoms: Kitty title describes a historical task quoted in session-review output while Codex works on the review itself.
+- Applicability: Native Codex thread-name terminal titles after pasted historical output or a changed task.
+- Diagnostic checks: Compare native name, Kitty title and actual current work; inspect the live request and title-call records before changing terminal settings.
+- Remedy: Correct the identified native task name. Require current-intent title checkpoints at turn/resume/compaction entry and before substantive progress updates; discover deferred native title tools.
+- Verification evidence: Native rename returned `Verify Second Brain sessions`; Kitty ls showed the same name with its activity glyph, exit 0. Strengthened instructions were deployed by refresh-config (exit 0), matched installed bytes, and passed independent reasoning review.
+- Limitations: Title transport is verified; future instruction compliance remains a manual smoke check. Existing processes may retain old instructions. No polling or independent enforcement was added.
+- Source: [Stale Codex title from a pasted session report](../../../../docs/postmortem/2026-10-08-stale-codex-task-title.md).

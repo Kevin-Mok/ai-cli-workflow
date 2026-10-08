@@ -89,3 +89,7 @@ Completed: add an independent Toronto timer with setup and privacy checks. Verif
 ### Milestone 9 — feat(scripts): add guarded Dust directory size reports
 
 Completed: wrap pinned Dust with allocated reports and incomplete-scan guards verify accounting, progress and cancellation. Verified: fresh scoped checks recorded above plus staged whitespace and incident-link contracts. Remaining: 6 planned groups, then one upstream push. Blockers: none for this milestone; documented broader vault inventory warning and manual acceptance limits remain. Next: fix(codex): reconcile titles with current work.
+
+### Milestone 10 — fix(codex): reconcile titles with current work
+
+Completed: require live-request title checkpoints and document the recap regression. Verified: fresh scoped checks recorded above plus staged whitespace and incident-link contracts. Remaining: 5 planned groups, then one upstream push. Blockers: none for this milestone; documented broader vault inventory warning and manual acceptance limits remain. Next: feat(notifications): speak completed Codex task titles.

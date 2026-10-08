@@ -694,6 +694,8 @@ periodic /btw requests. Fullscreen hides i3 titlebars. No sudo is needed.
   Expected: Each Kitty window has one titlebar. New/resumed Codex shows an activity indicator and a short current-work summary without the project suffix; ordinary shells show their normal title. Other applications retain their existing border behavior.
 - Action: Run two independent Codex conversations in the same repository with different tasks, then change the objective or move to a meaningful new phase in one conversation.
   Expected: Each agent uses its own 3–5-word summary (at most 36 characters). The changed conversation updates its title without renaming the other; the label describes the work rather than the most recent shell command.
+- Action: In a fresh Codex process, paste session-review output whose first recap is an old video repair, and ask the agent to improve the Second Brain review output. Continue into verification, then resume the task in a new process.
+  Expected: Before its first substantive progress update, the saved conversation name and Kitty title describe the Second Brain review, not the quoted video repair. Later progress updates and resume keep the title aligned with the actual task/phase; another conversation's name stays unchanged. This checks agent instruction compliance as well as title transport.
 - Action: Narrow a split, switch between split and tabbed layouts, and toggle fullscreen on and off.
   Expected: Titles stay within their available width without overlapping neighboring windows. Fullscreen hides the titlebar; leaving fullscreen restores it. No extra header appears inside the terminal transcript.
 - Action: Observe an agent while working, awaiting input, and after verified completion; then resume that conversation.

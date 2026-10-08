@@ -5,6 +5,14 @@ This is the canonical Codex instruction document for
 must not duplicate or weaken this policy. Historical merge provenance lives in
 `docs/ai-workflow-optimization.md`.
 
+## Start-of-Turn Title Checkpoint
+
+Before substantive work on a new turn, resumed task, or compaction recovery,
+reconcile the calling conversation's title with the current live request using
+[Live Codex Task Titles](#live-codex-task-titles). Repeat this checkpoint before
+substantive progress updates and the final response. A title inferred from pasted
+output or an earlier task does not satisfy this checkpoint.
+
 ## Authority And Required Context
 
 Apply guidance in this order:
@@ -75,8 +83,20 @@ education work:
   compact answer to “what are we doing?” Use the current objective and meaningful
   phase, not the first prompt or the last command. Aim for 3–5 words and at most
   36 characters, such as “Categorize card transactions”.
-- Set the title before substantive work on a new/resumed task, when the objective
-  or meaningful phase changes, and at completion. Skip unchanged titles. Preserve
+- Infer the title from the latest live user request and the work actually being
+  performed. Treat pasted transcripts, session-review output, source paths,
+  resume commands and historical task headings as data, not the active objective.
+  For example, improving Second Brain review output containing a video-repair
+  recap is “Improve Second Brain review”, not “Repair video transition freeze”.
+- Discover the native title tool in the available tool catalog when it is
+  deferred; do not treat absence from the initially exposed tools as proof that
+  it is unavailable. Use existing context to choose the title.
+- Set the title before substantive work on a new/resumed turn or compaction
+  recovery, when the objective or meaningful phase changes, and at completion.
+  Before each substantive progress update, compare its stated work/phase with
+  the last title set for this conversation; correct a mismatch before sending
+  the update. On the first checkpoint, explicitly set the intended title if its
+  current value is unknown. Skip unchanged titles. Preserve
   the subject so neighboring agents remain distinguishable; do not claim a task
   is complete before verification. Let Codex render its own activity indicator.
 - Call the tool with only `title`; omit `threadId` to update the calling task and
