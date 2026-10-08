@@ -1,0 +1,245 @@
+{
+  "versions": {
+    "dust": "Dust 1.2.6",
+    "du": "du (GNU coreutils) 9.4",
+    "sort": "sort (GNU coreutils) 9.4"
+  },
+  "cache": "Uncontrolled OS cache. Newly created fixture has warm metadata; no cache drops. Commands rotate across three repetitions; real commands run sequentially once each.",
+  "fixture": [
+    {
+      "name": "wrapper-8-threads",
+      "repetition": 1,
+      "elapsed_seconds": 0.2554,
+      "timeout": false,
+      "complete": true,
+      "returncodes": [
+        0
+      ],
+      "stdout_bytes": 8352,
+      "stderr_bytes": 229,
+      "first_stdout_seconds": 0.24647683301009238,
+      "first_stderr_seconds": 0.04384752700570971,
+      "first_indexing_seconds": null,
+      "permission_diagnostic": false,
+      "vanished_diagnostic": false,
+      "last_indexing": null,
+      "all_processes_reaped": true
+    },
+    {
+      "name": "dust-8-threads",
+      "repetition": 1,
+      "elapsed_seconds": 0.1603,
+      "timeout": false,
+      "complete": true,
+      "returncodes": [
+        0
+      ],
+      "stdout_bytes": 7164,
+      "stderr_bytes": 0,
+      "first_stdout_seconds": 0.15892644005361944,
+      "first_stderr_seconds": null,
+      "first_indexing_seconds": null,
+      "permission_diagnostic": false,
+      "vanished_diagnostic": false,
+      "last_indexing": null,
+      "all_processes_reaped": true
+    },
+    {
+      "name": "du-allocated-sort",
+      "repetition": 1,
+      "elapsed_seconds": 0.0942,
+      "timeout": false,
+      "complete": true,
+      "returncodes": [
+        0,
+        0
+      ],
+      "stdout_bytes": 18006,
+      "stderr_bytes": 0,
+      "first_stdout_seconds": 0.09296559996437281,
+      "first_stderr_seconds": null,
+      "first_indexing_seconds": null,
+      "permission_diagnostic": false,
+      "vanished_diagnostic": false,
+      "last_indexing": null,
+      "all_processes_reaped": true
+    },
+    {
+      "name": "dust-8-threads",
+      "repetition": 2,
+      "elapsed_seconds": 0.1659,
+      "timeout": false,
+      "complete": true,
+      "returncodes": [
+        0
+      ],
+      "stdout_bytes": 7164,
+      "stderr_bytes": 0,
+      "first_stdout_seconds": 0.16427408996969461,
+      "first_stderr_seconds": null,
+      "first_indexing_seconds": null,
+      "permission_diagnostic": false,
+      "vanished_diagnostic": false,
+      "last_indexing": null,
+      "all_processes_reaped": true
+    },
+    {
+      "name": "du-allocated-sort",
+      "repetition": 2,
+      "elapsed_seconds": 0.0855,
+      "timeout": false,
+      "complete": true,
+      "returncodes": [
+        0,
+        0
+      ],
+      "stdout_bytes": 18006,
+      "stderr_bytes": 0,
+      "first_stdout_seconds": 0.08409541891887784,
+      "first_stderr_seconds": null,
+      "first_indexing_seconds": null,
+      "permission_diagnostic": false,
+      "vanished_diagnostic": false,
+      "last_indexing": null,
+      "all_processes_reaped": true
+    },
+    {
+      "name": "wrapper-8-threads",
+      "repetition": 2,
+      "elapsed_seconds": 0.2514,
+      "timeout": false,
+      "complete": true,
+      "returncodes": [
+        0
+      ],
+      "stdout_bytes": 8352,
+      "stderr_bytes": 229,
+      "first_stdout_seconds": 0.24518090195488185,
+      "first_stderr_seconds": 0.04304248292464763,
+      "first_indexing_seconds": null,
+      "permission_diagnostic": false,
+      "vanished_diagnostic": false,
+      "last_indexing": null,
+      "all_processes_reaped": true
+    },
+    {
+      "name": "du-allocated-sort",
+      "repetition": 3,
+      "elapsed_seconds": 0.083,
+      "timeout": false,
+      "complete": true,
+      "returncodes": [
+        0,
+        0
+      ],
+      "stdout_bytes": 18006,
+      "stderr_bytes": 0,
+      "first_stdout_seconds": 0.08288123004604131,
+      "first_stderr_seconds": null,
+      "first_indexing_seconds": null,
+      "permission_diagnostic": false,
+      "vanished_diagnostic": false,
+      "last_indexing": null,
+      "all_processes_reaped": true
+    },
+    {
+      "name": "wrapper-8-threads",
+      "repetition": 3,
+      "elapsed_seconds": 0.2493,
+      "timeout": false,
+      "complete": true,
+      "returncodes": [
+        0
+      ],
+      "stdout_bytes": 8352,
+      "stderr_bytes": 229,
+      "first_stdout_seconds": 0.2423173829447478,
+      "first_stderr_seconds": 0.040005158982239664,
+      "first_indexing_seconds": null,
+      "permission_diagnostic": false,
+      "vanished_diagnostic": false,
+      "last_indexing": null,
+      "all_processes_reaped": true
+    },
+    {
+      "name": "dust-8-threads",
+      "repetition": 3,
+      "elapsed_seconds": 0.1908,
+      "timeout": false,
+      "complete": true,
+      "returncodes": [
+        0
+      ],
+      "stdout_bytes": 7164,
+      "stderr_bytes": 0,
+      "first_stdout_seconds": 0.18529084394685924,
+      "first_stderr_seconds": null,
+      "first_indexing_seconds": null,
+      "permission_diagnostic": false,
+      "vanished_diagnostic": false,
+      "last_indexing": null,
+      "all_processes_reaped": true
+    }
+  ],
+  "reference": [
+    {
+      "name": "wrapper-8-threads",
+      "elapsed_seconds": 20.2645,
+      "timeout": true,
+      "complete": false,
+      "returncodes": [
+        143
+      ],
+      "stdout_bytes": 0,
+      "stderr_bytes": 1089,
+      "first_stdout_seconds": null,
+      "first_stderr_seconds": 0.040187497972510755,
+      "first_indexing_seconds": 0.24136552691925317,
+      "permission_diagnostic": false,
+      "vanished_diagnostic": false,
+      "last_indexing": "Provisional Indexing: . 557700 files, 493Gi ... |",
+      "all_processes_reaped": true
+    },
+    {
+      "name": "du-allocated-sort",
+      "elapsed_seconds": 20.0323,
+      "timeout": true,
+      "complete": false,
+      "returncodes": [
+        -15,
+        -15
+      ],
+      "stdout_bytes": 0,
+      "stderr_bytes": 0,
+      "first_stdout_seconds": null,
+      "first_stderr_seconds": null,
+      "first_indexing_seconds": null,
+      "permission_diagnostic": false,
+      "vanished_diagnostic": false,
+      "last_indexing": null,
+      "all_processes_reaped": true
+    },
+    {
+      "name": "du-apparent-sort",
+      "elapsed_seconds": 20.0022,
+      "timeout": true,
+      "complete": false,
+      "returncodes": [
+        -15,
+        -15
+      ],
+      "stdout_bytes": 0,
+      "stderr_bytes": 0,
+      "first_stdout_seconds": null,
+      "first_stderr_seconds": null,
+      "first_indexing_seconds": null,
+      "permission_diagnostic": false,
+      "vanished_diagnostic": false,
+      "last_indexing": null,
+      "all_processes_reaped": true
+    }
+  ],
+  "fixture_description": "30,000 1KiB files; 120 two-level directory branches, empty directory, 512MiB sparse file, one hardlink and one directory symlink; depth 2.",
+  "reference_path": "/mnt/usb-8tb/sys-backup/10-06-26.incomplete",
+  "reference_revision_note": "Reference probe used initial text renderer before final JSON rendering and descriptor-cleanup refactor; scanner/accounting/options unchanged. Final fixtures remeasured; real probes not repeated."
+}

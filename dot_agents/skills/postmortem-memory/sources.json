@@ -4142,6 +4142,27 @@
       "verification_scope": "workaround"
     },
     {
+      "applicability": "Linux Dust v1.2.6 logical-size comparisons with GNU du 9.4.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Compare allocated separately. Inspect known fixture directory st_size and hardlink accounting."
+      ],
+      "id": "local-dust-directory-apparent-accounting",
+      "limitations": "Fixture evidence only; changing trees and backend upgrades require new evidence. This does not modify Dust or GNU du.",
+      "reference": "references/artifact-verification.md#local-dust-directory-apparent-accounting",
+      "remedy": "Preserve backend semantics; disclose directory st_size inclusion and compare logical Dust against du --apparent-size --count-links plus known directory metadata.",
+      "sources": [
+        "45925bf17c9fe949f06c9e347bec71f3354f83f7d7bec6ec1fcaca380f4b11d3"
+      ],
+      "status": "verified_workaround",
+      "symptoms": [
+        "Dust logical total differs from GNU du apparent total by directory metadata sizes"
+      ],
+      "topic": "artifact-verification",
+      "verification": "Three fixture directories of st_size 4096 account exactly for the 12288-byte logical difference; allocated totals match.",
+      "verification_scope": "runtime"
+    },
+    {
       "applicability": "Second Brain module additions and extractions under scripts/second_brain.",
       "confidence": "confirmed",
       "diagnostics": [
@@ -7011,12 +7032,40 @@
     },
     {
       "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-08-directory-size-prompt-sandbox-startup.md"
+      ],
+      "decision": "No new reusable learning beyond local-sandbox-loopback-approved-route: approved scoped reads and exact prompt save/read-back succeeded; default runner startup remains unresolved. Incidental unsupported TextEncoder probe ran before task launch; ASCII handoff length needs no encoder or new general guidance. Fresh-task approval rejection was resolved by explicit user approval and a successful create_thread result; task outcomes remain unverified. Follow-up reference-directory baseline was deliberately bounded, not an unexpected failure; no generalizable new learning.",
+      "findings": [],
+      "reviewed_on": "2026-10-08",
+      "sha256": "333102b6ba9fc3cc8871bec18c6d1c3dc21558cc93497deaed8b2a64d049852b"
+    },
+    {
+      "aliases": [
         "/home/example/coding/example-client-app/docs/postmortem/2026-10-08-vps-smoke-local-execution.md"
       ],
       "decision": "No new learning: existing sandbox approved-route and fixture-contract guidance covers these issues. Monitor syntax and receipt mock-contract regression corrected; parent monitor19, entrypoint9 and full infrastructure suite passed. Default sandbox remains unavailable; no live extraction issue introduced.",
       "findings": [],
       "reviewed_on": "2026-10-08",
       "sha256": "8121ef18651b5cbc03eeebefa8fb2e6914bbe2161d8b30065fbbad96afcc49f3"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-08-directory-sizes-implementation-sandbox.md"
+      ],
+      "decision": "No new learning: identical pre-execution sandbox startup failure; existing local-sandbox-loopback-approved-route covers the verified approved workaround. Native title transport failure is incidental availability, not implementation failure; no remedy attempted.",
+      "findings": [],
+      "reviewed_on": "2026-10-08",
+      "sha256": "2a8a7a4f79b68d78cef2b6b32a2bc66f70e0777a290d7f11178967f673c8e536"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-08-directory-sizes-accounting.md"
+      ],
+      "findings": [
+        "local-dust-directory-apparent-accounting"
+      ],
+      "reviewed_on": "2026-10-08",
+      "sha256": "45925bf17c9fe949f06c9e347bec71f3354f83f7d7bec6ec1fcaca380f4b11d3"
     },
     {
       "aliases": [
@@ -7035,6 +7084,15 @@
       "findings": [],
       "reviewed_on": "2026-10-08",
       "sha256": "d208cd15b9f6f0ab72ca5c10459cee56e21968b7f529efd5caff30a46318cec8"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-08-directory-sizes-verification.md"
+      ],
+      "decision": "No new general learning: existing workflow distinguishes targeted coverage from whole-corpus coverage; supplied-path discovery and child-process cleanup are established practices. Specific defining cleanup test accompanies this task.",
+      "findings": [],
+      "reviewed_on": "2026-10-08",
+      "sha256": "e260e64ad28f43682e80d2d2d7b01403221267184e8a0568c4364ec5b45c9e82"
     },
     {
       "aliases": [

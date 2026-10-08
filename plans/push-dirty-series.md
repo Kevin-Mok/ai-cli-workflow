@@ -85,3 +85,7 @@ Completed: add verified bundles, restore guards and copy progress preserve invok
 ### Milestone 8 — feat(second-brain): add private digest scheduling
 
 Completed: add an independent Toronto timer with setup and privacy checks. Verified: fresh scoped checks recorded above plus staged whitespace and incident-link contracts. Remaining: 7 planned groups, then one upstream push. Blockers: none for this milestone; documented broader vault inventory warning and manual acceptance limits remain. Next: feat(scripts): add guarded Dust directory size reports.
+
+### Milestone 9 — feat(scripts): add guarded Dust directory size reports
+
+Completed: wrap pinned Dust with allocated reports and incomplete-scan guards verify accounting, progress and cancellation. Verified: fresh scoped checks recorded above plus staged whitespace and incident-link contracts. Remaining: 6 planned groups, then one upstream push. Blockers: none for this milestone; documented broader vault inventory warning and manual acceptance limits remain. Next: fix(codex): reconcile titles with current work.

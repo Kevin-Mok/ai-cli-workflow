@@ -398,6 +398,16 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Limitations: The configured Google timezone was inferred from a three-hour clock difference, not read directly. Actual shared-sheet setting activation remains pending. Local Calc function reparsing is a verification adapter and does not prove an import defect in Google.
 - Source: [Sheet clock incident](/home/example/coding/codex-usage/docs/postmortem/2026-10-07-sheet-clock-behind-toronto.md) (SHA-256 `ac8154fdd3d4`; reviewed alias in [sources.json](../sources.json)).
 
+## local-dust-directory-apparent-accounting
+
+- Status: **verified_workaround**; confidence **confirmed**; scope **runtime**.
+- Symptom/applicability: Dust v1.2.6 logical totals exceed GNU du 9.4 apparent totals on Linux fixtures.
+- Diagnostics: Compare allocated separately; inspect fixture directory st_size and hardlinks.
+- Remedy: Document backend semantics. Dust includes directory st_size and logical hardlink names; GNU du --apparent-size --count-links omits directory metadata.
+- Verification: Three 4096-byte fixture directories exactly explain a 12,288-byte logical delta; allocated totals match.
+- Limits: Fixture evidence only; no atomic snapshot or upgrade guarantee.
+- Source: [accounting investigation](../../../../docs/postmortem/2026-10-08-directory-sizes-accounting.md).
+
 ## local-backup-vm-stage-sidecars
 
 - Status: **verified_fix**; confidence: **confirmed**; verification scope: **code**.

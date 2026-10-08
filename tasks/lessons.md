@@ -123,6 +123,7 @@
 
 - 2026-10-07: For notification integration fixtures, poll DBus NameHasOwner before dunstctl to avoid autoactivating a competing daemon; verify duplicate-object script_run transfer before promising silence on all history recalls. See [Dunst fixture investigation](../docs/postmortem/2026-10-07-dunst-fixture-startup.md).
 
+- 2026-10-08: Keep disk-usage metrics explicit: Dust logical mode includes directory st_size and all hardlink names; GNU du apparent mode omits directory sizes. Require allocated equality independently. See [fixture accounting](../docs/postmortem/2026-10-08-directory-sizes-accounting.md).
 - 2026-10-07: Recent-session recap reads must tolerate concurrent cache clearing; count attempts after acquiring generation ownership and clean safe orphan atomic files under the maintenance lock. Verify the actual CLI index lock during a sleeping inference, not only after the batch. See [cache lifecycle review](../docs/postmortem/2026-10-07-codex-recent-cache-races.md).
 
 ## 2026-10-08: Recent session review boundaries

@@ -1,0 +1,43 @@
+#!/usr/bin/env python3
+"""Install pinned Dust into an explicit user-owned prefix, without sudo."""
+import argparse
+from pathlib import Path
+import platform
+import shutil
+import subprocess
+import tarfile
+import tempfile
+
+VERSION = 'v1.2.6'
+
+
+def main():
+    parser = argparse.ArgumentParser(description='Download pinned Dust release with gh into PREFIX/bin; needs gh and network, no sudo.')
+    parser.add_argument('--prefix', type=Path, required=True, help='explicit writable installation prefix, for example /tmp/directory-sizes-tools')
+    args = parser.parse_args()
+    machine = {'x86_64':'x86_64','aarch64':'aarch64'}.get(platform.machine())
+    if platform.system() != 'Linux' or not machine:
+        parser.error('supports Linux x86_64/aarch64; see https://github.com/bootandy/dust/releases for other systems')
+    if not shutil.which('gh'):
+        parser.error('install GitHub CLI (gh) first: https://cli.github.com/')
+    dest = args.prefix.absolute() / 'bin' / 'dust'
+    if dest.exists() or dest.is_symlink():
+        parser.error(f'refusing to overwrite {dest}')
+    stem = f'dust-{VERSION}-{machine}-unknown-linux-musl'
+    with tempfile.TemporaryDirectory(prefix='setup-directory-sizes-') as temp:
+        subprocess.run(['gh','release','download',VERSION,'--repo','bootandy/dust','--pattern',stem+'.tar.gz','--dir',temp],check=True)
+        with tarfile.open(Path(temp)/(stem+'.tar.gz')) as archive:
+            members = [m for m in archive.getmembers() if Path(m.name).name == 'dust' and m.isfile()]
+            if len(members) != 1:
+                parser.error('release must contain exactly one regular Dust executable')
+            source = archive.extractfile(members[0])
+            dest.parent.mkdir(parents=True,exist_ok=True)
+            with dest.open('xb') as output:
+                shutil.copyfileobj(source,output)
+        dest.chmod(0o755)
+    subprocess.run([str(dest),'--version'],check=True)
+    print(f'Installed {dest}; add {dest.parent} to PATH or pass --backend {dest}')
+
+
+if __name__ == '__main__':
+    main()

@@ -6,8 +6,20 @@ result with `Expected`. When a change adds a manual check or reveals a gap,
 update the relevant entry or add one under the right area, replacing stale
 checks rather than duplicating them.
 
+## Directory Sizes
+
 Install the pinned backend into a fresh disposable prefix. These checks inspect a small disposable backend directory; a real backup scan is an explicit opt-in.
 
+- Action: ./scripts/executable_setup-directory-sizes --prefix /tmp/directory-sizes-smoke
+  Expected: Dust 1.2.6 is installed into `/tmp/directory-sizes-smoke/bin/dust`, with no sudo. Repeating the command refuses to overwrite it.
+- Action: ./scripts/executable_directory-sizes --backend /tmp/directory-sizes-smoke/bin/dust --depth 1 /tmp/directory-sizes-smoke
+  Expected: Aligned binary sizes and quoted nested directory names appear on stdout after completion; allocated metric/target and status appear on stderr. No scanned contents or permissions change. Short scans can finish before indexing progress.
+- Action: ./scripts/executable_directory-sizes --backend /tmp/directory-sizes-smoke/bin/dust --json --depth 0 /tmp/directory-sizes-smoke
+  Expected: Valid JSON root with byte-size string and no displayed children; the whole tree was still scanned.
+- Action: DIRECTORY_SIZES_REAL_BACKEND=/tmp/directory-sizes-smoke/bin/dust python3 -B tests/test_directory_sizes.py
+  Expected: Nine tests pass, including allocated GNU du equality and explicitly measured logical directory-size difference, safe names, and separate-session interruption cleanup.
+- Action: timeout --signal=TERM --kill-after=5s 20s ./scripts/executable_directory-sizes --backend /tmp/directory-sizes-smoke/bin/dust --depth 1 /mnt/usb-8tb/sys-backup/10-06-26.incomplete
+  Expected: Run only when a new real probe is explicitly requested. Provisional indexing feedback appears during a long scan. If timed out, exit 124, no completed totals on stdout, and backend stopped/reaped. Reported permission errors return nonzero and withhold totals. Do not interpret progress as completed usage. See [measurements and limitations](directory-sizes.md).
 
 ## Codex Session Search
 

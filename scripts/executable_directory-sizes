@@ -1,0 +1,171 @@
+#!/usr/bin/env python3
+"""Single-scan, read-only directory reports using Dust, with guarded completion."""
+import argparse
+import json
+import os
+from pathlib import Path
+import re
+import shutil
+import signal
+import subprocess
+import sys
+import tempfile
+import time
+
+PROGRESS = re.compile(r'(?:Indexing: \. \d+ files, .+|Preparing: \. .+) \.\.\. [-\\|/]\Z')
+
+
+def visible(text):
+    """Keep backend paths from injecting terminal controls or extra lines."""
+    return ''.join(c if c.isprintable() or c == '\n' else ascii(c)[1:-1] for c in text)
+
+
+def number(value):
+    result = int(value)
+    if result < 0:
+        raise argparse.ArgumentTypeError('must be nonnegative')
+    return result
+
+
+def positive(value):
+    result = number(value)
+    if result == 0:
+        raise argparse.ArgumentTypeError('must be greater than zero')
+    return result
+
+
+def main():
+    parser = argparse.ArgumentParser(description='Inspect allocated directory sizes with one Dust scan. Depth limits display, not traversal.')
+    parser.add_argument('directory', nargs='?', default='.', help='target directory (default current directory); use -- before leading-dash paths')
+    parser.add_argument('--depth', '-d', type=number, default=1, help='display depth, root is 0 (default 1)')
+    parser.add_argument('--threads', '-T', type=positive, default=min(8, os.cpu_count() or 1), help='walker threads (default up to 8); try 1 on rotational disks')
+    parser.add_argument('--apparent-size', action='store_true', help='logical bytes; counts each hard link, unlike allocated default')
+    parser.add_argument('--json', action='store_true', help='Dust JSON tree with byte sizes, for machine use')
+    parser.add_argument('--backend', default='dust', help='Dust executable or path (default dust on PATH)')
+    args = parser.parse_args()
+    target = Path(os.path.abspath(args.directory))
+    if not target.is_dir() or target.is_symlink():
+        parser.error('target must be an existing real directory (root symlink targets are rejected)')
+    backend = shutil.which(args.backend)
+    if not backend:
+        parser.error('Dust is missing; run ./scripts/executable_setup-directory-sizes --prefix /tmp/directory-sizes-tools then add its bin directory to PATH')
+    backend = os.path.abspath(backend)
+    print(f'Scanning {ascii(str(target))}: {"logical bytes (hard links counted per name)" if args.apparent_size else "allocated disk usage"}; totals pending.', file=sys.stderr, flush=True)
+    command = [backend, '--only-dir', '--depth', str(args.depth), '--threads', str(args.threads),
+               '--number-of-lines', str(sys.maxsize), '--no-colors', '--no-percent-bars',
+               '--full-paths', '--print-errors']
+    command += ['--output-json', '--output-format', 'b']
+    if args.apparent_size:
+        command += ['--apparent-size']
+    proc = None
+    interrupted = signal.SIGINT
+
+    def stop(signum, frame):
+        nonlocal interrupted
+        interrupted = signum
+        raise KeyboardInterrupt
+
+    old_handlers = {s: signal.signal(s, stop) for s in (signal.SIGINT, signal.SIGTERM)}
+    try:
+        with tempfile.TemporaryDirectory(prefix='directory-sizes-') as temp:
+            config = Path(temp) / 'empty.toml'
+            config.write_text('')
+            command += ['--config', str(config), '--', '.']
+            with (Path(temp) / 'output').open('w+b') as output, (Path(temp) / 'errors').open('w+b') as errors:
+                proc = subprocess.Popen(command, cwd=target, stdout=output, stderr=errors, start_new_session=True)
+                error_reader = (Path(temp) / 'errors').open('rb')
+                offset = 0
+                pending = ''
+                diagnostics = []
+                last_progress = 0.0
+
+                def collect(final=False):
+                    nonlocal offset, pending, last_progress
+                    error_reader.seek(offset)
+                    chunk = error_reader.read()
+                    offset += len(chunk)
+                    pending += chunk.decode('utf-8', errors='replace')
+                    records = pending.split('\r')
+                    pending = records.pop()
+                    if final:
+                        records.append(pending)
+                        pending = ''
+                    for record in records:
+                        record = record.strip()
+                        if not record:
+                            continue
+                        if PROGRESS.fullmatch(record):
+                            if time.monotonic() - last_progress >= 1:
+                                print('Provisional ' + visible(record), file=sys.stderr, flush=True)
+                                last_progress = time.monotonic()
+                        else:
+                            diagnostics.append(record)
+                    # Dust flushes its active progress record before the next CR.
+                    if PROGRESS.fullmatch(pending.strip()) and time.monotonic() - last_progress >= 1:
+                        print('Provisional ' + visible(pending.strip()), file=sys.stderr, flush=True)
+                        last_progress = time.monotonic()
+
+                while proc.poll() is None:
+                    collect()
+                    time.sleep(.1)
+                collect(final=True)
+                error_reader.close()
+                if proc.returncode != 0 or diagnostics:
+                    print('Scan incomplete; totals withheld.', file=sys.stderr)
+                    for diagnostic in diagnostics:
+                        print(visible(diagnostic), file=sys.stderr)
+                    return proc.returncode if proc.returncode and proc.returncode > 0 else 1
+                output.seek(0)
+                result = output.read().decode('utf-8', errors='replace')
+                if not result.strip():
+                    print('Scan incomplete: backend returned no results.', file=sys.stderr)
+                    return 1
+                try:
+                    tree = json.loads(result)
+                    lines = []
+                    stack = [(tree, 0)]
+                    while stack:
+                        node, depth = stack.pop()
+                        if not isinstance(node, dict) or not isinstance(node.get('name'), str) or not isinstance(node.get('children'), list):
+                            raise ValueError('invalid Dust node')
+                        size = node.get('size')
+                        if not isinstance(size, str) or not re.fullmatch(r'\d+B', size):
+                            raise ValueError('invalid byte size')
+                        value = int(size[:-1])
+                        amount = float(value)
+                        unit = 'B'
+                        for unit in ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB']:
+                            if amount < 1024 or unit == 'PiB':
+                                break
+                            amount /= 1024
+                        lines.append(f'{amount:8.2f} {unit:3}  {"  " * depth}{ascii(node["name"])}')
+                        stack.extend((child, depth + 1) for child in reversed(node['children']))
+                except (ValueError, TypeError, OverflowError) as error:
+                    print(f'Scan incomplete: invalid backend result: {error}', file=sys.stderr)
+                    return 1
+                sys.stdout.write(result if args.json else '\n'.join(lines) + '\n')
+                print('Scan finished without reported errors; this is not an atomic filesystem snapshot.', file=sys.stderr)
+                return 0
+    except KeyboardInterrupt:
+        print('Scan interrupted; incomplete totals withheld.', file=sys.stderr)
+        return 128 + interrupted
+    except OSError as error:
+        print(f'Scan incomplete: {error}', file=sys.stderr)
+        return 1
+    finally:
+        if proc is not None and proc.poll() is None:
+            try:
+                os.killpg(proc.pid, signal.SIGTERM)
+            except ProcessLookupError:
+                pass
+            try:
+                proc.wait(timeout=2)
+            except subprocess.TimeoutExpired:
+                os.killpg(proc.pid, signal.SIGKILL)
+                proc.wait()
+        for sig, handler in old_handlers.items():
+            signal.signal(sig, handler)
+
+
+if __name__ == '__main__':
+    sys.exit(main())
