@@ -1,0 +1,175 @@
+#!/usr/bin/env python3
+"""Manage only the private daily Codex digest systemd user timer."""
+from __future__ import annotations
+
+import argparse
+import importlib.machinery
+import importlib.util
+import json
+import os
+import stat
+import sys
+from pathlib import Path
+from typing import Sequence
+
+
+def _shared_setup():
+    # Chezmoi removes executable_ from installed helper names.
+    sibling_name = ('executable_setup-second-brain-timer'
+                    if Path(__file__).name.startswith('executable_')
+                    else 'setup-second-brain-timer')
+    source = Path(__file__).parent / sibling_name
+    metadata = source.lstat()
+    if (source.is_symlink() or not stat.S_ISREG(metadata.st_mode)
+            or metadata.st_nlink != 1 or metadata.st_uid != os.geteuid()):
+        raise OSError('shared timer helper is unsafe')
+    loader = importlib.machinery.SourceFileLoader('_sessions_timer_setup', str(source))
+    spec = importlib.util.spec_from_loader(loader.name, loader)
+    module = importlib.util.module_from_spec(spec)
+    loader.exec_module(module)
+    module.SERVICE_NAME = 'second-brain-sessions.service'
+    module.TIMER_NAME = 'second-brain-sessions.timer'
+    module.UNIT_NAMES = (module.SERVICE_NAME, module.TIMER_NAME)
+    module.TIMER_NAMES = (module.TIMER_NAME,)
+    return module
+
+
+def _validate_dependencies(shared) -> None:
+    # These existing recap modules are deployed by refresh-config. Verify them
+    # without reinstalling or editing unrelated recap work during timer setup.
+    for name in ('codex_search_index.py', 'codex_search_runtime.py'):
+        target = Path.home() / 'scripts' / name
+        source = shared._source_for(target)
+        try:
+            installed = shared.regular_file_bytes(target.parent, target)
+            expected = shared.regular_file_bytes(source.parent, source)
+        except (OSError, shared.PathError) as error:
+            raise shared.TimerSetupError(
+                'installed digest dependency is missing or unsafe; run refresh-config') from error
+        if installed != expected:
+            raise shared.TimerSetupError(
+                'installed digest dependency is stale; run refresh-config')
+
+
+def _active_runtime(shared, path_value: str | None = None) -> tuple[Path, Path]:
+    from codex_search_runtime import _find_codex
+    original = os.environ.get('PATH')
+    try:
+        if path_value is not None:
+            os.environ['PATH'] = path_value
+        executable = _find_codex()
+        if executable:
+            for entry in os.get_exec_path():
+                candidate = Path(entry) / 'codex'
+                if candidate.is_file() and candidate.resolve() == Path(executable):
+                    directory = candidate.parent.resolve()
+                    node = directory / 'node'
+                    if (not node.is_file() or not os.access(node, os.X_OK)
+                            or any(c in str(directory) for c in ('\n', '\r', ':', '%'))):
+                        break
+                    return directory, Path(executable)
+    finally:
+        if original is None:
+            os.environ.pop('PATH', None)
+        else:
+            os.environ['PATH'] = original
+    raise shared.TimerSetupError('active Codex/node runtime is unavailable; enable from the current Codex shell')
+
+
+def _dropin() -> Path:
+    return (Path.home() / '.config/systemd/user/second-brain-sessions.service.d'
+            / 'runtime-path.conf')
+
+
+def _runtime_config(directory: Path, executable: Path) -> str:
+    value = f'PATH={directory}:{Path.home()}/.local/bin:/usr/local/bin:/usr/bin:/bin'
+    return ('[Service]\n# Codex executable: ' + json.dumps(str(executable)) + '\n'
+            + 'Environment=' + json.dumps(value, ensure_ascii=False) + '\n')
+
+
+def _write_runtime(shared, directory: Path, executable: Path) -> None:
+    from second_brain.paths import atomic_write
+    target = _dropin()
+    try:
+        shared.ensure_owned_directories(Path.home(), (target.parent,))
+        if target.exists() or target.is_symlink():
+            shared.regular_file_bytes(Path.home(), target)
+        atomic_write(target, _runtime_config(directory, executable), mode=0o600)
+    except (OSError, shared.PathError) as error:
+        raise shared.TimerSetupError('scheduled runtime drop-in path is unsafe') from error
+
+
+def _validate_runtime(shared) -> None:
+    target = _dropin()
+    try:
+        data = shared.regular_file_bytes(Path.home(), target)
+        metadata = target.lstat()
+        if stat.S_IMODE(metadata.st_mode) != 0o600 or len(data) > 65536:
+            raise ValueError()
+        lines = data.decode().splitlines()
+        if (len(lines) != 3 or lines[0] != '[Service]'
+                or not lines[1].startswith('# Codex executable: ')
+                or not lines[2].startswith('Environment=')):
+            raise ValueError()
+        expected = json.loads(lines[1][len('# Codex executable: '):])
+        setting = json.loads(lines[2][len('Environment='):])
+        if not isinstance(setting, str) or not setting.startswith('PATH='):
+            raise ValueError()
+        directory, executable = _active_runtime(shared, setting[len('PATH='):])
+        if str(executable) != expected or data.decode() != _runtime_config(directory, executable):
+            raise ValueError()
+    except (OSError, ValueError, UnicodeError, shared.PathError) as error:
+        raise shared.TimerSetupError('scheduled Codex runtime is missing or stale; rerun --enable') from error
+
+
+def _enable_sessions(shared) -> None:
+    directory, executable = _active_runtime(shared)
+    targets, sources, module_targets, module_sources, cleanup = shared._validate_sources()
+    shared._prepare_install_parents(targets)
+    shared._run(('chezmoi', 'apply', str(targets[0]),
+                 *(str(p) for p in module_targets), *(str(p) for p in cleanup),
+                 *(str(p) for p in targets[2:])), 'chezmoi unit apply failed')
+    shared._validate_installed_launcher(targets[0], sources[0])
+    shared._validate_installed_package(targets[1], module_targets, module_sources)
+    shared._validate_installed_units(targets[2:], sources[2:])
+    _write_runtime(shared, directory, executable)
+    _validate_runtime(shared)
+    shared._run(('systemctl', '--user', 'daemon-reload'), 'systemd user daemon reload failed')
+    shared._run(('systemctl', '--user', 'enable', '--now', shared.TIMER_NAME), 'timer enable failed')
+    print('Second Brain sessions timer enabled.')
+
+
+def main(argv: Sequence[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(
+        prog='setup-second-brain-sessions-timer',
+        description='Manage the private daily Codex digest user timer independently.')
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument('--check', action='store_true', help='Validate installed runtime and units.')
+    group.add_argument('--enable', action='store_true', help='Install and enable only the digest timer.')
+    group.add_argument('--disable', action='store_true', help='Disable only the digest timer.')
+    args = parser.parse_args(argv)
+    try:
+        shared = _shared_setup()
+    except (OSError, ImportError) as error:
+        print('setup-second-brain-sessions-timer: shared timer helper unavailable or unsafe',
+              file=sys.stderr)
+        return 2
+    try:
+        with shared._setup_lock(require_repository=not args.disable):
+            if not args.disable:
+                _validate_dependencies(shared)
+            if args.check:
+                _validate_runtime(shared)
+                shared._check()
+            elif args.enable:
+                _enable_sessions(shared)
+            else:
+                shared._disable()
+    except shared.TimerSetupError as error:
+        print(f'setup-second-brain-sessions-timer: {error}', file=sys.stderr)
+        return 2
+    return 0
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())

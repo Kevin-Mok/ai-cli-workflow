@@ -28,6 +28,42 @@ invocation does not start a ExampleProject focus or session lifecycle. For a rel
 compact interface; other memory services must not ingest its private source or
 retrieval results.
 
+## Private Codex work digest
+
+`second-brain sessions refresh --format text|json` incrementally updates private
+summaries. `second-brain sessions review --format text|json` refreshes changed
+sessions before displaying the digest and open checks. Use review only when
+example-user asks for a recap or explicitly invokes the session skill. Present a compact
+recap, then ask which outstanding check he wants to handle; do not require a
+ExampleProject outcome for a recap. Scheduled refresh never prompts or notifies.
+
+Inferred checks are private review items, not tasks or commitments. After an
+explicit checked or dismissed request, pipe this shape through
+`second-brain sessions resolve --payload -`:
+
+```json
+{
+  "schema_version": 1,
+  "check_id": "copy-the-stable-id-from-review",
+  "disposition": "checked",
+  "confirmed": true
+}
+```
+
+`disposition` accepts `checked` or `dismissed`. Stable IDs and dispositions
+survive regeneration, and unresolved checks survive their session aging out.
+Review separates intentions, reported results, and recorded verification;
+conversation claims never independently prove implementation. Surface unknown,
+partial, stale, skipped, failed, and queued coverage. Recent activity does not
+prove a session is running.
+
+State and Markdown live beneath the private XDG Second Brain state root,
+outside Git. Personal-context use excludes the whole session when separation
+cannot be established. Policy mentions alone are not invocations. Likely secrets
+are redacted before inference and persistence; existing recap caches are not
+imported. Preserve existing focus, closeout, public-note, and deferred-reminder
+confirmation boundaries.
+
 ## Raw Session Payload
 
 Pipe JSON on stdin to second-brain capture --kind raw-session --payload -:

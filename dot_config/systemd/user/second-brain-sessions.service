@@ -1,0 +1,12 @@
+[Unit]
+Description=Refresh the private Codex work digest
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/env %h/scripts/second-brain sessions refresh --format json
+Environment=PYTHONDONTWRITEBYTECODE=1
+Environment="PATH=%h/.local/bin:/usr/local/bin:/usr/bin:/bin"
+UMask=0077
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=second-brain-sessions

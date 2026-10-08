@@ -81,3 +81,7 @@ Completed: register reviewed accounting, runtime and artifact verification findi
 ### Milestone 7 — feat(backup): add guarded recovery and live backup workflows
 
 Completed: add verified bundles, restore guards and copy progress preserve invoking-user access and repair VM sidecar staging. Verified: fresh scoped checks recorded above plus staged whitespace and incident-link contracts. Remaining: 8 planned groups, then one upstream push. Blockers: none for this milestone; documented broader vault inventory warning and manual acceptance limits remain. Next: feat(second-brain): add private digest scheduling.
+
+### Milestone 8 — feat(second-brain): add private digest scheduling
+
+Completed: add an independent Toronto timer with setup and privacy checks. Verified: fresh scoped checks recorded above plus staged whitespace and incident-link contracts. Remaining: 7 planned groups, then one upstream push. Blockers: none for this milestone; documented broader vault inventory warning and manual acceptance limits remain. Next: feat(scripts): add guarded Dust directory size reports.

@@ -6966,6 +6966,24 @@
     },
     {
       "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-07-private-digest-sandbox-startup.md"
+      ],
+      "decision": "No new learning: existing pre-command bwrap startup boundary; approved execution is a verified workaround, not sandbox repair.",
+      "findings": [],
+      "reviewed_on": "2026-10-07",
+      "sha256": "0101c00129dce686aaaf7cf27654e35c2e5e4b02d413561f7548efa17b589adf"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-07-private-digest-validation.md"
+      ],
+      "decision": "No new learning: existing environment, fixture, dependency/path and bounded processing guidance applies. Runtime verified; unrelated vault fixture and sandbox limitation preserved.",
+      "findings": [],
+      "reviewed_on": "2026-10-07",
+      "sha256": "87fd575ea94fff510d5326cfa872af1cda10b94ecc900a1a99db54c27acde2ef"
+    },
+    {
+      "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-10-07-git-lfs-instructions-sandbox.md"
       ],
       "decision": "No new reusable learning: existing local-sandbox-loopback-approved-route covers the verified scoped execution workaround; locate helpers before assuming their path.",

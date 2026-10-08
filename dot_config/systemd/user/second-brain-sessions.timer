@@ -1,0 +1,11 @@
+[Unit]
+Description=Refresh the private Codex work digest at 4 PM Toronto time
+
+[Timer]
+OnCalendar=*-*-* 16:00:00 America/Toronto
+Persistent=true
+AccuracySec=1s
+Unit=second-brain-sessions.service
+
+[Install]
+WantedBy=timers.target

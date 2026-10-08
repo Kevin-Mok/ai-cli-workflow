@@ -233,3 +233,15 @@ Use copy-first, resumable, and approval-bound steps only.
 
 If you need the older, more detailed operator notes, use the specific command help
 for each entrypoint.
+
+### Dedicated digest timer
+
+The timer runs at 16:00 `America/Toronto`, persists missed runs, and never
+activates or changes the checkpoint or deferred timers. It uses your existing
+Codex authentication and configured model. No sudo is required. Disable only
+this job with `setup-second-brain-sessions-timer --disable`; private digest state
+is retained. The source helper is
+`scripts/executable_setup-second-brain-sessions-timer`.
+
+
+Check or enable it with `setup-second-brain-sessions-timer --check` or `--enable`.
