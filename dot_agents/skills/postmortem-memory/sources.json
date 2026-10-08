@@ -5942,6 +5942,33 @@
       "reviewed_on": "2026-10-08",
       "findings": [],
       "decision": "No new reusable learning: extracted index lacks Git metadata and safe repository location required by broader fixtures; focused staged runtime checks pass. Normal repository verification remains authoritative."
+    },
+    {
+      "sha256": "947b48a3cbbde16c4eefbddcac16dd265cb863536e641b62a0aa146961f2e1e4",
+      "aliases": [
+        "/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-08-overview-command-environment.md"
+      ],
+      "reviewed_on": "2026-10-08",
+      "findings": [],
+      "decision": "No new reusable learning: ext-sandbox-loopback and local-discover-paths-before-reads cover runner startup and path discovery. Approved scoped execution succeeded; default bwrap remains unresolved. Earlier task commits changed the dirty set during snapshot capture; committed pre-overview CLI comparisons passed. Documentation probe excludes illustrative prose and shell operators; 51 actual examples parse."
+    },
+    {
+      "sha256": "3932d8cbe0d03022446648758dd5d784696a26f04d81a5ed3c7ca1c2fbcb4daa",
+      "aliases": [
+        "/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-08-overview-test-fixture.md"
+      ],
+      "reviewed_on": "2026-10-08",
+      "findings": [],
+      "decision": "No new reusable learning: existing realistic-fixture/schema guidance covers required Session timestamps, storage writer side effects and distinguishing help command entries from descriptive words. Production validation and single-writer guards are unchanged. Corrected defining tests and complete 224-test suite pass."
+    },
+    {
+      "sha256": "feb1129396b1011d16e7ae6a08c0f167ff59cc08d4074a00657f1b95710b30fc",
+      "aliases": [
+        "/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-08-overview-verification.md"
+      ],
+      "reviewed_on": "2026-10-08",
+      "findings": [],
+      "decision": "No new reusable learning: local-terminal-report-readable-projection covers responsive width/plain/runtime checks, with the specific Rich Rule-title ASCII trap recorded only in project tasks/lessons.md. Strict TypedDict loop naming and explicit literal/import formatting are ordinary check cleanup. 224 tests, strict mypy/Ruff, build and installed-source/export/alias/read-only/runtime verification pass."
     }
   ],
   "review": {
