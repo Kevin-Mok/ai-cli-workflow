@@ -466,3 +466,14 @@ security checks with the arguments you passed.
 - Verification: The inference-boundary contract test failed before repair; 80 session tests pass afterward. Installed default review exited 0 with five recaps, including the previously failing recap.
 - Limitations: The exact earlier private invalid value was not retained, so its field-level cause is supported rather than independently reconstructed; unrelated model failures remain possible.
 - Source: [Live session recap validation](/home/example/linux-config/docs/postmortem/2026-10-08-recent-session-review-live-check.md).
+
+## local-shortcut-stored-text-verification
+
+- Status: **verified_fix**; confidence: **confirmed**; verification scope: **code**.
+- Symptoms: absolute executables with arguments route as file paths; stored fish backticks gain backslashes.
+- Applicability: shortcut routing and template/fish string encoding.
+- Diagnostics: test absolute executable requests; compare stored `abbr --show` text in isolated fish without executing expansions. Syntax and idempotence alone can conceal changed strings.
+- Remedy: multiword values are commands unless the whole value is an existing path; retain backticks without extra escaping inside fish double quotes.
+- Verification: defining RED regressions preceded fixes; 19 shortcut tests, syntax and installed-file checks passed.
+- Limitations: mapped commands were never executed; conditions remain host-specific and template-delimiter input has its own guard.
+- Source: [Fish alias completion checks](/home/example/linux-config/docs/postmortem/2026-10-08-fish-alias-completion-checks.md).

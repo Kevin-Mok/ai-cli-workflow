@@ -3621,6 +3621,27 @@
       "sources": [
         "e3fa3bd9952c79a5ddea41e1319772a80682c2bfb02d1ee354897c7168beee2d"
       ]
+    },
+    {
+      "id": "local-shortcut-stored-text-verification",
+      "reference": "references/api-contracts-fixtures.md#local-shortcut-stored-text-verification",
+      "status": "verified_fix",
+      "symptoms": [
+        "Absolute executables with arguments route as file paths; generated fish abbreviation text contains extra backslashes before backticks."
+      ],
+      "applicability": "Shortcut request routing and string encoding across template and fish syntax.",
+      "diagnostics": [
+        "Compare stored abbreviation text using fish --no-config and abbr --show on isolated fixtures; do not execute mapped commands.",
+        "Exercise absolute executable paths with arguments and quoted/spaced path fixtures."
+      ],
+      "confidence": "confirmed",
+      "remedy": "Treat multiple words as a command unless the complete value is an existing path; do not escape backticks in fish double-quoted command values.",
+      "verification": "RED routing and stored-backtick regressions preceded the minimum fixes; all 19 shortcut tests, generated syntax and installed-byte checks passed.",
+      "verification_scope": "code",
+      "limitations": "No mapped command was executed. Condition activation still follows current host; unsupported template requests are rejected separately.",
+      "sources": [
+        "2c0f5d18179756b22b7ac8ac470d9cad3d36b245464e147703f742d6dbc63652"
+      ]
     }
   ],
   "reports": [
@@ -5978,6 +5999,25 @@
       "reviewed_on": "2026-10-08",
       "findings": [],
       "decision": "No new reusable learning: identical pre-execution Bubblewrap loopback failure and approved scoped workaround already covered by local-sandbox-loopback-approved-route; host repair remains unresolved."
+    },
+    {
+      "sha256": "9e092ff246092966300e4560a1f4c63bfd216738f0efc37815c6407d14a11740",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-08-fish-alias-resume-sandbox.md"
+      ],
+      "reviewed_on": "2026-10-08",
+      "findings": [],
+      "decision": "No new learning: recurrence of reviewed local-sandbox-loopback-approved-route; approved bounded reads passed while default sandbox remains unresolved."
+    },
+    {
+      "sha256": "2c0f5d18179756b22b7ac8ac470d9cad3d36b245464e147703f742d6dbc63652",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-08-fish-alias-completion-checks.md"
+      ],
+      "reviewed_on": "2026-10-08",
+      "findings": [
+        "local-shortcut-stored-text-verification"
+      ]
     }
   ],
   "review": {
