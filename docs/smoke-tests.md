@@ -6,6 +6,9 @@ result with `Expected`. When a change adds a manual check or reveals a gap,
 update the relevant entry or add one under the right area, replacing stale
 checks rather than duplicating them.
 
+Install the pinned backend into a fresh disposable prefix. These checks inspect a small disposable backend directory; a real backup scan is an explicit opt-in.
+
+
 ## Codex Session Search
 
 Run the installed command from any directory; before installation, use
@@ -827,3 +830,41 @@ only a disposable temporary fixture and requires no sudo.
   If permissions block that tracked write, it reports the exact path and pending
   learning instead of writing installed memory. A novel search miss leads to a
   new reproducer and review, not an invented known fix.
+## Full-system Backup And Guarded Recovery
+
+Run these checks from `/home/example/linux-config`. The automated and help checks
+need no sudo and use disposable fixtures; they do not erase or mount host disks.
+Actual source preflight, backup, resync and access repair require sudo. Follow
+[the recovery guide](backup-pc-recovery.md) for supported mounts and the
+separate disposable-VM boot acceptance check.
+
+- Action: `python3 -B -m unittest discover -s tests -p 'test_backup_pc*.py'`
+  Expected: All backup, progress and VM fixtures pass. Corrupt bundles, unsafe
+  disks, changed identities and declined erase confirmation cause no disk writes.
+  Live vanished files are accepted while permission/I/O errors remain fatal;
+  generated artifacts are readable by the invoking sudo user without changing
+  copied home metadata. Resource budgets and incomplete home resync are covered.
+- Action: `python3 -B tests/test_backup_pc_vm.py`
+  Expected: Disposable initialization stages the entrypoint and both helper
+  files together. Dry-run creates nothing, device/symlink inputs are rejected,
+  and the boot phase disconnects source, backup and live ISO. These assertions
+  do not establish guest bootability or Secure Boot support.
+- Action: `bash -n scripts/executable_backup-pc`
+  Expected: Exit 0; the standalone Bash entrypoint parses without execution.
+- Action: `./scripts/executable_backup-pc backup --help`
+  Expected: Explicit `--live`, integer `--resource-percent` (default 75) and
+  `--dry-run` are shown; no files change.
+- Action: `./scripts/executable_backup-pc sync-home --help`
+  Expected: Required bundle/source arguments and optional live/dry-run flags
+  appear. Home-only sync preserves the existing system archive and does not
+  publish an incomplete bundle as a complete recovery backup.
+- Action: `./scripts/executable_backup-pc access --help`
+  Expected: Scoped generated-artifact access repair accepts `--bundle` and
+  optional `--user`; copied home ownership remains untouched.
+- Action: `./scripts/executable_backup-pc excludes`
+  Expected: Built-in exclusions print without sudo. Cache/runtime data are
+  omitted while persistent application state remains eligible for backup.
+- Action: `./scripts/backup-pc-vm-check --help`
+  Expected: Init, backup, restore and boot phases are listed. For runtime
+  acceptance, execute the guide’s workflow using only disposable virtual images,
+  then record login/data/UUID results with the source and backup disconnected.

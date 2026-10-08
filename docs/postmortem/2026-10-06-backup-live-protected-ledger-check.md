@@ -1,0 +1,10 @@
+# Live backup protected-ledger verification mismatch
+
+The final refresh verification found a changed shared incident ledger while the other protected files stayed identical. Preserve the current ledger, check this task's records and the installed backup command independently, and distinguish concurrent updates from refresh failures.
+
+- Symptom/evidence: final SHA-256 comparison reported only dot_agents/skills/postmortem-memory/sources.json changed; all eight other checkpointed files matched. The assertion stopped installed-equality and actual-machine preflight checks in that Python cell. No backup/disk writes occurred.
+- Impact/status: auxiliary strict hash audit flagged a concurrent shared-ledger update; backup regression suite still passed 37 tests and refresh returned REFRESH COMPLETE/exit 0. The recent ledger contains the concurrent codex-search-refresh-audit report added by the other task; refresh log has no source adoption/conflict. Exact earlier ledger bytes were not checkpointed, so no wholesale unchanged claim is made. No source restoration performed.
+- Lookup: searched concurrent shared ledger protected hash; relevant existing tasks/lessons.md guidance explicitly requires preserving another task's new evidence rather than restoring a stale deployment snapshot. The checkpoint stores hashes, so exact before-content attribution cannot be reconstructed from it.
+- Resolution/verification: inspected recent ledger records and the concurrent Codex-search refresh audit; installed backup script matches tested source exactly and actual-machine read-only live preflight passed again. Other checkpointed files stayed identical. Own incident hashes are checked separately.
+- Follow-up: use owned-record checks for mutable shared ledgers and byte checks for task code; preserve concurrent additions. This is a verified audit workaround, not proof of a quiet workspace.
+- Learning: no new reusable learning; existing deployable-file-set and stale-baseline guidance covers concurrent evidence additions. Register this reviewed report with an explicit no-new-learning decision. Evidence is verification/audit only, not backup/boot execution.

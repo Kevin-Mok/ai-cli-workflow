@@ -1,9 +1,31 @@
-/dev/*
-/home/example/.cache/*
-/lost+found
-/media/*
-/mnt/*
-/proc/*
-/run/*
-/sys/*
-/tmp/*
+# GNU tar patterns for archive members relative to the source root: ./PATH.
+# Use --anchored --wildcards; the backup-pc script embeds the same policy.
+# Comment lines are rationale, not patterns; strip them before --exclude-from.
+
+# Runtime contents are recreated at boot; retain directories and permissions.
+./dev/*
+./proc/*
+./sys/*
+./run/*
+./tmp/*
+
+# User caches are disposable. Keep .config, .local/share and .local/state.
+# Nonstandard XDG_CACHE_HOME paths remain included unless reviewed separately.
+./home/*/.cache/*
+./root/.cache/*
+
+# Downloaded packages/indexes can be fetched again; retain package databases.
+./var/cache/apt/archives/*
+./var/lib/apt/lists/*
+./var/cache/pacman/pkg/*
+
+# Snap's cache is disposable; retain installed snaps and persistent Snap state.
+./var/lib/snapd/cache/*
+
+# Include installed state and personal data: /opt, dpkg/pacman databases,
+# Snap/Docker data, browser profiles, Android directories, projects, games,
+# logs, crash dumps, /var/tmp and lost+found are intentionally retained.
+# backup-pc stores root/EFI in system.tar.xz and home as normal browsable files.
+# Its rsync home copy applies the home cache exclusions with metadata preserved.
+# backup-pc dynamically excludes its destination and unrelated mounted disks.
+# Ordinary local files beneath /mnt, /media and /backup remain included.

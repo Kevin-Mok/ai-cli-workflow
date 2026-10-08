@@ -3111,7 +3111,8 @@
         "3f98c41411b35f4c4ca87559b57d3dc5e2af9d437717097e6ed62539c851ec9a",
         "d9ba347c48d34ceb4d4b69b916d6eca9ad683ca88ccfe0662c93c7ad2d67957f",
         "66d697b22da8fb875426071cfbcce541fe357041bdbf2eb7bda359309c44d31e",
-        "9a2fa7b009ac91e367b1ab8eaf02efefbf608285261867fb29f4d0fbf3e6b426"
+        "9a2fa7b009ac91e367b1ab8eaf02efefbf608285261867fb29f4d0fbf3e6b426",
+        "281cd2e0f1c558eb6a3323971abfc4b4487357c9a7a43c36ee51db67e752589b"
       ],
       "status": "verified_workaround",
       "symptoms": [
@@ -3622,6 +3623,27 @@
       "verification_scope": "runtime"
     },
     {
+      "applicability": "Backup source validation comparing fstab identifiers with lsblk canonical names.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Compare raw fstab identifier and resolved block path; retain type and source-disk ancestry checks."
+      ],
+      "id": "local-backup-swap-alias",
+      "limitations": "Actual runtime evidence covers preflight only; no full-machine backup or restored-disk boot test performed.",
+      "reference": "references/paths-ownership.md#local-backup-swap-alias",
+      "remedy": "Resolve absolute device aliases and supported LABEL/PARTUUID references before block lookup; do not weaken topology checks.",
+      "sources": [
+        "1b1f947831f523ac1cdfce6a55b31d628e3d300587e05f31df0e629d78665901"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "Live backup rejects valid swap /dev/disk/by-uuid fstab path"
+      ],
+      "topic": "paths-ownership",
+      "verification": "Alias regression RED then GREEN; actual-machine read-only source/destination preflight passed; full 37-test backup suite passed.",
+      "verification_scope": "runtime"
+    },
+    {
       "applicability": "Operational backup/install sequences for applications managed by an isolated Python environment.",
       "confidence": "confirmed",
       "diagnostics": [
@@ -3839,6 +3861,50 @@
       ],
       "topic": "operational-drift",
       "verification": "Defining RED-to-GREEN cache, live recovery and independent-review race regressions; 187 offline tests and cached Pyright passed. Synthetic warm and reader-add paths dropped from 51/52 reads to zero; cold work unchanged.",
+      "verification_scope": "code"
+    },
+    {
+      "applicability": "Opt-in live filesystem backups whose users accept disappearing source files.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Distinguish rsync vanished-source exit 24 from partial-transfer exit 23.",
+        "Exercise both progress and direct-copy paths and verify final publication."
+      ],
+      "id": "local-backup-best-effort-vanished",
+      "limitations": "Runtime evidence covers installation; no complete machine backup or restored boot was performed. Live application data remains nonatomic.",
+      "reference": "references/artifact-verification.md#local-backup-best-effort-vanished",
+      "remedy": "Accept live rsync exit 24 after one pass; preserve warning diagnostics and verify the copied inventory before publication. Retain fatal errors and offline strictness.",
+      "sources": [
+        "bef0db3a91521eaed940e1f7bc615d4adf6587f97e9ac8509efdb157d7d7d340"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "Live home backup exhausts rsync code-24 retries during LevelDB rotation"
+      ],
+      "topic": "artifact-verification",
+      "verification": "Two defining tests observed RED; all 58 backup tests passed, including fixture publication with injected code 24, warning checksums and tamper rejection. refresh-config succeeded and installed script bytes matched.",
+      "verification_scope": "runtime"
+    },
+    {
+      "applicability": "Private backup bundle artifacts created by a privileged backup process.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Inspect bundle and archive/log UID/modes.",
+        "Verify generated artifact scope separately from copied-home metadata."
+      ],
+      "id": "local-backup-invoker-artifact-access",
+      "limitations": "Existing root-owned bundle repair and fresh real-archive read require local sudo authentication. No restored boot verification.",
+      "reference": "references/paths-ownership.md#local-backup-invoker-artifact-access",
+      "remedy": "Resolve invoking sudo account through pwd and assign only bundle directory and known generated regular files. Apply on startup, publication and failure; provide scoped access repair and skip symlinks. Never recursively chown copied home.",
+      "sources": [
+        "595e229ca8d6d271e650cbeabc2fca91a2b46079a3206dfcab078c8bd858758c"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "Sudo-created backup archives and logs unreadable by invoking user"
+      ],
+      "topic": "paths-ownership",
+      "verification": "Ownership/account regressions RED then GREEN; complete 62-test backup suite passes including interruption cleanup and publication. Installed helper matches source after refresh-config.",
       "verification_scope": "code"
     },
     {
@@ -4190,6 +4256,26 @@
       "topic": "api-contracts-fixtures",
       "verification": "Focused real subprocess cancellation passes; full98 search suite passes after correcting the immediate observation race. A running child remains a failure after one second.",
       "verification_scope": "runtime"
+    },
+    {
+      "applicability": "Disposable VM recovery staging for backup helpers with adjacent runtime dependencies.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Inspect the real initialized tools directory and dependency imports before guest launch."
+      ],
+      "id": "local-backup-vm-stage-sidecars",
+      "limitations": "Fixture staging does not prove guest restore boot or Secure Boot.",
+      "reference": "references/artifact-verification.md#local-backup-vm-stage-sidecars",
+      "remedy": "Stage both required sidecar helpers beside the backup entrypoint; verify the real copies with external image creation mocked only.",
+      "sources": [
+        "56e8c95882b9edf241a5baf4f5ace0a43ea0748794a12facee93ccc109482588"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "VM tools disk includes backup entrypoint but omits required progress/home-sync sidecars."
+      ],
+      "verification": "Defining missing-sidecar test failed before the fix; 4 VM tests and full 67-test backup suite passed after it.",
+      "verification_scope": "code"
     }
   ],
   "reports": [
@@ -6280,6 +6366,16 @@
     },
     {
       "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-06-backup-recovery-sandbox-startup.md"
+      ],
+      "findings": [
+        "local-sandbox-loopback-approved-route"
+      ],
+      "reviewed_on": "2026-10-06",
+      "sha256": "281cd2e0f1c558eb6a3323971abfc4b4487357c9a7a43c36ee51db67e752589b"
+    },
+    {
+      "aliases": [
         "/home/example/coding/example-client-app/docs/postmortem/2026-10-06-rescue-command-terminal.md"
       ],
       "decision": "Isolated operator preparation errors: wrong terminal followed by a visibly split path. Instructions/local lesson now use prompt boundaries and short quoted-path helpers. Key installation was verified by strict batch SSH and read-only disk checks; no new cross-repository finding is warranted. Actual backup remains pending.",
@@ -6334,6 +6430,15 @@
       "findings": [],
       "reviewed_on": "2026-10-06",
       "sha256": "d1bc6ab4b5a9989ce1dde39d288d47b779db17b14aed087c5f28f37f1f633e65"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-06-backup-recovery-reference-lookups.md"
+      ],
+      "decision": "No new learning: read-only path guesses and HTTP 429 repeat known discovery/primary-source practices; corrected local reads and installed xz manual unblock verification.",
+      "findings": [],
+      "reviewed_on": "2026-10-06",
+      "sha256": "65ebd9bd42b4d621ddc16e758dc1941eb082b14b7544385579ff43cfb374cda3"
     },
     {
       "aliases": [
@@ -6405,6 +6510,16 @@
     },
     {
       "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-06-live-backup-swap-alias.md"
+      ],
+      "findings": [
+        "local-backup-swap-alias"
+      ],
+      "reviewed_on": "2026-10-06",
+      "sha256": "1b1f947831f523ac1cdfce6a55b31d628e3d300587e05f31df0e629d78665901"
+    },
+    {
+      "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-10-06-codex-search-output-readability.md"
       ],
       "findings": [
@@ -6434,6 +6549,15 @@
     },
     {
       "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-06-backup-live-protected-ledger-check.md"
+      ],
+      "decision": "No new learning: concurrent Codex-search evidence was appended to the shared ledger during refresh verification; preserve it and apply existing deployable-file-set/stale-baseline guidance. Installed backup and actual preflight verified independently.",
+      "findings": [],
+      "reviewed_on": "2026-10-06",
+      "sha256": "d9d4ce9d1f7ab595ad0e25d59a4ff115390768bcdd1d40ba8ca197eca7748f4c"
+    },
+    {
+      "aliases": [
         "/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-06-burn-preservation-audit.md"
       ],
       "decision": "No new learning: repeats the prior verified additive historical-evidence audit principle. All 42,472 completed turns retain start/end/coverage/model contexts; every old wait preserved and merged wait unions equal. New redundant historical wait lies within existing wait, so counted time unchanged; raw equality audit corrected, not product.",
@@ -6460,6 +6584,33 @@
       ],
       "reviewed_on": "2026-10-06",
       "sha256": "74fdcb77a95ac264eeca4a8dff326d361c54414889ffee4bbd4ed1692fb08e16"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-06-backup-compression-tool-syntax.md"
+      ],
+      "decision": "Scoped JavaScript wrapper parser failure; corrected valid string transport verified a workaround before any shell or backup mutation. No new reusable finding beyond existing transport guidance.",
+      "findings": [],
+      "reviewed_on": "2026-10-06",
+      "sha256": "e49b7350b8784c87ebce19bd003590234531783e9fb30d2a85f4372d0afcd637"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-06-backup-resource-fixture-arithmetic.md"
+      ],
+      "decision": "Hand-checked test fixture unit conversion corrected; memory-bound requirement unchanged. No reusable finding beyond ordinary independent fixture arithmetic.",
+      "findings": [],
+      "reviewed_on": "2026-10-06",
+      "sha256": "acbe9cad42e18ee89433cfbbb0db8e71373140ca563e1b283ed89f1da9d9a2fd"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-06-backup-resource-verification-baseline.md"
+      ],
+      "decision": "Scoped attribution of unrelated repository contract/hash/vault failures, concurrent incident discovery and expected live configuration snapshot drift; existing reviewed baseline guidance applies. No new finding or unrelated repair.",
+      "findings": [],
+      "reviewed_on": "2026-10-06",
+      "sha256": "d93000f0c47ee5691ac4e7f5818d989846b946d7314c4e2f1fe7ee393b64a676"
     },
     {
       "aliases": [
@@ -6647,6 +6798,35 @@
       "findings": [],
       "reviewed_on": "2026-10-07",
       "sha256": "f5502c281934e88f25b5f0e65ebde89d2644a96511bed3c6b72313fb21cee599"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-07-backup-vanished-files.md"
+      ],
+      "findings": [
+        "local-backup-best-effort-vanished"
+      ],
+      "reviewed_on": "2026-10-07",
+      "sha256": "bef0db3a91521eaed940e1f7bc615d4adf6587f97e9ac8509efdb157d7d7d340"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-07-backup-fix-tooling.md"
+      ],
+      "decision": "No new reusable learning: repeats documented approved sandbox bypass and inspection/schema mistakes; default sandbox remains unresolved.",
+      "findings": [],
+      "reviewed_on": "2026-10-07",
+      "sha256": "17c044d7dcf975e7bd46e63e242a0d120ae2d91e3fe3d71fa4a2fee82f580b61"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-07-backup-owner-access.md"
+      ],
+      "findings": [
+        "local-backup-invoker-artifact-access"
+      ],
+      "reviewed_on": "2026-10-07",
+      "sha256": "595e229ca8d6d271e650cbeabc2fca91a2b46079a3206dfcab078c8bd858758c"
     },
     {
       "aliases": [
@@ -7051,6 +7231,16 @@
       "findings": [],
       "reviewed_on": "2026-10-08",
       "sha256": "4b37a31b474f46483712c6512352c27f3f9aeebc81bf5bbc52042a5eb129b373"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-08-backup-vm-sidecar-staging.md"
+      ],
+      "findings": [
+        "local-backup-vm-stage-sidecars"
+      ],
+      "reviewed_on": "2026-10-08",
+      "sha256": "56e8c95882b9edf241a5baf4f5ace0a43ea0748794a12facee93ccc109482588"
     }
   ],
   "review": {

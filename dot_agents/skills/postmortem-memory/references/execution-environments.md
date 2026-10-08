@@ -194,6 +194,8 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
   - [2026-10-04-vps-bootstrap-prompt-sandbox-startup.md](/home/example/linux-config/.worktrees/vps-aws-bootstrap-prompt/docs/postmortem/2026-10-04-vps-bootstrap-prompt-sandbox-startup.md) (SHA-256 `66d697b22da8`; 1 alias(es), all retained in [sources.json](../sources.json)).
   - [2026-10-05-worktree-guide-sandbox-startup.md](/home/example/linux-config/.worktrees/vps-aws-bootstrap-prompt/docs/postmortem/2026-10-05-worktree-guide-sandbox-startup.md) (SHA-256 `9a2fa7b009ac`; 1 alias(es), all retained in [sources.json](../sources.json)).
 
+  - [2026-10-06-backup-recovery-sandbox-startup.md](/home/example/linux-config/docs/postmortem/2026-10-06-backup-recovery-sandbox-startup.md) (SHA-256 `281cd2e0f1c5`; approved scoped reads verified; default runner remains unavailable).
+
 ## local-systemd-installed-prerequisite
 
 - Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **runtime**.

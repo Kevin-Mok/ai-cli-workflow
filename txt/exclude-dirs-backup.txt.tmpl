@@ -1,32 +1,31 @@
-/home/example/.cache
-/home/example/.local/share/Steam/steamapps/common
-/home/example/.ACEStream
-/home/example/.android
-/home/example/.AndroidStudio3.3
-/home/example/.config/chromium
-/home/example/.config/discord
-/home/example/.config/Slack
-/home/example/.local/share/godot/templates
-/home/example/Android
-/home/example/coding/archived/opencv
-/home/example/Downloads/build
-/backup
-/lost+found
-/mnt
-/opt
-/proc
-/run
-/sys
-/tmp
-/var/cache/apt/archives
-/var/cache/pacman
-/var/lib/systemd/coredump
-/var/lib/dhcpcd/proc
-/var/lib/docker/overlay2
-/var/log/journal
-/var/log
-/var/tmp
-/var/lib/apt/lists
-/var/lib/dpkg/info
-/var/lib/snapd
+# GNU tar patterns for archive members relative to the source root: ./PATH.
+# Use --anchored --wildcards; the backup-pc script embeds the same policy.
+# Comment lines are rationale, not patterns; strip them before --exclude-from.
 
+# Runtime contents are recreated at boot; retain directories and permissions.
+./dev/*
+./proc/*
+./sys/*
+./run/*
+./tmp/*
+
+# User caches are disposable. Keep .config, .local/share and .local/state.
+# Nonstandard XDG_CACHE_HOME paths remain included unless reviewed separately.
+./home/*/.cache/*
+./root/.cache/*
+
+# Downloaded packages/indexes can be fetched again; retain package databases.
+./var/cache/apt/archives/*
+./var/lib/apt/lists/*
+./var/cache/pacman/pkg/*
+
+# Snap's cache is disposable; retain installed snaps and persistent Snap state.
+./var/lib/snapd/cache/*
+
+# Include installed state and personal data: /opt, dpkg/pacman databases,
+# Snap/Docker data, browser profiles, Android directories, projects, games,
+# logs, crash dumps, /var/tmp and lost+found are intentionally retained.
+# backup-pc stores root/EFI in system.tar.xz and home as normal browsable files.
+# Its rsync home copy applies the home cache exclusions with metadata preserved.
+# backup-pc dynamically excludes its destination and unrelated mounted disks.
+# Ordinary local files beneath /mnt, /media and /backup remain included.

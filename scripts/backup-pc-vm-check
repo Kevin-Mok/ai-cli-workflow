@@ -1,0 +1,132 @@
+#!/usr/bin/env python3
+"""Only virtual files; never map a host block device into the recovery VM."""
+import argparse
+import json
+from pathlib import Path
+import shutil
+import stat
+import subprocess
+import sys
+
+
+def regular_file(value):
+    path=Path(value).absolute()
+    if path.is_symlink() or '/dev'==str(path) or '/dev/' in str(path) or not stat.S_ISREG(path.stat().st_mode):
+        raise ValueError('Only regular virtual-image/ISO/firmware files are allowed: '+str(path))
+    return str(path.resolve())
+
+
+def run(*args,capture=False):
+    result=subprocess.run([str(a) for a in args],check=True,text=True,
+                          stdout=subprocess.PIPE if capture else None)
+    return result.stdout if capture else ''
+
+
+def qemu_command(state,mode):
+    args=['qemu-system-x86_64','-machine','q35','-m','4096','-smp','2',
+          '-drive','if=pflash,format=raw,readonly=on,file='+state['code'],
+          '-drive','if=pflash,format=raw,file='+state['vars'],
+          '-nic','user,model=virtio-net-pci']
+    def drive(path,fmt,serial,readonly=False):
+        args.extend(['-drive',f'file={path},format={fmt},if=virtio,serial={serial}'+(',readonly=on' if readonly else '')])
+    if mode=='backup': drive(state['source'],'qcow2','SOURCE_SYSTEM')
+    if mode in ('backup','restore'): drive(state['backup'],'qcow2','BACKUP_STORE')
+    if mode in ('restore','boot'): drive(state['target'],'raw','RESTORE_TARGET')
+    if mode!='boot':
+        args.extend(['-cdrom',state['iso'],'-boot','d','-drive','file=fat:ro:'+state['stage']+',format=raw,if=virtio,readonly=on'])
+    return args
+
+
+def initialize(args):
+    paths={key:regular_file(value) for key,value in {'iso':args.iso,'source_base':args.source_image,
+           'code':args.firmware_code,'vars_base':args.firmware_vars}.items()}
+    work=Path(args.work_dir).absolute()
+    if work.exists() or work.is_symlink() or work.resolve()!=work:
+        raise ValueError('Use a new nonsymlink disposable --work-dir.')
+    if args.target_size<70 or args.backup_size<1:
+        raise ValueError('Target must be at least 70 GiB; backup size must be positive.')
+    if any(',' in value or '\n' in value for value in list(paths.values())+[str(work)]):
+        raise ValueError('QEMU image paths may not contain commas/newlines.')
+    print(f'Disposable VM files: {work}; source base is read-only backing storage; target {args.target_size} GiB.')
+    if args.dry_run: return
+    if not shutil.which('qemu-img') or not shutil.which('qemu-system-x86_64'):
+        raise ValueError('Install qemu-system-x86 and qemu-utils; use an OVMF firmware pair.')
+    source_info=json.loads(run('qemu-img','info','--output=json',paths['source_base'],capture=True))
+    if source_info['format'] not in ('raw','qcow2') or source_info.get('backing-filename'):
+        raise ValueError('Source must be a standalone raw/qcow2 image, without a backing chain.')
+    work.mkdir(mode=0o700)
+    state={'iso':paths['iso'],'code':paths['code'],'vars':str(work/'OVMF_VARS.fd'),
+           'source':str(work/'source.qcow2'),'backup':str(work/'backup.qcow2'),
+           'target':str(work/'target.raw'),'stage':str(work/'stage')}
+    shutil.copy2(paths['vars_base'],state['vars'])
+    run('qemu-img','create','-f','qcow2','-F',source_info['format'],'-b',paths['source_base'],state['source'])
+    run('qemu-img','create','-f','qcow2',state['backup'],str(args.backup_size)+'G')
+    # Sparse regular file with a valid nonempty MBR: exercise existing-data preview
+    # without using sfdisk, loop devices, host mounts or root privileges.
+    with open(state['target'],'xb') as f:
+        f.truncate(args.target_size*2**30)
+        mbr=bytearray(512); mbr[446+4]=0x83
+        mbr[446+8:446+12]=(2048).to_bytes(4,'little')
+        mbr[446+12:446+16]=(4096).to_bytes(4,'little')
+        mbr[510:512]=b'\x55\xaa'; f.seek(0); f.write(mbr)
+    stage=Path(state['stage']); stage.mkdir()
+    shutil.copy2(Path(__file__).with_name('executable_backup-pc'),stage/'backup-pc')
+    for helper in ('backup-pc-progress.py','backup-pc-sync.py'):
+        shutil.copy2(Path(__file__).with_name(helper),stage/helper)
+    shutil.copy2(Path(__file__).parents[1]/'docs/backup-pc-recovery.md',stage/'RECOVERY.md')
+    (work/'state.json').write_text(json.dumps(state,indent=2)+'\n')
+    (work/'RESULTS.md').write_text('''# Disposable recovery evidence
+
+Record observed results from the backup, restore and isolated boot phases. This file starts unverified; launcher tests alone do not establish bootability.
+
+- Firmware version and Secure Boot enabled/disabled:
+- Original image Ubuntu 24.04 amd64, ext4 root/home and FAT EFI:
+- Source root/home/EFI mounted ro, full bundle created and verified:
+- Nonempty target preview, wrong ERASE rejected, correct ERASE restored:
+- Boot with source/backup images disconnected:
+- Login, representative apps and personal files:
+- Root/home distinct fresh UUIDs match fstab:
+- EFI mounted; swap/resume reference match fresh UUID:
+- External mounts absent; boot succeeds with nofail:
+- Logs, failure notes and screenshots:
+''')
+    print('Initialized. Launch backup, restore, then boot. Record results in '+str(work/'RESULTS.md'))
+
+
+def launch(args):
+    work=Path(args.work_dir).resolve(strict=True)
+    state=json.loads((work/'state.json').read_text())
+    for key in ('source','backup','target','vars'):
+        file=Path(regular_file(state[key]))
+        if file.parent!=work: raise ValueError('Mutable VM images/firmware must be in the disposable work directory.')
+    for key in ('iso','code'): regular_file(state[key])
+    stage=Path(state['stage'])
+    if stage.resolve()!=work/'stage': raise ValueError('Unexpected VM stage directory.')
+    command=qemu_command(state,args.mode)
+    print('Phase '+args.mode+': '+('target only; original and backup disconnected' if args.mode=='boot' else 'live ISO; virtual disks only'))
+    print('Read '+str(work/'RESULTS.md')+' and docs/backup-pc-recovery.md; never use host disk paths.')
+    if args.dry_run:
+        print(json.dumps(command)); return
+    run(*command)
+
+
+def main():
+    parser=argparse.ArgumentParser(description='Disposable UEFI recovery VM launcher. No sudo or host disk access. Init with an existing standalone Ubuntu virtual source disk; then backup, restore, boot.')
+    sub=parser.add_subparsers(dest='mode',required=True)
+    init=sub.add_parser('init',help='Create sparse nonempty target, source overlay, backup image and evidence checklist')
+    for option in ('work-dir','source-image','iso','firmware-code','firmware-vars'): init.add_argument('--'+option,required=True)
+    init.add_argument('--target-size',type=int,default=160,help='GiB (default 160)')
+    init.add_argument('--backup-size',type=int,default=256,help='GiB (default 256)')
+    init.add_argument('--dry-run',action='store_true')
+    for mode in ('backup','restore','boot'):
+        p=sub.add_parser(mode,help='Launch '+mode+' phase with only appropriate virtual images attached')
+        p.add_argument('--work-dir',required=True);p.add_argument('--dry-run',action='store_true')
+    args=parser.parse_args()
+    if args.mode=='init': initialize(args)
+    else: launch(args)
+
+
+if __name__=='__main__':
+    try: main()
+    except (ValueError,OSError,KeyError,subprocess.CalledProcessError) as exc:
+        print('backup-pc-vm-check: '+str(exc),file=sys.stderr);sys.exit(1)

@@ -77,3 +77,7 @@ Completed: expand gl history and point tb at the USB backup drive. Verified: fre
 ### Milestone 6 — docs(postmortems): expand reviewed cross-project guidance
 
 Completed: register reviewed accounting, runtime and artifact verification findings. Verified: fresh scoped checks recorded above plus staged whitespace and incident-link contracts. Remaining: 9 planned groups, then one upstream push. Blockers: none for this milestone; documented broader vault inventory warning and manual acceptance limits remain. Next: feat(backup): add guarded recovery and live backup workflows.
+
+### Milestone 7 — feat(backup): add guarded recovery and live backup workflows
+
+Completed: add verified bundles, restore guards and copy progress preserve invoking-user access and repair VM sidecar staging. Verified: fresh scoped checks recorded above plus staged whitespace and incident-link contracts. Remaining: 8 planned groups, then one upstream push. Blockers: none for this milestone; documented broader vault inventory warning and manual acceptance limits remain. Next: feat(second-brain): add private digest scheduling.

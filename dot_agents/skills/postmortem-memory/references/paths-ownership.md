@@ -197,3 +197,26 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Limitations: VPS live dry-run/apply acceptance remains pending. Disposable homes/service substitutes do not prove remote upgrade.
 - Sources:
   - [2026-10-03-vps-codex-repair.md](/home/example/linux-config/.worktrees/vps-aws-bootstrap-prompt/docs/postmortem/2026-10-03-vps-codex-repair.md) (SHA-256 `3f4f62937662`; 2 alias(es), all retained in [sources.json](../sources.json)).
+
+## local-backup-swap-alias
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **runtime** (preflight only).
+- Symptoms: valid swap fstab /dev/disk/by-uuid alias rejected as unsupported/missing.
+- Applicability: backup preflight matching fstab identifiers to lsblk canonical partition names.
+- Diagnostic checks: compare alias resolution and canonical name, type and source-disk ancestry.
+- Remedy: resolve absolute device aliases and LABEL/PARTUUID references before lookup, retaining conventional topology guards.
+- Verification: alias regression RED then GREEN, actual-machine read-only live source/destination preflight passed, 37-test backup suite passed.
+- Limitations: no full-machine backup or restored disk boot tested; runtime scope covers preflight only.
+- Sources: [live backup swap alias report](/home/example/linux-config/docs/postmortem/2026-10-06-live-backup-swap-alias.md) (SHA-256 `1b1f947831f523ac1cdfce6a55b31d628e3d300587e05f31df0e629d78665901`).
+
+## local-backup-invoker-artifact-access
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **code**.
+- Symptoms: Sudo-created backup archives and logs unreadable by invoking user
+- Applicability: Private backup bundle artifacts created by a privileged backup process.
+- Diagnostic checks: Inspect bundle and archive/log UID/modes. Verify generated artifact scope separately from copied-home metadata.
+- Remedy: Resolve invoking sudo account through pwd and assign only bundle directory and known generated regular files. Apply on startup, publication and failure; provide scoped access repair and skip symlinks. Never recursively chown copied home.
+- Verification evidence: Ownership/account regressions RED then GREEN; complete 62-test backup suite passes including interruption cleanup and publication. Installed helper matches source after refresh-config.
+- Limitations: Existing root-owned bundle repair and fresh real-archive read require local sudo authentication. No restored boot verification.
+- Sources:
+  - [2026-10-07-backup-owner-access.md](/home/example/linux-config/docs/postmortem/2026-10-07-backup-owner-access.md) (SHA-256 `595e229ca8d6`; 1 alias).

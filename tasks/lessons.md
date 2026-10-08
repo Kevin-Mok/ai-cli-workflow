@@ -104,11 +104,22 @@
 
 - 2026-10-05: Validate i3 titlebars on a visible workspace using `actual_deco_rect` (with `deco_rect` fallback), not stale hidden-workspace geometry. Allow a compositor frame and use a unique screenshot path; scrot can suffix an existing filename. See [the overview probe investigation](../docs/postmortem/2026-10-05-kitty-overview-inspection.md).
 
+- 2026-10-06: In standalone backup recovery, resolve absolute archived links with chroot semantics before host-side reads, reject links at host-managed mount/write paths, and make /dev binds private before mounting devpts. Keep rsync and inventory cache/submount matching identical: Python fnmatch crosses slashes while rsync single-star patterns do not. Regression fixtures cover Ubuntu shim alternatives links, nested project caches and literal bracketed mount names.
+
 - 2026-10-06: Local Codex JSONL indexing must validate discriminant types and UTF-8 text after JSON decoding; syntax-valid records can still contain arrays in type fields or lone surrogates. Preserve good neighboring records and cover terminal-control cwd plus early-closing pipe behavior. See [search record validation](../docs/postmortem/2026-10-06-codex-search-malformed-records.md).
 - 2026-10-06: fzf selection wrappers should capture stdout only and inherit stderr for the UI. Verify real picker presentation as well as stubbed argv; real resumed Codex may append lifecycle records even with zero prompts. See [picker stream verification](../docs/postmortem/2026-10-06-codex-search-picker-ui.md).
 - 2026-10-06: A bounded search excerpt also needs bounded highlight work: skip rg submatches outside its byte window before decoding offsets. Preserve matched trailing CR characters, escape controls before coloring, and test both dense lines and narrow Unicode PTYs. See [search output readability](../docs/postmortem/2026-10-06-codex-search-output-readability.md).
 
+- 2026-10-06: Backup fstab swap entries can use /dev/disk/by-uuid aliases; resolve them before matching lsblk canonical names, while retaining partition and source-disk guards. For live tar warnings, match diagnostic suffixes so a filename containing warning text cannot hide permission/I/O failures. See [live backup preflight](../docs/postmortem/2026-10-06-live-backup-swap-alias.md).
+
+- 2026-10-06: Backup progress must drain stdout/stderr together and keep progress records out of diagnostic guards. Create selectors before spawning, catch SIGINT/TERM/HUP for detached copy groups, and make cleanup independent of log writes. After publication, report the actual valid bundle on final log failure. Rsync summary timestamps are elapsed time, so derive home ETA from percentage/elapsed rather than relabeling them. Disposable subprocess and tar/rsync regressions cover these paths.
+
 - 2026-10-06: When splitting a portable skill helper, load siblings relative to __file__ and describe the dynamic callable/validated JSON boundary with an explicit Protocol and TypedDict. Preserve direct-file-import tests and rerun basedpyright as well as CLI tests. See [context helper imports](../docs/postmortem/2026-10-06-context-helper-sibling-import.md) and [typed boundary](../docs/postmortem/2026-10-06-context-helper-type-boundary.md).
+
+- 2026-10-07: Live backup rsync exit 24 means source files vanished during copying; accept it once under the requested best-effort policy, retain warnings and verify the copied inventory. Keep code 23 and all other errors fatal, and preserve offline strictness. Whole-home retries cannot converge during continuous LevelDB rotation.
+
+- 2026-10-07: Sudo backup artifacts must be readable by the invoking account, including incomplete runs. Resolve the account via pwd and assign only the bundle and known generated regular files; skip symlinks and never recursively chown copied home data, whose owners/ACLs are restore metadata.
+
 
 - 2026-10-07: For notification integration fixtures, poll DBus NameHasOwner before dunstctl to avoid autoactivating a competing daemon; verify duplicate-object script_run transfer before promising silence on all history recalls. See [Dunst fixture investigation](../docs/postmortem/2026-10-07-dunst-fixture-startup.md).
 

@@ -1,43 +1,1063 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# Standalone: the published copy needs Bash, Python 3 and standard Ubuntu tools.
+set -euo pipefail
+export BACKUP_PC_SCRIPT="$(readlink -f -- "${BASH_SOURCE[0]}")"
+exec python3 - "$@" <<'BACKUP_PC_PY'
+import argparse
+import base64
+import errno
+import datetime
+import hashlib
+import importlib.util
+import json
+import math
+import os
+from pathlib import Path, PurePosixPath
+import platform
+import posixpath
+import pwd
+import re
+import shutil
+import stat
+import subprocess
+import sys
+import tarfile
+import tempfile
 
-# mount_dir="/run/media/example-user/backup-hd"
-#mount_dir="/mnt/linux-files-2"
-mount_dir="/backup"
-# Backup destination
-case $1 in
-	nzxt )
-		backup_dest="$mount_dir/nzxt"
-		# backup_dest="$mount_dir/backup-usb/nzxt"
-		;;
-	arch-2 )
-		backup_dest="$mount_dir/arch-2"
-		# backup_dest="$mount_dir/backup-usb/nzxt"
-		;;
-	x1 )
-		backup_dest="$mount_dir/laptop"
-		;;
-	ubuntu )
-		backup_dest="$mount_dir/ubuntu"
-		;;
-	ubuntu-h7 )
-		backup_dest="$mount_dir/ubuntu-h7"
-		;;
-esac
-exclude_dirs_list="/home/example/txt/exclude-dirs-backup.txt"
-exclude_dirs_list_full="/home/example/txt/exclude-dirs-backup-full.txt"
+GIB = 2**30
+MIB = 2**20
+# Match GNU tar names relative to -C SOURCE; omit contents, keep directory metadata.
+EXCLUDES = [f'./{p}/*' for p in ('dev', 'proc', 'sys', 'run', 'tmp',
+            'home/*/.cache', 'root/.cache', 'var/cache/apt/archives',
+            'var/lib/apt/lists', 'var/cache/pacman/pkg', 'var/lib/snapd/cache')]
+ACTIVE_PROGRESS = None
+BUNDLE_FILES = ('system.tar.xz', 'home-index.json', 'warnings.json', 'manifest.json', 'backup-pc', 'RECOVERY.md')
+REQUIRED = ('etc/os-release', 'etc/fstab', 'var/lib/dpkg/status', 'usr/bin/dpkg',
+            'usr/sbin/grub-install', 'usr/sbin/update-initramfs', 'usr/sbin/update-grub',
+            'usr/lib/grub/x86_64-efi/modinfo.sh', 'usr/lib/shim/shimx64.efi.signed',
+            'usr/lib/grub/x86_64-efi-signed/grubx64.efi.signed',
+            'boot/efi/EFI/ubuntu/shimx64.efi', 'boot/efi/EFI/ubuntu/grubx64.efi')
 
-case $2 in
-	tar-root )
-		# Labels for backup name
-		distro="arch"
-		datetime=$(date "+%m.%d-%H.%M")
-		backup_file="$backup_dest/tar/$datetime-$distro-root.tar.gz"
 
-		sudo tar -czpvf "$backup_file" --exclude-from="$exclude_dirs_list" --exclude=/home /
-		;;
-	# full )
-		# sudo rsync -PraAX --exclude-from="$exclude_dirs_list_full" / "$backup_dest/full"
-        # ;;
-	home )
-		sudo rsync -PraAX --exclude-from="$exclude_dirs_list_full" /home "$backup_dest/full"
-esac
+class BackupError(Exception):
+    pass
+
+
+def fail(message):
+    raise BackupError(message)
+
+
+def backup_owner(user=None):
+    user=user or os.environ.get('SUDO_USER')
+    if user:
+        account=pwd.getpwnam(user)
+        return account.pw_uid,account.pw_gid
+    return os.getuid(),os.getgid()
+
+
+def set_bundle_owner(bundle, owner):
+    bundle=Path(bundle)
+    if bundle.is_symlink() or not bundle.is_dir():
+        fail('Backup bundle must be an ordinary directory.')
+    os.chown(bundle,*owner,follow_symlinks=False)
+    # Only generated artifacts: copied home ownership/ACLs are restore data.
+    for name in (*BUNDLE_FILES,'backup.log','backup-pc-progress.py','backup-pc-sync.py','SHA256SUMS','COMPLETE'):
+        path=bundle/name
+        try: mode=path.lstat().st_mode
+        except FileNotFoundError: continue
+        if stat.S_ISREG(mode):
+            os.chown(path,*owner,follow_symlinks=False)
+
+
+def repair_access(args):
+    require_root()
+    bundle=Path(args.bundle)
+    for name in ('system.tar.xz','backup.log'):
+        path=bundle/name
+        if path.is_symlink() or not path.is_file():
+            fail('Access repair requires a backup bundle containing ordinary '+name)
+    owner=backup_owner(args.user)
+    set_bundle_owner(bundle,owner)
+    phase('Backup artifacts now owned by '+pwd.getpwuid(owner[0]).pw_name+': '+str(bundle))
+
+
+def phase(message):
+    if ACTIVE_PROGRESS: ACTIVE_PROGRESS.message(message)
+    else: print(f'[backup-pc] {message}', flush=True)
+
+
+def command_env():
+    return dict({k:v for k,v in os.environ.items() if k not in ('XZ_OPT','XZ_DEFAULTS')},LC_ALL='C')
+
+
+def run(*args, capture=False):
+    result = subprocess.run([str(x) for x in args], check=True,
+                            stdout=subprocess.PIPE if capture else None,
+                            text=True, env=command_env())
+    return result.stdout if capture else ''
+
+
+def require_root():
+    if os.geteuid() != 0:
+        fail('Run this operation with sudo from a live USB.')
+
+
+def require_tools(names):
+    missing = [name for name in names if not shutil.which(name)]
+    if missing:
+        fail('Missing live-system tools: ' + ', '.join(missing))
+    if platform.machine() != 'x86_64':
+        fail('Only amd64 live systems are supported.')
+
+
+def flatten(nodes):
+    for node in nodes:
+        yield node
+        yield from flatten(node.get('children', []))
+
+
+def mounts():
+    data = json.loads(run('findmnt', '--json', '--output',
+                          'TARGET,SOURCE,FSTYPE,OPTIONS,MAJ:MIN,FSROOT', capture=True))
+    return list(flatten(data['filesystems']))
+
+
+def block_devices():
+    return json.loads(run('lsblk', '--json', '--bytes', '--paths', '--output',
+        'NAME,TYPE,SIZE,MODEL,SERIAL,WWN,MAJ:MIN,FSTYPE,PTTYPE,UUID,PARTN,RO', capture=True))['blockdevices']
+
+
+def is_block(path):
+    return stat.S_ISBLK(Path(path).stat().st_mode)
+
+
+def holders(node):
+    return [p.name for p in (Path('/sys/dev/block')/node['maj:min']/'holders').iterdir()]
+
+
+def ancestors(major, devices):
+    found = set()
+    def visit(node, parents):
+        chain = parents + [node]
+        if node.get('maj:min') == major:
+            found.update(x['name'] for x in chain if x['type'] == 'disk')
+        for child in node.get('children', []):
+            visit(child, chain)
+    for node in devices:
+        visit(node, [])
+    return found
+
+
+def path_disks(path, devices=None, table=None):
+    devices = block_devices() if devices is None else devices
+    table = mounts() if table is None else table
+    real = str(Path(path).resolve())
+    containing = [m for m in table if real == m['target'] or real.startswith(m['target'].rstrip('/')+'/')]
+    if not containing:
+        fail(f'Cannot identify filesystem containing {real}.')
+    return ancestors(max(containing, key=lambda m: len(m['target']))['maj:min'], devices)
+
+
+def swap_devices():
+    result = []
+    for path in run('swapon', '--show', '--raw', '--noheadings', '--output', 'NAME', capture=True).splitlines():
+        st = Path(path).stat()
+        dev = st.st_rdev if stat.S_ISBLK(st.st_mode) else st.st_dev
+        result.append(f'{os.major(dev)}:{os.minor(dev)}')
+    return result
+
+
+def disk_record(node):
+    return {key: node.get(key) for key in ('name', 'serial', 'wwn', 'maj:min', 'size')} | {
+        'uuids': [x['uuid'] for x in flatten([node]) if x.get('uuid')]}
+
+
+def identity(node):
+    seq = Path('/sys/dev/block')/node['maj:min']/'diskseq'
+    return disk_record(node) | {'diskseq': seq.read_text().strip() if seq.exists() else None,
+        'partitions': [(x['name'],x.get('size'),x.get('fstype'),x.get('pttype')) for x in flatten([node])]}
+
+
+def fstab_entries(text):
+    for line in text.splitlines():
+        content = line.split('#', 1)[0].strip()
+        if not content:
+            continue
+        fields = content.split()
+        if len(fields) < 4:
+            fail('Malformed fstab entry: '+line)
+        yield fields
+
+
+def unescape_fstab(value):
+    return re.sub(r'\\([0-7]{3})', lambda m: chr(int(m[1], 8)), value)
+
+
+def confined_path(root, name):
+    """Resolve filesystem links with chroot semantics; absolute links stay in root."""
+    root=Path(root); pending=list(PurePosixPath(name).parts); resolved=[]; hops=0
+    while pending:
+        part=pending.pop(0)
+        if part in ('','/','.'): continue
+        if part=='..':
+            if resolved: resolved.pop()
+            continue
+        path=root.joinpath(*resolved,part)
+        if path.is_symlink():
+            hops+=1
+            if hops>40: fail('Too many source symlinks: '+name)
+            link=os.readlink(path)
+            if link.startswith('/'): resolved=[]
+            pending=list(PurePosixPath(link).parts)+pending
+        else: resolved.append(part)
+    return root.joinpath(*resolved)
+
+
+def source_preflight(root, destination, live=False):
+    root = Path(root).resolve(strict=True)
+    if live and root!=Path('/'): fail('--live requires --source-root / on the running installation.')
+    if not live and root==Path('/'): fail('Source / is running; use --live explicitly or mount an offline installation.')
+    table, devices = mounts(), block_devices()
+    exact = {m['target']: m for m in table}
+    required = [(root, 'ext4'), (root/'home', 'ext4'), (root/'boot/efi', 'vfat')]
+    source_majors = set()
+    source_names = set()
+    for path, fs in required:
+        if path.resolve() != path:
+            fail(f'Source mount path may not be a symlink: {path}')
+        m = exact.get(str(path))
+        if not m or m['fstype'] != fs or m.get('fsroot') != '/':
+            fail(f'Missing conventional {fs} source mount: {path}')
+        if not live and 'ro' not in m['options'].split(','):
+            fail(f'Source must be mounted read-only: {path}')
+        source_majors.add(m['maj:min'])
+        matched = [n for n in flatten(devices) if n['maj:min'] == m['maj:min']]
+        if len(matched) != 1 or matched[0]['type'] != 'part':
+            fail('Encrypted, RAID, LVM and non-partition sources are unsupported.')
+        names = ancestors(m['maj:min'], devices)
+        if len(names) != 1:
+            fail('Cannot identify conventional source disk.')
+        source_names.update(names)
+    if len(source_majors) != 3:
+        fail('Root, home and EFI must be independent partitions.')
+    for m in table:
+        if not live and m['maj:min'] in source_majors:
+            if 'rw' in m['options'].split(',') or m['target'] in ('/', '/home', '/boot', '/boot/efi', '/usr', '/var'):
+                fail('Source is mounted writable or belongs to the running system.')
+    selected = [n for n in devices if n['name'] in source_names]
+    if len(selected) != len(source_names):
+        fail('Unsupported source block topology.')
+    for disk in selected:
+        if any(n['type'] not in ('disk','part') or holders(n) for n in flatten([disk])):
+            fail('Source has RAID/LVM/device-mapper holders.')
+    release = confined_path(root,'etc/os-release').read_text()
+    if not re.search(r'^ID=ubuntu$', release, re.M) or not re.search(r'^VERSION_ID="?24\.04"?$', release, re.M):
+        fail('Only Ubuntu 24.04 sources are supported.')
+    crypttab=confined_path(root,'etc/crypttab').read_text() if confined_path(root,'etc/crypttab').exists() else ''
+    with confined_path(root,'usr/bin/dpkg').open('rb') as executable:
+        elf=executable.read(20)
+    validate_system_metadata(release,confined_path(root,'etc/fstab').read_text(),crypttab,elf)
+    entries = list(fstab_entries(confined_path(root,'etc/fstab').read_text()))
+    for mountpoint, fs in [('/', 'ext4'),('/home','ext4'),('/boot/efi','vfat')]:
+        e = [x for x in entries if x[1] == mountpoint]
+        if len(e) != 1 or e[0][2] != fs:
+            fail(f'Source fstab must describe {mountpoint} as {fs}.')
+        node = next(n for n in flatten(devices) if n['maj:min'] == exact[str(root / mountpoint.lstrip('/'))]['maj:min'])
+        spec = unescape_fstab(e[0][0])
+        if spec != 'UUID='+str(node.get('uuid')) and Path(spec).resolve() != Path(node['name']).resolve():
+            # Resolve LABEL/PARTUUID aliases using util-linux, never execute source contents.
+            if not spec.startswith(('UUID=', 'LABEL=', 'PARTUUID=', 'PARTLABEL=')) or run('findfs', spec, capture=True).strip() != node['name']:
+                fail(f'Mounted {mountpoint} does not match source fstab.')
+    for e in entries:
+        if e[1] in ('/boot','/usr','/var','/opt') or any(e[1].startswith(p+'/') for p in ('/usr','/var','/opt')):
+            fail('Separate essential filesystems are unsupported: '+e[1])
+    dynamic = []
+    for m in table:
+        target = Path(m['target'])
+        if target != root and root in target.parents and str(target) not in {str(p) for p,_ in required}:
+            if any(target == p or target in p.parents for p,_ in required):
+                fail('Nested mount shadows a required source: '+str(target))
+            relative=target.relative_to(root)
+            if relative.parts[0] not in ('dev','proc','sys','run','tmp'):
+                dynamic.append('./'+str(relative))
+    destination = Path(destination).resolve()
+    if destination == root:
+        fail('Destination cannot be the source root.')
+    if root in destination.parents:
+        rel = destination.relative_to(root)
+        if rel.parts[0] not in ('mnt','media','backup'):
+            fail('Destination inside source must be below mnt, media or backup.')
+        dynamic.append('./'+str(rel))
+    if live:
+        containing=[m for m in table if str(destination)==m['target'] or str(destination).startswith(m['target'].rstrip('/')+'/')]
+        if not containing or max(containing,key=lambda m:len(m['target']))['maj:min'] in source_majors:
+            fail('Mount the backup drive first; live destination cannot be on source root/home/EFI.')
+    swap_bytes = 0
+    for e in entries:
+        if e[2] != 'swap':
+            continue
+        spec = unescape_fstab(e[0])
+        if spec.startswith('/') and (root/spec.lstrip('/')).is_file():
+            swap_bytes += (root/spec.lstrip('/')).stat().st_size
+            dynamic.append('./'+spec.lstrip('/'))
+        else:
+            resolved=spec
+            if spec.startswith('/'): resolved=str(Path(spec).resolve())
+            elif spec.startswith(('LABEL=','PARTUUID=','PARTLABEL=')): resolved=str(Path(run('findfs',spec,capture=True).strip()).resolve())
+            found = [n for n in flatten(devices) if resolved==n['name'] or spec=='UUID='+str(n.get('uuid'))]
+            if len(found) != 1 or found[0]['type'] != 'part' or not ancestors(found[0]['maj:min'],devices) <= source_names:
+                fail('Unsupported or missing source swap: '+spec)
+            swap_bytes += int(found[0]['size'])
+    return {'source_disks':[disk_record(n) for n in selected], 'swap_bytes':swap_bytes,
+            'excludes': sorted(set(dynamic)), 'consistency':'live-nonatomic' if live else 'offline'}
+
+
+def destination_preflight(destination):
+    table=mounts(); path=Path(destination).resolve()
+    containing=[m for m in table if str(path)==m['target'] or str(path).startswith(m['target'].rstrip('/')+'/')]
+    if not containing: fail('Cannot identify backup destination filesystem.')
+    mount=max(containing,key=lambda m:len(m['target']))
+    if mount['fstype'] not in ('ext4','xfs','btrfs','f2fs') or 'rw' not in mount['options'].split(','):
+        fail('Browsable home backup requires a writable Linux filesystem (ext4 recommended), not FAT/exFAT/NTFS.')
+
+
+def home_excludes(dynamic):
+    return ['/*/.cache/*']+['/'+re.sub(r'([*?\[\]\\])',r'\\\1',p[len('./home/'):]) for p in dynamic if p.startswith('./home/')]
+
+
+def home_skip(relative,dynamic,exclude_caches=True):
+    parts=PurePosixPath(relative).parts
+    if exclude_caches and len(parts)>=3 and parts[1]=='.cache': return True
+    for pattern in dynamic:
+        if pattern.startswith('./home/'):
+            literal=pattern[len('./home/'):].rstrip('/')
+            if relative==literal or relative.startswith(literal+'/'): return True
+    return False
+
+
+def copy_command(args, live, home_copy=False):
+    warnings=[]
+    result=ACTIVE_PROGRESS.command(args,'home' if home_copy else 'root',command_env()) if ACTIVE_PROGRESS else subprocess.run(
+        [str(a) for a in args],text=True,stderr=subprocess.PIPE,env=command_env())
+    lines=result.stderr.splitlines()
+    if result.stderr and not ACTIVE_PROGRESS: print(result.stderr,end='',file=sys.stderr)
+    warnings.extend(lines)
+    if home_copy:
+        if result.returncode==0: return warnings
+        if live and result.returncode==24:
+            phase('Files vanished during home copy; keeping best-effort copy and continuing verification')
+            return warnings
+        fail(f'Home copy failed (exit {result.returncode}); backup remains incomplete.')
+    if result.returncode not in (0,1): fail(f'Tar failed (exit {result.returncode}); backup remains incomplete.')
+    changed=any(line.endswith((': file changed as we read it',': File removed before we read it')) or re.search(r': File shrank by [0-9]+ bytes?; padding with zeros$',line) for line in lines)
+    for line in lines:
+        transient=any(line.endswith(': '+term) for term in ('file changed as we read it','File removed before we read it',
+            'Cannot stat: No such file or directory','Cannot open: No such file or directory')) or bool(re.search(r': File shrank by [0-9]+ bytes?; padding with zeros$',line))
+        adjusted=bool(re.fullmatch(r'xz: Reduced the number of threads from [1-9][0-9]* to [1-9][0-9]* to not exceed the memory usage limit of [1-9][0-9]* MiB',line))
+        harmless=adjusted or line.endswith(': socket ignored') or line.startswith('tar: Removing leading')
+        if not transient and not harmless: fail('Unexpected tar warning/error: '+line)
+        if transient and not live: fail('Offline source changed; backup remains incomplete.')
+    if result.returncode==1 and not (live and changed): fail('Tar returned an unexplained nonzero status.')
+    return warnings
+
+
+def copy_home(source, destination, dynamic, exclude_caches=True, live=False):
+    destination=Path(destination); destination.mkdir(parents=True,exist_ok=True)
+    excludes=home_excludes(dynamic) if exclude_caches else []
+    args=['rsync','-aHAXS','--numeric-ids',*['--exclude='+p for p in excludes],
+          str(source).rstrip('/')+'/',str(destination).rstrip('/')+'/']
+    if ACTIVE_PROGRESS: args[1:1]=['--info=progress2,name1','--no-inc-recursive','--outbuf=L','--out-format=BACKUP_PC_FILE:%n%L']
+    warnings=copy_command(args,live,home_copy=True) if live or ACTIVE_PROGRESS else []
+    if not live and not ACTIVE_PROGRESS: run(*args)
+    # Reapply directory timestamps explicitly: some rsync/filesystem combinations
+    # leave newly created directory times at copy time. Files retain rsync times.
+    def directory_times(path,relative):
+        if relative!='.' and home_skip(relative,dynamic,exclude_caches): return
+        if not path.is_symlink() and path.is_dir():
+            st=path.stat()
+            for child in path.iterdir(): directory_times(child,child.name if relative=='.' else relative+'/'+child.name)
+            os.utime(destination/relative,ns=(st.st_atime_ns,st.st_mtime_ns),follow_symlinks=False)
+    if not live: directory_times(Path(source),'.')
+    return warnings
+
+
+def sparse_file_info(path, size):
+    # Hash positions and nonzero 4 KiB blocks, including logical size. Canonical
+    # zero/hole treatment permits huge sparse files without reading terabytes.
+    digest=hashlib.sha256(b'sha256-nonzero-4k-v1\0'+str(size).encode()+b'\0')
+    fd=os.open(path,os.O_RDONLY|os.O_NOFOLLOW)
+    try:
+        position=0; allocated=0
+        while position<size:
+            try:
+                data=os.lseek(fd,position,os.SEEK_DATA)
+                end=os.lseek(fd,data,os.SEEK_HOLE)
+            except OSError as exc:
+                if exc.errno==errno.ENXIO: break
+                if exc.errno not in (errno.EINVAL,errno.ENOTSUP): raise
+                data,end=position,size
+            data=(data//4096)*4096; end=min(end,size)
+            os.lseek(fd,data,os.SEEK_SET)
+            while data<end:
+                chunk=os.read(fd,min(4*MIB,end-data))
+                if not chunk: fail('Home file changed while hashing: '+str(path))
+                for offset in range(0,len(chunk),4096):
+                    block=chunk[offset:offset+4096]
+                    if block!=bytes(len(block)):
+                        digest.update((data+offset).to_bytes(8,'big'));digest.update(block);allocated+=4096
+                data+=len(chunk)
+            position=max(end,position+1)
+    finally: os.close(fd)
+    return digest.hexdigest(),allocated
+
+
+def sparse_digest(path,size):
+    return sparse_file_info(path,size)[0]
+
+
+def inspect_home(home, excludes, exclude_caches=True):
+    home=Path(home)
+    if home.is_symlink() or not home.is_dir(): fail('Missing/nonsafe browsable home directory.')
+    entries=[]; inodes={}; total=0
+    def visit(path,relative):
+        nonlocal total
+        if relative!='.' and home_skip(relative,excludes,exclude_caches): return
+        st=path.lstat()
+        attrs={name:base64.b64encode(os.getxattr(path,name,follow_symlinks=False)).decode('ascii')
+               for name in sorted(os.listxattr(path,follow_symlinks=False))}
+        record={'path':relative,'mode':st.st_mode,'uid':st.st_uid,'gid':st.st_gid,'mtime_ns':st.st_mtime_ns,'xattrs':attrs}
+        total+=4096
+        if stat.S_ISREG(st.st_mode):
+            key=(st.st_dev,st.st_ino)
+            record['size']=st.st_size
+            if key in inodes: record['link']=inodes[key]
+            else:
+                inodes[key]=relative;record['digest'],allocated=sparse_file_info(path,st.st_size);total+=allocated
+        elif stat.S_ISLNK(st.st_mode): record['target']=os.readlink(path)
+        elif not stat.S_ISDIR(st.st_mode): record['rdev']=st.st_rdev
+        entries.append(record)
+        if stat.S_ISDIR(st.st_mode):
+            for child in sorted(path.iterdir(),key=lambda p:p.name):
+                visit(child,child.name if relative=='.' else relative+'/'+child.name)
+    visit(home,'.')
+    return {'digest_algorithm':'sha256-nonzero-4k-v1','entries':entries,'bytes':total}
+
+
+def compression_resources(percent=75):
+    if not isinstance(percent,int) or not 1<=percent<=100:
+        fail('Resource percentage must be an integer from 1 to 100.')
+    cpus=len(os.sched_getaffinity(0))
+    try:
+        memory={name:int(value)*1024 for name,value in
+                re.findall(r'^(MemTotal|MemAvailable):\s+([0-9]+) kB$',Path('/proc/meminfo').read_text(),re.M)}
+        ceiling=min(memory['MemTotal'],memory['MemAvailable'])*percent//100
+    except (OSError,KeyError,ValueError):
+        fail('Cannot read available RAM from /proc/meminfo; refusing an unbounded compressor.')
+    # -9e requires ~674 MiB single-threaded, ~1250 MiB per threaded encoder.
+    if ceiling<700*MIB: fail('Compression budget is below 700 MiB; free RAM or increase --resource-percent to retain -9e.')
+    threads=max(1,cpus*percent//100)
+    if ceiling<1280*MIB: threads=1
+    return {'percent':percent,'threads':threads,'memory_bytes':ceiling,'cpu_count':cpus}
+
+
+def create_archive(root, archive, dynamic, partial=False, live=False, resources=None):
+    excludes = EXCLUDES + (['./home'] if partial else ['./home/*'])
+    if not partial:
+        resources=compression_resources() if resources is None else resources
+    archive=Path(archive); archive.touch(mode=0o600); archive.chmod(0o600)
+    compression='--gzip' if partial else ('--use-compress-program=xz -9e --threads='+str(resources['threads'])+
+        ' --memlimit-compress='+str(resources['memory_bytes'])+' --no-adjust')
+    args = ['tar', '--create', compression, '--file', str(archive), '--numeric-owner',
+            '--acls', '--xattrs', '--xattrs-include=*', '--sparse', '--anchored', '--wildcards']
+    args.extend('--exclude='+p for p in excludes)
+    args.append('--no-wildcards');args.extend('--exclude='+p for p in dynamic)
+    if ACTIVE_PROGRESS: args+=['--verbose','--quoting-style=escape','--blocking-factor=20','--checkpoint=100','--checkpoint-action=echo=BACKUP_PC_ROOT_RECORD=%u']
+    # EFI is included; home directory metadata only, data is browsable beside tar.
+    if live: args.append('--ignore-failed-read')
+    return copy_command(args+['-C',str(root),'.'],live)
+
+
+def extract_archive(archive, root):
+    run('tar', '--extract', '--xz', '--file', archive, '--directory', root,
+        '--numeric-owner', '--same-permissions', '--acls', '--xattrs', '--xattrs-include=*', '--sparse')
+
+
+def safe_name(name):
+    if name.startswith('/') or '..' in PurePosixPath(name).parts:
+        fail('Unsafe archive path: '+name)
+    return str(PurePosixPath(name))
+
+
+def partition_of(name):
+    if name == 'home' or name.startswith('home/'):
+        return 'home'
+    if name == 'boot/efi' or name.startswith('boot/efi/'):
+        return 'efi'
+    return 'root'
+
+
+def validate_system_metadata(release, fstab, crypttab, elf):
+    if not re.search(r'^ID=ubuntu$',release,re.M) or not re.search(r'^VERSION_ID="?24\.04"?$',release,re.M):
+        fail('Only Ubuntu 24.04 archives are supported.')
+    if len(elf)<20 or elf[:6]!=b'\x7fELF\x02\x01' or int.from_bytes(elf[18:20],'little')!=62:
+        fail('Archive architecture is not amd64 ELF64.')
+    if any(line.split('#',1)[0].strip() for line in crypttab.splitlines()):
+        fail('Encrypted source/recovery layouts are unsupported.')
+    entries=list(fstab_entries(fstab))
+    for mountpoint,fs in [('/', 'ext4'),('/home','ext4'),('/boot/efi','vfat')]:
+        selected=[e for e in entries if e[1]==mountpoint]
+        if len(selected)!=1 or selected[0][2]!=fs:
+            fail('Unsupported fstab root/home/EFI layout.')
+    for entry in entries:
+        if entry[1] in ('/boot','/usr','/var','/opt') or any(entry[1].startswith(p+'/') for p in ('/usr','/var','/opt')):
+            fail('Separate essential filesystem unsupported: '+entry[1])
+
+
+def inspect_archive(archive):
+    phase('Reading full archive and checking required system/boot files')
+    # Consume listing without retaining millions of filenames in a subprocess buffer.
+    subprocess.run(['tar','--list','--xz','--ignore-zeros','--file',str(archive)],
+                   check=True, stdout=subprocess.DEVNULL,env=command_env())
+    totals={'root':0,'home':0,'efi':0}
+    seen, links, symlinks, dirs, metadata = {}, {}, {}, set(), {}
+    metadata_names={'etc/os-release','usr/lib/os-release','etc/fstab','etc/crypttab','usr/bin/dpkg'}
+    with tarfile.open(archive,'r:xz') as tf:
+        for member in tf:
+            name=safe_name(member.name)
+            if name in seen and not member.isdir(): fail('Duplicate archive path: '+name)
+            seen[name]='file' if member.isfile() else 'dir' if member.isdir() else 'other'
+            if member.isdir(): dirs.add(name)
+            if partition_of(name)=='efi' and not (member.isfile() or member.isdir()):
+                fail('EFI files must be ordinary files/directories for FAT32: '+name)
+            if member.issym(): symlinks[name]=member.linkname
+            if member.islnk():
+                target=safe_name(member.linkname)
+                if partition_of(name)!=partition_of(target): fail('Hardlink crosses restored filesystems: '+name)
+                links[name]=target
+            if member.isfile():
+                size=sum(length for _,length in member.sparse) if member.sparse is not None else member.size
+                totals[partition_of(name)]+=((size+4095)//4096)*4096+4096
+                if name in metadata_names:
+                    limit=20 if name=='usr/bin/dpkg' else MIB
+                    if name!='usr/bin/dpkg' and member.size>limit: fail('Oversized system metadata: '+name)
+                    metadata[name]=tf.extractfile(member).read(limit)
+            else: totals[partition_of(name)]+=4096
+    for name in seen:
+        if any(str(parent) in symlinks for parent in PurePosixPath(name).parents):
+            fail('Archive path descends through a symlink: '+name)
+    for name,target in links.items():
+        if seen.get(target)!='file': fail('Hardlink target missing or unsupported: '+name)
+    # These paths are subsequently used by the host Python/mount process. Never
+    # follow an archived absolute link out of the restored tree for writes/mounts.
+    managed_dirs=('dev','dev/pts','proc','sys','run','tmp','etc','etc/default','etc/default/grub.d',
+                  'etc/initramfs-tools','etc/initramfs-tools/conf.d','home','boot','boot/efi',
+                  'boot/efi/EFI','boot/efi/EFI/ubuntu','boot/efi/EFI/BOOT','usr','usr/lib','usr/lib/shim','usr/lib/grub','usr/lib/grub/x86_64-efi-signed')
+    for name in managed_dirs:
+        if name in seen and seen[name]!='dir': fail('Unsafe restore-managed directory: '+name)
+    for name in seen:
+        if name in ('etc/fstab','etc/default/grub') or name.startswith(('etc/default/grub.d/','etc/initramfs-tools/conf.d/')):
+            if seen[name] not in ('file','dir'): fail('Unsafe restore-managed configuration: '+name)
+    def resolve(name, visited=None):
+        visited=set() if visited is None else visited
+        if name in visited: fail('Cyclic required archive symlink: '+name)
+        visited.add(name)
+        if name in symlinks:
+            target=symlinks[name]
+            joined=posixpath.normpath('/'+(target.lstrip('/') if target.startswith('/') else posixpath.join(posixpath.dirname(name),target)))
+            return resolve(joined.lstrip('/'),visited)
+        return name
+    missing=[name for name in REQUIRED if seen.get(resolve(name))!='file']
+    if missing or not {'home','boot/efi'} <= dirs:
+        fail('Incomplete/legacy partial archive; missing: '+', '.join(missing or ['home/EFI directories']))
+    # Boot artifact source reads must remain inside the extracted tree too.
+    if any(name in symlinks for name in REQUIRED if name.startswith(('usr/bin/','usr/sbin/'))):
+        fail('Symlinked system executables are unsupported.')
+    if 'usr/lib/shim/mmx64.efi' in seen and seen.get(resolve('usr/lib/shim/mmx64.efi'))!='file':
+        fail('Unsupported optional MokManager artifact.')
+    release_name=resolve('etc/os-release')
+    if release_name not in metadata: fail('Unsupported os-release symlink target.')
+    validate_system_metadata(metadata[release_name].decode('utf-8'),metadata['etc/fstab'].decode('utf-8'),
+                             metadata.get('etc/crypttab',b'').decode('utf-8'),metadata['usr/bin/dpkg'])
+    kernels=[n[len('boot/vmlinuz-'):] for n in seen if n.startswith('boot/vmlinuz-') and seen[n]=='file']
+    if not kernels or not all(any(seen.get(p+k+'/modules.dep')=='file' for p in ('lib/modules/','usr/lib/modules/')) for k in kernels):
+        fail('Archive lacks matching kernels/modules.')
+    return {p+'_bytes':v for p,v in totals.items()}
+
+
+def sha256(path):
+    digest=hashlib.sha256()
+    with Path(path).open('rb') as f:
+        for chunk in iter(lambda:f.read(4*2**20),b''):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def bundle_files(bundle):
+    return tuple(name for name in BUNDLE_FILES if name!='warnings.json' or (bundle/name).exists()) + tuple(name for name in ('backup-pc-progress.py','backup-pc-sync.py') if (bundle/name).exists())
+
+
+def write_checksums(bundle):
+    (bundle/'SHA256SUMS').write_text(''.join(f'{sha256(bundle/name)}  {name}\n' for name in bundle_files(bundle)))
+
+
+def verify_bundle(archive):
+    archive = Path(archive).resolve(strict=True)
+    bundle = archive.parent
+    if archive.name != 'system.tar.xz' or not (bundle/'COMPLETE').is_file() or bundle.name.endswith('.incomplete'):
+        fail('Not a completed full-system backup bundle.')
+    files=bundle_files(bundle)
+    if any((bundle/name).is_symlink() or not (bundle/name).is_file() for name in files):
+        fail('Missing or symlinked bundle file.')
+    expected = {}
+    for line in (bundle/'SHA256SUMS').read_text().splitlines():
+        match = re.fullmatch(r'([0-9a-f]{64})  ([a-zA-Z0-9.-]+)',line)
+        if not match or match[2] in expected:
+            fail('Invalid checksum file.')
+        expected[match[2]]=match[1]
+    if set(expected) != set(files):
+        fail('Checksums must cover archive, manifest, script and instructions.')
+    phase('Verifying bundle SHA-256 checksums')
+    for name,digest in expected.items():
+        if sha256(bundle/name) != digest:
+            fail('Checksum mismatch: '+name)
+    manifest=json.loads((bundle/'manifest.json').read_text())
+    if not isinstance(manifest,dict) or any(manifest.get(k)!=v for k,v in {
+            'schema':2,'coverage':'full-system','storage':'compressed-system+browsable-home','architecture':'amd64','os':'ubuntu','version':'24.04','boot':'uefi'}.items()):
+        fail('Unsupported or legacy partial recovery manifest.')
+    if type(manifest.get('home_bytes')) is not int or manifest['home_bytes']<0 or type(manifest.get('swap_bytes')) is not int or not 0 <= manifest['swap_bytes'] <= 1024*GIB:
+        fail('Invalid source swap capacity.')
+    if not isinstance(manifest.get('source_disks'),list) or not all(isinstance(d,dict) for d in manifest['source_disks']):
+        fail('Invalid source disk identity records.')
+    if manifest.get('consistency','offline') not in ('offline','live-nonatomic'): fail('Invalid consistency label.')
+    if manifest.get('consistency')=='live-nonatomic' and 'warnings.json' not in files: fail('Live backup lacks warnings artifact.')
+    if 'warnings.json' in files and not isinstance(json.loads((bundle/'warnings.json').read_text()),list): fail('Invalid warnings artifact.')
+    info=inspect_archive(archive)
+    if info['home_bytes']>4096:
+        fail('System archive unexpectedly contains home data; split-storage bundle required.')
+    if manifest.get('archive') != info:
+        fail('Archive capacity metadata does not match archived contents.')
+    phase('Verifying browsable home files, metadata and hardlinks')
+    home=inspect_home(bundle/'home',excludes=[],exclude_caches=False)
+    recorded=json.loads((bundle/'home-index.json').read_text())
+    if home!=recorded or manifest.get('home_bytes')!=home['bytes']:
+        fail('Home files or metadata differ from the completed backup inventory.')
+    return manifest
+
+
+def new_bundle(destination, now=None):
+    day=(datetime.datetime.now().astimezone() if now is None else now).strftime('%m-%d-%y')
+    number=1
+    while True:
+        name=day+('' if number==1 else f'-{number:02d}')
+        target=Path(destination)/name
+        bundle=Path(destination)/(name+'.incomplete')
+        if not target.exists() and not target.is_symlink():
+            try:
+                bundle.mkdir(mode=0o700)
+                return bundle
+            except FileExistsError: pass
+        number+=1
+
+
+def sync_home(args):
+    path=Path(os.environ.get('BACKUP_PC_SCRIPT',__file__)).with_name('backup-pc-sync.py')
+    spec=importlib.util.spec_from_file_location('backup_sync',path)
+    helper=importlib.util.module_from_spec(spec);spec.loader.exec_module(helper)
+    helper.sync_home(args,globals())
+
+
+def backup(args):
+    global ACTIVE_PROGRESS
+    require_root()
+    require_tools(['tar','xz','rsync','findmnt','lsblk','findfs'])
+    live=getattr(args,'live',False)
+    root=Path(args.source_root).resolve(strict=True)
+    dest=Path(args.destination).resolve()
+    phase('Checking '+('running' if live else 'offline')+' source mounts and layout')
+    meta=source_preflight(root,dest,live=live)
+    meta['consistency']='live-nonatomic' if live else 'offline'
+    if live: phase('LIVE BACKUP: files and services can change between copies; this is not an atomic snapshot.')
+    destination_preflight(dest)
+    phase(f'Full-system source: {root}; destination: {dest}')
+    for pattern in EXCLUDES+meta['excludes']:
+        print('  exclude '+pattern)
+    for name in REQUIRED:
+        if not confined_path(root,name).is_file():
+            fail('Source lacks required recovery file: '+name)
+    resources=compression_resources(getattr(args,'resource_percent',75))
+    meta['compression']=resources
+    phase(f"Compression: xz -9e; up to {resources['threads']}/{resources['cpu_count']} CPU threads; "
+          f"{resources['memory_bytes']/GIB:.1f} GiB memory ceiling ({resources['percent']}% resource budget)")
+    if args.dry_run:
+        phase('Dry run complete; no files or disks changed')
+        return
+    spec=importlib.util.spec_from_file_location('backup_progress',Path(os.environ.get('BACKUP_PC_SCRIPT',__file__)).with_name('backup-pc-progress.py'))
+    progress=importlib.util.module_from_spec(spec);spec.loader.exec_module(progress)
+    owner=backup_owner()
+    dest.mkdir(parents=True,exist_ok=True)
+    stamp=datetime.datetime.now(datetime.timezone.utc).strftime('%Y%m%dT%H%M%SZ')
+    bundle=new_bundle(dest)
+    ACTIVE_PROGRESS=progress.Session(bundle)
+    published=None
+    try:
+        set_bundle_owner(bundle,owner)
+        phase('Activity log: '+str(ACTIVE_PROGRESS.log_path))
+        phase('Sizing root/EFI for estimated copy progress; home uses rsync transfer progress')
+        total=progress.estimate_root(root,EXCLUDES,meta['excludes'],live=live,callback=ACTIVE_PROGRESS.sizing)
+        ACTIVE_PROGRESS.start('root',total)
+        phase(f"Creating system tar.xz with xz -9e; up to {resources['threads']} threads, "
+              f"{resources['memory_bytes']/GIB:.1f} GiB memory ceiling; this can take hours")
+        warnings=create_archive(root,bundle/'system.tar.xz',meta['excludes'],live=live,resources=resources)
+        ACTIVE_PROGRESS.finish('root')
+        phase('Verifying root/EFI archive readability and required recovery files')
+        set_bundle_owner(bundle,owner)
+        info=inspect_archive(bundle/'system.tar.xz')
+        phase('Copying home as browsable files, preserving ownership/ACLs/xattrs/hardlinks/sparse files')
+        source_home=None if live else inspect_home(root/'home',meta['excludes'])
+        ACTIVE_PROGRESS.start('home')
+        warnings+=copy_home(root/'home',bundle/'home',meta['excludes'],live=live)
+        ACTIVE_PROGRESS.finish('home')
+        phase('Verifying copied home files and metadata; copy percentages exclude verification')
+        home=inspect_home(bundle/'home',excludes=[],exclude_caches=False)
+        if source_home is not None and source_home['entries']!=home['entries']:
+            fail('Destination did not preserve home data/metadata; use a Linux filesystem such as ext4.')
+        (bundle/'home-index.json').write_text(json.dumps(home,indent=2)+'\n')
+        (bundle/'home-index.json').chmod(0o600)
+        (bundle/'warnings.json').write_text(json.dumps(warnings,indent=2)+'\n')
+        (bundle/'warnings.json').chmod(0o600)
+        manifest={'schema':2,'coverage':'full-system','storage':'compressed-system+browsable-home','architecture':'amd64','os':'ubuntu',
+                  'version':'24.04','boot':'uefi','created_utc':stamp,'archive':info,'home_bytes':home['bytes'], **meta}
+        (bundle/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
+        script=Path(os.environ.get('BACKUP_PC_SCRIPT',__file__))
+        shutil.copy2(script,bundle/'backup-pc'); (bundle/'backup-pc').chmod(0o755)
+        shutil.copy2(progress.__file__,bundle/'backup-pc-progress.py')
+        shutil.copy2(script.with_name('backup-pc-sync.py'),bundle/'backup-pc-sync.py')
+        (bundle/'RECOVERY.md').write_text('''# Restore this Ubuntu backup
+
+Boot an amd64 Ubuntu live USB in UEFI mode, mount this backup HDD, and leave the target HDD unmounted. Run the included command with sudo, inspect the target and layout, then type the exact ERASE phrase only if the entire disk can be lost.
+
+sudo /path/to/BACKUP/backup-pc restore --archive /path/to/BACKUP/system.tar.xz --target-disk /dev/disk/by-id/TARGET-HDD
+
+Use --dry-run first; --root-size 80 sets root to 80 GiB. Every partition and all data on the selected disk will be lost. No firmware entries are changed. On success power off, disconnect source/backup disks and boot the target using the UEFI disk menu. Keep the sibling home/ directory and home-index.json intact; home files are directly browsable without extraction. System files use maximum xz compression. No automatic reboot. Secure Boot has not been boot-tested. Checksums detect corruption; keep the bundle trusted and protected. This bundle contains personal files and credentials and is not encrypted.
+
+Needs Bash, Python 3, GNU tar, xz, rsync, util-linux (findmnt/lsblk/findfs/swapon/sfdisk/wipefs/blkid/mount/chroot), parted, udevadm, dosfstools, e2fsprogs and source Ubuntu GRUB/initramfs tools. Use backup-pc --help for partial legacy commands; those archives cannot restore a disk.
+''')
+        with (bundle/'RECOVERY.md').open('a') as instructions:
+            instructions.write('\nSource consistency: '+meta['consistency']+'. Live backups copy changing files at different times; application consistency is not guaranteed. Review warnings.json. Restore always from live USB.\n')
+        phase('Writing bundle checksums before publication')
+        write_checksums(bundle)
+        (bundle/'COMPLETE').write_text('full-system schema 2 split storage\n')
+        for name in BUNDLE_FILES:
+            if not (bundle/name).is_file(): fail('Bundle publication lacks '+name)
+        set_bundle_owner(bundle,owner)
+        os.sync()
+        bundle.chmod(0o755)  # Home keeps original per-user permissions; allow traversal.
+        target=bundle.with_suffix('')
+        bundle.rename(target); published=target; os.sync()
+        phase('BACKUP COMPLETE: '+str(published))
+        phase('Activity log: '+str(published/'backup.log'))
+    except BaseException as exc:
+        if published is not None:
+            print('backup-pc: BACKUP PUBLISHED: '+str(published)+'; final reporting failed: '+str(exc),file=sys.stderr,flush=True)
+        else: phase('BACKUP INCOMPLETE: '+str(bundle)+'; '+str(exc))
+        raise
+    finally:
+        try:
+            try: set_bundle_owner(published or bundle,owner)
+            finally: ACTIVE_PROGRESS.close()
+        finally: ACTIVE_PROGRESS=None
+
+
+def layout_for(info, swap, capacity, override):
+    root_min=max(64, math.ceil((info['root_bytes']*1.2+GIB)/GIB))
+    root_gib=root_min if override is None else override
+    if type(root_gib) is not int or root_gib < root_min:
+        fail(f'Root must be at least {root_min} GiB for this archive.')
+    swap=math.ceil(swap/MIB)*MIB
+    home=capacity-GIB-root_gib*GIB-swap-4*MIB
+    home_min=math.ceil(info['home_bytes']*1.1)+GIB
+    if info.get('efi_bytes',0)>900*MIB:
+        fail('EFI data cannot fit the proposed 1 GiB EFI partition.')
+    if home < home_min:
+        fail(f'Target capacity insufficient; home needs at least {math.ceil(home_min/GIB)} GiB after root/EFI/swap.')
+    return {'root_gib':root_gib,'swap_bytes':swap,'home_bytes':home}
+
+
+def target_preflight(target, archive, manifest):
+    resolved=str(Path(target).resolve(strict=True)) if Path(target).exists() else str(Path(target).resolve())
+    if not is_block(resolved):
+        fail('Target must be an explicit whole block disk.')
+    devices, table=block_devices(), mounts()
+    disks=[d for d in devices if d['name']==resolved and d['type']=='disk']
+    if len(disks)!=1:
+        fail('Target must be a whole disk, not a partition/loop/RAID/LVM device.')
+    disk=disks[0]; nodes=list(flatten([disk])); majors={n['maj:min'] for n in nodes}
+    if disk.get('ro') or any(n['type'] not in ('disk','part') or holders(n) for n in nodes):
+        fail('Target is read-only or has RAID/LVM/device-mapper holders.')
+    if any(m['maj:min'] in majors for m in table):
+        fail('Target has mounted filesystems, including running-system mounts.')
+    if majors.intersection(swap_devices()):
+        fail('Target contains active swap.')
+    protected=path_disks(archive,devices,table)
+    for path in ('/','/home','/boot'):
+        protected.update(path_disks(path,devices,table))
+    if resolved in protected:
+        fail('Target is the backup or running-system disk.')
+    target_uuids={n.get('uuid') for n in nodes if n.get('uuid')}
+    for source in manifest['source_disks']:
+        matches=any(disk.get(k) and disk.get(k)==source.get(k) for k in ('serial','wwn'))
+        if matches or target_uuids.intersection(source.get('uuids',[])) or (not source.get('serial') and not source.get('wwn') and source.get('name')==resolved):
+            fail('Target matches the recorded source disk.')
+    disk=dict(disk); disk['_identity']=identity(disk)
+    return disk
+
+
+def rewrite_fstab(text, uuids):
+    kept=[]
+    for line in text.splitlines():
+        if not line.strip() or line.lstrip().startswith('#'):
+            kept.append(line); continue
+        fields=next(fstab_entries(line))
+        if fields[1] in ('/','/home','/boot/efi') or fields[2]=='swap':
+            continue
+        if fields[2] not in ('proc','sysfs','devpts','tmpfs','securityfs','cgroup','cgroup2','debugfs','efivarfs'):
+            opts=[o for o in fields[3].split(',') if o not in ('fail','nofail')]
+            fields[3]=','.join(opts+['nofail'])
+        kept.append(' '.join(fields))
+    kept += [f'UUID={uuids["root"]} / ext4 defaults 0 1',
+             f'UUID={uuids["home"]} /home ext4 defaults 0 2',
+             f'UUID={uuids["efi"]} /boot/efi vfat umask=0077 0 1']
+    if uuids.get('swap'):
+        kept.append(f'UUID={uuids["swap"]} none swap sw 0 0')
+    return '\n'.join(kept)+'\n'
+
+
+def update_resume(root, swap_uuid):
+    init=root/'etc/initramfs-tools/conf.d'; init.mkdir(parents=True,exist_ok=True)
+    for path in init.iterdir():
+        if path.is_file():
+            text=path.read_text()
+            path.write_text(re.sub(r'(?m)^\s*RESUME=.*$', 'RESUME='+('UUID='+swap_uuid if swap_uuid else 'none'),text))
+    (init/'resume').write_text('RESUME='+('UUID='+swap_uuid if swap_uuid else 'none')+'\n')
+    candidates=[root/'etc/default/grub']+list((root/'etc/default/grub.d').glob('*.cfg'))
+    for path in candidates:
+        if path.is_file():
+            text=path.read_text()
+            text=re.sub(r'\bresume=([^\s"\']+)', 'resume=UUID='+swap_uuid if swap_uuid else '',text)
+            text=re.sub(r'\bresume_offset=([^\s"\']+)', '', text)
+            path.write_text(text)
+
+
+def partition_paths(disk, count):
+    run('udevadm','settle')
+    data=json.loads(run('lsblk','--json','--paths','--output','NAME,TYPE,PARTN',disk,capture=True))
+    parts={int(n['partn']):n['name'] for n in flatten(data['blockdevices']) if n['type']=='part'}
+    if set(parts)!=set(range(1,count+1)):
+        fail('New partitions did not appear exactly as expected.')
+    return parts
+
+
+def install_boot(root, uuids):
+    run('chroot',root,'update-initramfs','-u','-k','all')
+    # os-prober must not add entries pointing at still-attached original disks.
+    grub_d=root/'etc/default/grub.d'; grub_d.mkdir(parents=True,exist_ok=True)
+    (grub_d/'99-backup-pc.cfg').write_text('GRUB_DISABLE_OS_PROBER=true\n')
+    run('chroot',root,'update-grub')
+    run('chroot',root,'grub-install','--target=x86_64-efi','--efi-directory=/boot/efi',
+        '--bootloader-id=ubuntu','--no-nvram','--recheck')
+    efi=root/'boot/efi/EFI'; ubuntu=efi/'ubuntu'; fallback=efi/'BOOT'
+    ubuntu.mkdir(parents=True,exist_ok=True); fallback.mkdir(parents=True,exist_ok=True)
+    # grub-install availability varies with Ubuntu signed packages. Preserve signed
+    # chain explicitly rather than replacing it with an unsigned fallback image.
+    shim=confined_path(root,'usr/lib/shim/shimx64.efi.signed')
+    grub=confined_path(root,'usr/lib/grub/x86_64-efi-signed/grubx64.efi.signed')
+    for directory in (ubuntu,fallback):
+        shutil.copy2(shim,directory/('BOOTX64.EFI' if directory==fallback else 'shimx64.efi'))
+        shutil.copy2(grub,directory/'grubx64.efi')
+        mm=confined_path(root,'usr/lib/shim/mmx64.efi')
+        if mm.exists(): shutil.copy2(mm,directory/'mmx64.efi')
+        (directory/'grub.cfg').write_text(f'search --no-floppy --fs-uuid --set=root {uuids["root"]}\nset prefix=($root)/boot/grub\nconfigfile $prefix/grub.cfg\n')
+
+
+def perform_restore(archive, disk, layout):
+    target=disk['name']; created=[]; work=Path(tempfile.mkdtemp(prefix='backup-pc-restore-'))
+    complete=False
+    def mount(*args):
+        run('mount',*args); created.append(Path(args[-1]))
+    try:
+        phase('ERASING selected disk and creating GPT partitions: '+target)
+        run('wipefs','--all',target)
+        run('parted','--script',target,'mklabel','gpt')
+        start=1; end=1025
+        run('parted','--script',target,'mkpart','EFI','fat32',f'{start}MiB',f'{end}MiB')
+        run('parted','--script',target,'set','1','esp','on')
+        start=end; end+=layout['root_gib']*1024
+        run('parted','--script',target,'mkpart','root','ext4',f'{start}MiB',f'{end}MiB')
+        if layout['swap_bytes']:
+            start=end; end+=layout['swap_bytes']//MIB
+            run('parted','--script',target,'mkpart','swap','linux-swap',f'{start}MiB',f'{end}MiB')
+        run('parted','--script',target,'mkpart','home','ext4',f'{end}MiB','100%')
+        run('partprobe',target)
+        parts=partition_paths(target,4 if layout['swap_bytes'] else 3)
+        home_n=4 if layout['swap_bytes'] else 3
+        phase('Creating fresh EFI/root/home filesystems and swap UUIDs')
+        # 4 KiB/inode matches conservative 4 KiB metadata allowance per archive
+        # entry, so tiny-file archives cannot exhaust default 16 KiB/inode tables.
+        # -F is applied only to the newly created ext4 partitions.
+        run('mkfs.vfat','-F','32',parts[1]); run('mkfs.ext4','-F','-i','4096','-m','1',parts[2])
+        run('mkfs.ext4','-F','-i','4096','-m','0',parts[home_n])
+        if layout['swap_bytes']: run('mkswap',parts[3])
+        mapping={'efi':parts[1],'root':parts[2],'home':parts[home_n]}
+        if layout['swap_bytes']: mapping['swap']=parts[3]
+        uuids={name:run('blkid','-s','UUID','-o','value',part,capture=True).strip() for name,part in mapping.items()}
+        if not all(uuids.values()) or len(set(uuids.values()))!=len(uuids):
+            fail('New filesystem UUIDs are missing or duplicated.')
+        mount(parts[2],work)
+        run('mount','--make-private',work)
+        for suffix in ('home','boot/efi'): (work/suffix).mkdir(parents=True,exist_ok=True)
+        mount(parts[home_n],work/'home'); mount(parts[1],work/'boot/efi')
+        phase('Restoring root/home/EFI files and metadata')
+        # FAT32 cannot store POSIX ownership/xattrs. Restore EFI separately without
+        # metadata flags; Linux root/home retain all tar metadata.
+        run('tar','--extract','--xz','--file',archive,'--directory',work,
+            '--numeric-owner','--same-permissions','--acls','--xattrs','--xattrs-include=*',
+            '--sparse','--exclude=./boot/efi')
+        run('tar','--extract','--xz','--file',archive,'--directory',work,
+            '--no-same-owner','--no-same-permissions','--no-acls','--no-xattrs','./boot/efi')
+        phase('Restoring browsable home files onto separate home partition')
+        copy_home(Path(archive).parent/'home',work/'home',[],exclude_caches=False)
+        for name,mode in [('dev',0o755),('proc',0o555),('sys',0o555),('run',0o755),('tmp',0o1777)]:
+            path=work/name
+            if not path.exists(): path.mkdir(mode=mode)
+        (work/'etc/fstab').write_text(rewrite_fstab((work/'etc/fstab').read_text(),uuids))
+        update_resume(work,uuids.get('swap'))
+        phase('Rebuilding initramfs and installing EFI boot files without firmware changes')
+        # Nonrecursive mounts prevent access to efivarfs; unmount exact owned paths.
+        for name,fs in [('dev',None),('proc','proc'),('sys','sysfs'),('run','tmpfs')]:
+            if fs: mount('-t',fs,fs,work/name)
+            else:
+                mount('--bind','/dev',work/name)
+                run('mount','--make-private',work/name)
+        (work/'dev/pts').mkdir(exist_ok=True)
+        mount('-t','devpts','devpts',work/'dev/pts')
+        install_boot(work,uuids)
+        run('sync'); complete=True
+    finally:
+        unmounted=True
+        for path in reversed(created):
+            try: run('umount',path)
+            except subprocess.CalledProcessError:
+                unmounted=False; print('Unmount failed; manually unmount script-created path: '+str(path),file=sys.stderr)
+        if unmounted: work.rmdir()
+        if not complete or not unmounted:
+            phase('TARGET INCOMPLETE: '+target+'; do not boot until recovery succeeds')
+        if complete and not unmounted: fail('Restore finished but cleanup failed.')
+    phase('RESTORE COMPLETE: '+target+'. Power off, disconnect original/backup disks, and select this disk in the UEFI boot menu. No reboot performed.')
+
+
+def restore(args):
+    require_root()
+    require_tools(['tar','xz','rsync','findmnt','lsblk','swapon','wipefs','parted','partprobe','udevadm',
+                   'mkfs.vfat','mkfs.ext4','mkswap','blkid','mount','umount','chroot','sync'])
+    manifest=verify_bundle(Path(args.archive))
+    if manifest.get('consistency')=='live-nonatomic': phase('LIVE BACKUP: application/file consistency is not guaranteed; review warnings.json before restoring.')
+    disk=target_preflight(args.target_disk,Path(args.archive),manifest)
+    snapshot=disk.get('_identity',identity(disk))
+    layout=layout_for(dict(manifest['archive'],home_bytes=manifest['home_bytes']),manifest['swap_bytes'],int(disk['size']),args.root_size)
+    phase('Target preview:')
+    print(f'  Path: {disk["name"]}\n  Model: {disk.get("model")}\n  Serial: {disk.get("serial")}\n  Capacity: {int(disk["size"])/GIB:.2f} GiB')
+    for n in flatten([disk]):
+        print(f'  Existing: {n["name"]} type={n["type"]} table={n.get("pttype")} filesystem={n.get("fstype")} size={n["size"]}')
+    # Read-only signature probe: even unpartitioned disks with old signatures hold data.
+    signatures=run('wipefs','--json','--no-act',disk['name'],capture=True)
+    print('  Existing signatures: '+signatures.strip())
+    print(f'  Proposed GPT: EFI 1 GiB FAT32; root {layout["root_gib"]} GiB ext4; swap {layout["swap_bytes"]/GIB:.2f} GiB; home remainder (~{layout["home_bytes"]/GIB:.2f} GiB) ext4')
+    print('WARNING: Every partition and all existing data on the selected HDD will be lost.')
+    if args.dry_run:
+        phase('Dry run complete; zero destructive operations')
+        return
+    try: answer=input(f'Type ERASE {disk["name"]} to continue: ')
+    except (EOFError,KeyboardInterrupt): fail('Cancelled; no disk changes.')
+    if answer!='ERASE '+disk['name']:
+        fail('Confirmation did not match; no disk changes.')
+    phase('Rechecking target identity and protection immediately before erasing')
+    fresh=target_preflight(args.target_disk,Path(args.archive),manifest)
+    if fresh.get('_identity',identity(fresh))!=snapshot:
+        fail('Target identity or partition state changed; no disk changes.')
+    perform_restore(Path(args.archive).resolve(),fresh,layout)
+
+
+def legacy(profile, command, dry_run):
+    profiles={'nzxt':'nzxt','arch-2':'arch-2','x1':'laptop','ubuntu':'ubuntu','ubuntu-h7':'ubuntu-h7'}
+    dest=Path('/backup')/profiles[profile]
+    phase('PARTIAL BACKUP: legacy '+command+' does not support full-disk recovery')
+    if dry_run:
+        phase(f'Dry run: source /{"home" if command=="home" else ""}, destination {dest}')
+        return
+    require_root()
+    if not any(m['target']=='/backup' for m in mounts()): fail('Mount backup HDD at /backup first.')
+    if command=='tar-root':
+        target=dest/'tar'; target.mkdir(parents=True,exist_ok=True)
+        archive=target/(datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')+'-'+os.urandom(3).hex()+'-root.tar.gz')
+        dynamic=['./backup']+['./'+m['target'].lstrip('/') for m in mounts() if m['target'].startswith(('/mnt/','/media/'))]
+        create_archive(Path('/'),archive,dynamic,partial=True)
+    else:
+        require_tools(['rsync']); target=dest/'full'; target.mkdir(parents=True,exist_ok=True)
+        run('rsync','-PraAX','--exclude=*/.cache/*','/home',str(target)+'/')
+
+
+def root_size(value):
+    match=re.fullmatch(r'([1-9][0-9]*)(?:GiB)?',value)
+    if not match: raise argparse.ArgumentTypeError('Use a positive integer GiB size, for example 80 or 80GiB.')
+    return int(match[1])
+
+
+def resource_percent(value):
+    if not value.isdigit() or not 1<=int(value)<=100:
+        raise argparse.ArgumentTypeError('Use an integer from 1 to 100.')
+    return int(value)
+
+
+def main():
+    parser=argparse.ArgumentParser(prog='backup-pc', description='Offline or opt-in live Ubuntu 24.04 amd64 UEFI full-system backup and guarded HDD restore.',
+        epilog='Full backup: backup --source-root ROOT --destination DIR [--live] [--dry-run]. Recovery: restore --archive FILE --target-disk DISK [--root-size GiB] [--dry-run]. Legacy: backup-pc {nzxt,arch-2,x1,ubuntu,ubuntu-h7} {tar-root,home} [--dry-run]. Partial coverage only; cannot restore a whole disk.')
+    sub=parser.add_subparsers(dest='command',required=True)
+    b=sub.add_parser('backup',help='Compress offline root/EFI maximally; copy home as browsable normal files')
+    b.add_argument('--source-root',required=True); b.add_argument('--destination',required=True)
+    b.add_argument('--live',action='store_true',help='Allow --source-root / on the running machine; non-atomic copy, no service shutdown')
+    b.add_argument('--resource-percent',type=resource_percent,default=75,help='CPU worker and available-RAM compression budget, 1 to 100 (default: 75); retains xz -9e')
+    b.add_argument('--dry-run',action='store_true',help='Validate and preview; no writes')
+    r=sub.add_parser('restore',help='Verify bundle, preview target, require ERASE phrase, restore whole disk',
+        description='restore --archive BACKUP/system.tar.xz --target-disk /dev/disk/by-id/HDD [--root-size GiB] [--dry-run]')
+    r.add_argument('--archive',required=True); r.add_argument('--target-disk',required=True,help='Whole disk; every partition and all data will be lost')
+    r.add_argument('--root-size',type=root_size,help='Root partition size in GiB; default minimum 64 GiB with 20%% headroom')
+    r.add_argument('--dry-run',action='store_true',help='Verify/preview; never partition or format')
+    sync=sub.add_parser('sync-home',help='Resync home in an incomplete bundle; preserve root archive and incomplete status')
+    sync.add_argument('--bundle',required=True); sync.add_argument('--source-root',required=True)
+    sync.add_argument('--live',action='store_true'); sync.add_argument('--dry-run',action='store_true')
+    access=sub.add_parser('access',help='Make generated backup artifacts readable by the invoking sudo user; preserve home metadata')
+    access.add_argument('--bundle',required=True)
+    access.add_argument('--user',help='Account to own generated artifacts (default: invoking sudo user)')
+    sub.add_parser('excludes',help='Print cache/runtime policy; preserve state, opt, logs and ordinary mnt/media files')
+    for profile in ('nzxt','arch-2','x1','ubuntu','ubuntu-h7'):
+        p=sub.add_parser(profile,help='Legacy PARTIAL backup profile')
+        p.add_argument('partial',choices=['tar-root','home']); p.add_argument('--dry-run',action='store_true')
+    args=parser.parse_args()
+    if args.command=='backup': backup(args)
+    elif args.command=='restore': restore(args)
+    elif args.command=='access': repair_access(args)
+    elif args.command=='sync-home': sync_home(args)
+    elif args.command=='excludes':
+        print('# Omit runtime/cache contents; retain mount directories and persistent state.')
+        print('\n'.join(EXCLUDES))
+        print('# Backup destination, swap files and unrelated mounts excluded dynamically in preview.')
+    else: legacy(args.command,args.partial,args.dry_run)
+
+
+if __name__=='__main__':
+    try: main()
+    except (BackupError,OSError,ValueError,KeyError,tarfile.TarError,subprocess.CalledProcessError) as exc:
+        print('backup-pc: '+str(exc),file=sys.stderr); sys.exit(1)
+    except KeyboardInterrupt:
+        print('backup-pc: interrupted',file=sys.stderr); sys.exit(130)
+BACKUP_PC_PY

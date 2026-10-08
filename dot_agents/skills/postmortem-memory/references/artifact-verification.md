@@ -341,6 +341,17 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Sources:
   - [2026-10-06-burn-terminal-readability.md](/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-06-burn-terminal-readability.md) (SHA-256 `74fdcb77a95a`; 1 alias, retained in [sources.json](../sources.json)).
 
+## local-backup-best-effort-vanished
+
+- Symptoms: Live home backup exhausts rsync code-24 retries during LevelDB rotation
+- Applicability: Opt-in live filesystem backups whose users accept disappearing source files.
+- Diagnostic checks: Distinguish rsync vanished-source exit 24 from partial-transfer exit 23. Exercise both progress and direct-copy paths and verify final publication.
+- Remedy: Accept live rsync exit 24 after one pass; preserve warning diagnostics and verify the copied inventory before publication. Retain fatal errors and offline strictness.
+- Verification evidence: Two defining tests observed RED; all 58 backup tests passed, including fixture publication with injected code 24, warning checksums and tamper rejection. refresh-config succeeded and installed script bytes matched.
+- Limitations: Runtime evidence covers installation; no complete machine backup or restored boot was performed. Live application data remains nonatomic.
+- Sources:
+  - [2026-10-07-backup-vanished-files.md](/home/example/linux-config/docs/postmortem/2026-10-07-backup-vanished-files.md) (SHA-256 `bef0db3a9152`; 1 alias).
+
 ## local-xlsx-owned-inputs-and-expiry
 
 - Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **runtime**.
@@ -386,3 +397,14 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Verification: Native caches showed shared86, remaining61.67/24.33, Reconciled and two future finishes at09:42. After local function-name reparsing, the09:42:38 guard reproduced; changing only effective clock to12:42:38 restored daily9.50/3.75 and rest-of-today4.47/1.76 with balances/input values/source hash unchanged and zero formula errors.
 - Limitations: The configured Google timezone was inferred from a three-hour clock difference, not read directly. Actual shared-sheet setting activation remains pending. Local Calc function reparsing is a verification adapter and does not prove an import defect in Google.
 - Source: [Sheet clock incident](/home/example/coding/codex-usage/docs/postmortem/2026-10-07-sheet-clock-behind-toronto.md) (SHA-256 `ac8154fdd3d4`; reviewed alias in [sources.json](../sources.json)).
+
+## local-backup-vm-stage-sidecars
+
+- Status: **verified_fix**; confidence: **confirmed**; verification scope: **code**.
+- Symptoms: disposable VM tools disk stages the backup entrypoint without its required adjacent helpers.
+- Applicability: recovery launchers packaging scripts with sidecar dependencies.
+- Diagnostics: inspect actual staging output against runtime imports before guest launch.
+- Remedy: copy both progress and home-sync helpers beside the entrypoint; exercise real staging while mocking only external image creation.
+- Verification: missing-sidecar regression observed RED, then 4 VM tests and all 67 backup tests passed.
+- Limitations: guest boot and Secure Boot remain unverified.
+- Source: [VM sidecar staging gap](../../../../docs/postmortem/2026-10-08-backup-vm-sidecar-staging.md).
