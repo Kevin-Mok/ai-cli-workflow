@@ -125,6 +125,13 @@ education work:
   `--details`; retain a concise, actionable warning when accuracy is limited.
   Provide `--plain` for ASCII output and preserve clean JSON/CSV exports when
   supported. Respect terminal width and `NO_COLOR`.
+- When creating or changing a CLI that may run for a long time or appear to
+  hang, always show ongoing progress by default: periodic status lines, a
+  progress indicator, percentage complete, or elapsed time and estimated time
+  remaining when reliable. Keep updates flowing during slow or blocking phases;
+  a startup message alone is insufficient. If total work is unknown, report
+  activity and elapsed time rather than inventing a percentage or ETA. Send
+  progress to stderr when stdout carries machine-readable output.
 - When a user must run commands manually, create a reusable script instead of a
   chat-only command list. State when it requires `sudo` and provide the exact
   invocation.
