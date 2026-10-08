@@ -742,7 +742,8 @@ this.
   followed by a command or path: `$fish-alias cbn codex-time burn day` adds
   `cbn "codex-time burn day"` in the existing work section. It previews the
   diff, comments active conflicts in place, preserves quoted hashes and spaced
-  paths, and refreshes changed mappings. File source keys gain an `n` prefix
+  paths, normalizes pasted `/home/example` directory prefixes to `~`, and refreshes
+  changed mappings. File source keys gain an `n` prefix
   in fish (`re README.md` becomes `nre`); activation follows current chezmoi
   conditions. The example is not installed automatically. See the
   [isolated checks](docs/smoke-tests.md#fish-alias-skill).

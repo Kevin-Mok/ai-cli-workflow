@@ -926,6 +926,10 @@ changed mappings; file source keys gain `n` in fish.
   Expected: The work template maps `cto` to `codex-time overview`, and the live
   fish definition has the same expansion. These checks do not execute the command.
 
+- Action: From `/home/example/linux-config`, run `rg -n '^ctp ' aliases/key_aliases.tmpl` and `fish --no-config -c 'source ~/.config/fish/key_abbr.fish; abbr --show' | rg '^abbr .* -- ctp '`.
+  Expected: The work template and installed fish abbreviation map `ctp` to
+  `codex-time projects`; inspection does not execute the mapped command.
+
 Live Codex usage: `$fish-alias cbn codex-time burn day`. To create the mapping,
 invoke this as an actual request, inspect the reported source/section/conflicts,
 then verify the refresh result. Repeating it must produce a no-op. Directory

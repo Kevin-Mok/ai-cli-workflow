@@ -7650,6 +7650,15 @@
       ],
       "reviewed_on": "2026-10-08",
       "sha256": "56e8c95882b9edf241a5baf4f5ace0a43ea0748794a12facee93ccc109482588"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-08-ctp-alias-command-inspection.md"
+      ],
+      "decision": "No new learning: approved sandbox route and discovery before guessed helper paths are already documented; this report verifies only a workaround.",
+      "findings": [],
+      "reviewed_on": "2026-10-08",
+      "sha256": "8f1ac36ccc6139134feb9e95cffc60b0b11da2ef1d7aa686cd832b5fc9d0f808"
     }
   ],
   "review": {

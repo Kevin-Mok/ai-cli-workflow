@@ -71,6 +71,29 @@ class FishAliasTests(unittest.TestCase):
         self.assertIn('my\\ project', self.path('files').read_text())
         self.assertFalse(self.success('nt ' + str(file))['changed'])
 
+    def test_example-user_home_directory_normalization(self):
+        for target in ('/home/example', '/home/example/coding/project/',
+                       '"/home/example/coding/my project/"',
+                       '/home/example/coding/my\\ project/'):
+            with self.subTest(target=target):
+                section = 'cdn' if 'coding' in target else 'sys'
+                result = self.success('pj ' + target, kind='dirs', section=section)
+                self.assertTrue(result['target'].startswith('~'), result)
+                self.assertNotIn('/home/example', result['target'])
+                self.assertEqual(result['section'], 'cdn' if 'coding' in target else 'sys')
+                self.assertFalse(self.success('pj ' + target, kind='dirs', section=section)['changed'])
+        generated = self.generate()
+        self.assertIn('~/coding/my', generated)
+
+    def test_home_normalization_is_directory_prefix_only(self):
+        for target in ('/home/example/project/', '/tmp/home/example-user/project/'):
+            with self.subTest(target=target):
+                self.assertEqual(self.success('pj ' + target, kind='dirs')['target'], target)
+        command = 'echo /home/example/coding/project'
+        self.assertEqual(self.success('zz ' + command, section='work')['target'], command)
+        file = '/home/example/notes.md'
+        self.assertEqual(self.success('nt ' + file, kind='files')['target'], file)
+
     def test_conflicts_and_exact_comment_preservation(self):
         self.path('commands').write_text(self.original['commands'] + '  cbn "old" # retain\n# cbn "older"\nuntouched "yes"\n')
         self.path('dirs').write_text(self.original['dirs'] + 'cbn ~/old\n')

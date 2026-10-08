@@ -11,12 +11,13 @@ Example request: `$fish-alias cbn codex-time burn day` adds `cbn "codex-time bur
 
 ## Input and routing
 
-Treat the first token as the source key and retain the entire remainder as the command/path, including internal spacing, quotes and metacharacters. Do not split and rebuild command arguments. Ask for missing input or genuinely ambiguous intent; the user need not supply a template or section.
+Treat the first token as the source key and retain the entire remainder as the command/path, including internal spacing, quotes and metacharacters, except for directory home-prefix normalization described below. Do not split and rebuild command arguments. Ask for missing input or genuinely ambiguous intent; the user need not supply a template or section.
 
 Canonical repository: `/home/example/linux-config`. Read its applicable instructions and current source files; capture dirty state and preserve unrelated work.
 
 - Commands belong in `aliases/key_aliases.tmpl`.
 - Directory paths belong in `aliases/key_dirs.tmpl`.
+  After identifying a directory, replace its leading `/home/example` (exact home or followed by `/`) with `~` before choosing its section and storing it. For example, `/home/example/coding/track-codex-sessions` becomes `~/coding/track-codex-sessions`. Unquote and escape spaces as needed so `~` expands in fish. Commands, file mappings, other users and embedded home strings keep their original text. Repeating the pasted absolute directory is a no-op once normalized.
 - File paths belong in `aliases/key_files.tmpl`. Existing file conventions prefix the source key with `n` in fish: `re README.md` produces **nre**. Report this effective abbreviation. If the user explicitly names a desired fish abbreviation instead of a source key, resolve that distinction before editing.
 
 Prefer actual path type; a trailing slash identifies a directory, a file suffix helps identify a nonexistent file. Commands with arguments remain commands even when an argument names a file. Inspect nearby related entries to select the closest existing section. Codex executables belong in **work**. The helper previews executable-family/path-prefix placement; override its `section` when source inspection supports a better existing section. For unresolved path type, ask then supply `kind` (`commands`, `dirs`, `files`).
