@@ -69,3 +69,7 @@ Completed: document host identity and distinguish key passphrases from account p
 ### Milestone 4 — docs: record Codex configuration inspection incidents
 
 Completed: record sandbox recovery and executable snapshot lookup. Verified: fresh scoped checks recorded above plus staged whitespace and incident-link contracts. Remaining: 11 planned groups, then one upstream push. Blockers: none for this milestone; documented broader vault inventory warning and manual acceptance limits remain. Next: chore(aliases): update log and backup shortcuts.
+
+### Milestone 5 — chore(aliases): update log and backup shortcuts
+
+Completed: expand gl history and point tb at the USB backup drive. Verified: fresh scoped checks recorded above plus staged whitespace and incident-link contracts. Remaining: 10 planned groups, then one upstream push. Blockers: none for this milestone; documented broader vault inventory warning and manual acceptance limits remain. Next: docs(postmortems): expand reviewed cross-project guidance.
