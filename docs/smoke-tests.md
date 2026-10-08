@@ -329,6 +329,31 @@ checks use invented temporary data; real notes are never repository fixtures.
 
 ## Second Brain
 
+- Action: Run `second-brain sessions review`, then
+  `second-brain sessions review --limit 1 --refresh-limit 0` in a narrow terminal.
+  Expected: The latest five eligible real work conversations appear newest first
+  (fewer when unavailable), including sessions without checks. Guardian/spawned
+  helpers do not occupy slots. The second command shows only the newest session
+  and makes zero model calls. Entries wrap title/project, show Toronto-local
+  activity, at most two recap lines and one current next step; no global backlog
+  or coverage dump appears. Repeat with `--plain` for ASCII text without emoji;
+  `NO_COLOR=1` keeps output free of ANSI sequences, and JSON remains clean.
+- Action: Run `second-brain sessions review --limit 1 --details`, then the same
+  command with `--format json`. Run
+  `second-brain sessions review --all --refresh-limit 0 --details`.
+  Expected: Details and JSON expand the same selected sessions with full evidence,
+  source/resume data, retained check IDs and global diagnostics. `--all` exposes
+  the eligible historical inventory. `--all --limit 1` is rejected. Unchanged
+  recaps need no inference, and formatting does not resolve any checks.
+- Action: Run `second-brain sessions refresh --limit 1 --format json`.
+  Expected: The background queue processes at most one changed source and outputs
+  only safe metadata; its limit remains independent of review display size.
+- Action: Run `python3 -B tests/scripts/second_brain_sessions_review_check.py`.
+  Expected: Disposable sources exercise the installed CLI's default five, limits,
+  refresh budgets, details/JSON, helpers, old checks, preserved resolutions and
+  zero-inference repeats. Only model responses are simulated; real private state
+  and native conversations are untouched. No sudo is required.
+
 - Action: python3 -B -m unittest tests.test_second_brain_command tests.test_second_brain_timer tests.test_second_brain_skill -v
   Expected: Fixture-only deferred reminders support private `someday` records, future-date scheduling, 04:00 persistent promotion, count-only status, opt-in private listing, and no tracked-vault reminder text.
 - Action: scripts/executable_second-brain defer --help

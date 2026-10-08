@@ -3579,6 +3579,48 @@
       "topic": "state-security",
       "verification": "Fixture changed to patch.dict(..., clear=True) and boolean membership assertions; all seventeen runtime tests passed. No diagnostic environment dump was written to a repository artifact or separate temporary log.",
       "verification_scope": "code"
+    },
+    {
+      "id": "local-second-brain-runtime-module-inventory",
+      "reference": "references/api-contracts-fixtures.md#local-second-brain-runtime-module-inventory",
+      "status": "verified_fix",
+      "symptoms": [
+        "chezmoi runtime package source is incomplete after adding a Second Brain module"
+      ],
+      "applicability": "Second Brain module additions and extractions under scripts/second_brain.",
+      "diagnostics": [
+        "Compare .py source inventory with RUNTIME_MODULE_NAMES and source directives in executable_setup-second-brain-timer.",
+        "Run sessions timer enable/check fixtures."
+      ],
+      "confidence": "confirmed",
+      "remedy": "Add required modules to the explicit runtime inventory in the same change; preserve strict source validation.",
+      "verification": "72 session tests pass after the manifest addition; four installer tests failed beforehand.",
+      "verification_scope": "code",
+      "limitations": "Fixture installation evidence does not prove live activation or unrelated timer behavior.",
+      "sources": [
+        "1134d2147abd68bf08c58c6e650f8ee222e5f36a222aae13dbf334a55aaccd85"
+      ]
+    },
+    {
+      "id": "local-digest-provider-check-contract",
+      "reference": "references/api-contracts-fixtures.md#local-digest-provider-check-contract",
+      "status": "verified_fix",
+      "symptoms": [
+        "Repeated invalid_summary from invalid digest check while other recaps succeed"
+      ],
+      "applicability": "Schema-constrained model output followed by stricter local check-key/text validation.",
+      "diagnostics": [
+        "Inspect safe field shapes and validator error category without printing private response values.",
+        "Compare provider key patterns and string bounds with local validation; exercise the emitted schema through the inference boundary."
+      ],
+      "confidence": "supported",
+      "remedy": "Constrain provider check keys/text to the existing local contract and state the format in the prompt; preserve strict local validation.",
+      "verification": "Defining provider-contract test failed before repair; 80 session tests pass after repair; installed default review exited 0 with five recaps including the previously failing one.",
+      "verification_scope": "runtime",
+      "limitations": "The earlier private invalid value was not retained; other inference or schema failures remain possible and must retain per-recap error handling.",
+      "sources": [
+        "e3fa3bd9952c79a5ddea41e1319772a80682c2bfb02d1ee354897c7168beee2d"
+      ]
     }
   ],
   "reports": [
@@ -5844,6 +5886,62 @@
       "reviewed_on": "2026-10-08",
       "findings": [],
       "decision": "No new learning: explicit raw CLI JSON resolves the diagnostic output-contract mismatch; live i3 mapping verified, exit 0."
+    },
+    {
+      "sha256": "f3e70ebb4ffe8cf52b9d59eebe7275d988548bb8648e07237f850eb5a2b37af4",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-08-recent-session-review-sandbox.md"
+      ],
+      "reviewed_on": "2026-10-08",
+      "findings": [],
+      "decision": "No new learning: existing local-sandbox-loopback-approved-route fully covers the startup failure and verified scoped workaround."
+    },
+    {
+      "sha256": "1134d2147abd68bf08c58c6e650f8ee222e5f36a222aae13dbf334a55aaccd85",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-08-session-review-module-manifest.md"
+      ],
+      "reviewed_on": "2026-10-08",
+      "findings": [
+        "local-second-brain-runtime-module-inventory"
+      ]
+    },
+    {
+      "sha256": "089a99b8fc4e36018913865ea5e2cc0267fa23e5089b0eff05090a608995e778",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-08-session-review-doc-edit.md"
+      ],
+      "reviewed_on": "2026-10-08",
+      "findings": [],
+      "decision": "No new learning: ext-stale-patch-context applies; inspected partial writes and current destination marker before retry."
+    },
+    {
+      "sha256": "970d166038c5189a9f244a2f442cc3d8c7b56df539ccd8bd71916da33e676366",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-08-session-review-verification-drift.md"
+      ],
+      "reviewed_on": "2026-10-08",
+      "findings": [],
+      "decision": "Unresolved external source reversion and unavailable native title transport; no new reusable causal claim. Existing preservation/deployable-file guidance applies to hash verification."
+    },
+    {
+      "sha256": "e3fa3bd9952c79a5ddea41e1319772a80682c2bfb02d1ee354897c7168beee2d",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-08-recent-session-review-live-check.md"
+      ],
+      "reviewed_on": "2026-10-08",
+      "findings": [
+        "local-digest-provider-check-contract"
+      ]
+    },
+    {
+      "sha256": "2d60d30cbd63785f10714040b171fee122aa0b59a1aabd91d88ed095e6fa1b32",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-08-session-review-commit-tree-check.md"
+      ],
+      "reviewed_on": "2026-10-08",
+      "findings": [],
+      "decision": "No new reusable learning: extracted index lacks Git metadata and safe repository location required by broader fixtures; focused staged runtime checks pass. Normal repository verification remains authoritative."
     }
   ],
   "review": {

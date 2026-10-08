@@ -444,3 +444,25 @@ security checks with the arguments you passed.
 - Verification: Eight new index tests and 29 legacy CLI tests pass after correcting the cache-only assertion.
 - Limitations: Does not permit ignoring changed source metadata or skipping permission checks.
 - Source: [Recent index fixture](../../../../docs/postmortem/2026-10-07-codex-recent-index-fixture.md).
+
+## local-second-brain-runtime-module-inventory
+
+- Status: **verified_fix**; confidence: **confirmed**; verification scope: **code**.
+- Symptoms: `chezmoi runtime package source is incomplete` after extracting a runtime module.
+- Applicability: Second Brain Python modules installed through the timer helper.
+- Diagnostics: Compare source `.py` filenames to `RUNTIME_MODULE_NAMES` and source directives in `scripts/executable_setup-second-brain-timer`; run timer installation fixtures.
+- Remedy: Include the module in the explicit manifest in the same change. Keep strict inventory validation.
+- Verification: Four existing installer tests failed before the addition; all 72 session tests passed afterward.
+- Limitations: Synthetic installation does not establish live activation.
+- Source: [Session review module manifest](/home/example/linux-config/docs/postmortem/2026-10-08-session-review-module-manifest.md).
+
+## local-digest-provider-check-contract
+
+- Status: **verified_fix**; confidence: **supported**; verification scope: **runtime**.
+- Symptoms: Repeated `invalid_summary` classified as `invalid digest check`, with other recaps succeeding.
+- Applicability: Provider schemas that permit values rejected by the local output validator.
+- Diagnostics: Inspect safe field types/counts and the local error category. Compare emitted schema constraints with validation; do not log private model text.
+- Remedy: Apply the existing lowercase kebab-case check-key pattern and nonblank bounded check-text contract to generation; state key rules in the prompt. Keep local validation strict.
+- Verification: The inference-boundary contract test failed before repair; 80 session tests pass afterward. Installed default review exited 0 with five recaps, including the previously failing recap.
+- Limitations: The exact earlier private invalid value was not retained, so its field-level cause is supported rather than independently reconstructed; unrelated model failures remain possible.
+- Source: [Live session recap validation](/home/example/linux-config/docs/postmortem/2026-10-08-recent-session-review-live-check.md).

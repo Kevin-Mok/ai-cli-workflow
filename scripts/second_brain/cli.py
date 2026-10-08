@@ -7,6 +7,7 @@ import json
 import sys
 from typing import Any, Sequence
 
+from . import sessions
 from .deferred import defer, list_reminders, process_due, resolve, schedule
 from .checkpoint import CheckpointError, run_checkpoint
 from .doctor import build_report as build_doctor_report
@@ -69,6 +70,48 @@ def build_parser() -> argparse.ArgumentParser:
         "resolve-deferred", help="Resolve one private inbox reminder."
     )
     resolve_deferred_parser.add_argument("--payload", required=True)
+    sessions_parser = subparsers.add_parser(
+        "sessions", help="Refresh or explicitly review the private Codex work digest."
+    )
+    sessions_commands = sessions_parser.add_subparsers(
+        dest="sessions_command", required=True
+    )
+    for operation in ("refresh", "review"):
+        operation_parser = sessions_commands.add_parser(operation)
+        operation_parser.add_argument(
+            "--format", choices=("text", "json"), default="text"
+        )
+        if operation == "review":
+            selection = operation_parser.add_mutually_exclusive_group()
+            selection.add_argument(
+                "--limit", type=int, choices=range(1, 21), default=None, metavar="N",
+                help="Show the N most recently active work sessions (1 to 20; default 5).",
+            )
+            selection.add_argument(
+                "--all", dest="all_sessions", action="store_true",
+                help="Show all eligible historical work sessions.",
+            )
+            operation_parser.add_argument(
+                "--refresh-limit", type=int, choices=range(0, 21), default=None, metavar="N",
+                help="Generate at most N selected recaps (0 to 20; default display limit, or 20 with --all).",
+            )
+            operation_parser.add_argument(
+                "--plain", action="store_true",
+                help="Use ASCII text without emoji; escape non-ASCII content (JSON unchanged).",
+            )
+            operation_parser.add_argument(
+                "--details", action="store_true",
+                help="Expand the selected sessions with full evidence, source paths and check IDs.",
+            )
+        else:
+            operation_parser.add_argument(
+                "--limit", type=int, choices=range(1, 21), default=20, metavar="N",
+                help="Refresh at most N queued changed sessions (1 to 20; default 20).",
+            )
+    sessions_resolve = sessions_commands.add_parser(
+        "resolve", help="Record an explicitly requested check-in disposition."
+    )
+    sessions_resolve.add_argument("--payload", choices=("-",), required=True)
     status_parser = subparsers.add_parser(
         "status", help="Show active projects, Inbox state, and recent Daily Notes."
     )
@@ -146,6 +189,11 @@ def _print_status_text(report: dict[str, Any]) -> None:
         f"Private reminders: {private['someday']} someday, "
         f"{private['deferred']} deferred, {private['inbox']} inbox"
     )
+    digest = report["private_sessions"]
+    print(
+        f"Private sessions: {digest['pending_count']} pending check(s), "
+        f"last refresh {digest['refreshed_at'] or 'never'}"
+    )
     print("Latest Daily Notes: " + ", ".join(report["latest_daily_notes"]))
 
 
@@ -153,6 +201,57 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
     try:
+        if args.command == "sessions":
+            if args.sessions_command == "resolve":
+                _print_json(sessions.resolve(load_payload(args.payload)))
+            else:
+                operation = (
+                    sessions.refresh if args.sessions_command == "refresh"
+                    else sessions.review
+                )
+                if args.sessions_command == "refresh":
+                    report = operation() if args.limit == 20 else operation(limit=args.limit)
+                else:
+                    options = {}
+                    if args.limit is not None:
+                        options["limit"] = args.limit
+                    if args.refresh_limit is not None:
+                        options["refresh_limit"] = args.refresh_limit
+                    if args.all_sessions:
+                        options["all_sessions"] = True
+                    report = operation(**options)
+                if args.sessions_command == "refresh":
+                    # Timer stdout may enter the journal; review content stays opt-in.
+                    report = {
+                        key: report[key] for key in (
+                            "schema_version", "refreshed_at", "summary_updated_at", "pending_count",
+                            "backlog_count", "model_calls", "coverage", "error",
+                        ) if key in report
+                    }
+                if args.format == "json":
+                    _print_json(report)
+                elif args.sessions_command == "refresh":
+                    print(
+                        f"Private session refresh: {report.get('refreshed_at') or 'never'}; "
+                        f"{report.get('pending_count', 0)} open checks; "
+                        f"{report.get('backlog_count', 0)} queued; "
+                        f"{report.get('model_calls', 0)} model calls"
+                    )
+                    print("Coverage: " + ", ".join(
+                        f"{key}={count}" for key, count in report.get("coverage", {}).items()
+                    ))
+                    if report.get("error"):
+                        print("Refresh issue: " + report["error"])
+                else:
+                    if args.details:
+                        output = sessions.render(report)
+                        if args.plain:
+                            output = output.encode("ascii", errors="backslashreplace").decode()
+                    else:
+                        output = sessions.render_terminal(report, plain=args.plain)
+                    sys.stdout.write(output)
+                return 1 if report.get("error") else 0
+            return 0
         if args.command == "status":
             report = status_report()
             if args.format == "json":

@@ -113,3 +113,15 @@
 - 2026-10-07: For notification integration fixtures, poll DBus NameHasOwner before dunstctl to avoid autoactivating a competing daemon; verify duplicate-object script_run transfer before promising silence on all history recalls. See [Dunst fixture investigation](../docs/postmortem/2026-10-07-dunst-fixture-startup.md).
 
 - 2026-10-07: Recent-session recap reads must tolerate concurrent cache clearing; count attempts after acquiring generation ownership and clean safe orphan atomic files under the maintenance lock. Verify the actual CLI index lock during a sleeping inference, not only after the batch. See [cache lifecycle review](../docs/postmortem/2026-10-07-codex-recent-cache-races.md).
+
+## 2026-10-08: Recent session review boundaries
+
+- Track safely screened source metadata separately from successfully generated
+  recap hashes. A changed or failed inference attempt must never certify an old
+  summary as fresh; conservatively refresh ambiguous legacy states.
+- Keep explicit review discovery out of the scheduled refresh queue, and
+  revalidate privacy after slow model calls before displaying cached content.
+- When extracting a Second Brain runtime module, update the explicit installer
+  module inventory and exercise installer fixtures before activation.
+- Keep provider output schema constraints aligned with the strict local
+  validator; diagnose private recap failures using field shapes, not raw text.
