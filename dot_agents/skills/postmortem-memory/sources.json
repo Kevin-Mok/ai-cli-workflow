@@ -7725,6 +7725,33 @@
       "reviewed_on": "2026-10-09",
       "findings": [],
       "decision": "No new reusable learning: repeats ext-sandbox-loopback and local-sandbox-loopback-approved-route; approved scoped reads exited 0, while default sandbox startup remains unresolved."
+    },
+    {
+      "sha256": "84c2f67e7c320c753dec2a40e7746bf9c77ea8abad7d509700ffeccfe3c8886f",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-09-voice-audition-sandbox-startup.md"
+      ],
+      "reviewed_on": "2026-10-09",
+      "findings": [],
+      "decision": "No new learning: identical ext-sandbox-loopback startup failure and approved scoped-runner workaround; absent optional checkout directory is a bounded discovery miss."
+    },
+    {
+      "sha256": "cfc4fb8b19b27787d72ff00af8d94f35b817c08c8a2f669b7756422d1f00f8ec",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-09-voice-audition-argument-shadowing.md"
+      ],
+      "reviewed_on": "2026-10-09",
+      "findings": [],
+      "decision": "No new reusable guidance: defining tests and type checking caught a bounded namespace shadowing error; repo-specific lesson recorded in tasks/lessons.md."
+    },
+    {
+      "sha256": "1581ad7f38c450a1e183324a83e78d8fa355adbaadae3fd9e6a28525199435f3",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-09-Voice Contributor-concurrency-fixture.md"
+      ],
+      "reviewed_on": "2026-10-09",
+      "findings": [],
+      "decision": "No new reusable learning: synthetic fixture retained old voice after selected default changed; literal Voice Contributor selection and full serialized playback assertions remain covered."
     }
   ],
   "review": {

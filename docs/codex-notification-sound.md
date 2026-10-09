@@ -23,9 +23,32 @@ On GUI hosts, `refresh-config` also installs the repo clip at `~/scripts/can-i-a
 
 The daemon and your shell must use the same XDG config location. Missing configuration means disabled. A missing/invalid file or unavailable `mpv` skips audio without breaking the popup. Errors go to `${XDG_STATE_HOME:-$HOME/.local/state}/codex-notification-sound/errors.log` and appear on stderr with `--details`; default warnings give a short recovery action. Player failures make `preview` exit 1; the Dunst hook always exits 0. Playback has a 60-second limit; use a short notification clip.
 
+## Audition ten local voices
+
+Run the numbered audition script to compare ten offline Piper alternatives, hear the question clip before each test, then replay a favorite with different lines. These auditions leave your selected notification voice and speech switch unchanged. No sudo or cloud service is needed.
+
+```sh
+~/scripts/codex-voice-auditions --list
+~/scripts/codex-voice-auditions
+~/scripts/codex-voice-auditions --voice 1 --sample celebrate
+~/scripts/codex-voice-auditions --voice 1 6 --sample technical
+~/scripts/codex-voice-auditions --voice 6 --text "All done! The tests passed, and your changes are ready."
+~/scripts/codex-voice-auditions --voice 1 --sample celebrate --length-scale 0.9 --offline
+```
+
+Numbers are stable: **1 Amy, 2 Bryce, 3 HFC Female, 4 HFC Male, 5 Contact A, 6 Voice Contributor, 7 Alan, 8 Alba, 9 Cori, 10 Jenny Dioco**. The first six are US voices; the final four are UK voices. Voice Contributor and Cori use high-quality models; the others use medium. These single-speaker IDs were verified in the [upstream voice catalog](https://huggingface.co/rhasspy/piper-voices/raw/main/voices.json). `--voice` also accepts a full name (quote names with spaces) or model ID. `--samples` displays the shared `short`, `celebrate` and `technical` lines; default `all` reads all three. `--text` supplies literal custom wording, up to 4,000 characters.
+
+Install the existing speech environment first using `setup-codex-notification-speech --install` if needed. The first audition downloads only selected missing models into the existing XDG data voices folder; subsequent runs reuse them. Ten model downloads require substantial local storage. `--offline` prohibits downloads. Generation and playback are local; naturalness and upbeat delivery depend on the individual voice. The audition pace is slightly brisk at `--length-scale 0.95`; `1.0` is normal and `0.9` faster. This pace does not change notification playback settings.
+
+Before every audible sample, the script displays its number/name, starts speech generation while the included "Can I ask you a question?" clip plays, then prints the remaining gap and plays the voice. The gap measures process handoff after clip completion, rather than physical speaker onset. It reflects cold-process synthesis, not a cached recording. `--clip PATH` lets you use another question clip. Actual notification playback also synthesizes while its configured MP3 plays, reducing the remaining gap while preserving strict MP3-then-speech order and serialized sequences. Synthesis retains a 30-second deadline and MP3 failure cleans up its owned synthesis process.
+
+WAVs and a manifest containing sample text, pace, voice IDs and timings are saved under `${XDG_DATA_HOME:-$HOME/.local/share}/codex-notification-speech/auditions`. Each run replaces samples for selected voices and the manifest; failed generation preserves earlier valid WAVs. Use a separate `--output-dir PATH` to keep multiple wording/pace comparisons. `--render-only` exports WAVs without audio or clip timing. `--dry-run` prints the selected numbers and wording without dependencies or downloads. `--plain` is ASCII; `--details` reveals full paths/diagnostics. Slow subprocess phases report elapsed activity every five seconds. Interrupting stops owned workers and retains completed samples. Voice Contributor (number 6) is now the selected notification voice at pace 0.95. Auditions remain independent of notification settings.
+
+For direct checks from the checkout (no sudo), substitute `./scripts/executable_codex-voice-auditions` for the installed command above. Run `python3 -B tests/test_codex_voice_auditions.py` and `python3 -B tests/test_codex_notification_sound.py` for automated coverage; subjective voice choice needs listening.
+
 ## Optional offline title speech
 
-Install the pinned Piper 1.8.0 English `en_US-lessac-medium` voice, then check it:
+The selected notification voice is **6 — Voice Contributor (US, high)**, using the celebrate audition pace of **0.95**. The committed [Voice Contributor celebrate MP3](../scripts/Voice Contributor-celebrate.mp3), tracked with Git LFS, reads "All done! The tests passed, and your changes are ready. Take a look at what I built!" and is a replayable reference sample. Play it with `mpv --no-config --no-video ~/scripts/Voice Contributor-celebrate.mp3`; it contains Voice Contributor speech only, while the question intro remains a separate clip. Notifications still speak the exact task title; `celebrate` supplies the upbeat test wording. Install the pinned Piper 1.8.0 English `en_US-Voice Contributor-high` voice, then check it:
 
 ```sh
 ~/scripts/setup-codex-notification-speech --install
@@ -33,7 +56,7 @@ Install the pinned Piper 1.8.0 English `en_US-lessac-medium` voice, then check i
 ~/scripts/codex-notification-sound preview --title "Smoke-test VPS backup"
 ```
 
-No sudo is needed. Installation needs internet and Python's `venv`/pip support. The isolated environment, voice, download cache and temporary installation files stay under `${XDG_DATA_HOME:-$HOME/.local/share}/codex-notification-speech`. `--check` synthesizes a temporary WAV offline and deletes it; playback contacts no service. `status` uses aligned, width-aware output with helpful icons; add `--plain` for ASCII or `--details` for full paths and recent diagnostics. Both notification commands accept these display flags and emit no ANSI colors, respecting `NO_COLOR`. `status` reports speech activation and voice file readiness; `--check` verifies the pinned runtime and actual synthesis.
+No sudo is needed. Installation needs internet and Python's `venv`/pip support. The isolated environment, voice, download cache and temporary installation files stay under `${XDG_DATA_HOME:-$HOME/.local/share}/codex-notification-speech`. `--check` synthesizes a temporary WAV offline and deletes it; playback contacts no service. `status` uses aligned, width-aware output with helpful icons; add `--plain` for ASCII or `--details` for full paths and recent diagnostics. Both notification commands accept these display flags and emit no ANSI colors, respecting `NO_COLOR`. `status` reports speech activation, selected Voice Contributor model/pace and voice file readiness; `--check` verifies the pinned runtime and actual synthesis.
 
 After `refresh-config` deploys the completion callback, start or resume affected Codex conversations to load it, then enable speech:
 
@@ -45,7 +68,7 @@ Audio follows **completed turns only**, including focused and background complet
 
 The [event bridge](../scripts/executable_codex-notification-event) resolves completion `thread-id`. The transcript must resolve inside `${CODEX_HOME:-$HOME/.codex}`. A filename's rollout UUID need not equal its conversation ID. The latest matching `thread_name` in `session_index.jsonl` is captured before detached audio queues; visible terminals, answer text and other conversations are never title fallbacks. Ordinary spawned agents use their own saved title. Internal system/reviewer threads are silent. Missing, malformed or inconsistent identity/title means MP3 only.
 
-One per-user state-directory lock serializes each complete MP3 → synthesized title WAV sequence. Piper receives the exact title through stdin with a 30-second limit; each mpv playback retains its 60-second limit. Temporary WAVs are deleted. Failed synthesis leaves the already-played MP3 as the notification, without retrying it or affecting Codex. Legacy permission-hook calls return immediately with no audio or approval decision. Scheduler order between simultaneous sequences is unspecified.
+One per-user state-directory lock serializes each complete MP3 → synthesized title WAV sequence. Piper begins while the MP3 plays and receives the exact title through private temporary stdin with a 30-second limit; each mpv playback retains its 60-second limit. Temporary WAVs are deleted. Failed synthesis leaves the already-played MP3 as the notification, without retrying it or affecting Codex. Legacy permission-hook calls return immediately with no audio or approval decision. Scheduler order between simultaneous sequences is unspecified.
 
 For immediate speech rollback, preserving the selected MP3:
 

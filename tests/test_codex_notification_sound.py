@@ -8,6 +8,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import textwrap
 from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
@@ -194,6 +195,30 @@ class SpeechTests(PlaybackTests):
         self.configure()
         self.assertEqual(self.helper.main(['speech', 'enable']), 0)
 
+    def test_selected_voice_is_Voice Contributor_high(self):
+        with patch.dict(os.environ, {'XDG_DATA_HOME': str(self.root / 'data')}):
+            python, model = self.helper.voice_paths()
+        self.assertEqual(model.name, 'en_US-Voice Contributor-high.onnx')
+        self.assertEqual(python.name, 'python')
+
+    def test_selected_voice_uses_celebrate_audition_pace(self):
+        self.configure()
+        env, player, ready, voice = self.speech_fixture()
+        with env, player, ready, voice:
+            self.assertEqual(self.helper.main(['preview', '--title', 'All done! Take a look at what I built.']), 0)
+        args = json.loads((self.root / 'synthesis.args').read_text())
+        self.assertIn('--length-scale', args)
+        self.assertEqual(args[args.index('--length-scale') + 1], '0.95')
+
+    def test_status_names_selected_voice_and_pace(self):
+        import contextlib
+        import io
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            self.assertEqual(self.helper.main(['status', '--plain']), 0)
+        self.assertIn('Voice Contributor', output.getvalue())
+        self.assertIn('0.95', output.getvalue())
+
     def test_speech_switch_preserves_clip_and_suppresses_dunst(self):
         self.enable()
         with patch.object(self.helper.subprocess, 'run') as player:
@@ -205,37 +230,162 @@ class SpeechTests(PlaybackTests):
             self.helper.main(['codex-kitty', 'Complete', '', '', 'NORMAL'])
             self.assertEqual(player.call_count, 1)
 
-    def test_mp3_then_title_stdin_timeout_and_cleanup(self):
+    def speech_fixture(self, synthesis='success', clip_failure=False):
+        """Run actual children with controlled synthesis and playback side effects."""
+        python = self.root / 'piper-python'
+        python.write_text(textwrap.dedent("""\
+            #!/usr/bin/python3
+            import json,os,pathlib,sys,time
+            root=pathlib.Path(os.environ['FIXTURE_ROOT'])
+            def event(value):
+                with (root/'events').open('a') as output:
+                    output.write(value+'\\n')
+            (root/'synthesis.pid').write_text(str(os.getpid()))
+            text=sys.stdin.read()
+            (root/'synthesis.args').write_text(json.dumps(sys.argv[1:]))
+            event('synthesis start')
+            (root/'synthesis-started').touch()
+            mode=os.environ['SYNTHESIS_MODE']
+            if mode=='blocked':
+                while True: time.sleep(.05)
+            if mode=='success':
+                while not (root/'clip-ended').exists(): time.sleep(.01)
+            if mode=='delayed':
+                while not (root/'clip-ended').exists(): time.sleep(.01)
+                time.sleep(.15)
+            if mode=='past-deadline': time.sleep(.8)
+            if mode=='failed': sys.exit(2)
+            if mode!='empty':
+                pathlib.Path(sys.argv[sys.argv.index('--output_file')+1]).write_text(text)
+            event('synthesis end')
+        """))
+        python.chmod(0o755)
+        model = self.root / 'voice.onnx'
+        player = self.root / 'mpv'
+        player.write_text(textwrap.dedent("""\
+            #!/usr/bin/python3
+            import json,os,pathlib,sys,time
+            root=pathlib.Path(os.environ['FIXTURE_ROOT'])
+            def event(value):
+                with (root/'events').open('a') as output:
+                    output.write(value+'\\n')
+            path=pathlib.Path(sys.argv[-1])
+            if path.suffix=='.mp3':
+                event('clip start')
+                deadline=time.monotonic()+.6
+                while not (root/'synthesis-started').exists() and time.monotonic()<deadline:
+                    time.sleep(.01)
+                if (root/'synthesis-started').exists(): event('synthesis overlaps clip')
+                if os.environ['SYNTHESIS_MODE']=='past-deadline':
+                    time.sleep(.4)
+                    pid=(root/'synthesis.pid').read_text()
+                    status=pathlib.Path('/proc')/pid/'stat'
+                    if not status.exists() or status.read_text().split()[2]=='Z':
+                        event('synthesis stopped during clip')
+                (root/'clip-ended').touch()
+                event('clip end')
+                if os.environ['CLIP_FAILURE']=='1': sys.exit(2)
+            else:
+                event('title '+path.read_text().rstrip('\\n'))
+                (root/'wav-path').write_text(str(path))
+        """))
+        player.chmod(0o755)
+        return (patch.dict(os.environ, {'FIXTURE_ROOT': str(self.root),
+                    'SYNTHESIS_MODE': synthesis, 'CLIP_FAILURE': str(int(clip_failure))}),
+                patch.object(self.helper.shutil, 'which', return_value=str(player)),
+                patch.object(self.helper, 'voice_ready', return_value=True),
+                patch.object(self.helper, 'voice_paths', return_value=(python, model)))
+
+    def test_synthesis_overlaps_clip_but_title_plays_after_once(self):
         self.configure()
-        title = 'Fix café $(touch nope); "quotes"'
-        calls = []
-        def run(argv, **kwargs):
-            calls.append((argv, kwargs))
-            if '-m' in argv:
-                Path(argv[argv.index('--output_file') + 1]).write_bytes(b'RIFFfixture')
-            return SimpleNamespace(returncode=0)
-        with patch.object(self.helper.shutil, 'which', return_value='/usr/bin/mpv'), patch.object(self.helper, 'voice_ready', return_value=True, create=True), patch.object(self.helper.subprocess, 'run', side_effect=run):
+        title = f'Fix café $(touch {self.root / "nope"}); "quotes"'
+        env, player, ready, voice = self.speech_fixture()
+        with env, player, ready, voice:
             self.assertEqual(self.helper.main(['preview', '--title', title, '--plain', '--details']), 0)
-        self.assertEqual(len(calls), 3)
-        self.assertEqual(calls[0][0][-1], str(self.clip))
-        self.assertEqual(calls[1][1]['input'], title + '\n')
-        self.assertEqual(calls[1][1]['timeout'], 30)
-        self.assertNotIn(title, calls[1][0])
-        self.assertEqual(calls[2][1]['timeout'], 60)
-        self.assertFalse(Path(calls[2][0][-1]).exists())
+        events = (self.root / 'events').read_text().splitlines()
+        self.assertIn('synthesis overlaps clip', events)
+        self.assertLess(events.index('synthesis start'), events.index('clip end'))
+        self.assertGreater(events.index('synthesis end'), events.index('clip end'))
+        self.assertEqual(events.count('clip start'), 1)
+        self.assertEqual(events.count('title '+title), 1)
+        self.assertGreater(events.index('title '+title), events.index('clip end'))
+        self.assertGreater(events.index('title '+title), events.index('synthesis end'))
+        self.assertFalse(Path((self.root / 'wav-path').read_text()).exists())
+        self.assertFalse((self.root / 'nope').exists())
+
+    def test_clip_failure_stops_and_reaps_owned_synthesis(self):
+        self.configure()
+        env, player, ready, voice = self.speech_fixture(synthesis='blocked', clip_failure=True)
+        with env, player, ready, voice:
+            self.assertEqual(self.helper.main(['preview', '--title', 'Exact title']), 1)
+        self.assertTrue((self.root / 'synthesis.pid').exists())
+        pid = int((self.root / 'synthesis.pid').read_text())
+        with self.assertRaises(ProcessLookupError):
+            os.kill(pid, 0)
+        events = (self.root / 'events').read_text().splitlines()
+        self.assertEqual(events.count('clip start'), 1)
+        self.assertNotIn('title Exact title', events)
+
+    def test_synthesis_deadline_includes_clip_time(self):
+        self.configure()
+        env, player, ready, voice = self.speech_fixture(synthesis='delayed')
+        with env, player, ready, voice, patch.object(self.helper, 'time', SimpleNamespace(monotonic=iter([0, 0, 31]).__next__), create=True):
+            self.assertEqual(self.helper.main(['preview', '--title', 'Exact title']), 0)
+        events = (self.root / 'events').read_text().splitlines()
+        self.assertEqual(events.count('clip start'), 1)
+        self.assertNotIn('title Exact title', events)
+        pid = int((self.root / 'synthesis.pid').read_text())
+        with self.assertRaises(ProcessLookupError):
+            os.kill(pid, 0)
+        self.assertIn('timed out', (self.state / 'codex-notification-sound/errors.log').read_text())
+
+    def test_hard_synthesis_deadline_expires_during_long_clip(self):
+        self.configure()
+        env, player, ready, voice = self.speech_fixture(synthesis='past-deadline')
+        with env, player, ready, voice, patch.object(self.helper, 'SYNTHESIS_TIMEOUT', .2, create=True):
+            self.assertEqual(self.helper.play('Exact title'), 0)
+        events = (self.root / 'events').read_text().splitlines()
+        self.assertIn('synthesis stopped during clip', events)
+        self.assertLess(events.index('synthesis stopped during clip'), events.index('clip end'))
+        self.assertEqual(events.count('clip start'), 1)
+        self.assertNotIn('title Exact title', events)
+        pid = int((self.root / 'synthesis.pid').read_text())
+        with self.assertRaises(ProcessLookupError):
+            os.kill(pid, 0)
+        self.assertIn('timed out', (self.state / 'codex-notification-sound/errors.log').read_text())
 
     def test_synthesis_failure_keeps_mp3(self):
+        for mode in ('failed', 'empty'):
+            with self.subTest(mode=mode):
+                self.configure()
+                (self.root / 'events').unlink(missing_ok=True)
+                env, player, ready, voice = self.speech_fixture(synthesis=mode)
+                with env, player, ready, voice:
+                    self.assertEqual(self.helper.main(['preview', '--title', 'Exact title']), 0)
+                events = (self.root / 'events').read_text().splitlines()
+                self.assertEqual(events.count('clip start'), 1)
+                self.assertNotIn('title Exact title', events)
+
+    def test_absent_title_and_unavailable_voice_keep_clip_only(self):
         self.configure()
-        calls = []
-        def run(argv, **kwargs):
-            calls.append(argv)
-            if '-m' in argv:
-                raise subprocess.TimeoutExpired('piper', 30)
-            return SimpleNamespace(returncode=0)
-        with patch.object(self.helper.shutil, 'which', return_value='/usr/bin/mpv'), patch.object(self.helper, 'voice_ready', return_value=True, create=True), patch.object(self.helper.subprocess, 'run', side_effect=run):
-            self.assertEqual(self.helper.main(['preview', '--title', 'Exact title']), 0)
-        self.assertEqual(len(calls), 2)
-        self.assertEqual(calls[0][-1], str(self.clip))
+        env, player, ready, voice = self.speech_fixture()
+        with env, player, ready, voice:
+            for title, available in ((None, True), ('', True), ('Exact title', False)):
+                with self.subTest(title=title, available=available):
+                    (self.root / 'events').unlink(missing_ok=True)
+                    with patch.object(self.helper, 'voice_ready', return_value=available):
+                        self.assertEqual(self.helper.play(title), 0)
+                    self.assertEqual((self.root / 'events').read_text().splitlines(), ['clip start', 'clip end'])
+                    self.assertFalse((self.root / 'synthesis.pid').exists())
+
+    def test_synthesis_start_failure_keeps_clip_once(self):
+        self.configure()
+        env, player, ready, voice = self.speech_fixture()
+        with env, player, ready, voice, patch.object(self.helper, 'voice_paths', return_value=(self.root / 'missing-python', self.root / 'voice.onnx')):
+            self.assertEqual(self.helper.play('Exact title'), 0)
+        self.assertEqual((self.root / 'events').read_text().splitlines(), ['clip start', 'clip end'])
+        self.assertFalse((self.root / 'synthesis.pid').exists())
+        self.assertIn('missing-python', (self.state / 'codex-notification-sound/errors.log').read_text())
 
     def test_malformed_speech_setting_keeps_dunst_mp3(self):
         self.configure()
@@ -274,7 +424,7 @@ class SpeechTests(PlaybackTests):
         python.parent.mkdir(parents=True)
         python.write_text('#!/usr/bin/python3\nimport pathlib,sys\ntext=sys.stdin.read()\npathlib.Path(sys.argv[sys.argv.index("--output_file")+1]).write_text(text)\n')
         python.chmod(0o755)
-        model = data / 'voices/en_US-lessac-medium.onnx'
+        model = data / 'voices/en_US-Voice Contributor-high.onnx'
         model.parent.mkdir()
         model.write_bytes(b'fixture')
         model.with_suffix('.onnx.json').write_text('{}')
@@ -282,7 +432,7 @@ class SpeechTests(PlaybackTests):
         binary.mkdir()
         player = binary / 'mpv'
         events = self.root / 'playbacks'
-        player.write_text('#!/usr/bin/python3\nimport os,pathlib,sys,time\np=pathlib.Path(sys.argv[-1])\nv="clip" if p.suffix==".mp3" else p.read_text().strip()\nf=open(os.environ["EVENTS"],"a",buffering=1)\nf.write("start "+v+"\\n")\ntime.sleep(.08)\nf.write("end "+v+"\\n")\n')
+        player.write_text('#!/usr/bin/python3\nimport json,os,pathlib,sys,time\np=pathlib.Path(sys.argv[-1])\nv="clip" if p.suffix==".mp3" else p.read_text().strip()\nf=open(os.environ["EVENTS"],"a",buffering=1)\nf.write("start "+v+"\\n")\ntime.sleep(.08)\nf.write("end "+v+"\\n")\n')
         player.chmod(0o755)
         env = {**os.environ, 'XDG_DATA_HOME': str(self.root / 'data'), 'PATH': str(binary)+':'+os.environ['PATH'], 'EVENTS': str(events)}
         workers = [subprocess.Popen([sys.executable, str(ROOT / 'scripts/executable_codex-notification-sound'), 'preview', '--title', title], env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True) for title in ('Title A', 'Title B')]

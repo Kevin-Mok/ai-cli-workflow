@@ -11,7 +11,7 @@ from typing import cast
 import wave
 
 PIPER_VERSION = '1.8.0'
-VOICE = 'en_US-lessac-medium'
+VOICE = 'en_US-Voice Contributor-high'
 SYNTHESIS_TIMEOUT = 30
 _plain = False
 _details = False
@@ -54,7 +54,7 @@ def check() -> None:
     with tempfile.TemporaryDirectory(prefix='speech-check-', dir=root) as directory:
         wav = Path(directory) / 'check.wav'
         _ = subprocess.run(
-            [str(python), '-m', 'piper', '--model', str(model), '--config', str(config), '--output-file', str(wav)],
+            [str(python), '-m', 'piper', '--model', str(model), '--config', str(config), '--length-scale', '0.95', '--output-file', str(wav)],
             input='Codex title speech is ready.\n', text=True, capture_output=True,
             check=True, timeout=SYNTHESIS_TIMEOUT,
         )
@@ -63,7 +63,7 @@ def check() -> None:
                 raise ValueError('Piper produced empty speech audio')
     prefix = '' if _plain else '✅ '
     print(prefix + 'Offline speech is ready.')
-    print('  Voice   English / Lessac medium')
+    print('  Voice   English / Voice Contributor high')
     print(f'  Piper   {PIPER_VERSION}')
     if _details:
         print(f'Voice: {model}')
@@ -71,7 +71,7 @@ def check() -> None:
 
 def install() -> None:
     """Download Piper and its voice under XDG data, then verify offline speech."""
-    print(('' if _plain else '⬇️ ') + 'Installing the English voice...', flush=True)
+    print(('' if _plain else '⬇️ ') + 'Installing English / Voice Contributor high...', flush=True)
     root = data_directory()
     root.mkdir(parents=True, exist_ok=True)
     cache = root / 'cache'
@@ -115,7 +115,7 @@ def main(argv: list[str] | None = None) -> int:
     _ = parser.add_argument('--plain', action='store_true', help='use ASCII output')
     _ = parser.add_argument('--details', action='store_true', help='show installation logs, paths and diagnostics')
     commands = parser.add_mutually_exclusive_group(required=True)
-    _ = commands.add_argument('--install', action='store_true', help='install Piper 1.8.0 and the English voice; requires internet')
+    _ = commands.add_argument('--install', action='store_true', help='install Piper 1.8.0 and English / Voice Contributor high; requires internet')
     _ = commands.add_argument('--check', action='store_true', help='verify the installed voice by offline synthesis')
     args = SetupArguments()
     _ = parser.parse_args(argv, namespace=args)

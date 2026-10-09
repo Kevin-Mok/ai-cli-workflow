@@ -1,0 +1,274 @@
+#!/usr/bin/env python3
+"""Hear ten numbered local voices; replay numbers/names with your own lines. No sudo."""
+import argparse
+import json
+import math
+import os
+from pathlib import Path
+import shutil
+import subprocess
+import sys
+import tempfile
+import threading
+import time
+from typing import cast
+import wave
+
+# Verified single-speaker alternatives in rhasspy/piper-voices/voices.json.
+VOICES = (
+    ('Amy', 'en_US-amy-medium', 'US'),
+    ('Bryce', 'en_US-bryce-medium', 'US'),
+    ('HFC Female', 'en_US-hfc_female-medium', 'US'),
+    ('HFC Male', 'en_US-hfc_male-medium', 'US'),
+    ('Contact A', 'en_US-Contact A-medium', 'US'),
+    ('Voice Contributor', 'en_US-Voice Contributor-high', 'US'),
+    ('Alan', 'en_GB-alan-medium', 'UK'),
+    ('Alba', 'en_GB-alba-medium', 'UK'),
+    ('Cori', 'en_GB-cori-high', 'UK'),
+    ('Jenny Dioco', 'en_GB-jenny_dioco-medium', 'UK'),
+)
+SAMPLES = {
+    'short': 'Your approval is needed. Can I go ahead?',
+    'celebrate': 'All done! The tests passed, and your changes are ready. Take a look at what I built!',
+    'technical': 'Update the Codex notification hook. Run the Python tests, check the backup, and deploy version one point eight.',
+}
+PIPER_VERSION = '1.8.0'
+SYNTHESIS_TIMEOUT = 30
+
+
+class Arguments(argparse.Namespace):
+    list_: bool = False
+    samples: bool = False
+    voice: list[str] | None = None
+    sample: str = 'all'
+    text: str | None = None
+    dry_run: bool = False
+    render_only: bool = False
+    offline: bool = False
+    output_dir: str | None = None
+    clip: str = str(Path(__file__).resolve().with_name('can-i-ask-you-a-question.mp3'))
+    length_scale: float = 0.95
+    plain: bool = False
+    details: bool = False
+
+
+def say(message: str, args: Arguments, icon: str = '') -> None:
+    width = max(40, shutil.get_terminal_size().columns)
+    line = (icon + ' ' if icon and not args.plain else '') + message
+    print(line if args.details or len(line) <= width else line[:width - 3] + '...', flush=True)
+
+
+def select(values: list[str] | None) -> list[int]:
+    if not values:
+        return list(range(len(VOICES)))
+    result: list[int] = []
+    for value in values:
+        matches = [i for i, voice in enumerate(VOICES) if value.casefold() in (str(i + 1), voice[0].casefold(), voice[1].casefold())]
+        if not matches:
+            raise ValueError(f'Unknown voice {value!r}; use --list and choose a number or name.')
+        if matches[0] not in result:
+            result.append(matches[0])
+    return result
+
+
+def wait(process: subprocess.Popen[str], timeout: float, label: str, args: Arguments) -> str:
+    started = time.monotonic()
+    try:
+        while True:
+            remaining = timeout - (time.monotonic() - started)
+            if remaining <= 0:
+                raise subprocess.TimeoutExpired(label, timeout)
+            try:
+                stdout, stderr = process.communicate(timeout=min(5, remaining))
+                if process.returncode:
+                    if args.details:
+                        print(stderr.strip(), file=sys.stderr)
+                    raise ValueError(f'{label} failed; use --details for diagnostics.')
+                return stdout
+            except subprocess.TimeoutExpired:
+                if time.monotonic() - started >= timeout:
+                    raise
+                say(f'{label} ... {time.monotonic() - started:.0f}s elapsed', args, '⏳')
+    finally:
+        if process.poll() is None:
+            process.kill()
+            _ = process.communicate()
+
+
+def run(argv: list[str], timeout: float, label: str, args: Arguments) -> str:
+    process = subprocess.Popen(argv, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    return wait(process, timeout, label, args)
+
+
+def valid_voice(model: Path) -> bool:
+    try:
+        if not model.is_file() or not model.stat().st_size:
+            return False
+        data = cast(object, json.loads(model.with_suffix('.onnx.json').read_text()))
+        audio = cast(dict[str, object], data).get('audio') if isinstance(data, dict) else None
+        rate = cast(dict[str, object], audio).get('sample_rate') if isinstance(audio, dict) else None
+        return isinstance(rate, int) and not isinstance(rate, bool) and rate > 0
+    except (OSError, ValueError, UnicodeError):
+        return False
+
+
+def prepare(python: Path, root: Path, number: int, args: Arguments) -> Path:
+    name, voice, _region = VOICES[number]
+    model = root / 'voices' / f'{voice}.onnx'
+    if valid_voice(model):
+        return model
+    if args.offline:
+        raise ValueError(f'{name} is missing/invalid in offline mode; rerun without --offline to download it.')
+    say(f'Downloading {number + 1}/10 - {name} (first use only)...', args, '⬇️')
+    model.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix='audition-download-', dir=root) as directory:
+        _ = run([str(python), '-m', 'piper.download_voices', voice, '--data-dir', directory], 600, f'Downloading {name}', args)
+        candidate = Path(directory) / model.name
+        if not valid_voice(candidate):
+            raise ValueError(f'{name} download was incomplete; rerun to retry.')
+        _ = candidate.with_suffix('.onnx.json').replace(model.with_suffix('.onnx.json'))
+        _ = candidate.replace(model)
+    return model
+
+
+def audition(python: Path, model: Path, wav: Path, text: str, player: str | None, args: Arguments, label: str) -> tuple[float, float | None]:
+    with tempfile.TemporaryFile(mode='w+t', encoding='utf-8') as source:
+        _ = source.write(text + '\n')
+        _ = source.seek(0)
+        started = time.monotonic()
+        process = subprocess.Popen([str(python), '-m', 'piper', '--model', str(model), '--config', str(model.with_suffix('.onnx.json')), '--length-scale', str(args.length_scale), '--output-file', str(wav)], stdin=source, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        expired = threading.Event()
+        def expire() -> None:
+            if process.poll() is None:
+                expired.set()
+                try:
+                    process.kill()
+                except ProcessLookupError:
+                    pass
+        timer = threading.Timer(SYNTHESIS_TIMEOUT, expire)
+        timer.daemon = True
+        clip_end: float | None = None
+        try:
+            timer.start()
+            if player:
+                say('Playing: Can I ask you a question? (synthesis runs alongside)', args, '🔔')
+                _ = run([player, '--no-config', '--no-video', '--no-terminal', '--audio-display=no', '--', str(Path(args.clip).expanduser().resolve())], 60, 'Question clip', args)
+                clip_end = time.monotonic()
+            _ = wait(process, max(0.001, SYNTHESIS_TIMEOUT - (time.monotonic() - started)), 'Synthesizing speech', args)
+            if expired.is_set():
+                raise ValueError('Speech synthesis timed out after 30 seconds.')
+            generated = time.monotonic() - started
+            with wave.open(str(wav), 'rb') as audio:
+                frames = audio.getnframes()
+                if frames <= 0 or audio.getframerate() <= 0:
+                    raise ValueError('Piper produced empty speech audio.')
+                if len(audio.readframes(frames)) != frames * audio.getnchannels() * audio.getsampwidth():
+                    raise ValueError('Piper produced incomplete speech audio.')
+            gap = None
+            if player and clip_end is not None:
+                gap = time.monotonic() - clip_end
+                say(f'Gap after clip: {gap:.3f}s (process handoff)', args, '⏱️')
+                say(f'Playing now: {label}', args, '🗣️')
+                _ = run([player, '--no-config', '--no-video', '--no-terminal', '--audio-display=no', '--', str(wav)], 120, 'Voice sample', args)
+            return generated, gap
+        finally:
+            timer.cancel()
+            if timer.ident is not None:
+                timer.join()
+            if process.poll() is None:
+                process.kill()
+                _ = process.communicate()
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    _ = parser.add_argument('--list', dest='list_', action='store_true', help='show all ten numbers, names and voice IDs')
+    _ = parser.add_argument('--samples', action='store_true', help='show the built-in sample lines')
+    _ = parser.add_argument('--voice', nargs='+', help='replay one or more numbers/names/IDs; default: all ten')
+    wording = parser.add_mutually_exclusive_group()
+    _ = wording.add_argument('--sample', choices=['all', *SAMPLES], default='all')
+    _ = wording.add_argument('--text', help='custom lines to read literally')
+    _ = parser.add_argument('--dry-run', action='store_true', help='show selection/text without downloads or audio')
+    _ = parser.add_argument('--render-only', action='store_true', help='save WAVs without playing the clip or speech')
+    _ = parser.add_argument('--offline', action='store_true', help='use cached models only; never download')
+    _ = parser.add_argument('--output-dir', help='save WAVs/manifest here; default: XDG data auditions folder')
+    _ = parser.add_argument('--clip', default=Arguments.clip, help='question clip played before every voice')
+    _ = parser.add_argument('--length-scale', type=float, default=0.95, help='pace: 1.0 normal, 0.95 slightly brisk, 0.9 faster')
+    _ = parser.add_argument('--plain', action='store_true', help='ASCII output')
+    _ = parser.add_argument('--details', action='store_true', help='full paths and subprocess diagnostics')
+    args = Arguments()
+    _ = parser.parse_args(argv, namespace=args)
+    try:
+        if not math.isfinite(args.length_scale) or not 0.5 <= args.length_scale <= 2:
+            raise ValueError('--length-scale must be between 0.5 and 2.0.')
+        numbers = select(args.voice)
+        if args.list_:
+            say('Ten local voice alternatives', args, '🎙️')
+            for i, (name, voice, region) in enumerate(VOICES, 1):
+                print(f'{i:2} {name:12} {region}  {voice}')
+            return 0
+        if args.samples:
+            for name, text in SAMPLES.items():
+                print(f'{name}: {text}')
+            return 0
+        text = args.text if args.text is not None else (' '.join(SAMPLES.values()) if args.sample == 'all' else SAMPLES[args.sample])
+        if not text.strip() or len(text) > 4000:
+            raise ValueError('Sample text must contain 1 to 4000 characters.')
+        if args.dry_run:
+            for number in numbers:
+                print(f'{number + 1}/10 - {VOICES[number][0]} ({VOICES[number][2]})')
+            print(f'Lines: {text}')
+            print(f'Pace: {args.length_scale}; question clip before each audible test.')
+            return 0
+        root = Path(os.environ.get('XDG_DATA_HOME') or Path.home() / '.local/share') / 'codex-notification-speech'
+        python = root / 'venv/bin/python'
+        if not os.access(python, os.X_OK):
+            raise ValueError('Piper is not installed; run ~/scripts/setup-codex-notification-speech --install first.')
+        # Fail offline missing-voice checks before launching any process.
+        if args.offline:
+            for number in numbers:
+                _ = prepare(python, root, number, args)
+        player = None if args.render_only else shutil.which('mpv')
+        if not args.render_only and (not player or not Path(args.clip).expanduser().is_file()):
+            raise ValueError('Playback needs mpv and the question MP3; install mpv or pass --clip PATH.')
+        version = run([str(python), '-c', 'from importlib.metadata import version; print(version("piper-tts"))'], 30, 'Checking Piper', args).strip()
+        if version != PIPER_VERSION:
+            raise ValueError(f'Piper {PIPER_VERSION} required; run setup-codex-notification-speech --install.')
+        output = Path(args.output_dir).expanduser().resolve() if args.output_dir else root / 'auditions'
+        output.mkdir(parents=True, exist_ok=True)
+        records: list[dict[str, object]] = []
+        for position, number in enumerate(numbers, 1):
+            name, voice, region = VOICES[number]
+            say(f'{number + 1}/10 - {name} ({region}) | audition {position}/{len(numbers)}', args, '🎙️')
+            model = prepare(python, root, number, args)
+            # Synthesis failures preserve previous samples; publish only valid WAVs.
+            with tempfile.TemporaryDirectory(prefix='sample-', dir=output) as directory:
+                wav = Path(directory) / 'sample.wav'
+                generated, gap = audition(python, model, wav, text, player, args, f'{number + 1}/10 - {name} ({region})')
+                destination = output / f'{number + 1:02}-{voice}.wav'
+                _ = wav.replace(destination)
+            records.append({'number': number + 1, 'name': name, 'voice': voice, 'wav': str(destination), 'synthesis_and_clip_seconds': round(generated, 3), 'gap_after_clip_seconds': round(gap, 3) if gap is not None else None})
+            say(f'Saved {destination.name}', args, '✅')
+            print(f'Replay: ~/scripts/codex-voice-auditions --voice {number + 1} --sample celebrate')
+        manifest = {'text': text, 'length_scale': args.length_scale, 'clip': str(Path(args.clip).expanduser().resolve()), 'voices': records}
+        with tempfile.NamedTemporaryFile(mode='w', encoding='utf-8', dir=output, delete=False) as stream:
+            temporary = Path(stream.name)
+            json.dump(manifest, stream, indent=2)
+            _ = stream.write('\n')
+        try:
+            _ = temporary.replace(output / 'manifest.json')
+        finally:
+            temporary.unlink(missing_ok=True)
+        say(f'Finished {len(numbers)} auditions. Files: {output}', args, '✅')
+        print('Notification voice/settings were not changed. Choose your favorite number.')
+        return 0
+    except (OSError, ValueError, RuntimeError, subprocess.SubprocessError, wave.Error, EOFError) as error:
+        print(f'{"Warning: " if args.plain else "⚠️ "}{error}', file=sys.stderr)
+        return 1
+    except KeyboardInterrupt:
+        print('Audition stopped; completed samples remain saved.', file=sys.stderr)
+        return 130
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())

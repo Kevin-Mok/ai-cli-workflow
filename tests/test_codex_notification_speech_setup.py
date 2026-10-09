@@ -28,7 +28,7 @@ class SpeechSetupTests(unittest.TestCase):
         self.addCleanup(self.temp.cleanup)
         self.data = Path(self.temp.name) / 'data with spaces'
         self.root = self.data / 'codex-notification-speech'
-        self.model = self.root / 'voices/en_US-lessac-medium.onnx'
+        self.model = self.root / 'voices/en_US-Voice Contributor-high.onnx'
         self.config = self.model.with_suffix('.onnx.json')
         self.python = self.root / 'venv/bin/python'
         self.env = patch.dict(os.environ, {'XDG_DATA_HOME': str(self.data)})
@@ -55,13 +55,14 @@ class SpeechSetupTests(unittest.TestCase):
             self.python.chmod(0o700)
         elif 'piper.download_voices' in argv:
             directory = Path(argv[argv.index('--data-dir') + 1])
-            self.assertEqual(argv[3], 'en_US-lessac-medium')
+            self.assertEqual(argv[3], 'en_US-Voice Contributor-high')
             self.assertTrue(directory.is_relative_to(self.root))
-            (directory / 'en_US-lessac-medium.onnx').write_bytes(b'onnx fixture')
-            (directory / 'en_US-lessac-medium.onnx.json').write_text(json.dumps({'audio': {'sample_rate': 22050}}), encoding='utf-8')
+            (directory / 'en_US-Voice Contributor-high.onnx').write_bytes(b'onnx fixture')
+            (directory / 'en_US-Voice Contributor-high.onnx.json').write_text(json.dumps({'audio': {'sample_rate': 22050}}), encoding='utf-8')
         elif 'piper' in argv:
             self.assertEqual(argv[argv.index('--model') + 1], str(self.model))
             self.assertEqual(argv[argv.index('--config') + 1], str(self.config))
+            self.assertEqual(argv[argv.index('--length-scale') + 1], '0.95')
             self.assertEqual(kwargs['timeout'], 30)
             self.assertIsInstance(kwargs['input'], str)
             self.assertNotIn(kwargs['input'], argv)
@@ -104,6 +105,7 @@ class SpeechSetupTests(unittest.TestCase):
         before = sorted(path.relative_to(self.root) for path in self.root.rglob('*'))
         self.assertEqual(self.run_helper('--check'), 0)
         self.assertIn('ready', self.output.getvalue().lower())
+        self.assertIn('Voice Contributor high', self.output.getvalue())
         self.assertEqual(sorted(path.relative_to(self.root) for path in self.root.rglob('*')), before)
         self.assertEqual(len(self.calls), 2)
         self.assertTrue(all(call[0][0] == str(self.python) for call in self.calls))

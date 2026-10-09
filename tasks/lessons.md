@@ -156,3 +156,5 @@
 - 2026-10-08: Session privacy screening must use actual invocation provenance, not arbitrary public tool-result mentions. A parser correction needs a screening-cache revision; otherwise unchanged false exclusions persist. Group recent directories separately from recap inference order.
 
 - 2026-10-08: Group signals are asynchronous and process.wait() reaps only its leader. Cancellation fixtures should bound observation of an owned descendant disappearing or becoming Z, retain immediate leader absence, and fail if the child survives the deadline.
+
+- 2026-10-09: Typed argparse namespaces must not shadow built-in type names (for example list) with preceding class attributes; use an explicit dest such as list_ and verify helper imports plus the type checker. See [voice audition argument shadowing](../docs/postmortem/2026-10-09-voice-audition-argument-shadowing.md).

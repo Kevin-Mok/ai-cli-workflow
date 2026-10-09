@@ -798,7 +798,7 @@ stacking, suppression and history. Dunst 1.9.2 may sound once on recall of a
 silently stacked duplicate; normal already-sounded history stays silent.
 
 - Action: Run `~/scripts/setup-codex-notification-speech --install`, then `--check` and `~/scripts/codex-notification-sound preview --title "Smoke-test VPS backup"`.
-  Expected: Pinned Piper 1.8.0 and English voice verify without sudo; preview plays exactly one MP3 followed by that title. Repeating check/preview without internet succeeds, and temporary WAVs disappear.
+  Expected: Pinned Piper 1.8.0 and English Voice Contributor high voice at pace 0.95 verify without sudo; preview plays exactly one MP3 followed by that title. Repeating check/preview without internet succeeds, and temporary WAVs disappear.
 - Action: After deployment, start/resume affected conversations, then run `~/scripts/codex-notification-sound speech enable`.
   Expected: Status shows enabled and ready. No hook trust is required. A tagged Dunst smoke popup is silent; existing popup actions and content remain unchanged.
 - Action: Use two named conversations sharing a terminal. Complete focused/background turns, rename one and complete again, then request permission including an automatically reviewed request while the task continues. Also complete an ordinary spawned agent with its own saved title.
@@ -807,6 +807,27 @@ silently stacked duplicate; normal already-sounded history stays silent.
   Expected: Complete audio sequences never overlap; text is spoken literally. Unavailable synthesis retains one MP3, logs the failure and does not delay Codex or change permission decisions.
 - Action: Run `~/scripts/codex-notification-sound speech disable`, then repeat a displayed completion/approval and a focused completion.
   Expected: Displayed popups regain their original single MP3. Focus suppression again suppresses audio, and the selected MP3 remains configured.
+
+### Local Codex voice auditions
+
+Compare the ten numbered local voices, then replay favorites with new wording before selecting one. Install Piper with the existing speech setup helper first. No sudo; first model downloads require internet. Voice auditions do not change speech activation or the selected notification voice.
+
+- Action: `mpv --no-config --no-video ~/scripts/Voice Contributor-celebrate.mp3`.
+  Expected: The committed Voice Contributor high reference sample reads the celebrate line at pace 0.95, without the separately retained question intro.
+- Action: `~/scripts/codex-voice-auditions --list`, then `--samples`.
+  Expected: Stable numbers 1–10 (Amy through Jenny Dioco), region/model IDs, and three shared sample sets; no download or audio.
+- Action: `~/scripts/codex-voice-auditions`.
+  Expected: All ten run in numbered order with visible names, the question clip then speech per voice, a remaining-gap reading and saved WAVs/manifest. Synthesis overlaps the clip, audio never overlaps within a sequence, and downloads/slow generation report ongoing elapsed activity.
+- Action: `~/scripts/codex-voice-auditions --voice 1 6 --sample celebrate --offline`.
+  Expected: Cached Amy and Voice Contributor play with identical upbeat wording and their original numbers, no network downloads. If either model is missing, an actionable offline warning appears before playback.
+- Action: `~/scripts/codex-voice-auditions --voice 6 --text "All done! The tests passed, and your changes are ready."`.
+  Expected: Voice Contributor alone reads the literal custom line after the question clip; number 6 and name appear immediately before speech. Compare naturalness and energy by listening.
+- Action: `~/scripts/codex-voice-auditions --voice 1 --sample celebrate --length-scale 0.9 --offline`.
+  Expected: Amy uses a brisker pace, with the question clip and measured remaining gap; notification settings retain their prior values.
+- Action: `~/scripts/codex-voice-auditions --voice 1 --render-only --output-dir /tmp/codex-voice-check --offline`.
+  Expected: One nonempty WAV plus manifest.json; no audio. Manifest records voice number/name, wording and pace; clip-gap field is null for rendering.
+- Action: `~/scripts/codex-notification-sound preview --title "All done! The tests passed."`.
+  Expected: Selected Voice Contributor high voice at the celebrate pace (0.95) is synthesized during the MP3; one MP3 then one title with reduced remaining wait. Simultaneous notifications remain serialized; failure retains the existing MP3 fallback. Approval speech remains silent.
 
 ### Kitty and Codex scrolling
 

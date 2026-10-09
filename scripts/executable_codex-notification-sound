@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Optional local sound for Dunst's codex-kitty notifications. No sudo needed."""
 import argparse
+from contextlib import ExitStack
 import fcntl
 from datetime import datetime, timezone
 import json
@@ -10,8 +11,14 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import threading
+import time
 
 APP_NAME = 'codex-kitty'
+VOICE = 'en_US-Voice Contributor-high'
+VOICE_LABEL = 'Voice Contributor (US, high)'
+LENGTH_SCALE = 0.95
+SYNTHESIS_TIMEOUT = 30
 _plain = False
 _details = False
 
@@ -67,7 +74,7 @@ def speech_enabled() -> bool:
 
 def voice_paths() -> tuple[Path, Path]:
     root = Path(os.environ.get('XDG_DATA_HOME') or Path.home() / '.local/share') / 'codex-notification-speech'
-    return root / 'venv/bin/python', root / 'voices/en_US-lessac-medium.onnx'
+    return root / 'venv/bin/python', root / 'voices' / f'{VOICE}.onnx'
 
 
 def voice_ready() -> bool:
@@ -102,7 +109,7 @@ def play(title: str | None = None) -> int:
             raise ValueError('mpv is unavailable on PATH')
         lock = error_log().with_name('playback.lock')
         lock.parent.mkdir(parents=True, exist_ok=True)
-        with lock.open('a') as owner:
+        with lock.open('a') as owner, ExitStack() as temporary_files:
             fcntl.flock(owner, fcntl.LOCK_EX)
             def playback(path: Path) -> None:
                 result = subprocess.run(
@@ -112,24 +119,65 @@ def play(title: str | None = None) -> int:
                     stderr=subprocess.DEVNULL, timeout=60, check=False)
                 if result.returncode:
                     raise ValueError(f'mpv playback failed (exit {result.returncode}); preview the clip and check your audio output')
-            playback(clip)
-            if title and voice_ready():
-                try:
-                    python, model = voice_paths()
-                    with tempfile.TemporaryDirectory(prefix='codex-title-') as temporary:
+            synthesis: subprocess.Popen[bytes] | None = None
+            synthesis_error: str | None = None
+            watchdog: threading.Timer | None = None
+            timed_out = threading.Event()
+            wav: Path | None = None
+            deadline = 0.0
+            try:
+                if title:
+                    try:
+                        if not voice_ready():
+                            raise ValueError('voice unavailable; run setup-codex-notification-speech --install')
+                        python, model = voice_paths()
+                        temporary = temporary_files.enter_context(tempfile.TemporaryDirectory(prefix='codex-title-'))
                         wav = Path(temporary) / 'title.wav'
-                        result = subprocess.run(
+                        # A private, unlinked stdin file avoids blocking on a
+                        # pipe while the clip waits to start. Titles stay local.
+                        text = temporary_files.enter_context(tempfile.TemporaryFile(mode='w+t', encoding='utf-8'))
+                        text.write(title + '\n')
+                        text.seek(0)
+                        deadline = time.monotonic() + SYNTHESIS_TIMEOUT
+                        synthesis = subprocess.Popen(
                             [str(python), '-m', 'piper', '--model', str(model),
-                             '--config', str(model.with_suffix('.onnx.json')), '--output_file', str(wav)],
-                            input=title + '\n', text=True, stdout=subprocess.DEVNULL,
-                            stderr=subprocess.DEVNULL, timeout=30, check=False)
-                        if result.returncode or not wav.is_file() or not wav.stat().st_size:
+                             '--config', str(model.with_suffix('.onnx.json')),
+                             '--length-scale', str(LENGTH_SCALE), '--output_file', str(wav)],
+                            stdin=text, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                        def enforce_deadline() -> None:
+                            if synthesis is not None and synthesis.poll() is None:
+                                timed_out.set()
+                                synthesis.kill()
+                        timer = threading.Timer(max(0.0, deadline - time.monotonic()), enforce_deadline)
+                        timer.daemon = True
+                        timer.start()
+                        watchdog = timer
+                    except (OSError, ValueError, UnicodeError, subprocess.SubprocessError) as error:
+                        synthesis_error = str(error)
+                playback(clip)
+                if synthesis is not None:
+                    try:
+                        synthesis.wait(timeout=max(0.0, deadline - time.monotonic()))
+                        if watchdog is not None:
+                            watchdog.cancel()
+                            watchdog.join()
+                        if timed_out.is_set():
+                            raise subprocess.TimeoutExpired(synthesis.args, SYNTHESIS_TIMEOUT)
+                        if synthesis.returncode or wav is None or not wav.is_file() or not wav.stat().st_size:
                             raise ValueError('Piper synthesis failed; run setup-codex-notification-speech --check')
                         playback(wav)
-                except (OSError, ValueError, UnicodeError, subprocess.SubprocessError) as error:
-                    report_error(str(error))  # The MP3 already played; never retry it.
-            elif title:
-                report_error('voice unavailable; run setup-codex-notification-speech --install')
+                    except (OSError, ValueError, UnicodeError, subprocess.SubprocessError) as error:
+                        report_error(str(error))  # The MP3 already played; never retry it.
+                elif synthesis_error:
+                    report_error(synthesis_error)
+            finally:
+                if watchdog is not None:
+                    watchdog.cancel()
+                    watchdog.join()
+                if synthesis is not None:
+                    if synthesis.poll() is None:
+                        synthesis.kill()
+                    synthesis.wait()  # Reap our child before removing its WAV.
         return 0
     except (OSError, ValueError, UnicodeError, subprocess.SubprocessError) as error:
         report_error(str(error))
@@ -212,6 +260,8 @@ def main(argv: list[str] | None = None) -> int:
             display(f'  Sound   {"enabled" if clip else "disabled"}')
             display(f'  Speech  {"enabled" if speech_enabled() else "disabled"}')
             display(f'  Voice   {"ready" if voice_ready() else "not installed"}')
+            display(f'  Model   {VOICE_LABEL}')
+            display(f'  Pace    {LENGTH_SCALE} (slightly brisk)')
             if clip:
                 display(f'  Clip    {clip.name}')
             display('Use setup-codex-notification-speech --check to verify the voice.')
