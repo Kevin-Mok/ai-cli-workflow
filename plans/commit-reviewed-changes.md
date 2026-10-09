@@ -16,7 +16,7 @@ Feedback repair restores the HEAD byte prefix and appends all seven new entries;
 - [x] Run refresh-config, inspect all resulting source changes and verify installed event probes.
 - [x] Commit delivery policy and inspection incident.
 - [x] Commit October 8 session-insight learning.
-- [ ] Commit VPS lookup evidence.
+- [x] Commit VPS lookup evidence.
 - [ ] Commit notification eligibility and companion plans/docs/tests.
 - [ ] Commit final command-formatting guidance and pending acceptance evidence.
 - [ ] Commit graphical recovery learning and manual checks.
@@ -50,3 +50,7 @@ Delivery policy, append-only feedback repair and inspection incident are reviewe
 ### Milestone 2: docs(postmortem): capture session insight findings
 
 Session insight reference and four reviewed external report records are included with their three findings; aliases and available source hashes were independently checked. Remaining: five groups and remote delivery. Next: VPS lookup evidence.
+
+### Milestone 3: docs(postmortem): record VPS backup lookup limits
+
+VPS lookup report and its exact reviewed hash are included; targeted learning check has no errors or changed aliases. No backup or restore acceptance is claimed. Remaining: four groups and remote delivery. Next: notification eligibility.

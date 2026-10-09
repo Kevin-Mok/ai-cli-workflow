@@ -8054,6 +8054,15 @@
     },
     {
       "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-09-vps-backup-command-lookup.md"
+      ],
+      "decision": "No new reusable learning: ext-sandbox-loopback already describes runner initialization failure and verified scoped escalation workaround; optional nonexistent search paths were corrected without affecting repository state.",
+      "findings": [],
+      "reviewed_on": "2026-10-09",
+      "sha256": "c6ef8d08a7eab133dd96eaa12b9c755517838a63509e6d8a9bcc2cfcf57f3463"
+    },
+    {
+      "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-10-09-codex-priority-inspection.md"
       ],
       "decision": "Known sandbox/path lookup guidance remains unchanged. No separate learning for fixture helper/schema/hash/startup/preview assumptions, one-shot index-lock EAGAIN, aggregate fixture timeout or transient JSON formatting guard: preserve fresh shared records and use observed control state with bounded phase deadlines. Two confirmed scoped fixes are linked. Final source suite and protected installed runtime passed; simultaneous query edits during positional restoration remain independently unproved, and environmental transport-delay cause is unknown. Commit-scope serializer, no-index exit status, Markdown/schema excerpt and scratch-copy assumptions add no new finding; validate the explicit HEAD-plus-owned candidate and keep generated caches excluded. Post-push global equality also caught fresh concurrent changes; existing stale-baseline guidance applies. Preserve unrelated staged/working changes and verify published commit blobs rather than attributing writers from hashes.",
