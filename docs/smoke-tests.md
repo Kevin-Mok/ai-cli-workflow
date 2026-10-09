@@ -831,10 +831,12 @@ Compare the ten numbered local voices, then replay favorites with new wording be
 
 ### Short Voice Contributor introduction
 
-Open a fresh fish shell after refresh, or source ~/.config/fish/key_abbr.fish, then try the stored introduction and custom text. No sudo; the default saved MP3 needs mpv, while custom words also need installed Piper.
+After refresh-config, try the stored introduction and custom text in your existing fish shell; no abbreviation reload is required. No sudo; the default saved MP3 needs mpv, while custom words also need installed Piper.
 
 - Action: Type `rintro` and press Enter in interactive fish.
-  Expected: Expands to ~/scripts/Voice Contributor-intro and immediately plays the exact saved example-user introduction in Voice Contributor's voice, without the question clip.
+  Expected: Immediately plays the exact saved example-user introduction in Voice Contributor's voice, without the question clip.
+- Action: `fish -c 'rintro --help'`.
+  Expected: Usage with --text, exit 0, no audio; command resolves without abbreviations.
 - Action: `rintro --text "Welcome back! Your changes are ready."`.
   Expected: Voice Contributor reads those custom words only, with no question clip; notification settings remain unchanged.
 - Action: `~/scripts/Voice Contributor-intro --help`, then `~/scripts/Voice Contributor-intro --text`.

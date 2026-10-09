@@ -56,7 +56,7 @@ rintro --text "Welcome back! Your changes are ready."
 rintro --help
 ```
 
-The `rintro` abbreviation expands to `~/scripts/Voice Contributor-intro` when you press Space or Enter in interactive fish. After deployment, open a fresh shell or run `source ~/.config/fish/key_abbr.fish` in an already-open shell. Scripts and other shells can invoke `~/scripts/Voice Contributor-intro` directly.
+`rintro` is an autoloadable fish function forwarding arguments to `~/scripts/Voice Contributor-intro`. After deployment it works in existing and new fish shells without reloading abbreviations, including `fish -c 'rintro --help'`. Other shells can invoke `~/scripts/Voice Contributor-intro` directly.
 
 Default text is exactly: "Hello, everyone. I am example-user's Junior Software Engineer.." The [saved intro MP3](../scripts/Voice Contributor-intro.mp3) is Voice Contributor high at pace 0.95, tracked through Git LFS, and contains speech only. Default playback needs mpv but no synthesis startup. Custom `--text "WORDS"` uses local Piper with the same voice/pace; quote the complete phrase to preserve spaces and punctuation.
 

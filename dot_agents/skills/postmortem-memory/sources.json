@@ -7779,6 +7779,15 @@
       "reviewed_on": "2026-10-09",
       "findings": [],
       "decision": "No new reusable learning: Git LFS positional operand mistaken for file filter; ordinary inventory and committed pointer verify the asset. Record compound-runner status limits."
+    },
+    {
+      "sha256": "92c79b1c40a6fbbefd5e795da18d59ba83b2f43550e84d67c73376d268a10718",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-09-rintro-abbreviation-not-command.md"
+      ],
+      "reviewed_on": "2026-10-09",
+      "findings": [],
+      "decision": "No separate cross-task finding: repo-specific shortcut remedy is recorded directly in fish-alias SKILL.md and tasks/lessons.md; runtime fish resolution and six regression tests verify the repair. no-config fixture requires explicit function path."
     }
   ],
   "review": {

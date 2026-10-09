@@ -158,3 +158,5 @@
 - 2026-10-08: Group signals are asynchronous and process.wait() reaps only its leader. Cancellation fixtures should bound observation of an owned descendant disappearing or becoming Z, retain immediate leader absence, and fail if the child survives the deadline.
 
 - 2026-10-09: Typed argparse namespaces must not shadow built-in type names (for example list) with preceding class attributes; use an explicit dest such as list_ and verify helper imports plus the type checker. See [voice audition argument shadowing](../docs/postmortem/2026-10-09-voice-audition-argument-shadowing.md).
+
+- 2026-10-09: A stored callable fish command needs an executable or autoload function; an abbreviation alone depends on interactive expansion and reload state. Verify command resolution with fish --no-config and preserve quoted arguments.
