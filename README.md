@@ -873,8 +873,9 @@ this.
 - [`dot_config/i3/config.tmpl`](dot_config/i3/config.tmpl) is the main
   desktop control plane for workspace movement, app assignments,
   launcher bindings, display and audio shortcuts, and layout control.
-  Hold **Alt+Super** and press **1–9** for Redshift temperatures
-  from **1200K to 6000K** in 600K steps; **Alt+Super+0** or
+  Hold **Alt+Super** and press **2–6** for Redshift temperatures
+  of **1800K, 2100K, 2400K, 2700K, and 3000K** in 300K steps.
+  Keys **1, 7, 8, 9** select **1200K, 4800K, 5400K, 6000K**; **Alt+Super+0** or
   **Alt+Super+grave** removes the filter.
 - [`dot_config/i3blocks/`](dot_config/i3blocks/) plus
   [`dot_config/dunst/dunstrc`](dot_config/dunst/dunstrc) and

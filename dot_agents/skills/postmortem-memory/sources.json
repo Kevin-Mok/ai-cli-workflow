@@ -7996,6 +7996,15 @@
       "findings": [],
       "reviewed_on": "2026-10-09",
       "sha256": "8932a62b9596b5d26fc748a70c8127c21833bcc7b2323e8bd14853d90d102470"
+    },
+    {
+      "sha256": "5b0b18db55420d1a536c832c852ff3e469db71310af025fb74465479e07e40b6",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-09-redshift-sandbox-startup.md"
+      ],
+      "reviewed_on": "2026-10-09",
+      "findings": [],
+      "decision": "No new learning: recurrence of reviewed ext-sandbox-loopback; approved host shell works, default sandbox remains unresolved."
     }
   ],
   "review": {

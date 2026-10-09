@@ -26,11 +26,12 @@ if args.live:
 else:
     text = Path(args.config).expanduser().read_text()
     label = args.config
-expected = [(str(n), str(1200 + (n - 1) * 600)) for n in range(1, 10)]
+temperatures = (1200, 1800, 2100, 2400, 2700, 3000, 4800, 5400, 6000)
+expected = [(str(n), str(value)) for n, value in enumerate(temperatures, 1)]
 actual = re.findall(r'^bindsym \$mod\+Mod4\+([0-9]) exec redshift -x && redshift -O (\d+)$', text, re.M)
 if actual != expected:
     raise SystemExit(_cli_message(f'FAIL: {label}: expected {expected}; found {actual}', '❌'))
 for key in ('0', 'grave'):
     if not re.search(rf'^bindsym \$mod\+Mod4\+{key} exec redshift -x$', text, re.M):
         raise SystemExit(_cli_message(f'FAIL: {label}: {key} must reset the filter', '❌'))
-print(_cli_message(f'PASS: {label}: 1–9 = 1200–6000 K; 0/grave reset', '✅'))
+print(_cli_message(f'PASS: {label}: 2–6 = 1800, 2100, 2400, 2700, 3000 K; 1/7–9 unchanged; 0/grave reset', '✅'))
