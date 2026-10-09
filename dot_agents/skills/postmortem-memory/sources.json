@@ -7716,6 +7716,15 @@
       "reviewed_on": "2026-10-09",
       "findings": [],
       "decision": "No new learning: existing local-sandbox-loopback-approved-route and inspect-before-use guidance cover pre-shell failure and locating the refresh fish function; approved reads exited 0."
+    },
+    {
+      "sha256": "c888c6a06fc12bfc314cfd8c3c98e94ea6a4b02e1de4aac29f53f47d325938f8",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-09-task-completion-policy-sandbox-startup.md"
+      ],
+      "reviewed_on": "2026-10-09",
+      "findings": [],
+      "decision": "No new reusable learning: repeats ext-sandbox-loopback and local-sandbox-loopback-approved-route; approved scoped reads exited 0, while default sandbox startup remains unresolved."
     }
   ],
   "review": {

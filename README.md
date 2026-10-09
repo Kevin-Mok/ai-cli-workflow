@@ -202,6 +202,11 @@ without abandoning eligible commits. Planning-only requests remain read-only.
 After each commit, Codex reports a [high-level status overview](docs/commit-status-overviews.md)
 in both the active plan (or `docs/task-status.md`) and its response, alongside
 smoke-test commands, verified results, remaining work, blockers and the next step.
+Every task completion also includes 5–10 direct verification commands with
+working directory, sudo requirements and labeled expected output after each
+command, even when no commit or push occurs. This applies to documentation,
+configuration, analysis and planning as well as features. Automated checks run
+before completion and any commit, and are reported separately.
 
 - [`commit-plan-push`](dot_agents/skills/commit-plan-push/SKILL.md) makes a
   best-effort pass over the entire dirty worktree, separates safe changes into

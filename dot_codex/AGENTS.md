@@ -285,9 +285,14 @@ education work:
 - Before committing, check that another engineer can reproduce the result,
   review the rollback path, and ask whether the solution remains the simplest
   robust option.
-- After implementing new or changed features, always provide 5–10 concrete,
-  copy-pasteable smoke-test commands in the final handoff so the user can try
-  the features immediately. Cover the changed features and relevant edge cases.
+- After every task completion, always provide 5–10 concrete, copy-pasteable
+  direct verification commands in the final handoff, whether or not a commit or
+  push occurred. Apply this to documentation, configuration, analysis, planning,
+  and feature tasks. Commands must directly exercise or verify the completed
+  result through the actual CLI, app, API, or delivered artifact, including
+  relevant edge cases, with observable results. For tasks without new executable
+  behavior, use task-relevant artifact or workflow commands; do not invent
+  behavior or pad the list with unrelated checks.
   State the required working directory, whether sudo is needed, and the expected
   result for each command or clearly grouped commands. Prefer reusable smoke
   scripts and documented commands. Do not wait for the user to ask.
