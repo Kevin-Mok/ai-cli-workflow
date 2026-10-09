@@ -419,6 +419,17 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Limitations: guest boot and Secure Boot remain unverified.
 - Source: [VM sidecar staging gap](../../../../docs/postmortem/2026-10-08-backup-vm-sidecar-staging.md).
 
+## local-offline-apt-signed-optional-indexes
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **code**.
+- Symptoms: Native APT update requests include optional binary-all indexes absent from signed Ubuntu Release metadata; strict offline import refuses them.
+- Applicability: Offline package request/bundle workflows using actual APT serialization and authenticated official repository metadata.
+- Diagnostic checks: Serialize native update requests rather than only handwritten fixtures. Verify same-suite InRelease with gpgv, then compare every index with its signed SHA256 inventory.
+- Remedy: Normalize requests before fetching against authenticated metadata; remove only specifically optional unpublished binary-all Packages variants. Refuse every other unadvertised index and preserve package/hash verification.
+- Verification evidence: Defining RED followed by20 package tests; independent native18-row plucky/security request becomes10 authenticated rows after current gpgv verification.
+- Limitations: This establishes request normalization with real metadata and synthetic package/media flows, not a complete restored guest GNOME install. Repository availability must be checked freshly without changing releases or weakening authentication.
+- Source: [Graphical VPS rehearsal](/home/example/coding/example-client-app/docs/postmortem/2026-10-09-graphical-vps-rehearsal.md) (SHA-256 `0371a96f2aee`; reviewed alias in [sources.json](../sources.json)).
+
 ## local-audio-fixture-marker-ordering
 
 - Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **code**.

@@ -287,6 +287,17 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Limitations: exact historical playback unlogged; silent installed probes do not prove hardware listening. Other provenance formats fail silently. Broader193 suite retains one unrelated concurrent fzf/picker failure.
 - Source: [2026-10-09-empty-attention-notification-audio.md](/home/example/linux-config/docs/postmortem/2026-10-09-empty-attention-notification-audio.md) (SHA-256 `6c3e5daec804`).
 
+## local-restore-proof-current-boot
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **code**.
+- Symptoms: Partial all-green check lists accepted as server recovery. An earlier boot report certifies a later changed overlay. Unattributed HTTP or generic databases can substitute unrelated application evidence.
+- Applicability: Local VM restore certification that gates subsequent cloning or recovery claims.
+- Diagnostic checks: Reject missing named checks, wrong domain UUID and old boot nonce. Reproduce two boot cycles with actual qcow2 fixtures and bind normal shutdown to the current overlay. Inspect service-owned listener ports and configured database paths/schemas.
+- Remedy: Require a complete explicit checklist; identify the marked domain and fresh per-start SMBIOS nonce; match stopped-domain shutdown evidence and overlay hash before sealing or cloning. Attribute HTTP and database checks to the actual restored services.
+- Verification evidence: Defining RED regressions followed by35 host and12 checker tests; independent probe rejects old nonce and accepts current nonce; full264-test recovery suite passes with one optional live-VM skip.
+- Limitations: Real libvirt boot, application/database acceptance and GNOME login remain operator checks. A nonce binds host-managed starts; it does not prove external networking or every runtime database sidecar is unchanged.
+- Source: [Graphical VPS rehearsal](/home/example/coding/example-client-app/docs/postmortem/2026-10-09-graphical-vps-rehearsal.md) (SHA-256 `0371a96f2aee`; reviewed alias in [sources.json](../sources.json)).
+
 ## local-recap-same-key-input-replacement
 
 - Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **code**.

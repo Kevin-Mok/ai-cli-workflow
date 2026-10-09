@@ -4590,6 +4590,51 @@
       "verification_scope": "code"
     },
     {
+      "applicability": "Local VM restore certification that gates subsequent cloning or recovery claims.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Reject missing named checks, wrong domain UUID and old boot nonce.",
+        "Reproduce two boot cycles with actual qcow2 fixtures and bind normal shutdown to the current overlay.",
+        "Inspect service-owned listener ports and configured database paths/schemas."
+      ],
+      "id": "local-restore-proof-current-boot",
+      "limitations": "Real libvirt boot, application/database acceptance and GNOME login remain operator checks. A nonce binds host-managed starts; it does not prove external networking or every runtime database sidecar is unchanged.",
+      "reference": "references/state-security.md#local-restore-proof-current-boot",
+      "remedy": "Require a complete explicit checklist; identify the marked domain and fresh per-start SMBIOS nonce; match stopped-domain shutdown evidence and overlay hash before sealing or cloning. Attribute HTTP and database checks to the actual restored services.",
+      "sources": [
+        "0371a96f2aee2023267f63cb6095ca5a454fde1e94afac4276b8cbee057bf6e0"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "Partial all-green check lists accepted as server recovery.",
+        "An earlier boot report certifies a later changed overlay.",
+        "Unattributed HTTP or generic databases can substitute unrelated application evidence."
+      ],
+      "verification": "Defining RED regressions followed by35 host and12 checker tests; independent probe rejects old nonce and accepts current nonce; full264-test recovery suite passes with one optional live-VM skip.",
+      "verification_scope": "code"
+    },
+    {
+      "applicability": "Offline package request/bundle workflows using actual APT serialization and authenticated official repository metadata.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Serialize native update requests rather than only handwritten fixtures.",
+        "Verify same-suite InRelease with gpgv, then compare every index with its signed SHA256 inventory."
+      ],
+      "id": "local-offline-apt-signed-optional-indexes",
+      "limitations": "This establishes request normalization with real metadata and synthetic package/media flows, not a complete restored guest GNOME install. Repository availability must be checked freshly without changing releases or weakening authentication.",
+      "reference": "references/artifact-verification.md#local-offline-apt-signed-optional-indexes",
+      "remedy": "Normalize requests before fetching against authenticated metadata; remove only specifically optional unpublished binary-all Packages variants. Refuse every other unadvertised index and preserve package/hash verification.",
+      "sources": [
+        "0371a96f2aee2023267f63cb6095ca5a454fde1e94afac4276b8cbee057bf6e0"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "Native APT update requests include optional binary-all indexes absent from signed Ubuntu Release metadata; strict offline import refuses them."
+      ],
+      "verification": "Defining RED followed by20 package tests; independent native18-row plucky/security request becomes10 authenticated rows after current gpgv verification.",
+      "verification_scope": "code"
+    },
+    {
       "applicability": "Interactive fzf pickers that reload reordered rows and preserve a selected stable UUID, including fzf 0.44 callback contracts.",
       "confidence": "confirmed",
       "diagnostics": [
@@ -8163,6 +8208,17 @@
       ],
       "reviewed_on": "2026-10-09",
       "sha256": "bf50298cb56cf8897edbc07bf097c633dac0dc8a6d7a76859adc0cf8cbf26518"
+    },
+    {
+      "aliases": [
+        "/home/example/coding/example-client-app/docs/postmortem/2026-10-09-graphical-vps-rehearsal.md"
+      ],
+      "findings": [
+        "local-restore-proof-current-boot",
+        "local-offline-apt-signed-optional-indexes"
+      ],
+      "reviewed_on": "2026-10-09",
+      "sha256": "0371a96f2aee2023267f63cb6095ca5a454fde1e94afac4276b8cbee057bf6e0"
     },
     {
       "aliases": [

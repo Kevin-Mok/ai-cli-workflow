@@ -1130,3 +1130,15 @@ separate disposable-VM boot acceptance check.
   Expected: Init, backup, restore and boot phases are listed. For runtime
   acceptance, execute the guide’s workflow using only disposable virtual images,
   then record login/data/UUID results with the source and backup disconnected.
+
+
+## Example Client graphical VPS recovery
+
+Run from the PC using the [project runbook](/home/example/coding/example-client-app/docs/graphical-vps-restore.md). This is independent of backup-pc and does not modify the production VPS.
+
+- Action: Run `bash /home/example/coding/example-client-app/scripts/infra/graphical-vps.sh check`, then the documented sudo setup stage only for new USB rehearsal paths.
+  Expected: Actionable prerequisite output, full original-image verification, new isolated VM disks/media and retained original backups. Open virt-manager through the normal-user open-proof stage.
+- Action: Complete the marked guest's proof stage and the offline GNOME exchanges, using the documented PC/guest stages.
+  Expected: Original UUID/files/configured database/local-service checks and a current-session complete report gate the separate desktop clone; signed same-release packages install without guest Internet. Record actual GNOME login/reboot screenshots.
+- Action: Run the project status and finish stages after acceptance.
+  Expected: Exact owned domain UUIDs/network none, normal shutdown and BACKING IMAGE UNCHANGED. Public TLS/external bots/production upgrades remain separate evidence.

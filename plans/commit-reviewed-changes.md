@@ -19,7 +19,7 @@ Feedback repair restores the HEAD byte prefix and appends all seven new entries;
 - [x] Commit VPS lookup evidence.
 - [x] Commit notification eligibility and companion plans/docs/tests.
 - [x] Commit final command-formatting guidance and pending acceptance evidence.
-- [ ] Commit graphical recovery learning and manual checks.
+- [x] Commit graphical recovery learning and manual checks.
 - [ ] Commit Vesktop settings excluding generated sync-version metadata.
 - [ ] Verify the complete series and push once to origin/main.
 
@@ -62,3 +62,7 @@ Notification code, tests, public docs, original/follow-up plans and learning are
 ### Milestone 5: docs(codex): separate runnable commands from reading code
 
 Final runnable-command/reading-code policy, compiled prompt, historical/current reports and learning are included together. Exact wrapped clipboard acceptance stays pending. Remaining: recovery/Vesktop groups and remote delivery. Next: graphical recovery lessons.
+
+### Milestone 6: docs(recovery): capture graphical VPS verification lessons
+
+Graphical recovery reference sections, signed metadata/current-boot findings and corresponding smoke checks are included. Guest GNOME/runtime acceptance remains external/manual. Remaining: Vesktop settings and remote delivery. Next: reviewed desktop settings.
