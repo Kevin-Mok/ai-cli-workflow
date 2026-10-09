@@ -979,6 +979,9 @@ changed mappings; file source keys gain `n` in fish.
   Expected: Source has `tcs ~/coding/track-codex-sessions` in cdn; installed fish
   expands tcs to `cd ~/coding/track-codex-sessions`. Inspect only; no cd executes.
 
+- Action: In a fresh fish session, inspect `abbr --show | string match -- "abbr -a -- tbo *"` without running the expansion.
+  Expected: `abbr -a -- tbo 'cd /mnt/usb-8tb/obs'`; the shortcut remains registered after refresh.
+
 Live Codex usage: `$fish-alias cbn codex-time burn day`. To create the mapping,
 invoke this as an actual request, inspect the reported source/section/conflicts,
 then verify the refresh result. Repeating it must produce a no-op. Directory

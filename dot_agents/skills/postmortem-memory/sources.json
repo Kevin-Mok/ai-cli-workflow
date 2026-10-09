@@ -7761,6 +7761,15 @@
       "reviewed_on": "2026-10-09",
       "findings": [],
       "decision": "No new learning: one subagent-local title transport failure with no retry or tested repair; unaffected parent/title/source workflows continued."
+    },
+    {
+      "sha256": "bdb66401e812c64aaa885d34ddaa8eba50ee24cc5580af7b8b36f8b300b6e08f",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-09-tbo-shortcut-sandbox-startup.md"
+      ],
+      "reviewed_on": "2026-10-09",
+      "findings": [],
+      "decision": "No new reusable learning: recurrence of local-sandbox-loopback-approved-route; approved scoped execution works while default sandbox remains unresolved."
     }
   ],
   "review": {
