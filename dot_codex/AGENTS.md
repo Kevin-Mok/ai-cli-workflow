@@ -156,6 +156,24 @@ education work:
   a startup message alone is insufficient. If total work is unknown, report
   activity and elapsed time rather than inventing a percentage or ETA. Send
   progress to stderr when stdout carries machine-readable output.
+- Separate runnable shell commands from code intended for reading in Codex
+  replies. Shell commands intended to paste into another terminal must be
+  standalone raw-text lines, one physical line per command, starting at column
+  zero and using valid fish syntax. Do not use fences, inline backticks, list
+  prefixes, blockquotes, prompt markers, continuation backslashes or inserted
+  line breaks. Keep every argument and flag on that line; terminal visual
+  wrapping is acceptable only when selection preserves the command text.
+  Code intended for reading, including source snippets, diffs, JSON and
+  illustrative shell code, uses normal language-tagged fenced blocks with
+  meaningful indentation and syntax highlighting. Expected output belongs in
+  a separate labeled code block. Put explanations, working-directory and sudo
+  requirements outside runnable command lines. “Raw” describes runnable command
+  presentation; it does not require raw rendering for the whole conversation.
+  Verify actual wrapped selection/paste into a fresh fish terminal separately
+  from visible syntax colors in Python, JSON and diff blocks; source formatting,
+  language tags and syntax parsing alone do not establish either result. Change
+  supported rendering settings only after observing that the alternative meets
+  both requirements; otherwise report the exact installed-TUI limitation.
 - When a user must run commands manually, create a reusable script instead of a
   chat-only command list. State when it requires `sudo` and provide the exact
   invocation.

@@ -210,7 +210,22 @@ blockers and the next step. Every task completion also includes 5–10 direct
 verification commands with working directory, sudo requirements and labeled
 expected output after each command, even when no commit or push occurs. This
 applies to documentation, configuration, analysis and planning as well as features.
-Automated checks run before
+In Codex replies, runnable shell commands are standalone raw-text lines at
+column zero, one physical line per command, using valid fish syntax. Omit fences,
+inline backticks, list prefixes, blockquotes, prompt markers and continuation
+backslashes; keep all arguments and flags on that line. Code for reading,
+including source snippets, JSON, diffs and illustrative shell code, keeps normal
+language-tagged fences and meaningful indentation. Expected output has a separate
+labeled code block; explanations, working-directory and sudo requirements stay
+outside command lines. “Raw” describes command presentation, not a requirement
+to render the whole conversation raw. The existing raw scrollback startup setting
+is a supported copying option, toggled with `/raw` or Alt+R; it does not establish
+selective rendering. See the [Codex configuration reference](https://developers.openai.com/codex/config-reference/)
+and the [formatting verification plan](plans/single-line-codex-commands.md#follow-up-separate-runnable-commands-from-displayed-code).
+Verify actual selection and paste of a visibly wrapped command into a fresh fish
+terminal separately from visible Python, JSON and diff colors. Change supported
+rendering settings only when observed evidence satisfies both requirements;
+report exact installed-TUI limitations otherwise. Automated checks run before
 completion and any commit, and are reported separately.
 
 - [`commit-plan-push`](dot_agents/skills/commit-plan-push/SKILL.md) makes a

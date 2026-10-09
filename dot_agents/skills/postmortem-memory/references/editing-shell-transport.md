@@ -217,6 +217,20 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
   - [2026-10-04-metaprompt-session-scope.md](/home/example/linux-config/.worktrees/vps-aws-bootstrap-prompt/docs/postmortem/2026-10-04-metaprompt-session-scope.md) (SHA-256 `ac02deccdb08`; 2 alias(es), all retained in [sources.json](../sources.json)).
   - [2026-10-04-vps-prompt-delivery-patch-context.md](/home/example/linux-config/.worktrees/vps-aws-bootstrap-prompt/docs/postmortem/2026-10-04-vps-prompt-delivery-patch-context.md) (SHA-256 `39c67958db27`; 1 alias(es), all retained in [sources.json](../sources.json)).
 
+
+## local-codex-rendered-command-copy
+
+- Status: **activation_pending**; root-cause confidence: **supported**; verification scope: **code**.
+- Symptoms: Wrapped command selections may retain padding/hard breaks despite one physical source line; observed raw Python/JSON/diff blocks show literal fences and uniform color, while formatted view shows colors and indented hard command wrapping.
+- Applicability: Codex CLI 0.162.0 npm TUI and the observed mixed-content/selection paths; verify version and rendering path before applying elsewhere.
+- Diagnostic checks: Separate source syntax, visible colors, native selection bytes and exact clipboard/paste acceptance. Inspect startup raw mode separately from current view. Compare bare one-line fish commands with tagged Python/JSON/diff reading blocks in both views; verify exact wrapped selection/paste in a fresh fish terminal. Stale clipboards or wrong selection boundaries establish no copy outcome.
+- Remedy: Apply the current bare-command/fenced-reading-code distinction without requiring session-wide raw rendering. Raw startup and /raw/Alt+R are supported copying options, not selective-rendering guarantees. Preserve the existing setting until an observed supported alternative meets actual paste and code-color requirements; otherwise report the exact observed limitation. See the [official configuration reference](https://developers.openai.com/codex/config-reference/).
+- Verification evidence: Historical config deployment, no-inference config/read and refresh/install checks passed; the user confirmed raw fish-block colors separately. New screenshots show raw Python/JSON/diff uniform text and formatted token/diff colors. Native formatted clipboard fragments contain padding/hard breaks, but outer selection boundaries were invalid. Five source commands and syntax checks passed in fresh fish processes, exit 0; no rendering setting was changed.
+- Limitations: Exact bare-command selection/paste/execution remains unverified. Invalid automation boundaries are not a raw-copy failure. Historical shell colors do not establish Python/JSON/diff colors or clipboard repair. No supported alternative has been shown to satisfy both outcomes; no binary/renderer/terminal patch was made.
+- Sources:
+  - [historical rendered-copy report](../../../../docs/postmortem/2026-10-09-codex-wrapped-command-padding.md) (reviewed historical source; prior user-confirmed shell colors preserved).
+  - [mixed-content comparison](../../../../docs/postmortem/2026-10-09-codex-mixed-content-rendering.md) (reviewed current source; exact paste remains pending).
+
 ## local-ast-utf8-edit-columns
 
 - Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **code**.

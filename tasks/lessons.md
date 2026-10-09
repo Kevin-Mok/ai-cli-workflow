@@ -162,6 +162,8 @@
 - 2026-10-09: A stored callable fish command needs an executable or autoload function; an abbreviation alone depends on interactive expansion and reload state. Verify command resolution with fish --no-config and preserve quoted arguments.
 
 - 2026-10-09: Notification completion does not imply a user-facing answer: spawned workers can inherit parent finals and record completion at spawn. Require known top-level provenance and event-local nonblank final text before automatic audio; keep unknown/ambiguous origins silent. See [false-attention audio investigation](../docs/postmortem/2026-10-09-empty-attention-notification-audio.md).
+
+- A single-line command source and a passing fish syntax check do not verify copying wrapped Codex output. Reproduce the actual rendered selection/paste; check the documented raw scrollback setting and keep active-session clipboard acceptance pending until observed.
 - 2026-10-09: Codex async question hooks should announce after PostToolUse confirms accepted=true; blocking requests need PreToolUse because Post follows the answer. Verify native delivery and trust hashes, and validate blocking schema before the early cue.
 - 2026-10-09: Concurrent test fixtures must log the observable completion event before publishing the completion marker; publishing first permits the dependent child to overtake the event log. Preserve playback assertions and reproduce scheduling gaps deterministically.
 
@@ -172,3 +174,5 @@
 - 2026-10-09: A recent picker should display available UUID metadata before archive parsing or lock acquisition. Keep dialogue pending, index in background batches, retain usable rows through malformed/unreadable input, and keep diagnostics inside the UI. Do not prune unknown recap UUIDs on partial discovery. Real-manager fixtures must provide consistent native sources, cached dialogue and titles even when inference is synthetic. See [picker startup](../docs/postmortem/2026-10-09-codex-picker-archive-startup.md).
 
 - 2026-10-09: AST column offsets count UTF-8 bytes, not Unicode characters. Convert columns before slicing source text, apply edits right to left and parse before writing; multibyte glyphs make naive string indexing unsafe. See [the verified editing incident](../docs/postmortem/2026-10-09-cli-emoji-edit-offsets.md).
+
+- 2026-10-09: In Codex 0.162.0, observed raw shell-block colors do not establish Python/JSON/diff highlighting. Check actual code colors and wrapped clipboard acceptance separately in each live view; stale clipboards and incorrect native selection boundaries supply no copying verdict. See [the mixed-content comparison](../docs/postmortem/2026-10-09-codex-mixed-content-rendering.md).

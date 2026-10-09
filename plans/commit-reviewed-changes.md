@@ -18,7 +18,7 @@ Feedback repair restores the HEAD byte prefix and appends all seven new entries;
 - [x] Commit October 8 session-insight learning.
 - [x] Commit VPS lookup evidence.
 - [x] Commit notification eligibility and companion plans/docs/tests.
-- [ ] Commit final command-formatting guidance and pending acceptance evidence.
+- [x] Commit final command-formatting guidance and pending acceptance evidence.
 - [ ] Commit graphical recovery learning and manual checks.
 - [ ] Commit Vesktop settings excluding generated sync-version metadata.
 - [ ] Verify the complete series and push once to origin/main.
@@ -58,3 +58,7 @@ VPS lookup report and its exact reviewed hash are included; targeted learning ch
 ### Milestone 4: fix(notifications): silence non-user-facing completions
 
 Notification code, tests, public docs, original/follow-up plans and learning are atomic. Fresh60 notification tests,7 setup tests,12 question tests and type check pass; source/installed14-case silent probes and private Dunst check pass. Remaining: three groups and remote delivery; hardware listening remains manual. Next: final formatting guidance.
+
+### Milestone 5: docs(codex): separate runnable commands from reading code
+
+Final runnable-command/reading-code policy, compiled prompt, historical/current reports and learning are included together. Exact wrapped clipboard acceptance stays pending. Remaining: recovery/Vesktop groups and remote delivery. Next: graphical recovery lessons.

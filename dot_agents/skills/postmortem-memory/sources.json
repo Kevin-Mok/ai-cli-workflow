@@ -4563,6 +4563,33 @@
       "verification_scope": "runtime"
     },
     {
+      "applicability": "Codex CLI 0.162.0 npm TUI with the observed wrapped assistant-command selection symptom; verify the installed version and rendering path before applying elsewhere.",
+      "confidence": "supported",
+      "diagnostics": [
+        "Distinguish source syntax, visible colors, native selection bytes and exact clipboard/paste acceptance; preserve the user screenshot and reproducer.",
+        "Inspect installed startup raw mode separately from active-session state.",
+        "Emit bare column-zero one-line fish commands alongside normal tagged Python/JSON/diff reading blocks. Compare raw and formatted views, inspect real selected command bytes, and require exact-command paste/execution in a fresh fish terminal. Invalid selection boundaries or stale clipboard contents establish no copy outcome."
+      ],
+      "id": "local-codex-rendered-command-copy",
+      "limitations": "Exact bare-command wrapped selection/paste/execution remains unverified. Raw Python/JSON/diff blocks were monochrome in this observed session; formatted view had colors and hard command wrapping/padding. Native selection-boundary failures are probe limits, not proof that raw copying fails. Preserve the historical user-confirmed raw shell-block colors separately. No supported alternative was shown to meet both outcomes; no binary, renderer or terminal patch was made.",
+      "reference": "references/editing-shell-transport.md#local-codex-rendered-command-copy",
+      "remedy": "Use the current distinction: bare one-line fish runnable commands and tagged fenced reading code, without requiring session-wide raw rendering. Treat documented raw startup and /raw/Alt+R as copying options. Preserve the existing setting until a supported alternative is observed to satisfy both actual wrapped selection/paste and Python/JSON/diff colors; otherwise report the specific installed-view limitation.",
+      "sources": [
+        "45d9636d03cfe581e2c4bf3251535edc8c77e1660a4097743b53e191f068ea10",
+        "e09884b40a10eb36638e117257f5a0c6512852e1cad8c148d912a61b7d8ec51d"
+      ],
+      "status": "activation_pending",
+      "symptoms": [
+        "Wrapped Codex command selection retains leading padding before a flag or unwanted hard newlines.",
+        "One physical source command line and passing fish/runtime probes did not establish clean rendered copying.",
+        "Plain raw-view command paragraphs appear in one uniform color.",
+        "Mixed Python/JSON/diff reading blocks show literal fences and uniform color in observed raw view; formatted view shows colors but renders long bare commands on indented hard lines."
+      ],
+      "topic": "editing-shell-transport",
+      "verification": "Unset config observed intentional RED. Scoped config deployment exited 0; strict installed config/read accepted raw_output_mode true without a thread/inference request. Live and tracked TOML matched; refresh-config and fresh installed instruction/config checks passed. In raw mode with one-half-light, the user confirmed different syntax colors for a top-level fish-tagged fenced block. Revised tagged-block guidance refresh exited 0; installed/source instructions matched, live raw mode stayed true and prior feedback bytes were preserved. Mixed-content follow-up observed literal fences/uniform Python/JSON/diff text in raw view, and actual token/diff colors in formatted view. A native formatted selection contained command padding and hard newlines but had invalid outer boundaries; exact paste/execution acceptance remains unverified. All five source commands and separate syntax checks passed in fresh fish processes, exit 0. These do not prove copying. No rendering setting was changed.",
+      "verification_scope": "code"
+    },
+    {
       "applicability": "Interactive fzf pickers that reload reordered rows and preserve a selected stable UUID, including fzf 0.44 callback contracts.",
       "confidence": "confirmed",
       "diagnostics": [
@@ -8110,6 +8137,25 @@
     },
     {
       "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-09-single-line-command-policy-sandbox.md"
+      ],
+      "decision": "No new reusable learning: ext-sandbox-loopback and local-sandbox-loopback-approved-route already cover the verified scoped execution workaround and unresolved default runner; local-push-policy-baseline-contract covers the confirmed untouched exact-literal workflow-check mismatch. ext-optional-path-discovery and authoritative feedback-memory/SKILL.md cover the mistaken optional installed-log assumption; corrected canonical-log and installed-policy checks passed.",
+      "findings": [],
+      "reviewed_on": "2026-10-09",
+      "sha256": "2d2a05525084a2d5f631c9cf323c39dad10f8d540cb4781fc93404da6b28e346"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-09-codex-wrapped-command-padding.md"
+      ],
+      "findings": [
+        "local-codex-rendered-command-copy"
+      ],
+      "reviewed_on": "2026-10-09",
+      "sha256": "45d9636d03cfe581e2c4bf3251535edc8c77e1660a4097743b53e191f068ea10"
+    },
+    {
+      "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-10-09-queued-question-sandbox-startup.md"
       ],
       "findings": [
@@ -8157,12 +8203,31 @@
     },
     {
       "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-09-command-formatting-sandbox-startup.md"
+      ],
+      "decision": "No new reusable learning: ext-sandbox-loopback and local-sandbox-loopback-approved-route already cover identical pre-execution denial, approved scoped execution, and unresolved default runner. Temporary probe tuple-method typo has no reusable product learning; no applicable finding returned, exact cause recorded in report. Invalid initial clipboard measurement had no selected bytes; CRLF mapping and synthetic copy caveats are disposable-probe issues, not evidence of renderer failure. Optional installed-source read assumed an absent layout; existing local-discover-paths-before-reads guidance covers it.",
+      "findings": [],
+      "reviewed_on": "2026-10-09",
+      "sha256": "ed9aeeba7b54083e26dbc7191f2c145afb9b54d5ed1e6c27afa2ee478f2d2e62"
+    },
+    {
+      "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-10-09-cli-emoji-progress-log-decoration.md"
       ],
       "decision": "No new reusable learning: local-terminal-report-readable-projection and canonical generated-file preservation already cover terminal-only decoration; verified code regression, no live backup.",
       "findings": [],
       "reviewed_on": "2026-10-09",
       "sha256": "8932a62b9596b5d26fc748a70c8127c21833bcc7b2323e8bd14853d90d102470"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-09-codex-mixed-content-rendering.md"
+      ],
+      "findings": [
+        "local-codex-rendered-command-copy"
+      ],
+      "reviewed_on": "2026-10-09",
+      "sha256": "e09884b40a10eb36638e117257f5a0c6512852e1cad8c148d912a61b7d8ec51d"
     },
     {
       "aliases": [
