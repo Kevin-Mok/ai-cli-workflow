@@ -7752,6 +7752,15 @@
       "reviewed_on": "2026-10-09",
       "findings": [],
       "decision": "No new reusable learning: synthetic fixture retained old voice after selected default changed; literal Voice Contributor selection and full serialized playback assertions remain covered."
+    },
+    {
+      "sha256": "ad859bfaa524c6f1babacfd7448f84523f1ea3d34376781016f8550f36e078e7",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-09-Voice Contributor-intro-title-transport.md"
+      ],
+      "reviewed_on": "2026-10-09",
+      "findings": [],
+      "decision": "No new learning: one subagent-local title transport failure with no retry or tested repair; unaffected parent/title/source workflows continued."
     }
   ],
   "review": {

@@ -46,6 +46,22 @@ WAVs and a manifest containing sample text, pace, voice IDs and timings are save
 
 For direct checks from the checkout (no sudo), substitute `./scripts/executable_codex-voice-auditions` for the installed command above. Run `python3 -B tests/test_codex_voice_auditions.py` and `python3 -B tests/test_codex_notification_sound.py` for automated coverage; subjective voice choice needs listening.
 
+## Short Voice Contributor introduction
+
+Use `rintro` in interactive fish to play the saved Voice Contributor introduction immediately. Add `--text` for custom words; both modes speak without the question clip and leave notification settings unchanged. No sudo or cloud service is needed.
+
+```sh
+rintro
+rintro --text "Welcome back! Your changes are ready."
+rintro --help
+```
+
+The `rintro` abbreviation expands to `~/scripts/Voice Contributor-intro` when you press Space or Enter in interactive fish. After deployment, open a fresh shell or run `source ~/.config/fish/key_abbr.fish` in an already-open shell. Scripts and other shells can invoke `~/scripts/Voice Contributor-intro` directly.
+
+Default text is exactly: "Hello, everyone. I am example-user's Junior Software Engineer.." The [saved intro MP3](../scripts/Voice Contributor-intro.mp3) is Voice Contributor high at pace 0.95, tracked through Git LFS, and contains speech only. Default playback needs mpv but no synthesis startup. Custom `--text "WORDS"` uses local Piper with the same voice/pace; quote the complete phrase to preserve spaces and punctuation.
+
+The general equivalent is `~/scripts/codex-notification-sound preview --speech-only --title "WORDS" --plain`. Speech-only requires a nonblank title, works without a configured/valid question clip, shares the existing audio lock and returns nonzero on missing voice or synthesis failure. Ordinary notification previews and completions retain the question clip. `--help` reads nothing; unsupported/missing wrapper arguments exit 2 with usage.
+
 ## Optional offline title speech
 
 The selected notification voice is **6 — Voice Contributor (US, high)**, using the celebrate audition pace of **0.95**. The committed [Voice Contributor celebrate MP3](../scripts/Voice Contributor-celebrate.mp3), tracked with Git LFS, reads "All done! The tests passed, and your changes are ready. Take a look at what I built!" and is a replayable reference sample. Play it with `mpv --no-config --no-video ~/scripts/Voice Contributor-celebrate.mp3`; it contains Voice Contributor speech only, while the question intro remains a separate clip. Notifications still speak the exact task title; `celebrate` supplies the upbeat test wording. Install the pinned Piper 1.8.0 English `en_US-Voice Contributor-high` voice, then check it:

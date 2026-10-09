@@ -99,10 +99,12 @@ def set_speech(enabled: bool) -> int:
     return 0
 
 
-def play(title: str | None = None) -> int:
+def play(title: str | None = None, *, speech_only: bool = False) -> int:
     try:
-        clip = configured_clip()
-        if clip is None:
+        if speech_only and (title is None or not title.strip()):
+            raise ValueError('--speech-only requires a nonblank --title')
+        clip = None if speech_only else configured_clip()
+        if clip is None and not speech_only:
             return 0
         player = shutil.which('mpv')
         if player is None:
@@ -154,7 +156,8 @@ def play(title: str | None = None) -> int:
                         watchdog = timer
                     except (OSError, ValueError, UnicodeError, subprocess.SubprocessError) as error:
                         synthesis_error = str(error)
-                playback(clip)
+                if clip is not None:
+                    playback(clip)
                 if synthesis is not None:
                     try:
                         synthesis.wait(timeout=max(0.0, deadline - time.monotonic()))
@@ -167,8 +170,12 @@ def play(title: str | None = None) -> int:
                             raise ValueError('Piper synthesis failed; run setup-codex-notification-speech --check')
                         playback(wav)
                     except (OSError, ValueError, UnicodeError, subprocess.SubprocessError) as error:
+                        if speech_only:
+                            raise
                         report_error(str(error))  # The MP3 already played; never retry it.
                 elif synthesis_error:
+                    if speech_only:
+                        raise ValueError(synthesis_error)
                     report_error(synthesis_error)
             finally:
                 if watchdog is not None:
@@ -227,8 +234,9 @@ def main(argv: list[str] | None = None) -> int:
     commands = parser.add_subparsers(dest='command', required=True)
     configure = commands.add_parser('set', help='enable sound using a local MP3 path (quoted if it contains spaces)', parents=[presentation])
     configure.add_argument('path')
-    preview = commands.add_parser('preview', help='play the configured clip once without a popup', parents=[presentation])
-    preview.add_argument('--title', help='speak this exact title after the clip')
+    preview = commands.add_parser('preview', help='preview the configured clip or a speech-only title', parents=[presentation])
+    preview.add_argument('--title', help='speak this exact title after the clip, or alone with --speech-only')
+    preview.add_argument('--speech-only', action='store_true', help='speak --title without the configured clip; requires nonblank text')
     speech = commands.add_parser('speech', help='switch hook audio; disable restores Dunst audio', parents=[presentation])
     speech.add_argument('state', choices=('enable', 'disable'))
     commands.add_parser('event-play', help=argparse.SUPPRESS, parents=[presentation])
@@ -242,7 +250,7 @@ def main(argv: list[str] | None = None) -> int:
     if options.command == 'set':
         return save_clip(options.path)
     if options.command == 'preview':
-        return play(options.title)
+        return play(options.title, speech_only=options.speech_only)
     try:
         if options.command == 'speech':
             return set_speech(options.state == 'enable')

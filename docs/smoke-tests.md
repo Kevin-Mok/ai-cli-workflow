@@ -829,6 +829,21 @@ Compare the ten numbered local voices, then replay favorites with new wording be
 - Action: `~/scripts/codex-notification-sound preview --title "All done! The tests passed."`.
   Expected: Selected Voice Contributor high voice at the celebrate pace (0.95) is synthesized during the MP3; one MP3 then one title with reduced remaining wait. Simultaneous notifications remain serialized; failure retains the existing MP3 fallback. Approval speech remains silent.
 
+### Short Voice Contributor introduction
+
+Open a fresh fish shell after refresh, or source ~/.config/fish/key_abbr.fish, then try the stored introduction and custom text. No sudo; the default saved MP3 needs mpv, while custom words also need installed Piper.
+
+- Action: Type `rintro` and press Enter in interactive fish.
+  Expected: Expands to ~/scripts/Voice Contributor-intro and immediately plays the exact saved example-user introduction in Voice Contributor's voice, without the question clip.
+- Action: `rintro --text "Welcome back! Your changes are ready."`.
+  Expected: Voice Contributor reads those custom words only, with no question clip; notification settings remain unchanged.
+- Action: `~/scripts/Voice Contributor-intro --help`, then `~/scripts/Voice Contributor-intro --text`.
+  Expected: Help shows default text and --text usage without audio; missing words exit 2 with usage.
+- Action: `~/scripts/codex-notification-sound preview --speech-only --title "Only Voice Contributor speech." --plain`.
+  Expected: Speech only, even without a configured question clip. Blank titles are rejected before children; missing/failed voice returns nonzero with an actionable warning.
+- Action: `mpv --no-config --no-video ~/scripts/Voice Contributor-intro.mp3`.
+  Expected: The same literal default introduction; no synthesis delay or question clip.
+
 ### Kitty and Codex scrolling
 
 Use a fresh Kitty window after refresh-config: a larger history cannot recover

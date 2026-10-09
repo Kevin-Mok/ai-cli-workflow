@@ -195,6 +195,126 @@ class SpeechTests(PlaybackTests):
         self.configure()
         self.assertEqual(self.helper.main(['speech', 'enable']), 0)
 
+    def speech_only_preview(self, title=None):
+        arguments = ['preview', '--speech-only', '--plain', '--details']
+        if title is not None:
+            arguments.extend(['--title', title])
+        try:
+            return self.helper.main(arguments)
+        except SystemExit as error:
+            return error.code  # Preserve the CLI exit status for RED parsing.
+
+    def test_speech_only_ignores_absent_or_invalid_clip_settings(self):
+        title = f'Hi, I am Voice Contributor! café $(touch {self.root / "nope"})'
+        for configuration in (None, 'not json', '{"path":"/missing.mp3"}'):
+            with self.subTest(configuration=configuration):
+                self.setting.parent.mkdir(parents=True, exist_ok=True)
+                if configuration is None:
+                    self.setting.unlink(missing_ok=True)
+                else:
+                    self.setting.write_text(configuration)
+                (self.root / 'events').unlink(missing_ok=True)
+                env, player, ready, voice = self.speech_fixture(synthesis='immediate')
+                with env, player, ready, voice:
+                    self.assertEqual(self.speech_only_preview(title), 0)
+                events = (self.root / 'events').read_text().splitlines()
+                self.assertEqual(events, ['synthesis start', 'synthesis end', 'title '+title])
+                args = json.loads((self.root / 'synthesis.args').read_text())
+                self.assertEqual(args[args.index('--length-scale')+1], '0.95')
+                self.assertFalse(Path((self.root / 'wav-path').read_text()).exists())
+                self.assertFalse((self.root / 'nope').exists())
+
+    def test_speech_only_rejects_missing_or_blank_title_before_children(self):
+        import contextlib
+        import io
+        for title in (None, '', ' \t\n '):
+            with self.subTest(title=title), contextlib.redirect_stderr(io.StringIO()) as errors:
+                self.assertEqual(self.speech_only_preview(title), 1)
+                self.assertIn('nonblank --title', errors.getvalue())
+                self.assertFalse((self.state / 'codex-notification-sound/playback.lock').exists())
+
+    def test_speech_only_unavailable_voice_fails_without_playing_clip(self):
+        self.configure()
+        env, player, ready, voice = self.speech_fixture(synthesis='immediate')
+        with env, player, ready, voice, patch.object(self.helper, 'voice_ready', return_value=False):
+            self.assertEqual(self.speech_only_preview('Voice Contributor says hello'), 1)
+        self.assertFalse((self.root / 'events').exists())
+        self.assertIn('--install', (self.state / 'codex-notification-sound/errors.log').read_text())
+
+    def test_speech_only_failed_or_empty_synthesis_returns_error_without_clip(self):
+        for mode in ('failed', 'empty'):
+            with self.subTest(mode=mode):
+                (self.root / 'events').unlink(missing_ok=True)
+                env, player, ready, voice = self.speech_fixture(synthesis=mode)
+                with env, player, ready, voice:
+                    self.assertEqual(self.speech_only_preview('Voice Contributor says hello'), 1)
+                events = (self.root / 'events').read_text().splitlines()
+                self.assertEqual(events.count('synthesis start'), 1)
+                self.assertNotIn('clip start', events)
+                self.assertNotIn('title Voice Contributor says hello', events)
+                pid = int((self.root / 'synthesis.pid').read_text())
+                with self.assertRaises(ProcessLookupError):
+                    os.kill(pid, 0)
+
+    def test_speech_only_timeout_kills_and_reaps_child(self):
+        env, player, ready, voice = self.speech_fixture(synthesis='blocked')
+        with env, player, ready, voice, patch.object(self.helper, 'SYNTHESIS_TIMEOUT', .2):
+            self.assertEqual(self.speech_only_preview('Voice Contributor says hello'), 1)
+        events = (self.root / 'events').read_text().splitlines()
+        self.assertNotIn('clip start', events)
+        self.assertNotIn('title Voice Contributor says hello', events)
+        pid = int((self.root / 'synthesis.pid').read_text())
+        with self.assertRaises(ProcessLookupError):
+            os.kill(pid, 0)
+        self.assertIn('timed out', (self.state / 'codex-notification-sound/errors.log').read_text())
+
+    def test_speech_only_synthesis_start_failure_reports_error(self):
+        env, player, ready, voice = self.speech_fixture(synthesis='immediate')
+        with env, player, ready, voice, patch.object(self.helper, 'voice_paths', return_value=(self.root / 'missing-python', self.root / 'voice.onnx')):
+            self.assertEqual(self.speech_only_preview('Voice Contributor says hello'), 1)
+        self.assertFalse((self.root / 'events').exists())
+        self.assertIn('missing-python', (self.state / 'codex-notification-sound/errors.log').read_text())
+
+    def test_speech_only_playback_failure_reports_error_and_cleans_wav(self):
+        env, player, ready, voice = self.speech_fixture(synthesis='speech-playback-failed')
+        with env, player, ready, voice:
+            self.assertEqual(self.speech_only_preview('Voice Contributor says hello'), 1)
+        self.assertEqual((self.root / 'events').read_text().splitlines(), ['synthesis start', 'synthesis end', 'title Voice Contributor says hello'])
+        self.assertFalse(Path((self.root / 'wav-path').read_text()).exists())
+        self.assertIn('mpv playback failed', (self.state / 'codex-notification-sound/errors.log').read_text())
+
+    def test_speech_only_waits_for_shared_playback_lock(self):
+        import fcntl
+        import time
+        env, _player, _ready, _voice = self.speech_fixture(synthesis='immediate')
+        data = self.root / 'data'
+        python = data / 'codex-notification-speech/venv/bin/python'
+        python.parent.mkdir(parents=True)
+        shutil.copy2(self.root / 'piper-python', python)
+        model = data / 'codex-notification-speech/voices/en_US-Voice Contributor-high.onnx'
+        model.parent.mkdir()
+        model.write_bytes(b'fixture')
+        model.with_suffix('.onnx.json').write_text('{}')
+        lock = self.state / 'codex-notification-sound/playback.lock'
+        lock.parent.mkdir(parents=True)
+        with env, patch.dict(os.environ, {'XDG_DATA_HOME': str(data), 'PATH': str(self.root)+':'+os.environ['PATH']}), lock.open('a') as owner:
+            fcntl.flock(owner, fcntl.LOCK_EX)
+            worker = subprocess.Popen([sys.executable, str(ROOT / 'scripts/executable_codex-notification-sound'), 'preview', '--speech-only', '--title', 'Voice Contributor says hello'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            try:
+                deadline = time.monotonic()+.3
+                while not (self.root / 'events').exists() and time.monotonic()<deadline:
+                    time.sleep(.01)
+                self.assertFalse((self.root / 'events').exists())
+                self.assertIsNone(worker.poll())
+                fcntl.flock(owner, fcntl.LOCK_UN)
+                stdout, stderr = worker.communicate(timeout=5)
+                self.assertEqual(worker.returncode, 0, stdout+stderr)
+            finally:
+                if worker.poll() is None:
+                    worker.kill()
+                worker.communicate()
+        self.assertEqual((self.root / 'events').read_text().splitlines(), ['synthesis start', 'synthesis end', 'title Voice Contributor says hello'])
+
     def test_selected_voice_is_Voice Contributor_high(self):
         with patch.dict(os.environ, {'XDG_DATA_HOME': str(self.root / 'data')}):
             python, model = self.helper.voice_paths()
@@ -288,6 +408,7 @@ class SpeechTests(PlaybackTests):
             else:
                 event('title '+path.read_text().rstrip('\\n'))
                 (root/'wav-path').write_text(str(path))
+                if os.environ['SYNTHESIS_MODE']=='speech-playback-failed': sys.exit(2)
         """))
         player.chmod(0o755)
         return (patch.dict(os.environ, {'FIXTURE_ROOT': str(self.root),
