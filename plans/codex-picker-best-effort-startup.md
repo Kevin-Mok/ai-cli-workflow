@@ -145,7 +145,7 @@ No worktree or history rewrite is needed.
 
 - [x] Prepare HEAD-based candidate blobs using direct session-write evidence.
 - [x] Run isolated-candidate regressions, README and learning gates, runtime checks.
-- [ ] Commit the verified scope and push its configured `origin/main` upstream.
+- [x] Commit the verified implementation and push configured `origin/main`.
 
 The scope helper's `unsafe`/empty result reflects unrecognized nested code-mode
 writes. Its direct-write fallback excludes concurrent emoji/notification/policy/
@@ -168,3 +168,14 @@ verification, docs and installation are complete; delivery is one reviewed
 session-only commit followed by the configured upstream push. Its resulting hash
 and push outcome are reported in the handoff. Preserve every unrelated working
 byte and existing index entry; no product blocker or new rollout is needed.
+
+Implementation milestone delivered as `3263c97`, successfully pushed to
+`origin/main`; its tree matches the verified candidate. The later whole-workspace
+guard noticed seven concurrent changes after commit/tree/remote checks passed.
+Preserve them and the newly staged unrelated workflow. The inspection incident
+records the stale-baseline guard, matched preservation guidance and no-new-learning
+decision. Follow-up milestone `docs(codex-search): record session delivery verification`
+contains only that report, reviewed hashes and these two status plans. Product
+behavior and its 160-test/runtime evidence are unchanged; learning/README/scope
+checks prove the follow-up. Remaining action is its private-index commit and
+configured upstream push, then report both delivery hashes. No product blocker.

@@ -186,10 +186,10 @@ at the reviewed hunk scope.
 - [x] Attribute both implementation phases and prepare isolated candidate blobs.
 - [x] Reconcile inspection report learning after temporary scope-check mistakes.
 - [x] Verify the isolated candidate, README gate, exact runtime behavior and scope.
-- [ ] Create the single scoped commit and push the configured `origin/main`.
+- [x] Create the scoped implementation commit and push configured `origin/main`.
 
 Latest reviewed inspection SHA-256:
-`833710b502f21f6bd9484a46ea1c2246fd7f7c2c51905b0aa4479a8fd0829741`.
+`55a2a381970aa0f7eeae2f374409b001cc35ff5aae9818246c1e2730155b1895`.
 Fresh targeted incident check passes with no changed/unregistered records.
 Completed implementation/install evidence remains above. The next step is
 the authorized commit and push. No product blocker.
@@ -210,3 +210,16 @@ verification and documentation have no remaining blocker. Rollback remains
 limited to owned hunks and protected script installation; native sources are
 read-only. Simultaneous query-edit intent and live AI judgment retain the stated
 verification limits.
+
+Implementation milestone delivered as `3263c97`, pushed successfully to
+`origin/main`; its committed tree exactly matches the verified candidate.
+An overbroad post-push workspace guard caught seven fresh concurrent changes,
+after commit/tree/remote/staging checks had passed. Preserve those files and the
+new unrelated staging; do not restore the historical snapshot. Record that guard
+outcome and reconciled learning in the focused follow-up milestone
+`docs(codex-search): record session delivery verification`.
+No product change or additional regression run is needed: this follow-up updates
+only the incident, its reviewed hashes and the two delivery plans. Verify learning
+contracts, README and patch scope before delivery. Remaining work is the scoped
+follow-up commit/push; no product blocker. Final handoff reports both commit hashes
+and the published result, while preserving the other workflow's staged work.

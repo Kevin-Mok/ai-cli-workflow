@@ -302,3 +302,35 @@ the repository and Git index were untouched. Use the explicit two-file allowlist
 never a recursive glob over scratch outputs, and compare their candidate hashes
 with the reviewed blobs. The same scoped-state lookup applies; generated caches
 remain excluded and this adds no new product finding.
+
+## Post-push shared-workspace guard
+
+Session commit `3263c973c3cf30c9fdea0bbd4879ac37442a1764` was created from the
+verified private-index tree and pushed to `origin/main`. Its 27 paths and tree
+matched the candidate; normal index synchronization changed no working bytes.
+The post-push check also confirmed local HEAD, remote main and that tree matched,
+with no staged changes, before its whole-workspace equality assertion failed.
+Seven protected paths changed during that later observation window: README.md,
+docs/smoke-tests.md, dot_agents/skills/postmortem-memory/sources.json,
+dot_agents/skills/feedback-memory/feedback.log, dot_codex/config.toml,
+plans/cli-emoji-rollout.md and plans/single-line-codex-commands.md.
+
+No commit/push command wrote those working files. The shared workspace can
+continue changing during delivery; whole-tree byte equality is too broad for
+attributing changes in that window. Do not restore these files or stage their
+fresh unrelated edits. Status: published implementation is verified; narrow the
+final check to the commit/tree/remote and owned staging, preserve current shared
+bytes, and reconcile this living report's reviewed hash. Actor identity and each
+concurrent change's purpose remain outside this session's attribution.
+
+Lookup `shared workspace concurrent bytes scoped state delivery` matched
+`local-skip-worktree-and-scoped-state` and `local-stale-preservation-baseline`,
+both verified workarounds. Their byte-window and writer-attribution limitations
+apply directly; inspect committed blobs and preserve current bytes rather than
+restoring an old snapshot. `local-shared-index-commit-race` is unresolved and
+does not establish contamination here: the private-index commit tree was verified.
+Fresh status shows another workflow has now staged many unrelated paths. Keep
+that staging intact and construct this incident/status follow-up in a private
+index. Synchronize only the follow-up's own patch into the shared index, retaining
+its other staged changes. This is an existing preservation lesson, so no new
+finding is added. Product regression/runtime evidence remains valid.

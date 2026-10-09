@@ -4482,7 +4482,7 @@
       "reference": "references/api-contracts-fixtures.md#local-fzf-serialized-reload-acknowledgement",
       "remedy": "Serialize immutable row generations. Capture UUID before reload, let the synchronous load callback publish its revision-bound restoration action without calling HTTP, and send it from the parent. Wait for an acknowledgement written by the executed fzf callback, retain active input and never replay an uncertain position action. Accept only the visible UUID and reap children after normal cancellation.",
       "sources": [
-        "833710b502f21f6bd9484a46ea1c2246fd7f7c2c51905b0aa4479a8fd0829741"
+        "55a2a381970aa0f7eeae2f374409b001cc35ff5aae9818246c1e2730155b1895"
       ],
       "status": "verified_fix",
       "symptoms": [
@@ -4508,7 +4508,7 @@
       "reference": "references/state-security.md#local-recap-same-key-input-replacement",
       "remedy": "Refresh retained queued dictionaries from latest same-key metadata without reordering requests or consuming another attempt. Under the index lock obtain current same-key input; if cleanup preceded the UI update, recover its filename through the validated canonical manifest only for equal UUID/hash and verify actual SHA256. Snapshot before slow preflight, release the lock for inference, keep acquisition cancellable/deadline bounded, and reject delayed old results.",
       "sources": [
-        "833710b502f21f6bd9484a46ea1c2246fd7f7c2c51905b0aa4479a8fd0829741"
+        "55a2a381970aa0f7eeae2f374409b001cc35ff5aae9818246c1e2730155b1895"
       ],
       "status": "verified_fix",
       "symptoms": [
@@ -7924,13 +7924,13 @@
       "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-10-09-codex-priority-inspection.md"
       ],
-      "decision": "Known sandbox/path lookup guidance remains unchanged. No separate learning for fixture helper/schema/hash/startup/preview assumptions, one-shot index-lock EAGAIN, aggregate fixture timeout or transient JSON formatting guard: preserve fresh shared records and use observed control state with bounded phase deadlines. Two confirmed scoped fixes are linked. Final source suite and protected installed runtime passed; simultaneous query edits during positional restoration remain independently unproved, and environmental transport-delay cause is unknown. Commit-scope serializer, no-index exit status, Markdown/schema excerpt and scratch-copy assumptions add no new finding; validate the explicit HEAD-plus-owned candidate and keep generated caches excluded.",
+      "decision": "Known sandbox/path lookup guidance remains unchanged. No separate learning for fixture helper/schema/hash/startup/preview assumptions, one-shot index-lock EAGAIN, aggregate fixture timeout or transient JSON formatting guard: preserve fresh shared records and use observed control state with bounded phase deadlines. Two confirmed scoped fixes are linked. Final source suite and protected installed runtime passed; simultaneous query edits during positional restoration remain independently unproved, and environmental transport-delay cause is unknown. Commit-scope serializer, no-index exit status, Markdown/schema excerpt and scratch-copy assumptions add no new finding; validate the explicit HEAD-plus-owned candidate and keep generated caches excluded. Post-push global equality also caught fresh concurrent changes; existing stale-baseline guidance applies. Preserve unrelated staged/working changes and verify published commit blobs rather than attributing writers from hashes.",
       "findings": [
         "local-fzf-serialized-reload-acknowledgement",
         "local-recap-same-key-input-replacement"
       ],
       "reviewed_on": "2026-10-09",
-      "sha256": "833710b502f21f6bd9484a46ea1c2246fd7f7c2c51905b0aa4479a8fd0829741"
+      "sha256": "55a2a381970aa0f7eeae2f374409b001cc35ff5aae9818246c1e2730155b1895"
     },
     {
       "aliases": [
