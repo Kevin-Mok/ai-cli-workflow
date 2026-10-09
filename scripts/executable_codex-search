@@ -27,14 +27,15 @@ def cell_width(char):
     return 2 if unicodedata.east_asian_width(char) in ('W', 'F') else 1
 
 
-def shorten(text, width):
+def shorten(text, width, marker='…'):
     if sum(map(cell_width, text)) <= width:
         return text
+    marker = marker[:max(0, width)]
     used = 0
     for end, char in enumerate(text):
         used += cell_width(char)
-        if used > max(0, width - 1):
-            return text[:end] + '…'
+        if used > max(0, width - len(marker)):
+            return text[:end] + marker
     return text
 
 
@@ -42,7 +43,7 @@ def paint(text, color, style):
     return f'\x1b[{style}m{text}\x1b[0m' if color else text
 
 
-def render_snippet(snippet, color=False, width=None):
+def render_snippet(snippet, color=False, width=None, plain=False):
     # Escape terminal controls while retaining rg's byte-derived match locations.
     parts = [visible(char) for char in snippet['text']]
     offsets = [0]
@@ -50,6 +51,7 @@ def render_snippet(snippet, color=False, width=None):
         offsets.append(offsets[-1] + len(part))
     text = ''.join(parts)
     spans = [(offsets[left], offsets[right]) for left, right in snippet['spans']]
+    marker = '...' if plain else '…'
     start, end = 0, len(text)
     if width is not None and sum(map(cell_width, text)) > width:
         start = spans[0][0] if spans else 0
@@ -57,12 +59,13 @@ def render_snippet(snippet, color=False, width=None):
         while start > 0 and context + cell_width(text[start - 1]) <= min(30, width // 3):
             start -= 1
             context += cell_width(text[start])
-        budget = max(0, width - int(start > 0) - 1)
+        marker = marker[:max(0, width)]
+        budget = max(0, width - (len(marker) if start > 0 else 0) - len(marker))
         end, used = start, 0
         while end < len(text) and used + cell_width(text[end]) <= budget:
             used += cell_width(text[end])
             end += 1
-    chunks = ['…'] if start else []
+    chunks = [marker] if start else []
     cursor = start
     for left, right in spans:
         left, right = max(left, start), min(right, end)
@@ -71,7 +74,7 @@ def render_snippet(snippet, color=False, width=None):
             cursor = right
     chunks.append(text[cursor:end])
     if end < len(text):
-        chunks.append('…')
+        chunks.append(marker)
     return ''.join(chunks)
 
 
@@ -88,7 +91,10 @@ def display_date(value):
 def print_results(results, names, args):
     terminal = sys.stdout.isatty()
     compact = terminal and not args.details
-    color = terminal and not os.environ.get('NO_COLOR') and os.environ.get('TERM') != 'dumb'
+    plain = getattr(args, 'plain', False)
+    marker = '...' if plain else '…'
+    separator = ' | ' if plain else ' · '
+    color = terminal and not plain and not os.environ.get('NO_COLOR') and os.environ.get('TERM') != 'dumb'
     try:
         width = os.get_terminal_size(sys.stdout.fileno()).columns
     except OSError:
@@ -96,7 +102,8 @@ def print_results(results, names, args):
     limit = args.limit if args.limit is not None else 20 if terminal else 0
     shown = results[:limit] if limit else results
     if len(shown) < len(results):
-        warn(f'showing {len(shown)} of {len(results)} matches, newest first; '
+        order = 'AI priority first' if getattr(args, 'sort', None) == 'priority' else 'newest first'
+        warn(f'showing {len(shown)} of {len(results)} matches, {order}; '
              '--limit 0 shows all; --pick browses all')
     for number, (entry, snippets) in enumerate(shown, 1):
         sid = entry['id']
@@ -108,26 +115,26 @@ def print_results(results, names, args):
             prefix = f'{number:02d}  '
             date = display_date(entry['timestamp'])
             if width < len(prefix) + len(date) + 15:
-                print(paint(prefix + shorten(visible(directory), max(1, width - len(prefix))), color, '1;36'))
-                print('    ' + paint(shorten(date, max(1, width - 4)), color, '2'))
+                print(paint(prefix + shorten(visible(directory), max(1, width - len(prefix)), marker), color, '1;36'))
+                print('    ' + paint(shorten(date, max(1, width - 4), marker), color, '2'))
             else:
                 path_width = width - len(prefix) - len(date) - 3
-                print(paint(prefix + shorten(visible(directory), path_width), color, '1;36') +
-                      ' · ' + paint(date, color, '2'))
+                print(paint(prefix + shorten(visible(directory), path_width, marker), color, '1;36') +
+                      separator + paint(date, color, '2'))
             if names.get(sid):
-                print('    ' + paint(shorten(visible(names[sid]), max(1, width - 4)), color, '1'))
+                print('    ' + paint(shorten(visible(names[sid]), max(1, width - 4), marker), color, '1'))
             for snippet in snippets[:1]:
-                print('    ' + render_snippet(snippet, color, max(1, width - 4)))
+                print('    ' + render_snippet(snippet, color, max(1, width - 4), plain))
         else:
             print('Title: ' + visible(names.get(sid, '(untitled)')))
             print('Timestamp: ' + visible(entry['timestamp'] or '(unknown)'))
             print('Directory: ' + visible(entry['cwd'] or '(not recorded)'))
             print('Session: ' + sid)
             for snippet in snippets:
-                print('  ' + render_snippet(snippet, color))
+                print('  ' + render_snippet(snippet, color, plain=plain))
         command = resume_args(entry)
         if command:
-            print(paint(('    ↳ ' if compact else 'Resume: ') + shlex.join(command), color, '2'))
+            print(paint((('    -> ' if plain else '    ↳ ') if compact else 'Resume: ') + shlex.join(command), color, '2'))
         else:
             print('Resume unavailable: recorded directory is missing or invalid')
         print()
@@ -137,14 +144,27 @@ def print_recent(results, names, args, manager):
     """Reuse ordinary output formatting with a cached recap instead of a match."""
     if args.limit is None:
         args.limit = 20
+    from codex_search_recent import order_sessions, priority_value
+    statuses = {entry['id']: manager.status(entry) for entry, _ in results}
+    entries = order_sessions([entry for entry, _ in results], statuses, args.sort or 'recent')
     rendered = []
-    for entry, _ in results:
-        status = manager.status(entry)
+    for entry in entries:
+        status = statuses[entry['id']]
         label = status['status']
         if status['partial']:
             label += ', partial'
         headline = status['recap']['headline'] if status['recap'] else 'No cached AI recap'
-        rendered.append((entry, [{'text': f'Recap [{label}]: {headline}', 'spans': []}]))
+        priority = priority_value(status, current_only=True)
+        separator = ' | ' if args.plain else ' · '
+        detail = f'Priority [{priority}]' + separator + f'Recap [{label}]: {headline}'
+        if args.details:
+            recap = status['recap'] or {}
+            reason = recap.get('priority_reason') or 'No current AI priority evidence.'
+            prior = recap.get('priority')
+            if prior and status['status'] != 'ready':
+                reason = f'Older {prior} priority: ' + reason
+            detail += separator + 'Reason: ' + reason
+        rendered.append((entry, [{'text': detail, 'spans': []}]))
     print_results(rendered, names, args)
 
 
@@ -181,7 +201,7 @@ def parser():
     result = argparse.ArgumentParser(
         prog='codex-search',
         usage='%(prog)s [-i] [-F] [--all-text] [--pick] [--details] [--limit N] PATTERN\n'
-              '       %(prog)s --recent [--pick] [--limit N] [--no-summaries]\n'
+              '       %(prog)s --recent [--pick] [--sort priority|recent] [--limit N] [--no-summaries]\n'
               '       %(prog)s (--rebuild-index | --clear-cache)\n'
               '       %(prog)s --help',
         description='Search local Codex user messages and assistant replies across projects.\n'
@@ -211,6 +231,8 @@ def parser():
     result.add_argument('--details', action='store_true', help='show full metadata and up to five snippets per match')
     result.add_argument('--limit', type=int, metavar='N', help='max results to print; 0 means all (default: 20 in terminal, all in pipes); picker always sees all')
     result.add_argument('--recent', action='store_true', help='browse sessions by activity without a pattern; default newest 20, including pipes')
+    result.add_argument('--plain', action='store_true', help='use ASCII decoration and disable color')
+    result.add_argument('--sort', choices=('priority', 'recent'), help='recent-mode order: AI priority by default in picker; newest activity in listings')
     result.add_argument('--summary-model', metavar='MODEL', help='override the configured model for recent-session recaps')
     result.add_argument('--summary-count', type=int, default=20, metavar='N', help='automatically recap newest N sessions in recent picker (default: 20); 0 disables automatic work')
     result.add_argument('--no-summaries', action='store_true', help='prohibit all model calls, including Ctrl-G; keep cached recaps and local previews')
@@ -231,6 +253,8 @@ def main():
         cli.error('--summary-model must not be empty')
     if args.recent and args.pattern is not None:
         cli.error('--recent cannot be combined with a search pattern')
+    if args.sort is not None and not args.recent:
+        cli.error('--sort requires --recent')
     if not args.recent and (args.summary_model or args.no_summaries or args.summary_count != 20):
         cli.error('summary options require --recent')
     if args.clear_cache and (args.pattern is not None or args.pick or args.recent):
@@ -248,29 +272,38 @@ def main():
     if args.pick and not shutil.which('fzf'):
         raise SearchError('install fzf to use --pick, for example: sudo apt install fzf; ordinary search works without it')
     home = Path(os.environ.get('CODEX_HOME') or Path.home() / '.codex').expanduser().resolve()
-    with cache_lock(home) as root:
-        from codex_search_recaps import maintain_cache
-        if args.clear_cache:
-            maintain_cache(root, set(), clear=True)
-            cleanup(root)
-            warn('cache cleared for ' + str(home))
-            return 0
-        entries = refresh(root, home, args.rebuild_index)
-        maintain_cache(root, {entry['id'] for entry in entries.values() if entry['id']})
-        if args.pattern is None and not args.recent:
-            return 0
-        results = recent_entries(entries) if args.recent else search(root, entries, args)
-        names = titles(home)
+    fast_recent = args.recent and args.pick and not args.rebuild_index
+    if fast_recent:
+        from codex_search_index import initial_recent, prepare_cache
+        root = prepare_cache(home)
+        results = recent_entries(initial_recent(root, home))
+        names = titles(home, details=False, max_bytes=1024 * 1024)
+    else:
+        with cache_lock(home) as root:
+            from codex_search_recaps import maintain_cache
+            if args.clear_cache:
+                maintain_cache(root, set(), clear=True)
+                cleanup(root)
+                warn('cache cleared for ' + str(home))
+                return 0
+            entries = refresh(root, home, args.rebuild_index)
+            maintain_cache(root, {entry['id'] for entry in entries.values() if entry['id']})
+            if args.pattern is None and not args.recent:
+                return 0
+            results = recent_entries(entries) if args.recent else search(root, entries, args)
+            names = titles(home)
     # Never retain the cache lock across an interactive picker or resumed Codex process.
-    if not results:
+    if not results and not fast_recent:
         return 1
     if args.recent:
         from codex_search_recaps import SummaryManager
         manager = SummaryManager(root, home, args.summary_model, count=args.summary_count,
                                  enabled=args.pick and not args.no_summaries)
+        manager.plain = args.plain
+        manager.details = args.details
         if args.pick:
             from codex_search_recent import pick_recent
-            entry = pick_recent(results, names, root, manager)
+            entry = pick_recent(results, names, root, manager, sort=args.sort or 'priority')
             if entry is None:
                 return 0
             command = resume_args(entry)

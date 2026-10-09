@@ -4468,6 +4468,82 @@
       ],
       "verification": "The existing assertion failed under a deliberate 50ms scheduling gap before the correction and passed with the same gap afterward; all 67 focused notification/speech tests passed.",
       "verification_scope": "code"
+    },
+    {
+      "applicability": "Interactive fzf pickers that reload reordered rows and preserve a selected stable UUID, including fzf 0.44 callback contracts.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Exercise reordered reloads with real fzf and inspect current UUID/query plus capture, load and executed revision acknowledgements.",
+        "Deliver reload/restoration actions but deliberately lose their HTTP replies; distinguish uncertain delivery from process exit.",
+        "Select a different visible UUID after restoration and confirm Enter accepts that UUID; synchronize synthetic updates to observed selection."
+      ],
+      "id": "local-fzf-serialized-reload-acknowledgement",
+      "limitations": "Runtime evidence uses source and installed CLI with disposable sessions and synthetic inference, not provider/private history. Fixed-query identity is covered; simultaneous query edits during load-time positional restoration were not independently proved. Enter accepts the visibly supplied UUID but does not establish interleaved highlight intent. The environmental cause of short HTTP transport delay is unknown; verify supported actions against the actual fzf version.",
+      "reference": "references/api-contracts-fixtures.md#local-fzf-serialized-reload-acknowledgement",
+      "remedy": "Serialize immutable row generations. Capture UUID before reload, let the synchronous load callback publish its revision-bound restoration action without calling HTTP, and send it from the parent. Wait for an acknowledgement written by the executed fzf callback, retain active input and never replay an uncertain position action. Accept only the visible UUID and reap children after normal cancellation.",
+      "sources": [
+        "833710b502f21f6bd9484a46ea1c2246fd7f7c2c51905b0aa4479a8fd0829741"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "Priority reload restores a different UUID despite a retained query or --track.",
+        "A saved focus overrides a later visible selection.",
+        "cannot confirm updated selection after an action executed but its HTTP reply was lost.",
+        "Late restoration POST raises connection refused during normal cancellation."
+      ],
+      "topic": "api-contracts-fixtures",
+      "verification": "Defining real-fzf lost reload/restoration reply fixtures observed RED, then passed with exact UUID/query and cleanup. The actual source CLI passed three complete Guardian append/rename, cached-priority and newest-first repetitions. Visible-only acceptance regression passed. Final source suite passed 122 tests in 69.796s; protected refresh completed and the matching installed actual-CLI fixture passed live/cache/recent modes with exact UUID/cwd, zero added cached calls and complete child/temp cleanup.",
+      "verification_scope": "runtime"
+    },
+    {
+      "applicability": "Asynchronous recap workers whose index refresh replaces decoded dialogue filenames even when dialogue content and generation identity are unchanged.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Re-extract metadata/tool-only source activity into a new dialogue filename with an unchanged hash, remove the old file and update while work is queued or waiting for the index lock.",
+        "Release the index lock before publishing the UI update to exercise the missing-input window.",
+        "Confirm one generation per UUID/dialogue/model/format key, actual input hash validation and cancellation during lock waits."
+      ],
+      "id": "local-recap-same-key-input-replacement",
+      "limitations": "Verified with 36 scoped synthetic recap tests; no live provider or private session payloads. Matching generation identity does not certify that an old input filename still exists. Only validated canonical same-UUID/hash input may replace it; different content needs a new attempt identity.",
+      "reference": "references/state-security.md#local-recap-same-key-input-replacement",
+      "remedy": "Refresh retained queued dictionaries from latest same-key metadata without reordering requests or consuming another attempt. Under the index lock obtain current same-key input; if cleanup preceded the UI update, recover its filename through the validated canonical manifest only for equal UUID/hash and verify actual SHA256. Snapshot before slow preflight, release the lock for inference, keep acquisition cancellable/deadline bounded, and reject delayed old results.",
+      "sources": [
+        "833710b502f21f6bd9484a46ea1c2246fd7f7c2c51905b0aa4479a8fd0829741"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "Metadata-only Guardian refresh deletes a queued dialogue filename while its hash stays unchanged.",
+        "Queued or index-lock-waiting recap becomes unavailable and cannot retry its consumed content key.",
+        "Missing old input before UI publication although canonical equal-content replacement exists."
+      ],
+      "topic": "state-security",
+      "verification": "All three metadata replacement defining tests observed unavailable != ready before correction, then passed; all 36 recap tests passed, including unchanged-content call caps, lock cancellation and rejection of delayed old writes.",
+      "verification_scope": "code"
+    },
+    {
+      "applicability": "Recent-session pickers that can show identity metadata before dialogue and AI evidence finish indexing.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Hold an archive lock on cold and cached fixtures; assert actual fzf listener and usable UUIDs before indexing.",
+        "Inject malformed neighbors, unreadable/discovery failures and an initially absent source directory.",
+        "Verify pending inference guards, exact resume and complete-discovery cache maintenance."
+      ],
+      "id": "local-picker-metadata-first-readiness",
+      "limitations": "Initial metadata is capped and preliminary; between-source budgets cannot bound one oversized source/listing. Ordinary search and explicit rebuild retain full scans. Startup verification calls no provider. Synthetic real-manager fixtures need consistent native source/cache/title metadata; observe bounded GET retries and never replay uncertain position POSTs.",
+      "reference": "references/api-contracts-fixtures.md#local-picker-metadata-first-readiness",
+      "remedy": "Use validated lock-free cached metadata or bounded native headers/title tails; mark dialogue pending, refresh in bounded background passes, defer inference/manual requests, preserve provisional rows and avoid pruning unknown recaps. Keep diagnostics in private disposable storage with concise in-UI progress and bounded explicit details.",
+      "sources": [
+        "f11a6fcf7be36154cbab7a2c8a395b431607ca18056f39a8b82613cce4af2992"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "recent picker waits for full archive indexing before fzf",
+        "malformed-record warnings overwrite interactive UI",
+        "cached startup waits behind index lock"
+      ],
+      "topic": "api-contracts-fixtures",
+      "verification": "Defining checks observed RED then GREEN; final complete Codex suite160 tests passed88.946s. Source and installed real CLI/fzf cold/cache/locked/malformed checks open within2s, resume exact UUID/cwd, preserve source bytes and clean up. Native installed history displayed199 usable rows in1.968s and Escape cleaned up with summaries disabled.",
+      "verification_scope": "runtime"
     }
   ],
   "reports": [
@@ -7820,6 +7896,37 @@
       ],
       "reviewed_on": "2026-10-09",
       "sha256": "bf50298cb56cf8897edbc07bf097c633dac0dc8a6d7a76859adc0cf8cbf26518"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-09-codex-priority-inspection.md"
+      ],
+      "decision": "Known sandbox/path lookup guidance remains unchanged. No separate learning for fixture helper/schema/hash/startup/preview assumptions, one-shot index-lock EAGAIN, aggregate fixture timeout or transient JSON formatting guard: preserve fresh shared records and use observed control state with bounded phase deadlines. Two confirmed scoped fixes are linked. Final source suite and protected installed runtime passed; simultaneous query edits during positional restoration remain independently unproved, and environmental transport-delay cause is unknown. Commit-scope serializer, no-index exit status, Markdown/schema excerpt and scratch-copy assumptions add no new finding; validate the explicit HEAD-plus-owned candidate and keep generated caches excluded.",
+      "findings": [
+        "local-fzf-serialized-reload-acknowledgement",
+        "local-recap-same-key-input-replacement"
+      ],
+      "reviewed_on": "2026-10-09",
+      "sha256": "833710b502f21f6bd9484a46ea1c2246fd7f7c2c51905b0aa4479a8fd0829741"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-09-codex-priority-final-whitespace.md"
+      ],
+      "decision": "No new reusable finding: preserve unrelated concurrent edits and use task-scoped verification; full workspace whitespace remains an unrelated warning.",
+      "findings": [],
+      "reviewed_on": "2026-10-09",
+      "sha256": "47b71cb5f1f16fd73b4b138842725c54fa00ad4e57e042c25c2810b82053f548"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-09-codex-picker-archive-startup.md"
+      ],
+      "findings": [
+        "local-picker-metadata-first-readiness"
+      ],
+      "reviewed_on": "2026-10-09",
+      "sha256": "f11a6fcf7be36154cbab7a2c8a395b431607ca18056f39a8b82613cce4af2992"
     }
   ],
   "review": {

@@ -620,23 +620,36 @@ Search saved conversations across projects with `codex-search "cache.*refresh"`
 or `csg -iF "exact phrase"` in fish. Use `codex-search --pick "pattern"`
 to select a match in fzf and resume in its recorded directory; Esc cancels.
 Use `codex-search --recent` for the newest 20 sessions without a pattern, or
-`crg` (`codex-search --recent --pick`) for all sessions with background AI recaps.
+`crg` (`codex-search --recent --pick`) for sessions ranked by AI priority:
+urgent, actionable, unknown, waiting, then complete, with activity breaking ties.
+The preview explains each priority and labels stale or missing evidence. Use
+`--sort recent` for newest-first picking, or `--recent --sort priority` to list
+cached priorities without calling a model.
 Picker rows use compact Toronto timestamps (`Oct 8 12:24`), with full timestamps
 in the preview. Abbreviated paths and tight spacing keep titles visible; Ctrl-/
 toggles the responsive preview. Guardian review and untitled rows use AI recap headlines,
 updating in the list as recaps arrive. Waiting rows show queue position and elapsed
-time; generating rows show a ticking timer. The query filters the updated titles.
+time; generating rows show a ticking timer. Guardian/session changes refresh
+titles, activity, dialogue and discovery in the background, then update recaps
+and ordering. The query and selected UUID remain stable while still matching.
 `--no-summaries` keeps cached recaps and local previews without model calls;
 Ctrl-G requests a recap for the highlighted session when generation is enabled.
 Use `codex-search --help` for options and examples, and the grouped
 [smoke checks](docs/smoke-tests.md#codex-session-search) to verify the workflow.
-The local private cache refreshes automatically. Python 3.11+ and ripgrep are
+The recent picker opens available local metadata before full archive indexing
+finishes, including when another refresh holds the index lock. Cold caches begin
+with bounded native metadata; remaining native titles catch up in the background.
+Pending dialogue ranks as unknown or keeps visibly stale cached evidence.
+Indexing continues with concise progress and no per-file
+warning flood; Ctrl-G waits for pending dialogue. `--details` adds bounded
+background diagnostics to the preview. Python 3.11+ and ripgrep are
 required for pattern search; fzf is optional for selection. See the [session search guide](docs/codex-session-search.md)
 for tool-output searches, cache controls, and verification.
 Terminal searches show the newest 20 matches with a short highlighted excerpt;
 use `--details` for full blocks and `--limit 0` for all results. Piped output
 includes every full block without color; recent listing defaults to 20 even in
-pipes. The picker always sees all matches or discovered recent sessions.
+pipes. Pattern picking sees all matches; recent picking adds usable sessions as
+background indexing progresses.
 
 ## Core Command Reference
 
@@ -649,7 +662,7 @@ source in this repo.
 | `chezmoi -S "$PWD" diff` | Preview what the checked-out source tree would change in `$HOME`. | `-S` / `--source` points chezmoi at this clone instead of the default source directory. `--reverse` flips the diff direction when you need the comparison the other way around. |
 | `chezmoi -S "$PWD" apply -n -v` | Dry-run an apply with extra detail before touching files in `$HOME`. | `-S` / `--source` uses this repo as the source state. `-n` / `--dry-run` previews changes without writing them. `-v` / `--verbose` prints more detail. |
 | `chezmoi -S "$PWD" apply` | Apply the tracked source state from this clone into `$HOME`. | `-S` / `--source` uses this repo as the source state. `-P` / `--parent-dirs` is useful when you apply a nested target and also want its parent directories handled. |
-| [`codex-search`](docs/codex-session-search.md) | Search decoded local Codex conversations across directories, print snippets and resume commands, or select a session to resume. Installed from `scripts/executable_codex-search`; fish abbreviations `csg` (search) and `crg` (recent picker). | `--recent` lists newest 20 sessions without a pattern or model calls; `--recent --pick` browses all sessions with cached/live recaps. `--summary-count N` sets the automatic newest-session window (default 20, 0 disables it); Ctrl-G requests a selected recap. `--summary-model MODEL` overrides the configured model; `--no-summaries` prohibits all generation. `-i` ignores case; `-F` uses literal text; `--all-text` adds tool calls/output; `--pick` uses optional fzf and browses all matches. Terminal output defaults to 20 compact results; `--details` shows full blocks; `--limit N` caps printing (0 means all). Pipes default to all full blocks without ANSI; `NO_COLOR` disables terminal color. `--rebuild-index` reparses sources; `--clear-cache` deletes this Codex home's private index. `CODEX_HOME` selects sessions, `XDG_CACHE_HOME` selects cache storage; `--help`, `-h` or no arguments show usage and examples. Requires Python 3.11+ and rg for pattern search, fzf (tested 0.44.1) for recent picking, and compatible Codex with login for recaps; no sudo to run. |
+| [`codex-search`](docs/codex-session-search.md) | Search decoded local Codex conversations across directories, print snippets and resume commands, or select a session to resume. Installed from `scripts/executable_codex-search`; fish abbreviations `csg` (search) and `crg` (recent picker). | `--recent` lists newest 20 sessions without a pattern or model calls; `--recent --pick` opens available metadata before full archive indexing, then adds usable sessions in the background and ranks them by AI priority. Pending dialogue stays unknown/stale and defers recap generation; Ctrl-G remembers a request until ready. Malformed archive records do not flood the picker; `--details` exposes diagnostics. Guardian/session changes refresh automatically. `--sort priority\|recent` selects the order; picking defaults to priority, listing to recent. Priority is urgent/actionable/unknown/waiting/complete with activity ties; the preview explains its reason and freshness. `--summary-count N` sets the automatic newest-session window (default 20, 0 disables it); Ctrl-G requests a selected recap. `--summary-model MODEL` overrides the configured model; `--no-summaries` prohibits all generation. `-i` ignores case; `-F` uses literal text; `--all-text` adds tool calls/output; `--pick` uses optional fzf and browses all matches. Terminal output defaults to 20 compact results; `--details` shows full blocks; `--limit N` caps printing (0 means all). Pipes default to all full blocks without ANSI; `NO_COLOR` disables terminal color; `--plain` also uses ASCII printed decoration and ASCII borders in the recent picker. `--rebuild-index` reparses sources; `--clear-cache` deletes this Codex home's private index. `CODEX_HOME` selects sessions, `XDG_CACHE_HOME` selects cache storage; `--help`, `-h` or no arguments show usage and examples. Requires Python 3.11+ and rg for pattern search, fzf (tested 0.44.1) for recent picking, and compatible Codex with login for recaps; no sudo to run. |
 | `refresh-config` | Snapshot the live Codex and Git configs into the repo, force-apply those exact targets without prompts, then reapply the remaining chezmoi-managed environment layer. | No user-facing flags. It calls `snapshot-codex-config`, copies `~/.gitconfig` into its tracked source, force-applies those two targets, and runs non-interactive `chezmoi apply --no-tty --keep-going` for the rest. It adopts reported local-conflict targets into source and retries once, syncs and reloads shortcuts, then returns nonzero for unresolved apply failures. |
 | [`./scripts/executable_fix-vps-codex.sh`](docs/fix-vps-codex.md) | Run locally to repair Codex npm permissions on a VPS using SSH keys, without sudo. Reuses compatible Node/npm and verifies a normal update through a second SSH session. | Defaults to `example-user@192.0.2.10`; `--host`, `--port`, and `--identity` override the connection. `--dry-run` reads diagnostics without repair writes or npm execution; `--help` shows prerequisites. Requires remote Linux, Python 3.8+, bash or fish, and an already trusted host key. |
 | `sync-superpowers-release` | Refresh the externally managed `obra/superpowers` skill bundle from the latest GitHub release archive through chezmoi. | `--dry-run` previews the release refresh without writing files. `LINUX_CONFIG_SOURCE` points the helper at this repo when it is not checked out at `$HOME/linux-config`. |

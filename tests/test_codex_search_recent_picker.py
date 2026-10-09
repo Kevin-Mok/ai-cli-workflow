@@ -224,7 +224,7 @@ class RecentPickerTerminalTest(unittest.TestCase):
     def test_async_recap_preserves_query_and_uuid_and_ctrl_g_requests_selected(self):
         fixture = ROOT / 'tests' / 'scripts' / 'codex_recent_live_check.py'
         self.assertTrue(fixture.exists(), 'real recent picker fixture is missing')
-        result = subprocess.run([sys.executable, str(fixture)], capture_output=True, text=True, timeout=30)
+        result = subprocess.run([sys.executable, str(fixture)], capture_output=True, text=True, timeout=60)
         self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
         self.assertIn('query, selection, Ctrl-G, cancellation and worker cleanup passed', result.stdout)
 

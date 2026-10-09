@@ -86,16 +86,103 @@ fixture below provides a repeatable picker check without using private history.
   lock and original sessions. Exit 0; the next search recreates the cache. See
   the [operator guide](codex-session-search.md) for tests, timings and rollback.
 
+### Codex recent picker best-effort startup
+
+Run fixtures from `/home/example/linux-config`; they use invented sessions, the
+actual CLI and real fzf, with no provider calls or sudo. Initial cold-cache
+metadata/activity is preliminary; pending dialogue must not trigger inference.
+
+- Action: codex-search --recent --pick --no-summaries
+  Expected: Validated cached metadata opens the picker before full archive work
+  finishes, including while another refresh holds the index lock. Cold caches
+  begin with bounded native metadata and add rows as indexing progresses;
+  remaining native titles catch up in the background.
+  Uncached pending previews show `AI recap: indexing`; generic rows also show
+  `[indexing]`. Cached pending recaps stay stale/unknown. Concise indexing and
+  skipped-input status stays visible without per-file warnings flooding the UI. No model calls; Esc cancels safely.
+- Action: codex-search --recent --pick --summary-count 0 --details
+  Expected: Preview adds a bounded tail of background diagnostics, including
+  skipped/unreadable source paths, while default output remains concise. Logs
+  are private and temporary. Ctrl-G on an indexing row remembers its request
+  and generates only after validated dialogue is available; automatic work
+  remains off. Background indexing updates activity; the requested recap can
+  update priority after dialogue is ready. Explicit --rebuild-index remains a
+  full foreground refresh.
+- Action: python3 tests/scripts/codex_startup_live_check.py --scenario all
+  Expected: Cold, cached, malformed and locked-index cases reach real fzf from
+  available metadata before archive completion; good rows remain usable,
+  pending rows avoid inference, and exact resume/worker cleanup pass. No private history/provider calls; exit 0. Individual --scenario cold,
+  cached, malformed or locked repeats that case.
+- Action: python3 tests/scripts/codex_startup_live_check.py --command "$HOME/scripts/codex-search" --scenario all
+  Expected: After refresh-config, the same disposable startup checks pass
+  against the installed command and sibling modules; exit 0, no provider calls.
+
+### Codex recent picker priority and Guardian refresh
+
+Run these commands from any directory after installation; use the source command
+from the repository root before installation. No sudo is needed. Ordinary
+listing is cached-only; opening a picker can generate recaps unless disabled.
+
+- Action: codex-search --recent --pick
+  Expected: The `crg` picker ranks urgent, actionable, unknown, waiting, then
+  complete sessions, with newest recorded activity breaking ties. Preview shows
+  each priority and reason. Missing/legacy/stale priority ranks as unknown; stale
+  evidence remains explicitly labelled. The newest summary-count sessions still
+  form the automatic generation window, independent of priority order.
+- Action: codex-search --recent --pick --sort recent --no-summaries
+  Expected: Usable sessions appear newest-first by recorded activity, with
+  additional rows arriving as background indexing progresses. Cached recaps
+  remain readable; Ctrl-G and automatic refresh cause no model calls. Uncached generic rows show `[recaps off]`. Esc resumes nothing.
+- Action: codex-search --recent --sort priority --details --limit 5
+  Expected: At most five full blocks appear in cached priority order, with
+  priority/reason and freshness visible; no model runs. Ordinary --recent listing
+  without --sort remains newest-first and keeps its default limit of 20.
+- Action: codex-search --recent --sort recent --limit 5
+  Expected: At most five newest sessions appear by recorded activity; no model
+  runs. Source filesystem and recap-cache times do not affect ordering.
+- Action: codex-search --recent --pick --summary-count 0
+  Expected: Automatic generation stays off. Highlight an uncached `[Ctrl-G]` row
+  and press Ctrl-G: manual queued/generating progress appears, then its AI
+  headline, priority and reason arrive. Manual requests outside the newest
+  window work normally. Each unchanged generation key gets at most one attempt
+  per opening; changed dialogue can receive a new attempt. Failed recaps show
+  `[unavailable]` and explain why in the preview. Esc cancels and stops workers.
+- Action: codex-search --recent --pick --no-summaries
+  Expected: Cached priority determines order and local evidence refreshes with
+  zero model calls, including Ctrl-G. While open, filter by a stable directory,
+  highlight a session, and let Guardian or another pane update that session.
+  Renames/activity/dialogue changes appear after background discovery; changed
+  dialogue makes the older priority stale/unknown. Query and UUID stay stable
+  during reorder while still matching. Newly discovered sessions appear and
+  deleted ones disappear. Enter with zero matches resumes nothing.
+
+- Action: codex-search --recent --sort priority --plain --limit 5
+  Expected: At most five cached sessions appear with ASCII decoration and no
+  printed color. Terminal separators/arrows/truncation markers use `|`, `->`
+  and `...`; original conversation characters remain intact. No model runs.
+- Action: codex-search --recent --pick --plain --no-summaries
+  Expected: The recent picker uses ASCII fzf borders, cached priority and local
+  evidence refresh with zero model calls; Enter/Esc retain their usual behavior.
+- Action: python3 tests/scripts/codex_priority_live_check.py --scenario all
+  Expected: From the repo root, the actual source CLI and real fzf use disposable
+  sessions and a deterministic local runtime. Guardian append/rename updates
+  dialogue/activity/title, urgent-to-complete regeneration reorders while keeping
+  query/UUID, and Enter sends the exact UUID/cwd to a resume stub. Source bytes
+  change only through fixture appends; watcher/workers and temporary runtime
+  directories are removed. Cached/recent second opens and Ctrl-G make zero
+  additional calls. Exit 0, no private history/provider calls, no sudo.
+- Action: python3 tests/scripts/codex_priority_live_check.py --command "$HOME/scripts/codex-search" --scenario all
+  Expected: After refresh-config, the same disposable checks pass against the
+  installed command and its installed sibling modules, without private history
+  or provider calls. Exact resume, source preservation and cleanup pass; exit 0.
+
 ### Codex recent picker layout
 
 - Action: Run `crg`, select a session in `/mnt/usb-8tb/`, and resize the terminal between narrow and wide windows. Press Ctrl-/ twice, then Enter or Esc.
   Expected: The directory appears as `/m/usb-8tb>` beside the complete title when space permits, followed by the short timestamp, without large tab gaps. The full title wraps in the preview; the original directory remains there. The preview is on the right in wide windows and below in narrow ones; Ctrl-/ toggles it for full-width list reading. Enter resumes the original directory and UUID; Esc cancels.
 
 - Action: Run `crg`, filter by directory and select an uncached Guardian review or untitled row. Request Ctrl-G on it and another waiting row; keep the picker open until ready. Repeat using only `Guardian` as the query, then clear it after the title changes.
-  Expected: Generic rows show waiting position/time such as `[queued #2 12s]`, then a ticking `[generating 8s]` timer. Manual priority changes queue position while retaining waiting time; generation starts a fresh timer. Once ready, the AI headline replaces either placeholder and its timer without reopening. Preview retains Original title, recap state and elapsed phase time. Directory query/UUID stay stable; an old-title-only query re-filters normally. Enter with no matches resumes nothing; meaningful native titles stay unchanged.
-
-- Action: Run `codex-search --recent --pick --summary-count 0`, select a missing `[Ctrl-G]` row and request Ctrl-G. Then run `codex-search --recent --pick --no-summaries` and inspect uncached/cached generic rows; press Ctrl-G, then Esc.
-  Expected: Count zero starts no automatic work but allows manual queue/generation progress. Disabled generation starts no model calls or timers, marks missing titles `[recaps off]` and shows cached AI titles immediately. Failed recaps show `[unavailable]` and explain why in preview. Esc cancels and stops workers.
+  Expected: Generic rows show waiting position/time such as `[queued #2 12s]`, then a ticking `[generating 8s]` timer. Manual requests change queue position while retaining waiting time; generation starts a fresh timer. Once ready, the AI headline replaces either placeholder and its timer without reopening. Preview retains Original title, recap state and elapsed phase time. Directory query/UUID stay stable; an old-title-only query re-filters normally. Enter with no matches resumes nothing; meaningful native titles stay unchanged.
 
 ### Codex recent picker timezone
 

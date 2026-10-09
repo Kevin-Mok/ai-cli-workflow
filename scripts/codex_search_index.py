@@ -13,6 +13,7 @@ import stat
 import subprocess
 import sys
 import tempfile
+import time
 import uuid
 
 CACHE_VERSION = 2
@@ -79,12 +80,18 @@ def secure_file(path):
     path.chmod(0o600)
 
 
-@contextmanager
-def cache_lock(home):
+def prepare_cache(home):
+    """Prepare the private cache without waiting for an archive refresh lock."""
     base = Path(os.environ.get('XDG_CACHE_HOME') or Path.home() / '.cache') / 'codex-search'
     secure_directory(base)
     root = base / hashlib.sha256(os.fsencode(home)).hexdigest()
     secure_directory(root)
+    return root
+
+
+@contextmanager
+def cache_lock(home):
+    root = prepare_cache(home)
     lock_path = root / '.lock'
     fd = os.open(lock_path, os.O_RDWR | os.O_CREAT | os.O_NOFOLLOW, 0o600)
     try:
@@ -116,19 +123,23 @@ def atomic_json(path, value):
         os.replace(tmp, path)
 
 
-def records(path, problems):
+def parsed_records(lines, problems):
     """Malformed input never leaks its payload through diagnostics."""
+    for raw in lines:
+        if not raw.strip():
+            continue
+        try:
+            row = json.loads(raw)
+            if not isinstance(row, dict):
+                raise ValueError('not an object')
+            yield row
+        except (ValueError, UnicodeError, RecursionError):
+            problems[0] += 1
+
+
+def records(path, problems):
     with path.open('rb') as source:
-        for raw in source:
-            if not raw.strip():
-                continue
-            try:
-                row = json.loads(raw)
-                if not isinstance(row, dict):
-                    raise ValueError('not an object')
-                yield row
-            except (ValueError, UnicodeError, RecursionError):
-                problems[0] += 1
+        yield from parsed_records(source, problems)
 
 
 def conversation_text(role, text):
@@ -169,7 +180,7 @@ def tool_strings(value, depth=0):
                 yield from tool_strings(child, depth + 1)
 
 
-def extract(path, root, source_signature):
+def extract(path, root, source_signature, details=True):
     token = uuid.uuid4().hex
     conversation = root / (token + '.conversation.txt')
     tools = root / (token + '.tools.txt')
@@ -270,20 +281,21 @@ def extract(path, root, source_signature):
         raise
     metadata['dialogue_hash'] = dialogue_hash.hexdigest()
     metadata['skipped'] = problems[0]
-    if not metadata['id']:
+    if not metadata['id'] and details:
         warn(f'skipped session without valid session_meta UUID: {path}')
     return metadata
 
 
-def load_manifest(root, home):
+def load_manifest(root, home, details=True):
     path = root / 'manifest.json'
-    if not path.exists():
+    if not path.exists() and not path.is_symlink():
         return {}
     secure_file(path)
     try:
         data = json.loads(path.read_text())
         if not isinstance(data, dict) or data.get('version') != CACHE_VERSION or data.get('home') != str(home):
-            warn('cache format changed; rebuilding index')
+            if details:
+                warn('cache format changed; rebuilding index')
             return {}
         entries = data['sources']
         if not isinstance(entries, dict):
@@ -299,6 +311,8 @@ def load_manifest(root, home):
             if any(not isinstance(entry[k], str) for k in ('cwd', 'timestamp')) or \
                     type(entry['skipped']) is not int or entry['skipped'] < 0:
                 raise ValueError('metadata')
+            if 'index_pending' in entry and type(entry['index_pending']) is not bool:
+                raise ValueError('pending state')
             for field, extension in (('conversation', 'txt'), ('tools', 'txt'), ('dialogue', 'jsonl')):
                 pattern = r'[0-9a-f]{32}\.' + field + r'\.' + extension
                 if not isinstance(entry[field], str) or not re.fullmatch(pattern, entry[field]):
@@ -306,9 +320,111 @@ def load_manifest(root, home):
             if not isinstance(entry['dialogue_hash'], str) or not re.fullmatch(r'[0-9a-f]{64}', entry['dialogue_hash']):
                 raise ValueError('dialogue hash')
         return entries
-    except (ValueError, KeyError, TypeError, RecursionError):
-        warn('invalid cache manifest; rebuilding index')
+    except (ValueError, UnicodeError, KeyError, TypeError, RecursionError):
+        if details:
+            warn('invalid cache manifest; rebuilding index')
         return {}
+
+
+def cache_files_ready(root, entry):
+    """Missing content is recoverable; an unsafe cache reference is not."""
+    ready = True
+    for field in ('conversation', 'tools', 'dialogue'):
+        path = root / entry[field]
+        if path.exists() or path.is_symlink():
+            secure_file(path)
+        else:
+            ready = False
+    return ready
+
+
+def native_header(path):
+    """Read at most 64 KiB of native metadata, never the session dialogue."""
+    with path.open('rb') as source:
+        header = source.read(64 * 1024)
+    for raw in header.splitlines():
+        try:
+            row = json.loads(raw)
+        except (ValueError, UnicodeError, RecursionError):
+            continue
+        if not isinstance(row, dict) or row.get('type') != 'session_meta':
+            continue
+        payload = row.get('payload')
+        if not isinstance(payload, dict):
+            continue
+        sid = session_id(payload.get('id'))
+        if not sid:
+            continue
+        timestamp = payload.get('timestamp', row.get('timestamp', ''))
+        cwd = payload.get('cwd', '')
+        return {'id': sid, 'cwd': cwd if isinstance(cwd, str) else '',
+                'timestamp': timestamp if isinstance(timestamp, str) else '',
+                'signature': signature(path), 'source': str(path), 'index_pending': True,
+                'conversation': '', 'tools': '', 'dialogue': '', 'dialogue_hash': '', 'skipped': 0}
+    return None
+
+
+def initial_recent(root, home, limit=200):
+    """Return cached rows or bounded native headers without locking or indexing."""
+    if limit <= 0:
+        return {}
+    entries = load_manifest(root, home, details=False)
+    result = {}
+    for key, entry in sorted(entries.items(), key=lambda item: epoch(item[1]['timestamp']), reverse=True):
+        path = Path(key)
+        if not entry['id']:
+            continue
+        try:
+            if path.is_symlink() or not path.is_file():
+                continue
+        except OSError:
+            # A temporarily unreadable source still has useful cached metadata.
+            pass
+        try:
+            ready = cache_files_ready(root, entry)
+            view = dict(entry, source=key)
+            try:
+                changed = entry['signature'] != signature(path)
+            except OSError:
+                changed = True
+            if not ready or changed:
+                view['index_pending'] = True
+            result[key] = view
+        except FileNotFoundError:
+            # An atomic cache refresh can retire old content after this snapshot.
+            result[key] = dict(entry, source=key, index_pending=True)
+        except OSError:
+            continue
+        if len(result) >= limit:
+            break
+    if result:
+        return result
+
+    # Native archives use date folders and timestamped names. Visit the newest
+    # names first, rather than enumerating and sorting every historical source.
+    deadline = time.monotonic() + 1.0
+    pending = [home / 'sessions']
+    candidates = 0
+    while pending and candidates < 1000 and time.monotonic() < deadline:
+        path = pending.pop()
+        try:
+            if path.is_symlink():
+                continue
+            if path.is_dir():
+                with os.scandir(path) as children:
+                    pending.extend(Path(child.path) for child in sorted(children, key=lambda child: child.name))
+                continue
+            if path.suffix != '.jsonl' or not path.is_file():
+                continue
+            candidates += 1
+            entry = native_header(path)
+            if entry:
+                result[str(path)] = entry
+                if len(result) >= limit:
+                    break
+        except OSError:
+            continue
+    return result
 
 
 def cleanup(root, keep=()):
@@ -323,75 +439,169 @@ def cleanup(root, keep=()):
             path.unlink()
 
 
-def refresh(root, home, rebuild=False):
-    entries = {} if rebuild else load_manifest(root, home)
+def refresh(root, home, rebuild=False, details=True, max_updates=None, stats=None, preferred_sources=()):
+    """Refresh all sources, or one bounded background pass when capped."""
+    entries = {} if rebuild else load_manifest(root, home, details=details)
     sources = home / 'sessions'
     current = {}
     updated = 0
-    if not sources.exists():
+    attempted = 0
+    skipped = 0
+    pending_sources = []
+    inventory = []
+    unreadable_sources = set()
+    unreadable_directories = []
+    bounded = max_updates is not None
+    if bounded and (type(max_updates) is not int or max_updates < 0):
+        raise ValueError('max_updates must be a non-negative integer')
+    if not sources.exists() and details:
         warn(f'sessions directory does not exist: {sources}')
     def walk_error(error):
         # Do not discard cached sources when discovery is incomplete.
-        raise SearchError(f'cannot discover sessions: {error}')
+        if not bounded:
+            raise SearchError(f'cannot discover sessions: {error}')
+        unreadable_directories.append(str(error.filename or sources))
+        if details:
+            warn(f'cannot discover some sessions: {error}')
     for folder, _, names in os.walk(sources, onerror=walk_error, followlinks=False):
         for name in sorted(names):
             if not name.endswith('.jsonl'):
                 continue
             path = Path(folder) / name
-            if path.is_symlink() or not path.is_file():
-                warn(f'skipped non-regular session source: {path}')
-                continue
-            key = str(path)
             try:
-                sig = signature(path)
-                entry = entries.get(key)
-                valid_files = entry and all((root / entry[field]).exists() for field in ('conversation', 'tools', 'dialogue'))
-                if valid_files and entry is not None:
-                    for field in ('conversation', 'tools', 'dialogue'):
-                        secure_file(root / entry[field])
-                if entry is None or not valid_files or entry['signature'] != sig:
-                    if updated == 0:
-                        warn('refreshing local session index...')
-                    entry = extract(path, root, sig)
-                    # An append during parsing must be retried on the next invocation.
-                    if signature(path) != sig:
-                        entry['signature'] = [0, 0, 0, 0, 0]
-                        warn(f'session changed while indexing; will refresh next search: {path}')
-                    updated += 1
-                    if updated % 100 == 0:
-                        warn(f'indexed {updated} changed sessions')
-                current[key] = entry
-                if entry['skipped']:
-                    warn(f"skipped {entry['skipped']} malformed/incomplete records in {path}")
+                if path.is_symlink() or not path.is_file():
+                    if details:
+                        warn(f'skipped non-regular session source: {path}')
+                    continue
+                inventory.append((path, signature(path)))
             except FileNotFoundError:
-                warn(f'session disappeared during indexing: {path}')
+                if details:
+                    warn(f'session disappeared during indexing: {path}')
             except OSError as error:
+                if bounded:
+                    inventory.append((path, None))
+                    unreadable_sources.add(str(path))
+                if details:
+                    warn(f'cannot index session {path}: {error.strerror}')
+    known = {str(path) for path, _ in inventory}
+    for folder in unreadable_directories:
+        for key in entries:
+            if key not in known and Path(key).is_relative_to(folder):
+                inventory.append((Path(key), None))
+                unreadable_sources.add(key)
+                known.add(key)
+    if bounded:
+        preferred = set(preferred_sources)
+        inventory.sort(key=lambda item: (str(item[0]) in preferred,
+                       item[1][1] if item[1] is not None else 0, str(item[0])), reverse=True)
+    started = time.monotonic() if bounded else 0.0
+    for path, sig in inventory:
+        key = str(path)
+        try:
+            entry = entries.get(key)
+            valid_files = entry is not None and cache_files_ready(root, entry)
+            if sig is None:
+                pending_sources.append(key)
+                if entry is not None:
+                    current[key] = dict(entry, index_pending=True)
+                    skipped += entry['skipped']
+                continue
+            needs_update = entry is None or not valid_files or entry['signature'] != sig
+            if needs_update and bounded and (attempted >= max_updates or time.monotonic() - started >= 1.0):
+                pending_sources.append(key)
+                if entry is not None:
+                    current[key] = dict(entry, index_pending=True)
+                    skipped += entry['skipped']
+                continue
+            if needs_update:
+                if updated == 0 and details:
+                    warn('refreshing local session index...')
+                attempted += 1
+                entry = extract(path, root, sig, details=details)
+                # An append during parsing must be retried on the next invocation.
+                if signature(path) != sig:
+                    entry['signature'] = [0, 0, 0, 0, 0]
+                    if bounded:
+                        entry['index_pending'] = True
+                        pending_sources.append(key)
+                    if details:
+                        warn(f'session changed while indexing; will refresh next search: {path}')
+                updated += 1
+                if updated % 100 == 0 and details:
+                    warn(f'indexed {updated} changed sessions')
+            elif entry.get('index_pending'):
+                entry = dict(entry)
+                entry.pop('index_pending', None)
+            current[key] = entry
+            skipped += entry['skipped']
+            if entry['skipped'] and details:
+                warn(f"skipped {entry['skipped']} malformed/incomplete records in {path}")
+        except FileNotFoundError:
+            if details:
+                warn(f'session disappeared during indexing: {path}')
+        except OSError as error:
+            if details:
                 warn(f'cannot index session {path}: {error.strerror}')
-                # Preserve existing data for recovery, but exclude stale matches.
+            if bounded:
+                unreadable_sources.add(key)
+                pending_sources.append(key)
+                if key in entries:
+                    current[key] = dict(entries[key], index_pending=True)
+                    skipped += entries[key]['skipped']
+            # Full text search continues to exclude stale matches after errors.
     changed = rebuild or current != entries or not (root / 'manifest.json').exists()
     if changed:
         atomic_json(root / 'manifest.json', {'version': CACHE_VERSION, 'home': str(home), 'sources': current})
     keep = ['manifest.json'] + [entry[field] for entry in current.values() for field in ('conversation', 'tools', 'dialogue')]
     cleanup(root, keep)
-    if updated:
+    if stats is not None:
+        stats.update(total=len(inventory), pending=len(pending_sources), refreshed=updated,
+                     skipped=skipped, sources=[str(path) for path, _ in inventory],
+                     pending_sources=pending_sources, unreadable=len(unreadable_sources),
+                     unreadable_sources=sorted(unreadable_sources),
+                     discovery_incomplete=bool(unreadable_directories),
+                     unreadable_directories=unreadable_directories)
+    if updated and details:
         warn(f'index ready: {updated} refreshed, {len(current)} sources')
     return current
 
 
-def titles(home):
+def titles(home, details=True, max_bytes=None):
     result = {}
     problems = [0]
-    path = home / 'session_index.jsonl'
-    if not path.exists():
+    if max_bytes is not None and (type(max_bytes) is not int or max_bytes < 0):
+        raise ValueError('max_bytes must be a non-negative integer')
+    if max_bytes == 0:
         return result
+    path = home / 'session_index.jsonl'
     try:
-        for row in records(path, problems):
+        if not path.exists():
+            return result
+        if not path.is_file():
+            if details:
+                warn('skipped non-regular optional title index')
+            return result
+        if max_bytes is None:
+            rows = records(path, problems)
+        else:
+            with path.open('rb') as source:
+                size = os.fstat(source.fileno()).st_size
+                if size > max_bytes:
+                    # The first byte is a boundary probe inside the budget.
+                    # If it is not a newline, discard the partial leading row.
+                    source.seek(size - max_bytes)
+                    raw = source.read(max_bytes).partition(b'\n')[2]
+                else:
+                    raw = source.read(max_bytes)
+            rows = parsed_records(raw.splitlines(), problems)
+        for row in rows:
             sid, title = session_id(row.get('id')), row.get('thread_name')
             if sid and isinstance(title, str) and title.strip():
                 result[sid] = title.strip()
     except OSError as error:
-        warn(f'cannot read optional title index: {error.strerror}')
-    if problems[0]:
+        if details:
+            warn(f'cannot read optional title index: {error.strerror}')
+    if problems[0] and details:
         warn(f'skipped {problems[0]} malformed/incomplete title index records')
     return result
 

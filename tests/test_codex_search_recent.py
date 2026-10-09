@@ -11,7 +11,53 @@ class RecentCLITest(unittest.TestCase):
     stub = fixture.CodexSearchTest.stub
     session = fixture.CodexSearchTest.session
     run_cli = fixture.CodexSearchTest.run_cli
+    run_terminal = fixture.CodexSearchTest.run_terminal
     manifest = fixture.CodexSearchTest.manifest
+
+    def test_sort_requires_recent_and_has_cached_priority_listing(self):
+        self.session()
+        output=self.run_cli('--recent','--sort','priority','--no-summaries').stdout
+        self.assertIn('Priority [unknown]',output)
+        self.assertFalse(self.log.exists())
+        self.run_cli('--sort','priority','pattern',expected=2)
+        self.run_cli('--recent','--sort','invalid',expected=2)
+        self.assertIn('--sort',self.run_cli('--help').stdout)
+
+    def test_cached_priority_orders_older_urgent_before_newer_complete(self):
+        import sys
+        sys.path.insert(0,str(fixture.ROOT/'scripts'))
+        from codex_search_recaps import RecapCache
+        self.session(stamp='2026-10-08T00:00:00Z')
+        self.session(fixture.ID2,name='two.jsonl',stamp='2026-10-09T00:00:00Z')
+        self.run_cli('--recent')
+        root=next((self.cache/'codex-search').iterdir())
+        entries=json.loads((root/'manifest.json').read_text())['sources'].values()
+        for entry in entries:
+            priority='urgent' if entry['id']==fixture.ID1 else 'complete'
+            RecapCache(root,'synthetic-model').save(entry,dict(headline='Synthetic work',
+                goal='Synthetic goal',progress='Reported progress',state='Reported state',
+                next_steps='Review',priority=priority,priority_reason='Reported release blocker' if priority=='urgent' else 'Reported complete'),False)
+        ranked=self.run_cli('--recent','--sort','priority','--summary-model','synthetic-model','--details').stdout
+        self.assertLess(ranked.index(fixture.ID1),ranked.index(fixture.ID2))
+        self.assertIn('Priority [urgent]',ranked)
+        self.assertIn('Reported release blocker',ranked)
+        recent=self.run_cli('--recent','--sort','recent','--summary-model','synthetic-model').stdout
+        self.assertLess(recent.index(fixture.ID2),recent.index(fixture.ID1))
+        self.assertFalse(self.log.exists())
+
+    def test_plain_priority_listing_has_ascii_decoration_and_no_color(self):
+        self.session()
+        output=self.run_cli('--recent','--sort','priority','--plain').stdout
+        self.assertIn('Priority [unknown]',output)
+        self.assertTrue(output.isascii())
+        self.assertNotIn('\x1b',output)
+
+    def test_plain_priority_listing_keeps_ascii_when_terminal_truncates(self):
+        self.session()
+        for width in (20, 58):
+            output,_=self.run_terminal('--recent','--sort','priority','--plain',width=width)
+            self.assertTrue(output.isascii(),output)
+            self.assertNotIn('\x1b',output)
 
     def test_recent_defaults_to_twenty_even_in_pipe_and_limit_zero_means_all(self):
         for i in range(24):
@@ -86,7 +132,14 @@ while not marker.exists() and time.monotonic()<end:time.sleep(.01)
 if not marker.exists():sys.exit(3)
 root=next(Path(os.environ['XDG_CACHE_HOME']).glob('codex-search/*'))
 with (root/'.lock').open('r+') as lock:
-    fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
+    end=time.monotonic()+2
+    while True:
+        try:
+            fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
+            break
+        except BlockingIOError:
+            if time.monotonic()>=end:sys.exit(3)
+            time.sleep(.01)
 Path(os.environ['PICK_LOG']).write_text('index lock free during active inference')
 sys.exit(130)
 ''')
@@ -108,6 +161,7 @@ runpy.run_path(sys.argv[0],run_name='__main__')
         env={**self.env,'RECAP_STARTED':str(started)}
         result=subprocess.run([sys.executable,'-c',code,str(fixture.ROOT/'scripts')],env=env,capture_output=True,text=True,timeout=10)
         self.assertEqual(result.returncode,0,result.stderr)
+        self.assertTrue((self.base/'pick.txt').exists(),result.stderr+result.stdout)
         self.assertEqual((self.base/'pick.txt').read_text(),'index lock free during active inference')
         with self.assertRaises(ProcessLookupError):os.kill(int(started.read_text()),0)
         self.assertFalse(self.log.exists())

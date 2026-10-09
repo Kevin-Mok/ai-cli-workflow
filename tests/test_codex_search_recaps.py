@@ -16,7 +16,9 @@ sys.path.insert(0, str(SCRIPTS))
 ID = '00000000-0000-4000-8000-000000000001'
 RECAP = dict(headline='Synthetic cache task', goal='Improve the synthetic cache.',
              progress='Reported one passing check.', state='Implementation remains in progress.',
-             next_steps='Run the remaining checks.')
+             next_steps='Run the remaining checks.', priority='actionable',
+             priority_reason='The conversation reports unfinished checks that can run now.')
+LEGACY_RECAP = {key: RECAP[key] for key in ('headline', 'goal', 'progress', 'state', 'next_steps')}
 
 
 class RecapTest(unittest.TestCase):
@@ -47,6 +49,8 @@ if mode in ('sleep','child'):
         child=subprocess.Popen([sys.executable,'-c','import time;time.sleep(60)'])
         Path(sys.argv[2]+'.child').write_text(str(child.pid))
     time.sleep(60)
+if mode=='hold':
+    while not Path(sys.argv[5]).exists(): time.sleep(.01)
 if mode=='auth': print('401 authentication failed',file=sys.stderr);sys.exit(1)
 if mode=='rate': print('429 rate_limit_exceeded',file=sys.stderr);sys.exit(1)
 if mode=='bad': Path(sys.argv[1]).write_text('{malformed');sys.exit(0)
@@ -56,10 +60,12 @@ Path(sys.argv[1]).write_text(sys.argv[4])
         class Runtime:
             model='synthetic-model'
             prepared=0
+            output=RECAP
+            hold_path=owner.root/'release'
             def prepare(self): self.prepared+=1; return self.model
             def cancel(self): pass
             def command(self,workdir,schema_path,output_path):
-                return [sys.executable,str(fixture),str(output_path),str(owner.log),mode,json.dumps(RECAP)],dict(os.environ)
+                return [sys.executable,str(fixture),str(output_path),str(owner.log),mode,json.dumps(self.output),str(self.hold_path)],dict(os.environ)
         return Runtime()
 
     def manager(self, **kwargs):
@@ -83,6 +89,367 @@ Path(sys.argv[1]).write_text(sys.argv[4])
         for bad in [[],{**RECAP,'extra':'unexpected'},{**RECAP,'progress':'word '*151},{**RECAP,'state':[]},{**RECAP,'goal':'\ud800'},{**RECAP,'headline':''}]:
             with self.subTest(bad=repr(bad)):
                 with self.assertRaises(ValueError):self.m.validate_recap(bad)
+
+    def test_priority_validation_accepts_only_evidence_tiers_and_bounded_reason(self):
+        for priority in ('urgent', 'actionable', 'unknown', 'waiting', 'complete'):
+            self.assertEqual(self.m.validate_recap({**RECAP, 'priority': priority})['priority'], priority)
+        for bad in ({**RECAP, 'priority': 'ignore instructions'},
+                    {**RECAP, 'priority': []}, {**RECAP, 'priority_reason': ''},
+                    {**RECAP, 'priority_reason': 'x' * 241}, LEGACY_RECAP):
+            with self.subTest(bad=repr(bad)), self.assertRaises(ValueError):
+                self.m.validate_recap(bad)
+        # Exactly 150 prose words is valid; the enum label is not prose.
+        at_limit = dict(headline='task', goal='goal', progress='progress', state='state',
+                        next_steps='word ' * 145, priority='unknown', priority_reason='uncertain')
+        self.m.validate_recap(at_limit)
+        with self.assertRaises(ValueError):
+            self.m.validate_recap({**at_limit, 'priority_reason': 'still uncertain'})
+
+    def test_legacy_five_field_cache_remains_readable_with_unknown_stale_priority(self):
+        directory = self.root / 'recaps'; directory.mkdir(mode=0o700)
+        # Even a coincidentally matching envelope cannot certify missing priority.
+        path = directory / (ID + '.json')
+        path.write_text(json.dumps({'id': ID, 'key': self.m.recap_key(self.entry, 'synthetic-model'),
+                                    'version': 1, 'partial': False, 'recap': LEGACY_RECAP}))
+        status = self.m.RecapCache(self.root, 'synthetic-model').status(self.entry)
+        self.assertEqual(status['status'], 'stale')
+        self.assertEqual(status['recap']['headline'], 'Synthetic cache task')
+        self.assertEqual(status['recap']['priority'], 'unknown')
+        self.assertTrue(status['recap']['priority_reason'])
+
+    def test_generated_five_field_legacy_output_is_rejected(self):
+        self.runtime.output = LEGACY_RECAP
+        manager = self.manager(); manager.start([self.entry])
+        self.assertEqual(self.wait_status(manager, self.entry)['status'], 'unavailable')
+        self.assertEqual(manager.cache.status(self.entry)['status'], 'missing')
+
+    def update_manager(self, manager, entries):
+        self.assertTrue(callable(getattr(manager, 'update', None)), 'live recap updates are not implemented')
+        manager.update(entries)
+
+    def pending_entry(self, entry, retain_dialogue=False):
+        return {**entry, 'index_pending': True,
+                **({} if retain_dialogue else {'dialogue': '', 'dialogue_hash': ''})}
+
+    def test_pending_index_starts_no_model_work_and_generates_once_when_indexed(self):
+        pending = self.pending_entry(self.entry)
+        manager = self.manager(count=1); manager.start([pending])
+        time.sleep(.08)
+        status = manager.status(pending)
+        self.assertEqual(status['status'], 'indexing')
+        self.assertEqual(status['detail'], 'Indexing local dialogue; recap will be available shortly.')
+        self.assertFalse(self.calls())
+        self.assertEqual(self.runtime.prepared, 0)
+        self.update_manager(manager, [self.entry])
+        self.assertEqual(self.wait_status(manager, self.entry)['status'], 'ready')
+        self.assertEqual(len(self.calls()), 1)
+        self.update_manager(manager, [self.entry]); time.sleep(.08)
+        self.assertEqual(len(self.calls()), 1)
+
+    def test_pending_index_keeps_cached_recap_stale_even_when_old_key_matches(self):
+        cache = self.m.RecapCache(self.root, 'synthetic-model')
+        cache.save(self.entry, RECAP, False)
+        pending = self.pending_entry(self.entry, retain_dialogue=True)
+        status = cache.status(pending)
+        self.assertEqual(status['status'], 'stale')
+        self.assertEqual(status['recap'], RECAP)
+        manager = self.manager(); manager.start([pending]); time.sleep(.08)
+        status = manager.status(pending)
+        self.assertEqual(status['status'], 'stale')
+        self.assertEqual(status['detail'], 'Indexing local dialogue; recap will be available shortly.')
+        self.assertEqual(status['recap']['headline'], 'Synthetic cache task')
+        self.assertFalse(self.calls())
+        self.assertEqual(self.runtime.prepared, 0)
+
+    def test_pending_manual_request_survives_indexing_outside_zero_automatic_window(self):
+        pending = self.pending_entry(self.entry)
+        manager = self.manager(count=0); manager.start([pending])
+        manager.request(pending); manager.request(pending); time.sleep(.08)
+        self.assertFalse(self.calls())
+        self.assertEqual(self.runtime.prepared, 0)
+        other = self.make_entry('00000000-0000-4000-8000-000000000002')
+        self.update_manager(manager, [other, self.entry])
+        self.assertEqual(self.wait_status(manager, self.entry)['status'], 'ready')
+        self.assertEqual(manager.status(other)['status'], 'missing')
+        self.assertEqual(len(self.calls()), 1)
+        self.update_manager(manager, [other, self.entry]); time.sleep(.08)
+        self.assertEqual(len(self.calls()), 1)
+
+    def test_pending_manual_request_moves_before_automatic_ready_backlog(self):
+        import threading
+        entered = threading.Event(); release = threading.Event()
+        original = self.runtime.prepare
+        def controlled_prepare():
+            entered.set(); release.wait(3)
+            return original()
+        self.runtime.prepare = controlled_prepare
+        self.addCleanup(release.set)
+        other = self.make_entry('00000000-0000-4000-8000-000000000002', 'Automatic second request')
+        selected = self.make_entry('00000000-0000-4000-8000-000000000003', 'Manual third request')
+        pending_other = self.pending_entry(other)
+        pending_selected = self.pending_entry(selected)
+        manager = self.manager(count=2); manager.start([self.entry, pending_other, pending_selected])
+        self.assertTrue(entered.wait(2))
+        manager.request(pending_selected)
+        self.update_manager(manager, [self.entry, other, selected])
+        self.assertEqual(manager.status(selected).get('queue_position'), 1)
+        self.assertEqual(manager.status(other).get('queue_position'), 2)
+        release.set()
+        for entry in (self.entry, other, selected):
+            self.assertEqual(self.wait_status(manager, entry)['status'], 'ready')
+        self.assertEqual(len(self.calls()), 3)
+        self.assertIn('Manual third request', self.calls()[1]['prompt'])
+        self.assertIn('Automatic second request', self.calls()[2]['prompt'])
+
+    def test_queued_manual_request_defers_when_its_input_becomes_pending(self):
+        import threading
+        entered = threading.Event(); release = threading.Event()
+        original = self.runtime.prepare
+        def controlled_prepare():
+            entered.set(); release.wait(3)
+            return original()
+        self.runtime.prepare = controlled_prepare
+        self.addCleanup(release.set)
+        other = self.make_entry('00000000-0000-4000-8000-000000000002')
+        manager = self.manager(count=1); manager.start([self.entry, other])
+        self.assertTrue(entered.wait(2))
+        manager.request(other)
+        pending = self.pending_entry(other, retain_dialogue=True)
+        self.update_manager(manager, [self.entry, pending])
+        self.assertEqual(manager.status(pending)['status'], 'indexing')
+        release.set()
+        self.assertEqual(self.wait_status(manager, self.entry)['status'], 'ready')
+        time.sleep(.1)
+        self.assertEqual(len(self.calls()), 1)
+        self.update_manager(manager, [self.entry, other])
+        self.assertEqual(self.wait_status(manager, other)['status'], 'ready')
+        self.assertEqual(len(self.calls()), 2)
+
+    def test_deleted_pending_manual_request_does_not_survive_reappearance(self):
+        pending = self.pending_entry(self.entry)
+        manager = self.manager(count=0); manager.start([pending]); manager.request(pending)
+        self.update_manager(manager, [])
+        self.update_manager(manager, [self.entry]); time.sleep(.08)
+        self.assertFalse(self.calls())
+        self.assertEqual(manager.status(self.entry)['status'], 'missing')
+        manager.request(self.entry)
+        self.assertEqual(self.wait_status(manager, self.entry)['status'], 'ready')
+        self.assertEqual(len(self.calls()), 1)
+
+    def test_disabled_pending_manual_request_never_runs_after_index_ready(self):
+        pending = self.pending_entry(self.entry)
+        manager = self.manager(enabled=False, count=0); manager.start([pending]); manager.request(pending)
+        self.update_manager(manager, [self.entry]); time.sleep(.08)
+        self.assertFalse(self.calls())
+        self.assertEqual(self.runtime.prepared, 0)
+        self.assertEqual(manager.status(self.entry)['status'], 'missing')
+
+    def test_changed_dialogue_gets_one_new_attempt_but_metadata_update_does_not(self):
+        manager = self.manager(count=1); manager.start([self.entry])
+        self.assertEqual(self.wait_status(manager, self.entry)['status'], 'ready')
+        metadata = {**self.entry, 'timestamp': '2026-10-09T00:00:00Z', 'title': 'Guardian title'}
+        self.update_manager(manager, [metadata]); time.sleep(.1)
+        self.assertEqual(len(self.calls()), 1)
+        changed = self.make_entry(ID, 'Guardian new request', 'Reported new remaining check')
+        self.update_manager(manager, [changed])
+        self.assertEqual(self.wait_status(manager, changed)['status'], 'ready')
+        self.assertEqual(len(self.calls()), 2)
+        self.assertIn('Guardian new request', self.calls()[1]['prompt'])
+        self.update_manager(manager, [changed]); manager.request(changed); time.sleep(.1)
+        self.assertEqual(len(self.calls()), 2)
+
+    def test_update_requeues_only_the_newest_automatic_window(self):
+        manager = self.manager(count=1); manager.start([self.entry])
+        self.assertEqual(self.wait_status(manager, self.entry)['status'], 'ready')
+        newest = self.make_entry('00000000-0000-4000-8000-000000000002', 'New newest session')
+        outside = self.make_entry('00000000-0000-4000-8000-000000000003')
+        self.update_manager(manager, [newest, outside, self.entry])
+        self.assertEqual(self.wait_status(manager, newest)['status'], 'ready')
+        self.assertEqual(manager.status(outside)['status'], 'missing')
+        self.assertEqual(len(self.calls()), 2)
+
+    def test_metadata_refresh_preserves_manual_request_ahead_of_automatic_queue(self):
+        import threading
+        entered = threading.Event(); release = threading.Event()
+        prepare = self.runtime.prepare
+        def controlled_prepare():
+            entered.set(); release.wait(3)
+            return prepare()
+        self.runtime.prepare = controlled_prepare
+        self.addCleanup(release.set)
+        entries = [self.entry, self.make_entry('00000000-0000-4000-8000-000000000002'),
+                   self.make_entry('00000000-0000-4000-8000-000000000003')]
+        manager = self.manager(count=3); manager.start(entries)
+        self.assertTrue(entered.wait(2))
+        manager.request(entries[2])
+        self.update_manager(manager, [{**entry, 'title': 'Updated Guardian title'} for entry in entries])
+        self.assertEqual(manager.status(entries[2]).get('queue_position'), 1)
+        self.assertEqual(manager.status(entries[1]).get('queue_position'), 2)
+        release.set()
+        for entry in entries:
+            self.assertEqual(self.wait_status(manager, entry)['status'], 'ready')
+        self.assertEqual(len(self.calls()), 3)
+
+    def test_effective_model_resolution_preserves_queue_progress_and_attempt_cap(self):
+        import threading
+        entered = threading.Event(); release = threading.Event()
+        self.runtime.model = 'effective-synthetic-model'
+        command = self.runtime.command
+        def controlled_command(*args):
+            entered.set(); release.wait(3)
+            return command(*args)
+        self.runtime.command = controlled_command
+        self.addCleanup(release.set)
+        other = self.make_entry('00000000-0000-4000-8000-000000000002')
+        manager = self.manager(count=2); manager.start([self.entry, other])
+        self.assertTrue(entered.wait(2))
+        status = manager.status(other)
+        self.assertEqual(status['status'], 'queued')
+        self.assertEqual(status.get('queue_position'), 1)
+        release.set()
+        for entry in (self.entry, other):
+            self.assertEqual(self.wait_status(manager, entry)['status'], 'ready')
+        self.update_manager(manager, [self.entry, other]); time.sleep(.1)
+        self.assertEqual(len(self.calls()), 2)
+
+    def replace_dialogue_file(self, entry):
+        token = hashlib.md5((entry['dialogue'] + '-replacement').encode()).hexdigest()
+        replacement = {**entry, 'dialogue': token + '.dialogue.jsonl'}
+        (self.root / replacement['dialogue']).write_bytes((self.root / entry['dialogue']).read_bytes())
+        (self.root / entry['dialogue']).unlink()
+        return replacement
+
+    def publish_manifest(self, entries):
+        import codex_search_index
+        sources = {}
+        for entry in entries:
+            token = entry['dialogue'].split('.')[0]
+            sources[str(self.home / 'sessions' / (entry['id'] + '.jsonl'))] = {
+                **entry, 'signature': [0, 0, 0, 0, 0], 'skipped': 0,
+                'conversation': token + '.conversation.txt', 'tools': token + '.tools.txt'}
+            (self.root / (token + '.conversation.txt')).write_text('Synthetic indexed conversation')
+            (self.root / (token + '.tools.txt')).write_text('Synthetic indexed tools')
+        codex_search_index.atomic_json(self.root / 'manifest.json', {
+            'version': codex_search_index.CACHE_VERSION, 'home': str(self.home), 'sources': sources})
+
+    def test_metadata_only_replacement_updates_queued_dialogue_filename(self):
+        import threading
+        entered = threading.Event(); release = threading.Event()
+        prepare = self.runtime.prepare
+        def controlled_prepare():
+            entered.set(); release.wait(3)
+            return prepare()
+        self.runtime.prepare = controlled_prepare
+        self.addCleanup(release.set)
+        other = self.make_entry('00000000-0000-4000-8000-000000000002')
+        manager = self.manager(count=2); manager.start([self.entry, other])
+        self.assertTrue(entered.wait(2))
+        replacement = self.replace_dialogue_file(other)
+        self.update_manager(manager, [self.entry, replacement])
+        release.set()
+        self.assertEqual(self.wait_status(manager, replacement)['status'], 'ready')
+        self.assertEqual(len(self.calls()), 2)
+        self.update_manager(manager, [self.entry, replacement]); time.sleep(.1)
+        self.assertEqual(len(self.calls()), 2)
+
+    def test_metadata_only_replacement_updates_input_waiting_for_index_lock(self):
+        import fcntl
+        manager = self.manager()
+        with (self.root / '.lock').open('a+') as lock:
+            fcntl.flock(lock, fcntl.LOCK_EX)
+            manager.start([self.entry])
+            self.wait_status(manager, self.entry, states=('generating',))
+            replacement = self.replace_dialogue_file(self.entry)
+            self.update_manager(manager, [replacement])
+        self.assertEqual(self.wait_status(manager, replacement)['status'], 'ready')
+        self.assertEqual(len(self.calls()), 1)
+
+    def test_metadata_only_replacement_before_ui_update_uses_validated_manifest(self):
+        import fcntl
+        manager = self.manager()
+        with (self.root / '.lock').open('a+') as lock:
+            fcntl.flock(lock, fcntl.LOCK_EX)
+            manager.start([self.entry])
+            self.wait_status(manager, self.entry, states=('generating',))
+            replacement = self.replace_dialogue_file(self.entry)
+            self.publish_manifest([replacement])
+        # The watcher has released .lock, but the UI has not read its new snapshot.
+        self.assertEqual(self.wait_status(manager, self.entry)['status'], 'ready')
+        self.assertEqual(len(self.calls()), 1)
+        self.update_manager(manager, [replacement]); time.sleep(.1)
+        self.assertEqual(len(self.calls()), 1)
+
+    def test_old_unavailable_state_does_not_follow_changed_dialogue(self):
+        runtime = self.runtime_for('bad')
+        manager = self.manager(runtime=runtime); manager.start([self.entry])
+        self.assertEqual(self.wait_status(manager, self.entry)['status'], 'unavailable')
+        good = self.runtime_for('success')
+        runtime.command = good.command
+        changed = self.make_entry(ID, 'Updated after invalid old provider output')
+        self.update_manager(manager, [changed])
+        self.assertNotEqual(manager.status(changed)['status'], 'unavailable')
+        self.assertEqual(self.wait_status(manager, changed)['status'], 'ready')
+        self.assertEqual(len(self.calls()), 2)
+
+    def test_delayed_old_generation_cannot_overwrite_new_dialogue(self):
+        runtime = self.runtime_for('hold')
+        first_release = runtime.hold_path
+        second_release = self.root / 'release-new'
+        self.addCleanup(first_release.touch); self.addCleanup(second_release.touch)
+        manager = self.manager(runtime=runtime, count=1); manager.start([self.entry])
+        end = time.monotonic() + 3
+        while len(self.calls()) < 1 and time.monotonic() < end: time.sleep(.01)
+        self.assertEqual(len(self.calls()), 1)
+        changed = self.make_entry(ID, 'Guardian changed while old inference runs')
+        self.update_manager(manager, [changed])
+        self.assertEqual(manager.status(changed)['status'], 'queued')
+        runtime.hold_path = second_release
+        first_release.touch()
+        end = time.monotonic() + 3
+        while len(self.calls()) < 2 and time.monotonic() < end: time.sleep(.01)
+        self.assertEqual(len(self.calls()), 2)
+        self.assertEqual(manager.cache.status(self.entry)['status'], 'missing', 'old delayed output was saved')
+        second_release.touch()
+        self.assertEqual(self.wait_status(manager, changed)['status'], 'ready')
+        self.assertIn('Guardian changed', self.calls()[1]['prompt'])
+
+    def test_bounded_input_snapshot_survives_cleanup_during_runtime_prepare(self):
+        import fcntl
+        original = self.runtime.prepare
+        def cleanup_after_snapshot():
+            with (self.root / '.lock').open('a+') as lock:
+                fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                (self.root / self.entry['dialogue']).unlink()
+            return original()
+        self.runtime.prepare = cleanup_after_snapshot
+        manager = self.manager(); manager.start([self.entry])
+        self.assertEqual(self.wait_status(manager, self.entry)['status'], 'ready')
+        self.assertIn('Synthetic first request', self.calls()[0]['prompt'])
+
+    def test_close_cancels_snapshot_waiting_for_local_index_maintenance(self):
+        import fcntl
+        import threading
+        manager = self.manager()
+        with (self.root / '.lock').open('a+') as lock:
+            fcntl.flock(lock, fcntl.LOCK_EX)
+            manager.start([self.entry])
+            self.wait_status(manager, self.entry, states=('generating',))
+            self.assertFalse(self.calls(), 'inference started before index lock release')
+            closer = threading.Thread(target=manager.close)
+            closer.start()
+            try:
+                closer.join(.4)
+                self.assertFalse(closer.is_alive(), 'close blocked on local index maintenance')
+            finally:
+                fcntl.flock(lock, fcntl.LOCK_UN)
+                closer.join(3)
+        self.assertFalse(self.calls())
+
+    def test_old_digest_does_not_send_replaced_dialogue_to_provider(self):
+        self.make_entry(ID, 'Replaced bytes before queued work starts')
+        manager = self.manager(); manager.start([self.entry])
+        self.assertEqual(self.wait_status(manager, self.entry)['status'], 'unavailable')
+        self.assertFalse(self.calls(), 'old digest incorrectly inferred newer content')
 
     def test_dialogue_bound_preserves_initial_and_latest_utf8(self):
         entry=self.make_entry(ID,'BEGIN '+('é😀'*16000),('middle '*14000)+' LATEST')
