@@ -4,7 +4,11 @@ Use this checklist to confirm that a changed part of `/home/example/linux-config
 works as expected. Find its section, carry out the `Action`, and compare the
 result with `Expected`. When a change adds a manual check or reveals a gap,
 update the relevant entry or add one under the right area, replacing stale
-checks rather than duplicating them.
+checks rather than duplicating them. Post-commit, push and every task completion handoff
+must select commands that directly exercise or verify the completed result through the
+actual CLI, app, API, or generated artifact and expose an observable result.
+Automated tests, linters, type checks, builds, Git hygiene checks and source-text
+searches run before completion and any commit; do not use them to fill the handoff command list.
 
 ## Directory Sizes
 
@@ -582,7 +586,7 @@ checks use invented temporary data; real notes are never repository fixtures.
 ## Repo Instructions
 
 - Action: In a disposable clone, ask Codex to make two small authorized commits and follow the commit-status overview policy.
-  Expected: After each commit, Codex promptly reports a high-level overview of completed work, verified results, remaining work, blockers and the next step, links the maintained active plan or `docs/task-status.md`, and includes 5–10 copy-pasteable smoke-test commands with the working directory, expected results and sudo requirement. Each commit includes its matching status-document update; earlier milestones remain available. Intermediate reports use commentary and the final response repeats the current overview and commands. Push cadence is unchanged.
+  Expected: After each commit, Codex promptly reports a high-level overview of completed work, verified results, remaining work, blockers and the next step, links the maintained active plan or `docs/task-status.md`, and includes 5–10 copy-pasteable direct verification commands with the working directory, expected results and sudo requirement. Each commit includes its matching status-document update; earlier milestones remain available. Intermediate reports use commentary and the final response repeats the current overview and commands. Push cadence is unchanged.
 
 - Action: In fresh Codex sessions, complete documentation, configuration, analysis, planning and feature tasks without creating or pushing commits.
   Expected: Every final completion response includes 5–10 relevant copy-pasteable direct verification commands with working directory and sudo requirements. Each command has its own labeled example expected-output block immediately after it; silent success is explicit and variable values are placeholders. Commands exercise or verify the completed result or delivered artifact, without invented behavior, unrelated padding, automated test suites, linters, type checks, builds, Git hygiene checks or source-text searches. Commit and push handoffs retain the same format.

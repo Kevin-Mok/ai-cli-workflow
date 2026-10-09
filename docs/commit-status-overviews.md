@@ -1,6 +1,6 @@
 # Commit status overviews
 
-After each commit, give a short overview of where the task stands in both a maintained document and Codex output. Prepare the document with the related work, report the commit result with a link to it, and include the smoke-test commands so example-user can immediately check the result. Every task completion also includes these commands, even when no commit or push occurs.
+After each commit, give a short overview of where the task stands in both a maintained document and Codex output. Prepare the document with the related work, report the commit result with a link to it, and include direct verification commands so example-user can immediately exercise the implemented behavior. Every task completion also includes these commands, even when no commit or push occurs.
 
 ## Document and reporting cadence
 
@@ -15,7 +15,9 @@ Identify the document milestone by commit subject or sequence. After the commit 
 - Remaining: unfinished work and blockers, explicitly stating when there are none.
 - Next: the next concrete step, or that the requested scope is complete.
 
-Keep the overview high-level and specific to the task. Link the maintained document from the Codex response and include 5–10 copy-pasteable smoke-test commands with the working directory, expected results and whether sudo is required. Prefer an existing reusable smoke script. Push reports also include the smoke-test commands.
+Keep the overview high-level and specific to the task. Link the maintained document from the Codex response and include 5–10 copy-pasteable direct verification commands with the working directory, expected results and whether sudo is required. Each command must exercise behavior implemented in the commit through the actual CLI, app, API, or generated artifact, with an observable result. Show a labeled example expected-output block immediately after each command. Prefer an existing reusable script only when it directly exercises that behavior. Push reports use the same rule.
+
+Run required automated tests, linters, type checks, builds and repository hygiene checks before committing, then summarize their results separately. These checks and source-text searches do not count as direct verification commands.
 
 ## Task completion without a commit
 
@@ -37,6 +39,6 @@ Complete required automated checks before the handoff and report them separately
 > Remaining: install and exercise the CLI on the intended machine. No blockers.
 > Next: refresh the managed configuration and run the documented live smoke check.
 
-The accompanying Codex response reports the actual commit hash, links this milestone document and gives the task's smoke-test commands.
+The accompanying Codex response reports the actual commit hash, links this milestone document and gives the task's direct verification commands.
 
 See the [canonical delivery policy](../dot_codex/AGENTS.md#git-and-delivery) and [repository smoke checks](smoke-tests.md#repo-instructions).

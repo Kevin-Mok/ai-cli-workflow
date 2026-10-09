@@ -35,6 +35,31 @@
   ],
   "findings": [
     {
+      "applicability": "Recent-session pickers that can show identity metadata before dialogue and AI evidence finish indexing.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Hold an archive lock on cold and cached fixtures; assert actual fzf listener and usable UUIDs before indexing.",
+        "Inject malformed neighbors, unreadable/discovery failures and an initially absent source directory.",
+        "Verify pending inference guards, exact resume and complete-discovery cache maintenance."
+      ],
+      "id": "local-picker-metadata-first-readiness",
+      "limitations": "Initial metadata is capped and preliminary; between-source budgets cannot bound one oversized source/listing. Ordinary search and explicit rebuild retain full scans. Startup verification calls no provider. Synthetic real-manager fixtures need consistent native source/cache/title metadata; observe bounded GET retries and never replay uncertain position POSTs.",
+      "reference": "references/api-contracts-fixtures.md#local-picker-metadata-first-readiness",
+      "remedy": "Use validated lock-free cached metadata or bounded native headers/title tails; mark dialogue pending, refresh in bounded background passes, defer inference/manual requests, preserve provisional rows and avoid pruning unknown recaps. Keep diagnostics in private disposable storage with concise in-UI progress and bounded explicit details.",
+      "sources": [
+        "f11a6fcf7be36154cbab7a2c8a395b431607ca18056f39a8b82613cce4af2992"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "recent picker waits for full archive indexing before fzf",
+        "malformed-record warnings overwrite interactive UI",
+        "cached startup waits behind index lock"
+      ],
+      "topic": "api-contracts-fixtures",
+      "verification": "Defining checks observed RED then GREEN; final complete Codex suite160 tests passed88.946s. Source and installed real CLI/fzf cold/cache/locked/malformed checks open within2s, resume exact UUID/cwd, preserve source bytes and clean up. Native installed history displayed199 usable rows in1.968s and Escape cleaned up with summaries disabled.",
+      "verification_scope": "runtime"
+    },
+    {
       "applicability": "Adapters, HTTP/CLI boundaries and persisted configuration recovery.",
       "confidence": "confirmed",
       "diagnostics": [
@@ -450,7 +475,7 @@
       "symptoms": [
         "intermittent Gitea 502",
         "root route quick but profile hangs",
-        "healthz intermittently 20\u201350 seconds",
+        "healthz intermittently 20–50 seconds",
         "single thread near full CPU"
       ],
       "topic": "operational-drift",
@@ -3464,7 +3489,7 @@
       "symptoms": [
         "Float sums change when a counted interval is partitioned by model."
       ],
-      "verification": "Fractional RED\u2192GREEN regressions, native record-byte invariance, full 86-test suite and strict typing passed.",
+      "verification": "Fractional RED→GREEN regressions, native record-byte invariance, full 86-test suite and strict typing passed.",
       "verification_scope": "code"
     },
     {
@@ -3504,7 +3529,7 @@
       "symptoms": [
         "uv tool install --force reinstalls a cached local wheel after source-only edits under the same package version."
       ],
-      "verification": "Isolated real-uv repeated setup test RED\u2192GREEN; real setup rebuilt package, models help and v2 schema passed, 14 installed source modules matched.",
+      "verification": "Isolated real-uv repeated setup test RED→GREEN; real setup rebuilt package, models help and v2 schema passed, 14 installed source modules matched.",
       "verification_scope": "runtime"
     },
     {
@@ -4448,28 +4473,6 @@
       "verification_scope": "none"
     },
     {
-      "applicability": "Concurrent subprocess test fixtures that publish a completion marker before recording the corresponding observable event.",
-      "confidence": "confirmed",
-      "diagnostics": [
-        "Compare marker publication and event-log order in the fixture.",
-        "Inject a bounded scheduling gap after marker publication to reproduce the exact assertion failure."
-      ],
-      "id": "local-audio-fixture-marker-ordering",
-      "limitations": "This corrects test-fixture ordering, not hardware audio timing or Codex activation. Default command sandbox remains unresolved and uses the separately reviewed workaround.",
-      "reference": "references/artifact-verification.md#local-audio-fixture-marker-ordering",
-      "remedy": "Record the completion event before publishing its marker so dependent subprocesses cannot overtake the log; retain all behavior assertions.",
-      "sources": [
-        "bf50298cb56cf8897edbc07bf097c633dac0dc8a6d7a76859adc0cf8cbf26518"
-      ],
-      "status": "verified_fix",
-      "symptoms": [
-        "synthesis end is logged before clip end despite the child waiting for clip-ended",
-        "notification speech ordering assertion fails intermittently"
-      ],
-      "verification": "The existing assertion failed under a deliberate 50ms scheduling gap before the correction and passed with the same gap afterward; all 67 focused notification/speech tests passed.",
-      "verification_scope": "code"
-    },
-    {
       "applicability": "Interactive fzf pickers that reload reordered rows and preserve a selected stable UUID, including fzf 0.44 callback contracts.",
       "confidence": "confirmed",
       "diagnostics": [
@@ -4521,55 +4524,71 @@
       "verification_scope": "code"
     },
     {
-      "applicability": "Recent-session pickers that can show identity metadata before dialogue and AI evidence finish indexing.",
+      "applicability": "Concurrent subprocess test fixtures that publish a completion marker before recording the corresponding observable event.",
       "confidence": "confirmed",
       "diagnostics": [
-        "Hold an archive lock on cold and cached fixtures; assert actual fzf listener and usable UUIDs before indexing.",
-        "Inject malformed neighbors, unreadable/discovery failures and an initially absent source directory.",
-        "Verify pending inference guards, exact resume and complete-discovery cache maintenance."
+        "Compare marker publication and event-log order in the fixture.",
+        "Inject a bounded scheduling gap after marker publication to reproduce the exact assertion failure."
       ],
-      "id": "local-picker-metadata-first-readiness",
-      "limitations": "Initial metadata is capped and preliminary; between-source budgets cannot bound one oversized source/listing. Ordinary search and explicit rebuild retain full scans. Startup verification calls no provider. Synthetic real-manager fixtures need consistent native source/cache/title metadata; observe bounded GET retries and never replay uncertain position POSTs.",
-      "reference": "references/api-contracts-fixtures.md#local-picker-metadata-first-readiness",
-      "remedy": "Use validated lock-free cached metadata or bounded native headers/title tails; mark dialogue pending, refresh in bounded background passes, defer inference/manual requests, preserve provisional rows and avoid pruning unknown recaps. Keep diagnostics in private disposable storage with concise in-UI progress and bounded explicit details.",
+      "id": "local-audio-fixture-marker-ordering",
+      "limitations": "This corrects test-fixture ordering, not hardware audio timing or Codex activation. Default command sandbox remains unresolved and uses the separately reviewed workaround.",
+      "reference": "references/artifact-verification.md#local-audio-fixture-marker-ordering",
+      "remedy": "Record the completion event before publishing its marker so dependent subprocesses cannot overtake the log; retain all behavior assertions.",
       "sources": [
-        "f11a6fcf7be36154cbab7a2c8a395b431607ca18056f39a8b82613cce4af2992"
+        "bf50298cb56cf8897edbc07bf097c633dac0dc8a6d7a76859adc0cf8cbf26518"
       ],
       "status": "verified_fix",
       "symptoms": [
-        "recent picker waits for full archive indexing before fzf",
-        "malformed-record warnings overwrite interactive UI",
-        "cached startup waits behind index lock"
+        "synthesis end is logged before clip end despite the child waiting for clip-ended",
+        "notification speech ordering assertion fails intermittently"
       ],
-      "topic": "api-contracts-fixtures",
-      "verification": "Defining checks observed RED then GREEN; final complete Codex suite160 tests passed88.946s. Source and installed real CLI/fzf cold/cache/locked/malformed checks open within2s, resume exact UUID/cwd, preserve source bytes and clean up. Native installed history displayed199 usable rows in1.968s and Escape cleaned up with summaries disabled.",
-      "verification_scope": "runtime"
+      "verification": "The existing assertion failed under a deliberate 50ms scheduling gap before the correction and passed with the same gap afterward; all 67 focused notification/speech tests passed.",
+      "verification_scope": "code"
     },
     {
+      "applicability": "Temporary source editors using Python AST line/column spans to modify Unicode text.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "AST column offsets are UTF-8 byte offsets; compare byte and character indices on a multibyte line.",
+        "Parse proposed source before writing and inspect already-written targets separately."
+      ],
       "id": "local-ast-utf8-edit-columns",
-      "topic": "editing-shell-transport",
+      "limitations": "Temporary editing-helper repair; does not prove live installation or authorize broad replacements of protocol data.",
       "reference": "references/editing-shell-transport.md#local-ast-utf8-edit-columns",
+      "remedy": "Convert UTF-8 byte columns to character positions before slicing source strings, or operate consistently on encoded bytes. Apply replacements from right to left and parse the result before writing.",
+      "sources": [
+        "59513f18129fd6e551e0d90a50a417640131aabd2b4d1a0c089b7209ac9c509d"
+      ],
       "status": "verified_fix",
       "symptoms": [
         "Temporary Python edit raises SyntaxError near an existing multibyte Unicode character",
         "AST col_offset used as a string character index"
       ],
-      "applicability": "Temporary source editors using Python AST line/column spans to modify Unicode text.",
-      "diagnostics": [
-        "AST column offsets are UTF-8 byte offsets; compare byte and character indices on a multibyte line.",
-        "Parse proposed source before writing and inspect already-written targets separately."
-      ],
-      "confidence": "confirmed",
-      "remedy": "Convert UTF-8 byte columns to character positions before slicing source strings, or operate consistently on encoded bytes. Apply replacements from right to left and parse the result before writing.",
+      "topic": "editing-shell-transport",
       "verification": "Corrected helper completed; seven defining Python output tests passed. Root independently parsed all script, local skill and non-candidate benchmark Python sources and passed a multibyte AST offset probe.",
-      "verification_scope": "code",
-      "limitations": "Temporary editing-helper repair; does not prove live installation or authorize broad replacements of protocol data.",
-      "sources": [
-        "59513f18129fd6e551e0d90a50a417640131aabd2b4d1a0c089b7209ac9c509d"
-      ]
+      "verification_scope": "code"
     }
   ],
   "reports": [
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-09-codex-picker-archive-startup.md"
+      ],
+      "findings": [
+        "local-picker-metadata-first-readiness"
+      ],
+      "reviewed_on": "2026-10-09",
+      "sha256": "f11a6fcf7be36154cbab7a2c8a395b431607ca18056f39a8b82613cce4af2992"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-09-codex-priority-final-whitespace.md"
+      ],
+      "decision": "No new reusable finding: preserve unrelated concurrent edits and use task-scoped verification; full workspace whitespace remains an unrelated warning.",
+      "findings": [],
+      "reviewed_on": "2026-10-09",
+      "sha256": "47b71cb5f1f16fd73b4b138842725c54fa00ad4e57e042c25c2810b82053f548"
+    },
     {
       "aliases": [
         "/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-08-model-report-presentation.md"
@@ -7830,95 +7849,103 @@
       "sha256": "80a19a4bbc8805f0f7be65008bfa3976212559566772978389eaad090b78fbe1"
     },
     {
-      "sha256": "7b711ab14dce29426254f0187ae1cc399fae493954d70dcc49ffca95f8ee9b25",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-08-smoke-output-policy-sandbox-startup.md"
+      ],
+      "decision": "No new learning: repeats ext-sandbox-loopback; approved scoped execution succeeds while default runner startup remains unresolved.",
+      "findings": [],
+      "reviewed_on": "2026-10-08",
+      "sha256": "cb904014113363b48870d35c64d9d78e60a0577232cb433a383663a6de92d4f0"
+    },
+    {
       "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-10-09-redshift-inspection-runner.md"
       ],
-      "reviewed_on": "2026-10-09",
+      "decision": "No new learning: existing local-sandbox-loopback-approved-route and inspect-before-use guidance cover pre-shell failure and locating the refresh fish function; approved reads exited 0.",
       "findings": [],
-      "decision": "No new learning: existing local-sandbox-loopback-approved-route and inspect-before-use guidance cover pre-shell failure and locating the refresh fish function; approved reads exited 0."
+      "reviewed_on": "2026-10-09",
+      "sha256": "7b711ab14dce29426254f0187ae1cc399fae493954d70dcc49ffca95f8ee9b25"
     },
     {
-      "sha256": "c888c6a06fc12bfc314cfd8c3c98e94ea6a4b02e1de4aac29f53f47d325938f8",
       "aliases": [
-        "/home/example/linux-config/docs/postmortem/2026-10-09-task-completion-policy-sandbox-startup.md"
+        "/home/example/linux-config/docs/postmortem/2026-10-09-direct-verification-policy-sandbox-startup.md"
       ],
-      "reviewed_on": "2026-10-09",
+      "decision": "No new reusable learning: repeats reviewed ext-sandbox-loopback startup failure and approved scoped-execution workaround; default sandbox remains unresolved.",
       "findings": [],
-      "decision": "No new reusable learning: repeats ext-sandbox-loopback and local-sandbox-loopback-approved-route; approved scoped reads exited 0, while default sandbox startup remains unresolved."
+      "reviewed_on": "2026-10-09",
+      "sha256": "c04ab418feae2de778dadc201d4dd3b33c8b637e5556891bc7e4f22f6d96e1ce"
     },
     {
-      "sha256": "84c2f67e7c320c753dec2a40e7746bf9c77ea8abad7d509700ffeccfe3c8886f",
       "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-10-09-voice-audition-sandbox-startup.md"
       ],
-      "reviewed_on": "2026-10-09",
+      "decision": "No new learning: identical ext-sandbox-loopback startup failure and approved scoped-runner workaround; absent optional checkout directory is a bounded discovery miss.",
       "findings": [],
-      "decision": "No new learning: identical ext-sandbox-loopback startup failure and approved scoped-runner workaround; absent optional checkout directory is a bounded discovery miss."
+      "reviewed_on": "2026-10-09",
+      "sha256": "84c2f67e7c320c753dec2a40e7746bf9c77ea8abad7d509700ffeccfe3c8886f"
     },
     {
-      "sha256": "cfc4fb8b19b27787d72ff00af8d94f35b817c08c8a2f669b7756422d1f00f8ec",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-09-task-completion-policy-sandbox-startup.md"
+      ],
+      "decision": "No new reusable learning: repeats ext-sandbox-loopback and local-sandbox-loopback-approved-route; approved scoped reads exited 0, while default sandbox startup remains unresolved.",
+      "findings": [],
+      "reviewed_on": "2026-10-09",
+      "sha256": "c888c6a06fc12bfc314cfd8c3c98e94ea6a4b02e1de4aac29f53f47d325938f8"
+    },
+    {
       "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-10-09-voice-audition-argument-shadowing.md"
       ],
-      "reviewed_on": "2026-10-09",
+      "decision": "No new reusable guidance: defining tests and type checking caught a bounded namespace shadowing error; repo-specific lesson recorded in tasks/lessons.md.",
       "findings": [],
-      "decision": "No new reusable guidance: defining tests and type checking caught a bounded namespace shadowing error; repo-specific lesson recorded in tasks/lessons.md."
+      "reviewed_on": "2026-10-09",
+      "sha256": "cfc4fb8b19b27787d72ff00af8d94f35b817c08c8a2f669b7756422d1f00f8ec"
     },
     {
-      "sha256": "1581ad7f38c450a1e183324a83e78d8fa355adbaadae3fd9e6a28525199435f3",
       "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-10-09-Voice Contributor-concurrency-fixture.md"
       ],
-      "reviewed_on": "2026-10-09",
+      "decision": "No new reusable learning: synthetic fixture retained old voice after selected default changed; literal Voice Contributor selection and full serialized playback assertions remain covered.",
       "findings": [],
-      "decision": "No new reusable learning: synthetic fixture retained old voice after selected default changed; literal Voice Contributor selection and full serialized playback assertions remain covered."
+      "reviewed_on": "2026-10-09",
+      "sha256": "1581ad7f38c450a1e183324a83e78d8fa355adbaadae3fd9e6a28525199435f3"
     },
     {
-      "sha256": "ad859bfaa524c6f1babacfd7448f84523f1ea3d34376781016f8550f36e078e7",
       "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-10-09-Voice Contributor-intro-title-transport.md"
       ],
-      "reviewed_on": "2026-10-09",
+      "decision": "No new learning: one subagent-local title transport failure with no retry or tested repair; unaffected parent/title/source workflows continued.",
       "findings": [],
-      "decision": "No new learning: one subagent-local title transport failure with no retry or tested repair; unaffected parent/title/source workflows continued."
+      "reviewed_on": "2026-10-09",
+      "sha256": "ad859bfaa524c6f1babacfd7448f84523f1ea3d34376781016f8550f36e078e7"
     },
     {
-      "sha256": "bdb66401e812c64aaa885d34ddaa8eba50ee24cc5580af7b8b36f8b300b6e08f",
       "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-10-09-tbo-shortcut-sandbox-startup.md"
       ],
-      "reviewed_on": "2026-10-09",
+      "decision": "No new reusable learning: recurrence of local-sandbox-loopback-approved-route; approved scoped execution works while default sandbox remains unresolved.",
       "findings": [],
-      "decision": "No new reusable learning: recurrence of local-sandbox-loopback-approved-route; approved scoped execution works while default sandbox remains unresolved."
+      "reviewed_on": "2026-10-09",
+      "sha256": "bdb66401e812c64aaa885d34ddaa8eba50ee24cc5580af7b8b36f8b300b6e08f"
     },
     {
-      "sha256": "abf553222efec1d4638c077ccb5a432522b30bbcaf2e9a75c82fc16f8a4da1bc",
       "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-10-09-Voice Contributor-intro-lfs-inspection.md"
       ],
-      "reviewed_on": "2026-10-09",
+      "decision": "No new reusable learning: Git LFS positional operand mistaken for file filter; ordinary inventory and committed pointer verify the asset. Record compound-runner status limits.",
       "findings": [],
-      "decision": "No new reusable learning: Git LFS positional operand mistaken for file filter; ordinary inventory and committed pointer verify the asset. Record compound-runner status limits."
+      "reviewed_on": "2026-10-09",
+      "sha256": "abf553222efec1d4638c077ccb5a432522b30bbcaf2e9a75c82fc16f8a4da1bc"
     },
     {
-      "sha256": "92c79b1c40a6fbbefd5e795da18d59ba83b2f43550e84d67c73376d268a10718",
       "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-10-09-rintro-abbreviation-not-command.md"
       ],
-      "reviewed_on": "2026-10-09",
+      "decision": "No separate cross-task finding: repo-specific shortcut remedy is recorded directly in fish-alias SKILL.md and tasks/lessons.md; runtime fish resolution and six regression tests verify the repair. no-config fixture requires explicit function path.",
       "findings": [],
-      "decision": "No separate cross-task finding: repo-specific shortcut remedy is recorded directly in fish-alias SKILL.md and tasks/lessons.md; runtime fish resolution and six regression tests verify the repair. no-config fixture requires explicit function path."
-    },
-    {
-      "aliases": [
-        "/home/example/linux-config/docs/postmortem/2026-10-09-queued-question-sandbox-startup.md"
-      ],
-      "findings": [
-        "local-audio-fixture-marker-ordering"
-      ],
       "reviewed_on": "2026-10-09",
-      "sha256": "bf50298cb56cf8897edbc07bf097c633dac0dc8a6d7a76859adc0cf8cbf26518"
+      "sha256": "92c79b1c40a6fbbefd5e795da18d59ba83b2f43550e84d67c73376d268a10718"
     },
     {
       "aliases": [
@@ -7934,22 +7961,13 @@
     },
     {
       "aliases": [
-        "/home/example/linux-config/docs/postmortem/2026-10-09-codex-priority-final-whitespace.md"
-      ],
-      "decision": "No new reusable finding: preserve unrelated concurrent edits and use task-scoped verification; full workspace whitespace remains an unrelated warning.",
-      "findings": [],
-      "reviewed_on": "2026-10-09",
-      "sha256": "47b71cb5f1f16fd73b4b138842725c54fa00ad4e57e042c25c2810b82053f548"
-    },
-    {
-      "aliases": [
-        "/home/example/linux-config/docs/postmortem/2026-10-09-codex-picker-archive-startup.md"
+        "/home/example/linux-config/docs/postmortem/2026-10-09-queued-question-sandbox-startup.md"
       ],
       "findings": [
-        "local-picker-metadata-first-readiness"
+        "local-audio-fixture-marker-ordering"
       ],
       "reviewed_on": "2026-10-09",
-      "sha256": "f11a6fcf7be36154cbab7a2c8a395b431607ca18056f39a8b82613cce4af2992"
+      "sha256": "bf50298cb56cf8897edbc07bf097c633dac0dc8a6d7a76859adc0cf8cbf26518"
     },
     {
       "aliases": [
@@ -7998,13 +8016,22 @@
       "sha256": "8932a62b9596b5d26fc748a70c8127c21833bcc7b2323e8bd14853d90d102470"
     },
     {
-      "sha256": "5b0b18db55420d1a536c832c852ff3e469db71310af025fb74465479e07e40b6",
       "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-10-09-redshift-sandbox-startup.md"
       ],
-      "reviewed_on": "2026-10-09",
+      "decision": "No new learning: recurrence of reviewed ext-sandbox-loopback; approved host shell works, default sandbox remains unresolved.",
       "findings": [],
-      "decision": "No new learning: recurrence of reviewed ext-sandbox-loopback; approved host shell works, default sandbox remains unresolved."
+      "reviewed_on": "2026-10-09",
+      "sha256": "5b0b18db55420d1a536c832c852ff3e469db71310af025fb74465479e07e40b6"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-09-commit-series-inspection.md"
+      ],
+      "decision": "No new reusable learning: existing sandbox workaround and optional-path discovery guidance cover the read-only runner failures; temporary ledger inspection assumptions were corrected after inspecting its actual list schema. Default sandbox remains unresolved.",
+      "findings": [],
+      "reviewed_on": "2026-10-09",
+      "sha256": "8696ab7136c54978e0af3fdb7746f39f3cf7e4260a9d641c2ad9f26068e62274"
     }
   ],
   "review": {

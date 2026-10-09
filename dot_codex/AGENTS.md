@@ -261,10 +261,19 @@ education work:
   related work; identify the milestone by subject or sequence, then report the
   resulting commit hash in Codex output. Link the status document in the response.
 - Alongside each commit overview, and immediately after reporting a push result,
-  include 5–10 copy-pasteable smoke-test commands in the same Codex response,
-  with expected results and required working directory. Use commentary for
-  intermediate commits and include the overview and commands in the final
-  handoff. Prefer the reusable smoke script when available; state whether sudo
+  include 5–10 copy-pasteable direct verification commands in the same Codex response,
+  with the required working directory and example expected output immediately
+  after each command, in its own labeled output block. For commands that succeed
+  silently, state "No output; exit status 0." Mark variable values as placeholders
+  and label examples as expected output rather than claiming they were observed.
+  Use commentary for intermediate commits and include the overview and commands
+  in the final
+  handoff. Each command must exercise behavior implemented in that commit through
+  the actual CLI, app, API, or generated artifact and expose an observable result.
+  Do not fill this list with automated test suites, linters, type checks, builds,
+  Git status/diff checks, or source-text searches; run required automated checks
+  before committing and summarize their results separately. Prefer a reusable
+  script only when it directly exercises the implemented behavior; state whether sudo
   is needed. Do not wait for the user to ask. Preserve the configured push cadence.
 - Single-commit workflows push after the commit passes verification; multi-commit workflows push once after the complete verified series, unless the user explicitly requests another cadence.
 - Push the configured upstream only when the target is clear. Do not amend,
@@ -296,10 +305,16 @@ education work:
   result through the actual CLI, app, API, or delivered artifact, including
   relevant edge cases, with observable results. For tasks without new executable
   behavior, use task-relevant artifact or workflow commands; do not invent
-  behavior or pad the list with unrelated checks.
-  State the required working directory, whether sudo is needed, and the expected
-  result for each command or clearly grouped commands. Prefer reusable smoke
-  scripts and documented commands. Do not wait for the user to ask.
+  behavior or pad the list with unrelated checks. Automated tests, linters, type checks,
+  builds, Git hygiene checks, and source-text searches do not count toward this
+  list; complete required automated checks before completion and, when relevant,
+  before committing, and report their results separately.
+  State the required working directory and whether sudo is needed. Immediately
+  after each command, show its own labeled example expected-output block; do not
+  group expected outputs separately from their commands. For silent success,
+  state "No output; exit status 0." Mark variable values as placeholders and
+  distinguish expected examples from observed verification. Prefer reusable scripts
+  and documented commands that directly exercise the implemented behavior. Do not wait for the user to ask.
 - For coding-task handoff, include the atomic plan, a paste-ready Cursor prompt,
   exact automated and manual test plan, docs updates, a Conventional Commit
   suggestion, and any additional validation notes.
