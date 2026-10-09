@@ -4473,6 +4473,71 @@
       "verification_scope": "none"
     },
     {
+      "applicability": "Deterministic session-to-commit attribution from successful tool events in shared repositories.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Reproduce git show --output in a temporary repository after a verified owned commit.",
+        "Exercise executable post-commit hooks and filters actually applied by file attributes."
+      ],
+      "id": "local-session-insights-command-effects",
+      "limitations": "Arbitrary shell writes, dynamic wrappers and unverifiable historical ownership remain unknown; this is code verification, not live activation.",
+      "reference": "references/session-insights.md#local-session-insights-command-effects",
+      "remedy": "Validate recorded command arguments with conservative allowlists and account for applicable executable helpers; unsupported effects retain unknown status while preserving verified commit counts.",
+      "sources": [
+        "ddcf72b87847944658ae57777a6dc1957c3ae26ecb57de97e5e4116b1230d86b"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "A nominally read-only recorded Git command with an output option creates uncommitted work but reports all committed.",
+        "Executable Git helpers or hooks can create effects not represented by recorded patch evidence."
+      ],
+      "verification": "Eighteen new RED cases preceded the guard fix; 58 commit-evidence tests and final 334-test suite passed.",
+      "verification_scope": "code"
+    },
+    {
+      "applicability": "Local bounded JSONL transcript discovery and dialogue extraction.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Place a deeply nested unrelated metadata header beside a valid transcript.",
+        "Append a nested malformed dialogue record and require partial usable evidence."
+      ],
+      "id": "local-bounded-json-nesting",
+      "limitations": "Bounds protect memory and known parser failures but do not establish support for every historical transcript schema.",
+      "reference": "references/session-insights.md#local-bounded-json-nesting",
+      "remedy": "Catch RecursionError at both discovery and per-record parsing boundaries; skip invalid headers and mark incomplete dialogue partial without copying raw input to diagnostics.",
+      "sources": [
+        "ddcf72b87847944658ae57777a6dc1957c3ae26ecb57de97e5e4116b1230d86b"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "Byte-bounded deeply nested JSON raises RecursionError and breaks discovery for unrelated valid sessions."
+      ],
+      "verification": "Both nested-header and nested-record tests failed before the fix, then passed; final 334-test suite passed.",
+      "verification_scope": "code"
+    },
+    {
+      "applicability": "Private derived-summary caches using an existing configured Codex CLI/provider.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Use unchanged dialogue and an empty model configuration for two consecutive generations.",
+        "Change the model-selection configuration and require invalidation without an arbitrary-model wildcard."
+      ],
+      "id": "local-implicit-model-cache-identity",
+      "limitations": "Unreadable configuration cannot establish freshness; this code evidence does not establish compatibility with future CLI isolation schemas.",
+      "reference": "references/session-insights.md#local-implicit-model-cache-identity",
+      "remedy": "Cache a validated model-selection fingerprint of configuration and CLI identity alongside the effective model; reuse only matching evidence and selection, and label model/configuration drift stale.",
+      "sources": [
+        "ddcf72b87847944658ae57777a6dc1957c3ae26ecb57de97e5e4116b1230d86b"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "Unchanged summaries regenerate when effective Codex model is implicit and local configuration has no explicit model.",
+        "No-summaries marks a freshly generated unchanged default-model entry stale."
+      ],
+      "verification": "Consecutive default-model runs reproduced two generations before the fix; reuse/invalidation regression and final 334-test suite passed.",
+      "verification_scope": "code"
+    },
+    {
       "applicability": "Interactive fzf pickers that reload reordered rows and preserve a selected stable UUID, including fzf 0.44 callback contracts.",
       "confidence": "confirmed",
       "diagnostics": [
@@ -7856,6 +7921,46 @@
       "findings": [],
       "reviewed_on": "2026-10-08",
       "sha256": "cb904014113363b48870d35c64d9d78e60a0577232cb433a383663a6de92d4f0"
+    },
+    {
+      "aliases": [
+        "/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-08-token-cost-environment.md",
+        "/home/example/coding/track-codex-sessions/.worktrees/token-cost-reporting/docs/postmortem/2026-10-08-token-cost-environment.md"
+      ],
+      "decision": "No new reusable learning: ext-sandbox-loopback and local-discover-paths-before-reads cover the repeated runner startup failure and guessed optional source paths. Approved scoped execution and actual-path reads succeed; default sandbox startup remains unresolved.",
+      "findings": [],
+      "reviewed_on": "2026-10-08",
+      "sha256": "9e08568854d4c79d51e72ceafd4cc46f6d75db63e54b58f32f91e7aeff20d8e2"
+    },
+    {
+      "aliases": [
+        "/home/example/coding/track-codex-sessions/.worktrees/ctp-session-insights/docs/postmortem/2026-10-08-ctp-insights-environment.md"
+      ],
+      "decision": "No new reusable learning: ext-sandbox-loopback covers the pre-execution RTM_NEWADDR failure and approved scoped execution workaround. Read-only file-not-found probes reinforce inspecting inventory before assuming paths; no product defect or shared-service change occurred. Host sandbox remains unrepaired.",
+      "findings": [],
+      "reviewed_on": "2026-10-08",
+      "sha256": "160eeec98691af59dabf6546c83d60125eaf6dc8ef19799dd64ed96a6cfa8212"
+    },
+    {
+      "aliases": [
+        "/home/example/coding/track-codex-sessions/.worktrees/token-cost-reporting/docs/postmortem/2026-10-08-token-cost-verification.md"
+      ],
+      "decision": "No new reusable learning: fixture naming, static-check cleanup, equivalent Decimal assertions, and legacy report-row compatibility corrections are resolved by 306 worktree source tests, 26-file mypy, Ruff, smoke checks, and build. The corrected renderer test path passed 67 focused tests; that guessed path and the absent health.py inspection repeat local-discover-paths-before-reads. Independent installed health returned a fresh heartbeat, without proving backfill completion. The smoke-string E501 repeats existing line-wrapping cleanup; ext-xml-boolean-semantics remains a scoped verifier analogy. Live backfill remains outside this evidence.",
+      "findings": [],
+      "reviewed_on": "2026-10-08",
+      "sha256": "52d3e3ccc496aafc997c39e907ce4cf32557f449bf77ea8226bfdd224d1c0059"
+    },
+    {
+      "aliases": [
+        "/home/example/coding/track-codex-sessions/.worktrees/ctp-session-insights/docs/postmortem/2026-10-08-ctp-insights-verification.md"
+      ],
+      "findings": [
+        "local-session-insights-command-effects",
+        "local-bounded-json-nesting",
+        "local-implicit-model-cache-identity"
+      ],
+      "reviewed_on": "2026-10-08",
+      "sha256": "ddcf72b87847944658ae57777a6dc1957c3ae26ecb57de97e5e4116b1230d86b"
     },
     {
       "aliases": [

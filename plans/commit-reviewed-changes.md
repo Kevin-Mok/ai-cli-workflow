@@ -15,7 +15,7 @@ Feedback repair restores the HEAD byte prefix and appends all seven new entries;
 - [x] Run focused notification, speech/setup, type, private daemon, README and targeted learning checks.
 - [x] Run refresh-config, inspect all resulting source changes and verify installed event probes.
 - [x] Commit delivery policy and inspection incident.
-- [ ] Commit October 8 session-insight learning.
+- [x] Commit October 8 session-insight learning.
 - [ ] Commit VPS lookup evidence.
 - [ ] Commit notification eligibility and companion plans/docs/tests.
 - [ ] Commit final command-formatting guidance and pending acceptance evidence.
@@ -46,3 +46,7 @@ Fresh root evidence: checkout/installed silent probes passed all14 cases; comple
 ### Milestone 1: docs(workflow): require direct verification handoffs
 
 Delivery policy, append-only feedback repair and inspection incident are reviewed; README gate and local report hash checks pass. Remaining: six groups, generated Vesktop timestamp and remote delivery. Next: October 8 external learning.
+
+### Milestone 2: docs(postmortem): capture session insight findings
+
+Session insight reference and four reviewed external report records are included with their three findings; aliases and available source hashes were independently checked. Remaining: five groups and remote delivery. Next: VPS lookup evidence.
