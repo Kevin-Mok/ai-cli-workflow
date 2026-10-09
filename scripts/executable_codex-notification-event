@@ -76,6 +76,13 @@ def internal(meta: dict[str, object]) -> bool:
         reserved(meta.get(key)) for key in ('agent_role', 'agent_type'))
 
 
+def user_facing(meta: dict[str, object]) -> bool:
+    # Worker results are collected by their parent, including copied finals on
+    # spawn. Unknown source formats cannot establish a user-facing answer.
+    return (meta.get('source') in ('cli', 'vscode') and not internal(meta)
+            and not any(meta.get(key) for key in ('parent_thread_id', 'parent_session_id')))
+
+
 def latest_title(identity: str) -> str | None:
     title = None
     try:
@@ -115,13 +122,15 @@ def resolve_event(event: object) -> tuple[bool, str | None]:
                 for path in (codex_home() / folder).rglob('*.jsonl'):
                     candidate = metadata(path)
                     if candidate and valid_id(candidate.get('id')) == identity:
-                        excluded = excluded or internal(candidate)
+                        excluded = excluded or not user_facing(candidate)
                         ambiguous = ambiguous or (meta is not None and candidate != meta)
                         meta = candidate
             if excluded:
                 return False, None
             if ambiguous:
-                return True, None
+                return False, None
+        if meta is None:
+            return False, None
     else:
         return False, None
     return True, latest_title(identity) if identity and meta else None
@@ -217,6 +226,9 @@ def main(argv: list[str] | None = None) -> int:
                 return 0
             eligible, title = resolve_question(event)
         elif event.get('type') == 'agent-turn-complete':
+            answer = event.get('last-assistant-message')
+            if not isinstance(answer, str) or not answer.strip():
+                return 0
             eligible, title = resolve_event(event)
         else:
             return 0

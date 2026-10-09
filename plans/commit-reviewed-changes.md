@@ -17,7 +17,7 @@ Feedback repair restores the HEAD byte prefix and appends all seven new entries;
 - [x] Commit delivery policy and inspection incident.
 - [x] Commit October 8 session-insight learning.
 - [x] Commit VPS lookup evidence.
-- [ ] Commit notification eligibility and companion plans/docs/tests.
+- [x] Commit notification eligibility and companion plans/docs/tests.
 - [ ] Commit final command-formatting guidance and pending acceptance evidence.
 - [ ] Commit graphical recovery learning and manual checks.
 - [ ] Commit Vesktop settings excluding generated sync-version metadata.
@@ -54,3 +54,7 @@ Session insight reference and four reviewed external report records are included
 ### Milestone 3: docs(postmortem): record VPS backup lookup limits
 
 VPS lookup report and its exact reviewed hash are included; targeted learning check has no errors or changed aliases. No backup or restore acceptance is claimed. Remaining: four groups and remote delivery. Next: notification eligibility.
+
+### Milestone 4: fix(notifications): silence non-user-facing completions
+
+Notification code, tests, public docs, original/follow-up plans and learning are atomic. Fresh60 notification tests,7 setup tests,12 question tests and type check pass; source/installed14-case silent probes and private Dunst check pass. Remaining: three groups and remote delivery; hardware listening remains manual. Next: final formatting guidance.

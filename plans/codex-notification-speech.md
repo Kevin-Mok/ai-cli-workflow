@@ -1,6 +1,6 @@
 # Speak exact Codex titles after the MP3
 
-Implement offline title-only speech after the existing clip, using exact Codex identity and preserving desktop popup behavior. Install the optional voice, deploy the completion callback, then explicitly enable machine-local speech. Current policy speaks completed turns only; permission audio was removed after user feedback.
+Implement offline title-only speech after the existing clip, using exact Codex identity and preserving desktop popup behavior. Install the optional voice, deploy the completion callback, then explicitly enable machine-local speech. Current policy speaks user-facing completed answers with nonblank final text only; permissions, spawned helpers and unknown origins remain silent after user feedback.
 
 ## Context and scope
 
@@ -11,7 +11,7 @@ Existing helper: scripts/executable_codex-notification-sound; existing unit suit
 - User supplied plan is the specification; inline execution with independent setup-helper delegation.
 - Speech disabled by default; preserve MP3 configuration. Speech activation suppresses Dunst audio only.
 - Completion uses thread-id and metadata. Runtime permission callbacks are silent; historical permission identity resolution tests remain separate from event eligibility. Never use parent session_id or visible terminal title for completion speech.
-- Validate transcript under configured CODEX_HOME; permit separate rollout UUID. Exclude internal system/reviewer threads, permit ordinary spawned agents only with exact identity. Missing/inconsistent title means MP3 only. Capture title before queueing.
+- Validate transcript under configured CODEX_HOME; permit separate rollout UUID. Exclude all spawned/internal threads and unknown or ambiguous provenance; require nonblank event-local final text. Missing/inconsistent title for a verified user-facing answer means MP3 only. See [the eligibility follow-up](fix-unnecessary-question-audio.md). Capture title before queueing.
 - Piper 1.8.0, en_US-lessac-medium, isolated XDG data venv; synthesis stdin and 30-second timeout, each mpv playback 60 seconds, per-user lock over the sequence.
 - Ruling: use current workspace and maintain this plan as ledger; user forbids unsolicited worktrees and requested implementation, so skill worktree prerequisite does not apply. Current mode cannot switch itself to Plan mode; execute the supplied decision-complete plan.
 
@@ -27,7 +27,7 @@ Existing helper: scripts/executable_codex-notification-sound; existing unit suit
 
 ## Risks and rollback
 
-Transcript format may drift: fail closed to MP3. No permission hook trust is required for completion speech. Enable after active sessions load the completion callback; legacy permission calls stay silent through runtime gating. Speech disable immediately restores Dunst MP3 delivery. No permanent service. Preserve user-selected clip and unrelated changes. Per-user lock serializes playback but queue ordering depends on scheduler.
+Transcript format may drift: unknown provenance fails silently; unavailable title for a verified user-facing answer retains MP3 fallback. No permission hook trust is required for completion speech. Enable after active sessions load the completion callback; legacy permission calls stay silent through runtime gating. Speech disable immediately restores Dunst MP3 delivery. No permanent service. Preserve user-selected clip and unrelated changes. Per-user lock serializes playback but queue ordering depends on scheduler.
 
 ## Verification
 

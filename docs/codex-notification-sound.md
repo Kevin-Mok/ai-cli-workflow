@@ -80,9 +80,9 @@ After `refresh-config` deploys the completion callback, start or resume affected
 ~/scripts/codex-notification-sound speech enable
 ```
 
-Audio follows **completed turns only**, including focused and background completions. Permission requests and automatic approval reviews remain silent in speech mode, so a task does not repeatedly announce its title during work. Desktop popup content, actions and focus behavior remain unchanged. Dunst's sound callback becomes a no-op, preventing a second MP3. Existing sessions may still have the former PermissionRequest hook loaded; the updated bridge rejects its calls before launching audio. The deployed hooks file removes that permission handler, and no `/hooks` trust is required for completion speech.
+Completion audio follows **user-facing completed answers**, including focused and background completions. The event must contain a nonblank `last-assistant-message`, and exact matching transcript metadata must identify a top-level `cli` or `vscode` conversation. Ordinary helper-agent completions, copied results on agent spawn, empty/missing answers, parent-linked sessions and unknown/ambiguous provenance stay silent. Permission requests and automatic approval reviews remain silent in speech mode, so a task does not repeatedly announce its title during work. Desktop popup content, actions and focus behavior remain unchanged. Dunst's sound callback becomes a no-op, preventing a second MP3. Existing sessions may still have the former PermissionRequest hook loaded; the updated bridge rejects its calls before launching audio. The deployed hooks file removes that permission handler, and no `/hooks` trust is required for completion speech.
 
-The [event bridge](../scripts/executable_codex-notification-event) resolves completion `thread-id`. The transcript must resolve inside `${CODEX_HOME:-$HOME/.codex}`. A filename's rollout UUID need not equal its conversation ID. The latest matching `thread_name` in `session_index.jsonl` is captured before detached audio queues; visible terminals, answer text and other conversations are never title fallbacks. Ordinary spawned agents use their own saved title. Internal system/reviewer threads are silent. Missing, malformed or inconsistent identity/title means MP3 only.
+The [event bridge](../scripts/executable_codex-notification-event) resolves completion `thread-id`. The transcript must resolve inside `${CODEX_HOME:-$HOME/.codex}`. A filename's rollout UUID need not equal its conversation ID. The latest matching `thread_name` in `session_index.jsonl` is captured before detached audio queues; visible terminals, answer text and other conversations are never title fallbacks. All spawned agents and internal system/reviewer threads are silent; their parent announces the final user-facing answer. Missing, malformed or inconsistent identity/provenance stays silent. A verified user-facing answer with an unavailable saved title still plays MP3 only.
 
 One per-user state-directory lock serializes each complete MP3 → synthesized title or question WAV sequence. Piper begins while the MP3 plays and receives the exact title through private temporary stdin with a 30-second limit; each mpv playback retains its 60-second limit. Temporary WAVs are deleted. Failed synthesis leaves the already-played MP3 as the notification, without retrying it or affecting Codex. Legacy permission-hook calls return immediately with no audio or approval decision. Scheduler order between simultaneous sequences is unspecified.
 
@@ -94,7 +94,7 @@ For immediate speech rollback, preserving the selected MP3:
 
 Dunst's existing MP3-on-popup behavior resumes immediately. `disable` still removes only the MP3 setting; use `speech disable` separately when returning to popup audio. The machine-local speech switch is `speech.json` beside `sound.json`, atomically written with mode 0600. No setting, voice or virtual environment is tracked in Git.
 
-The contracts are described in [Codex hooks](https://learn.chatgpt.com/docs/hooks) and [Piper 1.8.0](https://pypi.org/project/piper-tts/1.8.0/). Transcript metadata is a defensive local integration and can change; unavailable metadata fails to MP3 only.
+The contracts are described in [Codex hooks](https://learn.chatgpt.com/docs/hooks) and [Piper 1.8.0](https://pypi.org/project/piper-tts/1.8.0/). Transcript metadata is a defensive local integration and can change; unavailable or unfamiliar provenance fails silently.
 
 ## Queued-question speech
 
@@ -156,6 +156,16 @@ xvfb-run -a dbus-run-session -- python3 -B tests/scripts/codex_notification_daem
 ```
 
 Unit tests cover fake completion/approval origins, channel isolation, text lookalikes, disappearing processes, absent/invalid local settings, safe filenames, one player invocation, failures and a real empty-home chezmoi install. The daemon check uses private DBus/Xvfb and a fake mpv; it verifies exact app matching, delivery timing, duplicates, history, pausing and empty-format suppression without audio or changes to your desktop daemon.
+
+Check event eligibility without playing real audio or changing settings (no sudo):
+
+```sh
+python3 -B scripts/smoke_codex_notification_events.py --plain
+python3 -B scripts/smoke_codex_notification_events.py --installed --plain
+python3 -B scripts/smoke_codex_notification_events.py --installed --case worker --plain
+```
+
+The probe copies checkout handlers (or deployed `~/scripts` handlers with `--installed`) into a disposable home, feeds actual JSON events to the CLI and records calls to a silent fake mpv. Default `--case all` checks completion, worker, empty, missing, unknown, ambiguous, parent and permission events plus async, multiple, blocking, worker, empty and secret question cases. Completion records one playback; valid questions record one clip then one spoken sentence (two calls); all rejected/silent cases record zero. Each case prints progress and a PASS count; a mismatch exits 1. This validates eligibility and deployment bytes, while actual hardware listening and subsequent real Codex completion remain separate acceptance checks.
 
 After selecting a clip, run the reusable live checks:
 

@@ -585,7 +585,7 @@ class SpeechTests(PlaybackTests):
         with lock.open('a') as owner:
             fcntl.flock(owner, fcntl.LOCK_EX)
             result = subprocess.run([sys.executable, str(ROOT / 'scripts/executable_codex-notification-event')],
-                input=json.dumps({'type': 'agent-turn-complete', 'thread-id': identity}),
+                input=json.dumps({'type': 'agent-turn-complete', 'thread-id': identity, 'last-assistant-message': 'Ready to read.'}),
                 text=True, capture_output=True, env=env, timeout=5)
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertEqual(result.stdout, '')  # Never returns an approval decision.
@@ -643,10 +643,14 @@ class EventBridgeTests(unittest.TestCase):
         self.assertEqual(self.bridge.resolve_event({'type': 'agent-turn-complete', 'thread-id': self.A}), (True, 'Renamed café; $(no)'))
         self.assertEqual(self.bridge.resolve_event({'hook_event_name': 'PermissionRequest', 'agent_id': self.B, 'transcript_path': str(path)}), (True, None))
 
-    def test_missing_title_identity_or_external_path_means_clip_only(self):
-        path = self.transcript(self.A)
-        for event in ({'type': 'agent-turn-complete', 'thread-id': self.A}, {'type': 'agent-turn-complete', 'thread-id': self.B}, {'hook_event_name': 'PermissionRequest', 'transcript_path': '/tmp/outside.jsonl'}, {'hook_event_name': 'PermissionRequest', 'transcript_path': str(path), 'agent_id': 'bad'}):
-            self.assertEqual(self.bridge.resolve_event(event), (True, None))
+    def test_missing_title_for_known_root_means_clip_only(self):
+        self.transcript(self.A)
+        self.assertEqual(self.bridge.resolve_event({'type': 'agent-turn-complete', 'thread-id': self.A}), (True, None))
+
+    def test_unknown_completion_identity_stays_silent(self):
+        self.names()
+        for identity in (self.B, 'bad', None):
+            self.assertEqual(self.bridge.resolve_event({'type': 'agent-turn-complete', 'thread-id': identity}), (False, None))
 
     def test_internal_system_and_reviewers_are_silent(self):
         self.names()
@@ -661,10 +665,55 @@ class EventBridgeTests(unittest.TestCase):
         self.transcript(self.A, 'cli', 'copied-metadata.jsonl')
         self.assertEqual(self.bridge.resolve_event({'type': 'agent-turn-complete', 'thread-id': self.A}), (False, None))
 
-    def test_worker_nickname_is_not_internal_provenance(self):
+    def test_worker_completion_is_silent_even_with_nonblank_inherited_answer(self):
         self.names()
-        self.transcript(self.A, {'subagent': {'thread_spawn': {'agent_role': 'worker', 'agent_nickname': 'review'}}})
-        self.assertEqual(self.bridge.resolve_event({'type': 'agent-turn-complete', 'thread-id': self.A}), (True, 'Renamed café; $(no)'))
+        meta = {'subagent': {'thread_spawn': {'agent_role': 'worker', 'agent_nickname': 'review'}}}
+        path = self.transcript(self.A, meta)
+        with path.open('a') as stream:
+            stream.write(json.dumps({'type': 'event_msg', 'payload': {'type': 'task_complete', 'last_agent_message': 'Copied parent answer'}})+'\n')
+        self.assertFalse(self.bridge.internal({'source': meta}))  # Nickname remains user data.
+        with patch.object(self.bridge, 'speech_enabled', return_value=True), patch.object(self.bridge.subprocess, 'Popen') as spawn:
+            self.assertEqual(self.bridge.main([json.dumps({'type': 'agent-turn-complete', 'thread-id': self.A, 'last-assistant-message': 'Worker finished'})]), 0)
+            spawn.assert_not_called()
+
+    def test_missing_or_blank_final_response_never_spawns_audio(self):
+        self.transcript(self.A)
+        self.names()
+        for answer in (None, '', ' \t\n\u00a0\u2003 ', [], {}):
+            event = {'type': 'agent-turn-complete', 'thread-id': self.A, 'last-assistant-message': answer}
+            with self.subTest(answer=answer), patch.object(self.bridge, 'speech_enabled', return_value=True), patch.object(self.bridge.subprocess, 'Popen') as spawn:
+                self.assertEqual(self.bridge.main([json.dumps(event)]), 0)
+                spawn.assert_not_called()
+        with patch.object(self.bridge, 'speech_enabled', return_value=True), patch.object(self.bridge.subprocess, 'Popen') as spawn:
+            self.assertEqual(self.bridge.main([json.dumps({'type': 'agent-turn-complete', 'thread-id': self.A})]), 0)
+            spawn.assert_not_called()
+
+    def test_parent_provenance_overrides_root_shaped_source(self):
+        self.names()
+        for key in ('parent_thread_id', 'parent_session_id'):
+            path = self.transcript(self.A)
+            path.write_text(json.dumps({'type': 'session_meta', 'payload': {'id': self.A, 'source': 'cli', key: self.B}})+'\n')
+            self.assertEqual(self.bridge.resolve_event({'type': 'agent-turn-complete', 'thread-id': self.A}), (False, None))
+
+    def test_unknown_or_malformed_source_is_silent(self):
+        self.names()
+        for source in (None, 'unknown', 'future-source', {}, {'cli': {}}, {'subagent': {}}):
+            with self.subTest(source=source):
+                self.transcript(self.A, source)
+                self.assertEqual(self.bridge.resolve_event({'type': 'agent-turn-complete', 'thread-id': self.A}), (False, None))
+
+    def test_conflicting_duplicate_root_metadata_is_silent(self):
+        self.names()
+        self.transcript(self.A, 'cli')
+        self.transcript(self.A, 'vscode', 'duplicate.jsonl')
+        self.assertEqual(self.bridge.resolve_event({'type': 'agent-turn-complete', 'thread-id': self.A}), (False, None))
+
+    def test_vscode_completion_with_answer_captures_title(self):
+        self.transcript(self.A, 'vscode')
+        self.names()
+        with patch.object(self.bridge, 'speech_enabled', return_value=True), patch.object(self.bridge.subprocess, 'Popen') as spawn:
+            self.assertEqual(self.bridge.main([json.dumps({'type': 'agent-turn-complete', 'thread-id': self.A, 'last-assistant-message': 'Finished café'})]), 0)
+            self.assertEqual(json.loads(spawn.return_value.stdin.write.call_args.args[0]), 'Renamed café; $(no)')
 
     def test_permission_requests_never_spawn_speech_during_work(self):
         path = self.transcript(self.A)
@@ -679,9 +728,18 @@ class EventBridgeTests(unittest.TestCase):
         self.transcript(self.A)
         self.names()
         with patch.object(self.bridge, 'speech_enabled', return_value=True), patch.object(self.bridge.subprocess, 'Popen') as spawn:
-            self.assertEqual(self.bridge.main([json.dumps({'type': 'agent-turn-complete', 'thread-id': self.A})]), 0)
+            self.assertEqual(self.bridge.main([json.dumps({'type': 'agent-turn-complete', 'thread-id': self.A, 'last-assistant-message': 'Ready to read.'})]), 0)
             self.assertTrue(spawn.call_args.kwargs['start_new_session'])
             self.assertEqual(json.loads(spawn.return_value.stdin.write.call_args.args[0]), 'Renamed café; $(no)')
+
+
+class EventProbeTests(unittest.TestCase):
+    def test_real_event_cli_probe_exercises_audio_and_silent_paths(self):
+        result = subprocess.run([sys.executable, str(ROOT / 'scripts/smoke_codex_notification_events.py'), '--plain'], capture_output=True, text=True, timeout=20)
+        self.assertEqual(result.returncode, 0, result.stdout+result.stderr)
+        self.assertIn('PASS completion: 1 playback', result.stdout)
+        for kind in ('worker', 'empty', 'missing', 'unknown', 'ambiguous', 'parent', 'permission'):
+            self.assertIn(f'PASS {kind}: 0 playback', result.stdout)
 
 
 if __name__ == '__main__':

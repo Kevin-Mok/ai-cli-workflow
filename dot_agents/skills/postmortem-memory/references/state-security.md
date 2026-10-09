@@ -276,6 +276,17 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Limitations: Unknown source-edit scripts containing inert private-path literals can remain excluded; report incomplete coverage. Fixture inference does not establish provider availability.
 - Source: [Missing recent directory sessions](../../../../docs/postmortem/2026-10-08-recent-directory-review-missing-sessions.md).
 
+## local-notification-user-facing-completion
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **runtime**.
+- Symptoms: question audio without a user-facing answer; worker spawn copies completed parent responses; unknown identity falls back to MP3.
+- Applicability: local Codex speech-mode event bridges using event payloads and transcript metadata.
+- Diagnostic checks: inspect source/parent provenance and event-local last-assistant-message; reproduce worker, blank/missing, unknown and conflicting metadata cases; exercise installed CLI with an isolated silent player.
+- Remedy: require unambiguous top-level cli/vscode metadata without parent linkage and nonblank string final text. Keep helpers/internal threads and unknown origins silent; missing-title MP3 fallback applies only to verified user-facing answers. Historical/copied transcript finals cannot establish readiness.
+- Verification evidence: defining RED, 67 notification/speech tests GREEN, zero-error type check, private Dunst pass, refresh-config and target verification, installed eight-event probe with completion=one and false triggers=zero; real user/helper identity check.
+- Limitations: exact historical playback unlogged; silent installed probes do not prove hardware listening. Other provenance formats fail silently. Broader193 suite retains one unrelated concurrent fzf/picker failure.
+- Source: [2026-10-09-empty-attention-notification-audio.md](/home/example/linux-config/docs/postmortem/2026-10-09-empty-attention-notification-audio.md) (SHA-256 `6c3e5daec804`).
+
 ## local-recap-same-key-input-replacement
 
 - Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **code**.

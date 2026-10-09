@@ -4538,6 +4538,31 @@
       "verification_scope": "code"
     },
     {
+      "applicability": "Local Codex speech-mode notification bridges using event payloads and transcript metadata.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Inspect provenance and event-local last-assistant-message before launching audio.",
+        "Reproduce worker/copied-final, blank/missing answer, unknown identity and conflicting metadata cases.",
+        "Verify deployed handlers with isolated events and a silent fake player, separate from hardware listening."
+      ],
+      "id": "local-notification-user-facing-completion",
+      "limitations": "Exact historical offending playback was not logged. Installed probes use silent isolated playback; subjective hardware listening remains manual. Other provenance formats deliberately fail silently. Broader193 suite has one unrelated concurrent fzf/picker failure.",
+      "reference": "references/state-security.md#local-notification-user-facing-completion",
+      "remedy": "Require unambiguous top-level cli/vscode provenance without parent linkage and a nonblank string last-assistant-message; keep helpers, internal threads and unknown origins silent. Only verified user-facing answers may use missing-title MP3 fallback.",
+      "sources": [
+        "6c3e5daec804556c6d1ec941073c8e718c7a719aeb5280790ece76f65dc9a6a0"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "Question-clip audio while no user-facing answer exists",
+        "Ordinary spawned helpers inherit completed parent responses",
+        "Unknown completion identity falls back to MP3"
+      ],
+      "topic": "state-security",
+      "verification": "Defining RED followed by 67 passing notification/speech tests, zero-error type check, private Dunst pass, refresh-config success, deployed eight-case CLI probe (completion one playback; seven false triggers zero) and real user/helper identity resolution.",
+      "verification_scope": "runtime"
+    },
+    {
       "applicability": "Interactive fzf pickers that reload reordered rows and preserve a selected stable UUID, including fzf 0.44 callback contracts.",
       "confidence": "confirmed",
       "diagnostics": [
@@ -8072,6 +8097,16 @@
       ],
       "reviewed_on": "2026-10-09",
       "sha256": "55a2a381970aa0f7eeae2f374409b001cc35ff5aae9818246c1e2730155b1895"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-09-empty-attention-notification-audio.md"
+      ],
+      "findings": [
+        "local-notification-user-facing-completion"
+      ],
+      "reviewed_on": "2026-10-09",
+      "sha256": "6c3e5daec804556c6d1ec941073c8e718c7a719aeb5280790ece76f65dc9a6a0"
     },
     {
       "aliases": [
