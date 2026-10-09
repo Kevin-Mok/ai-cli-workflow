@@ -7770,6 +7770,15 @@
       "reviewed_on": "2026-10-09",
       "findings": [],
       "decision": "No new reusable learning: recurrence of local-sandbox-loopback-approved-route; approved scoped execution works while default sandbox remains unresolved."
+    },
+    {
+      "sha256": "abf553222efec1d4638c077ccb5a432522b30bbcaf2e9a75c82fc16f8a4da1bc",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-09-Voice Contributor-intro-lfs-inspection.md"
+      ],
+      "reviewed_on": "2026-10-09",
+      "findings": [],
+      "decision": "No new reusable learning: Git LFS positional operand mistaken for file filter; ordinary inventory and committed pointer verify the asset. Record compound-runner status limits."
     }
   ],
   "review": {
