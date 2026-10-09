@@ -1,6 +1,6 @@
 # Codex notification sound
 
-Play your own MP3 for Codex notifications, with optional offline speech of the exact saved conversation title afterward. Configure a clip, install the voice, deploy the completion callback, resume affected conversations, then explicitly enable speech. MP3 sound stays disabled until you configure a path; speech is separately disabled by default. The selected [can-i-ask-you-a-question.mp3](../scripts/can-i-ask-you-a-question.mp3) is stored in this repo; the setting remains machine-local.
+Play your own MP3 for Codex notifications, with optional offline speech of the exact saved conversation title or a short sentence about a queued question afterward. Configure a clip, install the voice, deploy the completion and question callbacks, resume affected conversations, then explicitly enable speech. MP3 sound stays disabled until you configure a path; speech is separately disabled by default. The selected [can-i-ask-you-a-question.mp3](../scripts/can-i-ask-you-a-question.mp3) is stored in this repo; the setting remains machine-local.
 
 ## Choose, preview and disable
 
@@ -84,7 +84,7 @@ Audio follows **completed turns only**, including focused and background complet
 
 The [event bridge](../scripts/executable_codex-notification-event) resolves completion `thread-id`. The transcript must resolve inside `${CODEX_HOME:-$HOME/.codex}`. A filename's rollout UUID need not equal its conversation ID. The latest matching `thread_name` in `session_index.jsonl` is captured before detached audio queues; visible terminals, answer text and other conversations are never title fallbacks. Ordinary spawned agents use their own saved title. Internal system/reviewer threads are silent. Missing, malformed or inconsistent identity/title means MP3 only.
 
-One per-user state-directory lock serializes each complete MP3 → synthesized title WAV sequence. Piper begins while the MP3 plays and receives the exact title through private temporary stdin with a 30-second limit; each mpv playback retains its 60-second limit. Temporary WAVs are deleted. Failed synthesis leaves the already-played MP3 as the notification, without retrying it or affecting Codex. Legacy permission-hook calls return immediately with no audio or approval decision. Scheduler order between simultaneous sequences is unspecified.
+One per-user state-directory lock serializes each complete MP3 → synthesized title or question WAV sequence. Piper begins while the MP3 plays and receives the exact title through private temporary stdin with a 30-second limit; each mpv playback retains its 60-second limit. Temporary WAVs are deleted. Failed synthesis leaves the already-played MP3 as the notification, without retrying it or affecting Codex. Legacy permission-hook calls return immediately with no audio or approval decision. Scheduler order between simultaneous sequences is unspecified.
 
 For immediate speech rollback, preserving the selected MP3:
 
@@ -95,6 +95,27 @@ For immediate speech rollback, preserving the selected MP3:
 Dunst's existing MP3-on-popup behavior resumes immediately. `disable` still removes only the MP3 setting; use `speech disable` separately when returning to popup audio. The machine-local speech switch is `speech.json` beside `sound.json`, atomically written with mode 0600. No setting, voice or virtual environment is tracked in Git.
 
 The contracts are described in [Codex hooks](https://learn.chatgpt.com/docs/hooks) and [Piper 1.8.0](https://pypi.org/project/piper-tts/1.8.0/). Transcript metadata is a defensive local integration and can change; unavailable metadata fails to MP3 only.
+
+## Queued-question speech
+
+When the TUI shows “Queued follow-up inputs · 1 question”, the question hook plays your selected “Can I ask you a question?” MP3 once, then Voice Contributor speaks one concise sentence about the actual question. For example, “The checks passed. Should I deploy now?” becomes “Codex asks: Should I deploy now?” The task title and answer choices are not read.
+
+The [question hooks](../dot_codex/hooks.json) use `PostToolUse` for `request_user_input_async` after its response confirms `accepted=true`, so rejected requests stay silent. Blocking `request_user_input` uses `PreToolUse`, before waiting for an answer, and validates required question fields first. Both require matching top-level cli/vscode transcript identity under CODEX_HOME. Helper/internal conversations, permission reviews, empty/malformed prompts and secret questions stay silent. The bridge accepts the native async `title` or blocking `question` fields, keeps at most three prompts plus a remaining-question count in one sentence capped at 280 characters, strips controls, and prefers the actual ask over preceding context. This is local text extraction and Piper synthesis, with no cloud summarization.
+
+After applying, start/resume affected Codex conversations so they load the question hooks. On a new installation or after changing the hook command, open `/hooks` and enable/trust only the two question entries running `python3 /home/example/scripts/codex-notification-event`. Codex stores their exact trusted hashes and enabled state in its config; completion `notify` does not need hook trust. Speech and sound must both be enabled/configured. Questions announce in focused and background conversations, through the same serialized clip-then-speech player. Hardware listening and a genuine queued question are the final acceptance checks.
+
+Run these silent direct probes from `~/linux-config`; no sudo or voice download is needed:
+
+```sh
+python3 -B scripts/smoke_codex_question_events.py --installed --case question --plain
+python3 -B scripts/smoke_codex_question_events.py --installed --case multi-question --plain
+python3 -B scripts/smoke_codex_question_events.py --installed --case question-blocking --plain
+python3 -B scripts/smoke_codex_question_events.py --installed --case question-worker --plain
+python3 -B scripts/smoke_codex_question_events.py --installed --case question-empty --plain
+python3 -B scripts/smoke_codex_question_events.py --installed --case question-secret --plain
+```
+
+The first three verify one clip then one exact question sentence with two silent fixture-player calls. Worker, empty and secret cases verify zero calls. They copy deployed handlers into disposable directories and do not change your settings or play real audio. Native hook timing is covered separately by an isolated local fake-provider app-server probe; [the implementation plan](../plans/codex-queued-question-audio.md) records the observed runtime evidence and remaining live-session loading requirement. The hook coverage contract is documented in [Codex tool hooks](https://learn.chatgpt.com/docs/hooks#tool-coverage).
 
 ## Installation and activation
 
@@ -128,6 +149,7 @@ The inspected contracts are documented in [Kitty's callback configuration](https
 
 ```sh
 python3 -B tests/test_codex_notification_sound.py
+python3 -B tests/test_codex_question_notification.py
 python3 -B tests/test_codex_notification_speech_setup.py
 basedpyright --level error scripts/executable_codex-notification-sound scripts/executable_codex-notification-event scripts/executable_setup-codex-notification-speech
 xvfb-run -a dbus-run-session -- python3 -B tests/scripts/codex_notification_daemon_check.py
@@ -146,4 +168,4 @@ With speech disabled, the first should show one synthetic popup and play once. W
 
 ## Rollback
 
-For immediate speech rollback, run `~/scripts/codex-notification-sound speech disable`. To disable all configured audio, run `~/scripts/codex-notification-sound disable`; popups continue normally. For complete removal, remove only the `codex_notification_sound` rule, restore `always_run_script=true` if there are no intervening script-rule changes, and remove the completion `notify` entry, then remove this task's Kitty callback, event bridge, sound helper, setup helper and activation helper from both the tracked and installed paths. Apply the remaining config, restart Dunst and start a fresh Kitty process. Do not reset unrelated dirty files. Your MP3 is never deleted.
+For immediate speech rollback, run `~/scripts/codex-notification-sound speech disable`. To disable all configured audio, run `~/scripts/codex-notification-sound disable`; popups continue normally. For complete removal, remove only the `codex_notification_sound` rule, restore `always_run_script=true` if there are no intervening script-rule changes, and remove the completion `notify` entry and the two question entries in `hooks.json`, then remove this task's Kitty callback, event bridge, sound helper, setup helper and activation helper from both the tracked and installed paths. Apply the remaining config, restart Dunst and start a fresh Kitty process. Do not reset unrelated dirty files. Your MP3 is never deleted.

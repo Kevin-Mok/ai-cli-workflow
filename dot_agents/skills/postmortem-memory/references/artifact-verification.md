@@ -418,3 +418,14 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Verification: missing-sidecar regression observed RED, then 4 VM tests and all 67 backup tests passed.
 - Limitations: guest boot and Secure Boot remain unverified.
 - Source: [VM sidecar staging gap](../../../../docs/postmortem/2026-10-08-backup-vm-sidecar-staging.md).
+
+## local-audio-fixture-marker-ordering
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **code**.
+- Symptoms: A child logs synthesis end before clip end despite waiting for the clip-ended marker; notification ordering assertions intermittently fail.
+- Applicability: Concurrent subprocess fixtures publishing a completion marker before its observable log event.
+- Diagnostic checks: Inspect marker/log order; inject a bounded scheduling gap after marker publication and reproduce the exact assertion.
+- Remedy: Log completion before publishing the marker; preserve the behavior assertions.
+- Verification evidence: A 50ms injected gap failed the existing assertion before correction and passed afterward; all 67 focused notification/speech tests passed.
+- Limitations: Fixture code evidence does not prove hardware timing or live Codex activation. The separately reviewed default-sandbox workaround remains necessary.
+- Source: [queued-question task verification incident](/home/example/linux-config/docs/postmortem/2026-10-09-queued-question-sandbox-startup.md).

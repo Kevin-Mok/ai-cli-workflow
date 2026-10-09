@@ -4446,6 +4446,28 @@
       ],
       "verification": "Five reviewed files became twelve in commit 5451db5. It was local at the initial remote check, but another session subsequently published it and follow-up f8f044e; fresh HEAD, origin/main and ls-remote agree on f8f044e. Recovery not attempted. User chose to keep published history intact and close delivery with a documentation follow-up.",
       "verification_scope": "none"
+    },
+    {
+      "applicability": "Concurrent subprocess test fixtures that publish a completion marker before recording the corresponding observable event.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Compare marker publication and event-log order in the fixture.",
+        "Inject a bounded scheduling gap after marker publication to reproduce the exact assertion failure."
+      ],
+      "id": "local-audio-fixture-marker-ordering",
+      "limitations": "This corrects test-fixture ordering, not hardware audio timing or Codex activation. Default command sandbox remains unresolved and uses the separately reviewed workaround.",
+      "reference": "references/artifact-verification.md#local-audio-fixture-marker-ordering",
+      "remedy": "Record the completion event before publishing its marker so dependent subprocesses cannot overtake the log; retain all behavior assertions.",
+      "sources": [
+        "bf50298cb56cf8897edbc07bf097c633dac0dc8a6d7a76859adc0cf8cbf26518"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "synthesis end is logged before clip end despite the child waiting for clip-ended",
+        "notification speech ordering assertion fails intermittently"
+      ],
+      "verification": "The existing assertion failed under a deliberate 50ms scheduling gap before the correction and passed with the same gap afterward; all 67 focused notification/speech tests passed.",
+      "verification_scope": "code"
     }
   ],
   "reports": [
@@ -7788,6 +7810,16 @@
       "reviewed_on": "2026-10-09",
       "findings": [],
       "decision": "No separate cross-task finding: repo-specific shortcut remedy is recorded directly in fish-alias SKILL.md and tasks/lessons.md; runtime fish resolution and six regression tests verify the repair. no-config fixture requires explicit function path."
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-09-queued-question-sandbox-startup.md"
+      ],
+      "findings": [
+        "local-audio-fixture-marker-ordering"
+      ],
+      "reviewed_on": "2026-10-09",
+      "sha256": "bf50298cb56cf8897edbc07bf097c633dac0dc8a6d7a76859adc0cf8cbf26518"
     }
   ],
   "review": {

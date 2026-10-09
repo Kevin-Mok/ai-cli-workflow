@@ -1,4 +1,29 @@
 {
-  "description": "Title speech uses completion notify only. Permission requests remain silent.",
-  "hooks": {}
+  "description": "Question requests play the selected clip then a concise prompt sentence. Completion titles use notify; permission requests remain silent.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "^request_user_input$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 /home/example/scripts/codex-notification-event",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "^request_user_input_async$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 /home/example/scripts/codex-notification-event",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
 }

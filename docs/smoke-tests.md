@@ -805,6 +805,12 @@ silently stacked duplicate; normal already-sounded history stays silent.
   Expected: Each completed turn plays exactly one MP3 then its exact current saved title, never the visible or parent conversation's title. Permission requests/reviews during work stay silent. Focused completion sounds without forcing a popup. Internal reviewers stay silent. Unknown/mismatched identity or missing title plays MP3 only.
 - Action: Trigger simultaneous completions and preview a Unicode title with quoted shell-sensitive text. Temporarily make the Piper environment unavailable and repeat, then restore it.
   Expected: Complete audio sequences never overlap; text is spoken literally. Unavailable synthesis retains one MP3, logs the failure and does not delay Codex or change permission decisions.
+- Action: After deployment, start/resume Codex and inspect `/hooks` for enabled/trusted blocking and async question entries running `python3 /home/example/scripts/codex-notification-event`; let a real task queue a nonblocking follow-up question.
+  Expected: The TUI shows a queued question, the selected question MP3 plays once, then Voice Contributor speaks one concise sentence about the question itself. Choices and the task title are omitted. Work continues and answering through Shift+Left still works.
+- Action: Queue two questions together, then exercise a blocking question in Plan mode.
+  Expected: Each request plays one MP3 then one sentence; multiple prompts share that sentence, and a blocking question announces before you answer. Rejected async requests, helpers and permission reviews do not announce.
+- Action: From `~/linux-config`, run `python3 -B scripts/smoke_codex_question_events.py --installed --case question --plain`; repeat with `multi-question`, `question-blocking`, `question-worker`, `question-empty` and `question-secret`.
+  Expected: Valid cases report two silent fixture-player calls (clip then exact spoken sentence); worker, empty and secret cases report zero. No real audio, settings changes, sudo or voice downloads.
 - Action: Run `~/scripts/codex-notification-sound speech disable`, then repeat a displayed completion/approval and a focused completion.
   Expected: Displayed popups regain their original single MP3. Focus suppression again suppresses audio, and the selected MP3 remains configured.
 

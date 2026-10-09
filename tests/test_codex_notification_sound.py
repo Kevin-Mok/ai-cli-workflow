@@ -402,8 +402,8 @@ class SpeechTests(PlaybackTests):
                     status=pathlib.Path('/proc')/pid/'stat'
                     if not status.exists() or status.read_text().split()[2]=='Z':
                         event('synthesis stopped during clip')
-                (root/'clip-ended').touch()
                 event('clip end')
+                (root/'clip-ended').touch()
                 if os.environ['CLIP_FAILURE']=='1': sys.exit(2)
             else:
                 event('title '+path.read_text().rstrip('\\n'))

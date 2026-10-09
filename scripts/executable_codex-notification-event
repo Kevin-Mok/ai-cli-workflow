@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Resolve exact Codex event identity, snapshot its saved title, detach audio."""
+"""Resolve Codex identity and detach completion-title or queued-question audio."""
 import json
 import os
 from pathlib import Path
@@ -127,6 +127,74 @@ def resolve_event(event: object) -> tuple[bool, str | None]:
     return True, latest_title(identity) if identity and meta else None
 
 
+def question_summary(tool_name: object, tool_input: object) -> str | None:
+    """Extract one bounded sentence from question prompts; never read choices."""
+    if tool_name not in ('request_user_input', 'request_user_input_async'):
+        return None
+    if isinstance(tool_input, str):
+        try:
+            tool_input = json.loads(tool_input)
+        except ValueError:
+            return None
+    if not isinstance(tool_input, dict):
+        return None
+    questions = tool_input.get('questions')
+    if not isinstance(questions, list) or not questions:
+        return None
+    if tool_name == 'request_user_input':
+        # The blocking hook precedes native validation. Reject the whole call
+        # if any required question/option field cannot form a valid request.
+        for question in questions:
+            if not isinstance(question, dict) or any(
+                    not isinstance(question.get(key), str) or not question[key].strip()
+                    for key in ('id', 'header', 'question')):
+                return None
+            options = question.get('options')
+            if options is not None and (not isinstance(options, list) or any(
+                    not isinstance(option, dict) or any(not isinstance(option.get(key), str)
+                    for key in ('label', 'description')) for option in options)):
+                return None
+    prompts: list[str] = []
+    field = 'title' if tool_name == 'request_user_input_async' else 'question'
+    for question in questions:
+        if not isinstance(question, dict) or question.get('isSecret') is True:
+            continue
+        text = question.get(field)
+        if not isinstance(text, str):
+            continue
+        text = ' '.join(re.sub(r'[\x00-\x1f\x7f-\x9f]', ' ', text).split())
+        if not text:
+            continue
+        sentences = re.split(r'(?<=[.!?])\s+', text)
+        # Context often precedes the actual ask. Prefer its last question.
+        ask = next((part for part in reversed(sentences) if part.endswith('?')), text)
+        ask = re.sub(r'[.!?](?=\s|$)', ';', ask).strip(' .!?;')
+        if ask:
+            prompts.append(ask)
+    if not prompts:
+        return None
+    remaining = max(0, len(prompts) - 3)
+    tail = f'; and {remaining} more question' + ('s' if remaining != 1 else '') if remaining else ''
+    prompts = prompts[:3]
+    budget = (280 - len('Codex asks: ') - len(tail) - 1 - 2 * (len(prompts) - 1)) // len(prompts)
+    shortened = [prompt if len(prompt) <= budget else prompt[:budget - 1].rsplit(' ', 1)[0] + '…' for prompt in prompts]
+    return 'Codex asks: ' + '; '.join(shortened) + tail + '?'
+
+
+def resolve_question(event: dict[str, object]) -> tuple[bool, str | None]:
+    summary = question_summary(event.get('tool_name'), event.get('tool_input'))
+    path = event.get('transcript_path')
+    meta = metadata(Path(path)) if isinstance(path, str) and Path(path).is_absolute() else None
+    identity = valid_id(meta.get('id')) if meta else None
+    if (summary is None or meta is None or meta.get('source') not in ('cli', 'vscode')
+            or internal(meta) or any(meta.get(key) for key in ('parent_thread_id', 'parent_session_id'))
+            or identity is None
+            or valid_id(event.get('session_id')) != identity
+            or ('agent_id' in event and valid_id(event['agent_id']) != identity)):
+        return False, None
+    return True, summary
+
+
 def main(argv: list[str] | None = None) -> int:
     try:
         if not speech_enabled():
@@ -135,9 +203,23 @@ def main(argv: list[str] | None = None) -> int:
         event = json.loads(args[0]) if args else json.load(sys.stdin)
         # Loaded PermissionRequest hooks may survive config changes in active
         # sessions. Keep these calls silent even after the hook is removed.
-        if not isinstance(event, dict) or event.get('type') != 'agent-turn-complete':
+        if not isinstance(event, dict):
             return 0
-        eligible, title = resolve_event(event)
+        hook = event.get('hook_event_name')
+        tool_name = event.get('tool_name')
+        if hook == 'PreToolUse' and tool_name == 'request_user_input':
+            eligible, title = resolve_question(event)
+        elif hook == 'PostToolUse' and tool_name == 'request_user_input_async':
+            response = event.get('tool_response')
+            if isinstance(response, str):
+                response = json.loads(response)
+            if not isinstance(response, dict) or response.get('accepted') is not True:
+                return 0
+            eligible, title = resolve_question(event)
+        elif event.get('type') == 'agent-turn-complete':
+            eligible, title = resolve_event(event)
+        else:
+            return 0
         if eligible:
             helper = Path(__file__).with_name('codex-notification-sound')
             if not helper.exists():
