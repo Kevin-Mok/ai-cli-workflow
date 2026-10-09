@@ -20,8 +20,8 @@ Feedback repair restores the HEAD byte prefix and appends all seven new entries;
 - [x] Commit notification eligibility and companion plans/docs/tests.
 - [x] Commit final command-formatting guidance and pending acceptance evidence.
 - [x] Commit graphical recovery learning and manual checks.
-- [ ] Commit Vesktop settings excluding generated sync-version metadata.
-- [ ] Verify the complete series and push once to origin/main.
+- [x] Commit Vesktop settings excluding generated sync-version metadata.
+- [x] Verify local delivery checks and prepare one upstream push; report its observed result in the final handoff.
 
 ## Verification and limits
 
@@ -35,7 +35,7 @@ Concurrent work may appear: compare status and snapshots before staging, and lea
 
 ## Progress and review notes
 
-README gate returned pass_no_change. Independent notification review found no safety issues: 60 focused tests passed in 16.785s; type check reported zero errors/warnings. Root will independently verify actual silent-event CLI and private Dunst behavior. Initial inspection failures and no-new-learning decision are in docs/postmortem/2026-10-09-commit-series-inspection.md.
+README gate returned pass_no_change. Independent notification review found no safety issues: 60 focused tests passed in 16.785s; type check reported zero errors/warnings. Root independently verified actual checkout/installed silent-event CLI and private Dunst behavior. Initial inspection failures and no-new-learning decision are in docs/postmortem/2026-10-09-commit-series-inspection.md.
 
 ## Commit milestones
 
@@ -66,3 +66,9 @@ Final runnable-command/reading-code policy, compiled prompt, historical/current 
 ### Milestone 6: docs(recovery): capture graphical VPS verification lessons
 
 Graphical recovery reference sections, signed metadata/current-boot findings and corresponding smoke checks are included. Guest GNOME/runtime acceptance remains external/manual. Remaining: Vesktop settings and remote delivery. Next: reviewed desktop settings.
+
+Final pre-commit refresh: fish -c refresh-config completed with REFRESH COMPLETE, exit0. Source status contains only the remaining reviewed Vesktop file; no new configuration drift. Remote delivery is intentionally reported after the final local commit, so milestone notes below retain their commit-time state.
+
+### Milestone 7: chore(vesktop): refresh plugin and window settings
+
+Vesktop disabled-plugin/window/cloud defaults are included; generated settingsSyncVersion is excluded and preserved locally. All seven reviewed groups are committed in order after this milestone. Verification: fresh focused suites, type, daemon, silent CLI probes, README, JSON and report hashes pass; diff checks pass. Remaining: push origin/main and report its observed result; exact clipboard/hardware/external guest acceptance stay manual. Next: one upstream push.
