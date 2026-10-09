@@ -523,8 +523,11 @@ checks use invented temporary data; real notes are never repository fixtures.
 
 ## Keyboard And Input
 
-- Action: After `refresh-config` and an i3 reload, hold Alt+Super and press the number-row keys `1` through `9`, then `0`; press Alt+Super+grave to reset.
-  Expected: Redshift selects 1000K, 2000K, …, 9000K, 10000K in even steps from warm to cool; grave restores the default color temperature.
+- Action: Run `python3 scripts/smoke_redshift_keys.py`, then `python3 scripts/smoke_redshift_keys.py ~/.config/i3/config` and `python3 scripts/smoke_redshift_keys.py --live` after refreshing and reloading i3.
+  Expected: Each prints PASS for 1–9 = 1200–6000 K and 0/grave reset. No sudo is needed; the live check requires a running i3 session.
+
+- Action: After `refresh-config` and an i3 reload, hold Alt+Super and press the number-row keys `1` through `9`; press Alt+Super+0 or Alt+Super+grave to reset.
+  Expected: Redshift selects 1200K, 1800K, 2400K, 3000K, 3600K, 4200K, 4800K, 5400K, and 6000K; 0 and grave restore the default color temperature.
 - Action: Start a fresh X session on a desktop host that applies this repo's shell and `Xmodmap` config, open a terminal, type a short word, and press Backspace once.
   Expected: Exactly one character is deleted and opening a new bash shell does not rewrite the active keyboard remap.
 - Action: Open Neovim with the tracked config, enter the command-line window with `q:`, wait long enough for `CursorHold`, then exit back to the file.

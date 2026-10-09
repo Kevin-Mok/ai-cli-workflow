@@ -7707,6 +7707,15 @@
       ],
       "reviewed_on": "2026-10-08",
       "sha256": "80a19a4bbc8805f0f7be65008bfa3976212559566772978389eaad090b78fbe1"
+    },
+    {
+      "sha256": "7b711ab14dce29426254f0187ae1cc399fae493954d70dcc49ffca95f8ee9b25",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-09-redshift-inspection-runner.md"
+      ],
+      "reviewed_on": "2026-10-09",
+      "findings": [],
+      "decision": "No new learning: existing local-sandbox-loopback-approved-route and inspect-before-use guidance cover pre-shell failure and locating the refresh fish function; approved reads exited 0."
     }
   ],
   "review": {

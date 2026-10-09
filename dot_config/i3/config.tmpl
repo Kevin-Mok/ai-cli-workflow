@@ -139,17 +139,17 @@ bindsym Control+$mod+p --release exec "scrot -u ~/tmp/screenshot-$(date +%F_%T).
 
 #  redshift [[[ # 
 
-# Alt+Super+1 through 0: 1000K through 10000K, in 1000K steps.
-bindsym $mod+Mod4+1 exec redshift -x && redshift -O 1000
-bindsym $mod+Mod4+2 exec redshift -x && redshift -O 2000
-bindsym $mod+Mod4+3 exec redshift -x && redshift -O 3000
-bindsym $mod+Mod4+4 exec redshift -x && redshift -O 4000
-bindsym $mod+Mod4+5 exec redshift -x && redshift -O 5000
-bindsym $mod+Mod4+6 exec redshift -x && redshift -O 6000
-bindsym $mod+Mod4+7 exec redshift -x && redshift -O 7000
-bindsym $mod+Mod4+8 exec redshift -x && redshift -O 8000
-bindsym $mod+Mod4+9 exec redshift -x && redshift -O 9000
-bindsym $mod+Mod4+0 exec redshift -x && redshift -O 10000
+# Alt+Super+1–9: 1200K through 6000K in 600K steps; 0 resets the filter.
+bindsym $mod+Mod4+1 exec redshift -x && redshift -O 1200
+bindsym $mod+Mod4+2 exec redshift -x && redshift -O 1800
+bindsym $mod+Mod4+3 exec redshift -x && redshift -O 2400
+bindsym $mod+Mod4+4 exec redshift -x && redshift -O 3000
+bindsym $mod+Mod4+5 exec redshift -x && redshift -O 3600
+bindsym $mod+Mod4+6 exec redshift -x && redshift -O 4200
+bindsym $mod+Mod4+7 exec redshift -x && redshift -O 4800
+bindsym $mod+Mod4+8 exec redshift -x && redshift -O 5400
+bindsym $mod+Mod4+9 exec redshift -x && redshift -O 6000
+bindsym $mod+Mod4+0 exec redshift -x
 bindsym $mod+Mod4+grave exec redshift -x
 
 #  ]]] redshift # 
