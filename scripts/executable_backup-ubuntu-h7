@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+
+# Human-facing decoration; keep protocol/data output unchanged.
+cli_emoji() {
+  [ "${CLI_PLAIN:-0}" = 1 ] || printf '%s ' "$1"
+}
 set -euo pipefail
 
 ROOT_TAR_DIR="/mnt/linux-files-3/ubuntu-h7/tar"
@@ -34,6 +39,7 @@ HOME_RSYNC_EXCLUDES=(
 )
 
 usage() {
+	printf '%s' "$(cli_emoji '📖')"
 	cat <<'EOF'
 Usage: executable_backup-ubuntu-h7 <subcommand>
 
@@ -46,7 +52,7 @@ EOF
 }
 
 die() {
-	echo "Error: $*" >&2
+	echo "$(cli_emoji '❌')Error: $*" >&2
 	exit 1
 }
 
@@ -78,7 +84,7 @@ backup_tar_root() {
 		tar_exclude_args+=( "--exclude=$pattern" )
 	done
 
-	echo "Creating root tarball: $backup_file"
+	echo "$(cli_emoji 'ℹ️')Creating root tarball: $backup_file"
 	sudo tar -cpzvf "$backup_file" \
 		--numeric-owner \
 		--acls \
@@ -88,7 +94,7 @@ backup_tar_root() {
 		--exclude=/home \
 		/
 
-	echo "Root tarball created: $backup_file"
+	echo "$(cli_emoji 'ℹ️')Root tarball created: $backup_file"
 }
 
 backup_home() {
@@ -100,12 +106,13 @@ backup_home() {
 		rsync_exclude_args+=( "--exclude=$pattern" )
 	done
 
-	echo "Syncing /home to $HOME_BACKUP_DIR"
+	echo "$(cli_emoji 'ℹ️')Syncing /home to $HOME_BACKUP_DIR"
 	sudo rsync -PraAX "${rsync_exclude_args[@]}" /home "$HOME_BACKUP_DIR/"
-	echo "Home sync complete: $HOME_BACKUP_DIR"
+	echo "$(cli_emoji '✅')Home sync complete: $HOME_BACKUP_DIR"
 }
 
 restore_help() {
+	printf '%s' "$(cli_emoji '📖')"
 	cat <<'EOF'
 Root restore (live USB, clean root restore):
 1) Verify devices:

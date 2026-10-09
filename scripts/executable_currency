@@ -3,6 +3,14 @@
 import sys
 import requests
 
+
+def _cli_message(text, icon):
+    """Decorate human output; CLI_PLAIN=1 keeps legacy scripts undecorated."""
+    import os
+    import sys
+    plain = os.environ.get('CLI_PLAIN') == '1' or '--plain' in sys.argv
+    return ('' if plain else icon + ' ') + text
+
 REQUEST_TIMEOUT_SECONDS = 5
 EXCHANGE_RATE_API_URL = "https://open.er-api.com/v6/latest/{from_currency}"
 
@@ -12,29 +20,29 @@ def convert_currency(amount, from_currency, to_currency):
     try:
         response = requests.get(url, timeout=REQUEST_TIMEOUT_SECONDS)
     except requests.Timeout:
-        print(f"Error: Request timed out after {REQUEST_TIMEOUT_SECONDS}s.", file=sys.stderr)
+        print(_cli_message(f"Error: Request timed out after {REQUEST_TIMEOUT_SECONDS}s.", '❌'), file=sys.stderr)
         return 1
     except requests.RequestException:
-        print("Error: Unable to fetch exchange rates. Check your network and try again.", file=sys.stderr)
+        print(_cli_message("Error: Unable to fetch exchange rates. Check your network and try again.", '❌'), file=sys.stderr)
         return 1
 
     if response.status_code == 200:
         data = response.json()
         if data.get("result") != "success" or to_currency not in data.get("rates", {}):
-            print("Error: Unable to fetch exchange rates.", file=sys.stderr)
+            print(_cli_message("Error: Unable to fetch exchange rates.", '❌'), file=sys.stderr)
             return 1
 
         converted_amount = amount * data["rates"][to_currency]
-        print(f"{amount} {from_currency} = {converted_amount} {to_currency}")
+        print(_cli_message(f"{amount} {from_currency} = {converted_amount} {to_currency}", '💱'))
         return 0
     else:
-        print("Error: Unable to fetch exchange rates.", file=sys.stderr)
+        print(_cli_message("Error: Unable to fetch exchange rates.", '❌'), file=sys.stderr)
         return 1
 
 def main():
     if len(sys.argv) != 4:
-        print("Usage: currency_converter.py <amount> <from_currency> <to_currency>")
-        print("Example: currency_converter.py 100 CAD USD")
+        print(_cli_message("Usage: currency_converter.py <amount> <from_currency> <to_currency>", '💱'))
+        print(_cli_message("Example: currency_converter.py 100 CAD USD", '💱'))
         return 1
 
     amount = float(sys.argv[3])

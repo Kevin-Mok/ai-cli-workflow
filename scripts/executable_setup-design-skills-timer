@@ -13,6 +13,14 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Iterator, Sequence
 
+
+def _cli_message(text, icon):
+    """Decorate human output; CLI_PLAIN=1 keeps legacy scripts undecorated."""
+    import os
+    import sys
+    plain = os.environ.get('CLI_PLAIN') == '1' or '--plain' in sys.argv
+    return ('' if plain else icon + ' ') + text
+
 HELPER_NAME = "sync-design-skills"
 SERVICE_NAME = "design-skills-sync.service"
 TIMER_NAME = "design-skills-sync.timer"
@@ -30,7 +38,7 @@ class TimerSetupError(RuntimeError):
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="setup-design-skills-timer",
-        description="Manage the design-skills systemd user timer.",
+        description=_cli_message("Manage the design-skills systemd user timer.", '🧰'),
     )
     action = parser.add_mutually_exclusive_group(required=True)
     action.add_argument("--check", action="store_true", help="Validate the timer units.")
@@ -236,7 +244,7 @@ def _verify_installed_units(targets: tuple[Path, Path, Path]) -> None:
 def _check() -> None:
     _source, targets, _sources = _validate_sources()
     _verify_installed_units(targets)
-    print("Design skills timer units are valid.")
+    print(_cli_message("Design skills timer units are valid.", '⏱️'))
 
 
 def _best_effort_disable() -> None:
@@ -266,7 +274,7 @@ def _enable() -> None:
     except TimerSetupError:
         _best_effort_disable()
         raise
-    print("Design skills timer enabled.")
+    print(_cli_message("Design skills timer enabled.", '⏱️'))
 
 
 def _disable() -> None:
@@ -282,7 +290,7 @@ def _disable() -> None:
     output = f"{completed.stdout}\n{completed.stderr}".casefold()
     if completed.returncode != 0 and "is not loaded" not in output:
         raise TimerSetupError("timer disable failed")
-    print("Design skills timer disabled.")
+    print(_cli_message("Design skills timer disabled.", '⏱️'))
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -297,7 +305,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 else:
                     _disable()
     except TimerSetupError as error:
-        print(f"setup-design-skills-timer: {error}", file=sys.stderr)
+        print(_cli_message(f"setup-design-skills-timer: {error}", '❌'), file=sys.stderr)
         return 2
     return 0
 

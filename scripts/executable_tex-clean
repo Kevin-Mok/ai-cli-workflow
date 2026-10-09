@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# Human-facing decoration; keep protocol/data output unchanged.
+cli_emoji() {
+  [ "${CLI_PLAIN:-0}" = 1 ] || printf '%s ' "$1"
+}
+
 # Delete TeX build files when exiting from Vim or call on directory/directly to
 # remove from there.
 
@@ -36,7 +41,7 @@ else
 			if [[ -d "$1" ]]; then
 				remove_build_files "$1" "${regex[0]}"
 			else
-				printf "Give .tex file or directory as argument.\\n"
+				printf "%sGive .tex file or directory as argument.\\n" "$(cli_emoji 'ℹ️')"
 			fi ;;
 	esac
 fi

@@ -6,6 +6,14 @@ from pathlib import Path
 import subprocess
 import tempfile
 
+
+def _cli_message(text, icon):
+    """Decorate human output; CLI_PLAIN=1 keeps legacy scripts undecorated."""
+    import os
+    import sys
+    plain = os.environ.get('CLI_PLAIN') == '1' or '--plain' in sys.argv
+    return ('' if plain else icon + ' ') + text
+
 REPO = Path(__file__).resolve().parents[1]
 SKILL = REPO / 'dot_agents/skills/postmortem-memory'
 HELPER = SKILL / 'scripts/postmortem_memory.py'
@@ -59,7 +67,7 @@ def main():
         updated = run('search', 'synthetic retry', '--knowledge', str(knowledge))
         assert updated['matches'][0]['status'] == 'activation_pending'
         assert updated['matches'][0]['verification_scope'] == 'code'
-    print('PASS: cross-repo tracked lookup; stale hash rejected; reviewed learning updated; activation remains pending; fixture removed.')
+    print(_cli_message('PASS: cross-repo tracked lookup; stale hash rejected; reviewed learning updated; activation remains pending; fixture removed.', '✅'))
 
 
 if __name__ == '__main__':

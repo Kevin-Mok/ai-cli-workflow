@@ -6,7 +6,15 @@ from pathlib import Path
 import re
 import subprocess
 
-parser = argparse.ArgumentParser(description=__doc__)
+
+def _cli_message(text, icon):
+    """Decorate human output; CLI_PLAIN=1 keeps legacy scripts undecorated."""
+    import os
+    import sys
+    plain = os.environ.get('CLI_PLAIN') == '1' or '--plain' in sys.argv
+    return ('' if plain else icon + ' ') + text
+
+parser = argparse.ArgumentParser(description=_cli_message(__doc__, '🧰'))
 parser.add_argument('config', nargs='?', default='dot_config/i3/config.tmpl')
 parser.add_argument('--live', action='store_true', help='Check running i3 via IPC')
 args = parser.parse_args()
@@ -21,8 +29,8 @@ else:
 expected = [(str(n), str(1200 + (n - 1) * 600)) for n in range(1, 10)]
 actual = re.findall(r'^bindsym \$mod\+Mod4\+([0-9]) exec redshift -x && redshift -O (\d+)$', text, re.M)
 if actual != expected:
-    raise SystemExit(f'FAIL: {label}: expected {expected}; found {actual}')
+    raise SystemExit(_cli_message(f'FAIL: {label}: expected {expected}; found {actual}', '❌'))
 for key in ('0', 'grave'):
     if not re.search(rf'^bindsym \$mod\+Mod4\+{key} exec redshift -x$', text, re.M):
-        raise SystemExit(f'FAIL: {label}: {key} must reset the filter')
-print(f'PASS: {label}: 1–9 = 1200–6000 K; 0/grave reset')
+        raise SystemExit(_cli_message(f'FAIL: {label}: {key} must reset the filter', '❌'))
+print(_cli_message(f'PASS: {label}: 1–9 = 1200–6000 K; 0/grave reset', '✅'))

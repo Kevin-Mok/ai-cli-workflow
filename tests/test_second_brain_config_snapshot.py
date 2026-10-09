@@ -441,7 +441,7 @@ class ConfigSnapshotTest(unittest.TestCase):
         self.assertNotIn(secret, completed.stderr)
         self.assertEqual("", completed.stdout)
         self.assertEqual(
-            "snapshot-codex-config: snapshot validation failed\n",
+            "❌ snapshot-codex-config: snapshot validation failed\n",
             completed.stderr,
         )
 

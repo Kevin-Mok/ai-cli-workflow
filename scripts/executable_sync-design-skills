@@ -1,7 +1,13 @@
 #!/usr/bin/env bash
+
+# Human-facing decoration; keep protocol/data output unchanged.
+cli_emoji() {
+  [ "${CLI_PLAIN:-0}" = 1 ] || printf '%s ' "$1"
+}
 set -euo pipefail
 
 usage() {
+  printf '%s' "$(cli_emoji '📖')"
   cat <<'USAGE'
 Usage: sync-design-skills [--dry-run|--bootstrap]
 
@@ -17,18 +23,18 @@ case "${1:-}" in
   --bootstrap) mode=bootstrap ;;
   --help|-h) usage; exit 0 ;;
   "") ;;
-  *) echo "sync-design-skills: unknown option: $1" >&2; usage >&2; exit 2 ;;
+  *) echo "$(cli_emoji '❌')sync-design-skills: unknown option: $1" >&2; usage >&2; exit 2 ;;
 esac
 
 source_dir="${LINUX_CONFIG_SOURCE:-$HOME/linux-config}"
 if [[ ! -d "$source_dir" ]]; then
-  echo "sync-design-skills: source directory not found: $source_dir" >&2
+  echo "$(cli_emoji '❌')sync-design-skills: source directory not found: $source_dir" >&2
   exit 1
 fi
 
 if [[ "$mode" == bootstrap ]]; then
   npx --yes ui-ux-pro-max-cli init --ai codex --global
-  echo "Design skills bootstrap complete."
+  echo "$(cli_emoji '✅')Design skills bootstrap complete."
   exit 0
 fi
 
@@ -46,7 +52,7 @@ fi
 chezmoi "${apply_args[@]}" "${targets[@]}"
 
 if [[ "$mode" == dry-run ]]; then
-  echo "Design skill refresh preview complete."
+  echo "$(cli_emoji '✅')Design skill refresh preview complete."
   exit 0
 fi
 
@@ -55,4 +61,4 @@ if [[ -d "$HOME/.agents/skills/ui-ux-pro-max" ]]; then
 else
   npx --yes ui-ux-pro-max-cli init --ai codex --global
 fi
-echo "Design skills refreshed. Restart Codex sessions to load updates."
+echo "$(cli_emoji 'ℹ️')Design skills refreshed. Restart Codex sessions to load updates."

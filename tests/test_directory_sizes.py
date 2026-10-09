@@ -58,6 +58,7 @@ if mode=='nonzero': sys.exit(3)
         self.assertNotIn('--dereference-links',call['args'])
         self.assertNotIn('--apparent-size',call['args'])
         self.assertIn('4.00 KiB',p.stdout)
+        self.assertIn('✅ Scan finished without reported errors', p.stderr)
 
     def test_readable_paths_escape_newlines(self):
         p=self.run_script(str(self.target))

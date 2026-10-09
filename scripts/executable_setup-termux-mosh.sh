@@ -1,12 +1,18 @@
 #!/usr/bin/env bash
 
+# Human-facing decoration; keep protocol/data output unchanged.
+cli_emoji() {
+  [ "${CLI_PLAIN:-0}" = 1 ] || printf '%s ' "$1"
+}
+
 set -euo pipefail
 
 print_fail() {
-  printf 'FAIL: %s\n' "$1" >&2
+  printf '%sFAIL: %s\n' "$(cli_emoji '❌')" "$1" >&2
 }
 
 usage() {
+  printf '%s' "$(cli_emoji '📖')"
   cat <<'EOF'
 Usage:
   ./scripts/executable_setup-termux-mosh.sh --host HOST --user USER --ssh-port PORT [options]
@@ -160,7 +166,7 @@ require_command awk
 require_command install
 require_command mktemp
 
-printf 'Installing Termux packages: mosh, openssh, rsync\n'
+printf '%sInstalling Termux packages: mosh, openssh, rsync\n' "$(cli_emoji 'ℹ️')"
 pkg install -y mosh openssh rsync
 
 ssh_dir="${HOME}/.ssh"
@@ -178,6 +184,7 @@ write_helper "${bin_dir}/pc-push" <<EOF
 #!/usr/bin/env bash
 set -euo pipefail
 if [ "\$#" -ne 2 ]; then
+  if [ "\${CLI_PLAIN:-0}" != 1 ]; then printf '📖 ' >&2; fi
   printf 'Usage: pc-push LOCAL_PATH REMOTE_PATH\\n' >&2
   exit 1
 fi
@@ -188,6 +195,7 @@ write_helper "${bin_dir}/pc-pull" <<EOF
 #!/usr/bin/env bash
 set -euo pipefail
 if [ "\$#" -ne 2 ]; then
+  if [ "\${CLI_PLAIN:-0}" != 1 ]; then printf '📖 ' >&2; fi
   printf 'Usage: pc-pull REMOTE_PATH LOCAL_PATH\\n' >&2
   exit 1
 fi
@@ -198,6 +206,7 @@ write_helper "${bin_dir}/pc-sync-to-pc" <<EOF
 #!/usr/bin/env bash
 set -euo pipefail
 if [ "\$#" -ne 2 ]; then
+  if [ "\${CLI_PLAIN:-0}" != 1 ]; then printf '📖 ' >&2; fi
   printf 'Usage: pc-sync-to-pc LOCAL_DIR REMOTE_DIR\\n' >&2
   exit 1
 fi
@@ -208,21 +217,22 @@ write_helper "${bin_dir}/pc-sync-from-pc" <<EOF
 #!/usr/bin/env bash
 set -euo pipefail
 if [ "\$#" -ne 2 ]; then
+  if [ "\${CLI_PLAIN:-0}" != 1 ]; then printf '📖 ' >&2; fi
   printf 'Usage: pc-sync-from-pc REMOTE_DIR LOCAL_DIR\\n' >&2
   exit 1
 fi
 exec rsync -a --info=progress2 --human-readable --protect-args -e ssh -- ${ssh_alias@Q}:"\${1%/}/" "\${2%/}/"
 EOF
 
-printf '\nConfigured SSH host: %s\n' "$ssh_alias"
-printf 'Installed helpers in: %s\n' "$bin_dir"
-printf '\nRun these checks from Termux:\n'
+printf '\n%sConfigured SSH host: %s\n' "$(cli_emoji 'ℹ️')" "$ssh_alias"
+printf '%sInstalled helpers in: %s\n' "$(cli_emoji 'ℹ️')" "$bin_dir"
+printf '\n%sRun these checks from Termux:\n' "$(cli_emoji 'ℹ️')"
 printf '  ssh %s true\n' "$ssh_alias"
 printf '  pc-mosh\n'
-printf '\nFile helpers:\n'
+printf '\n%sFile helpers:\n' "$(cli_emoji 'ℹ️')"
 printf '  pc-push LOCAL_PATH REMOTE_PATH\n'
 printf '  pc-pull REMOTE_PATH LOCAL_PATH\n'
 printf '  pc-sync-to-pc LOCAL_DIR REMOTE_DIR\n'
 printf '  pc-sync-from-pc REMOTE_DIR LOCAL_DIR\n'
-printf '\nIf your shell cannot find pc-mosh, add this for the current session:\n'
+printf '\n%sIf your shell cannot find pc-mosh, add this for the current session:\n' "$(cli_emoji 'ℹ️')"
 printf '  export PATH="%s:$PATH"\n' "$bin_dir"

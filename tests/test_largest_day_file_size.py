@@ -46,7 +46,7 @@ class LargestDayFileSizeTests(unittest.TestCase):
         result = self.run_script(self.root)
 
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertEqual(result.stdout, "2026-07-28 12 B\n2026-07-29 11 B\n")
+        self.assertEqual(result.stdout, "📅 2026-07-28 12 B\n📅 2026-07-29 11 B\n")
 
     def test_tie_uses_earliest_date(self):
         self.make_file("later", 3, "2026-07-29")
@@ -55,7 +55,7 @@ class LargestDayFileSizeTests(unittest.TestCase):
         result = self.run_script(self.root)
 
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertEqual(result.stdout, "2026-07-28 3 B\n2026-07-29 3 B\n")
+        self.assertEqual(result.stdout, "📅 2026-07-28 3 B\n📅 2026-07-29 3 B\n")
 
     def test_shows_only_three_largest_days_with_human_readable_sizes(self):
         self.make_file("first", 5000, "2026-07-26")
@@ -68,9 +68,9 @@ class LargestDayFileSizeTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(
             result.stdout,
-            "2026-07-26 4.9 KiB\n"
-            "2026-07-27 2.0 KiB\n"
-            "2026-07-28 1.0 KiB\n",
+            "📅 2026-07-26 4.9 KiB\n"
+            "📅 2026-07-27 2.0 KiB\n"
+            "📅 2026-07-28 1.0 KiB\n",
         )
 
     def test_displays_large_total_in_gib(self):
@@ -83,7 +83,7 @@ class LargestDayFileSizeTests(unittest.TestCase):
         result = self.run_script(self.root)
 
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertEqual(result.stdout, "2026-08-21 30.5 GiB\n")
+        self.assertEqual(result.stdout, "📅 2026-08-21 30.5 GiB\n")
 
     def test_empty_directory_has_actionable_error(self):
         result = self.run_script(self.root)

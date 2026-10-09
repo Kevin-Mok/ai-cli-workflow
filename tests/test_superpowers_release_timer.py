@@ -165,7 +165,7 @@ printf 'PRIVATE_NOTE_AND_CONFIG_CONTENT_MUST_NOT_LEAK\n' >&2; exit 1; } ;;
     def test_check_resolves_sources_and_verifies_installed_units(self) -> None:
         completed = self.run_script("--check")
         self.assertEqual(completed.returncode, 0, completed.stderr)
-        self.assertEqual(completed.stdout, "Superpowers release timer units are valid.\n")
+        self.assertEqual(completed.stdout, "⏱️ Superpowers release timer units are valid.\n")
         self.assertEqual(self.calls(), [
             f"chezmoi -S {self.source} source-path {self.helper}",
             f"chezmoi -S {self.source} source-path {self.service}",
@@ -176,7 +176,7 @@ printf 'PRIVATE_NOTE_AND_CONFIG_CONTENT_MUST_NOT_LEAK\n' >&2; exit 1; } ;;
     def test_enable_applies_exact_targets_before_activation(self) -> None:
         completed = self.run_script("--enable")
         self.assertEqual(completed.returncode, 0, completed.stderr)
-        self.assertEqual(completed.stdout, "Superpowers release timer enabled.\n")
+        self.assertEqual(completed.stdout, "⏱️ Superpowers release timer enabled.\n")
         self.assertEqual(self.calls(), [
             f"chezmoi -S {self.source} source-path {self.helper}",
             f"chezmoi -S {self.source} source-path {self.service}",
@@ -193,7 +193,7 @@ printf 'PRIVATE_NOTE_AND_CONFIG_CONTENT_MUST_NOT_LEAK\n' >&2; exit 1; } ;;
         first, second = self.run_script("--disable", env=env), self.run_script("--disable", env=env)
         self.assertEqual(first.returncode, 0, first.stderr)
         self.assertEqual(second.returncode, 0, second.stderr)
-        self.assertEqual(first.stdout, "Superpowers release timer disabled.\n")
+        self.assertEqual(first.stdout, "⏱️ Superpowers release timer disabled.\n")
         self.assertEqual(self.calls(), [
             "systemctl --user disable --now superpowers-release-sync.timer",
             "systemctl --user disable --now superpowers-release-sync.timer",

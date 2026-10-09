@@ -14,6 +14,14 @@ import tempfile
 import threading
 import time
 
+
+def _cli_message(text, icon):
+    """Decorate human output; CLI_PLAIN=1 keeps legacy scripts undecorated."""
+    import os
+    import sys
+    plain = os.environ.get('CLI_PLAIN') == '1' or '--plain' in sys.argv
+    return ('' if plain else icon + ' ') + text
+
 APP_NAME = 'codex-kitty'
 VOICE = 'en_US-Voice Contributor-high'
 VOICE_LABEL = 'Voice Contributor (US, high)'
@@ -227,10 +235,10 @@ def main(argv: list[str] | None = None) -> int:
             play()
         return 0  # Sound failure never makes the notification script fail.
 
-    presentation = argparse.ArgumentParser(add_help=False)
+    presentation = argparse.ArgumentParser(add_help=False, description=_cli_message('codex notification sound', '🎙️'))
     presentation.add_argument('--plain', action='store_true', default=argparse.SUPPRESS, help='use ASCII output')
     presentation.add_argument('--details', action='store_true', default=argparse.SUPPRESS, help='show full paths and diagnostics')
-    parser = argparse.ArgumentParser(description=__doc__, parents=[presentation])
+    parser = argparse.ArgumentParser(description=_cli_message(__doc__, '🎙️'), parents=[presentation])
     commands = parser.add_subparsers(dest='command', required=True)
     configure = commands.add_parser('set', help='enable sound using a local MP3 path (quoted if it contains spaces)', parents=[presentation])
     configure.add_argument('path')
@@ -245,7 +253,7 @@ def main(argv: list[str] | None = None) -> int:
     smoke = commands.add_parser('smoke', help='exercise the Dunst rule or emit an unrelated Kitty OSC 9 popup', parents=[presentation])
     smoke.add_argument('kind', choices=('tagged', 'kitty'))
     options = parser.parse_args(args)
-    _plain = bool(getattr(options, 'plain', False))
+    _plain = bool(getattr(options, 'plain', False)) or os.environ.get('CLI_PLAIN') == '1'
     _details = bool(getattr(options, 'details', False))
     if options.command == 'set':
         return save_clip(options.path)

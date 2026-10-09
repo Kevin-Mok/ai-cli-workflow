@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+# Human-facing decoration; keep protocol/data output unchanged.
+cli_emoji() {
+  [ "${CLI_PLAIN:-0}" = 1 ] || printf '%s ' "$1"
+}
+
 set -euo pipefail
 
 CURL_BIN="${UPDATE_VESKTOP_CURL:-curl}"
@@ -11,18 +16,19 @@ DOWNLOAD_URL="${UPDATE_VESKTOP_DOWNLOAD_URL:-https://vencord.dev/download/veskto
 PACKAGE_NAME="vesktop"
 
 print_section() {
-  printf '\n== %s ==\n' "$1"
+  printf '\n%s== %s ==\n' "$(cli_emoji '🔧')" "$1"
 }
 
 print_note() {
-  printf '%s\n' "$1"
+  printf '%s%s\n' "$(cli_emoji 'ℹ️')" "$1"
 }
 
 print_fail() {
-  printf 'FAIL: %s\n' "$1" >&2
+  printf '%sFAIL: %s\n' "$(cli_emoji '❌')" "$1" >&2
 }
 
 usage() {
+  printf '%s' "$(cli_emoji '📖')"
   cat <<'EOF'
 Usage:
   ./scripts/executable_update-vesktop.sh [--check]

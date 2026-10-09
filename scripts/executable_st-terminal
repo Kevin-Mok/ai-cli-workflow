@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+# Human-facing decoration; keep protocol/data output unchanged.
+cli_emoji() {
+  [ "${CLI_PLAIN:-0}" = 1 ] || printf '%s ' "$1"
+}
+
 set -euo pipefail
 
 search_path="${ST_TERMINAL_SEARCH_PATH:-$PATH}"
@@ -63,5 +68,5 @@ fi
 if PATH="$search_path" command -v notify-send >/dev/null 2>&1; then
   notify-send "st terminal launcher could not find a usable binary" "Install st, stterm, kitty, or urxvt, then retry the i3 binding."
 fi
-printf 'Install st, stterm, kitty, or urxvt so this launcher can open the terminal.\n' >&2
+printf '%sInstall st, stterm, kitty, or urxvt so this launcher can open the terminal.\n' "$(cli_emoji 'ℹ️')" >&2
 exit 1

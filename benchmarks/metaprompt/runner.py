@@ -2,6 +2,7 @@
 import argparse
 from collections import Counter
 import json
+import os
 from pathlib import Path
 import random
 import shutil
@@ -334,7 +335,7 @@ def report() -> dict:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(description=('' if os.environ.get('CLI_PLAIN') == '1' else '📖 ') + __doc__)
     parser.add_argument('command', choices=['verify','dry-run','freeze','refreeze-development','run','report'])
     parser.add_argument('--phase', choices=['development','holdout'], default='development')
     parser.add_argument('--retry-infrastructure', action='store_true', help='Retain failed development attempt and retry after a diagnosed fix; consumes existing budget')

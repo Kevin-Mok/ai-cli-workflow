@@ -21,6 +21,14 @@ from urllib.parse import unquote, urlsplit
 from ai_workflow_second_brain import second_brain_findings
 
 
+def _cli_message(text, icon):
+    """Decorate human output; CLI_PLAIN=1 keeps legacy scripts undecorated."""
+    import os
+    import sys
+    plain = os.environ.get('CLI_PLAIN') == '1' or '--plain' in sys.argv
+    return ('' if plain else icon + ' ') + text
+
+
 SCHEMA_VERSION = 1
 TOKEN_METHOD = "ceil(unicode_characters/4)"
 SEVERITY_ORDER = {"error": 0, "warning": 1, "info": 2}
@@ -927,11 +935,15 @@ def text_report(report: dict[str, Any]) -> str:
         resolved = ", ".join(comparison["resolved_finding_keys"]) or "none"
         lines.append(f"- Added finding keys: {added}")
         lines.append(f"- Resolved finding keys: {resolved}")
+    import os
+    import sys
+    if os.environ.get('CLI_PLAIN') != '1' and '--plain' not in sys.argv:
+        lines = [('❌ ' if '- ERROR' in line else '⚠️ ' if '- WARNING' in line else '🩺 ' if 'AI workflow doctor' in line else '📋 ') + line for line in lines]
     return "\n".join(lines) + "\n"
 
 
 def parser() -> argparse.ArgumentParser:
-    argument_parser = argparse.ArgumentParser(prog="ai-workflow-doctor")
+    argument_parser = argparse.ArgumentParser(prog="ai-workflow-doctor", description=_cli_message('ai workflow doctor', '🧰'))
     argument_parser.add_argument("--repo", default=".")
     argument_parser.add_argument("--format", choices=("text", "json"), default="text")
     argument_parser.add_argument("--snapshot")
@@ -974,7 +986,7 @@ def run(arguments: list[str] | None = None) -> int:
         subprocess.SubprocessError,
         ValueError,
     ) as error:
-        print(f"ai-workflow-doctor: {error}", file=sys.stderr)
+        print(_cli_message(f"ai-workflow-doctor: {error}", "❌"), file=sys.stderr)
         return 2
 
 

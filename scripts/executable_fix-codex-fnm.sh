@@ -1,23 +1,29 @@
 #!/usr/bin/env bash
 
+# Human-facing decoration; keep protocol/data output unchanged.
+cli_emoji() {
+  [ "${CLI_PLAIN:-0}" = 1 ] || printf '%s ' "$1"
+}
+
 set -euo pipefail
 
 MIN_NODE_VERSION="22.22.0"
 DEFAULT_NODE_VERSION="23.6.0"
 
 print_step() {
-  printf '\n== %s ==\n' "$1"
+  printf '\n%s== %s ==\n' "$(cli_emoji '🔧')" "$1"
 }
 
 print_note() {
-  printf '%s\n' "$1"
+  printf '%s%s\n' "$(cli_emoji 'ℹ️')" "$1"
 }
 
 print_warn() {
-  printf 'WARN: %s\n' "$1"
+  printf '%sWARN: %s\n' "$(cli_emoji '⚠️')" "$1"
 }
 
 usage() {
+  printf '%s' "$(cli_emoji '📖')"
   cat <<'EOF'
 Usage: executable_fix-codex-fnm.sh [--node-version VERSION] [--dry-run]
 

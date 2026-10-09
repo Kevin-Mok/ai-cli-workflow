@@ -7,11 +7,13 @@ function server-pages
     for i in (seq (count $sites))
         set title (wget -qO- "$sites[$i]" | perl -l -0777 -ne 'print $1 if /<title.*?>\s*(.*?)\s*<\/title/si' | recode html)
         if test $title = $titles[$i]
-            set symbol "✓"
+            set symbol "✅"
+            set label OK
         else
-            set symbol "✗"
+            set symbol "❌"
+            set label FAIL
         end
-        printf "[$symbol] $sites[$i]\n"
+        cli-message "$symbol" "[$label] $sites[$i]"
     end
 end
 

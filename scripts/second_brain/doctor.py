@@ -496,4 +496,8 @@ def text_report(report: dict[str, Any]) -> str:
             )
     else:
         lines.append("Findings: none")
+    import os
+    import sys
+    if os.environ.get('CLI_PLAIN') != '1' and '--plain' not in sys.argv:
+        lines = [('❌ ' if '- ERROR' in line else '⚠️ ' if '- WARNING' in line else '🩺 ' if 'Second Brain doctor' in line else '📋 ') + line for line in lines]
     return "\n".join(lines) + "\n"

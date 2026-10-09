@@ -1,13 +1,18 @@
 #!/usr/bin/env bash
 
+# Human-facing decoration; keep protocol/data output unchanged.
+cli_emoji() {
+  [ "${CLI_PLAIN:-0}" = 1 ] || printf '%s ' "$1"
+}
+
 set -euo pipefail
 
 usage() {
-  printf 'Usage: rsync-media-date YYYY-MM-DD SOURCE DESTINATION\n' >&2
+  printf '%sUsage: rsync-media-date YYYY-MM-DD SOURCE DESTINATION\n' "$(cli_emoji '📖')" >&2
 }
 
 fail() {
-  printf 'rsync-media-date: %s\n' "$1" >&2
+  printf '%srsync-media-date: %s\n' "$(cli_emoji 'ℹ️')" "$1" >&2
   exit 1
 }
 
@@ -47,5 +52,5 @@ fi
 mkdir -p -- "$destination"
 
 mapfile -d '' -t media_files < "$file_list"
-printf 'Copying %d media file(s) from %s to %s\n' "${#media_files[@]}" "$requested_date" "$destination"
+printf '%sCopying %d media file(s) from %s to %s\n' "$(cli_emoji 'ℹ️')" "${#media_files[@]}" "$requested_date" "$destination"
 exec rsync --archive --info=progress2 --human-readable --no-relative -- "${media_files[@]}" "${destination}/"

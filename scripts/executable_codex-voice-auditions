@@ -14,6 +14,14 @@ import time
 from typing import cast
 import wave
 
+
+def _cli_message(text, icon):
+    """Decorate human output; CLI_PLAIN=1 keeps legacy scripts undecorated."""
+    import os
+    import sys
+    plain = os.environ.get('CLI_PLAIN') == '1' or '--plain' in sys.argv
+    return ('' if plain else icon + ' ') + text
+
 # Verified single-speaker alternatives in rhasspy/piper-voices/voices.json.
 VOICES = (
     ('Amy', 'en_US-amy-medium', 'US'),
@@ -181,7 +189,7 @@ def audition(python: Path, model: Path, wav: Path, text: str, player: str | None
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(description=_cli_message(__doc__, '🎙️'))
     _ = parser.add_argument('--list', dest='list_', action='store_true', help='show all ten numbers, names and voice IDs')
     _ = parser.add_argument('--samples', action='store_true', help='show the built-in sample lines')
     _ = parser.add_argument('--voice', nargs='+', help='replay one or more numbers/names/IDs; default: all ten')
@@ -198,6 +206,7 @@ def main(argv: list[str] | None = None) -> int:
     _ = parser.add_argument('--details', action='store_true', help='full paths and subprocess diagnostics')
     args = Arguments()
     _ = parser.parse_args(argv, namespace=args)
+    args.plain = args.plain or os.environ.get("CLI_PLAIN") == "1"
     try:
         if not math.isfinite(args.length_scale) or not 0.5 <= args.length_scale <= 2:
             raise ValueError('--length-scale must be between 0.5 and 2.0.')
@@ -205,20 +214,20 @@ def main(argv: list[str] | None = None) -> int:
         if args.list_:
             say('Ten local voice alternatives', args, '🎙️')
             for i, (name, voice, region) in enumerate(VOICES, 1):
-                print(f'{i:2} {name:12} {region}  {voice}')
+                say(f'{i:2} {name:12} {region}  {voice}', args, '🎙️')
             return 0
         if args.samples:
             for name, text in SAMPLES.items():
-                print(f'{name}: {text}')
+                say(f'{name}: {text}', args, '🗣️')
             return 0
         text = args.text if args.text is not None else (' '.join(SAMPLES.values()) if args.sample == 'all' else SAMPLES[args.sample])
         if not text.strip() or len(text) > 4000:
             raise ValueError('Sample text must contain 1 to 4000 characters.')
         if args.dry_run:
             for number in numbers:
-                print(f'{number + 1}/10 - {VOICES[number][0]} ({VOICES[number][2]})')
-            print(f'Lines: {text}')
-            print(f'Pace: {args.length_scale}; question clip before each audible test.')
+                say(f'{number + 1}/10 - {VOICES[number][0]} ({VOICES[number][2]})', args, '🎙️')
+            say(f'Lines: {text}', args, '🗣️')
+            say(f'Pace: {args.length_scale}; question clip before each audible test.', args, '⏱️')
             return 0
         root = Path(os.environ.get('XDG_DATA_HOME') or Path.home() / '.local/share') / 'codex-notification-speech'
         python = root / 'venv/bin/python'
@@ -249,7 +258,7 @@ def main(argv: list[str] | None = None) -> int:
                 _ = wav.replace(destination)
             records.append({'number': number + 1, 'name': name, 'voice': voice, 'wav': str(destination), 'synthesis_and_clip_seconds': round(generated, 3), 'gap_after_clip_seconds': round(gap, 3) if gap is not None else None})
             say(f'Saved {destination.name}', args, '✅')
-            print(f'Replay: ~/scripts/codex-voice-auditions --voice {number + 1} --sample celebrate')
+            say(f'Replay: ~/scripts/codex-voice-auditions --voice {number + 1} --sample celebrate', args, '🔁')
         manifest = {'text': text, 'length_scale': args.length_scale, 'clip': str(Path(args.clip).expanduser().resolve()), 'voices': records}
         with tempfile.NamedTemporaryFile(mode='w', encoding='utf-8', dir=output, delete=False) as stream:
             temporary = Path(stream.name)
@@ -260,13 +269,13 @@ def main(argv: list[str] | None = None) -> int:
         finally:
             temporary.unlink(missing_ok=True)
         say(f'Finished {len(numbers)} auditions. Files: {output}', args, '✅')
-        print('Notification voice/settings were not changed. Choose your favorite number.')
+        say('Notification voice/settings were not changed. Choose your favorite number.', args, '🎙️')
         return 0
     except (OSError, ValueError, RuntimeError, subprocess.SubprocessError, wave.Error, EOFError) as error:
         print(f'{"Warning: " if args.plain else "⚠️ "}{error}', file=sys.stderr)
         return 1
     except KeyboardInterrupt:
-        print('Audition stopped; completed samples remain saved.', file=sys.stderr)
+        print(('' if args.plain else '⚠️ ') + 'Audition stopped; completed samples remain saved.', file=sys.stderr)
         return 130
 
 

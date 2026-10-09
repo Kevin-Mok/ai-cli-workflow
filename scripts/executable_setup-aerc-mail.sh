@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+# Human-facing decoration; keep protocol/data output unchanged.
+cli_emoji() {
+  [ "${CLI_PLAIN:-0}" = 1 ] || printf '%s ' "$1"
+}
+
 set -euo pipefail
 
 readonly script_name="$(basename "$0")"
@@ -16,15 +21,16 @@ dry_run=false
 pass_recipient=""
 
 fail() {
-  printf 'FAIL: %s\n' "$*" >&2
+  printf '%sFAIL: %s\n' "$(cli_emoji '❌')" "$*" >&2
   exit 1
 }
 
 note() {
-  printf '%s\n' "$*"
+  printf '%s%s\n' "$(cli_emoji 'ℹ️')" "$*"
 }
 
 usage() {
+  printf '%s' "$(cli_emoji '📖')"
   cat <<EOF
 Usage: ${script_name} ACTION [--dry-run]
 
@@ -238,14 +244,14 @@ prepare_accounts_file() {
 prompt_value() {
   local prompt="$1"
   local value
-  read -r -p "$prompt" value
+  read -r -p "$(cli_emoji '✉️')$prompt" value
   printf '%s' "$value"
 }
 
 prompt_secret() {
   local prompt="$1"
   local value
-  read -r -s -p "$prompt" value
+  read -r -s -p "$(cli_emoji '🔐')$prompt" value
   printf '\n' >&2
   printf '%s' "$value"
 }
@@ -418,7 +424,7 @@ status() {
     if pass show "$pass_key" >/dev/null 2>&1; then
       note "$label: $provider"
     else
-      printf '%s: %s (missing credential)\n' "$label" "$provider" >&2
+      printf '%s%s: %s (missing credential)\n' "$(cli_emoji '❌')" "$label" "$provider" >&2
       failed=1
     fi
   done < <(sed -n 's/^# BEGIN aerc-mail-setup: \(.*\)$/\1/p' "$accounts_config")

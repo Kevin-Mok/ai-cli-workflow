@@ -1,0 +1,1369 @@
+{
+  "schema_version": 1,
+  "scope": "Existing script/fish/helper sources reviewed for approved emoji rollout; unrelated concurrently added sources are excluded.",
+  "output_escape": "Existing --plain or CLI_PLAIN=1 for legacy helpers",
+  "preserved_surfaces": [
+    "JSON/CSV and MCP/status protocols",
+    "raw paths, clipboard/passwords and generated artifacts",
+    "standard parser diagnostics and third-party output",
+    "benchmark candidate snapshots and terminal art",
+    "i3blocks status/pango protocol, ranger previews/GUI and silent config hooks"
+  ],
+  "entries": [
+    {
+      "path": "benchmarks/metaprompt-selection/selection.py",
+      "language": "benchmark",
+      "classification": "modified help only; trial/result JSON preserved"
+    },
+    {
+      "path": "benchmarks/metaprompt/runner.py",
+      "language": "benchmark",
+      "classification": "modified help only; trial/result JSON preserved"
+    },
+    {
+      "path": "dot_agents/skills/gh-fix-ci/scripts/inspect_pr_checks.py",
+      "language": "skill helper",
+      "classification": "modified prose/help; protocols/data preserved"
+    },
+    {
+      "path": "dot_agents/skills/imagegen/scripts/image_gen.py",
+      "language": "skill helper",
+      "classification": "modified prose/help; protocols/data preserved"
+    },
+    {
+      "path": "dot_agents/skills/leetcode-init/scripts/init_leetcode_problem.py",
+      "language": "skill helper",
+      "classification": "modified prose/help; protocols/data preserved"
+    },
+    {
+      "path": "dot_agents/skills/metaprompt/scripts/update_upstream.py",
+      "language": "skill helper",
+      "classification": "modified prose/help; protocols/data preserved"
+    },
+    {
+      "path": "dot_agents/skills/playwright/scripts/playwright_cli.sh",
+      "language": "skill helper",
+      "classification": "modified prose/help; protocols/data preserved"
+    },
+    {
+      "path": "dot_agents/skills/screenshot/scripts/ensure_macos_permissions.sh",
+      "language": "skill helper",
+      "classification": "modified prose/help; protocols/data preserved"
+    },
+    {
+      "path": "dot_agents/skills/screenshot/scripts/take_screenshot.py",
+      "language": "skill helper",
+      "classification": "modified prose/help; protocols/data preserved"
+    },
+    {
+      "path": "dot_agents/skills/transcribe/scripts/transcribe_diarize.py",
+      "language": "skill helper",
+      "classification": "modified prose/help; protocols/data preserved"
+    },
+    {
+      "path": "dot_config/fish/functions/369/a2/carsim.fish",
+      "language": "fish",
+      "classification": "data/protocol/control"
+    },
+    {
+      "path": "dot_config/fish/functions/369/a2/gdb-a2.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/369/a3/gdb-a3-break.fish",
+      "language": "fish",
+      "classification": "data/protocol/control"
+    },
+    {
+      "path": "dot_config/fish/functions/369/a3/run-a3.fish",
+      "language": "fish",
+      "classification": "data/protocol/control"
+    },
+    {
+      "path": "dot_config/fish/functions/369/a4/block-to-line.fish",
+      "language": "fish",
+      "classification": "data/protocol/control"
+    },
+    {
+      "path": "dot_config/fish/functions/369/a4/executable_revert-image.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/369/a4/hex.fish",
+      "language": "fish",
+      "classification": "data/protocol/control"
+    },
+    {
+      "path": "dot_config/fish/functions/369/a4/mount-image.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/369/a4/run-a4.fish",
+      "language": "fish",
+      "classification": "data/protocol/control"
+    },
+    {
+      "path": "dot_config/fish/functions/369/grep-c.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/369/grep-headers.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/369/rg-headers.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/369/rgc.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/aws-attach-volume.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/backup-phone-pics.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/backup-phone-storage.fish",
+      "language": "fish",
+      "classification": "modified human presentation"
+    },
+    {
+      "path": "dot_config/fish/functions/bc-qalc.fish",
+      "language": "fish",
+      "classification": "data/protocol/control"
+    },
+    {
+      "path": "dot_config/fish/functions/benq-brightness.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/cad-to-us.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/cd.fish.tmpl",
+      "language": "fish",
+      "classification": "modified human presentation"
+    },
+    {
+      "path": "dot_config/fish/functions/certbot-ssl.fish",
+      "language": "fish",
+      "classification": "data/protocol/control"
+    },
+    {
+      "path": "dot_config/fish/functions/cli-message.fish",
+      "language": "fish",
+      "classification": "modified human presentation"
+    },
+    {
+      "path": "dot_config/fish/functions/clip.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/conda_activate.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/copy.fish",
+      "language": "fish",
+      "classification": "data/protocol/control"
+    },
+    {
+      "path": "dot_config/fish/functions/create-fish-function.fish",
+      "language": "fish",
+      "classification": "data/protocol/control"
+    },
+    {
+      "path": "dot_config/fish/functions/define.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/discord-burner.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/dump-rarity-check.fish",
+      "language": "fish",
+      "classification": "data/protocol/control"
+    },
+    {
+      "path": "dot_config/fish/functions/enable-site.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/evince-silent.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/export-pkgs.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/find-bg.fish",
+      "language": "fish",
+      "classification": "data/protocol/control"
+    },
+    {
+      "path": "dot_config/fish/functions/find-vim-filetype.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/fish_mode_prompt.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/fn-progress.fish",
+      "language": "fish",
+      "classification": "modified human presentation"
+    },
+    {
+      "path": "dot_config/fish/functions/fzf-cd.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/fzf-ranger.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/fzf-vim.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/gen-pass.fish",
+      "language": "fish",
+      "classification": "data/protocol/control"
+    },
+    {
+      "path": "dot_config/fish/functions/git-log-short.fish",
+      "language": "fish",
+      "classification": "modified human presentation"
+    },
+    {
+      "path": "dot_config/fish/functions/git-submodule-branch.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/git/git-amend-push.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/git/git-clone-gitea.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/git/git-delete-branch.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/git/git-diff-files.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/git/git-mult-remotes.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/git/git-push-diff-name.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/git/git-push-initial.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/git/git-push-multiple.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/git/git-push-new-gitea.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/git/git-replace-origin-gitea.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/git/git-replace-origin.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/grep-aliases.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/grep-pdf-file.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/grep-pdf.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/ipad/clip-ipad.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/ipad/mpv-ipad-mov.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/ipad/mpv-ipad.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/ipad/rm-ipad.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/ipad/rsync-ipad-vid-mov.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/ipad/rsync-ipad-vid.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/ipad/unmount-ipad.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/java-compile-run.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/java-compile-test.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/libreoffice-silent.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/man-vim.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/maven-test-method.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/mkdir-cd.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/mpv-sub.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/mute-video.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/pastebin.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/qalc-history.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/qalc-update-amount.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/qalc-update.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/readlink-cp.fish",
+      "language": "fish",
+      "classification": "data/protocol/control"
+    },
+    {
+      "path": "dot_config/fish/functions/redshift-set.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/refresh-config-task.fish",
+      "language": "fish",
+      "classification": "modified human presentation"
+    },
+    {
+      "path": "dot_config/fish/functions/refresh-config.fish",
+      "language": "fish",
+      "classification": "modified human presentation"
+    },
+    {
+      "path": "dot_config/fish/functions/reminder.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/restart_ethernet.fish",
+      "language": "fish",
+      "classification": "modified human presentation"
+    },
+    {
+      "path": "dot_config/fish/functions/rintro.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/scan-history.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/scp-cdf.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/scp-vid.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/server-pages.fish",
+      "language": "fish",
+      "classification": "modified human presentation"
+    },
+    {
+      "path": "dot_config/fish/functions/shred-rm.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/smol/smol-add.fish",
+      "language": "fish",
+      "classification": "data/protocol/control"
+    },
+    {
+      "path": "dot_config/fish/functions/smol/smol-delete.fish",
+      "language": "fish",
+      "classification": "data/protocol/control"
+    },
+    {
+      "path": "dot_config/fish/functions/smol/smol-replace.fish",
+      "language": "fish",
+      "classification": "data/protocol/control"
+    },
+    {
+      "path": "dot_config/fish/functions/smol/smol-slist.fish",
+      "language": "fish",
+      "classification": "data/protocol/control"
+    },
+    {
+      "path": "dot_config/fish/functions/ssh-bandit.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/sudo.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/sxiv-silent.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/sync-alt-cal.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/systemctl-restart.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/task/task-anno.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/task/task-context.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/task/task-delete.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/task/task-done.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/task/task-due-rm.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/task/task-due.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/task/task-edit.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/task/task-mod-pri.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/task/task-mod-proj.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/task/task-mod-tag.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/task/task-next-rm.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/task/task-next.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/task/task-notes.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/task/task-start.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/task/task-wait.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/taskopen-new.fish",
+      "language": "fish",
+      "classification": "data/protocol/control"
+    },
+    {
+      "path": "dot_config/fish/functions/test_output.txt",
+      "language": "fish",
+      "classification": "fixture data"
+    },
+    {
+      "path": "dot_config/fish/functions/thesaurus.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/timetrace-list.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/tmux-attach.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/unix-timestamp.fish",
+      "language": "fish",
+      "classification": "data/protocol/control"
+    },
+    {
+      "path": "dot_config/fish/functions/unzip-rm.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/us-to-cad.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/video-to-gif.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/vim-snippet.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/vpn-red-hat.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/watson-add-fortnite.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/watson-add-game.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/wc-pdf.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/wget-all.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "dot_config/fish/functions/wget-name.fish",
+      "language": "fish",
+      "classification": "third-party passthrough or silent"
+    },
+    {
+      "path": "scripts/ai_workflow_second_brain.py",
+      "language": "python",
+      "classification": "no human output (library)"
+    },
+    {
+      "path": "scripts/backup-pc-progress.py",
+      "language": "python",
+      "classification": "modified"
+    },
+    {
+      "path": "scripts/backup-pc-sync.py",
+      "language": "python",
+      "classification": "modified"
+    },
+    {
+      "path": "scripts/backup-pc-vm-check",
+      "language": "python",
+      "classification": "modified"
+    },
+    {
+      "path": "scripts/codex_search_index.py",
+      "language": "python",
+      "classification": "modified"
+    },
+    {
+      "path": "scripts/codex_search_recaps.py",
+      "language": "python",
+      "classification": "no human output (library)"
+    },
+    {
+      "path": "scripts/codex_search_recent.py",
+      "language": "python",
+      "classification": "modified"
+    },
+    {
+      "path": "scripts/codex_search_runtime.py",
+      "language": "python",
+      "classification": "no human output (library)"
+    },
+    {
+      "path": "scripts/codex_search_watch.py",
+      "language": "python",
+      "classification": "protocol/delegate only"
+    },
+    {
+      "path": "scripts/colors/executable_arch",
+      "language": "shell",
+      "classification": "art"
+    },
+    {
+      "path": "scripts/colors/executable_blocks",
+      "language": "shell",
+      "classification": "art"
+    },
+    {
+      "path": "scripts/colors/executable_panes",
+      "language": "shell",
+      "classification": "art"
+    },
+    {
+      "path": "scripts/colors/executable_rupees",
+      "language": "shell",
+      "classification": "art"
+    },
+    {
+      "path": "scripts/colors/executable_space-invaders",
+      "language": "shell",
+      "classification": "art"
+    },
+    {
+      "path": "scripts/colors/executable_unowns",
+      "language": "python",
+      "classification": "terminal art only"
+    },
+    {
+      "path": "scripts/executable_ai-workflow-doctor",
+      "language": "python",
+      "classification": "modified"
+    },
+    {
+      "path": "scripts/executable_apply-desktop-display-layout",
+      "language": "shell",
+      "classification": "third-party-only"
+    },
+    {
+      "path": "scripts/executable_apply-pywal-theme",
+      "language": "shell",
+      "classification": "human output modified"
+    },
+    {
+      "path": "scripts/executable_backup-pc",
+      "language": "shell",
+      "classification": "human output modified"
+    },
+    {
+      "path": "scripts/executable_backup-ubuntu-h7",
+      "language": "shell",
+      "classification": "human output modified"
+    },
+    {
+      "path": "scripts/executable_bg-chooser",
+      "language": "shell",
+      "classification": "protocol/data-only"
+    },
+    {
+      "path": "scripts/executable_burn-iso.sh",
+      "language": "shell",
+      "classification": "third-party-only"
+    },
+    {
+      "path": "scripts/executable_change-sink",
+      "language": "shell",
+      "classification": "protocol/data-only"
+    },
+    {
+      "path": "scripts/executable_chatgpt-dictation",
+      "language": "shell",
+      "classification": "protocol/data-only"
+    },
+    {
+      "path": "scripts/executable_chatgpt-dictation-sequenced",
+      "language": "shell",
+      "classification": "protocol/data-only"
+    },
+    {
+      "path": "scripts/executable_codex",
+      "language": "shell",
+      "classification": "human output modified"
+    },
+    {
+      "path": "scripts/executable_codex-model-status",
+      "language": "shell",
+      "classification": "third-party-only"
+    },
+    {
+      "path": "scripts/executable_codex-notification-activate",
+      "language": "python",
+      "classification": "modified"
+    },
+    {
+      "path": "scripts/executable_codex-notification-event",
+      "language": "python",
+      "classification": "protocol/delegate only"
+    },
+    {
+      "path": "scripts/executable_codex-notification-sound",
+      "language": "python",
+      "classification": "modified"
+    },
+    {
+      "path": "scripts/executable_codex-search",
+      "language": "python",
+      "classification": "modified"
+    },
+    {
+      "path": "scripts/executable_codex-voice-auditions",
+      "language": "python",
+      "classification": "modified"
+    },
+    {
+      "path": "scripts/executable_concat-timestamped-videos",
+      "language": "python",
+      "classification": "modified"
+    },
+    {
+      "path": "scripts/executable_currency",
+      "language": "python",
+      "classification": "modified"
+    },
+    {
+      "path": "scripts/executable_directory-sizes",
+      "language": "python",
+      "classification": "modified"
+    },
+    {
+      "path": "scripts/executable_dmenu-history",
+      "language": "shell",
+      "classification": "protocol/data-only"
+    },
+    {
+      "path": "scripts/executable_dmenu-twitch",
+      "language": "shell",
+      "classification": "protocol/data-only"
+    },
+    {
+      "path": "scripts/executable_docker-compose-doctor.sh",
+      "language": "shell",
+      "classification": "human output modified"
+    },
+    {
+      "path": "scripts/executable_doctor-phone-ssh.sh",
+      "language": "shell",
+      "classification": "human output modified"
+    },
+    {
+      "path": "scripts/executable_fix-aux-speaker-audio",
+      "language": "shell",
+      "classification": "human output modified"
+    },
+    {
+      "path": "scripts/executable_fix-codex-fnm.sh",
+      "language": "shell",
+      "classification": "human output modified"
+    },
+    {
+      "path": "scripts/executable_fix-vps-codex.sh",
+      "language": "shell",
+      "classification": "human output modified"
+    },
+    {
+      "path": "scripts/executable_flavibot-browser",
+      "language": "shell",
+      "classification": "third-party-only"
+    },
+    {
+      "path": "scripts/executable_generate-i3-pywal-colors",
+      "language": "python",
+      "classification": "modified"
+    },
+    {
+      "path": "scripts/executable_glhf-metadata",
+      "language": "python",
+      "classification": "modified"
+    },
+    {
+      "path": "scripts/executable_harden-phone-ssh.sh",
+      "language": "shell",
+      "classification": "human output modified"
+    },
+    {
+      "path": "scripts/executable_install-arch-pkgs.sh",
+      "language": "shell",
+      "classification": "third-party-only"
+    },
+    {
+      "path": "scripts/executable_install-chatgpt-linux",
+      "language": "shell",
+      "classification": "human output modified"
+    },
+    {
+      "path": "scripts/executable_install-docker-compose-v2.sh",
+      "language": "shell",
+      "classification": "human output modified"
+    },
+    {
+      "path": "scripts/executable_install-tmux-tpm.sh",
+      "language": "shell",
+      "classification": "human output modified"
+    },
+    {
+      "path": "scripts/executable_install-ubuntu-start-helpers.sh",
+      "language": "shell",
+      "classification": "human output modified"
+    },
+    {
+      "path": "scripts/executable_kitty-scrollback-smoke",
+      "language": "python",
+      "classification": "modified"
+    },
+    {
+      "path": "scripts/executable_kraken",
+      "language": "shell",
+      "classification": "protocol/data-only"
+    },
+    {
+      "path": "scripts/executable_largest-day-file-size",
+      "language": "python",
+      "classification": "modified"
+    },
+    {
+      "path": "scripts/executable_mount-pixel-9",
+      "language": "shell",
+      "classification": "human output modified"
+    },
+    {
+      "path": "scripts/executable_mute-gba.sh",
+      "language": "shell",
+      "classification": "third-party-only"
+    },
+    {
+      "path": "scripts/executable_passmenu",
+      "language": "shell",
+      "classification": "protocol/data-only"
+    },
+    {
+      "path": "scripts/executable_qr-gif.sh",
+      "language": "shell",
+      "classification": "human output modified"
+    },
+    {
+      "path": "scripts/executable_readme-recruiter-sync",
+      "language": "shell",
+      "classification": "human output modified"
+    },
+    {
+      "path": "scripts/executable_restart-ethernet",
+      "language": "shell",
+      "classification": "third-party-only"
+    },
+    {
+      "path": "scripts/executable_rick-roll",
+      "language": "shell",
+      "classification": "human output modified"
+    },
+    {
+      "path": "scripts/executable_rsync-media-date",
+      "language": "shell",
+      "classification": "human output modified"
+    },
+    {
+      "path": "scripts/executable_Voice Contributor-intro",
+      "language": "shell",
+      "classification": "human output modified"
+    },
+    {
+      "path": "scripts/executable_screenshot-all-monitors",
+      "language": "shell",
+      "classification": "human output modified"
+    },
+    {
+      "path": "scripts/executable_scroll-5-lines-temp",
+      "language": "shell",
+      "classification": "third-party-only"
+    },
+    {
+      "path": "scripts/executable_second-brain",
+      "language": "python",
+      "classification": "protocol/delegate only"
+    },
+    {
+      "path": "scripts/executable_setup-aerc-mail.sh",
+      "language": "shell",
+      "classification": "human output modified"
+    },
+    {
+      "path": "scripts/executable_setup-codex-notification-speech",
+      "language": "python",
+      "classification": "modified"
+    },
+    {
+      "path": "scripts/executable_setup-design-skills-timer",
+      "language": "python",
+      "classification": "modified"
+    },
+    {
+      "path": "scripts/executable_setup-directory-sizes",
+      "language": "python",
+      "classification": "modified"
+    },
+    {
+      "path": "scripts/executable_setup-mosh.sh",
+      "language": "shell",
+      "classification": "human output modified"
+    },
+    {
+      "path": "scripts/executable_setup-neovim-python-completion.sh",
+      "language": "shell",
+      "classification": "human output modified"
+    },
+    {
+      "path": "scripts/executable_setup-phone-ssh.sh",
+      "language": "shell",
+      "classification": "human output modified"
+    },
+    {
+      "path": "scripts/executable_setup-second-brain-sessions-timer",
+      "language": "python",
+      "classification": "modified"
+    },
+    {
+      "path": "scripts/executable_setup-second-brain-state",
+      "language": "shell",
+      "classification": "human output modified"
+    },
+    {
+      "path": "scripts/executable_setup-second-brain-timer",
+      "language": "python",
+      "classification": "modified"
+    },
+    {
+      "path": "scripts/executable_setup-st.sh",
+      "language": "shell",
+      "classification": "human output modified"
+    },
+    {
+      "path": "scripts/executable_setup-superpowers-release-timer",
+      "language": "python",
+      "classification": "modified"
+    },
+    {
+      "path": "scripts/executable_setup-termux-mosh.sh",
+      "language": "shell",
+      "classification": "human output modified"
+    },
+    {
+      "path": "scripts/executable_shuffler",
+      "language": "shell",
+      "classification": "human output modified"
+    },
+    {
+      "path": "scripts/executable_snapshot-codex-config",
+      "language": "python",
+      "classification": "modified"
+    },
+    {
+      "path": "scripts/executable_speechnotes-dictation",
+      "language": "shell",
+      "classification": "human output modified"
+    },
+    {
+      "path": "scripts/executable_st-terminal",
+      "language": "shell",
+      "classification": "human output modified"
+    },
+    {
+      "path": "scripts/executable_sync-design-skills",
+      "language": "shell",
+      "classification": "human output modified"
+    },
+    {
+      "path": "scripts/executable_sync-shortcuts",
+      "language": "shell",
+      "classification": "protocol/data-only"
+    },
+    {
+      "path": "scripts/executable_sync-superpowers-release",
+      "language": "shell",
+      "classification": "human output modified"
+    },
+    {
+      "path": "scripts/executable_tex-clean",
+      "language": "shell",
+      "classification": "human output modified"
+    },
+    {
+      "path": "scripts/executable_ticker",
+      "language": "shell",
+      "classification": "human output modified"
+    },
+    {
+      "path": "scripts/executable_ubuntu-start",
+      "language": "shell",
+      "classification": "human output modified"
+    },
+    {
+      "path": "scripts/executable_unmount-pixel-9",
+      "language": "shell",
+      "classification": "human output modified"
+    },
+    {
+      "path": "scripts/executable_update-chrome.sh",
+      "language": "shell",
+      "classification": "human output modified"
+    },
+    {
+      "path": "scripts/executable_update-vesktop.sh",
+      "language": "shell",
+      "classification": "human output modified"
+    },
+    {
+      "path": "scripts/executable_vim-man",
+      "language": "shell",
+      "classification": "third-party-only"
+    },
+    {
+      "path": "scripts/executable_xmodmap-custom.tmpl",
+      "language": "shell",
+      "classification": "third-party-only"
+    },
+    {
+      "path": "scripts/executable_yt-dl",
+      "language": "python",
+      "classification": "modified"
+    },
+    {
+      "path": "scripts/hdd-init-wizard.sh",
+      "language": "shell",
+      "classification": "human output modified"
+    },
+    {
+      "path": "scripts/metaprompt-benchmark-analysis.py",
+      "language": "python",
+      "classification": "protocol only"
+    },
+    {
+      "path": "scripts/metaprompt-benchmark.py",
+      "language": "python",
+      "classification": "protocol/delegate only"
+    },
+    {
+      "path": "scripts/metaprompt-selection-analysis.py",
+      "language": "python",
+      "classification": "modified"
+    },
+    {
+      "path": "scripts/metaprompt-selection-skill.py",
+      "language": "python",
+      "classification": "modified"
+    },
+    {
+      "path": "scripts/metaprompt-selection.py",
+      "language": "python",
+      "classification": "protocol/delegate only"
+    },
+    {
+      "path": "scripts/second_brain/__init__.py",
+      "language": "python",
+      "classification": "no human output (library)"
+    },
+    {
+      "path": "scripts/second_brain/checkpoint.py",
+      "language": "python",
+      "classification": "no human output (library)"
+    },
+    {
+      "path": "scripts/second_brain/checkpoint_contract.py",
+      "language": "python",
+      "classification": "no human output (library)"
+    },
+    {
+      "path": "scripts/second_brain/checkpoint_git.py",
+      "language": "python",
+      "classification": "no human output (library)"
+    },
+    {
+      "path": "scripts/second_brain/checkpoint_scan.py",
+      "language": "python",
+      "classification": "no human output (library)"
+    },
+    {
+      "path": "scripts/second_brain/cli.py",
+      "language": "python",
+      "classification": "modified"
+    },
+    {
+      "path": "scripts/second_brain/config_snapshot.py",
+      "language": "python",
+      "classification": "no human output (library)"
+    },
+    {
+      "path": "scripts/second_brain/content_security.py",
+      "language": "python",
+      "classification": "no human output (library)"
+    },
+    {
+      "path": "scripts/second_brain/deferred.py",
+      "language": "python",
+      "classification": "no human output (library)"
+    },
+    {
+      "path": "scripts/second_brain/doctor.py",
+      "language": "python",
+      "classification": "modified"
+    },
+    {
+      "path": "scripts/second_brain/doctor_contract.py",
+      "language": "python",
+      "classification": "no human output (library)"
+    },
+    {
+      "path": "scripts/second_brain/doctor_lfs.py",
+      "language": "python",
+      "classification": "no human output (library)"
+    },
+    {
+      "path": "scripts/second_brain/migration.py",
+      "language": "python",
+      "classification": "no human output (library)"
+    },
+    {
+      "path": "scripts/second_brain/migration_apply.py",
+      "language": "python",
+      "classification": "no human output (library)"
+    },
+    {
+      "path": "scripts/second_brain/migration_common.py",
+      "language": "python",
+      "classification": "no human output (library)"
+    },
+    {
+      "path": "scripts/second_brain/migration_inventory.py",
+      "language": "python",
+      "classification": "no human output (library)"
+    },
+    {
+      "path": "scripts/second_brain/migration_verify.py",
+      "language": "python",
+      "classification": "no human output (library)"
+    },
+    {
+      "path": "scripts/second_brain/paths.py",
+      "language": "python",
+      "classification": "no human output (library)"
+    },
+    {
+      "path": "scripts/second_brain/remove_state.py",
+      "language": "python",
+      "classification": "no human output (library)"
+    },
+    {
+      "path": "scripts/second_brain/safe_contract.py",
+      "language": "python",
+      "classification": "no human output (library)"
+    },
+    {
+      "path": "scripts/second_brain/safe_create.py",
+      "language": "python",
+      "classification": "no human output (library)"
+    },
+    {
+      "path": "scripts/second_brain/safe_files.py",
+      "language": "python",
+      "classification": "no human output (library)"
+    },
+    {
+      "path": "scripts/second_brain/schema.py",
+      "language": "python",
+      "classification": "no human output (library)"
+    },
+    {
+      "path": "scripts/second_brain/session_digest_input.py",
+      "language": "python",
+      "classification": "no human output (library)"
+    },
+    {
+      "path": "scripts/second_brain/session_digest_runtime.py",
+      "language": "python",
+      "classification": "no human output (library)"
+    },
+    {
+      "path": "scripts/second_brain/session_review.py",
+      "language": "python",
+      "classification": "modified"
+    },
+    {
+      "path": "scripts/second_brain/sessions.py",
+      "language": "python",
+      "classification": "already emojis (terminal renderer); generated Markdown unchanged"
+    },
+    {
+      "path": "scripts/second_brain/state_private.py",
+      "language": "python",
+      "classification": "no human output (library)"
+    },
+    {
+      "path": "scripts/second_brain/upgrade.py",
+      "language": "python",
+      "classification": "no human output (library)"
+    },
+    {
+      "path": "scripts/second_brain/vault.py",
+      "language": "python",
+      "classification": "no human output (library)"
+    },
+    {
+      "path": "scripts/smoke_codex_notification_events.py",
+      "language": "python",
+      "classification": "modified"
+    },
+    {
+      "path": "scripts/smoke_postmortem_memory.py",
+      "language": "python",
+      "classification": "modified"
+    },
+    {
+      "path": "scripts/smoke_redshift_keys.py",
+      "language": "python",
+      "classification": "modified"
+    }
+  ]
+}

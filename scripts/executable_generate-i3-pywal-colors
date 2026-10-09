@@ -7,6 +7,14 @@ import pathlib
 import sys
 
 
+def _cli_message(text, icon):
+    """Decorate human output; CLI_PLAIN=1 keeps legacy scripts undecorated."""
+    import os
+    import sys
+    plain = os.environ.get('CLI_PLAIN') == '1' or '--plain' in sys.argv
+    return ('' if plain else icon + ' ') + text
+
+
 MIN_CONTRAST_RATIO = 4.5
 BLACK = "#000000"
 WHITE = "#FFFFFF"
@@ -14,7 +22,7 @@ WHITE = "#FFFFFF"
 
 def parse_args(argv):
     parser = argparse.ArgumentParser(
-        description="Generate contrast-safe i3 colors from the active pywal palette."
+        description=_cli_message("Generate contrast-safe i3 colors from the active pywal palette.", '🧰')
     )
     cache_dir = pathlib.Path.home() / ".cache" / "wal"
     parser.add_argument(
@@ -153,10 +161,10 @@ def main(argv=None):
         resource_map = build_resource_map(palette)
         write_xresources(args.output, resource_map)
     except FileNotFoundError as exc:
-        print(f"Error: Missing input palette file: {exc.filename}", file=sys.stderr)
+        print(_cli_message(f"Error: Missing input palette file: {exc.filename}", '❌'), file=sys.stderr)
         return 1
     except (KeyError, ValueError, json.JSONDecodeError) as exc:
-        print(f"Error: Unable to derive i3 colors from pywal output: {exc}", file=sys.stderr)
+        print(_cli_message(f"Error: Unable to derive i3 colors from pywal output: {exc}", '❌'), file=sys.stderr)
         return 1
     return 0
 

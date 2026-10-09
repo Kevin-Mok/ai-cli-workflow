@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+
+# Human-facing decoration; keep protocol/data output unchanged.
+cli_emoji() {
+  [ "${CLI_PLAIN:-0}" = 1 ] || printf '%s ' "$1"
+}
 set -e
 
 LANG=C
@@ -7,12 +12,12 @@ LC_NUMERIC=C
 SYMBOLS=("$@")
 
 if ! $(type jq > /dev/null 2>&1); then
-  echo "'jq' is not in the PATH. (See: https://stedolan.github.io/jq/)"
+  echo "$(cli_emoji 'ℹ️')'jq' is not in the PATH. (See: https://stedolan.github.io/jq/)"
   exit 1
 fi
 
 if [ -z "$SYMBOLS" ]; then
-  echo "Usage: ./ticker.sh AAPL MSFT GOOG BTC-USD"
+  echo "$(cli_emoji '📖')Usage: ./ticker.sh AAPL MSFT GOOG BTC-USD"
   exit
 fi
 
@@ -41,7 +46,7 @@ for symbol in $(IFS=' '; echo "${SYMBOLS[*]}" | tr '[:lower:]' '[:upper:]'); do
   marketState="$(query $symbol 'marketState')"
 
   if [ -z $marketState ]; then
-    printf 'No results for symbol "%s"\n' $symbol
+    printf '%sNo results for symbol "%s"\n' "$(cli_emoji 'ℹ️')" $symbol
     continue
   fi
 

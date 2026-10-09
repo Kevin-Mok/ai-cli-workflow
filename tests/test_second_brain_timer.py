@@ -323,7 +323,7 @@ exit 99
         deferred_service_target = self.unit_target_dir / DEFERRED_SERVICE.name
         deferred_timer_target = self.unit_target_dir / DEFERRED_TIMER.name
         self.assertEqual(second.returncode, 0, second.stderr)
-        self.assertEqual(first.stdout, "Second Brain timer units are valid.\n")
+        self.assertEqual(first.stdout, "⏱️ Second Brain timer units are valid.\n")
         self.assertEqual(second.stdout, first.stdout)
 
         service_target = self.unit_target_dir / SERVICE.name
@@ -357,7 +357,7 @@ exit 99
         second = self.run_script("--enable")
         self.assertEqual(first.returncode, 0, first.stderr)
         self.assertEqual(second.returncode, 0, second.stderr)
-        self.assertEqual(first.stdout, "Second Brain timer enabled.\n")
+        self.assertEqual(first.stdout, "⏱️ Second Brain timer enabled.\n")
         self.assertEqual(second.stdout, first.stdout)
 
         service_target = self.unit_target_dir / SERVICE.name
@@ -786,7 +786,7 @@ exit 99
         second = self.run_script("--disable")
         self.assertEqual(first.returncode, 0, first.stderr)
         self.assertEqual(second.returncode, 0, second.stderr)
-        self.assertEqual(first.stdout, "Second Brain timer disabled.\n")
+        self.assertEqual(first.stdout, "⏱️ Second Brain timer disabled.\n")
         self.assertEqual(second.stdout, first.stdout)
         self.assertEqual(
             self.calls(),
@@ -814,7 +814,7 @@ exit 99
         )
 
         self.assertEqual(completed.returncode, 0, completed.stderr)
-        self.assertEqual(completed.stdout, "Second Brain timer disabled.\n")
+        self.assertEqual(completed.stdout, "⏱️ Second Brain timer disabled.\n")
         self.assertEqual(
             self.calls(),
             [

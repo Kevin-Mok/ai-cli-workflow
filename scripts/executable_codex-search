@@ -14,6 +14,14 @@ from codex_search_index import (SearchError, cache_lock, cleanup, refresh,
                                 search, recent_entries, titles, visible, warn)
 
 
+def _cli_message(text, icon):
+    """Decorate human output; CLI_PLAIN=1 keeps legacy scripts undecorated."""
+    import os
+    import sys
+    plain = os.environ.get('CLI_PLAIN') == '1' or '--plain' in sys.argv
+    return ('' if plain else icon + ' ') + text
+
+
 def resume_args(entry):
     cwd = entry['cwd']
     if not cwd or any(not c.isprintable() for c in cwd) or not Path(cwd).is_absolute() or not Path(cwd).is_dir():
@@ -91,7 +99,7 @@ def display_date(value):
 def print_results(results, names, args):
     terminal = sys.stdout.isatty()
     compact = terminal and not args.details
-    plain = getattr(args, 'plain', False)
+    plain = getattr(args, 'plain', False) or os.environ.get('CLI_PLAIN') == '1'
     marker = '...' if plain else '…'
     separator = ' | ' if plain else ' · '
     color = terminal and not plain and not os.environ.get('NO_COLOR') and os.environ.get('TERM') != 'dumb'
@@ -112,7 +120,7 @@ def print_results(results, names, args):
             home = str(Path.home())
             if directory == home or directory.startswith(home + os.sep):
                 directory = '~' + directory[len(home):]
-            prefix = f'{number:02d}  '
+            prefix = f'{number:02d}  ' + ('' if plain else '📁 ')
             date = display_date(entry['timestamp'])
             if width < len(prefix) + len(date) + 15:
                 print(paint(prefix + shorten(visible(directory), max(1, width - len(prefix)), marker), color, '1;36'))
@@ -126,10 +134,10 @@ def print_results(results, names, args):
             for snippet in snippets[:1]:
                 print('    ' + render_snippet(snippet, color, max(1, width - 4), plain))
         else:
-            print('Title: ' + visible(names.get(sid, '(untitled)')))
-            print('Timestamp: ' + visible(entry['timestamp'] or '(unknown)'))
-            print('Directory: ' + visible(entry['cwd'] or '(not recorded)'))
-            print('Session: ' + sid)
+            print(('' if plain else '💬 ') + 'Title: ' + visible(names.get(sid, '(untitled)')))
+            print(('' if plain else '🕒 ') + 'Timestamp: ' + visible(entry['timestamp'] or '(unknown)'))
+            print(('' if plain else '📁 ') + 'Directory: ' + visible(entry['cwd'] or '(not recorded)'))
+            print(('' if plain else '🧾 ') + 'Session: ' + sid)
             for snippet in snippets:
                 print('  ' + render_snippet(snippet, color, plain=plain))
         command = resume_args(entry)
@@ -204,9 +212,9 @@ def parser():
               '       %(prog)s --recent [--pick] [--sort priority|recent] [--limit N] [--no-summaries]\n'
               '       %(prog)s (--rebuild-index | --clear-cache)\n'
               '       %(prog)s --help',
-        description='Search local Codex user messages and assistant replies across projects.\n'
+        description=_cli_message('Search local Codex user messages and assistant replies across projects.\n'
                     'Terminal: newest 20 matches with a short highlighted excerpt.\n'
-                    'Pipes: all matches with full metadata. The private cache refreshes automatically.',
+                    'Pipes: all matches with full metadata. The private cache refreshes automatically.', '🧰'),
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog='Examples:\n'
                '  codex-search "cache.*refresh"\n'
@@ -245,6 +253,7 @@ def parser():
 def main():
     cli = parser()
     args = cli.parse_args()
+    args.plain = args.plain or os.environ.get('CLI_PLAIN') == '1'
     if args.limit is not None and args.limit < 0:
         cli.error('--limit must be 0 (all) or a positive integer')
     if args.summary_count < 0:

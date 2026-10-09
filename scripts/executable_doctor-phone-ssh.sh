@@ -1,21 +1,26 @@
 #!/usr/bin/env bash
 
+# Human-facing decoration; keep protocol/data output unchanged.
+cli_emoji() {
+  [ "${CLI_PLAIN:-0}" = 1 ] || printf '%s ' "$1"
+}
+
 set -euo pipefail
 
 print_section() {
-  printf '\n== %s ==\n' "$1"
+  printf '\n%s== %s ==\n' "$(cli_emoji '🔧')" "$1"
 }
 
 print_note() {
-  printf '%s\n' "$1"
+  printf '%s%s\n' "$(cli_emoji 'ℹ️')" "$1"
 }
 
 print_warn() {
-  printf 'WARN: %s\n' "$1"
+  printf '%sWARN: %s\n' "$(cli_emoji '⚠️')" "$1"
 }
 
 print_fail() {
-  printf 'FAIL: %s\n' "$1" >&2
+  printf '%sFAIL: %s\n' "$(cli_emoji '❌')" "$1" >&2
 }
 
 require_root() {
@@ -32,6 +37,7 @@ require_root() {
 }
 
 usage() {
+  printf '%s' "$(cli_emoji '📖')"
   cat <<'EOF'
 Usage:
   ./scripts/executable_doctor-phone-ssh.sh [--port PORT]
@@ -97,18 +103,18 @@ ssh_socket_active=0
 ssh_socket_enabled=0
 
 print_section "Phone SSH Doctor"
-printf 'Time: %s\n' "$(date -Is 2>/dev/null || date)"
-printf 'Port under test: %s\n' "$port"
+printf '%sTime: %s\n' "$(cli_emoji 'ℹ️')" "$(date -Is 2>/dev/null || date)"
+printf '%sPort under test: %s\n' "$(cli_emoji 'ℹ️')" "$port"
 
 if [ -r /etc/os-release ]; then
   . /etc/os-release
-  printf 'OS: %s\n' "${PRETTY_NAME:-unknown}"
+  printf '%sOS: %s\n' "$(cli_emoji 'ℹ️')" "${PRETTY_NAME:-unknown}"
 fi
 
 print_section "Network Addresses"
 lan_ips="$(hostname -I 2>/dev/null || true)"
 if [ -n "$lan_ips" ]; then
-  printf 'LAN IPs: %s\n' "$lan_ips"
+  printf '%sLAN IPs: %s\n' "$(cli_emoji 'ℹ️')" "$lan_ips"
 else
   print_warn "Could not determine LAN IPs with hostname -I"
 fi
@@ -116,7 +122,7 @@ fi
 if command -v curl >/dev/null 2>&1; then
   public_ip="$(curl -4 -fsS https://api.ipify.org 2>/dev/null || true)"
   if [ -n "$public_ip" ]; then
-    printf 'Public IPv4: %s\n' "$public_ip"
+    printf '%sPublic IPv4: %s\n' "$(cli_emoji 'ℹ️')" "$public_ip"
   else
     print_warn "Could not determine public IPv4 automatically"
   fi
@@ -151,9 +157,9 @@ if systemctl list-unit-files ssh.socket --no-legend 2>/dev/null | grep -Fq 'ssh.
     ssh_socket_enabled=1
   fi
 
-  printf 'present: yes\n'
-  printf 'active: %s\n' "$(systemctl is-active ssh.socket 2>/dev/null || true)"
-  printf 'enabled: %s\n' "$(systemctl is-enabled ssh.socket 2>/dev/null || true)"
+  printf '%spresent: yes\n' "$(cli_emoji 'ℹ️')"
+  printf '%sactive: %s\n' "$(cli_emoji 'ℹ️')" "$(systemctl is-active ssh.socket 2>/dev/null || true)"
+  printf '%senabled: %s\n' "$(cli_emoji 'ℹ️')" "$(systemctl is-enabled ssh.socket 2>/dev/null || true)"
   systemctl cat ssh.socket || true
 else
   print_note "ssh.socket is not installed on this host"
@@ -202,7 +208,7 @@ fi
 if command -v firewall-cmd >/dev/null 2>&1; then
   if firewall-cmd --state >/dev/null 2>&1; then
     firewalld_ports="$(firewall-cmd --list-ports 2>/dev/null || true)"
-    printf 'firewalld ports: %s\n' "$firewalld_ports"
+    printf '%sfirewalld ports: %s\n' "$(cli_emoji 'ℹ️')" "$firewalld_ports"
     if printf '%s\n' "$firewalld_ports" | grep -Eq "(^| )${port}/tcp($| )"; then
       firewalld_open=1
     fi

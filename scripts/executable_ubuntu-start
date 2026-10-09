@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# Human-facing decoration; keep protocol/data output unchanged.
+cli_emoji() {
+  [ "${CLI_PLAIN:-0}" = 1 ] || printf '%s ' "$1"
+}
+
 start_command() {
   local command_name="$1"
   shift
@@ -51,7 +56,7 @@ if command -v mountpoint >/dev/null 2>&1 && command -v mount >/dev/null 2>&1; th
     :
   else
     sudo mount "${GRAPHITI_VOLUME_DEVICE}" "${GRAPHITI_VOLUME_MOUNT}" ||
-      printf 'Graphiti mount failed for %s -> %s.\n' "${GRAPHITI_VOLUME_DEVICE}" "${GRAPHITI_VOLUME_MOUNT}" >&2
+      printf '%sGraphiti mount failed for %s -> %s.\n' "$(cli_emoji '❌')" "${GRAPHITI_VOLUME_DEVICE}" "${GRAPHITI_VOLUME_MOUNT}" >&2
   fi
 fi
 
@@ -64,12 +69,12 @@ start_command autorandr autorandr 4k-3-monitor
 if [ -f "${HOME}/Pictures/Backgrounds/4k/sukana.jpg" ]; then
   /home/example/scripts/apply-pywal-theme "${HOME}/Pictures/Backgrounds/4k/sukana.jpg" &
 else
-  printf 'Skipping pywal startup: no wallpaper found at %s.\n' "${HOME}/Pictures/Backgrounds/4k/sukana.jpg" >&2
+  printf '%sSkipping pywal startup: no wallpaper found at %s.\n' "$(cli_emoji '⚠️')" "${HOME}/Pictures/Backgrounds/4k/sukana.jpg" >&2
 fi
 
 if [ -f "${GRAPHITI_COMPOSE_FILE}" ] && command -v docker >/dev/null 2>&1; then
   (
     cd "${GRAPHITI_CHECKOUT}" &&
     docker compose -f docker/docker-compose-neo4j.yml up -d neo4j
-  ) || printf 'Graphiti docker startup failed; check docker logs for details.\n' >&2
+  ) || printf '%sGraphiti docker startup failed; check docker logs for details.\n' "$(cli_emoji '❌')" >&2
 fi

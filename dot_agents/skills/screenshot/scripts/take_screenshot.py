@@ -13,6 +13,12 @@ import subprocess
 import tempfile
 from pathlib import Path
 
+
+def _cli_message(text: str, emoji: str) -> str:
+    """Decorate authored prose without changing machine-readable output."""
+    return text if os.environ.get("CLI_PLAIN") == "1" else f"{emoji} {text}"
+
+
 SCRIPT_DIR = Path(__file__).resolve().parent
 MAC_PERM_SCRIPT = SCRIPT_DIR / "macos_permissions.swift"
 MAC_PERM_HELPER = SCRIPT_DIR / "ensure_macos_permissions.sh"
@@ -192,9 +198,9 @@ def run(cmd: list[str]) -> None:
     try:
         subprocess.run(cmd, check=True)
     except FileNotFoundError as exc:
-        raise SystemExit(f"required command not found: {cmd[0]}") from exc
+        raise SystemExit(_cli_message(f"required command not found: {cmd[0]}", 'ℹ️')) from exc
     except subprocess.CalledProcessError as exc:
-        raise SystemExit(f"command failed ({exc.returncode}): {' '.join(cmd)}") from exc
+        raise SystemExit(_cli_message(f"command failed ({exc.returncode}): {' '.join(cmd)}", '❌')) from exc
 
 
 def swift_json(script: Path, extra_args: list[str] | None = None) -> dict:
@@ -206,19 +212,19 @@ def swift_json(script: Path, extra_args: list[str] | None = None) -> dict:
     try:
         proc = subprocess.run(cmd, check=True, capture_output=True, text=True)
     except FileNotFoundError as exc:
-        raise SystemExit("swift not found; install Xcode command line tools") from exc
+        raise SystemExit(_cli_message("swift not found; install Xcode command line tools", 'ℹ️')) from exc
     except subprocess.CalledProcessError as exc:
         stderr = (exc.stderr or "").strip()
         if "ModuleCache" in stderr and "Operation not permitted" in stderr:
             raise SystemExit(
-                "swift needs module-cache access; rerun with escalated permissions"
+                _cli_message("swift needs module-cache access; rerun with escalated permissions", 'ℹ️')
             ) from exc
         msg = stderr or (exc.stdout or "").strip() or "swift helper failed"
         raise SystemExit(msg) from exc
     try:
         return json.loads(proc.stdout)
     except json.JSONDecodeError as exc:
-        raise SystemExit(f"swift helper returned invalid JSON: {proc.stdout.strip()}") from exc
+        raise SystemExit(_cli_message(f"swift helper returned invalid JSON: {proc.stdout.strip()}", 'ℹ️')) from exc
 
 
 def macos_screen_capture_granted(request: bool = False) -> bool:
@@ -230,14 +236,14 @@ def macos_screen_capture_granted(request: bool = False) -> bool:
 def ensure_macos_permissions() -> None:
     if os.environ.get("CODEX_SANDBOX"):
         raise SystemExit(
-            "screen capture checks are blocked in the sandbox; rerun with escalated permissions"
+            _cli_message("screen capture checks are blocked in the sandbox; rerun with escalated permissions", 'ℹ️')
         )
     if macos_screen_capture_granted():
         return
     subprocess.run(["bash", str(MAC_PERM_HELPER)], check=False)
     if not macos_screen_capture_granted():
         raise SystemExit(
-            "Screen Recording permission is required; enable it in System Settings and retry"
+            _cli_message("Screen Recording permission is required; enable it in System Settings and retry", 'ℹ️')
         )
 
 
@@ -300,14 +306,14 @@ def macos_window_ids(args: argparse.Namespace, capture_all: bool) -> list[int]:
             return [int(win_id)]
         except (TypeError, ValueError):
             pass
-    raise SystemExit("no matching macOS window found; try --list-windows to inspect ids")
+    raise SystemExit(_cli_message("no matching macOS window found; try --list-windows to inspect ids", '⚠️'))
 
 
 def list_macos_windows(args: argparse.Namespace) -> None:
     payload = macos_window_payload(args, frontmost=args.active_window, include_list=True)
     windows = payload.get("windows") or []
     if not windows:
-        print("no matching windows found")
+        print(_cli_message("no matching windows found", '⚠️'))
         return
     for item in windows:
         bounds = item.get("bounds") or {}
@@ -381,13 +387,13 @@ def capture_linux(args: argparse.Namespace, output: Path) -> None:
             geometry = f"{w}x{h}+{x}+{y}"
             run(["import", "-window", "root", "-crop", geometry, str(output)])
             return
-        raise SystemExit("region capture requires scrot or ImageMagick (import)")
+        raise SystemExit(_cli_message("region capture requires scrot or ImageMagick (import)", 'ℹ️'))
 
     if args.window_id is not None:
         if imagemagick:
             run(["import", "-window", str(args.window_id), str(output)])
             return
-        raise SystemExit("window-id capture requires ImageMagick (import)")
+        raise SystemExit(_cli_message("window-id capture requires ImageMagick (import)", 'ℹ️'))
 
     if args.active_window:
         if scrot:
@@ -403,7 +409,7 @@ def capture_linux(args: argparse.Namespace, output: Path) -> None:
             )
             run(["import", "-window", win_id, str(output)])
             return
-        raise SystemExit("active-window capture requires scrot, gnome-screenshot, or import+xdotool")
+        raise SystemExit(_cli_message("active-window capture requires scrot, gnome-screenshot, or import+xdotool", 'ℹ️'))
 
     if scrot:
         run(["scrot", str(output)])
@@ -414,11 +420,11 @@ def capture_linux(args: argparse.Namespace, output: Path) -> None:
     if imagemagick:
         run(["import", "-window", "root", str(output)])
         return
-    raise SystemExit("no supported screenshot tool found (scrot, gnome-screenshot, or import)")
+    raise SystemExit(_cli_message("no supported screenshot tool found (scrot, gnome-screenshot, or import)", 'ℹ️'))
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(description=_cli_message(__doc__, "📖"))
     parser.add_argument(
         "--path",
         help="output file path or directory; overrides --mode",
@@ -470,27 +476,27 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.region and args.window_id is not None:
-        raise SystemExit("choose either --region or --window-id, not both")
+        raise SystemExit(_cli_message("choose either --region or --window-id, not both", 'ℹ️'))
     if args.region and args.active_window:
-        raise SystemExit("choose either --region or --active-window, not both")
+        raise SystemExit(_cli_message("choose either --region or --active-window, not both", 'ℹ️'))
     if args.window_id is not None and args.active_window:
-        raise SystemExit("choose either --window-id or --active-window, not both")
+        raise SystemExit(_cli_message("choose either --window-id or --active-window, not both", 'ℹ️'))
     if args.app and args.window_id is not None:
-        raise SystemExit("choose either --app or --window-id, not both")
+        raise SystemExit(_cli_message("choose either --app or --window-id, not both", 'ℹ️'))
     if args.region and args.app:
-        raise SystemExit("choose either --region or --app, not both")
+        raise SystemExit(_cli_message("choose either --region or --app, not both", 'ℹ️'))
     if args.region and args.window_name:
-        raise SystemExit("choose either --region or --window-name, not both")
+        raise SystemExit(_cli_message("choose either --region or --window-name, not both", 'ℹ️'))
     if args.interactive and args.app:
-        raise SystemExit("choose either --interactive or --app, not both")
+        raise SystemExit(_cli_message("choose either --interactive or --app, not both", 'ℹ️'))
     if args.interactive and args.window_name:
-        raise SystemExit("choose either --interactive or --window-name, not both")
+        raise SystemExit(_cli_message("choose either --interactive or --window-name, not both", 'ℹ️'))
     if args.interactive and args.window_id is not None:
-        raise SystemExit("choose either --interactive or --window-id, not both")
+        raise SystemExit(_cli_message("choose either --interactive or --window-id, not both", 'ℹ️'))
     if args.interactive and args.active_window:
-        raise SystemExit("choose either --interactive or --active-window, not both")
+        raise SystemExit(_cli_message("choose either --interactive or --active-window, not both", 'ℹ️'))
     if args.list_windows and (args.region or args.window_id is not None or args.interactive):
-        raise SystemExit("--list-windows only supports --app, --window-name, and --active-window")
+        raise SystemExit(_cli_message("--list-windows only supports --app, --window-name, and --active-window", 'ℹ️'))
 
     test_mode = test_mode_enabled()
     system = platform.system()
@@ -502,7 +508,7 @@ def main() -> None:
     display_ids: list[int] = []
 
     if system != "Darwin" and (args.app or args.window_name or args.list_windows):
-        raise SystemExit("--app/--window-name/--list-windows are supported on macOS only")
+        raise SystemExit(_cli_message("--app/--window-name/--list-windows are supported on macOS only", 'ℹ️'))
 
     if system == "Darwin":
         if test_mode:
@@ -573,10 +579,10 @@ def main() -> None:
         capture_linux(args, output)
     elif system == "Windows":
         raise SystemExit(
-            "Windows support lives in scripts/take_screenshot.ps1; run it with PowerShell"
+            _cli_message("Windows support lives in scripts/take_screenshot.ps1; run it with PowerShell", 'ℹ️')
         )
     else:
-        raise SystemExit(f"unsupported platform: {system}")
+        raise SystemExit(_cli_message(f"unsupported platform: {system}", 'ℹ️'))
 
     print(output)
 

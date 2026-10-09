@@ -139,12 +139,16 @@ education work:
 - Keep modules cohesive. Split files that cross multiple concerns or grow beyond
   roughly 1,000 lines; avoid adding features to an already oversized file
   without organizing it.
-- CLI output must be prettified and easy to understand by default: use helpful
-  emojis, clear hierarchy, plain-language labels, aligned values, and readable
-  dates and durations. Keep raw diagnostics and technical evidence behind
-  `--details`; retain a concise, actionable warning when accuracy is limited.
-  Provide `--plain` for ASCII output and preserve clean JSON/CSV exports when
-  supported. Respect terminal width and `NO_COLOR`.
+- All human-facing CLI, script and shell-helper output must include appropriate
+  decorative emojis by default: headings, progress, prompts, successes, warnings
+  and errors. Keep clear hierarchy, plain-language labels, aligned values and
+  readable dates/durations; text must remain understandable without the glyphs.
+  Apply this to existing tools when changing them and to all new tools. Keep raw
+  diagnostics behind `--details` with concise actionable accuracy warnings.
+  Provide `--plain` for ASCII output; legacy helpers may use `CLI_PLAIN=1`.
+  Preserve JSON/CSV, protocol/status tokens, paths consumed by tools, clipboard
+  data, generated files and command substitutions. Keep silent commands silent.
+  Respect terminal width; `NO_COLOR` disables ANSI colors without removing emojis.
 - When creating or changing a CLI that may run for a long time or appear to
   hang, always show ongoing progress by default: periodic status lines, a
   progress indicator, percentage complete, or elapsed time and estimated time

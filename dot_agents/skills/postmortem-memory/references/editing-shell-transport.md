@@ -216,3 +216,15 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
   - [2026-10-04-kitty-scrollbar-inspection.md](/home/example/linux-config/docs/postmortem/2026-10-04-kitty-scrollbar-inspection.md) (SHA-256 `cac81ac1cb8c`; 1 alias(es), all retained in [sources.json](../sources.json)).
   - [2026-10-04-metaprompt-session-scope.md](/home/example/linux-config/.worktrees/vps-aws-bootstrap-prompt/docs/postmortem/2026-10-04-metaprompt-session-scope.md) (SHA-256 `ac02deccdb08`; 2 alias(es), all retained in [sources.json](../sources.json)).
   - [2026-10-04-vps-prompt-delivery-patch-context.md](/home/example/linux-config/.worktrees/vps-aws-bootstrap-prompt/docs/postmortem/2026-10-04-vps-prompt-delivery-patch-context.md) (SHA-256 `39c67958db27`; 1 alias(es), all retained in [sources.json](../sources.json)).
+
+## local-ast-utf8-edit-columns
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **code**.
+- Symptoms: Temporary AST edit produces SyntaxError near a multibyte character; byte columns were used as string indices.
+- Applicability: Python source editing with AST line/column spans and Unicode text.
+- Diagnostic checks: Compare UTF-8 byte offsets with character positions; parse each proposed file before writing and inspect already-written targets separately.
+- Remedy: Convert byte columns to character positions (or consistently edit encoded bytes), replace right to left and parse before writing.
+- Verification evidence: Corrected helper and seven defining tests passed; root independently parsed script/skill/benchmark sources and passed a multibyte offset probe.
+- Limitations: Code editing correctness only; live activation and protocol safety require separate checks.
+- Sources:
+  - [CLI emoji edit offset incident](/home/example/linux-config/docs/postmortem/2026-10-09-cli-emoji-edit-offsets.md).

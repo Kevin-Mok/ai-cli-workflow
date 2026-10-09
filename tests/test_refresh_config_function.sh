@@ -93,9 +93,9 @@ TEST_CODEX_TARGET="${tmpdir}/repo/dot_codex/config.toml" \
 TEST_GITCONFIG_TARGET="${tmpdir}/repo/dot_gitconfig.tmpl" \
 PATH="${tmpdir}/bin:${PATH}" \
 HOME="${tmpdir}/home" \
-"$real_fish" -c "source '$function_path'; refresh-config")"
+"$real_fish" -c "set -p fish_function_path '$repo_root/dot_config/fish/functions'; source '$function_path'; refresh-config")"
 
-if [ "$success_output" != 'REFRESH COMPLETE' ]; then
+if [ "$success_output" != '✅ REFRESH COMPLETE' ]; then
   printf 'expected one skimmable success line, got: %s\n' "$success_output" >&2
   exit 1
 fi
@@ -176,7 +176,7 @@ if TEST_LOG="$log_path" \
   TEST_CODEX_TARGET="${tmpdir}/repo/dot_codex/config.toml" \
   PATH="${tmpdir}/bin:${PATH}" \
   HOME="${tmpdir}/home" \
-  "$real_fish" -c "source '$function_path'; refresh-config"; then
+  "$real_fish" -c "set -p fish_function_path '$repo_root/dot_config/fish/functions'; source '$function_path'; refresh-config"; then
   printf 'expected refresh-config to fail when snapshot helper fails\n' >&2
   exit 1
 fi
@@ -186,3 +186,16 @@ if grep -Eq 'chezmoi:apply|sync-shortcuts|sourced-shortcuts|fish-reload' "$log_p
   cat "$log_path" >&2
   exit 1
 fi
+
+plain_output="$(CLI_PLAIN=1 TEST_LOG="$log_path" TEST_CODEX_SOURCE="${tmpdir}/home/.codex/config.toml" TEST_CODEX_TARGET="${tmpdir}/repo/dot_codex/config.toml" TEST_GITCONFIG_TARGET="${tmpdir}/repo/dot_gitconfig.tmpl" PATH="${tmpdir}/bin:${PATH}" HOME="${tmpdir}/home" "$real_fish" --no-config -c "set -p fish_function_path '$repo_root/dot_config/fish/functions'; source '$function_path'; refresh-config" 2>"${tmpdir}/plain-stderr")"
+if [ "$plain_output" != 'REFRESH COMPLETE' ]; then
+  printf 'expected ASCII completion in CLI_PLAIN=1 mode, got: %s\n' "$plain_output" >&2
+  exit 1
+fi
+python3 - "${tmpdir}/plain-stderr" <<'PYASCII'
+from pathlib import Path
+import sys
+output = Path(sys.argv[1]).read_text()
+assert output.isascii(), output
+assert '[start] snapshot-codex-config' in output, output
+PYASCII

@@ -247,6 +247,7 @@ def next_step(entry):
 
 def render_terminal(report, width=None, *, plain=False):
     """Render the complete selected report for a terminal, without Markdown."""
+    plain = plain or os.environ.get("CLI_PLAIN") == "1"
     width = max(40, min(88, width if width is not None else shutil.get_terminal_size((88, 24)).columns))
     lines = []
 

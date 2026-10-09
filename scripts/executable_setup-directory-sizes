@@ -8,11 +8,19 @@ import subprocess
 import tarfile
 import tempfile
 
+
+def _cli_message(text, icon):
+    """Decorate human output; CLI_PLAIN=1 keeps legacy scripts undecorated."""
+    import os
+    import sys
+    plain = os.environ.get('CLI_PLAIN') == '1' or '--plain' in sys.argv
+    return ('' if plain else icon + ' ') + text
+
 VERSION = 'v1.2.6'
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Download pinned Dust release with gh into PREFIX/bin; needs gh and network, no sudo.')
+    parser = argparse.ArgumentParser(description=_cli_message('Download pinned Dust release with gh into PREFIX/bin; needs gh and network, no sudo.', '🧰'))
     parser.add_argument('--prefix', type=Path, required=True, help='explicit writable installation prefix, for example /tmp/directory-sizes-tools')
     args = parser.parse_args()
     machine = {'x86_64':'x86_64','aarch64':'aarch64'}.get(platform.machine())
@@ -36,7 +44,7 @@ def main():
                 shutil.copyfileobj(source,output)
         dest.chmod(0o755)
     subprocess.run([str(dest),'--version'],check=True)
-    print(f'Installed {dest}; add {dest.parent} to PATH or pass --backend {dest}')
+    print(_cli_message(f'Installed {dest}; add {dest.parent} to PATH or pass --backend {dest}', '✅'))
 
 
 if __name__ == '__main__':

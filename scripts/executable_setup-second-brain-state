@@ -1,7 +1,13 @@
 #!/usr/bin/env bash
+
+# Human-facing decoration; keep protocol/data output unchanged.
+cli_emoji() {
+  [ "${CLI_PLAIN:-0}" = 1 ] || printf '%s ' "$1"
+}
 set -euo pipefail
 
 usage() {
+    printf '%s' "$(cli_emoji '📖')"
     cat <<'EOF'
 Set up Second Brain's private state outside the repository.
 
@@ -26,7 +32,7 @@ write_shell_config=false
 while (($#)); do
     case "$1" in
         --state-base)
-            (($# >= 2)) || { echo "Missing value for --state-base" >&2; exit 2; }
+            (($# >= 2)) || { echo "$(cli_emoji '❌')Missing value for --state-base" >&2; exit 2; }
             state_base="$2"
             shift 2
             ;;
@@ -39,7 +45,7 @@ while (($#)); do
             exit 0
             ;;
         *)
-            echo "Unknown option: $1" >&2
+            echo "$(cli_emoji '❌')Unknown option: $1" >&2
             usage >&2
             exit 2
             ;;
@@ -47,7 +53,7 @@ while (($#)); do
 done
 
 if [[ "$state_base" != /* ]]; then
-    echo "--state-base must be an absolute path" >&2
+    echo "$(cli_emoji 'ℹ️')--state-base must be an absolute path" >&2
     exit 2
 fi
 
@@ -68,7 +74,7 @@ if [[ "$write_shell_config" == true ]]; then
                 printf '\n# Second Brain private state\n'
                 printf '%s\n' "$shell_line"
             } >> "$shell_config"
-            echo "Updated $shell_config"
+            echo "$(cli_emoji '✅')Updated $shell_config"
         fi
     done
 
@@ -87,12 +93,12 @@ if [[ "$write_shell_config" == true ]]; then
             printf '\n# Second Brain private state\n'
             printf '%s\n' "$fish_shell_line"
         } >> "$fish_config"
-        echo "Updated $fish_config"
+        echo "$(cli_emoji '✅')Updated $fish_config"
     fi
 fi
 
-echo "Second Brain private state is ready at $state_root"
-echo "Current shell: $shell_line"
+echo "$(cli_emoji '✅')Second Brain private state is ready at $state_root"
+echo "$(cli_emoji 'ℹ️')Current shell: $shell_line"
 if [[ "$write_shell_config" == false ]]; then
-    echo "To make it permanent, rerun with --write-shell-config."
+    echo "$(cli_emoji 'ℹ️')To make it permanent, rerun with --write-shell-config."
 fi

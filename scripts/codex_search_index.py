@@ -16,6 +16,14 @@ import tempfile
 import time
 import uuid
 
+
+def _cli_message(text, icon):
+    """Decorate human output; CLI_PLAIN=1 keeps legacy scripts undecorated."""
+    import os
+    import sys
+    plain = os.environ.get('CLI_PLAIN') == '1' or '--plain' in sys.argv
+    return ('' if plain else icon + ' ') + text
+
 CACHE_VERSION = 2
 SNIPPETS = 5
 TOOL_ITEMS = {'function_call', 'function_call_output', 'custom_tool_call',
@@ -40,7 +48,7 @@ def visible(text):
 
 
 def warn(text):
-    print('codex-search: ' + visible(text), file=sys.stderr)
+    print(_cli_message('codex-search: ' + visible(text), '⚠️'), file=sys.stderr)
 
 
 def session_id(value):

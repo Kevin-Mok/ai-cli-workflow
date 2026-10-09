@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+
+# Human-facing decoration; keep protocol/data output unchanged.
+cli_emoji() {
+  [ "${CLI_PLAIN:-0}" = 1 ] || printf '%s ' "$1"
+}
 # Initialize a USB-attached SATA disk only after checking its identity and data.
 set -Eeuo pipefail
 
@@ -10,6 +15,7 @@ system_known=0
 declare -a system_disks=()
 
 usage() {
+  printf '%s' "$(cli_emoji '📖')"
   cat <<'EOF'
 Usage: bash scripts/hdd-init-wizard.sh [--dry-run | --help]
 
@@ -24,12 +30,12 @@ and filesystem data. It is not a secure erase.
 EOF
 }
 
-die() { printf 'Error: %s\n' "$*" >&2; exit 1; }
-note() { printf '\n%s\n' "$*"; }
+die() { printf '%sError: %s\n' "$(cli_emoji '❌')" "$*" >&2; exit 1; }
+note() { printf '\n%s%s\n' "$(cli_emoji 'ℹ️')" "$*"; }
 
 prompt() {
   local __name=$1 message=$2 input
-  if ! IFS= read -r -p "$message" input; then
+  if ! IFS= read -r -p "$(cli_emoji '❓')$message" input; then
     die 'Input cancelled. No further changes made.'
   fi
   printf -v "$__name" '%s' "$input"
@@ -102,20 +108,20 @@ diagnostics() {
   [[ -n $messages ]] || messages=$(dmesg 2>/dev/null || true)
   filtered=$(printf '%s\n' "$messages" | grep -Ei 'usb|uas|scsi|sd[a-z]|ata|block|I/O error|reset' | tail -n 40 || true)
   if [[ -n $filtered ]]; then printf '%s\n' "$filtered"; else
-    printf 'No readable recent USB/storage kernel messages.\n'
+    printf '%sNo readable recent USB/storage kernel messages.\n' "$(cli_emoji 'ℹ️')"
   fi
 
   note 'USB devices:'
   if command -v lsusb >/dev/null 2>&1; then
-    lsusb || printf 'lsusb could not list devices.\n'
+    lsusb || printf '%slsusb could not list devices.\n' "$(cli_emoji '❌')"
   else
-    printf 'lsusb is unavailable (usbutils package); no package was installed.\n'
+    printf '%slsusb is unavailable (usbutils package); no package was installed.\n' "$(cli_emoji '❌')"
   fi
 
   if command -v smartctl >/dev/null 2>&1; then
-    printf '\nSMART check available after disk selection (read-only).\n'
+    printf '\n%sSMART check available after disk selection (read-only).\n' "$(cli_emoji 'ℹ️')"
   else
-    printf '\nSMART check unavailable. Install manually if wanted: sudo apt install smartmontools\n'
+    printf '\n%sSMART check unavailable. Install manually if wanted: sudo apt install smartmontools\n' "$(cli_emoji '❌')"
   fi
 }
 
@@ -129,13 +135,13 @@ list_whole_disks() {
     [[ $kind == disk ]] || continue
     lsblk -dn -o PATH,SIZE,MODEL,SERIAL,TRAN,TYPE "$disk"
     if is_system_disk "$disk"; then
-      printf '  BLOCKED: Ubuntu system/boot disk\n'
+      printf '%s  BLOCKED: Ubuntu system/boot disk\n' "$(cli_emoji 'ℹ️')"
     elif has_mounts "$disk"; then
-      printf '  BLOCKED: disk or child partition is mounted\n'
+      printf '%s  BLOCKED: disk or child partition is mounted\n' "$(cli_emoji 'ℹ️')"
     elif ! disk_type_and_bus_ok "$disk"; then
-      printf '  BLOCKED: not a USB-attached disk\n'
+      printf '%s  BLOCKED: not a USB-attached disk\n' "$(cli_emoji 'ℹ️')"
     else
-      printf '  Candidate: confirm its exact full path to inspect it\n'
+      printf '%s  Candidate: confirm its exact full path to inspect it\n' "$(cli_emoji 'ℹ️')"
     fi
   done
 }
@@ -144,17 +150,17 @@ inspect_selected() {
   local table signatures
   note "Selected disk: $selected_disk"
   lsblk -dn -o PATH,SIZE,MODEL,SERIAL,TRAN,TYPE,PTTYPE "$selected_disk"
-  printf 'Partition table: '
+  printf '%sPartition table: ' "$(cli_emoji 'ℹ️')"
   table=$(lsblk -dnro PTTYPE "$selected_disk")
   printf '%s\n' "${table:-none detected}"
-  printf 'Disk and child filesystems / mount state:\n'
+  printf '%sDisk and child filesystems / mount state:\n' "$(cli_emoji 'ℹ️')"
   lsblk -o NAME,PATH,SIZE,TYPE,FSTYPE,LABEL,MOUNTPOINTS "$selected_disk"
   if (( dry_run )); then
-    printf 'Signatures: dry-run skips privileged signature inspection.\n'
+    printf '%sSignatures: dry-run skips privileged signature inspection.\n' "$(cli_emoji 'ℹ️')"
     return
   fi
   signatures=$(privileged wipefs -n "$selected_disk") || die 'Cannot inspect disk signatures safely.'
-  if [[ -n $signatures ]]; then printf 'Disk signatures:\n%s\n' "$signatures"; fi
+  if [[ -n $signatures ]]; then printf '%sDisk signatures:\n%s\n' "$(cli_emoji 'ℹ️')" "$signatures"; fi
 }
 
 existing_data() {
@@ -229,9 +235,9 @@ main() {
   discover_system_disks
   list_whole_disks
   if (( ! system_known )); then
-    printf '\nUbuntu system disk could not be resolved. Initialization is disabled.\n'
+    printf '\n%sUbuntu system disk could not be resolved. Initialization is disabled.\n' "$(cli_emoji '❌')"
   else
-    printf '\nProtected system disk(s): %s\n' "${system_disks[*]}"
+    printf '\n%sProtected system disk(s): %s\n' "$(cli_emoji 'ℹ️')" "${system_disks[*]}"
   fi
   local usb_count=0 disk kind
   while read -r disk kind; do
@@ -240,21 +246,21 @@ main() {
     fi
   done < <(lsblk -dnro PATH,TYPE)
   if (( usb_count == 0 )); then
-    printf 'No external SATA/USB disk detected. Check dock power, its power switch, USB cable, and try another USB port.\n'
+    printf '%sNo external SATA/USB disk detected. Check dock power, its power switch, USB cable, and try another USB port.\n' "$(cli_emoji 'ℹ️')"
     return 0
   fi
   if (( dry_run )) && [[ ! -t 0 ]]; then
-    printf '\nDry run: no disk selected. Interactive preview would inspect a selected USB disk, then show:\n'
+    printf '\n%sDry run: no disk selected. Interactive preview would inspect a selected USB disk, then show:\n' "$(cli_emoji 'ℹ️')"
     printf '  sudo parted -s <disk> mklabel gpt\n  sudo parted -s -a optimal <disk> mkpart primary ext4 1MiB 100%%\n  sudo mkfs.ext4 -F -O 64bit -L Storage <new-partition>\n'
     printf '  sudo mkdir -p /mnt/storage; sudo mount <new-partition> /mnt/storage\n'
     printf '  sudo cp -p /etc/fstab <timestamped-backup>; append UUID entry; sudo mount -a\n'
-    printf 'No writes were made.\n'
+    printf '%sNo writes were made.\n' "$(cli_emoji 'ℹ️')"
     return 0
   fi
   (( system_known )) || die 'Cannot safely distinguish the Ubuntu system disk.'
 
   prompt answer 'Type the exact full USB disk path to inspect (or press Enter to exit): '
-  [[ -n $answer ]] || { printf 'Cancelled.\n'; return 0; }
+  [[ -n $answer ]] || { printf '%sCancelled.\n' "$(cli_emoji 'ℹ️')"; return 0; }
   [[ $answer == /dev/* && -b $answer ]] || die 'That is not a full block-device path.'
   [[ $(readlink -f -- "$answer") == "$answer" ]] ||
     die 'Use the canonical full path shown in the whole-disk list.'
@@ -275,17 +281,17 @@ main() {
         show_privileged smartctl -a -d sat "$selected_disk"
       else
         privileged smartctl -a -d sat "$selected_disk" ||
-          printf 'SMART check failed; this USB bridge may not pass SMART data.\n'
+          printf '%sSMART check failed; this USB bridge may not pass SMART data.\n' "$(cli_emoji '❌')"
       fi
     fi
   fi
 
   if existing_data; then
     existing=1
-    printf '\nExisting partitions or filesystem signatures may contain data.\n'
-    printf '1) Exit\n2) Deliberately erase and reinitialize\n'
+    printf '\n%sExisting partitions or filesystem signatures may contain data.\n' "$(cli_emoji 'ℹ️')"
+    printf '%s1) Exit\n2) Deliberately erase and reinitialize\n' "$(cli_emoji 'ℹ️')"
     prompt answer 'Choose 1 or 2: '
-    [[ $answer == 2 ]] || { printf 'Exited without changes.\n'; return 0; }
+    [[ $answer == 2 ]] || { printf '%sExited without changes.\n' "$(cli_emoji 'ℹ️')"; return 0; }
     prompt answer "Type exactly 'ERASE $selected_disk': "
     [[ $answer == "ERASE $selected_disk" ]] || die 'Erase confirmation did not match.'
   fi
@@ -316,7 +322,7 @@ main() {
   show_privileged cp -p /etc/fstab '/etc/fstab.backup-YYYYMMDD-HHMMSS'
   printf '  append: UUID=<new-uuid> %s ext4 defaults,nofail 0 2\n' "$mount_path"
   show_privileged mount -a
-  if (( dry_run )); then printf 'Dry run complete. No writes were made.\n'; return 0; fi
+  if (( dry_run )); then printf '%sDry run complete. No writes were made.\n' "$(cli_emoji '✅')"; return 0; fi
 
   prompt answer "Final confirmation: type exactly 'INITIALIZE $selected_disk': "
   [[ $answer == "INITIALIZE $selected_disk" ]] || die 'Final confirmation did not match.'
@@ -363,7 +369,7 @@ main() {
   note 'Initialization complete:'
   lsblk -o NAME,PATH,SIZE,MODEL,SERIAL,TRAN,TYPE,FSTYPE,LABEL,MOUNTPOINTS "$selected_disk"
   df -h "$mount_path"
-  printf 'UUID: %s\nLabel: %s\nMount point: %s\nfstab backup: %s\n' "$uuid" "$label" "$mount_path" "$backup"
+  printf '%sUUID: %s\nLabel: %s\nMount point: %s\nfstab backup: %s\n' "$(cli_emoji 'ℹ️')" "$uuid" "$label" "$mount_path" "$backup"
 }
 
 main "$@"

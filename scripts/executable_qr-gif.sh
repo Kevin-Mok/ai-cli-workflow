@@ -1,17 +1,22 @@
 #!/bin/bash
+
+# Human-facing decoration; keep protocol/data output unchanged.
+cli_emoji() {
+  [ "${CLI_PLAIN:-0}" = 1 ] || printf '%s ' "$1"
+}
 # https://github.com/yishilin14/asc-key-to-qr-code-gif
 
 # Check requirements
-hash qrencode 2>/dev/null || { echo >&2 "Aborting: qrencode not installed"; exit 1; }
+hash qrencode 2>/dev/null || { echo >&2 "$(cli_emoji '❌')Aborting: qrencode not installed"; exit 1; }
 
 # Check argument
 if [ $# -ne 2 ]; then
-    echo "Usage: $0 <ascii armor key filename> <gif filename>"
+    echo "$(cli_emoji '📖')Usage: $0 <ascii armor key filename> <gif filename>"
     exit 1
 fi
 asc_filename=$1
 if [ ! -f ${asc_filename} ]; then
-    echo "Error: ${asc_filename} not found"
+    echo "$(cli_emoji '❌')Error: ${asc_filename} not found"
     exit 1
 fi
 
@@ -40,12 +45,12 @@ if hash zbarimg 2>/dev/null; then
     printf %s "$(cat ${asc_filename})" | diff ${asc_filename}.scanned -
     rm ${asc_filename}.scanned
 else
-    echo "Skip testing: zbarimg nout installed"
+    echo "$(cli_emoji 'ℹ️')Skip testing: zbarimg nout installed"
 fi
 
 # Convert to gif
 convert -delay ${gif_delay} ${asc_filename}.split* ${gif_filename}
-echo "Generated: ${gif_filename}"
+echo "$(cli_emoji '✅')Generated: ${gif_filename}"
 
 # Clean up png
 rm ${asc_filename}.split*

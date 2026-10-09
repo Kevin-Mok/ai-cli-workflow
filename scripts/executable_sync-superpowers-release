@@ -1,7 +1,13 @@
 #!/usr/bin/env bash
+
+# Human-facing decoration; keep protocol/data output unchanged.
+cli_emoji() {
+  [ "${CLI_PLAIN:-0}" = 1 ] || printf '%s ' "$1"
+}
 set -euo pipefail
 
 usage() {
+  printf '%s' "$(cli_emoji '📖')"
   cat <<'USAGE'
 Usage: sync-superpowers-release [--dry-run]
 
@@ -28,7 +34,7 @@ while [[ $# -gt 0 ]]; do
       exit 0
       ;;
     *)
-      echo "sync-superpowers-release: unknown option: $1" >&2
+      echo "$(cli_emoji '❌')sync-superpowers-release: unknown option: $1" >&2
       usage >&2
       exit 2
       ;;
@@ -38,8 +44,8 @@ done
 source_dir="${LINUX_CONFIG_SOURCE:-$HOME/linux-config}"
 
 if [[ ! -d "$source_dir" ]]; then
-  echo "sync-superpowers-release: source directory not found: $source_dir" >&2
-  echo "Set LINUX_CONFIG_SOURCE to this repo checkout if it lives elsewhere." >&2
+  echo "$(cli_emoji '❌')sync-superpowers-release: source directory not found: $source_dir" >&2
+  echo "$(cli_emoji 'ℹ️')Set LINUX_CONFIG_SOURCE to this repo checkout if it lives elsewhere." >&2
   exit 1
 fi
 
@@ -63,5 +69,5 @@ chezmoi "${apply_args[@]}"
 
 if [[ "$dry_run" -eq 0 ]]; then
   echo
-  echo "Superpowers release refreshed. Restart Codex sessions to load updated skills."
+  echo "$(cli_emoji '✅')Superpowers release refreshed. Restart Codex sessions to load updated skills."
 fi

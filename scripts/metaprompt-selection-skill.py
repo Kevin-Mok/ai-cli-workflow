@@ -18,6 +18,14 @@ import re
 import shutil
 import tempfile
 
+
+def _cli_message(text, icon):
+    """Decorate human output; CLI_PLAIN=1 keeps legacy scripts undecorated."""
+    import os
+    import sys
+    plain = os.environ.get('CLI_PLAIN') == '1' or '--plain' in sys.argv
+    return ('' if plain else icon + ' ') + text
+
 DEFAULT_ROOT = Path(__file__).resolve().parents[1] / 'benchmarks/metaprompt-selection'
 
 
@@ -162,7 +170,7 @@ def rollback(candidate: str, destination: Path, root: Path = DEFAULT_ROOT) -> No
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(description=_cli_message(__doc__, '🧰'))
     parser.add_argument('action', choices=('stage', 'rollback'))
     parser.add_argument('--candidate', required=True, help='Eligible ID in the local sources.json')
     parser.add_argument('--destination', required=True, type=Path, help='Explicit new skill directory; parent must exist')
@@ -171,7 +179,7 @@ def main() -> int:
         (stage if args.action == 'stage' else rollback)(args.candidate, args.destination)
     except (ValueError, OSError, KeyError, TypeError) as exc:
         parser.exit(1, 'Refused: ' + str(exc) + '\n')
-    print(('Staged verified skill: ' if args.action == 'stage' else 'Removed unchanged staged skill: ') + str(args.destination))
+    print(_cli_message(('Staged verified skill: ' if args.action == 'stage' else 'Removed unchanged staged skill: ') + str(args.destination), '✅'))
     return 0
 
 

@@ -576,7 +576,7 @@ def report() -> dict:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(description=('' if os.environ.get('CLI_PLAIN') == '1' else '📖 ') + __doc__)
     parser.add_argument('action', choices=['verify', 'dry-run', 'develop', 'recover-development', 'freeze', 'run', 'report'])
     parser.add_argument('--jobs', type=int, choices=[1, 2, 3], default=2)
     parser.add_argument('--development-round', type=int, choices=[1, 2], default=1)

@@ -1,4 +1,9 @@
 #!/bin/bash
+
+# Human-facing decoration; keep protocol/data output unchanged.
+cli_emoji() {
+  [ "${CLI_PLAIN:-0}" = 1 ] || printf '%s ' "$1"
+}
 # Rick Astley in your Terminal.
 # By Serene Han and Justine Tunney <3
 version='1.1'
@@ -22,10 +27,10 @@ cleanup() { (( audpid > 1 )) && kill $audpid 2>/dev/null; }
 quit() { echo -e "\x1b[2J \x1b[0H ${purp}<3 \x1b[?25h \x1b[u \x1b[m"; }
 
 usage () {
-  echo -en "${green}Rick Astley performs ♪ Never Gonna Give You Up ♪ on STDOUT."
+  echo -en "$(cli_emoji '🎵')${green}Rick Astley performs ♪ Never Gonna Give You Up ♪ on STDOUT."
   echo -e "  ${purp}[v$version]"
-  echo -e "${yell}Usage: ./astley.sh [OPTIONS...]"
-  echo -e "${purp}OPTIONS : ${yell}"
+  echo -e "$(cli_emoji '📖')${yell}Usage: ./astley.sh [OPTIONS...]"
+  echo -e "$(cli_emoji 'ℹ️')${purp}OPTIONS : ${yell}"
   echo -e " help   - Show this message."
   echo -e " inject - Append to ${purp}${USER}${yell}'s bashrc. (Recommended :D)"
 }
@@ -33,14 +38,14 @@ for arg in "$@"; do
   if [[ "$arg" == "help"* || "$arg" == "-h"* || "$arg" == "--h"* ]]; then
     usage && exit
   elif [[ "$arg" == "inject" ]]; then
-    echo -en "${red}[Inject] "
+    echo -en "$(cli_emoji '🔧')${red}[Inject] "
     echo $NEVER_GONNA >> $MAKE_YOU_CRY
-    echo -e "${green}Appended to $MAKE_YOU_CRY. <3"
-    echo -en "${yell}If you've astley overdosed, "
-    echo -e "delete the line ${purp}\"$NEVER_GONNA\"${yell}."
+    echo -e "$(cli_emoji '✅')${green}Appended to $MAKE_YOU_CRY. <3"
+    echo -en "$(cli_emoji 'ℹ️')${yell}If you've astley overdosed, "
+    echo -e "$(cli_emoji 'ℹ️')delete the line ${purp}\"$NEVER_GONNA\"${yell}."
     exit
   else
-    echo -e "${red}Unrecognized option: \"$arg\""
+    echo -e "$(cli_emoji '❌')${red}Unrecognized option: \"$arg\""
     usage && exit
   fi
 done
@@ -51,7 +56,7 @@ trap "quit" EXIT
 obtainium() {
   if has? curl; then curl -s $1
   elif has? wget; then wget -q -O - $1
-  else echo "Cannot has internets. :(" && exit
+  else echo "$(cli_emoji '❌')Cannot has internets. :(" && exit
   fi
 }
 echo -en "\x1b[?25l \x1b[2J \x1b[H"  # Hide cursor, clear screen.

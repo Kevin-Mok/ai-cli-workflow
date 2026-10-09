@@ -12,6 +12,14 @@ import sys
 import tempfile
 import time
 
+
+def _cli_message(text, icon):
+    """Decorate human output; CLI_PLAIN=1 keeps legacy scripts undecorated."""
+    import os
+    import sys
+    plain = os.environ.get('CLI_PLAIN') == '1' or '--plain' in sys.argv
+    return ('' if plain else icon + ' ') + text
+
 PROGRESS = re.compile(r'(?:Indexing: \. \d+ files, .+|Preparing: \. .+) \.\.\. [-\\|/]\Z')
 
 
@@ -35,7 +43,7 @@ def positive(value):
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Inspect allocated directory sizes with one Dust scan. Depth limits display, not traversal.')
+    parser = argparse.ArgumentParser(description=_cli_message('Inspect allocated directory sizes with one Dust scan. Depth limits display, not traversal.', '🧰'))
     parser.add_argument('directory', nargs='?', default='.', help='target directory (default current directory); use -- before leading-dash paths')
     parser.add_argument('--depth', '-d', type=number, default=1, help='display depth, root is 0 (default 1)')
     parser.add_argument('--threads', '-T', type=positive, default=min(8, os.cpu_count() or 1), help='walker threads (default up to 8); try 1 on rotational disks')
@@ -50,7 +58,7 @@ def main():
     if not backend:
         parser.error('Dust is missing; run ./scripts/executable_setup-directory-sizes --prefix /tmp/directory-sizes-tools then add its bin directory to PATH')
     backend = os.path.abspath(backend)
-    print(f'Scanning {ascii(str(target))}: {"logical bytes (hard links counted per name)" if args.apparent_size else "allocated disk usage"}; totals pending.', file=sys.stderr, flush=True)
+    print(_cli_message(f'Scanning {ascii(str(target))}: {"logical bytes (hard links counted per name)" if args.apparent_size else "allocated disk usage"}; totals pending.', '⏳'), file=sys.stderr, flush=True)
     command = [backend, '--only-dir', '--depth', str(args.depth), '--threads', str(args.threads),
                '--number-of-lines', str(sys.maxsize), '--no-colors', '--no-percent-bars',
                '--full-paths', '--print-errors']
@@ -96,13 +104,13 @@ def main():
                             continue
                         if PROGRESS.fullmatch(record):
                             if time.monotonic() - last_progress >= 1:
-                                print('Provisional ' + visible(record), file=sys.stderr, flush=True)
+                                print(_cli_message('Provisional ' + visible(record), '⏳'), file=sys.stderr, flush=True)
                                 last_progress = time.monotonic()
                         else:
                             diagnostics.append(record)
                     # Dust flushes its active progress record before the next CR.
                     if PROGRESS.fullmatch(pending.strip()) and time.monotonic() - last_progress >= 1:
-                        print('Provisional ' + visible(pending.strip()), file=sys.stderr, flush=True)
+                        print(_cli_message('Provisional ' + visible(pending.strip()), '⏳'), file=sys.stderr, flush=True)
                         last_progress = time.monotonic()
 
                 while proc.poll() is None:
@@ -111,14 +119,14 @@ def main():
                 collect(final=True)
                 error_reader.close()
                 if proc.returncode != 0 or diagnostics:
-                    print('Scan incomplete; totals withheld.', file=sys.stderr)
+                    print(_cli_message('Scan incomplete; totals withheld.', '❌'), file=sys.stderr)
                     for diagnostic in diagnostics:
                         print(visible(diagnostic), file=sys.stderr)
                     return proc.returncode if proc.returncode and proc.returncode > 0 else 1
                 output.seek(0)
                 result = output.read().decode('utf-8', errors='replace')
                 if not result.strip():
-                    print('Scan incomplete: backend returned no results.', file=sys.stderr)
+                    print(_cli_message('Scan incomplete: backend returned no results.', '❌'), file=sys.stderr)
                     return 1
                 try:
                     tree = json.loads(result)
@@ -138,19 +146,19 @@ def main():
                             if amount < 1024 or unit == 'PiB':
                                 break
                             amount /= 1024
-                        lines.append(f'{amount:8.2f} {unit:3}  {"  " * depth}{ascii(node["name"])}')
+                        lines.append(_cli_message(f'{amount:8.2f} {unit:3}  {"  " * depth}{ascii(node["name"])}', '📂'))
                         stack.extend((child, depth + 1) for child in reversed(node['children']))
                 except (ValueError, TypeError, OverflowError) as error:
-                    print(f'Scan incomplete: invalid backend result: {error}', file=sys.stderr)
+                    print(_cli_message(f'Scan incomplete: invalid backend result: {error}', '❌'), file=sys.stderr)
                     return 1
                 sys.stdout.write(result if args.json else '\n'.join(lines) + '\n')
-                print('Scan finished without reported errors; this is not an atomic filesystem snapshot.', file=sys.stderr)
+                print(_cli_message('Scan finished without reported errors; this is not an atomic filesystem snapshot.', '✅'), file=sys.stderr)
                 return 0
     except KeyboardInterrupt:
-        print('Scan interrupted; incomplete totals withheld.', file=sys.stderr)
+        print(_cli_message('Scan interrupted; incomplete totals withheld.', '❌'), file=sys.stderr)
         return 128 + interrupted
     except OSError as error:
-        print(f'Scan incomplete: {error}', file=sys.stderr)
+        print(_cli_message(f'Scan incomplete: {error}', '❌'), file=sys.stderr)
         return 1
     finally:
         if proc is not None and proc.poll() is None:

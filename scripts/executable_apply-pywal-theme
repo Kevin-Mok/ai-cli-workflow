@@ -1,9 +1,14 @@
 #!/usr/bin/env bash
 
+# Human-facing decoration; keep protocol/data output unchanged.
+cli_emoji() {
+  [ "${CLI_PLAIN:-0}" = 1 ] || printf '%s ' "$1"
+}
+
 set -euo pipefail
 
 if [ "$#" -eq 0 ]; then
-  printf 'Usage: %s <image-path>|<wal-args>\n' "$(basename "$0")" >&2
+  printf '%sUsage: %s <image-path>|<wal-args>\n' "$(cli_emoji '📖')" "$(basename "$0")" >&2
   exit 1
 fi
 

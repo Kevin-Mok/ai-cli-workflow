@@ -9,6 +9,13 @@ import sys
 from pathlib import Path
 from shutil import which
 from typing import Any, Iterable, Sequence
+import os
+
+
+def _cli_message(text: str, emoji: str) -> str:
+    """Decorate authored prose without changing machine-readable output."""
+    return text if os.environ.get("CLI_PLAIN") == "1" else f"{emoji} {text}"
+
 
 FAILURE_CONCLUSIONS = {
     "failure",
@@ -78,8 +85,8 @@ def run_gh_command_raw(args: Sequence[str], cwd: Path) -> tuple[int, bytes, str]
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
-            "Inspect failing GitHub PR checks, fetch GitHub Actions logs, and extract a "
-            "failure snippet."
+            _cli_message("Inspect failing GitHub PR checks, fetch GitHub Actions logs, and extract a "
+            "failure snippet.", "📖")
         ),
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
@@ -97,7 +104,7 @@ def main() -> int:
     args = parse_args()
     repo_root = find_git_root(Path(args.repo))
     if repo_root is None:
-        print("Error: not inside a Git repository.", file=sys.stderr)
+        print(_cli_message("Error: not inside a Git repository.", '❌'), file=sys.stderr)
         return 1
 
     if not ensure_gh_available(repo_root):
@@ -113,7 +120,7 @@ def main() -> int:
 
     failing = [c for c in checks if is_failing(c)]
     if not failing:
-        print(f"PR #{pr_value}: no failing checks detected.")
+        print(_cli_message(f"PR #{pr_value}: no failing checks detected.", '✅'))
         return 0
 
     results = []
@@ -149,13 +156,13 @@ def find_git_root(start: Path) -> Path | None:
 
 def ensure_gh_available(repo_root: Path) -> bool:
     if which("gh") is None:
-        print("Error: gh is not installed or not on PATH.", file=sys.stderr)
+        print(_cli_message("Error: gh is not installed or not on PATH.", '❌'), file=sys.stderr)
         return False
     result = run_gh_command(["auth", "status"], cwd=repo_root)
     if result.returncode == 0:
         return True
     message = (result.stderr or result.stdout or "").strip()
-    print(message or "Error: gh not authenticated.", file=sys.stderr)
+    print(_cli_message(message or "Error: gh not authenticated.", '❌'), file=sys.stderr)
     return False
 
 
@@ -165,16 +172,16 @@ def resolve_pr(pr_value: str | None, repo_root: Path) -> str | None:
     result = run_gh_command(["pr", "view", "--json", "number"], cwd=repo_root)
     if result.returncode != 0:
         message = (result.stderr or result.stdout or "").strip()
-        print(message or "Error: unable to resolve PR.", file=sys.stderr)
+        print(_cli_message(message or "Error: unable to resolve PR.", '❌'), file=sys.stderr)
         return None
     try:
         data = json.loads(result.stdout or "{}")
     except json.JSONDecodeError:
-        print("Error: unable to parse PR JSON.", file=sys.stderr)
+        print(_cli_message("Error: unable to parse PR JSON.", '❌'), file=sys.stderr)
         return None
     number = data.get("number")
     if not number:
-        print("Error: no PR number found.", file=sys.stderr)
+        print(_cli_message("Error: no PR number found.", '❌'), file=sys.stderr)
         return None
     return str(number)
 
@@ -200,7 +207,7 @@ def fetch_checks(pr_value: str, repo_root: Path) -> list[dict[str, Any]] | None:
             ]
             selected_fields = [field for field in fallback_fields if field in available_fields]
             if not selected_fields:
-                print("Error: no usable fields available for gh pr checks.", file=sys.stderr)
+                print(_cli_message("Error: no usable fields available for gh pr checks.", '❌'), file=sys.stderr)
                 return None
             result = run_gh_command(
                 ["pr", "checks", pr_value, "--json", ",".join(selected_fields)],
@@ -208,18 +215,18 @@ def fetch_checks(pr_value: str, repo_root: Path) -> list[dict[str, Any]] | None:
             )
             if result.returncode != 0:
                 message = (result.stderr or result.stdout or "").strip()
-                print(message or "Error: gh pr checks failed.", file=sys.stderr)
+                print(_cli_message(message or "Error: gh pr checks failed.", '❌'), file=sys.stderr)
                 return None
         else:
-            print(message or "Error: gh pr checks failed.", file=sys.stderr)
+            print(_cli_message(message or "Error: gh pr checks failed.", '❌'), file=sys.stderr)
             return None
     try:
         data = json.loads(result.stdout or "[]")
     except json.JSONDecodeError:
-        print("Error: unable to parse checks JSON.", file=sys.stderr)
+        print(_cli_message("Error: unable to parse checks JSON.", '❌'), file=sys.stderr)
         return None
     if not isinstance(data, list):
-        print("Error: unexpected checks JSON shape.", file=sys.stderr)
+        print(_cli_message("Error: unexpected checks JSON shape.", '❌'), file=sys.stderr)
         return None
     return data
 
@@ -458,20 +465,20 @@ def tail_lines(text: str, max_lines: int) -> str:
 
 def render_results(pr_number: str, results: Iterable[dict[str, Any]]) -> None:
     results_list = list(results)
-    print(f"PR #{pr_number}: {len(results_list)} failing checks analyzed.")
+    print(_cli_message(f"PR #{pr_number}: {len(results_list)} failing checks analyzed.", '🔎'))
     for result in results_list:
         print("-" * 60)
-        print(f"Check: {result.get('name', '')}")
+        print(_cli_message(f"Check: {result.get('name', '')}", 'ℹ️'))
         if result.get("detailsUrl"):
-            print(f"Details: {result['detailsUrl']}")
+            print(_cli_message(f"Details: {result['detailsUrl']}", 'ℹ️'))
         run_id = result.get("runId")
         if run_id:
-            print(f"Run ID: {run_id}")
+            print(_cli_message(f"Run ID: {run_id}", 'ℹ️'))
         job_id = result.get("jobId")
         if job_id:
-            print(f"Job ID: {job_id}")
+            print(_cli_message(f"Job ID: {job_id}", 'ℹ️'))
         status = result.get("status", "unknown")
-        print(f"Status: {status}")
+        print(_cli_message(f"Status: {status}", 'ℹ️'))
 
         run_meta = result.get("run", {})
         if run_meta:
@@ -479,25 +486,25 @@ def render_results(pr_number: str, results: Iterable[dict[str, Any]]) -> None:
             sha = (run_meta.get("headSha") or "")[:12]
             workflow = run_meta.get("workflowName") or run_meta.get("name") or ""
             conclusion = run_meta.get("conclusion") or run_meta.get("status") or ""
-            print(f"Workflow: {workflow} ({conclusion})")
+            print(_cli_message(f"Workflow: {workflow} ({conclusion})", 'ℹ️'))
             if branch or sha:
-                print(f"Branch/SHA: {branch} {sha}")
+                print(_cli_message(f"Branch/SHA: {branch} {sha}", 'ℹ️'))
             if run_meta.get("url"):
-                print(f"Run URL: {run_meta['url']}")
+                print(_cli_message(f"Run URL: {run_meta['url']}", 'ℹ️'))
 
         if result.get("note"):
-            print(f"Note: {result['note']}")
+            print(_cli_message(f"Note: {result['note']}", 'ℹ️'))
 
         if result.get("error"):
-            print(f"Error fetching logs: {result['error']}")
+            print(_cli_message(f"Error fetching logs: {result['error']}", '❌'))
             continue
 
         snippet = result.get("logSnippet") or ""
         if snippet:
-            print("Failure snippet:")
+            print(_cli_message("Failure snippet:", '❌'))
             print(indent_block(snippet, prefix="  "))
         else:
-            print("No snippet available.")
+            print(_cli_message("No snippet available.", '⚠️'))
     print("-" * 60)
 
 

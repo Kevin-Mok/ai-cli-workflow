@@ -1,8 +1,14 @@
 #!/usr/bin/env bash
+
+# Human-facing decoration; keep protocol/data output unchanged.
+cli_emoji() {
+  [ "${CLI_PLAIN:-0}" = 1 ] || printf '%s ' "$1"
+}
 # Local SSH transport; the self-contained remote payload requires Python 3.8+.
 set -euo pipefail
 
 usage() {
+  printf '%s' "$(cli_emoji '📖')"
   cat <<'EOF'
 Usage: executable_fix-vps-codex.sh [OPTIONS]
 
@@ -22,7 +28,7 @@ It then uses a second SSH session to verify the ordinary npm update command.
 EOF
 }
 
-fail() { printf 'ERROR: %s\n' "$*" >&2; exit 2; }
+fail() { printf '%sERROR: %s\n' "$(cli_emoji '❌')" "$*" >&2; exit 2; }
 host=example-user@192.0.2.10
 mode=apply
 ssh_options=(-T -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no
@@ -72,6 +78,12 @@ REGISTRY = 'https://registry.npmjs.org'
 BEGIN = '# >>> fix-vps-codex >>>'
 END = '# <<< fix-vps-codex <<<'
 mode = sys.argv[1]
+CLI_PLAIN = sys.argv[2] if len(sys.argv) > 2 else os.environ.get('CLI_PLAIN', '0')
+
+
+def human_print(message, *args, **kwargs):
+    symbol = '❌' if str(message).startswith('ERROR:') else '✅' if str(message).startswith(('SUCCESS:', 'Installed', 'Repair installed')) else 'ℹ️'
+    print(('' if CLI_PLAIN == '1' else symbol + ' ') + str(message), *args, **kwargs)
 env = os.environ.copy()
 backup_dir = None
 
@@ -173,12 +185,12 @@ def npm_get(npm, key):
 
 
 def describe(node, npm, prefix):
-    print('Remote: {} / {} / user {}'.format(platform.system(), platform.machine(), os.getuid()), flush=True)
+    human_print('Remote: {} / {} / user {}'.format(platform.system(), platform.machine(), os.getuid()), flush=True)
     if Path('/etc/os-release').is_file():
         for line in Path('/etc/os-release').read_text().splitlines():
             if line.startswith('PRETTY_NAME='):
-                print('OS: ' + line.split('=', 1)[1].strip('"'), flush=True)
-    print('Shell: {}'.format(env.get('SHELL', '(unknown)')), flush=True)
+                human_print('OS: ' + line.split('=', 1)[1].strip('"'), flush=True)
+    human_print('Shell: {}'.format(env.get('SHELL', '(unknown)')), flush=True)
     for name, path in [('node', node), ('npm', npm)]:
         version = '(missing)'
         if path and name == 'node':
@@ -188,16 +200,16 @@ def describe(node, npm, prefix):
             manifest = Path(path).resolve().parent.parent / 'package.json'
             if manifest.is_file():
                 version = json.loads(manifest.read_text()).get('version', '(unknown)')
-        print('{}: {} {}'.format(name, path or '(missing)', version), flush=True)
-    print('codex path: {}'.format(shutil.which('codex', path=env.get('PATH')) or '(missing)'), flush=True)
-    print('npm prefix (inferred from environment/config; apply checks npm): {}'.format(prefix), flush=True)
+        human_print('{}: {} {}'.format(name, path or '(missing)', version), flush=True)
+    human_print('codex path: {}'.format(shutil.which('codex', path=env.get('PATH')) or '(missing)'), flush=True)
+    human_print('npm prefix (inferred from environment/config; apply checks npm): {}'.format(prefix), flush=True)
     for manager in [HOME_DIR / '.nvm', HOME_DIR / '.local/share/fnm']:
         if manager.is_dir():
-            print('Existing runtime manager directory: {}'.format(manager), flush=True)
+            human_print('Existing runtime manager directory: {}'.format(manager), flush=True)
     for path in [Path(prefix), Path(prefix) / 'lib/node_modules/@openai/codex', HOME_DIR / '.npm']:
         if path.exists():
             info = path.stat()
-            print('{}: uid={} mode={} writable={}'.format(path, info.st_uid,
+            human_print('{}: uid={} mode={} writable={}'.format(path, info.st_uid,
                   oct(stat.S_IMODE(info.st_mode)), os.access(path, os.W_OK)), flush=True)
 
 
@@ -274,7 +286,7 @@ def download_node():
         run([str(staged / 'bin/npm'), '--version'], environment=test_env)
         (staged / '.archive-sha256').write_text(expected + '\n')
         staged.rename(target)
-    print('Installed user Node {} at {}'.format(release['version'], target), flush=True)
+    human_print('Installed user Node {} at {}'.format(release['version'], target), flush=True)
     return target / 'bin/node', target / 'bin/npm'
 
 
@@ -316,7 +328,7 @@ print('Configuration restored. Reconnect SSH. User-installed packages remain on 
 '''.replace('RECORDS', repr(records))
     (backup_dir / 'rollback.py').write_text(restore)
     (backup_dir / 'rollback.py').chmod(0o700)
-    print('Rollback on VPS: python3 {}'.format(shlex.quote(str(backup_dir / 'rollback.py'))), flush=True)
+    human_print('Rollback on VPS: python3 {}'.format(shlex.quote(str(backup_dir / 'rollback.py'))), flush=True)
     written = []
     try:
         for item, (path, text) in zip(records, changes.items()):
@@ -380,8 +392,8 @@ def main():
     describe(node, npm, prefix)
     if mode == 'dry-run':
         metadata = json.loads(fetch(REGISTRY + '/@openai%2fcodex/latest'))
-        print('Latest Codex: {}; Node requirement: {}'.format(metadata['version'], metadata.get('engines', {}).get('node')), flush=True)
-        print('DRY RUN: no repair writes or npm execution. Apply checks the initialized login shell, '
+        human_print('Latest Codex: {}; Node requirement: {}'.format(metadata['version'], metadata.get('engines', {}).get('node')), flush=True)
+        human_print('DRY RUN: no repair writes or npm execution. Apply checks the initialized login shell, '
               'reuses compatible tools, repairs the user prefix/PATH, and verifies a normal update.', flush=True)
         return
     if mode == 'verify':
@@ -400,7 +412,7 @@ def main():
         versions = re.findall(r'^codex-cli [^\r\n]+$', result.stdout, re.M)
         if not versions:
             fail('The ordinary update did not report a Codex version.')
-        print('SUCCESS: {} updates without sudo in a fresh SSH session ({}).'.format(versions[-1], codex), flush=True)
+        human_print('SUCCESS: {} updates without sudo in a fresh SSH session ({}).'.format(versions[-1], codex), flush=True)
         return
     for key in ['npm_config_prefix', 'NPM_CONFIG_PREFIX', 'npm_config_userconfig', 'NPM_CONFIG_USERCONFIG',
                 'npm_config_cache', 'NPM_CONFIG_CACHE']:
@@ -420,7 +432,7 @@ def main():
     compatible = node_result and node_result.returncode == 0 and version_tuple(node_result.stdout) >= needed
     npm_ok = npm and run([str(npm), '--version'], check=False).returncode == 0
     if not compatible or not npm_ok:
-        print('Node/npm is missing or incompatible; preparing an isolated current LTS runtime.', flush=True)
+        human_print('Node/npm is missing or incompatible; preparing an isolated current LTS runtime.', flush=True)
         node, npm = download_node()
         if version_tuple(run([str(node), '--version']).stdout) < needed:
             fail('Current Node LTS does not meet the Codex requirement; no configuration was changed.')
@@ -428,7 +440,7 @@ def main():
     if Path(npm_get(npm, 'userconfig')) != npmrc:
         fail('npm uses a custom userconfig. Restore the standard ~/.npmrc location before applying.')
     current_prefix = Path(npm_get(npm, 'prefix'))
-    print('Effective npm prefix: {}'.format(current_prefix), flush=True)
+    human_print('Effective npm prefix: {}'.format(current_prefix), flush=True)
     runtime_prefix = node.parent.parent
     managed = any(part in str(node) for part in ('/.nvm/', '/fnm/', '/codex-node/'))
     for key in ['NVM_DIR', 'FNM_DIR']:
@@ -471,7 +483,7 @@ def main():
     # install; the second SSH session proves the persistent ordinary command.
     prefix_path.mkdir(parents=True, exist_ok=True)
     install_env = {**env, 'npm_config_cache': str(cache)}
-    print('Installing Codex {} into {}'.format(metadata['version'], prefix_path), flush=True)
+    human_print('Installing Codex {} into {}'.format(metadata['version'], prefix_path), flush=True)
     run([str(npm), 'install', '-g', '@openai/codex@' + metadata['version'],
          '--prefix', str(prefix_path), '--registry', REGISTRY, '--engine-strict'], environment=install_env)
     binary = prefix_path / 'bin/codex'
@@ -485,38 +497,39 @@ def main():
     write_configs(changes)
     STATE.mkdir(parents=True, exist_ok=True, mode=0o700)
     (STATE / 'expected.json').write_text(json.dumps({'prefix': str(prefix_path)}))
-    print('Repair installed. Verifying through a second SSH session...', flush=True)
+    human_print('Repair installed. Verifying through a second SSH session...', flush=True)
 
 
 try:
     main()
 except Exception as exc:
-    print('ERROR: {}'.format(exc), file=sys.stderr, flush=True)
+    human_print('ERROR: {}'.format(exc), file=sys.stderr, flush=True)
     if backup_dir:
-        print('Configuration backup: {}'.format(backup_dir), file=sys.stderr, flush=True)
+        human_print('Configuration backup: {}'.format(backup_dir), file=sys.stderr, flush=True)
     sys.exit(1)
 PYTHON
 }
 
 remote_run() {
-  local action=$1 status
+  local action=$1 status plain=0
+  [[ ${CLI_PLAIN:-0} == 1 ]] && plain=1
   # Only this constant action is interpolated into the remote command. Host,
   # port and identity remain separate SSH arguments, never shell program text.
-  if remote_payload | ssh "${ssh_options[@]}" "$host" "python3 - $action"; then
+  if remote_payload | ssh "${ssh_options[@]}" "$host" "python3 - $action $plain"; then
     return 0
   else
     status=$?
     if [[ $status == 255 ]]; then
-      printf 'ERROR: SSH connection failed for %s (exit %s). Check the error above.\n' "$host" "$status" >&2
-      printf 'For an unknown host, verify its fingerprint with your VPS provider and connect normally first.\n' >&2
+      printf '%sERROR: SSH connection failed for %s (exit %s). Check the error above.\n' "$(cli_emoji '❌')" "$host" "$status" >&2
+      printf '%sFor an unknown host, verify its fingerprint with your VPS provider and connect normally first.\n' "$(cli_emoji '❌')" >&2
     else
-      printf 'ERROR: Remote %s failed for %s (exit %s). Check the error above.\n' "$action" "$host" "$status" >&2
+      printf '%sERROR: Remote %s failed for %s (exit %s). Check the error above.\n' "$(cli_emoji '❌')" "$action" "$host" "$status" >&2
     fi
     return "$status"
   fi
 }
 
-printf 'Codex VPS %s: %s\n' "$mode" "$host"
+printf '%sCodex VPS %s: %s\n' "$(cli_emoji 'ℹ️')" "$mode" "$host"
 remote_run "$mode"
 if [[ $mode == apply ]]; then
   remote_run verify

@@ -12,6 +12,12 @@ from pathlib import Path
 import sys
 from typing import Any, Dict, List, Optional, Tuple
 
+
+def _cli_message(text: str, emoji: str) -> str:
+    """Decorate authored prose without changing machine-readable output."""
+    return text if os.environ.get("CLI_PLAIN") == "1" else f"{emoji} {text}"
+
+
 DEFAULT_MODEL = "gpt-4o-mini-transcribe"
 DEFAULT_RESPONSE_FORMAT = "text"
 DEFAULT_CHUNKING_STRATEGY = "auto"
@@ -22,17 +28,17 @@ ALLOWED_RESPONSE_FORMATS = {"text", "json", "diarized_json"}
 
 
 def _die(message: str, code: int = 1) -> None:
-    print(f"Error: {message}", file=sys.stderr)
+    print(_cli_message(f"Error: {message}", '❌'), file=sys.stderr)
     raise SystemExit(code)
 
 
 def _warn(message: str) -> None:
-    print(f"Warning: {message}", file=sys.stderr)
+    print(_cli_message(f"Warning: {message}", '⚠️'), file=sys.stderr)
 
 
 def _ensure_api_key(dry_run: bool) -> None:
     if os.getenv("OPENAI_API_KEY"):
-        print("OPENAI_API_KEY is set.", file=sys.stderr)
+        print(_cli_message("OPENAI_API_KEY is set.", '✅'), file=sys.stderr)
         return
     if dry_run:
         _warn("OPENAI_API_KEY is not set; dry-run only.")
@@ -188,7 +194,7 @@ def _run_one(
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Transcribe audio (optionally with speaker diarization) using OpenAI."
+        description=_cli_message("Transcribe audio (optionally with speaker diarization) using OpenAI.", "📖")
     )
     parser.add_argument("audio", nargs="+", help="Audio file(s) to transcribe")
     parser.add_argument(
@@ -269,7 +275,7 @@ def main() -> None:
         out_path = _build_output_path(path, args.response_format, args.out, args.out_dir)
         out_path.parent.mkdir(parents=True, exist_ok=True)
         out_path.write_text(output, encoding="utf-8")
-        print(f"Wrote {out_path}")
+        print(_cli_message(f"Wrote {out_path}", '✅'))
 
 
 if __name__ == "__main__":

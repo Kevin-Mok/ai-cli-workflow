@@ -30,11 +30,19 @@ from .upgrade import UPGRADE_SPECS, apply_upgrade, build_upgrade_preview
 from .vault import capture, closeout, focus, status_report
 
 
+def _cli_message(text, icon):
+    """Decorate human output; CLI_PLAIN=1 keeps legacy scripts undecorated."""
+    import os
+    import sys
+    plain = os.environ.get('CLI_PLAIN') == '1' or '--plain' in sys.argv
+    return ('' if plain else icon + ' ') + text
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="second-brain",
         description=(
-            "Safely capture, retrieve, validate, and migrate the Second Brain."
+            _cli_message("Safely capture, retrieve, validate, and migrate the Second Brain.", '🧠')
         ),
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -189,25 +197,25 @@ def _print_json(value: dict[str, Any]) -> None:
 
 
 def _print_status_text(report: dict[str, Any]) -> None:
-    print(f"Second Brain status for {report['date']}")
-    print("Active projects:")
+    print(_cli_message(f"Second Brain status for {report['date']}", '🧠'))
+    print(_cli_message("Active projects:", '🧠'))
     for project in report["active_projects"]:
-        print(f"- {project}")
+        print(_cli_message(f"- {project}", '🧠'))
     print(
-        f"Inbox: {report['inbox']['count']} reviewed item(s) "
-        f"at {report['inbox']['path']}"
+        _cli_message(f"Inbox: {report['inbox']['count']} reviewed item(s) "
+        f"at {report['inbox']['path']}", '🧠')
     )
     private = report["private_reminders"]
     print(
-        f"Private reminders: {private['someday']} someday, "
-        f"{private['deferred']} deferred, {private['inbox']} inbox"
+        _cli_message(f"Private reminders: {private['someday']} someday, "
+        f"{private['deferred']} deferred, {private['inbox']} inbox", '🧠')
     )
     digest = report["private_sessions"]
     print(
-        f"Private sessions: {digest['pending_count']} pending check(s), "
-        f"last refresh {digest['refreshed_at'] or 'never'}"
+        _cli_message(f"Private sessions: {digest['pending_count']} pending check(s), "
+        f"last refresh {digest['refreshed_at'] or 'never'}", '🧠')
     )
-    print("Latest Daily Notes: " + ", ".join(report["latest_daily_notes"]))
+    print(_cli_message("Latest Daily Notes: " + ", ".join(report["latest_daily_notes"]), '🧠'))
 
 
 @contextmanager
@@ -282,6 +290,8 @@ def _write_review(output: str, *, plain: bool, no_pager: bool) -> bool:
 def main(argv: Sequence[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
+    if hasattr(args, "plain"):
+        args.plain = args.plain or os.environ.get("CLI_PLAIN") == "1"
     try:
         if args.command == "sessions":
             if args.sessions_command == "resolve":
@@ -327,16 +337,16 @@ def main(argv: Sequence[str] | None = None) -> int:
                     _print_json(report)
                 elif args.sessions_command == "refresh":
                     print(
-                        f"Private session refresh: {report.get('refreshed_at') or 'never'}; "
+                        _cli_message(f"Private session refresh: {report.get('refreshed_at') or 'never'}; "
                         f"{report.get('pending_count', 0)} open checks; "
                         f"{report.get('backlog_count', 0)} queued; "
-                        f"{report.get('model_calls', 0)} model calls"
+                        f"{report.get('model_calls', 0)} model calls", '🧠')
                     )
-                    print("Coverage: " + ", ".join(
+                    print(_cli_message("Coverage: " + ", ".join(
                         f"{key}={count}" for key, count in report.get("coverage", {}).items()
-                    ))
+                    ), '🧠'))
                     if report.get("error"):
-                        print("Refresh issue: " + report["error"])
+                        print(_cli_message("Refresh issue: " + report["error"], '❌'))
                 return 1 if report.get("error") else 0
             return 0
         if args.command == "status":
@@ -420,15 +430,15 @@ def main(argv: Sequence[str] | None = None) -> int:
             return 0
         parser.error("unsupported command")
     except (ValidationError, PathError, LockError, CheckpointError) as error:
-        print(f"second-brain: {error}", file=sys.stderr)
+        print(_cli_message(f"second-brain: {error}", '❌'), file=sys.stderr)
         return 2
     except ValueError as error:
-        print(f"second-brain: {error}", file=sys.stderr)
+        print(_cli_message(f"second-brain: {error}", '❌'), file=sys.stderr)
         return 2
     except (OSError, UnicodeError):
         print(
-            "second-brain: filesystem operation failed; "
-            "check vault and state permissions",
+            _cli_message("second-brain: filesystem operation failed; "
+            "check vault and state permissions", '❌'),
             file=sys.stderr,
         )
         return 2

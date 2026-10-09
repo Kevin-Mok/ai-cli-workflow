@@ -10,6 +10,14 @@ import stat
 import sys
 
 
+def _cli_message(text, icon):
+    """Decorate human output; CLI_PLAIN=1 keeps legacy scripts undecorated."""
+    import os
+    import sys
+    plain = os.environ.get('CLI_PLAIN') == '1' or '--plain' in sys.argv
+    return ('' if plain else icon + ' ') + text
+
+
 def largest_days(root: Path) -> list[tuple[str, int]]:
     totals: dict[str, int] = defaultdict(int)
 
@@ -46,23 +54,23 @@ def human_size(size: int) -> str:
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Show the top three local modification days by total file size."
+        description=_cli_message("Show the top three local modification days by total file size.", '📅')
     )
     parser.add_argument("directory", type=Path, help="directory to scan recursively")
     args = parser.parse_args()
 
     if not args.directory.is_dir():
-        print(f"largest-day-file-size: not a directory: {args.directory}", file=sys.stderr)
+        print(_cli_message(f"largest-day-file-size: not a directory: {args.directory}", '❌'), file=sys.stderr)
         return 1
 
     try:
         days = largest_days(args.directory)
     except (OSError, ValueError) as error:
-        print(f"largest-day-file-size: {error}", file=sys.stderr)
+        print(_cli_message(f"largest-day-file-size: {error}", '❌'), file=sys.stderr)
         return 1
 
     for day, size in days:
-        print(f"{day} {human_size(size)}")
+        print(_cli_message(f"{day} {human_size(size)}", '📅'))
     return 0
 
 

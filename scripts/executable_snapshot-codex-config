@@ -10,10 +10,18 @@ from typing import Sequence
 from second_brain.config_snapshot import ConfigSnapshotError, snapshot_codex_config
 
 
+def _cli_message(text, icon):
+    """Decorate human output; CLI_PLAIN=1 keeps legacy scripts undecorated."""
+    import os
+    import sys
+    plain = os.environ.get('CLI_PLAIN') == '1' or '--plain' in sys.argv
+    return ('' if plain else icon + ' ') + text
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="snapshot-codex-config",
-        description="Validate and atomically snapshot the live Codex config.",
+        description=_cli_message("Validate and atomically snapshot the live Codex config.", '🧰'),
     )
     parser.add_argument(
         "--dry-run",
@@ -25,17 +33,17 @@ def main(argv: Sequence[str] | None = None) -> int:
         result = snapshot_codex_config(dry_run=args.dry_run)
     except (ConfigSnapshotError, OSError, UnicodeError):
         print(
-            "snapshot-codex-config: snapshot validation failed",
+            _cli_message("snapshot-codex-config: snapshot validation failed", '❌'),
             file=sys.stderr,
         )
         return 2
 
     if result.dry_run:
-        print("Codex config snapshot dry run passed; no files changed.")
+        print(_cli_message("Codex config snapshot dry run passed; no files changed.", '✅'))
     elif result.changed:
-        print("Codex config snapshot completed.")
+        print(_cli_message("Codex config snapshot completed.", '✅'))
     else:
-        print("Codex config snapshot already current.")
+        print(_cli_message("Codex config snapshot already current.", '✅'))
     return 0
 
 

@@ -11,27 +11,35 @@ import sys
 import time
 
 
+def _cli_message(text, icon):
+    """Decorate human output; CLI_PLAIN=1 keeps legacy scripts undecorated."""
+    import os
+    import sys
+    plain = os.environ.get('CLI_PLAIN') == '1' or '--plain' in sys.argv
+    return ('' if plain else icon + ' ') + text
+
+
 def emit_fixture(lines: int, stream_lines: int, interval: float) -> None:
     while sys.stdout.isatty() and os.get_terminal_size(sys.stdout.fileno()).columns < 40:
-        input("Widen this window to at least 40 columns, then press Enter to generate history. ")
-    print("KITTY SCROLLBACK SMOKE TEST — start of history")
+        input(_cli_message("Widen this window to at least 40 columns, then press Enter to generate history. ", '🧪'))
+    print(_cli_message("KITTY SCROLLBACK SMOKE TEST — start of history", '🧪'))
     for number in range(1, lines + 1):
         print(
-            f"HISTORY {number:06d} | Long Codex-style output: inspect wrapped text, "
-            "drag the rounded scrollbar, select an older line, and resize this window."
+            _cli_message(f"HISTORY {number:06d} | Long Codex-style output: inspect wrapped text, "
+            "drag the rounded scrollbar, select an older line, and resize this window.", '🧪')
         )
     input(
-        "\nHistory ready. Try dragging, Shift+PageUp/PageDown, and Ctrl+Shift+End.\n"
-        "Press Enter to begin streaming, then scroll up while new lines arrive. "
+        _cli_message("\nHistory ready. Try dragging, Shift+PageUp/PageDown, and Ctrl+Shift+End.\n"
+        "Press Enter to begin streaming, then scroll up while new lines arrive. ", '🧪')
     )
     for number in range(1, stream_lines + 1):
-        print(f"STREAM {number:06d} | New output arriving; older text should stay readable.", flush=True)
+        print(_cli_message(f"STREAM {number:06d} | New output arriving; older text should stay readable.", '⏳'), flush=True)
         time.sleep(interval)
-    input("\nStream complete. Press Enter to close this test window. ")
+    input(_cli_message("\nStream complete. Press Enter to close this test window. ", '⏳'))
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(description=_cli_message(__doc__, '🧰'))
     parser.add_argument("--lines", type=int, default=10000, help="initial history records (default: 10000)")
     parser.add_argument("--stream-lines", type=int, default=300, help="streamed records (default: 300)")
     parser.add_argument("--interval", type=float, default=0.1, help="seconds between streamed records (default: 0.1)")

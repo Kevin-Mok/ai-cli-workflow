@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+cli_emoji() { [ "${CLI_PLAIN:-0}" = 1 ] || printf '%s ' "$1"; }
+
 if ! command -v npx >/dev/null 2>&1; then
-  echo "Error: npx is required but not found on PATH." >&2
+  echo "$(cli_emoji ❌)Error: npx is required but not found on PATH." >&2
   exit 1
 fi
 

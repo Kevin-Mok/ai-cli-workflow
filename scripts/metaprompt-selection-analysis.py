@@ -7,6 +7,14 @@ import json
 from pathlib import Path
 import random
 
+
+def _cli_message(text, icon):
+    """Decorate human output; CLI_PLAIN=1 keeps legacy scripts undecorated."""
+    import os
+    import sys
+    plain = os.environ.get('CLI_PLAIN') == '1' or '--plain' in sys.argv
+    return ('' if plain else icon + ' ') + text
+
 WORKFLOWS = ('create', 'sharpen', 'template', 'coding')
 INVALID = {'pending', 'interrupted', 'infrastructure_error', 'quota_truncated'}
 METRICS = ('input_tokens', 'output_tokens', 'cached_input_tokens', 'reasoning_tokens')
@@ -214,7 +222,7 @@ def verify_protocol(run):
 
 
 def main():
-    parser=argparse.ArgumentParser(description=__doc__)
+    parser=argparse.ArgumentParser(description=_cli_message(__doc__, '🧰'))
     parser.add_argument('--run',required=True,type=Path)
     args=parser.parse_args(); run=args.run.resolve(); protocol=verify_protocol(run)
     source_paths=[run/rel for rel in protocol['files'] if Path(rel).name=='sources.json']

@@ -14,6 +14,14 @@ import unicodedata
 from urllib.parse import parse_qs, urlsplit
 
 
+def _cli_message(text, icon):
+    """Decorate human output; CLI_PLAIN=1 keeps legacy scripts undecorated."""
+    import os
+    import sys
+    plain = os.environ.get('CLI_PLAIN') == '1' or '--plain' in sys.argv
+    return ('' if plain else icon + ' ') + text
+
+
 def video_url(value):
     """Accept video links only and discard playlist/tracking parameters."""
     try:
@@ -96,12 +104,12 @@ def verify_quality(artifact, url, runtime):
             f'highest reported is {best[0]}p at {best[1]:g} fps. '
             'File retained; use -o with a fresh directory to download the higher quality.')
     four_k = '4K or higher verified' if max(video['width'], video['height']) >= 3840 else '4K not reported by yt-dlp'
-    print(f'yt-dl: VERIFIED {video["width"]}x{video["height"]} at {actual[1]:g} fps '
-          f'with audio; highest reported resolution/frame rate; {four_k}.', file=sys.stderr)
+    print(_cli_message(f'yt-dl: VERIFIED {video["width"]}x{video["height"]} at {actual[1]:g} fps '
+          f'with audio; highest reported resolution/frame rate; {four_k}.', '✅'), file=sys.stderr)
 
 
 def main():
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(description=_cli_message(__doc__, '🧰'))
     parser.add_argument('url', type=video_url)
     parser.add_argument('-o', '--output-dir', type=Path,
                         default=Path('/mnt/linux-files-3/yt-vids'),
@@ -109,13 +117,13 @@ def main():
     args = parser.parse_args()
     for dependency in ('yt-dlp', 'ffmpeg', 'ffprobe'):
         if not shutil.which(dependency):
-            print(f'yt-dl: missing {dependency}; install it and ensure it is on PATH', file=sys.stderr)
+            print(_cli_message(f'yt-dl: missing {dependency}; install it and ensure it is on PATH', '❌'), file=sys.stderr)
             return 1
     runtime = ['--js-runtimes', 'node'] if shutil.which('node') else []
     try:
         output = args.output_dir.expanduser().resolve()
         output.mkdir(parents=True, exist_ok=True)
-        print('yt-dl: Fetching video information and starting download...',
+        print(_cli_message('yt-dl: Fetching video information and starting download...', '⏳'),
               file=sys.stderr, flush=True)
         info = fetch_metadata(args.url, runtime)
         stem = download_stem(info['title'])
@@ -133,20 +141,20 @@ def main():
             ], stdout=sys.stderr, text=True)
             paths = report.read_text().strip().splitlines() if report.exists() else []
         if result.returncode:
-            print('yt-dl: download failed; see yt-dlp diagnostics above', file=sys.stderr)
+            print(_cli_message('yt-dl: download failed; see yt-dlp diagnostics above', '❌'), file=sys.stderr)
             return result.returncode if result.returncode > 0 else 128 - result.returncode
         if len(paths) != 1:
             raise ValueError('downloader did not report exactly one completed file')
         artifact = Path(paths[0]).resolve()
         if artifact.parent != output or not artifact.is_file() or artifact.stat().st_size == 0:
             raise ValueError('downloader reported a missing, empty, or unexpected output file')
-        print('yt-dl: Checking downloaded quality...', file=sys.stderr, flush=True)
+        print(_cli_message('yt-dl: Checking downloaded quality...', '⏳'), file=sys.stderr, flush=True)
         verify_quality(artifact, args.url, runtime)
         print(artifact)
         return 0
     except (OSError, ValueError, KeyError, TypeError, ZeroDivisionError,
             subprocess.TimeoutExpired) as error:
-        print(f'yt-dl: {error}', file=sys.stderr)
+        print(_cli_message(f'yt-dl: {error}', '❌'), file=sys.stderr)
         return 1
 
 

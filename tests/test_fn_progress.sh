@@ -33,8 +33,8 @@ fi
 EOF
 chmod +x "${tmpdir}/bin/date"
 
-output="$(PATH="${tmpdir}/bin:${PATH}" fish --no-config -c "source '${function_path}'; fn-progress")"
-level_output="$(PATH="${tmpdir}/bin:${PATH}" fish --no-config -c "source '${function_path}'; fn-progress 75")"
+output="$(PATH="${tmpdir}/bin:${PATH}" fish --no-config -c "set -p fish_function_path '${repo_root}/dot_config/fish/functions'; source '${function_path}'; fn-progress")"
+level_output="$(PATH="${tmpdir}/bin:${PATH}" fish --no-config -c "set -p fish_function_path '${repo_root}/dot_config/fish/functions'; source '${function_path}'; fn-progress 75")"
 
 if [[ "$output" != *'🚀 Season Start: 2026-08-20 00:00:00'* ]]; then
   printf 'expected August 20 C7S4 season start in output\n%s\n' "$output" >&2

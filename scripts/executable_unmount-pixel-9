@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+# Human-facing decoration; keep protocol/data output unchanged.
+cli_emoji() {
+  [ "${CLI_PLAIN:-0}" = 1 ] || printf '%s ' "$1"
+}
+
 set -euo pipefail
 
 mount_dir="${MOUNT_PIXEL_9_DIR:-/mnt/pixel-9}"
@@ -10,6 +15,7 @@ fuser_cmd="${MOUNT_PIXEL_9_FUSER:-fuser}"
 sleep_cmd="${MOUNT_PIXEL_9_SLEEP:-sleep}"
 
 usage() {
+  printf '%s' "$(cli_emoji '📖')"
   cat <<EOF
 Usage:
   unmount-pixel-9 [--help]
@@ -20,7 +26,7 @@ EOF
 }
 
 fail() {
-  printf 'unmount-pixel-9: %s\n' "$1" >&2
+  printf '%sunmount-pixel-9: %s\n' "$(cli_emoji 'ℹ️')" "$1" >&2
   exit 1
 }
 
@@ -51,7 +57,7 @@ kill_mount_holders() {
     return 1
   fi
 
-  printf 'Stopping processes using %s: %s\n' "$mount_dir" "$holders" >&2
+  printf '%sStopping processes using %s: %s\n' "$(cli_emoji 'ℹ️')" "$mount_dir" "$holders" >&2
   "$fuser_cmd" -k -TERM -m "$mount_dir" >/dev/null 2>&1 || true
   "$sleep_cmd" 1
 
@@ -60,7 +66,7 @@ kill_mount_holders() {
     return 0
   fi
 
-  printf 'Force-stopping processes still using %s: %s\n' "$mount_dir" "$holders" >&2
+  printf '%sForce-stopping processes still using %s: %s\n' "$(cli_emoji '⚠️')" "$mount_dir" "$holders" >&2
   "$fuser_cmd" -k -KILL -m "$mount_dir" >/dev/null 2>&1 || true
   "$sleep_cmd" 1
 }
@@ -89,7 +95,7 @@ need_command "$fuser_cmd" "psmisc"
 need_command "$sleep_cmd" "coreutils"
 
 if [ -z "$(mounted_fstype)" ] && ! "$mountpoint_cmd" -q "$mount_dir"; then
-  printf 'Pixel 9 is not mounted at %s\n' "$mount_dir"
+  printf '%sPixel 9 is not mounted at %s\n' "$(cli_emoji 'ℹ️')" "$mount_dir"
   exit 0
 fi
 
@@ -100,4 +106,4 @@ if ! unmount_pixel; then
   fi
 fi
 
-printf 'Unmounted Pixel 9 from %s\n' "$mount_dir"
+printf '%sUnmounted Pixel 9 from %s\n' "$(cli_emoji '✅')" "$mount_dir"

@@ -12,12 +12,20 @@ import subprocess
 import sys
 
 
+def _cli_message(text, icon):
+    """Decorate human output; CLI_PLAIN=1 keeps legacy scripts undecorated."""
+    import os
+    import sys
+    plain = os.environ.get('CLI_PLAIN') == '1' or '--plain' in sys.argv
+    return ('' if plain else icon + ' ') + text
+
+
 VIDEO_SUFFIXES = {".mp4", ".mov", ".m4v"}
 PIXEL_NAME = re.compile(r"PXL_(\d{8})_(\d{6})(\d{3})?")
 
 
 def fail(message):
-    print(f"concat-timestamped-videos: {message}", file=sys.stderr)
+    print(_cli_message(f"concat-timestamped-videos: {message}", '❌'), file=sys.stderr)
     return 1
 
 
@@ -109,7 +117,7 @@ def reencode_command(clips, output):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Join top-level video clips in capture-time order."
+        description=_cli_message("Join top-level video clips in capture-time order.", '🧰')
     )
     parser.add_argument("directory", type=Path, help="directory containing timestamp-named clips")
     parser.add_argument("output", type=Path, help="new output video path")
@@ -175,7 +183,7 @@ def main():
     except (OSError, ValueError) as exc:
         return fail(str(exc))
 
-    print(f"Listed {len(clips)} clip(s) in {list_path}")
+    print(_cli_message(f"Listed {len(clips)} clip(s) in {list_path}", '✅'))
     if args.list_only:
         return 0
     if not shutil.which("ffmpeg"):

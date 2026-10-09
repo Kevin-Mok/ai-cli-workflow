@@ -100,7 +100,7 @@ class Session:
 
     def message(self,text):
         self.clear_display()
-        print('[backup-pc] '+safe_text(text),file=self.stream,flush=True)
+        print(('' if os.environ.get('CLI_PLAIN') == '1' else '💾 ')+'[backup-pc] '+safe_text(text),file=self.stream,flush=True)
         self.log('[phase] '+text)
         self.current=text
 
@@ -178,10 +178,11 @@ class Session:
             self.clear_display()
             try: width=os.get_terminal_size(self.stream.fileno()).columns or 120
             except OSError: width=120
-            rows=parts+[f'elapsed {duration(now-self.began)} | '+safe_text(self.current)]
+            icon='' if os.environ.get('CLI_PLAIN') == '1' else '💾 '
+            rows=[icon+part for part in parts]+[f'elapsed {duration(now-self.began)} | '+safe_text(self.current)]
             self.stream.write('\n'.join(fit_columns(row,max(1,width-1)) for row in rows))
             self.stream.flush();self.tty_rows=len(rows)
-        else: print('[backup-pc] '+text,file=self.stream,flush=True)
+        else: print(('' if os.environ.get('CLI_PLAIN') == '1' else '💾 ')+'[backup-pc] '+text,file=self.stream,flush=True)
         self.last_display=now
         if force or now-self.last_log>=10:
             self.log('[progress] '+text)

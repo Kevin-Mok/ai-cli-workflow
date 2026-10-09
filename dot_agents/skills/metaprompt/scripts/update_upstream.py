@@ -12,6 +12,13 @@ import re
 import sys
 from urllib.parse import quote
 from urllib.request import Request, urlopen
+import os
+
+
+def _cli_message(text: str, emoji: str) -> str:
+    """Decorate authored prose without changing machine-readable output."""
+    return text if os.environ.get("CLI_PLAIN") == "1" else f"{emoji} {text}"
+
 
 REPOSITORY = "getsentry/skills"
 SOURCE_PATH = "skills/prompt-optimizer"
@@ -80,7 +87,7 @@ def stage_candidate(destination: Path, revision: str) -> None:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(description=_cli_message(__doc__, "📖"))
     action = parser.add_mutually_exclusive_group(required=True)
     action.add_argument("--check", action="store_true", help="Compare pinned and latest skill commits")
     action.add_argument("--stage", type=Path, metavar="NEW_DIRECTORY", help="Download a candidate into a new review directory")
@@ -92,13 +99,13 @@ def main(argv: list[str] | None = None) -> int:
         current = json.loads((SKILL_ROOT / "UPSTREAM.json").read_text())["revision"]
         revision = args.revision or latest_revision()
         if args.check:
-            print(f"Pinned: {current}\nLatest skill commit: {revision}")
-            print("Up to date." if revision == current else "Update available; stage and review before applying.")
+            print(_cli_message(f"Pinned: {current}\nLatest skill commit: {revision}", 'ℹ️'))
+            print(_cli_message("Up to date." if revision == current else "Update available; stage and review before applying.", '⚠️'))
         else:
             stage_candidate(args.stage, revision)
-            print(f"Candidate staged: {args.stage}\nRevision: {revision}\nReview using SOURCE.md; tracked and installed skills were not changed.")
+            print(_cli_message(f"Candidate staged: {args.stage}\nRevision: {revision}\nReview using SOURCE.md; tracked and installed skills were not changed.", 'ℹ️'))
     except (OSError, ValueError, KeyError, IndexError) as exc:
-        print(f"metaprompt update: {exc}", file=sys.stderr)
+        print(_cli_message(f"metaprompt update: {exc}", '❌'), file=sys.stderr)
         return 1
     return 0
 

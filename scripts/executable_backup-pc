@@ -81,9 +81,19 @@ def repair_access(args):
     phase('Backup artifacts now owned by '+pwd.getpwuid(owner[0]).pw_name+': '+str(bundle))
 
 
+def emoji(symbol):
+    return '' if os.environ.get('CLI_PLAIN') == '1' else symbol + ' '
+
+
+class HumanParser(argparse.ArgumentParser):
+    def _print_message(self, message, file=None):
+        if message:
+            super()._print_message(emoji('📖' if message.startswith('usage:') else '❌') + message, file)
+
+
 def phase(message):
     if ACTIVE_PROGRESS: ACTIVE_PROGRESS.message(message)
-    else: print(f'[backup-pc] {message}', flush=True)
+    else: print(emoji('💾') + f'[backup-pc] {message}', flush=True)
 
 
 def command_env():
@@ -680,7 +690,7 @@ def backup(args):
     destination_preflight(dest)
     phase(f'Full-system source: {root}; destination: {dest}')
     for pattern in EXCLUDES+meta['excludes']:
-        print('  exclude '+pattern)
+        print(emoji('ℹ️') + '  exclude '+pattern)
     for name in REQUIRED:
         if not confined_path(root,name).is_file():
             fail('Source lacks required recovery file: '+name)
@@ -758,7 +768,7 @@ Needs Bash, Python 3, GNU tar, xz, rsync, util-linux (findmnt/lsblk/findfs/swapo
         phase('Activity log: '+str(published/'backup.log'))
     except BaseException as exc:
         if published is not None:
-            print('backup-pc: BACKUP PUBLISHED: '+str(published)+'; final reporting failed: '+str(exc),file=sys.stderr,flush=True)
+            print(emoji('⚠️') + 'backup-pc: BACKUP PUBLISHED: '+str(published)+'; final reporting failed: '+str(exc),file=sys.stderr,flush=True)
         else: phase('BACKUP INCOMPLETE: '+str(bundle)+'; '+str(exc))
         raise
     finally:
@@ -947,7 +957,7 @@ def perform_restore(archive, disk, layout):
         for path in reversed(created):
             try: run('umount',path)
             except subprocess.CalledProcessError:
-                unmounted=False; print('Unmount failed; manually unmount script-created path: '+str(path),file=sys.stderr)
+                unmounted=False; print(emoji('❌') + 'Unmount failed; manually unmount script-created path: '+str(path),file=sys.stderr)
         if unmounted: work.rmdir()
         if not complete or not unmounted:
             phase('TARGET INCOMPLETE: '+target+'; do not boot until recovery succeeds')
@@ -965,18 +975,18 @@ def restore(args):
     snapshot=disk.get('_identity',identity(disk))
     layout=layout_for(dict(manifest['archive'],home_bytes=manifest['home_bytes']),manifest['swap_bytes'],int(disk['size']),args.root_size)
     phase('Target preview:')
-    print(f'  Path: {disk["name"]}\n  Model: {disk.get("model")}\n  Serial: {disk.get("serial")}\n  Capacity: {int(disk["size"])/GIB:.2f} GiB')
+    print(emoji('💽') + f'  Path: {disk["name"]}\n  Model: {disk.get("model")}\n  Serial: {disk.get("serial")}\n  Capacity: {int(disk["size"])/GIB:.2f} GiB')
     for n in flatten([disk]):
-        print(f'  Existing: {n["name"]} type={n["type"]} table={n.get("pttype")} filesystem={n.get("fstype")} size={n["size"]}')
+        print(emoji('ℹ️') + f'  Existing: {n["name"]} type={n["type"]} table={n.get("pttype")} filesystem={n.get("fstype")} size={n["size"]}')
     # Read-only signature probe: even unpartitioned disks with old signatures hold data.
     signatures=run('wipefs','--json','--no-act',disk['name'],capture=True)
-    print('  Existing signatures: '+signatures.strip())
-    print(f'  Proposed GPT: EFI 1 GiB FAT32; root {layout["root_gib"]} GiB ext4; swap {layout["swap_bytes"]/GIB:.2f} GiB; home remainder (~{layout["home_bytes"]/GIB:.2f} GiB) ext4')
-    print('WARNING: Every partition and all existing data on the selected HDD will be lost.')
+    print(emoji('ℹ️') + '  Existing signatures: '+signatures.strip())
+    print(emoji('📋') + f'  Proposed GPT: EFI 1 GiB FAT32; root {layout["root_gib"]} GiB ext4; swap {layout["swap_bytes"]/GIB:.2f} GiB; home remainder (~{layout["home_bytes"]/GIB:.2f} GiB) ext4')
+    print(emoji('⚠️') + 'WARNING: Every partition and all existing data on the selected HDD will be lost.')
     if args.dry_run:
         phase('Dry run complete; zero destructive operations')
         return
-    try: answer=input(f'Type ERASE {disk["name"]} to continue: ')
+    try: answer=input(emoji('❓') + f'Type ERASE {disk["name"]} to continue: ')
     except (EOFError,KeyboardInterrupt): fail('Cancelled; no disk changes.')
     if answer!='ERASE '+disk['name']:
         fail('Confirmation did not match; no disk changes.')
@@ -1019,7 +1029,7 @@ def resource_percent(value):
 
 
 def main():
-    parser=argparse.ArgumentParser(prog='backup-pc', description='Offline or opt-in live Ubuntu 24.04 amd64 UEFI full-system backup and guarded HDD restore.',
+    parser=HumanParser(prog='backup-pc', description='Offline or opt-in live Ubuntu 24.04 amd64 UEFI full-system backup and guarded HDD restore.',
         epilog='Full backup: backup --source-root ROOT --destination DIR [--live] [--dry-run]. Recovery: restore --archive FILE --target-disk DISK [--root-size GiB] [--dry-run]. Legacy: backup-pc {nzxt,arch-2,x1,ubuntu,ubuntu-h7} {tar-root,home} [--dry-run]. Partial coverage only; cannot restore a whole disk.')
     sub=parser.add_subparsers(dest='command',required=True)
     b=sub.add_parser('backup',help='Compress offline root/EFI maximally; copy home as browsable normal files')
@@ -1057,7 +1067,7 @@ def main():
 if __name__=='__main__':
     try: main()
     except (BackupError,OSError,ValueError,KeyError,tarfile.TarError,subprocess.CalledProcessError) as exc:
-        print('backup-pc: '+str(exc),file=sys.stderr); sys.exit(1)
+        print(emoji('❌') + 'backup-pc: '+str(exc),file=sys.stderr); sys.exit(1)
     except KeyboardInterrupt:
-        print('backup-pc: interrupted',file=sys.stderr); sys.exit(130)
+        print(emoji('⚠️') + 'backup-pc: interrupted',file=sys.stderr); sys.exit(130)
 BACKUP_PC_PY

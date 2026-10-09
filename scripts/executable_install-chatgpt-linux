@@ -1,12 +1,17 @@
 #!/usr/bin/env bash
 
+# Human-facing decoration; keep protocol/data output unchanged.
+cli_emoji() {
+  [ "${CLI_PLAIN:-0}" = 1 ] || printf '%s ' "$1"
+}
+
 set -euo pipefail
 
 os_release_file="${CHATGPT_INSTALL_OS_RELEASE_FILE:-/etc/os-release}"
 architecture="${CHATGPT_INSTALL_ARCHITECTURE:-$(uname -m)}"
 
 if [ ! -r "$os_release_file" ]; then
-  printf 'Cannot read OS release metadata: %s\n' "$os_release_file" >&2
+  printf '%sCannot read OS release metadata: %s\n' "$(cli_emoji 'ℹ️')" "$os_release_file" >&2
   exit 1
 fi
 
@@ -18,7 +23,7 @@ case "${ID:-}" in
     case "${VERSION_ID:-}" in
       24.04|26.04) package_format="deb" ;;
       *)
-        printf 'Unsupported Ubuntu version: %s (supported: 24.04, 26.04)\n' "${VERSION_ID:-unknown}" >&2
+        printf '%sUnsupported Ubuntu version: %s (supported: 24.04, 26.04)\n' "$(cli_emoji '❌')" "${VERSION_ID:-unknown}" >&2
         exit 1
         ;;
     esac
@@ -26,7 +31,7 @@ case "${ID:-}" in
     ;;
   debian)
     if [ "${VERSION_ID:-}" != "13" ]; then
-      printf 'Unsupported Debian version: %s (supported: 13)\n' "${VERSION_ID:-unknown}" >&2
+      printf '%sUnsupported Debian version: %s (supported: 13)\n' "$(cli_emoji '❌')" "${VERSION_ID:-unknown}" >&2
       exit 1
     fi
     package_format="deb"
@@ -36,14 +41,14 @@ case "${ID:-}" in
     case "${VERSION_ID:-}" in
       43|44) package_format="rpm" ;;
       *)
-        printf 'Unsupported Fedora version: %s (supported: 43, 44)\n' "${VERSION_ID:-unknown}" >&2
+        printf '%sUnsupported Fedora version: %s (supported: 43, 44)\n' "$(cli_emoji '❌')" "${VERSION_ID:-unknown}" >&2
         exit 1
         ;;
     esac
     package_manager="dnf"
     ;;
   *)
-    printf 'Unsupported distribution: %s (supported: Ubuntu, Debian, Fedora)\n' "${ID:-unknown}" >&2
+    printf '%sUnsupported distribution: %s (supported: Ubuntu, Debian, Fedora)\n' "$(cli_emoji '❌')" "${ID:-unknown}" >&2
     exit 1
     ;;
 esac
@@ -58,7 +63,7 @@ case "$architecture" in
     rpm_package="chatgpt.aarch64.rpm"
     ;;
   *)
-    printf 'Unsupported processor architecture: %s (supported: x86_64, aarch64, arm64)\n' "$architecture" >&2
+    printf '%sUnsupported processor architecture: %s (supported: x86_64, aarch64, arm64)\n' "$(cli_emoji '❌')" "$architecture" >&2
     exit 1
     ;;
 esac
@@ -76,7 +81,7 @@ esac
 
 for command_name in curl sudo "$package_manager"; do
   if ! command -v "$command_name" >/dev/null 2>&1; then
-    printf 'Required command is unavailable: %s\n' "$command_name" >&2
+    printf '%sRequired command is unavailable: %s\n' "$(cli_emoji '❌')" "$command_name" >&2
     exit 1
   fi
 done
@@ -85,10 +90,10 @@ temporary_directory="$(mktemp -d "${TMPDIR:-/tmp}/chatgpt-install.XXXXXX")"
 trap 'rm -rf "$temporary_directory"' EXIT
 package_path="${temporary_directory}/${package_name}"
 
-printf 'Downloading ChatGPT desktop app: %s\n' "$package_url"
+printf '%sDownloading ChatGPT desktop app: %s\n' "$(cli_emoji 'ℹ️')" "$package_url"
 curl --fail --location --retry 3 --output "$package_path" "$package_url"
 chmod 711 "$temporary_directory"
 chmod 644 "$package_path"
 
-printf 'Installing ChatGPT desktop app with sudo %s.\n' "$package_manager"
+printf '%sInstalling ChatGPT desktop app with sudo %s.\n' "$(cli_emoji 'ℹ️')" "$package_manager"
 sudo "$package_manager" install "$package_path"

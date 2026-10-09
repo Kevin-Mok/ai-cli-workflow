@@ -13,6 +13,14 @@ from pathlib import Path
 from typing import Sequence
 
 
+def _cli_message(text, icon):
+    """Decorate human output; CLI_PLAIN=1 keeps legacy scripts undecorated."""
+    import os
+    import sys
+    plain = os.environ.get('CLI_PLAIN') == '1' or '--plain' in sys.argv
+    return ('' if plain else icon + ' ') + text
+
+
 def _shared_setup():
     # Chezmoi removes executable_ from installed helper names.
     sibling_name = ('executable_setup-second-brain-timer'
@@ -136,13 +144,13 @@ def _enable_sessions(shared) -> None:
     _validate_runtime(shared)
     shared._run(('systemctl', '--user', 'daemon-reload'), 'systemd user daemon reload failed')
     shared._run(('systemctl', '--user', 'enable', '--now', shared.TIMER_NAME), 'timer enable failed')
-    print('Second Brain sessions timer enabled.')
+    print(_cli_message('Second Brain sessions timer enabled.', '⏱️'))
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog='setup-second-brain-sessions-timer',
-        description='Manage the private daily Codex digest user timer independently.')
+        description=_cli_message('Manage the private daily Codex digest user timer independently.', '🧠'))
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument('--check', action='store_true', help='Validate installed runtime and units.')
     group.add_argument('--enable', action='store_true', help='Install and enable only the digest timer.')
@@ -151,7 +159,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     try:
         shared = _shared_setup()
     except (OSError, ImportError) as error:
-        print('setup-second-brain-sessions-timer: shared timer helper unavailable or unsafe',
+        print(_cli_message('setup-second-brain-sessions-timer: shared timer helper unavailable or unsafe', '⏱️'),
               file=sys.stderr)
         return 2
     try:
@@ -166,7 +174,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             else:
                 shared._disable()
     except shared.TimerSetupError as error:
-        print(f'setup-second-brain-sessions-timer: {error}', file=sys.stderr)
+        print(_cli_message(f'setup-second-brain-sessions-timer: {error}', '❌'), file=sys.stderr)
         return 2
     return 0
 

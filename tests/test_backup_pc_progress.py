@@ -22,6 +22,28 @@ def load_progress():
     return module
 
 
+class ProgressPresentationTests(unittest.TestCase):
+    def test_emojis_decorate_display_without_changing_persisted_progress_log(self):
+        progress = load_progress()
+        for plain in ('0', '1'):
+            with self.subTest(plain=plain), tempfile.TemporaryDirectory(prefix='progress-display-') as folder:
+                output = io.StringIO()
+                with patch.dict(os.environ, {'CLI_PLAIN': plain}):
+                    session = progress.Session(Path(folder), stream=output, clock=lambda: 0.0)
+                    try:
+                        session.render(force=True)
+                        log = session.log_path.read_text()
+                        self.assertIn('[progress] Root [----------]', log)
+                        self.assertNotIn('💾', log)
+                        self.assertIn('Home [----------]', log)
+                        if plain == '1':
+                            self.assertNotIn('💾', output.getvalue())
+                        else:
+                            self.assertIn('💾', output.getvalue())
+                    finally:
+                        session.close()
+
+
 class ProgressTests(unittest.TestCase):
     def setUp(self):
         self.p=load_progress()

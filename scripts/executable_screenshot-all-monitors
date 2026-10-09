@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+# Human-facing decoration; keep protocol/data output unchanged.
+cli_emoji() {
+  [ "${CLI_PLAIN:-0}" = 1 ] || printf '%s ' "$1"
+}
+
 set -euo pipefail
 
 SCREENSHOT_DIR="${SCREENSHOT_ALL_MONITORS_DIR:-/home/example/Pictures/screenshots/desktop/unsorted}"
@@ -13,7 +18,7 @@ require_command() {
   local package_hint="$2"
 
   if ! command -v "$command_name" >/dev/null 2>&1; then
-    printf 'missing required command: %s (%s)\n' "$command_name" "$package_hint" >&2
+    printf '%smissing required command: %s (%s)\n' "$(cli_emoji '❌')" "$command_name" "$package_hint" >&2
     exit 1
   fi
 }
@@ -24,9 +29,9 @@ require_command "$DATE_BIN" "install coreutils"
 notify() {
   local message="$1"
   if command -v notify-send >/dev/null 2>&1; then
-    notify-send "Screenshot" "$message"
+    notify-send "$(cli_emoji '📸')Screenshot" "$message"
   else
-    printf '%s\n' "$message"
+    printf '%s%s\n' "$(cli_emoji 'ℹ️')" "$message"
   fi
 }
 

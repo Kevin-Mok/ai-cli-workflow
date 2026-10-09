@@ -1,6 +1,7 @@
 """Home-only resync for incomplete recovery bundles; never publish or recreate root."""
 import importlib.util
 import json
+import os
 from pathlib import Path
 import types
 
@@ -34,7 +35,7 @@ def sync_home(args, engine):
     owner=b.backup_owner()
     if args.dry_run:
         b.phase('Dry run: home-only sync into '+str(bundle)+'; root archive unchanged')
-        for pattern in b.home_excludes(meta['excludes']): print('  exclude '+pattern)
+        for pattern in b.home_excludes(meta['excludes']): print(('' if os.environ.get('CLI_PLAIN') == '1' else '🚫 ')+'  exclude '+pattern)
         return
     spec=importlib.util.spec_from_file_location('backup_progress',Path(__file__).with_name('backup-pc-progress.py'))
     progress=importlib.util.module_from_spec(spec);spec.loader.exec_module(progress)

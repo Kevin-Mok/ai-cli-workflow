@@ -9,6 +9,14 @@ import subprocess
 import sys
 
 
+def _cli_message(text, icon):
+    """Decorate human output; CLI_PLAIN=1 keeps legacy scripts undecorated."""
+    import os
+    import sys
+    plain = os.environ.get('CLI_PLAIN') == '1' or '--plain' in sys.argv
+    return ('' if plain else icon + ' ') + text
+
+
 def regular_file(value):
     path=Path(value).absolute()
     if path.is_symlink() or '/dev'==str(path) or '/dev/' in str(path) or not stat.S_ISREG(path.stat().st_mode):
@@ -47,7 +55,7 @@ def initialize(args):
         raise ValueError('Target must be at least 70 GiB; backup size must be positive.')
     if any(',' in value or '\n' in value for value in list(paths.values())+[str(work)]):
         raise ValueError('QEMU image paths may not contain commas/newlines.')
-    print(f'Disposable VM files: {work}; source base is read-only backing storage; target {args.target_size} GiB.')
+    print(_cli_message(f'Disposable VM files: {work}; source base is read-only backing storage; target {args.target_size} GiB.', '🖥️'))
     if args.dry_run: return
     if not shutil.which('qemu-img') or not shutil.which('qemu-system-x86_64'):
         raise ValueError('Install qemu-system-x86 and qemu-utils; use an OVMF firmware pair.')
@@ -90,7 +98,7 @@ Record observed results from the backup, restore and isolated boot phases. This 
 - External mounts absent; boot succeeds with nofail:
 - Logs, failure notes and screenshots:
 ''')
-    print('Initialized. Launch backup, restore, then boot. Record results in '+str(work/'RESULTS.md'))
+    print(_cli_message('Initialized. Launch backup, restore, then boot. Record results in '+str(work/'RESULTS.md'), '🖥️'))
 
 
 def launch(args):
@@ -103,15 +111,15 @@ def launch(args):
     stage=Path(state['stage'])
     if stage.resolve()!=work/'stage': raise ValueError('Unexpected VM stage directory.')
     command=qemu_command(state,args.mode)
-    print('Phase '+args.mode+': '+('target only; original and backup disconnected' if args.mode=='boot' else 'live ISO; virtual disks only'))
-    print('Read '+str(work/'RESULTS.md')+' and docs/backup-pc-recovery.md; never use host disk paths.')
+    print(_cli_message('Phase '+args.mode+': '+('target only; original and backup disconnected' if args.mode=='boot' else 'live ISO; virtual disks only'), '🖥️'))
+    print(_cli_message('Read '+str(work/'RESULTS.md')+' and docs/backup-pc-recovery.md; never use host disk paths.', '🖥️'))
     if args.dry_run:
         print(json.dumps(command)); return
     run(*command)
 
 
 def main():
-    parser=argparse.ArgumentParser(description='Disposable UEFI recovery VM launcher. No sudo or host disk access. Init with an existing standalone Ubuntu virtual source disk; then backup, restore, boot.')
+    parser=argparse.ArgumentParser(description=_cli_message('Disposable UEFI recovery VM launcher. No sudo or host disk access. Init with an existing standalone Ubuntu virtual source disk; then backup, restore, boot.', '🧰'))
     sub=parser.add_subparsers(dest='mode',required=True)
     init=sub.add_parser('init',help='Create sparse nonempty target, source overlay, backup image and evidence checklist')
     for option in ('work-dir','source-image','iso','firmware-code','firmware-vars'): init.add_argument('--'+option,required=True)
@@ -129,4 +137,4 @@ def main():
 if __name__=='__main__':
     try: main()
     except (ValueError,OSError,KeyError,subprocess.CalledProcessError) as exc:
-        print('backup-pc-vm-check: '+str(exc),file=sys.stderr);sys.exit(1)
+        print(_cli_message('backup-pc-vm-check: '+str(exc), '🖥️'),file=sys.stderr);sys.exit(1)

@@ -10,6 +10,14 @@ import tempfile
 from typing import cast
 import wave
 
+
+def _cli_message(text, icon):
+    """Decorate human output; CLI_PLAIN=1 keeps legacy scripts undecorated."""
+    import os
+    import sys
+    plain = os.environ.get('CLI_PLAIN') == '1' or '--plain' in sys.argv
+    return ('' if plain else icon + ' ') + text
+
 PIPER_VERSION = '1.8.0'
 VOICE = 'en_US-Voice Contributor-high'
 SYNTHESIS_TIMEOUT = 30
@@ -111,7 +119,7 @@ class SetupArguments(argparse.Namespace):
 
 def main(argv: list[str] | None = None) -> int:
     global _plain, _details
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(description=_cli_message(__doc__, '🎙️'))
     _ = parser.add_argument('--plain', action='store_true', help='use ASCII output')
     _ = parser.add_argument('--details', action='store_true', help='show installation logs, paths and diagnostics')
     commands = parser.add_mutually_exclusive_group(required=True)
@@ -119,7 +127,7 @@ def main(argv: list[str] | None = None) -> int:
     _ = commands.add_argument('--check', action='store_true', help='verify the installed voice by offline synthesis')
     args = SetupArguments()
     _ = parser.parse_args(argv, namespace=args)
-    _plain, _details = args.plain, args.details
+    _plain, _details = args.plain or os.environ.get("CLI_PLAIN") == "1", args.details
     try:
         if args.install:
             install()

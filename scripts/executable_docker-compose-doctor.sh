@@ -1,29 +1,34 @@
 #!/usr/bin/env bash
 
+# Human-facing decoration; keep protocol/data output unchanged.
+cli_emoji() {
+  [ "${CLI_PLAIN:-0}" = 1 ] || printf '%s ' "$1"
+}
+
 set -u
 
 print_section() {
-  printf '\n== %s ==\n' "$1"
+  printf '\n%s== %s ==\n' "$(cli_emoji '🔧')" "$1"
 }
 
 print_ok() {
-  printf 'OK: %s\n' "$1"
+  printf '%sOK: %s\n' "$(cli_emoji '✅')" "$1"
 }
 
 print_warn() {
-  printf 'WARN: %s\n' "$1"
+  printf '%sWARN: %s\n' "$(cli_emoji '⚠️')" "$1"
 }
 
 print_fail() {
-  printf 'FAIL: %s\n' "$1"
+  printf '%sFAIL: %s\n' "$(cli_emoji '❌')" "$1"
 }
 
 print_section "Docker Compose Doctor"
-printf 'Time: %s\n' "$(date -Is 2>/dev/null || date)"
+printf '%sTime: %s\n' "$(cli_emoji 'ℹ️')" "$(date -Is 2>/dev/null || date)"
 
 if [ -r /etc/os-release ]; then
   . /etc/os-release
-  printf 'OS: %s\n' "${PRETTY_NAME:-unknown}"
+  printf '%sOS: %s\n' "$(cli_emoji 'ℹ️')" "${PRETTY_NAME:-unknown}"
 fi
 
 docker_path="$(command -v docker 2>/dev/null || true)"
@@ -32,7 +37,7 @@ legacy_compose_path="$(command -v docker-compose 2>/dev/null || true)"
 print_section "CLI Detection"
 if [ -z "$docker_path" ]; then
   print_fail "docker is not installed or not on PATH."
-  printf 'Next step: install Docker first, then rerun this doctor.\n'
+  printf '%sNext step: install Docker first, then rerun this doctor.\n' "$(cli_emoji 'ℹ️')"
   exit 1
 fi
 
@@ -112,10 +117,10 @@ if [ "$compose_v2_missing" -eq 1 ]; then
   if [ "$plugin_found" -eq 0 ]; then
     print_warn "No docker-compose plugin binary was found in standard plugin directories."
   fi
-  printf 'Recommended fix: run bash scripts/executable_install-docker-compose-v2.sh\n'
+  printf '%sRecommended fix: run bash scripts/executable_install-docker-compose-v2.sh\n' "$(cli_emoji 'ℹ️')"
   exit 1
 fi
 
 print_warn "The failure is not the usual missing-plugin message."
-printf 'Investigate the error above before installing anything.\n'
+printf '%sInvestigate the error above before installing anything.\n' "$(cli_emoji 'ℹ️')"
 exit 1

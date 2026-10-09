@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+# Human-facing decoration; keep protocol/data output unchanged.
+cli_emoji() {
+  [ "${CLI_PLAIN:-0}" = 1 ] || printf '%s ' "$1"
+}
+
 # INCOMPLETE: retained for later debugging, but not wired into i3 right now.
 
 set -euo pipefail
@@ -266,7 +271,7 @@ main() {
       fi
       ;;
     *)
-      printf 'unknown mode: %s\n' "$mode" >&2
+      printf '%sunknown mode: %s\n' "$(cli_emoji '❌')" "$mode" >&2
       exit 1
       ;;
   esac

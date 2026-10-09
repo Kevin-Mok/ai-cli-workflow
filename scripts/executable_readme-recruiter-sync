@@ -1,8 +1,14 @@
 #!/usr/bin/env bash
 
+# Human-facing decoration; keep protocol/data output unchanged.
+cli_emoji() {
+  [ "${CLI_PLAIN:-0}" = 1 ] || printf '%s ' "$1"
+}
+
 set -euo pipefail
 
 if [[ "${1:-}" == "--help" || "${1:-}" == "-h" ]]; then
+  printf '%s' "$(cli_emoji '📖')"
   cat <<'USAGE'
 Usage: executable_readme-recruiter-sync [REPO_ROOT]
 
@@ -57,15 +63,15 @@ resolve_skill_dir() {
 if [[ $# -ge 1 ]]; then
   if ! REPO_ROOT="$(cd "$1" && pwd)"; then
     echo "blocked"
-    echo "Reasons:"
-    echo "  - blocked: provided path is not a readable directory: $1"
+    echo "$(cli_emoji 'ℹ️')Reasons:"
+    echo "$(cli_emoji 'ℹ️')  - blocked: provided path is not a readable directory: $1"
     exit 2
   fi
 else
   if ! REPO_ROOT="$(find_repo_root "$(pwd)")"; then
     echo "blocked"
-    echo "Reasons:"
-    echo "  - blocked: could not locate a README.md in current path or any parent directory"
+    echo "$(cli_emoji 'ℹ️')Reasons:"
+    echo "$(cli_emoji '❌')  - blocked: could not locate a README.md in current path or any parent directory"
     exit 2
   fi
 fi
@@ -75,8 +81,8 @@ SKILL_DIR="$(resolve_skill_dir "$REPO_ROOT" || true)"
 
 if [[ -z "$SKILL_DIR" ]]; then
   echo "blocked"
-  echo "Reasons:"
-  echo "  - blocked: readme-recruiter-sync skill metadata is missing in repo dot_agents, repo .agents, environment override, and ~/.agents"
+  echo "$(cli_emoji 'ℹ️')Reasons:"
+  echo "$(cli_emoji '❌')  - blocked: readme-recruiter-sync skill metadata is missing in repo dot_agents, repo .agents, environment override, and ~/.agents"
   exit 2
 fi
 
@@ -214,9 +220,9 @@ fi
 
 printf '%s\n' "${status}"
 if [[ ${#issues[@]} -gt 0 ]]; then
-  printf '%s\n' 'Reasons:'
+  printf '%s%s\n' "$(cli_emoji 'ℹ️')" 'Reasons:'
   for issue in "${issues[@]}"; do
-    printf '  - %s\n' "$issue"
+    printf '%s  - %s\n' "$(cli_emoji 'ℹ️')" "$issue"
   done
 fi
 

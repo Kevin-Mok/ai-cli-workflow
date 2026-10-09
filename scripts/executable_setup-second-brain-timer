@@ -18,6 +18,14 @@ from second_brain.safe_contract import PathError
 from second_brain.safe_files import ensure_owned_directories, regular_file_bytes
 
 
+def _cli_message(text, icon):
+    """Decorate human output; CLI_PLAIN=1 keeps legacy scripts undecorated."""
+    import os
+    import sys
+    plain = os.environ.get('CLI_PLAIN') == '1' or '--plain' in sys.argv
+    return ('' if plain else icon + ' ') + text
+
+
 LAUNCHER_NAME = "second-brain"
 PACKAGE_NAME = "second_brain"
 SERVICE_NAME = "second-brain-checkpoint.service"
@@ -73,7 +81,7 @@ class TimerSetupError(RuntimeError):
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="setup-second-brain-timer",
-        description="Manage the Second Brain systemd user timer.",
+        description=_cli_message("Manage the Second Brain systemd user timer.", '🧠'),
     )
     action = parser.add_mutually_exclusive_group(required=True)
     action.add_argument("--check", action="store_true", help="Validate the units.")
@@ -380,7 +388,7 @@ def _check() -> None:
     _validate_installed_launcher(targets[0], sources[0])
     _validate_installed_package(targets[1], module_targets, module_sources)
     _validate_installed_units(targets[2:], sources[2:])
-    print("Second Brain timer units are valid.")
+    print(_cli_message("Second Brain timer units are valid.", '⏱️'))
 
 
 def _enable() -> None:
@@ -414,7 +422,7 @@ def _enable() -> None:
         ("systemctl", "--user", "enable", "--now", *TIMER_NAMES),
         "timer enable failed",
     )
-    print("Second Brain timer enabled.")
+    print(_cli_message("Second Brain timer enabled.", '⏱️'))
 
 
 def _disable() -> None:
@@ -426,7 +434,7 @@ def _disable() -> None:
         ("systemctl", "--user", "disable", "--now", *TIMER_NAMES),
         "timer disable failed",
     )
-    print("Second Brain timer disabled.")
+    print(_cli_message("Second Brain timer disabled.", '⏱️'))
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -440,7 +448,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             else:
                 _disable()
     except TimerSetupError as error:
-        print(f"setup-second-brain-timer: {error}", file=sys.stderr)
+        print(_cli_message(f"setup-second-brain-timer: {error}", '❌'), file=sys.stderr)
         return 2
     return 0
 

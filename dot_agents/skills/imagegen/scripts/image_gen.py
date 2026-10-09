@@ -19,6 +19,12 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 from io import BytesIO
 
+
+def _cli_message(text: str, emoji: str) -> str:
+    """Decorate authored prose without changing machine-readable output."""
+    return text if os.environ.get("CLI_PLAIN") == "1" else f"{emoji} {text}"
+
+
 DEFAULT_MODEL = "gpt-image-1.5"
 DEFAULT_SIZE = "1024x1024"
 DEFAULT_QUALITY = "auto"
@@ -35,17 +41,17 @@ MAX_BATCH_JOBS = 500
 
 
 def _die(message: str, code: int = 1) -> None:
-    print(f"Error: {message}", file=sys.stderr)
+    print(_cli_message(f"Error: {message}", '❌'), file=sys.stderr)
     raise SystemExit(code)
 
 
 def _warn(message: str) -> None:
-    print(f"Warning: {message}", file=sys.stderr)
+    print(_cli_message(f"Warning: {message}", '⚠️'), file=sys.stderr)
 
 
 def _ensure_api_key(dry_run: bool) -> None:
     if os.getenv("OPENAI_API_KEY"):
-        print("OPENAI_API_KEY is set.", file=sys.stderr)
+        print(_cli_message("OPENAI_API_KEY is set.", '✅'), file=sys.stderr)
         return
     if dry_run:
         _warn("OPENAI_API_KEY is not set; dry-run only.")
@@ -225,7 +231,7 @@ def _decode_and_write(images: List[str], outputs: List[Path], force: bool) -> No
             _die(f"Output already exists: {out_path} (use --force to overwrite)")
         out_path.parent.mkdir(parents=True, exist_ok=True)
         out_path.write_bytes(base64.b64decode(image_b64))
-        print(f"Wrote {out_path}")
+        print(_cli_message(f"Wrote {out_path}", '✅'))
 
 
 def _derive_downscale_path(path: Path, suffix: str) -> Path:
@@ -289,7 +295,7 @@ def _decode_write_and_downscale(
 
         raw = base64.b64decode(image_b64)
         out_path.write_bytes(raw)
-        print(f"Wrote {out_path}")
+        print(_cli_message(f"Wrote {out_path}", '✅'))
 
         if downscale_max_dim is None:
             continue
@@ -300,7 +306,7 @@ def _decode_write_and_downscale(
         derived.parent.mkdir(parents=True, exist_ok=True)
         resized = _downscale_image_bytes(raw, max_dim=downscale_max_dim, output_format=output_format)
         derived.write_bytes(resized)
-        print(f"Wrote {derived}")
+        print(_cli_message(f"Wrote {derived}", '✅'))
 
 
 def _create_client():
@@ -467,7 +473,7 @@ async def _generate_one_with_retries(
             if sleep_s is None:
                 sleep_s = min(60.0, 2.0**attempt)
             print(
-                f"{job_label} attempt {attempt}/{attempts} failed ({exc.__class__.__name__}); retrying in {sleep_s:.1f}s",
+                _cli_message(f"{job_label} attempt {attempt}/{attempts} failed ({exc.__class__.__name__}); retrying in {sleep_s:.1f}s", '❌'),
                 file=sys.stderr,
             )
             await asyncio.sleep(sleep_s)
@@ -569,7 +575,7 @@ async def _run_generate_batch(args: argparse.Namespace) -> int:
         )
         try:
             async with sem:
-                print(f"{job_label} starting", file=sys.stderr)
+                print(_cli_message(f"{job_label} starting", '⏳'), file=sys.stderr)
                 started = time.time()
                 result = await _generate_one_with_retries(
                     client,
@@ -578,7 +584,7 @@ async def _run_generate_batch(args: argparse.Namespace) -> int:
                     job_label=job_label,
                 )
                 elapsed = time.time() - started
-                print(f"{job_label} completed in {elapsed:.1f}s", file=sys.stderr)
+                print(_cli_message(f"{job_label} completed in {elapsed:.1f}s", '✅'), file=sys.stderr)
             images = [item.b64_json for item in result.data]
             _decode_write_and_downscale(
                 images,
@@ -591,7 +597,7 @@ async def _run_generate_batch(args: argparse.Namespace) -> int:
             return i, None
         except Exception as exc:
             any_failed = True
-            print(f"{job_label} failed: {exc}", file=sys.stderr)
+            print(_cli_message(f"{job_label} failed: {exc}", '❌'), file=sys.stderr)
             if args.fail_fast:
                 raise
             return i, str(exc)
@@ -643,14 +649,14 @@ def _generate(args: argparse.Namespace) -> None:
         return
 
     print(
-        "Calling Image API (generation). This can take up to a couple of minutes.",
+        _cli_message("Calling Image API (generation). This can take up to a couple of minutes.", '⏳'),
         file=sys.stderr,
     )
     started = time.time()
     client = _create_client()
     result = client.images.generate(**payload)
     elapsed = time.time() - started
-    print(f"Generation completed in {elapsed:.1f}s.", file=sys.stderr)
+    print(_cli_message(f"Generation completed in {elapsed:.1f}s.", '✅'), file=sys.stderr)
 
     images = [item.b64_json for item in result.data]
     _decode_write_and_downscale(
@@ -706,7 +712,7 @@ def _edit(args: argparse.Namespace) -> None:
         return
 
     print(
-        f"Calling Image API (edit) with {len(image_paths)} image(s).",
+        _cli_message(f"Calling Image API (edit) with {len(image_paths)} image(s).", '⏳'),
         file=sys.stderr,
     )
     started = time.time()
@@ -720,7 +726,7 @@ def _edit(args: argparse.Namespace) -> None:
         result = client.images.edit(**request)
 
     elapsed = time.time() - started
-    print(f"Edit completed in {elapsed:.1f}s.", file=sys.stderr)
+    print(_cli_message(f"Edit completed in {elapsed:.1f}s.", '✅'), file=sys.stderr)
     images = [item.b64_json for item in result.data]
     _decode_write_and_downscale(
         images,
@@ -824,7 +830,7 @@ def _add_shared_args(parser: argparse.ArgumentParser) -> None:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Generate or edit images via the Image API")
+    parser = argparse.ArgumentParser(description=_cli_message("Generate or edit images via the Image API", "📖"))
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     gen_parser = subparsers.add_parser("generate", help="Create a new image")

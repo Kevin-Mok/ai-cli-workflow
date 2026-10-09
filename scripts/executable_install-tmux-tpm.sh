@@ -1,8 +1,14 @@
 #!/usr/bin/env bash
 
+# Human-facing decoration; keep protocol/data output unchanged.
+cli_emoji() {
+  [ "${CLI_PLAIN:-0}" = 1 ] || printf '%s ' "$1"
+}
+
 set -euo pipefail
 
 usage() {
+  printf '%s' "$(cli_emoji '📖')"
   cat <<'USAGE'
 Usage:
   scripts/executable_install-tmux-tpm.sh
@@ -30,34 +36,34 @@ tmux_conf="${HOME}/.tmux.conf"
 tpm_remote="https://github.com/tmux-plugins/tpm.git"
 
 if ! command -v git >/dev/null 2>&1; then
-  echo "ERROR: git is required." >&2
+  echo "$(cli_emoji '❌')ERROR: git is required." >&2
   exit 1
 fi
 
 mkdir -p "$tpm_root"
 
 if [ -d "$tpm_dir/.git" ]; then
-  echo "Updating TPM in $tpm_dir..."
+  echo "$(cli_emoji 'ℹ️')Updating TPM in $tpm_dir..."
   git -C "$tpm_dir" pull --ff-only
 else
-  echo "Installing TPM to $tpm_dir..."
+  echo "$(cli_emoji 'ℹ️')Installing TPM to $tpm_dir..."
   git clone --depth 1 "$tpm_remote" "$tpm_dir"
 fi
 
 chmod +x "$tpm_dir/tpm"
 
 if [ -f "$tmux_conf" ] && grep -Fq "run -b '~/.tmux/plugins/tpm/tpm'" "$tmux_conf"; then
-  echo "Fixing tmux quoted TPM bootstrap path in $tmux_conf..."
+  echo "$(cli_emoji 'ℹ️')Fixing tmux quoted TPM bootstrap path in $tmux_conf..."
   sed -i "s#run -b '~/.tmux/plugins/tpm/tpm'#run -b ~/.tmux/plugins/tpm/tpm#g" "$tmux_conf"
 fi
 
 if command -v tmux >/dev/null 2>&1 && tmux list-sessions >/dev/null 2>&1; then
-  echo "Reloading tmux config..."
+  echo "$(cli_emoji 'ℹ️')Reloading tmux config..."
   tmux source-file "$tmux_conf"
-  echo "TPM bootstrap line is now loaded in active tmux session."
+  echo "$(cli_emoji 'ℹ️')TPM bootstrap line is now loaded in active tmux session."
 else
-  echo "TMUX is not running or unreachable."
-  echo "Start tmux and run the prefix + I to install plugins after this."
+  echo "$(cli_emoji 'ℹ️')TMUX is not running or unreachable."
+  echo "$(cli_emoji 'ℹ️')Start tmux and run the prefix + I to install plugins after this."
 fi
 
-echo "Done. TPM bootstrap installed at: $tpm_dir"
+echo "$(cli_emoji '✅')Done. TPM bootstrap installed at: $tpm_dir"

@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+# Human-facing decoration; keep protocol/data output unchanged.
+cli_emoji() {
+  [ "${CLI_PLAIN:-0}" = 1 ] || printf '%s ' "$1"
+}
+
 set -euo pipefail
 
 APT_GET_BIN="${UPDATE_CHROME_APT_GET:-apt-get}"
@@ -8,18 +13,19 @@ DPKG_QUERY_BIN="${UPDATE_CHROME_DPKG_QUERY:-dpkg-query}"
 PACKAGE_NAME="google-chrome-stable"
 
 print_section() {
-  printf '\n== %s ==\n' "$1"
+  printf '\n%s== %s ==\n' "$(cli_emoji '🔧')" "$1"
 }
 
 print_note() {
-  printf '%s\n' "$1"
+  printf '%s%s\n' "$(cli_emoji 'ℹ️')" "$1"
 }
 
 print_fail() {
-  printf 'FAIL: %s\n' "$1" >&2
+  printf '%sFAIL: %s\n' "$(cli_emoji '❌')" "$1" >&2
 }
 
 usage() {
+  printf '%s' "$(cli_emoji '📖')"
   cat <<'EOF'
 Usage:
   ./scripts/executable_update-chrome.sh [--check]

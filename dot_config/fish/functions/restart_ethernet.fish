@@ -6,7 +6,7 @@ function restart_ethernet --description 'Restart a NetworkManager ethernet conne
     end
 
     if not command -sq nmcli
-        echo "restart_ethernet: nmcli is not installed" >&2
+        cli-message ❌ "restart_ethernet: nmcli is not installed" >&2
         return 127
     end
 

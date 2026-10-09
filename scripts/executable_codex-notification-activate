@@ -10,6 +10,14 @@ import subprocess
 import sys
 import time
 
+
+def _cli_message(text, icon):
+    """Decorate human output; CLI_PLAIN=1 keeps legacy scripts undecorated."""
+    import os
+    import sys
+    plain = os.environ.get('CLI_PLAIN') == '1' or '--plain' in sys.argv
+    return ('' if plain else icon + ' ') + text
+
 BUS_COMMAND = ['dbus-send', '--session', '--print-reply', '--dest=org.freedesktop.DBus',
                '/org/freedesktop/DBus']
 BUS_NAME = 'string:org.freedesktop.Notifications'
@@ -71,7 +79,7 @@ def restart_dunst() -> None:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(description=_cli_message(__doc__, '🎙️'))
     parser.add_argument('--open-kitty', action='store_true', help='also open a fresh Kitty process, preserving existing terminals')
     options = parser.parse_args()
     try:
@@ -81,11 +89,11 @@ def main() -> int:
         restart_dunst()
         if kitty:
             subprocess.run([kitty, '--detach'], timeout=10, check=True)
-        print('Notification configuration active in Dunst; sound setting unchanged. '
-              + ('Fresh Kitty opened.' if kitty else 'Start a fresh Kitty process to load the callback.'))
+        print(_cli_message('Notification configuration active in Dunst; sound setting unchanged. '
+              + ('Fresh Kitty opened.' if kitty else 'Start a fresh Kitty process to load the callback.'), '✅'))
         return 0
     except (OSError, ValueError, subprocess.SubprocessError) as error:
-        print(f'codex-notification-activate: {error}', file=sys.stderr)
+        print(_cli_message(f'codex-notification-activate: {error}', '❌'), file=sys.stderr)
         return 1
 
 

@@ -2,6 +2,14 @@
 
 import requests
 
+
+def _cli_message(text, icon):
+    """Decorate human output; CLI_PLAIN=1 keeps legacy scripts undecorated."""
+    import os
+    import sys
+    plain = os.environ.get('CLI_PLAIN') == '1' or '--plain' in sys.argv
+    return ('' if plain else icon + ' ') + text
+
 def get_tier_value(num):
     url = f"https://www.glhfers.com/api/rom-metadata/{num}"
     try:
@@ -22,15 +30,15 @@ def get_tier_value(num):
 def main():
     while True:
         try:
-            num = input("Enter a number: ")
+            num = input(_cli_message("Enter a number: ", '🔎'))
             if num.lower() == 'exit':
                 break
             
             num = int(num)  # Convert input to integer
             tier_value = get_tier_value(num)
-            print(f"{tier_value}")
+            print(_cli_message(f"{tier_value}", '❌' if str(tier_value).startswith('Error') else '🔎'))
         except ValueError:
-            print("Invalid input. Please enter a number or 'exit' to quit.")
+            print(_cli_message("Invalid input. Please enter a number or 'exit' to quit.", '🔎'))
 
 if __name__ == "__main__":
     main()

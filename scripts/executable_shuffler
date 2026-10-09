@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# Human-facing decoration; keep protocol/data output unchanged.
+cli_emoji() {
+  [ "${CLI_PLAIN:-0}" = 1 ] || printf '%s ' "$1"
+}
+
 # vars {{{ #
 
 shuffle_cache="shuffle.txt"
@@ -12,6 +17,7 @@ dir=""
 
 function usage_msg() {
 	# echo "usage: shuffler [-r] [dir_name]"
+	printf '%s' "$(cli_emoji '📖')"
 	cat <<-EOF
 	Usage: shuffler [-r] [dir_name]
     -r: regenerate the shuffle cache
@@ -24,11 +30,11 @@ function usage_msg() {
 while getopts ":r" opt; do
   case $opt in
 	r)
-	  echo "-r was triggered!" >&2
+	  echo "$(cli_emoji 'ℹ️')-r was triggered!" >&2
 	  regen_flag=1
 	  ;;
 	\?)
-	  echo "Invalid flag: -$OPTARG" >&2
+	  echo "$(cli_emoji '❌')Invalid flag: -$OPTARG" >&2
 	  usage_msg
 	  exit 1
 	  ;;

@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+# Human-facing decoration; keep protocol/data output unchanged.
+cli_emoji() {
+  [ "${CLI_PLAIN:-0}" = 1 ] || printf '%s ' "$1"
+}
+
 set -euo pipefail
 
 mount_dir="${MOUNT_PIXEL_9_DIR:-/mnt/pixel-9}"
@@ -15,6 +20,7 @@ stat_cmd="${MOUNT_PIXEL_9_STAT:-stat}"
 id_cmd="${MOUNT_PIXEL_9_ID:-id}"
 
 usage() {
+  printf '%s' "$(cli_emoji '📖')"
   cat <<EOF
 Usage:
   mount-pixel-9 [--help]
@@ -27,7 +33,7 @@ EOF
 }
 
 fail() {
-  printf 'mount-pixel-9: %s\n' "$1" >&2
+  printf '%smount-pixel-9: %s\n' "$(cli_emoji 'ℹ️')" "$1" >&2
   exit 1
 }
 
@@ -97,14 +103,14 @@ need_command "$stat_cmd" "coreutils"
 
 if [ -n "$(mounted_fstype)" ]; then
   if mount_is_accessible; then
-    printf 'Pixel 9 is already mounted at %s\n' "$mount_dir"
+    printf '%sPixel 9 is already mounted at %s\n' "$(cli_emoji '✅')" "$mount_dir"
     exit 0
   fi
 
-  printf 'Remounting stale Pixel 9 MTP mount at %s\n' "$mount_dir"
+  printf '%sRemounting stale Pixel 9 MTP mount at %s\n' "$(cli_emoji 'ℹ️')" "$mount_dir"
   unmount_stale_mount
 elif "$mountpoint_cmd" -q "$mount_dir"; then
-  printf 'Pixel 9 is already mounted at %s\n' "$mount_dir"
+  printf '%sPixel 9 is already mounted at %s\n' "$(cli_emoji '✅')" "$mount_dir"
   exit 0
 fi
 
@@ -124,4 +130,4 @@ if ! mount_is_accessible; then
   fail "mounted but the phone storage is still inaccessible; unlock it, choose USB File transfer, then reconnect the cable and retry"
 fi
 
-printf 'Mounted Pixel 9 at %s\n' "$mount_dir"
+printf '%sMounted Pixel 9 at %s\n' "$(cli_emoji '✅')" "$mount_dir"

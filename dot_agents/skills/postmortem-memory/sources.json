@@ -4544,6 +4544,29 @@
       "topic": "api-contracts-fixtures",
       "verification": "Defining checks observed RED then GREEN; final complete Codex suite160 tests passed88.946s. Source and installed real CLI/fzf cold/cache/locked/malformed checks open within2s, resume exact UUID/cwd, preserve source bytes and clean up. Native installed history displayed199 usable rows in1.968s and Escape cleaned up with summaries disabled.",
       "verification_scope": "runtime"
+    },
+    {
+      "id": "local-ast-utf8-edit-columns",
+      "topic": "editing-shell-transport",
+      "reference": "references/editing-shell-transport.md#local-ast-utf8-edit-columns",
+      "status": "verified_fix",
+      "symptoms": [
+        "Temporary Python edit raises SyntaxError near an existing multibyte Unicode character",
+        "AST col_offset used as a string character index"
+      ],
+      "applicability": "Temporary source editors using Python AST line/column spans to modify Unicode text.",
+      "diagnostics": [
+        "AST column offsets are UTF-8 byte offsets; compare byte and character indices on a multibyte line.",
+        "Parse proposed source before writing and inspect already-written targets separately."
+      ],
+      "confidence": "confirmed",
+      "remedy": "Convert UTF-8 byte columns to character positions before slicing source strings, or operate consistently on encoded bytes. Apply replacements from right to left and parse the result before writing.",
+      "verification": "Corrected helper completed; seven defining Python output tests passed. Root independently parsed all script, local skill and non-candidate benchmark Python sources and passed a multibyte AST offset probe.",
+      "verification_scope": "code",
+      "limitations": "Temporary editing-helper repair; does not prove live installation or authorize broad replacements of protocol data.",
+      "sources": [
+        "59513f18129fd6e551e0d90a50a417640131aabd2b4d1a0c089b7209ac9c509d"
+      ]
     }
   ],
   "reports": [
@@ -7927,6 +7950,52 @@
       ],
       "reviewed_on": "2026-10-09",
       "sha256": "f11a6fcf7be36154cbab7a2c8a395b431607ca18056f39a8b82613cce4af2992"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-09-cli-emoji-sandbox-startup.md"
+      ],
+      "decision": "No new learning: repeats local-sandbox-loopback-approved-route; approved read-only inventory verifies the existing workaround and does not repair the default runner.",
+      "findings": [],
+      "reviewed_on": "2026-10-09",
+      "sha256": "6fd06cf2d892d64c677dfc78e1f9f18a65d90823e562ebb50d77004c40b2d3a0"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-09-cli-emoji-edit-offsets.md"
+      ],
+      "findings": [
+        "local-ast-utf8-edit-columns"
+      ],
+      "reviewed_on": "2026-10-09",
+      "sha256": "59513f18129fd6e551e0d90a50a417640131aabd2b4d1a0c089b7209ac9c509d"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-09-cli-emoji-output-snapshots.md"
+      ],
+      "decision": "No new reusable learning beyond existing contract/fixture guidance: eight approved prose expectations aligned and 76 targeted checks passed; invocation mistakes corrected. Seven baseline full-suite failure reports and a baseline shell mode precondition remain. Current hash reviewed; unchanged HEAD evidence confirms policy/digests/vault baseline.",
+      "findings": [],
+      "reviewed_on": "2026-10-09",
+      "sha256": "8f7ad9cb66f062b7fb1c2705811534e43944f17276c3be01b50a4479b2a801cb"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-09-cli-emoji-suite-sync-wait.md"
+      ],
+      "decision": "No new production remedy: original suite waits in host os.sync; a test-only patch verifies output/logic beyond that boundary. Production synchronization and unrelated disk job unchanged; native host flush remains unresolved.",
+      "findings": [],
+      "reviewed_on": "2026-10-09",
+      "sha256": "d14e773ade5eb36eced1cdad9ce154eedea2985f384d65b98e4b7a49cbc5567c"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-09-cli-emoji-progress-log-decoration.md"
+      ],
+      "decision": "No new reusable learning: local-terminal-report-readable-projection and canonical generated-file preservation already cover terminal-only decoration; verified code regression, no live backup.",
+      "findings": [],
+      "reviewed_on": "2026-10-09",
+      "sha256": "8932a62b9596b5d26fc748a70c8127c21833bcc7b2323e8bd14853d90d102470"
     }
   ],
   "review": {
