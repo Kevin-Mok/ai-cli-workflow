@@ -365,6 +365,12 @@ listing is cached-only; opening a picker can generate recaps unless disabled.
 
 ## Installed Skill Surface
 
+- Action: After refresh-config, run `chezmoi source-path ~/.agents/skills/last30days/SKILL.md`
+  and `chezmoi source-path ~/.agents/skills/find-skills/SKILL.md`.
+  Expected: Both resolve into this repo's `dot_agents/skills/` directories.
+- Action: Run `python3 ~/.agents/skills/last30days/scripts/last30days.py --help`.
+  Expected: Offline usage output appears without starting research or requiring credentials.
+
 - Action: Apply a tracked skill change to the live `~/.agents/skills/`
   install.
   Expected: The installed skill copy matches the repo-tracked source so

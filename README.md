@@ -406,6 +406,13 @@ This category matters because the repo packages higher-friction media
 workflows as inspectable local tools instead of leaving them as ad hoc
 prompts.
 
+The managed research and discovery skills include
+[`last30days`](dot_agents/skills/last30days/SKILL.md), which researches recent
+community discussion and provides a source health check, and
+[`find-skills`](dot_agents/skills/find-skills/SKILL.md), which finds and installs
+skills through the Skills CLI. Both are installed under `~/.agents/skills/`
+by the normal chezmoi refresh; provenance is recorded beside each package.
+
 Several skills also include `SOURCE.md`, helper scripts, reference
 material, or agent metadata. That makes them closer to local tools than
 to copied prompt snippets.

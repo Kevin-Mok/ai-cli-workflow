@@ -288,6 +288,14 @@ targets leave local commits intact. Planning-only requests remain read-only.
   verification step, a changed manual expectation, or an obvious smoke
   coverage gap.
 
+## Research And Skill Discovery
+
+- [`last30days`](last30days/SKILL.md): Researches recent discussion across
+  community and web sources and includes a source health check. Imported
+  installed version 3.28.0 from mvanhorn/last30days-skill; see [source](last30days/SOURCE.md).
+- [`find-skills`](find-skills/SKILL.md): Finds and installs skills through
+  the Skills CLI; see its local [import record](find-skills/SOURCE.md).
+
 ## Documents And Media
 
 - [`imagegen`](imagegen/SKILL.md): Generates or edits images through the

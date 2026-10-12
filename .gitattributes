@@ -21,3 +21,4 @@
 scripts/can-i-ask-you-a-question.mp3 filter=lfs diff=lfs merge=lfs -text
 scripts/Voice Contributor-celebrate.mp3 filter=lfs diff=lfs merge=lfs -text
 scripts/Voice Contributor-intro.mp3 filter=lfs diff=lfs merge=lfs -text
+dot_agents/skills/last30days/assets/dog-original.jpeg filter=lfs diff=lfs merge=lfs -text

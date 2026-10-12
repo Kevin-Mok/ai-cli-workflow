@@ -8302,6 +8302,33 @@
       "findings": [],
       "reviewed_on": "2026-10-09",
       "sha256": "8696ab7136c54978e0af3fdb7746f39f3cf7e4260a9d641c2ad9f26068e62274"
+    },
+    {
+      "sha256": "050b314565148184594965ee70ba555adde109bd4192831b422e196f50408c32",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-12-skill-import-sandbox-startup.md"
+      ],
+      "reviewed_on": "2026-10-12",
+      "findings": [],
+      "decision": "No new reusable learning: existing local-sandbox-loopback-approved-route documents the identical startup failure and verified approved-execution workaround; host repair remains unresolved."
+    },
+    {
+      "sha256": "53e0d3d68c7bc490ef10142101348b0fd1fb98fa4d18f8f0dde0dce56bcd9c54",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-12-skill-import-source-tree-execution.md"
+      ],
+      "reviewed_on": "2026-10-12",
+      "findings": [],
+      "decision": "No new reusable learning: installed-entrypoint verification policy already covers this source-tree probe mistake; chezmoi literal_ naming is preserved, and installed --help succeeds."
+    },
+    {
+      "sha256": "add2d8300c657e168883fda4acac09903c77ec81e716a79848f93614ab6d938f",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-12-skill-import-whitespace-check.md"
+      ],
+      "reviewed_on": "2026-10-12",
+      "findings": [],
+      "decision": "No new reusable learning: final staged verification policy already requires checking new import content; eight upstream whitespace lines are a reported warning, not a runtime defect or claimed fix."
     }
   ],
   "review": {
