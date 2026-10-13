@@ -107,7 +107,7 @@ Updated atomic delivery plan: snapshot current index/dirty bytes -> prepare and 
 - [x] Fetch and inspect remote graph/delta and clean merge-tree.
 - [x] Preserve all local overlays and prepare the reviewed normal remote merge.
 - [x] Prepare matching delivery incident/learning/status and scoped merge commit; refresh and verify.
-- [ ] Retry normal push and verify both session commits are reachable remotely.
+- [x] Retry normal push and verify both session commits are reachable remotely.
 
 Integration verification: normal no-ff/no-commit merge returned0; write-tree exactly cea0a806f5fabd492c447f8924103b4467cdf9eb and MERGE_HEAD182713c. Two combined instruction files inverse-merge back to exact original local bytes; all other37 captured dirty paths retain hashes (two overlay paths intentionally include remote additions). No untracked/ignored collision and no unrelated staging. Reviewed finding local-git-fetch-before-ancestry records128 versus valid1, supported by fetched graph evidence; push outcome remains pending.
 
@@ -116,3 +116,9 @@ Milestone3 (chore: merge remote main for tmux delivery) includes only the review
 Fresh pre-merge-commit regression: python3 -B tests/test_tmux_scrolling.py returned0; fourteen tests passed in28.379s. No tmux implementation changed during remote integration.
 
 Delivery-helper correction: first merge commit attempt stopped before creating a commit because write-tree tried to reacquire the helper-owned real-index lock. Preserved HEAD d499d64, MERGE_HEAD182713c, reviewed staged merge and working overlays; released only the owned lock. Defining failing attempt returned128; copied-index write-tree under that same real-index guard returned0 with the exact reviewed tree and unchanged real-index bytes. Corrected the helper accordingly. Matching dated report, reviewed finding local-git-owned-index-lock-check and local lesson are included in milestone3. No unresolved implementation blocker; next step remains scoped normal merge commit and push.
+
+## Final delivery record milestone
+
+Milestone3 committed5b9e858, preserving parents d499d64/182713c. Normal retry push returned0, origin/main advanced182713c..5b9e858. Fresh checked-script verification returned0: HEAD/origin/main/ls-remote agree on5b9e8582681eea1e606d74a9507db79fabb52438; both session commits and remote harness history are reachable, no staged changes remain, unrelated working bytes/overlays are preserved, and deployed scrolling files match source. A read-only final assertion command initially had a missing bracket and failed to parse; corrected script compilation and actual execution passed. Recorded the narrow failure with an explicit no-new-learning decision applying existing parser guidance, and closed the related index/merge/push reports with verified delivery evidence.
+
+Milestone4 subject: docs: finalize tmux session delivery evidence. Completed scope: final delivery plan/status and reviewed incident hashes/outcomes only. Core UX, tests, README and smoke guide are already shipped. Verified: fourteen fresh PTY tests, existing terminal regressions/actual GUI clipboard evidence from implementation, README gate, deployment refresh, exact ancestry/remote equality and protected file hashes. Physical shared-desktop gesture acceptance remains a documented user check. No implementation blocker; next action is the final scoped documentation commit and normal push of that verified record. Preserve all unrelated dirty work and the pre-existing prompt/authoring incident. Atomic implementation/test/manual/Cursor follow-up and targeted rollback remain documented above.

@@ -243,7 +243,7 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Remedy: Create the publication temporary file inside .git, copy/flush/fsync intended bytes, retain permissions and atomically rename on that filesystem under an owned index lock. Preserve the existing commit; do not reset/amend history.
 - Verification: Initial commit8d2d0da succeeded with16 intended paths; /tmp->.git rename failed. Same-filesystem repair verified original bytes unchanged, intended index bytes published, commit intact and no residual staged diff.
 - Limitations: Verified for this scoped commit/index state; changed real indexes require fresh reconciliation. Do not overwrite unrelated staged work or bypass hooks.
-- Source: [tmux index reconciliation](../../../../docs/postmortem/2026-10-13-tmux-commit-index-reconciliation.md) (SHA-256 `2a7e1e22d604c7b7190dcd45735515d03f1ae941c8184bc254daeee1a115f38a`).
+- Source: [tmux index reconciliation](../../../../docs/postmortem/2026-10-13-tmux-commit-index-reconciliation.md) (SHA-256 `da79e08750d7ab5a19b06981cea8fc9d45a83c36021eec65729cad5f83b0203c`).
 
 ## local-git-fetch-before-ancestry
 
@@ -255,7 +255,7 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Verification evidence: The unfetched182713c object caused exit128. Fetch returned0; both session commit ancestry probes against fetched182713c returned1 without object errors. Clean normal merge was prepared and unrelated local overlays retained.
 - Limitations: Ancestry verification and prepared local merge do not prove a subsequent push succeeded. Ambiguous conflicts or concurrent workspace changes require fresh review.
 - Sources:
-  - [2026-10-13-tmux-session-push-divergence.md](/home/example/linux-config/docs/postmortem/2026-10-13-tmux-session-push-divergence.md) (SHA-256 `2dfe179f5035`; aliases retained in [sources.json](../sources.json)).
+  - [2026-10-13-tmux-session-push-divergence.md](/home/example/linux-config/docs/postmortem/2026-10-13-tmux-session-push-divergence.md) (SHA-256 `3681884d70de`; aliases retained in [sources.json](../sources.json)).
 
 ## local-git-owned-index-lock-check
 
@@ -266,4 +266,4 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Remedy: Copy the guarded index and validate through a separate GIT_INDEX_FILE; avoid lock-taking operations on the real index until its guard is released. Keep atomic same-filesystem publication and normal hooks.
 - Verification evidence: Under the owned real-index lock, copied-index write-tree returned0 with the reviewed merge tree and real index bytes unchanged; helper was corrected accordingly.
 - Limitations: This probe verifies the lock interaction only; independently verify commit parents/scope and push reachability.
-- Source: [tmux merge index lock](/home/example/linux-config/docs/postmortem/2026-10-13-tmux-merge-index-lock.md) (SHA-256 `f74d7168d9e873fcb40dfbf7794b7be66673f3556705bffdaa83c508fd795a8e`).
+- Source: [tmux merge index lock](/home/example/linux-config/docs/postmortem/2026-10-13-tmux-merge-index-lock.md) (SHA-256 `7223eaacbad03dcbf3e6d08e497ec2a150ee1e7ef30804506e1c88a7c2c26b98`).

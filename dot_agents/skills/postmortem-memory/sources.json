@@ -4832,7 +4832,7 @@
       "confidence": "confirmed",
       "verification_scope": "runtime",
       "sources": [
-        "2a7e1e22d604c7b7190dcd45735515d03f1ae941c8184bc254daeee1a115f38a"
+        "da79e08750d7ab5a19b06981cea8fc9d45a83c36021eec65729cad5f83b0203c"
       ],
       "symptoms": [
         "Scoped Git commit succeeds but os.replace of a /tmp reconciliation index into .git/index fails with OSError18 Invalid cross-device link"
@@ -4855,7 +4855,7 @@
       "confidence": "confirmed",
       "verification_scope": "runtime",
       "sources": [
-        "2dfe179f503598bbf4579f12f40a8f0cf501a651ec7c8012bb216a6a9c11b6cb"
+        "3681884d70de66c83ab67af7b13b708c169b1964591193b1a421093c32cc1547"
       ],
       "symptoms": [
         "Push rejected fetch-first; merge-base against an ls-remote hash returns128 Not a valid commit name"
@@ -4878,7 +4878,7 @@
       "confidence": "confirmed",
       "verification_scope": "runtime",
       "sources": [
-        "f74d7168d9e873fcb40dfbf7794b7be66673f3556705bffdaa83c508fd795a8e"
+        "7223eaacbad03dcbf3e6d08e497ec2a150ee1e7ef30804506e1c88a7c2c26b98"
       ],
       "symptoms": [
         "Git write-tree returns128 index.lock File exists inside a helper that already owns the real-index lock"
@@ -8569,7 +8569,7 @@
       ]
     },
     {
-      "sha256": "2a7e1e22d604c7b7190dcd45735515d03f1ae941c8184bc254daeee1a115f38a",
+      "sha256": "da79e08750d7ab5a19b06981cea8fc9d45a83c36021eec65729cad5f83b0203c",
       "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-10-13-tmux-commit-index-reconciliation.md"
       ],
@@ -8579,7 +8579,7 @@
       ]
     },
     {
-      "sha256": "2dfe179f503598bbf4579f12f40a8f0cf501a651ec7c8012bb216a6a9c11b6cb",
+      "sha256": "3681884d70de66c83ab67af7b13b708c169b1964591193b1a421093c32cc1547",
       "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-10-13-tmux-session-push-divergence.md"
       ],
@@ -8589,7 +8589,7 @@
       ]
     },
     {
-      "sha256": "f74d7168d9e873fcb40dfbf7794b7be66673f3556705bffdaa83c508fd795a8e",
+      "sha256": "7223eaacbad03dcbf3e6d08e497ec2a150ee1e7ef30804506e1c88a7c2c26b98",
       "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-10-13-tmux-merge-index-lock.md"
       ],
@@ -8597,6 +8597,15 @@
       "findings": [
         "local-git-owned-index-lock-check"
       ]
+    },
+    {
+      "sha256": "b6bfc21aedd2430e18ee09aad2c3101f4505174f4d44f1ffeb1ee93f1dfb2446",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-13-tmux-delivery-verification.md"
+      ],
+      "reviewed_on": "2026-10-13",
+      "findings": [],
+      "decision": "No new reusable learning: a direct missing-bracket typo failed before execution; the existing local-nested-language-literal-emission parser prerequisite applies. Checked script compilation and actual delivery/state verification both passed; no product behavior changed."
     }
   ],
   "review": {
