@@ -4823,6 +4823,29 @@
       "remedy": "Bind Shift-wheel to pane history, MouseDragEnd to stop-selection, an explicit copy key to copy-selection-no-clear and Escape to cancel. Route Ctrl-Shift-C through a no-UI Kitty adapter that prefers native selection, otherwise resolves the tty foreground group and forwards a dedicated tmux key. Preserve shifted/ASCII fallback and use nonblocking pane status feedback.",
       "verification": "Defining RED covered Shift/release/OSC52 gaps. Fourteen PTY tests pass including second clipboard output and no-selection input. Actual Kitty/XTest copies exact released shell/app selections, restores selected text after clipboard reseeding, preserves viewport and returns via Escape. Native raw fish Kitty and fish-launched tmux copy checks pass. Independent review finds no important issue.",
       "limitations": "Isolated graphical display evidence, not physical desktop/imwheel acceptance. tmux3.4 native scrollbar remains absent; prior discarded history remains. Adapter detects local foreground tmux, not arbitrary remote SSH applications."
+    },
+    {
+      "id": "local-git-index-same-filesystem-publish",
+      "topic": "paths-ownership",
+      "reference": "references/paths-ownership.md#local-git-index-same-filesystem-publish",
+      "status": "verified_fix",
+      "confidence": "confirmed",
+      "verification_scope": "runtime",
+      "sources": [
+        "2a7e1e22d604c7b7190dcd45735515d03f1ae941c8184bc254daeee1a115f38a"
+      ],
+      "symptoms": [
+        "Scoped Git commit succeeds but os.replace of a /tmp reconciliation index into .git/index fails with OSError18 Invalid cross-device link"
+      ],
+      "applicability": "Publishing an isolated/reconciled Git index when temporary and repository filesystems differ.",
+      "diagnostics": [
+        "Distinguish successful commit creation from post-commit index cleanup failure.",
+        "Compare current index with the captured original before replacing it; stop on concurrent changes.",
+        "Check source/destination device IDs and preserve unrelated staging."
+      ],
+      "remedy": "Create the publication temporary file inside .git, copy/flush/fsync intended bytes, retain permissions and atomically rename on that filesystem under an owned index lock. Preserve the existing commit; do not reset/amend history.",
+      "verification": "Initial commit8d2d0da succeeded with16 intended paths; /tmp->.git rename failed. Same-filesystem repair verified original bytes unchanged, intended index bytes published, commit intact and no residual staged diff.",
+      "limitations": "Verified for this scoped commit/index state; changed real indexes require fresh reconciliation. Do not overwrite unrelated staged work or bypass hooks."
     }
   ],
   "reports": [
@@ -8498,6 +8521,16 @@
       "reviewed_on": "2026-10-13",
       "findings": [
         "local-tmux-released-selection-copy-ux"
+      ]
+    },
+    {
+      "sha256": "2a7e1e22d604c7b7190dcd45735515d03f1ae941c8184bc254daeee1a115f38a",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-13-tmux-commit-index-reconciliation.md"
+      ],
+      "reviewed_on": "2026-10-13",
+      "findings": [
+        "local-git-index-same-filesystem-publish"
       ]
     }
   ],

@@ -231,3 +231,16 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Verification evidence: Five reviewed files became twelve in commit 5451db5. It was local at the initial remote check, but another session subsequently published it and follow-up f8f044e; fresh HEAD, origin/main and ls-remote agree on f8f044e. Recovery not attempted. User chose to keep published history intact and close delivery with a documentation follow-up.
 - Limitations: Concurrent actor identity is unknown; no recovery or prevention test has passed.
 - Source: [ctp staging race](/home/example/linux-config/docs/postmortem/2026-10-08-ctp-session-staging-race.md).
+
+## local-git-index-same-filesystem-publish
+
+- Status: verified_fix
+- Confidence: confirmed
+- Verification scope: runtime
+- Symptoms: Scoped Git commit succeeds but os.replace of a /tmp reconciliation index into .git/index fails with OSError18 Invalid cross-device link
+- Applicability: Publishing an isolated/reconciled Git index when temporary and repository filesystems differ.
+- Diagnostics: Distinguish successful commit creation from post-commit index cleanup failure.; Compare current index with the captured original before replacing it; stop on concurrent changes.; Check source/destination device IDs and preserve unrelated staging.
+- Remedy: Create the publication temporary file inside .git, copy/flush/fsync intended bytes, retain permissions and atomically rename on that filesystem under an owned index lock. Preserve the existing commit; do not reset/amend history.
+- Verification: Initial commit8d2d0da succeeded with16 intended paths; /tmp->.git rename failed. Same-filesystem repair verified original bytes unchanged, intended index bytes published, commit intact and no residual staged diff.
+- Limitations: Verified for this scoped commit/index state; changed real indexes require fresh reconciliation. Do not overwrite unrelated staged work or bypass hooks.
+- Source: [tmux index reconciliation](../../../../docs/postmortem/2026-10-13-tmux-commit-index-reconciliation.md) (SHA-256 `2a7e1e22d604c7b7190dcd45735515d03f1ae941c8184bc254daeee1a115f38a`).
