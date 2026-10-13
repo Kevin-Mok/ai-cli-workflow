@@ -338,3 +338,4 @@ education work:
 - For coding-task handoff, include the atomic plan, a paste-ready Cursor prompt,
   exact automated and manual test plan, docs updates, a Conventional Commit
   suggestion, and any additional validation notes.
+- Delegate repo search/file mapping to the `search` agent, test runs to `tests`, and API/library doc lookups to `docs` (see `~/.codex/agents/`).

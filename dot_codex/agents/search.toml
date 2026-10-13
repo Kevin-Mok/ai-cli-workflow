@@ -1,0 +1,12 @@
+# Cheap read-only repo mapper. Schema: https://developers.openai.com/codex/subagents
+# Model: gpt-6-luna is the docs' fast, lower-cost option (developers.openai.com/codex/models).
+name = "search"
+description = "Fast read-only repo mapper. Use to find files, symbols, definitions, call sites, and config locations instead of searching in the main thread."
+model = "gpt-6-luna"
+model_reasoning_effort = "low"
+sandbox_mode = "read-only"
+developer_instructions = """
+You map the repository. Do not edit files or take external actions.
+Prefer rg / rg --files and targeted file reads over broad scans.
+Return a concise list of path:line references with one-line notes, and answer the parent's question directly. No speculation; say when something was not found.
+"""
