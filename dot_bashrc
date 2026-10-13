@@ -202,7 +202,7 @@ fi
 # Both PC/Laptop }}}
 
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
-source /home/example/aliases/.key_aliases
+source "$HOME/aliases/.key_aliases"
 
 alias claude-mem='/home/example/.bun/bin/bun "/home/example/.claude/plugins/marketplaces/thedotmack/plugin/scripts/worker-service.cjs"'
 export PATH=$PATH:$HOME/.maestro/bin
