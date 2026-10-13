@@ -8387,6 +8387,15 @@
       "reviewed_on": "2026-10-13",
       "findings": [],
       "decision": "No new reusable learning: existing local-sandbox-loopback-approved-route covers this pre-execution failure and verified scoped workaround; host sandbox remains unresolved."
+    },
+    {
+      "sha256": "28c0c08072135b7640af4fcbdc2ac41cf064a757d1f313e62529bff0a95e4101",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-13-notification-markdown-inspection.md"
+      ],
+      "reviewed_on": "2026-10-13",
+      "findings": [],
+      "decision": "No new general policy beyond existing API/context and fixture discovery guidance. Standard str SupportsIndex contract corrected; eight focused checks, sixty staged regressions and native activation/DBus delivery verify scoped adaptations."
     }
   ],
   "review": {

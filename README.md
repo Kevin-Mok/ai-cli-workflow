@@ -943,6 +943,8 @@ most distinctive and actively evolving part of the repo right now.
 
 Dunst uses Hack Nerd Font Mono 23.25 pt, 1.5 times the previous 15.5 pt. After refresh-config, run `~/scripts/codex-notification-activate` to restart Dunst, then `~/scripts/notification-font-test` for Codex and Discord sample popups with large text throughout. Notifications render about 669 px wide on the current 135-DPI desktop (467 logical pixels plus frame and automatic scaling). Height follows the text up to 600 logical pixels, preserving readability rather than forcing a 16:9 crop. Add `--compare` to include the smaller old-size reference. Use `--app codex` or `--app discord` for one sample and `--plain` for ASCII terminal output. Samples last 15 seconds and avoid the codex-kitty audio rule. Requires Python 3 and notify-send; no sudo.
 
+Terminal/Codex popup titles and bodies render `**bold**` as bold text; literal HTML and Markdown inside code remain literal. Run `~/scripts/notification-markdown-test --activate-all` to activate existing reachable Kitty instances and send a native bold sample. Use `--case literal` for escaping/code checks, `--case plain` for plain-text delivery, `--plain` for ASCII output and `--details` for activation diagnostics. New Kitty processes load the callback automatically. This covers strong emphasis rather than full Markdown or other apps' native notifications.
+
 ## License
 
 This repository is licensed under the [MIT License](LICENSE).

@@ -1,0 +1,67 @@
+#!/usr/bin/env python3
+"""Activate Markdown bold in Kitty and send a native notification sample."""
+import argparse
+import os
+from pathlib import Path
+import shutil
+import subprocess
+import sys
+
+
+def main() -> int:
+    plain = "--plain" in sys.argv or os.environ.get("CLI_PLAIN") == "1"
+    def message(icon: str, text: str) -> str:
+        return text if plain else icon + " " + text
+    parser = argparse.ArgumentParser(description=message("🔔", __doc__ or "Send native notification samples."))
+    parser.add_argument("--case", choices=("bold", "literal", "plain"), default="bold")
+    parser.add_argument("--activate-all", action="store_true", help="reload the callback in every reachable Kitty instance before sampling")
+    parser.add_argument("--details", action="store_true", help="show remote activation diagnostics on failure")
+    parser.add_argument("--plain", action="store_true", help="use ASCII terminal output")
+    options = parser.parse_args()
+    executable = shutil.which("kitten")
+    config = Path(os.environ.get("XDG_CONFIG_HOME") or Path.home() / ".config") / "kitty/notification_markdown.py"
+    if executable is None or not config.is_file():
+        print(message("❌", "Apply this configuration and install Kitty before sending a sample."), file=sys.stderr)
+        return 1
+    addresses = []
+    preferred = os.environ.get("KITTY_LISTEN_ON")
+    if preferred and preferred.startswith("unix:") and Path(preferred[5:]).is_socket():
+        addresses.append(preferred)
+    addresses.extend("unix:" + str(path) for path in sorted(Path("/tmp").glob("kitty-*")) if path.is_socket())
+    addresses = list(dict.fromkeys(addresses))
+    available = []
+    diagnostics = []
+    for address in addresses:
+        print(message("🔄", "Checking Kitty notification activation..."), flush=True)
+        try:
+            result = subprocess.run([executable, "@", "--to", address, "kitten", str(config), "activate"], capture_output=True, text=True, timeout=3)
+        except (OSError, subprocess.TimeoutExpired) as error:
+            diagnostics.append(str(error))
+            continue
+        if result.returncode:
+            diagnostics.append(result.stderr.strip() or result.stdout.strip())
+        # Stale sockets are normal after terminal exits. Only acknowledged
+        # activation makes an instance eligible for the native sample.
+        if result.returncode == 0 and "Notification Markdown active." in result.stdout:
+            available.append(address)
+            if not options.activate_all:
+                break
+    if not available:
+        print(message("❌", "No Kitty instance accepted activation. Open Kitty or retry with --details."), file=sys.stderr)
+        if options.details:
+            for detail in diagnostics:
+                print(detail, file=sys.stderr)
+        return 1
+    try:
+        result = subprocess.run([executable, "@", "--to", available[0], "kitten", str(config), options.case], capture_output=True, text=True, timeout=5, check=True)
+        if options.case.capitalize() + " sample sent." not in result.stdout:
+            raise ValueError("sample not acknowledged")
+    except (OSError, subprocess.SubprocessError, ValueError):
+        print(message("❌", "Sample delivery failed. Check Kitty notification rules and retry."), file=sys.stderr)
+        return 1
+    print(message("✅", f"{options.case.capitalize()} sample sent; Markdown active in {len(available)} Kitty instance(s)."))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

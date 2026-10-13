@@ -862,6 +862,21 @@ Check large text throughout popups about 669px wide with naturally growing heigh
 - Action: Run `~/scripts/notification-font-test --app discord --plain`.
   Expected: Only the Discord sample appears, with large chat text throughout; terminal output is ASCII.
 
+### Terminal notification Markdown bold
+
+Apply with refresh-config, then activate the callback in existing Kitty instances without restarting terminals or resetting notification state. Check bold, literal/code and unchanged plain text through native Kitty delivery; no sudo. Only Markdown strong emphasis is supported.
+
+- Action: Run `~/scripts/notification-markdown-test --activate-all`.
+  Expected: Prints an acknowledged activation count and shows a native popup whose title/body render bold emphasis without surrounding double asterisks. Literal HTML is escaped. Existing terminals and native click/focus behavior remain usable.
+- Action: Run `~/scripts/notification-markdown-test --case literal --plain`.
+  Expected: Bold renders; literal `<span>` and `&` display as text, while double asterisks inside code/escaped markers stay literal. Terminal output is ASCII.
+- Action: Run `~/scripts/notification-markdown-test --case plain --plain`.
+  Expected: Plain sample text arrives unchanged through Kitty. Popup width/font match the current Dunst settings.
+- Action: Click a native sample, then request a real unfocused Codex completion with `**bold**` in its answer.
+  Expected: Sample click focuses its originating Kitty window; the Codex popup formats emphasis while existing focus suppression, notification IDs and sound provenance remain native.
+- Action: If activation fails, run `~/scripts/notification-markdown-test --details` after opening Kitty.
+  Expected: Concise error by default; requested details expose the remote activation failure. New Kitty instances load the callback automatically.
+
 ### Codex notification sound
 
 Apply the [notification sources](codex-notification-sound.md), restart Dunst
