@@ -290,3 +290,16 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Verification evidence: Corrected RED contained no competing activation; private Xvfb/DBus integration passed and cleaned its own daemon.
 - Limitations: This proves fixture startup ownership, not live desktop audio or production daemon repair.
 - Source: [Dunst fixture startup](/home/example/linux-config/docs/postmortem/2026-10-07-dunst-fixture-startup.md) (SHA-256 `0ecc5a5310ac`).
+
+## local-tmux-binding-command-transport
+
+- Status: verified_fix
+- Confidence: confirmed
+- Verification scope: runtime
+- Symptoms: A multi-command tmux bind-key reload stores only select-pane while later copy-mode commands run immediately
+- Applicability: Shell transport of semicolon-separated tmux binding bodies through the tmux client CLI.
+- Diagnostics: Inspect list-keys for the full stored binding body after reloading.; Check whether escaped semicolons reached tmux as separate client command separators instead of part of the binding.
+- Remedy: Write the intended binding configuration to a scoped file and use tmux source-file to install it. Restore only transient state caused by the failed reload; do not reset sessions/history.
+- Verification: Initial list-keys showed only select-pane and current pane entered copy mode at position5. Scoped source-file restored full root and emacs/vi binding bodies; transient mode canceled. Subsequent PTY and isolated Kitty event checks passed.
+- Limitations: Verified for installed tmux3.4 and these mouse bindings; do not infer all quoting or shell transport is fixed. Reload only authorized options.
+- Source: [tmux scrolling diagnosis](../../../../docs/postmortem/2026-10-13-tmux-scrolling.md) (SHA-256 `8a1c8ba042b176a7612ebe0b94a68c6e1c912130bd3a9b11d10b1ae660574484`).

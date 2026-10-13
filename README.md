@@ -715,6 +715,7 @@ source in this repo.
 | [`~/scripts/codex-voice-auditions`](docs/codex-notification-sound.md#audition-ten-local-voices) | Compare ten numbered local voices with upbeat lines and the question clip before each sample; includes a committed [Voice Contributor celebrate MP3](scripts/Voice Contributor-celebrate.mp3) reference. | Default plays all ten; `--list`, `--samples`, `--voice NUMBER [NUMBER ...]` (names/IDs also accepted), `--sample all|short|celebrate|technical`, `--text TEXT`, `--length-scale 0.95`, `--offline`, `--render-only`, `--output-dir PATH`, `--clip PATH`, `--dry-run`, `--plain`, `--details`. Requires installed Piper 1.8.0 and mpv for playback; first model downloads need internet. Saves WAVs/manifest under XDG data, reports remaining clip-to-speech gap, changes no notification settings, no sudo. |
 | `rintro` → [`~/scripts/Voice Contributor-intro`](docs/codex-notification-sound.md#short-Voice Contributor-introduction) | Play example-user's saved Voice Contributor introduction without the question clip. | No arguments plays [Voice Contributor-intro.mp3](scripts/Voice Contributor-intro.mp3) immediately; `--text "WORDS"` synthesizes custom Voice Contributor high speech only, pace 0.95; `--help` prints usage. Autoloadable fish command, available in existing shells after deployment; mpv required, custom speech also needs installed Piper. Local-only, no sudo. |
 | `~/scripts/kitty-scrollback-smoke` | Open a separate Kitty window to check dragging, paging, selection, wrapping, and streaming history without sudo or model requests. | `--lines` defaults to 10000; `--stream-lines` to 300; `--interval` to 0.1 seconds. `--emit` prints in the current terminal instead. Press Enter to start streaming and again after it finishes to close the test. See the [scrolling smoke checks](docs/smoke-tests.md#kitty-and-codex-scrolling). |
+| [`~/scripts/tmux-scrollback-smoke`](docs/smoke-tests.md#tmux-pane-history-scrolling) | Open an isolated Kitty/tmux fixture for Shift+wheel history browsing and drag/release/Ctrl+Shift+C copying. | `--lines` defaults to 3000; `--app-mouse` checks application mouse ownership; `--plain` gives ASCII output. Escape returns to live input; Ctrl+D at empty input closes only the fixture. No sudo. |
 | `./scripts/executable_setup-aerc-mail.sh` | Install aerc mail prerequisites or add one Gmail/Outlook.com account at a time without storing addresses, app passwords, client IDs, or OAuth tokens in Git. | `--install` may prompt for sudo to install shared packages. `--init-pass GPG_KEY_ID` initializes an empty password store. `--add-gmail` prompts for a Gmail app password; `--add-outlook` prompts for a Microsoft app client ID and launches device-code OAuth; `--status` checks configured accounts without printing credentials; `--dry-run` previews write actions without changing files or starting OAuth. |
 | `sudo ./scripts/executable_setup-neovim-python-completion.sh` | Upgrade Neovim from Ubuntu's older package, install the repo's `vim-plug` Neovim stack including `nvim-lspconfig`, and install the Python language server used for strong completion and signature help. | `--neovim-version` pins a different official release. `--skip-plugins` skips `vim-plug` bootstrap and `PlugInstall`. `--skip-lsp` skips `uv tool install --upgrade basedpyright`. |
 | `sudo ./scripts/executable_update-chrome.sh` | Check the installed Google Chrome apt package version and upgrade it when the Google repo has a newer build. | `--check` prints the installed and candidate versions without modifying the system. With no flags, the script refreshes apt metadata and upgrades only `google-chrome-stable` when needed. |
@@ -840,7 +841,17 @@ this.
   config.
 - [`dot_tmux.conf`](dot_tmux.conf) is the multiplexing layer with a
   custom prefix, mouse mode, TPM plugins, a status line, and copy-mode
-  mappings that push selections to `xclip`. Use
+  mappings that push selections to `xclip`. New panes keep 50,000 history rows;
+  Shift+wheel browses pane history without holding a mouse button, even in
+  mouse-aware apps. Drag text, release, then Ctrl+Shift+C copies the persistent
+  highlight while keeping the viewport in place; Escape returns to live input.
+  A history-mode status hint shows the shortcuts. Plain wheel works at a shell;
+  Alt+wheel remains supported. Native Kitty selection copying is preserved.
+  tmux 3.4 text dragging selects rather than moving
+  a scrollbar; Kitty's native thumb cannot expose tmux-owned history. See the
+  [tmux gesture checks](docs/smoke-tests.md#tmux-pane-history-scrolling) and run
+  `~/scripts/tmux-scrollback-smoke` (or `--app-mouse`) in an isolated window.
+  Use
   [`scripts/executable_install-tmux-tpm.sh`](scripts/executable_install-tmux-tpm.sh)
   to install or update TPM and reload an active tmux server before using
   `prefix + I` to install its plugins.

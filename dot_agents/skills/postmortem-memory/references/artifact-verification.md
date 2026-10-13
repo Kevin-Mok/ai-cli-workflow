@@ -440,3 +440,29 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Verification evidence: A 50ms injected gap failed the existing assertion before correction and passed afterward; all 67 focused notification/speech tests passed.
 - Limitations: Fixture code evidence does not prove hardware timing or live Codex activation. The separately reviewed default-sandbox workaround remains necessary.
 - Source: [queued-question task verification incident](/home/example/linux-config/docs/postmortem/2026-10-09-queued-question-sandbox-startup.md).
+
+## local-tmux-history-mouse-ownership
+
+- Status: verified_workaround
+- Confidence: confirmed
+- Verification scope: runtime
+- Symptoms: Dragging in tmux highlights text without moving history like a Kitty scrollbar; Application mouse ownership prevents ordinary wheel from entering tmux history; Early pane output discarded at the default 2000-row history limit
+- Applicability: tmux3.4 in Kitty; pane-owned history versus terminal-native scrollbar and mouse-aware applications.
+- Diagnostics: Inspect installed version, effective mouse bindings, pane mouse_any_flag and history-limit.; Use a real attached PTY or isolated graphical display and numbered history; distinguish text drag, edge drag, ordinary wheel and modified wheel.; Confirm newly rendered earlier record numbers rather than matching text already visible before the event.
+- Remedy: Preserve ordinary application wheel/selection; explicitly bind Alt+wheel to copy-mode history up/down and retain 50000 rows for new panes. tmux3.4 has no native pane scrollbar; native support first appears in3.6.
+- Verification: Confirmed RED for absent app Alt-wheel override and lost earliest record, then six emacs/vi PTY tests passed. Installed Kitty on isolated Xvfb showed earlier numbered history, downward exit and INPUT hello in both shell and mouse-aware fixtures; text and edge dragging selected at scroll position0.
+- Limitations: This is supported history browsing, not draggable scrollbar parity. Existing pane limits and discarded history remain; app document history is separate. Isolated graphical evidence does not prove physical shared-desktop/imwheel routing. External xclip unchanged/not retested.
+- Source: [tmux scrolling diagnosis](../../../../docs/postmortem/2026-10-13-tmux-scrolling.md) (SHA-256 `8a1c8ba042b176a7612ebe0b94a68c6e1c912130bd3a9b11d10b1ae660574484`).
+
+## local-tmux-released-selection-copy-ux
+
+- Status: verified_fix
+- Confidence: confirmed
+- Verification scope: runtime
+- Symptoms: Shift-wheel does not browse tmux history; Mouse release cancels the blue selection before keyboard copying; Ctrl-Shift-C copies no tmux text or repeat copy leaves another app clipboard value unchanged
+- Applicability: Kitty0.49.2/tmux3.4 local terminal scroll/select/copy, including tmux under fish.
+- Diagnostics: Use Shift SGR68/69 events and observe release-persistent selection in both key modes.; Verify real X11 clipboard text after release, then replace clipboard data and repeat copy. A buffer or unchanged clipboard alone is insufficient.; Compare the replacement Kitty key mapping fallback flags with the default; inspect actual terminal foreground group if process list is empty.; A transient copy message can suppress subsequent clipboard output even while new tmux buffers are created.
+- Remedy: Bind Shift-wheel to pane history, MouseDragEnd to stop-selection, an explicit copy key to copy-selection-no-clear and Escape to cancel. Route Ctrl-Shift-C through a no-UI Kitty adapter that prefers native selection, otherwise resolves the tty foreground group and forwards a dedicated tmux key. Preserve shifted/ASCII fallback and use nonblocking pane status feedback.
+- Verification: Defining RED covered Shift/release/OSC52 gaps. Fourteen PTY tests pass including second clipboard output and no-selection input. Actual Kitty/XTest copies exact released shell/app selections, restores selected text after clipboard reseeding, preserves viewport and returns via Escape. Native raw fish Kitty and fish-launched tmux copy checks pass. Independent review finds no important issue.
+- Limitations: Isolated graphical display evidence, not physical desktop/imwheel acceptance. tmux3.4 native scrollbar remains absent; prior discarded history remains. Adapter detects local foreground tmux, not arbitrary remote SSH applications.
+- Source: [tmux scroll/copy UX](../../../../docs/postmortem/2026-10-13-tmux-scroll-copy-ux.md) (SHA-256 `07ca32cdf9a4f8d1d57f456abe187a2e66f5b8d87640ac592d39fd2354cc88c6`).

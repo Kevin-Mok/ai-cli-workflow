@@ -4750,6 +4750,79 @@
       "sources": [
         "048c41904d06255c9a2237a08f190804172c7ea89c83cb94fbf7c095cd9f7117"
       ]
+    },
+    {
+      "id": "local-tmux-history-mouse-ownership",
+      "topic": "artifact-verification",
+      "reference": "references/artifact-verification.md#local-tmux-history-mouse-ownership",
+      "status": "verified_workaround",
+      "confidence": "confirmed",
+      "verification_scope": "runtime",
+      "symptoms": [
+        "Dragging in tmux highlights text without moving history like a Kitty scrollbar",
+        "Application mouse ownership prevents ordinary wheel from entering tmux history",
+        "Early pane output discarded at the default 2000-row history limit"
+      ],
+      "applicability": "tmux3.4 in Kitty; pane-owned history versus terminal-native scrollbar and mouse-aware applications.",
+      "diagnostics": [
+        "Inspect installed version, effective mouse bindings, pane mouse_any_flag and history-limit.",
+        "Use a real attached PTY or isolated graphical display and numbered history; distinguish text drag, edge drag, ordinary wheel and modified wheel.",
+        "Confirm newly rendered earlier record numbers rather than matching text already visible before the event."
+      ],
+      "remedy": "Preserve ordinary application wheel/selection; explicitly bind Alt+wheel to copy-mode history up/down and retain 50000 rows for new panes. tmux3.4 has no native pane scrollbar; native support first appears in3.6.",
+      "verification": "Confirmed RED for absent app Alt-wheel override and lost earliest record, then six emacs/vi PTY tests passed. Installed Kitty on isolated Xvfb showed earlier numbered history, downward exit and INPUT hello in both shell and mouse-aware fixtures; text and edge dragging selected at scroll position0.",
+      "limitations": "This is supported history browsing, not draggable scrollbar parity. Existing pane limits and discarded history remain; app document history is separate. Isolated graphical evidence does not prove physical shared-desktop/imwheel routing. External xclip unchanged/not retested.",
+      "sources": [
+        "8a1c8ba042b176a7612ebe0b94a68c6e1c912130bd3a9b11d10b1ae660574484"
+      ]
+    },
+    {
+      "id": "local-tmux-binding-command-transport",
+      "topic": "execution-environments",
+      "reference": "references/execution-environments.md#local-tmux-binding-command-transport",
+      "status": "verified_fix",
+      "confidence": "confirmed",
+      "verification_scope": "runtime",
+      "symptoms": [
+        "A multi-command tmux bind-key reload stores only select-pane while later copy-mode commands run immediately"
+      ],
+      "applicability": "Shell transport of semicolon-separated tmux binding bodies through the tmux client CLI.",
+      "diagnostics": [
+        "Inspect list-keys for the full stored binding body after reloading.",
+        "Check whether escaped semicolons reached tmux as separate client command separators instead of part of the binding."
+      ],
+      "remedy": "Write the intended binding configuration to a scoped file and use tmux source-file to install it. Restore only transient state caused by the failed reload; do not reset sessions/history.",
+      "verification": "Initial list-keys showed only select-pane and current pane entered copy mode at position5. Scoped source-file restored full root and emacs/vi binding bodies; transient mode canceled. Subsequent PTY and isolated Kitty event checks passed.",
+      "limitations": "Verified for installed tmux3.4 and these mouse bindings; do not infer all quoting or shell transport is fixed. Reload only authorized options.",
+      "sources": [
+        "8a1c8ba042b176a7612ebe0b94a68c6e1c912130bd3a9b11d10b1ae660574484"
+      ]
+    },
+    {
+      "id": "local-tmux-released-selection-copy-ux",
+      "topic": "artifact-verification",
+      "reference": "references/artifact-verification.md#local-tmux-released-selection-copy-ux",
+      "status": "verified_fix",
+      "confidence": "confirmed",
+      "verification_scope": "runtime",
+      "sources": [
+        "07ca32cdf9a4f8d1d57f456abe187a2e66f5b8d87640ac592d39fd2354cc88c6"
+      ],
+      "symptoms": [
+        "Shift-wheel does not browse tmux history",
+        "Mouse release cancels the blue selection before keyboard copying",
+        "Ctrl-Shift-C copies no tmux text or repeat copy leaves another app clipboard value unchanged"
+      ],
+      "applicability": "Kitty0.49.2/tmux3.4 local terminal scroll/select/copy, including tmux under fish.",
+      "diagnostics": [
+        "Use Shift SGR68/69 events and observe release-persistent selection in both key modes.",
+        "Verify real X11 clipboard text after release, then replace clipboard data and repeat copy. A buffer or unchanged clipboard alone is insufficient.",
+        "Compare the replacement Kitty key mapping fallback flags with the default; inspect actual terminal foreground group if process list is empty.",
+        "A transient copy message can suppress subsequent clipboard output even while new tmux buffers are created."
+      ],
+      "remedy": "Bind Shift-wheel to pane history, MouseDragEnd to stop-selection, an explicit copy key to copy-selection-no-clear and Escape to cancel. Route Ctrl-Shift-C through a no-UI Kitty adapter that prefers native selection, otherwise resolves the tty foreground group and forwards a dedicated tmux key. Preserve shifted/ASCII fallback and use nonblocking pane status feedback.",
+      "verification": "Defining RED covered Shift/release/OSC52 gaps. Fourteen PTY tests pass including second clipboard output and no-selection input. Actual Kitty/XTest copies exact released shell/app selections, restores selected text after clipboard reseeding, preserves viewport and returns via Escape. Native raw fish Kitty and fish-launched tmux copy checks pass. Independent review finds no important issue.",
+      "limitations": "Isolated graphical display evidence, not physical desktop/imwheel acceptance. tmux3.4 native scrollbar remains absent; prior discarded history remains. Adapter detects local foreground tmux, not arbitrary remote SSH applications."
     }
   ],
   "reports": [
@@ -8396,6 +8469,36 @@
       "reviewed_on": "2026-10-13",
       "findings": [],
       "decision": "No new general policy beyond existing API/context and fixture discovery guidance. Standard str SupportsIndex contract corrected; eight focused checks, sixty staged regressions and native activation/DBus delivery verify scoped adaptations."
+    },
+    {
+      "sha256": "d5ed6d6b301c47c54abd907fdf7b3883822925b6ccff57484c78e50fec4fbac8",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-13-tmux-execution-sandbox.md"
+      ],
+      "reviewed_on": "2026-10-13",
+      "findings": [],
+      "decision": "No new reusable learning: approved loopback startup workaround is already documented; native title transport failed on resume, so retain the prior title without claiming service repair."
+    },
+    {
+      "sha256": "8a1c8ba042b176a7612ebe0b94a68c6e1c912130bd3a9b11d10b1ae660574484",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-13-tmux-scrolling.md"
+      ],
+      "reviewed_on": "2026-10-13",
+      "findings": [
+        "local-tmux-history-mouse-ownership",
+        "local-tmux-binding-command-transport"
+      ]
+    },
+    {
+      "sha256": "07ca32cdf9a4f8d1d57f456abe187a2e66f5b8d87640ac592d39fd2354cc88c6",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-13-tmux-scroll-copy-ux.md"
+      ],
+      "reviewed_on": "2026-10-13",
+      "findings": [
+        "local-tmux-released-selection-copy-ux"
+      ]
     }
   ],
   "review": {

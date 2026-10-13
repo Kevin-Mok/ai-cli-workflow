@@ -1,0 +1,95 @@
+# Restore supported tmux history scrolling
+
+Diagnose which layer owns scrolling, reproduce mouse behavior in an isolated server, then apply the smallest supported configuration and verify it without disturbing existing sessions.
+
+## Purpose and observable outcome
+
+Wheel browsing reaches earlier numbered pane output, wheel-down returns to live input, and mouse-aware applications keep normal mouse handling. Provide a deliberate override to browse pane history while an application owns the mouse. Establish draggable-scrollbar parity separately.
+
+## Context and boundaries
+
+Saved prompt: prompts/tmux-kitty-scrolling.md. Installed tmux 3.4 and Kitty 0.49.2. Source/live tmux files match; effective mouse is on and root wheel/drag bindings are stock. Kitty history is 50,000 lines; tmux history is 2,000. TPM exists, only TPM itself currently installed. Reference image inspected: Kitty right-edge thumb plus a large text selection. Native tmux scrollbars first appear in 3.6, outside this no-upgrade fix. No commits/push, session termination, history clearing, worktree, installation or host security changes authorized.
+
+## Assumptions and decisions
+
+Preserve unmodified mouse events for applications and current selection/clipboard mappings. Use tmux-owned copy mode on 3.4, explain native scrollbar limit. Default mode is fixed by the harness; maintain this ExecPlan rather than invoking an unavailable Plan Mode switch. Before editing behavior, run a PTY-based executable reproducer with numbered history and SGR mouse events.
+
+## Ordered checklist
+
+- [x] Capture protected Git status; read configs, reference plan, feedback/lessons and inspect image.
+- [x] Inspect installed versions, effective options, bindings and primary capability evidence.
+- [x] Build and run RED reproducer before modifying behavior.
+- [x] Apply focused config, helper and documentation changes.
+- [x] Verify GREEN, app forwarding, selection, live typing and regression checks.
+- [x] Audit refresh scope, run refresh-config, reload only affected live settings.
+- [x] Reconcile final evidence, diff, manual limits and rollback.
+
+## Risks and protected state
+
+Initial dirty files: .chezmoiexternal.toml.tmpl, README.md, docs/commit-status-overviews.md, docs/smoke-tests.md, dot_agents/skills/README.md, feedback.log, postmortem-memory references and sources.json, dot_codex/AGENTS.md, mimeapps.list, Vesktop settings and tasks/lessons.md. Initial untracked work includes pstack artifacts and prior prompt/incident work. Preserve all; append only scoped README/smoke/ledger additions. Before broad refresh inspect dry-run and snapshot protected bytes, because refresh captures live Codex/Git configs and applies pending chezmoi work. History-limit affects new panes; discarded output cannot be recovered. Rollback removes only this task's configuration block and reapplies ~/.tmux.conf.
+
+## Exact verification
+
+PTY fixture: fresh disposable socket, source config, numbered output exceeding viewport, inject wheel and drag events through attached client; query scroll_position/pane_in_mode and the attached-client rendered output (3.4 lacks capture-pane -M). Enable app mouse reporting, confirm ordinary wheel forwarding, then assert modified wheel enters tmux history. Scroll down to exit and send a literal command to verify live input. Test plain drag remains selection. Probe depth with >2,000 lines. Actual desktop evidence if supported; otherwise explicitly retain visual acceptance pending. Run terminal regression scripts, helper syntax/help and git diff --check; inspect and safely apply refresh before live option queries.
+
+## Progress and review notes
+
+2026-10-13: read-only agent independently confirmed installed manual lacks scrollbars and tmux 3.6 release evidence adds them. Root independently inspected effective stock bindings and source/live equality. Sandbox lookup matches local-sandbox-loopback-approved-route; approved scoped reads work. Incident recorded in docs/postmortem/2026-10-13-tmux-execution-sandbox.md with reviewed no-new-learning decision. No scrolling behavior edits yet.
+
+Corrected RED: python3 -B tests/test_tmux_scrolling.py returned 1 with two expected failures: Alt+wheel did not enter history in a mouse-aware fixture, and record 000001 was discarded after 3,000 lines. Ordinary wheel up/down, selection and hello input already passed. Initial full-config startup before creating a pane triggered an existing passthrough `no current pane` overlay; corrected fixture creates a placeholder before source-file. tmux3.4's first plain wheel event enters copy mode at position zero; second scrolls, so baseline gesture test uses two events. PTY painted earlier numbered lines on refresh-client. capture-pane -M is unavailable in 3.4; use attached-client output and live Kitty text rather than that planned newer flag.
+
+## Final verification and delivery
+
+- Config: added only history-limit 50000 and five Alt+wheel bindings (root up; emacs/vi up/down). Default wheel/drag and xclip mappings remain unchanged. Manual helper creates a unique disposable server in a separate Kitty window; --app-mouse models mouse ownership; --plain is ASCII. README and smoke guide describe gestures and exact limitations.
+- Automated GREEN: python3 -B tests/test_tmux_scrolling.py returned 0, six tests in both emacs and vi modes. Verifies original ordinary wheel behavior, fresh rendered earlier history, selection release/copied buffer, INPUT hello after wheel-down, plain application wheel/click forwarding, Alt+wheel override and >2,000-row retention. AST parsing and both helper help modes passed. Existing terminal workflow, wrapper and pywal regression scripts each returned 0.
+- Deployment: fish -c 'refresh-config' completed; log /tmp/refresh-config-20261013-121903-574319.log. It validated/snapshotted live Codex, copied/normalized live Git, applied chezmoi, regenerated shortcuts and reloaded fish abbreviations. Source/live Codex, actual Git source/live and protected config bytes remained unchanged. ~/.tmux.conf and ~/scripts/tmux-scrollback-smoke matched source. Scoped source-file reload installed complete bindings and history-limit 50000 without killing production sessions or clearing history. Initial CLI semicolon transport mistake was corrected and its transient copy mode restored.
+- Independent review: no critical/important issue. Reviewer independently verified Alt+wheel in vi mode and pointer targeting across two panes. Improved its identified rendering assertion gap by comparing newly captured earlier numbers against the pre-scroll viewport; all six tests pass. External xclip delivery was not retested because its mapping was unchanged.
+- Actual graphical evidence: python3 /tmp/tmux-gui-verify.py returned 0 on isolated Xvfb using installed Kitty and live tmux config. XTest wheel events showed first visible shell record 2952 -> 2937 and copy position 15; app Alt+wheel showed 2952 -> 2940 and position 20. Downward wheel returned mode 0 and INPUT hello appeared in both fixtures. Text selection and right-edge drag both stayed at scroll position 0; screenshots inspected (/tmp/tmux-gui-shell-history.png, /tmp/tmux-gui-app-history.png, /tmp/tmux-gui-selection.png, /tmp/tmux-gui-edge-drag.png). Both helpers closed with exit 0; their servers/display cleaned up. Evidence /tmp/tmux-gui-results.json. Shared-display attempts were invalidated by focus/pointer interference, so this does not prove the user's physical desktop/imwheel route.
+- Capability evidence: https://raw.githubusercontent.com/tmux/tmux/3.6a/CHANGES lines25,155-158 introduces native pane-scrollbars in 3.6. Installed 3.4 has no option. No upgrade was performed; wheel-only behavior is not exact Kitty scrollbar parity. Native terminal history cannot expose pane history; selection blue is expected.
+- Documentation: README tmux paragraph, docs/smoke-tests.md tmux gesture section, this plan, diagnosis report and reviewed troubleshooting knowledge. Saved prompt preserved at prompts/tmux-kitty-scrolling.md. No commit or push performed.
+
+Atomic plan completed: reproduce -> minimal config -> fixture/docs -> automated and isolated GUI verification -> refresh/live options -> evidence/rollback. Rollback: remove this task's configuration block, apply ~/.tmux.conf, unbind only these five new Alt+wheel bindings in the live server and restore default history-limit 2000 for future panes; preserve existing history and sessions. No tmux installation changes.
+
+Exact user manual plan: run ~/scripts/tmux-scrollback-smoke and follow docs/smoke-tests.md#tmux-pane-history-scrolling; repeat with --app-mouse. Check early records, downward return/hello, deliberate text selection, right-edge limitation and Ctrl+D at empty live input. Live option inspection: tmux show-option -g history-limit -> history-limit 50000. No sudo.
+
+Paste-ready Cursor follow-up: Read plans/tmux-kitty-scrolling.md and the tmux smoke section. If physical mouse scrolling differs from isolated GUI evidence, reproduce the exact gesture in the disposable helper, inspect desktop/imwheel versus Kitty/tmux event ownership, preserve default app gestures and all dirty work, update the living report/knowledge, and run the listed six PTY tests, terminal regressions and refresh-config. Do not upgrade, commit or push without authorization.
+
+Suggested commit: fix: improve tmux pane history scrolling.
+
+Final refresh after documentation/knowledge updates also returned 0; log /tmp/refresh-config-20261013-123036-599362.log. Source/live tmux/helper and protected configuration snapshot hashes match. A final all-file snapshot assertion failed for README.md because unrelated notification documentation changed concurrently; inspection confirmed only its Dunst paragraph differed, and that edit was preserved. Targeted postmortem-memory checks returned 0 for both task incidents: no changed/new hashes, missing sources, unregistered aliases or contract errors. Recorded local-tmux-history-mouse-ownership (verified_workaround/runtime) and local-tmux-binding-command-transport (verified_fix/runtime); execution incident has an explicit no-new-learning decision. Final six-test run and git diff --check returned 0. No eligible files were staged, committed or pushed because the saved prompt requires separate authorization.
+
+## Follow-up: familiar scroll and copy UX
+
+User explicitly requests Shift+wheel and Ctrl+Shift+C with a blue highlight that remains after mouse release. The original Alt-only and stock release/cancel choices are superseded for this flow. Preserve ordinary application wheel/drag when outside tmux history, native Kitty copy in raw shells, existing Alt-wheel/y mappings and all protected dirty work. No upgrade/commit/push.
+
+Settled design: add Shift-wheel bindings using Kitty's existing SGR event delivery. In tmux history, mouse release stops extension while keeping the selection visible; Ctrl+Shift+C copies through tmux/OSC52 while staying at the same viewport. Escape returns to live input. Kitty needs a small no-UI copy adapter because it otherwise copies only its own selection; detect foreground tmux even beneath fish, prefer a native Kitty selection when present, and forward a dedicated User0 sequence only for tmux. Provide an on-screen copy-mode hint.
+
+- [x] Capture RED for Shift-wheel and release-persistent selection/copy.
+- [x] Implement tmux bindings and conditional Kitty copy adapter; add a compact history hint.
+- [x] Verify emacs/vi modes, actual clipboard text, repeat copy, Escape/live input, raw Kitty copy and fish-launched tmux.
+- [x] Update helper instructions, README/smoke procedure, living report and reviewed knowledge.
+- [x] Run regressions, safely refresh/deploy/reload and record final user flow/rollback.
+
+Verification: extend tests/test_tmux_scrolling.py with shift68/69 events, release selection persistence, explicit clipboard key OSC52 and live exit. Isolated Xvfb/Kitty XTest sequence Shift-wheel -> drag/release -> Ctrl+Shift+C -> clipboard text matches tmux selection -> repeat copy -> Escape -> INPUT hello; repeat for mouse-aware app and tmux under fish. Raw Kitty drag/release/Ctrl+Shift+C still copies native selection. The existing fixture keeps readable instructions; physical-desktop acceptance remains a user check if shared pointer interference persists.
+
+Rollback removes only new Shift/persistent-selection/User0 bindings and Kitty adapter mapping, reinstates prior MouseDragEnd1Pane/Escape, preserves Alt-wheel and history50k, then applies and reloads the affected settings without killing sessions.
+
+Follow-up RED: twelve PTY tests returned1 with six expected failures, identical in emacs/vi: Shift-wheel did not enter history, release exited selection, and explicit copy sent no OSC52 text. Existing six checks passed. Actual Kitty/XTest RED also failed entering history on Shift-wheel. API inspection confirmed Window.write_to_child accepts bytes, native text_for_selection/copy_to_clipboard are supported. Use dedicated User0 ESC[99~ rather than an unrecognized F13 encoding.
+
+Follow-up GREEN: fourteen real-PTY tests passed (exit0,26.990s), including a second OSC52 write and safe no-selection input. Actual Xvfb/Kitty clipboard checks passed for shell and mouse-aware fixtures (exit0): Shift-wheel first visible2981 ->2961, released selection remained highlighted/inactive, Ctrl+Shift+C copied exactly HISTORY002966|t, the viewport stayed put, reseeding the clipboard and copying again restored the text, Escape resumed INPUT hello. Raw Kitty native selection copied RAW COPY SAMPLE; tmux launched from an interactive fish child also copied the selection. Images /tmp/tmux-copy-False.png and /tmp/tmux-copy-True.png; results /tmp/tmux-copy-gui-results.json and /tmp/kitty-copy-compat-results.json. Three existing terminal regressions and AST parsing returned0. Independent review checked multi-pane targeting and selection stability, then reviewed the corrected foreground detection, keyboard fallback and nonblocking status feedback without important findings.
+
+Runtime refinements required by evidence: Kitty's cached foreground_processes was empty even with a valid foreground group; direct tcgetpgrp/cmdline lookup fixes detection. Preserve default shifted/ASCII fallback for Ctrl+Shift+C. Transient message feedback allowed buffer creation but suppressed repeat clipboard output; use a pane status value and refresh-client -S so copy and Escape stay responsive. These failures and corrected checks are in the follow-up living report.
+
+Final user flow: hold Shift and wheel up without holding a mouse button; release Shift; drag the desired text and release the button; press Ctrl+Shift+C. The blue highlight and viewport persist, a Copied status confirms success, and Escape returns to live input. Ctrl+Shift+V remains normal paste. This flow is documented in the helper and docs/smoke-tests.md, and native Shift-drag/Kitty copying remains available. Paste-ready Cursor follow-up: Read plans/tmux-kitty-scrolling.md and reproduce any remaining physical gesture issue in the disposable helper; run the fourteen PTY checks and actual clipboard/compatibility flow, preserve app/native gestures and unrelated dirty work, update the living report/knowledge and run refresh-config. No upgrade, commit or push without authorization. Suggested commit: fix: make tmux scrolling and copying intuitive.
+
+Final follow-up activation: refresh-config returned0, log /tmp/refresh-config-20261013-130824-696318.log. Scoped source-file loaded the final Shift/release/User0/Escape/status bindings; complete live bodies were queried. Twelve active owned Kitty processes reloaded config with exit0, including shifted/ASCII fallback and the installed no-UI adapter. All four source/deployed scrolling files match. Parser reports history50000 and allowed write-clipboard/write-primary; git diff --check returned0. Targeted reviewed-memory check passed with no hash/alias/schema gaps. The four-step flow is ready in existing local Kitty/tmux windows; physical mouse acceptance remains the documented manual check. No commit or push.
+
+## Session commit milestone
+
+User invoked commit-session, authorizing one focused commit and the configured push. Milestone1 subject: fix: make tmux scrolling and copying intuitive. Completed: deeper history, Alt/Shift-wheel, release-persistent highlight, Ctrl+Shift+C/native-copy adapter, nonblocking feedback and Escape; matching fixture/tests/docs/incidents/knowledge and public-safe terminal preference included. Verified: fourteen PTY checks, three terminal regressions, actual isolated Kitty clipboard/compatibility checks, targeted knowledge validation, source/deployed equality and live reload. No implementation blocker; next delivery step is the scoped commit then origin/main push, with result reported in Codex.
+
+Scope helper for thread01a13606-79fe-7af2-97a5-a690c531aaee returned unsafe: it detected no successful writes/baseline inside orchestrated calls. Use directly observed writes and the initial pre-write Git status as evidence. Include the owned configuration, adapter, fixture, tests, plan and three root-authored incidents; split only tmux README/smoke hunks, two tmux lesson lines, one terminal-preference line, three owned finding/reference sections and their three report/hash records. Add the helper's truthful --lines/--app-mouse/--plain command-table row under the required README gate. All other hunks remain outside scope.
+
+Protected delivery state includes pre-existing staged notification Markdown work (README, smoke guide, sources.json and notification code/docs/tests/plan), unrelated dirty pstack, instructions, lessons, preferences, references, app settings and shell files. The saved prompt and its authoring incident predate this session and remain untracked. Live Codex preference snapshots and adopted .bashrc/.zshrc changes are unrelated; exclude them. Use an isolated index for the commit, then preserve pre-existing staged entries while accounting for this commit's owned content. Do not stage credentials or machine-local data. Root README gate returned pass_no_change; the scoped options row is an additional truthful documentation repair.
+
+Push target confirmed main -> origin/main at user@example.invalid:example-user/ai-cli-dotfiles.git. Read-only GitHub checks show authenticated example-user owns the private repository and has admin/push permission. Commit history is append-only; no reset/rebase/amend/force-push. The rollback path remains the targeted configuration removal/reapply described above. Manual clipboard acceptance commands require no sudo and work from any directory. Physical-desktop acceptance remains separate from isolated GUI evidence.
