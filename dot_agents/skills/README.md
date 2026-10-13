@@ -202,6 +202,12 @@ session-touched files, and favor including safe related files over omitting them
 Ordinary validation, README, or helper problems become warnings; missing push
 targets leave local commits intact. Planning-only requests remain read-only.
 
+- [`night`](night/SKILL.md): Explicit-only unattended overnight job on a
+  new local branch; commits without pushing and leaves an untracked
+  `NIGHT_NOTE.md` hand-off instead of asking questions.
+- [`morning`](morning/SKILL.md): Explicit-only pickup that reads
+  `NIGHT_NOTE.md` and the night branch, summarizes it, and asks numbered A/B/C
+  questions with recommendations before acting on the replies.
 - [`commit-plan-push`](commit-plan-push/SKILL.md): Makes a best-effort pass over
   the entire dirty worktree on an explicit request, committing every safe,
   reviewable group in chronological order and pushing once after the series.

@@ -1,0 +1,6 @@
+interface:
+  display_name: "Night"
+  short_description: "Unattended overnight job on a local branch"
+  default_prompt: "Use $night to work unattended on one self-verifiable task on a new local branch, commit without pushing, and leave an untracked NIGHT_NOTE.md hand-off."
+policy:
+  allow_implicit_invocation: false

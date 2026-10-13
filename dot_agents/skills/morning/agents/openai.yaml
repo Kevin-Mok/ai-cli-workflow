@@ -1,0 +1,6 @@
+interface:
+  display_name: "Morning"
+  short_description: "Review the night run and ask for decisions"
+  default_prompt: "Use $morning to read NIGHT_NOTE.md and the night branch history, summarize overnight work, and list numbered A/B/C questions with recommendations."
+policy:
+  allow_implicit_invocation: false
