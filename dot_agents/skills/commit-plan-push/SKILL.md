@@ -1,6 +1,7 @@
 ---
 name: commit-plan-push
 description: Use when I explicitly want the current dirty Git worktree planned into coherent commits, committed, and pushed now, including requests like `commit-plan-push`, “plan, commit, and push all dirty work,” or “split and ship these changes.” Make a best-effort delivery pass across all safe, reviewable changes; do not use for planning only, a single forced dirty commit, or history rewrites.
+disable-model-invocation: true
 ---
 
 # Commit Plan Push
