@@ -8369,6 +8369,15 @@
       "findings": [
         "local-dunst-supported-scaled-sizing"
       ]
+    },
+    {
+      "sha256": "9f80c8ea29a0ae73f4f0df708c26edbb479b7578ed8d6882975e1c682ab8a6b2",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-13-notification-session-push-rejected.md"
+      ],
+      "reviewed_on": "2026-10-13",
+      "findings": [],
+      "decision": "No new learning: reviewed upstream race, protected nonoverlapping dirty files and performed ordinary integration; existing merge collision-preflight guidance covers the safety boundary."
     }
   ],
   "review": {
