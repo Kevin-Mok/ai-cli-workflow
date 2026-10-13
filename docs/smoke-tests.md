@@ -1066,6 +1066,10 @@ request. The fixture suite does not execute mapped commands or install the cbn
 example. Live requests preserve active conflicts with exactly `# ` and refresh
 changed mappings; file source keys gain `n` in fish.
 
+- Action: Run `fish --no-config -c 'source ~/.config/fish/key_abbr.fish; abbr --show | string match -r "^abbr -a -- (?:v|kav|kad) .*"'` after refresh-config.
+  Expected: `v` expands to `vesktop`, `kav` to `killall vesktop`, and `kad`
+  to `killall discord`. Inspection launches no apps and kills no processes;
+  the previous `v ./start.sh voice` mapping remains commented in the source.
 - Action: python3 -B tests/test_fish_alias.py
   Expected: Command `cbn codex-time burn day` lands in the work section; directory
   and file paths, including spaces/quotes, route correctly. Active cross-source

@@ -8378,6 +8378,15 @@
       "reviewed_on": "2026-10-13",
       "findings": [],
       "decision": "No new learning: reviewed upstream race, protected nonoverlapping dirty files and performed ordinary integration; existing merge collision-preflight guidance covers the safety boundary."
+    },
+    {
+      "sha256": "6dbd42a5a512eb3cf0271323d73291b9707cca79c689a54bdfffbd28b5998735",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-13-fish-alias-sandbox-startup.md"
+      ],
+      "reviewed_on": "2026-10-13",
+      "findings": [],
+      "decision": "No new reusable learning: existing local-sandbox-loopback-approved-route covers this pre-execution failure and verified scoped workaround; host sandbox remains unresolved."
     }
   ],
   "review": {
