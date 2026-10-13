@@ -939,6 +939,10 @@ That broader dotfiles surface is still substantial, but the README stays
 centered on the four-Codex operating environment because that is the
 most distinctive and actively evolving part of the repo right now.
 
+### Desktop notification text
+
+Dunst uses Hack Nerd Font Mono 23.25 pt, 1.5 times the previous 15.5 pt. After refresh-config, run `~/scripts/codex-notification-activate` to restart Dunst, then `~/scripts/notification-font-test` for Codex and Discord sample popups with large text throughout. Notifications render about 669 px wide on the current 135-DPI desktop (467 logical pixels plus frame and automatic scaling). Height follows the text up to 600 logical pixels, preserving readability rather than forcing a 16:9 crop. Add `--compare` to include the smaller old-size reference. Use `--app codex` or `--app discord` for one sample and `--plain` for ASCII terminal output. Samples last 15 seconds and avoid the codex-kitty audio rule. Requires Python 3 and notify-send; no sudo.
+
 ## License
 
 This repository is licensed under the [MIT License](LICENSE).

@@ -849,6 +849,19 @@ periodic /btw requests. Fullscreen hides i3 titlebars. No sudo is needed.
 - Action: Repeat the existing Kitty scrolling checks below in a titled window.
   Expected: The scrollbar, paging, selection and inline Codex history still behave as documented.
 
+### Desktop notification font comparison
+
+Check large text throughout popups about 669px wide with naturally growing height, or add `--compare` for old/new references. Run refresh-config and `~/scripts/codex-notification-activate` first. The font is 23.25 points, 1.5 times the preceding 15.5-point size; desktop DPI scales actual pixels. No sudo.
+
+- Action: Run `~/scripts/notification-font-test`.
+  Expected: Codex and Discord samples have large titles and body text throughout, wrap without clipping at about 669px rendered width and last 15 seconds. Height follows the text up to 600 logical pixels; long messages are not forced into 16:9. Samples avoid the codex-kitty audio rule.
+- Action: Send one sample with `~/scripts/notification-font-test --app codex`, then run `xwininfo -name Dunst` while visible.
+  Expected: Actual rendered width is about 669px including the frame on the current 135-DPI desktop; height grows with wrapped text. Check runtime dimensions rather than only deployed config.
+- Action: Run `~/scripts/notification-font-test --compare --app codex`.
+  Expected: One Codex sample shows the same sentence at 15.5 pt and 23.25 pt. The smaller line is deliberately the old-size reference.
+- Action: Run `~/scripts/notification-font-test --app discord --plain`.
+  Expected: Only the Discord sample appears, with large chat text throughout; terminal output is ASCII.
+
 ### Codex notification sound
 
 Apply the [notification sources](codex-notification-sound.md), restart Dunst

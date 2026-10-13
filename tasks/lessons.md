@@ -176,3 +176,5 @@
 - 2026-10-09: AST column offsets count UTF-8 bytes, not Unicode characters. Convert columns before slicing source text, apply edits right to left and parse before writing; multibyte glyphs make naive string indexing unsafe. See [the verified editing incident](../docs/postmortem/2026-10-09-cli-emoji-edit-offsets.md).
 
 - 2026-10-09: In Codex 0.162.0, observed raw shell-block colors do not establish Python/JSON/diff highlighting. Check actual code colors and wrapped clipboard acceptance separately in each live view; stale clipboards and incorrect native selection boundaries supply no copying verdict. See [the mixed-content comparison](../docs/postmortem/2026-10-09-codex-mixed-content-rendering.md).
+
+- 2026-10-13: Dunst 1.9.2 ignores removed geometry and notification_height keys. Use supported sizing, read startup warnings, and measure render-ready popup dimensions with DPI/frame scaling; source/live equality proves deployment only. See [ignored sizing](../docs/postmortem/2026-10-13-dunst-ignored-sizing.md).

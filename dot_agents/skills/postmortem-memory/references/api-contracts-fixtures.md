@@ -577,3 +577,14 @@ security checks with the arguments you passed.
 - Verification evidence: Defining startup, pending-recap, unreadable/discovery and title-budget checks observed RED then GREEN. Source and installed actual CLI/real-fzf fixtures open cold/cache/locked/malformed cases within 2s, resume exact UUID/cwd, preserve source bytes and reap children. Native installed history showed 199 usable rows in 1.968s and Escape cleaned up with summaries disabled.
 - Limitations: Initial rows/activity/titles are preliminary and capped; budgets are checked between sources, so one large extraction/directory listing can exceed them after startup. Full text search and explicit rebuild retain full scans. Runtime startup checks call no provider. Inference substitution fixtures must keep native inventory, canonical cache and title metadata consistent; retry bounded GET observation, but do not replay uncertain position POSTs.
 - Source: [Codex picker archive startup](/home/example/linux-config/docs/postmortem/2026-10-09-codex-picker-archive-startup.md).
+
+## local-dunst-supported-scaled-sizing
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **runtime**.
+- Symptoms: Dunst ignores geometry/notification_height and popup width differs from configuration.
+- Applicability: Dunst 1.9.2/X11 with automatic HiDPI scaling.
+- Diagnostics: Check installed settings and startup warnings; measure actual drawn window after bounded readiness polling, including DPI and frame pixels.
+- Remedy: Use width, height (maximum), origin, offset and notification_limit. Account for desktop scaling rather than treating logical width as physical pixels.
+- Verification: Refresh/activation and five focused tests passed. At Xft.dpi=135, supported width 169 rendered 250x270 and width 347 rendered 501x134; removed-sizing warnings absent.
+- Limits: Content controls height; fixed ratio is not guaranteed. Values depend on DPI and frame. Other legacy settings remain outside scope.
+- Source: [Dunst ignored sizing](../../../../docs/postmortem/2026-10-13-dunst-ignored-sizing.md).

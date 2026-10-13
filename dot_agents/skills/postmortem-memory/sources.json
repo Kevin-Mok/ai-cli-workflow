@@ -4729,6 +4729,27 @@
       "topic": "editing-shell-transport",
       "verification": "Corrected helper completed; seven defining Python output tests passed. Root independently parsed all script, local skill and non-candidate benchmark Python sources and passed a multibyte AST offset probe.",
       "verification_scope": "code"
+    },
+    {
+      "id": "local-dunst-supported-scaled-sizing",
+      "reference": "references/api-contracts-fixtures.md#local-dunst-supported-scaled-sizing",
+      "status": "verified_fix",
+      "symptoms": [
+        "Notification width changes have no visual effect; geometry and notification_height do not exist; popup dimensions differ from configured pixels."
+      ],
+      "applicability": "Dunst 1.9.2 on X11 with automatic HiDPI scaling.",
+      "diagnostics": [
+        "Read daemon startup warnings and installed manual for supported settings.",
+        "Measure a render-ready popup with xwininfo; inspect Xft.dpi and account for frame pixels."
+      ],
+      "confidence": "confirmed",
+      "remedy": "Replace removed geometry/notification_height with supported width, height (maximum), origin, offset and notification_limit. Preserve font and automatic scaling; choose width using actual rendered dimensions. Poll until popup is drawn before measuring.",
+      "verification": "Refresh and activation succeeded; source/live match. At Xft.dpi=135, width=169 rendered 250x270; width=347 rendered 501x134 for the same sample. Removed-sizing warnings absent and five focused tests pass.",
+      "verification_scope": "runtime",
+      "limitations": "Height is content-dependent up to a maximum, not a minimum/fixed ratio. Logical width is scaled; these physical values apply to this desktop DPI and frame. Unrelated legacy settings warnings remain.",
+      "sources": [
+        "048c41904d06255c9a2237a08f190804172c7ea89c83cb94fbf7c095cd9f7117"
+      ]
     }
   ],
   "reports": [
@@ -8329,6 +8350,25 @@
       "reviewed_on": "2026-10-12",
       "findings": [],
       "decision": "No new reusable learning: final staged verification policy already requires checking new import content; eight upstream whitespace lines are a reported warning, not a runtime defect or claimed fix."
+    },
+    {
+      "sha256": "43184f08fff1d26dc038b5b2af14d219bb556633aeb521fe06130c642dff3878",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-13-notification-font-command-environment.md"
+      ],
+      "reviewed_on": "2026-10-13",
+      "findings": [],
+      "decision": "No new learning: existing ext-sandbox-loopback workaround covers pre-shell failure; locate tracked helpers rather than assume Fish function paths."
+    },
+    {
+      "sha256": "048c41904d06255c9a2237a08f190804172c7ea89c83cb94fbf7c095cd9f7117",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-13-dunst-ignored-sizing.md"
+      ],
+      "reviewed_on": "2026-10-13",
+      "findings": [
+        "local-dunst-supported-scaled-sizing"
+      ]
     }
   ],
   "review": {

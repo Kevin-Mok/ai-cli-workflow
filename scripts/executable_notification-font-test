@@ -1,0 +1,47 @@
+#!/usr/bin/env python3
+"""Send large-text desktop samples, optionally comparing old and new fonts."""
+import argparse
+import os
+import shutil
+import subprocess
+import sys
+
+
+def main():
+    plain = "--plain" in sys.argv or os.environ.get("CLI_PLAIN") == "1"
+    def message(icon, text):
+        return text if plain else f"{icon} {text}"
+
+    parser = argparse.ArgumentParser(description=message("🔎", __doc__))
+    parser.add_argument("--app", choices=("all", "codex", "discord"), default="all",
+                        help="send both samples (default), or just one")
+    parser.add_argument("--compare", action="store_true", help="include the smaller old-size reference")
+    parser.add_argument("--plain", action="store_true", help="use ASCII terminal output")
+    options = parser.parse_args()
+    executable = shutil.which("notify-send")
+    if not executable:
+        print(message("❌", "Install notify-send (libnotify-bin) and run this in your desktop session."), file=sys.stderr)
+        return 1
+    samples = {
+        "codex": ("Codex", "Task complete. Your changes are ready to review."),
+        "discord": ("Discord", "New message: Are you free to chat later today?"),
+    }
+    selected = samples if options.app == "all" else {options.app: samples[options.app]}
+    for app, text in selected.values():
+        body = (f'<span size="15872">Before (15.5 pt): {text}</span>\n\n'
+                f'<span size="23808">After (23.25 pt): {text}</span>') if options.compare else text
+        print(message("🔔", f"Sending {app} font {'comparison' if options.compare else 'sample'}..."), flush=True)
+        try:
+            subprocess.run([executable, "--app-name", app, "--urgency=normal",
+                            "--expire-time=15000", f"{app} font {'comparison' if options.compare else 'sample'}", body],
+                           check=True, timeout=5, capture_output=True, text=True)
+        except (OSError, subprocess.SubprocessError):
+            print(message("❌", "Could not send notification. Check that your desktop notification daemon is running."), file=sys.stderr)
+            return 1
+    print(message("✅", "Comparison sent: 15.5 pt before / 23.25 pt after (1.5x larger)."
+                  if options.compare else "Samples sent: large text throughout (23.25 pt)."))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
