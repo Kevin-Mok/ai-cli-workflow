@@ -4846,6 +4846,51 @@
       "remedy": "Create the publication temporary file inside .git, copy/flush/fsync intended bytes, retain permissions and atomically rename on that filesystem under an owned index lock. Preserve the existing commit; do not reset/amend history.",
       "verification": "Initial commit8d2d0da succeeded with16 intended paths; /tmp->.git rename failed. Same-filesystem repair verified original bytes unchanged, intended index bytes published, commit intact and no residual staged diff.",
       "limitations": "Verified for this scoped commit/index state; changed real indexes require fresh reconciliation. Do not overwrite unrelated staged work or bypass hooks."
+    },
+    {
+      "id": "local-git-fetch-before-ancestry",
+      "topic": "paths-ownership",
+      "reference": "references/paths-ownership.md#local-git-fetch-before-ancestry",
+      "status": "verified_fix",
+      "confidence": "confirmed",
+      "verification_scope": "runtime",
+      "sources": [
+        "2dfe179f503598bbf4579f12f40a8f0cf501a651ec7c8012bb216a6a9c11b6cb"
+      ],
+      "symptoms": [
+        "Push rejected fetch-first; merge-base against an ls-remote hash returns128 Not a valid commit name"
+      ],
+      "applicability": "Remote-ref comparison after concurrent updates or unfetched advertised hashes.",
+      "diagnostics": [
+        "Fetch the exact authorized remote branch before graph inspection.",
+        "Read exit status: 0 ancestor, 1 valid non-ancestor, other statuses are errors.",
+        "Inspect fetched graph and protected dirty state before merging."
+      ],
+      "remedy": "Fetch the authorized branch, then perform valid ancestry and delta checks; preserve local commits and use a reviewed normal merge when required, without history rewriting.",
+      "verification": "The unfetched182713c object caused exit128. Fetch returned0; both session commit ancestry probes against fetched182713c returned1 without object errors. Clean normal merge was prepared and unrelated local overlays retained.",
+      "limitations": "Ancestry verification and prepared local merge do not prove a subsequent push succeeded. Ambiguous conflicts or concurrent workspace changes require fresh review."
+    },
+    {
+      "id": "local-git-owned-index-lock-check",
+      "topic": "paths-ownership",
+      "reference": "references/paths-ownership.md#local-git-owned-index-lock-check",
+      "status": "verified_fix",
+      "confidence": "confirmed",
+      "verification_scope": "runtime",
+      "sources": [
+        "f74d7168d9e873fcb40dfbf7794b7be66673f3556705bffdaa83c508fd795a8e"
+      ],
+      "symptoms": [
+        "Git write-tree returns128 index.lock File exists inside a helper that already owns the real-index lock"
+      ],
+      "applicability": "Scoped commit helpers retaining a real-index guard while validating a prepared merge tree.",
+      "diagnostics": [
+        "Confirm the helper owns the lock and failed before commit creation.",
+        "Check HEAD, MERGE_HEAD and captured index bytes before changing anything."
+      ],
+      "remedy": "Copy the guarded index and validate through a separate GIT_INDEX_FILE; avoid lock-taking operations on the real index until its guard is released. Keep atomic same-filesystem publication and normal hooks.",
+      "verification": "Under the owned real-index lock, copied-index write-tree returned0 with the reviewed merge tree and real index bytes unchanged; helper was corrected accordingly.",
+      "limitations": "This probe verifies the lock interaction only; independently verify commit parents/scope and push reachability."
     }
   ],
   "reports": [
@@ -8531,6 +8576,26 @@
       "reviewed_on": "2026-10-13",
       "findings": [
         "local-git-index-same-filesystem-publish"
+      ]
+    },
+    {
+      "sha256": "2dfe179f503598bbf4579f12f40a8f0cf501a651ec7c8012bb216a6a9c11b6cb",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-13-tmux-session-push-divergence.md"
+      ],
+      "reviewed_on": "2026-10-13",
+      "findings": [
+        "local-git-fetch-before-ancestry"
+      ]
+    },
+    {
+      "sha256": "f74d7168d9e873fcb40dfbf7794b7be66673f3556705bffdaa83c508fd795a8e",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-13-tmux-merge-index-lock.md"
+      ],
+      "reviewed_on": "2026-10-13",
+      "findings": [
+        "local-git-owned-index-lock-check"
       ]
     }
   ],

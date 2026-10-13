@@ -184,3 +184,7 @@
 - 2026-10-13: Terminal copy UX needs real clipboard verification after mouse release, not only a tmux buffer or a highlight while the mouse is held. Preserve Kitty shifted-key fallback; its cached process list may be empty, so resolve the terminal foreground group when routing tmux copy. Keep copy feedback in the status line and prove repeated copy after replacing clipboard contents. See [scroll/copy UX diagnosis](../docs/postmortem/2026-10-13-tmux-scroll-copy-ux.md).
 
 - 2026-10-13: A session-only commit can succeed before index reconciliation fails. Preserve that commit and the original index snapshot; publish reconciled index bytes via a temporary file inside .git so atomic replacement stays on one filesystem. Verify bytes and residual staging rather than resetting history. See [index recovery](../docs/postmortem/2026-10-13-tmux-commit-index-reconciliation.md).
+
+- 2026-10-13: After a fetch-first push rejection, fetch the authorized branch before probing an ls-remote hash. merge-base exit128 means the object check failed; only exit1 establishes a valid non-ancestor result. Preserve local commits and dirty overlays during a reviewed normal merge.
+
+- 2026-10-13: While guarding the real Git index with an owned index.lock, validate write-tree through a copied GIT_INDEX_FILE. write-tree itself takes an index lock; calling it on the guarded real index blocks the helper before commit creation.

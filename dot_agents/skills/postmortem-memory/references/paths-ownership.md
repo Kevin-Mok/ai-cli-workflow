@@ -244,3 +244,26 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Verification: Initial commit8d2d0da succeeded with16 intended paths; /tmp->.git rename failed. Same-filesystem repair verified original bytes unchanged, intended index bytes published, commit intact and no residual staged diff.
 - Limitations: Verified for this scoped commit/index state; changed real indexes require fresh reconciliation. Do not overwrite unrelated staged work or bypass hooks.
 - Source: [tmux index reconciliation](../../../../docs/postmortem/2026-10-13-tmux-commit-index-reconciliation.md) (SHA-256 `2a7e1e22d604c7b7190dcd45735515d03f1ae941c8184bc254daeee1a115f38a`).
+
+## local-git-fetch-before-ancestry
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **runtime**.
+- Symptoms: Fetch-first push rejection followed by an unfetched remote object ancestry error128.
+- Applicability: Remote-ref comparison after concurrent updates or unfetched advertised hashes.
+- Diagnostic checks: Fetch the authorized branch first; distinguish exit0/1 from errors; review graph, delta and protected dirty state.
+- Remedy: Fetch the authorized branch, then perform valid ancestry and delta checks; preserve local commits and use a reviewed normal merge when required, without history rewriting.
+- Verification evidence: The unfetched182713c object caused exit128. Fetch returned0; both session commit ancestry probes against fetched182713c returned1 without object errors. Clean normal merge was prepared and unrelated local overlays retained.
+- Limitations: Ancestry verification and prepared local merge do not prove a subsequent push succeeded. Ambiguous conflicts or concurrent workspace changes require fresh review.
+- Sources:
+  - [2026-10-13-tmux-session-push-divergence.md](/home/example/linux-config/docs/postmortem/2026-10-13-tmux-session-push-divergence.md) (SHA-256 `2dfe179f5035`; aliases retained in [sources.json](../sources.json)).
+
+## local-git-owned-index-lock-check
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **runtime**.
+- Symptoms: write-tree fails on index.lock already owned by the calling helper.
+- Applicability: Scoped commit helpers retaining a real-index guard while validating a prepared merge tree.
+- Diagnostic checks: Confirm owned lock, intact HEAD/MERGE_HEAD and exact captured index bytes.
+- Remedy: Copy the guarded index and validate through a separate GIT_INDEX_FILE; avoid lock-taking operations on the real index until its guard is released. Keep atomic same-filesystem publication and normal hooks.
+- Verification evidence: Under the owned real-index lock, copied-index write-tree returned0 with the reviewed merge tree and real index bytes unchanged; helper was corrected accordingly.
+- Limitations: This probe verifies the lock interaction only; independently verify commit parents/scope and push reachability.
+- Source: [tmux merge index lock](/home/example/linux-config/docs/postmortem/2026-10-13-tmux-merge-index-lock.md) (SHA-256 `f74d7168d9e873fcb40dfbf7794b7be66673f3556705bffdaa83c508fd795a8e`).
