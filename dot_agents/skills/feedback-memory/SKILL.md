@@ -47,6 +47,7 @@ Do not log:
 5. Do not create, update, or reconcile a second log when the repo-tracked path exists.
 6. Keep the file append-only. Do not rewrite, reformat, dedupe, or move old entries unless the user explicitly asks.
 7. If the feedback is ambiguous, log only the durable part that would still help in a different future task.
+8. After a run where the user corrected a skill-driven workflow, ask: one-time fix, or should this be in the skill forever? Log it here or edit that skill's `SKILL.md` only when it is permanent.
 
 ## What to log
 

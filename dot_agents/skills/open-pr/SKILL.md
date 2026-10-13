@@ -1,6 +1,7 @@
 ---
 name: open-pr
 description: Use when asked to draft, write, prepare, open, update, or improve a pull request title or body from current branch changes, including base-branch comparisons, `docs/pr` sync, GitHub PR creation or editing with `gh`, DD/Reviewer A ExampleProject handoffs, or reviewer-focused PR context.
+disable-model-invocation: true
 ---
 
 # Open PR
