@@ -447,3 +447,8 @@ status_line_use_colors = true
 [tui.model_availability_nux]
 "gpt-5.5" = 4
 "gpt-5.6-sol" = 4
+
+# Ponytail (github.com/DietrichGebert/ponytail): installed by
+# run_onchange_after_install-codex-ponytail-plugin.sh.tmpl.
+[plugins."ponytail@ponytail"]
+enabled = true

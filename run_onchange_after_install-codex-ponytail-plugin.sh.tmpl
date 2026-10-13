@@ -1,0 +1,17 @@
+#!/bin/bash
+# Install the Ponytail Codex plugin (https://github.com/DietrichGebert/ponytail).
+# Idempotent; chezmoi reruns it only when this file changes (bump the ref to upgrade).
+# Ponytail ships skills plus SessionStart/SubagentStart/UserPromptSubmit hooks
+# (node, local only); trust them once via /hooks in Codex.
+set -euo pipefail
+ref="v5.2.0" # tag -> 2961b52fc1fe6a5a87c7a959a79512e5c2f3ffe5
+
+if ! command -v codex >/dev/null 2>&1; then
+    echo "codex not found; skipping Ponytail plugin install" >&2
+    exit 0
+fi
+
+if ! codex plugin marketplace list 2>/dev/null | grep -q '\bponytail\b'; then
+    codex plugin marketplace add DietrichGebert/ponytail --ref "$ref"
+fi
+codex plugin add ponytail@ponytail
