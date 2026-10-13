@@ -242,6 +242,9 @@ targets leave local commits intact. Planning-only requests remain read-only.
 
 ## Docs, Knowledge, And Output Control
 
+- [`long-task-harness`](long-task-harness/SKILL.md): Runs multi-session
+  work with a saved brief, acceptance criteria, `/goal`, an
+  `evidence-reviewer` claim -> evidence pass, and a `progress.md` handoff.
 - [`postmortem-memory`](postmortem-memory/SKILL.md): Retrieves reviewed incident
   remedies before troubleshooting and records new learning in tracked shared
   knowledge. Its read-only helper deduplicates copied reports, searches symptoms
