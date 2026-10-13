@@ -69,6 +69,8 @@ education work:
   to `.agent/PLANS.md`.
 - Make plans decision-complete: record scope, assumptions, checkboxes, risks,
   verification evidence, and review notes. Keep progress current while working.
+- For work spanning sessions, use the `long-task-harness` skill (brief,
+  `/goal`, `evidence-reviewer` pass, `progress.md` handoff).
   Commit matching plan updates in the same change as the work they describe.
 - A small task may use a short inline plan. If evidence invalidates any plan,
   stop and revise it before continuing.
