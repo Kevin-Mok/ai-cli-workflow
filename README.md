@@ -2,7 +2,7 @@
 
 A reproducible Linux workspace for AI-assisted engineering. This repo keeps
 desktop settings, Codex instructions and defaults, reusable skills, public-safe
-context notes, and work plans under version control. Review the workflow, install the
+workflow code, and work plans under version control. Review the workflow, install the
 prerequisites, preview and apply the configuration with `chezmoi`, then use
 the daily commands and checks to keep the environment consistent.
 
@@ -10,13 +10,7 @@ For recruiters and AI-native engineers, the point is concrete: this
 repo is a public artifact of how I structure leverage. It shows
 planning before edits, small reversible diffs, reproducible setup,
 durable context across sessions, and verification before claiming work
-is done.
-
-<p align="center">
-  <img src="media/ai-cli-workflow-samurai.png"
-       alt="Multi-agent AI CLI workflow across Codex, Claude, skills, and AGENTS files"
-       width="100%">
-</p>
+is done. Personal values and knowledge-vault contents are intentionally excluded.
 
 ## Tech Stack And Why Chosen
 
@@ -31,7 +25,7 @@ is done.
 | Graphiti MCP with Neo4j | [`dot_codex/config.toml`](dot_codex/config.toml), [`scripts/executable_codex`](scripts/executable_codex), and [`docs/graphiti-mcp-codex.md`](docs/graphiti-mcp-codex.md) | Adds a retrievable memory layer for multi-session work where provenance and evolving context matter. |
 | Shell and terminal tooling | [`dot_config/fish/config.fish.tmpl`](dot_config/fish/config.fish.tmpl), [`dot_tmux.conf`](dot_tmux.conf), [`dot_config/st/config.def.h.tmpl`](dot_config/st/config.def.h.tmpl), [`dot_config/kitty/kitty.conf`](dot_config/kitty/kitty.conf), and [`dot_config/i3/config.tmpl`](dot_config/i3/config.tmpl) | Optimizes for terminal-first execution and multiple parallel panes, with `kitty` as the default terminal, `st` kept ready as the low-friction alternate, and tmux handling the heavier session workflow. |
 | Python and Bash automation | [`scripts/`](scripts/) and [`dot_config/fish/functions/refresh-config.fish`](dot_config/fish/functions/refresh-config.fish) | Keeps repeatable operations small, inspectable, and version-controlled instead of burying them in chat or muscle memory. |
-| Markdown, Obsidian, and deterministic Python | [`second-brain/`](second-brain/), [the session skill](dot_agents/skills/second-brain-session/SKILL.md), and [the command package](scripts/second_brain/) | Makes personal and project context reviewable across Codex and Claude while keeping private raw capture outside Git, confirmation-gating public event writes, and enforcing schema, containment, approval, and retry-safe checks at each mutation boundary. |
+| Private-context workflow | [the vault placeholder](second-brain/README.md), [the session skill](dot_agents/skills/second-brain-session/SKILL.md), and [the command package](scripts/second_brain/) | Publishes the privacy-aware workflow and validation code without publishing the operator's notes, captures, attachments, or account data. |
 
 ## Table Of Contents
 
@@ -40,6 +34,7 @@ is done.
 - [Core Components](#core-components)
 - [Second Brain Context Layer](#second-brain-context-layer)
 - [Graphiti Memory Layer](#graphiti-memory-layer)
+- [Public-Safe Personal Values](#public-safe-personal-values)
 - [Install And Bootstrap](#install-and-bootstrap)
 - [Day-to-Day Use](#day-to-day-use)
 - [Core Command Reference](#core-command-reference)
@@ -49,8 +44,7 @@ is done.
 
 ## Operating Model At A Glance
 
-The screenshot above is the workflow. The most distinctive part of this
-repo is the tracked operating surface highlighted by the left-side tree:
+The most distinctive part of this repo is its tracked operating surface:
 
 ```text
 AGENTS.md
@@ -58,7 +52,7 @@ AGENTS.repo.md
 dot_codex/
 dot_agents/
 plans/
-second-brain/
+second-brain/README.md
 ```
 
 Those paths define how the AI layer behaves:
@@ -78,9 +72,9 @@ Those paths define how the AI layer behaves:
 - [`plans/`](plans/) is where non-trivial work becomes explicit,
   checklisted, and reviewable under the
   [ExecPlan contract](.agent/PLANS.md).
-- [`second-brain/`](second-brain/) is the public-sanitized Markdown context
-  layer. Private raw events and migration ledgers stay in XDG state instead of
-  entering the repository.
+- [`second-brain/README.md`](second-brain/README.md) documents the boundary for
+  an optional private vault. The vault itself, raw events, attachments, and
+  migration ledgers do not enter this public repository.
 
 ## AI Layer Highlights
 
@@ -112,9 +106,9 @@ high-leverage properties:
   with setup, usage, command flags, and repo positioning.
 - Non-trivial work is expected to move through tracked plans instead of
   disappearing into chat scrollback.
-- The Second Brain turns one confirmed ExampleProject outcome, deterministic
-  session capture, boss-readable closeout, and copy-first migration into a
-  tested cross-agent workflow instead of another unstructured note dump.
+- The Second Brain package turns explicit focus, deterministic session capture,
+  reviewed closeout, and copy-first migration into a tested workflow while its
+  operator data remains private.
 
 ## Core Components
 
@@ -455,47 +449,18 @@ parallelism with less chaos.
 
 ## Second Brain Context Layer
 
-The tracked [Second Brain vault](second-brain/) gives Codex and Claude one
-public-sanitized front door for profile context, active projects, curated
-resources, and daily summaries. Its PARA-style Markdown remains directly
-inspectable, while the shared
-[second-brain-session skill](dot_agents/skills/second-brain-session/SKILL.md)
-retrieves only the context relevant to the current session.
+The public repository contains the
+[second-brain-session skill](dot_agents/skills/second-brain-session/SKILL.md),
+the deterministic [command package](scripts/second_brain/), and the full
+[operator guide](docs/second-brain.md). It does not contain a personal vault.
+The placeholder at [`second-brain/README.md`](second-brain/README.md) explains
+that boundary, and `.gitignore` prevents accidental note or attachment commits.
 
-Private learning and relevant development briefs use the
-[`personal-context` skill](dot_agents/skills/personal-context/SKILL.md), whose
-external personal/project stores and caches are separate from this vault and
-its session lifecycle. Automatic retrieval does not start raw capture or focus.
-
-The engineering boundary matters more than the folder tree:
-
-- raw session events stay in private XDG state with 0700/0600 permissions
-- a private Codex work digest covers projects and persistent open checks;
-  `second-brain sessions review` shows the five most recently active directories,
-  each with recaps of its three newest work conversations, including completed work and excluding helpers;
-  the full emoji report includes evidence, checks and resume commands by default;
-  `--details` is compatible with that view and `--all` shows eligible history,
-  while its independent opt-in timer refreshes daily at 16:00 Toronto time
-- explicit deferred reminders can remain private in an unscheduled someday queue until example-user assigns a future local date
-- confirmed tracked writes use exact versioned JSON schemas and stable event IDs
-- the first confirmed ExampleProject focus is reused for the day instead of silently
-  being replaced
-- the doctor checks structure, privacy, ownership, imports, hard links, and LFS
-- migration is copy-first, text-only, approval-bound, resumable, and
-  checksum-verifiable
-- protected upgrades preview one batch approval and make dated exact-byte
-  backups without overwriting existing files
-- the daily checkpoint refuses a dirty index, freezes and scans only the vault
-  and Codex-config allowlist, uploads reachable Git LFS objects explicitly,
-  and pushes only the current branch's exact configured-upstream ref without
-  local hooks or unrelated tags
-- an opt-in persistent systemd user timer runs that checkpoint at 16:20 local
-  time and catches up after sleep or downtime without requiring sudo
-
-This layer links to the existing canonical owners for preferences, lessons,
-plans, tasks, and temporal memory; it does not duplicate them. The full
-privacy, migration, recovery, and exit-code contract is in the
-[Second Brain operator guide](docs/second-brain.md).
+Operators provide their own private vault path and XDG state. Raw captures,
+recaps, reminders, migrations, and personal/project briefs remain outside this
+repository; only deliberately authored public examples should be committed.
+The included doctor, schema checks, approval gates, and copy-first migration
+workflow are the reusable product surface.
 
 ## Graphiti Memory Layer
 
@@ -538,6 +503,41 @@ version is:
    [`dot_codex/config.toml`](dot_codex/config.toml).
 3. Use Graphiti as the temporal memory layer that complements AGENTS
    files, skills, and ExecPlans instead of replacing them.
+
+## Public-Safe Personal Values
+
+This repository contains templates and neutral examples, not live account
+values. Keep machine and identity data in the untracked chezmoi configuration at
+`~/.config/chezmoi/chezmoi.toml`, and keep passwords, tokens, SSH material,
+browser state, and private notes in their dedicated local stores.
+
+The mail and calendar templates expect these non-secret chezmoi data keys:
+
+```toml
+[data]
+mailHost = "smtp.example.invalid"
+mailPort = 587
+mailTlsStarttls = "on"
+mailAddress = "user@example.invalid"
+mailRealName = "Example User"
+calendarHost = "calendar.example.invalid"
+calendarPath = "/calendars/example"
+calendarUsername = "example-user"
+```
+
+The msmtp template reads its password at runtime from `pass show mail/smtp`;
+never add that password to TOML or Git. The optional private knowledge vault is
+also external: [`second-brain/README.md`](second-brain/README.md) documents the
+boundary. Before publishing changes, run the repository's history auditor:
+
+```bash
+./scripts/executable_audit-public-history --scope all
+```
+
+The auditor defaults to reachable objects. Use `--scope all` to include
+unreachable local objects, `--format text|json` for human or machine output,
+`--plain` for ASCII status text, and `--rules PATH` for a mode-`0600` private
+literal/path rule file that is never committed.
 
 ## Install And Bootstrap
 

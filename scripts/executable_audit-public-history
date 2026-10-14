@@ -1,0 +1,440 @@
+#!/usr/bin/env python3
+"""Audit every reachable Git commit and blob without printing matched values."""
+
+from __future__ import annotations
+
+import argparse
+import base64
+from collections import Counter
+import fnmatch
+import hashlib
+import ipaddress
+import json
+from pathlib import Path
+import re
+import subprocess
+import sys
+import time
+from typing import Iterable
+
+
+EMAIL_RE = re.compile(rb"(?i)(?<![\w.+-])([a-z0-9.!#$%&'*+/?^_`{|}~-]+@[a-z0-9.-]+\.[a-z]{2,})(?![\w.-])")
+HOME_RE = re.compile(rb"(?<![\w/])/home/([a-z_][a-z0-9_-]{0,31})(?=/|\b)", re.I)
+IPV4_RE = re.compile(rb"(?<![\d.])(?:\d{1,3}\.){3}\d{1,3}(?![\d.])")
+PRIVATE_KEY_LABEL_RE = rb"[A-Z0-9 ]*" + rb"PRIVATE " + rb"KEY"
+PEM_PRIVATE_KEY_RE = re.compile(rb"-----BEGIN " + PRIVATE_KEY_LABEL_RE + rb"-----")
+BASE64_RE = re.compile(rb"(?<![A-Za-z0-9+/])[A-Za-z0-9+/]{32,}={0,2}(?![A-Za-z0-9+/=])")
+SSH_KEY_RE = re.compile(rb"(?m)^\s*(?:ssh-(?:rsa|dss|ed25519)|ecdsa-sha2-[^\s]+)\s+[A-Za-z0-9+/]{40,}={0,2}(?:\s|$)")
+CREDENTIAL_RE = re.compile(
+    rb"(?im)\b(?:api[_-]?(?:key|token)|access[_-]?key|auth[_-]?token|client[_-]?secret|password|passwd|refresh[_-]?token|secret[_-]?key)\b\s*[:=]\s*[\"']?([^\s\"'#,;]{8,})"
+)
+
+SAFE_EMAIL_DOMAINS = {
+    b"example.com",
+    b"example.invalid",
+    b"noreply.github.com",
+    b"users.noreply.github.com",
+}
+SAFE_HOME_USERS = {b"example", b"user"}
+DOCUMENTATION_NETWORKS = (
+    ipaddress.ip_network("192.0.2.0/24"),
+    ipaddress.ip_network("198.51.100.0/24"),
+    ipaddress.ip_network("203.0.113.0/24"),
+)
+SAFE_VALUE_MARKERS = (
+    b"example",
+    b"placeholder",
+    b"redacted",
+    b"changeme",
+    b"dummy",
+    b"<",
+    b"${",
+    b"{{",
+    b"test-fixture",
+)
+
+
+class AuditError(RuntimeError):
+    """Raised for an incomplete Git audit."""
+
+
+def git_bytes(repo: Path, *arguments: str, stdin: bytes | None = None) -> bytes:
+    completed = subprocess.run(
+        ["git", "--no-optional-locks", *arguments],
+        cwd=repo,
+        input=stdin,
+        capture_output=True,
+        check=False,
+    )
+    if completed.returncode != 0:
+        raise AuditError(f"Git command failed with exit status {completed.returncode}")
+    return completed.stdout
+
+
+def object_inventory(repo: Path, scope: str) -> tuple[list[str], list[str]]:
+    if scope == "all":
+        checks = git_bytes(
+            repo,
+            "cat-file",
+            "--batch-all-objects",
+            "--batch-check=%(objectname) %(objecttype)",
+        )
+    else:
+        raw = git_bytes(repo, "rev-list", "--objects", "--all")
+        object_ids = [
+            line.split(b" ", 1)[0].decode("ascii")
+            for line in raw.splitlines()
+            if line
+        ]
+        if not object_ids:
+            return [], []
+        checks = git_bytes(
+            repo,
+            "cat-file",
+            "--batch-check=%(objectname) %(objecttype)",
+            stdin=("\n".join(object_ids) + "\n").encode("ascii"),
+        )
+    blobs: list[str] = []
+    commits: list[str] = []
+    for line in checks.splitlines():
+        object_id, object_type = line.decode("ascii").split()
+        if object_type == "blob":
+            blobs.append(object_id)
+        elif object_type == "commit":
+            commits.append(object_id)
+    return sorted(set(blobs)), sorted(set(commits))
+
+
+def path_inventory(repo: Path) -> list[str]:
+    tree_output = git_bytes(repo, "log", "--all", "--format=%T")
+    tree_ids = sorted(set(tree_output.decode("ascii").splitlines()))
+    paths: set[str] = set()
+    for tree_id in tree_ids:
+        if not tree_id:
+            continue
+        output = git_bytes(repo, "ls-tree", "-r", "--name-only", "-z", tree_id)
+        paths.update(
+            raw_path.decode("utf-8", errors="surrogateescape")
+            for raw_path in output.split(b"\0")
+            if raw_path
+        )
+    return sorted(paths)
+
+
+def read_objects(repo: Path, object_ids: Iterable[str]) -> Iterable[tuple[str, bytes]]:
+    process = subprocess.Popen(
+        ["git", "--no-optional-locks", "cat-file", "--batch"],
+        cwd=repo,
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    if process.stdin is None or process.stdout is None:
+        process.kill()
+        raise AuditError("Git object reader did not start")
+    try:
+        for object_id in object_ids:
+            process.stdin.write(object_id.encode("ascii") + b"\n")
+            process.stdin.flush()
+            header = process.stdout.readline().rstrip(b"\n")
+            parts = header.split()
+            if len(parts) != 3 or parts[0].decode("ascii") != object_id:
+                raise AuditError("Git object reader returned an invalid header")
+            size = int(parts[2])
+            content = process.stdout.read(size)
+            separator = process.stdout.read(1)
+            if len(content) != size or separator != b"\n":
+                raise AuditError("Git object reader returned incomplete content")
+            yield object_id, content
+    finally:
+        process.stdin.close()
+        process.wait(timeout=30)
+        if process.returncode != 0:
+            raise AuditError(f"Git object reader failed with exit status {process.returncode}")
+
+
+def is_safe_credential(value: bytes) -> bool:
+    lowered = value.lower()
+    return any(marker in lowered for marker in SAFE_VALUE_MARKERS)
+
+
+def is_binary_content(content: bytes) -> bool:
+    """Match Git's practical text/binary distinction for audit routing."""
+    return b"\0" in content[:8000]
+
+
+def scan_content(
+    content: bytes,
+    location_type: str,
+    literal_rules: tuple[tuple[bytes, str, bool, frozenset[str]], ...] = (),
+) -> set[str]:
+    categories: set[str] = set()
+    if PEM_PRIVATE_KEY_RE.search(content) or SSH_KEY_RE.search(content):
+        categories.add("private_key")
+    for candidate in BASE64_RE.findall(content):
+        try:
+            decoded = base64.b64decode(candidate, validate=True)
+        except (ValueError, base64.binascii.Error):
+            continue
+        if PEM_PRIVATE_KEY_RE.search(decoded):
+            categories.add("private_key")
+            break
+    for match in CREDENTIAL_RE.finditer(content):
+        if not is_safe_credential(match.group(1)):
+            categories.add("credential")
+            break
+    for email in EMAIL_RE.findall(content):
+        domain = email.rsplit(b"@", 1)[1].lower()
+        if domain not in SAFE_EMAIL_DOMAINS:
+            categories.add("email")
+            break
+    for user in HOME_RE.findall(content):
+        if user.lower() not in SAFE_HOME_USERS:
+            categories.add("home_path")
+            break
+    for candidate in IPV4_RE.findall(content):
+        try:
+            address = ipaddress.ip_address(candidate.decode("ascii"))
+        except ValueError:
+            continue
+        if (
+            not address.is_loopback
+            and not address.is_unspecified
+            and not any(address in network for network in DOCUMENTATION_NETWORKS)
+        ):
+            categories.add("ip_address")
+            break
+    lowered_content: bytes | None = None
+    for value, category, ignore_case, locations in literal_rules:
+        if location_type not in locations:
+            continue
+        if ignore_case:
+            if lowered_content is None:
+                lowered_content = content.lower()
+            matched = value.lower() in lowered_content
+        else:
+            matched = value in content
+        if matched:
+            categories.add(category)
+    return categories
+
+
+def finding(category: str, location_type: str, object_id: str) -> dict[str, str]:
+    short_id = object_id[:12]
+    return {
+        "id": f"{category}:{location_type}:{short_id}",
+        "category": category,
+        "location_type": location_type,
+        "object": short_id,
+    }
+
+
+def load_rules(path: Path | None) -> dict[str, object]:
+    if path is None:
+        return {"literals": (), "path_globs": (), "allowed_paths": ()}
+    try:
+        mode = path.stat().st_mode & 0o777
+    except OSError as error:
+        raise AuditError("Private rule file is unavailable") from error
+    if mode & 0o077:
+        raise AuditError("Private rule file must have mode 0600")
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError) as error:
+        raise AuditError("Private rule file is invalid") from error
+    if not isinstance(payload, dict):
+        raise AuditError("Private rule file must contain an object")
+    literals: list[tuple[bytes, str, bool, frozenset[str]]] = []
+    for item in payload.get("forbidden_literals", []):
+        if not isinstance(item, dict):
+            raise AuditError("Private literal rule is invalid")
+        value = item.get("value")
+        category = item.get("category")
+        ignore_case = item.get("ignore_case", False)
+        locations = item.get("locations", ["blob", "commit"])
+        if (
+            not isinstance(value, str)
+            or not value
+            or not isinstance(category, str)
+            or not isinstance(ignore_case, bool)
+            or not isinstance(locations, list)
+            or not locations
+            or not all(location in {"blob", "commit"} for location in locations)
+        ):
+            raise AuditError("Private literal rule is incomplete")
+        literals.append(
+            (value.encode("utf-8"), category, ignore_case, frozenset(locations))
+        )
+    path_globs = payload.get("forbidden_path_globs", [])
+    if not isinstance(path_globs, list) or not all(
+        isinstance(pattern, str) and pattern for pattern in path_globs
+    ):
+        raise AuditError("Private path rules are invalid")
+    allowed_paths = payload.get("allowed_paths", [])
+    if not isinstance(allowed_paths, list) or not all(
+        isinstance(allowed_path, str)
+        and allowed_path
+        and not allowed_path.startswith("/")
+        for allowed_path in allowed_paths
+    ):
+        raise AuditError("Private allowed paths are invalid")
+    return {
+        "literals": tuple(literals),
+        "path_globs": tuple(path_globs),
+        "allowed_paths": tuple(allowed_paths),
+    }
+
+
+def audit(
+    repo: Path, rules_path: Path | None = None, scope: str = "reachable"
+) -> dict[str, object]:
+    if not (repo / ".git").exists() and not (repo / "HEAD").exists():
+        raise AuditError("Audit target is not a Git repository")
+    rules = load_rules(rules_path)
+    literal_rules = rules["literals"]
+    path_globs = rules["path_globs"]
+    allowed_paths = rules["allowed_paths"]
+    assert isinstance(literal_rules, tuple)
+    assert isinstance(path_globs, tuple)
+    assert isinstance(allowed_paths, tuple)
+    blobs, inventory_commits = object_inventory(repo, scope)
+    if scope == "all":
+        commits = inventory_commits
+    else:
+        commits = sorted(
+            set(git_bytes(repo, "rev-list", "--all").decode("ascii").splitlines())
+        )
+        if set(commits) - set(inventory_commits):
+            raise AuditError("Commit inventory is incomplete")
+    findings: list[dict[str, str]] = []
+    binary_blobs = 0
+    started = time.monotonic()
+    last_progress = started
+    total = len(blobs) + len(commits)
+    completed_count = 0
+    for location_type, object_ids in (("blob", blobs), ("commit", commits)):
+        for object_id, content in read_objects(repo, object_ids):
+            if location_type == "blob" and is_binary_content(content):
+                binary_blobs += 1
+            else:
+                for category in sorted(
+                    scan_content(content, location_type, literal_rules)
+                ):
+                    findings.append(finding(category, location_type, object_id))
+            completed_count += 1
+            now = time.monotonic()
+            if now - last_progress >= 10:
+                print(
+                    f"Audit progress: {completed_count}/{total} Git objects checked",
+                    file=sys.stderr,
+                )
+                last_progress = now
+    paths = path_inventory(repo) if path_globs else []
+    for path in paths:
+        if path not in allowed_paths and any(
+            fnmatch.fnmatchcase(path, pattern) for pattern in path_globs
+        ):
+            path_id = hashlib.sha256(
+                path.encode("utf-8", errors="surrogateescape")
+            ).hexdigest()[:12]
+            findings.append(finding("sensitive_path", "path", path_id))
+    counts = Counter(item["category"] for item in findings)
+    status = "fail" if findings else "pass"
+    return {
+        "schema_version": 1,
+        "summary": {
+            "status": status,
+            "findings": len(findings),
+            "categories": dict(sorted(counts.items())),
+        },
+        "coverage": {
+            "commits": len(commits),
+            "unique_blobs": len(blobs),
+            "binary_blobs": binary_blobs,
+            "unique_paths": len(paths),
+            "scope": scope,
+            "elapsed_seconds": round(time.monotonic() - started, 3),
+        },
+        "findings": findings,
+    }
+
+
+def render_text(report: dict[str, object], plain: bool) -> str:
+    summary = report["summary"]
+    coverage = report["coverage"]
+    assert isinstance(summary, dict)
+    assert isinstance(coverage, dict)
+    passed = summary["status"] == "pass"
+    heading = "Public history audit" if plain else "🔎 Public history audit"
+    status = "PASS" if passed else "FAIL"
+    status_prefix = "" if plain else ("✅ " if passed else "❌ ")
+    lines = [
+        heading,
+        f"{status_prefix}Status: {status}",
+        f"Commits checked: {coverage['commits']}",
+        f"Unique blobs checked: {coverage['unique_blobs']}",
+        f"Findings: {summary['findings']}",
+    ]
+    categories = summary["categories"]
+    assert isinstance(categories, dict)
+    for category, count in categories.items():
+        lines.append(f"- {category}: {count}")
+    return "\n".join(lines) + "\n"
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Audit all reachable Git history without echoing matched values."
+    )
+    parser.add_argument("--repo", type=Path, default=Path.cwd())
+    parser.add_argument("--format", choices=("text", "json"), default="text")
+    parser.add_argument("--plain", action="store_true")
+    parser.add_argument(
+        "--rules",
+        type=Path,
+        help="Mode-0600 JSON file containing private literal and path rules.",
+    )
+    parser.add_argument(
+        "--scope",
+        choices=("reachable", "all"),
+        default="reachable",
+        help="Scan reachable history or every object in the local object database.",
+    )
+    return parser.parse_args()
+
+
+def main() -> int:
+    args = parse_args()
+    try:
+        report = audit(
+            args.repo.resolve(),
+            args.rules.resolve() if args.rules is not None else None,
+            args.scope,
+        )
+    except (AuditError, OSError, subprocess.SubprocessError) as error:
+        if args.format == "json":
+            print(
+                json.dumps(
+                    {
+                        "schema_version": 1,
+                        "summary": {"status": "error", "findings": 0},
+                        "error": str(error),
+                    },
+                    sort_keys=True,
+                )
+            )
+        else:
+            prefix = "ERROR" if args.plain else "❌ ERROR"
+            print(f"{prefix}: {error}", file=sys.stderr)
+        return 2
+    if args.format == "json":
+        print(json.dumps(report, indent=2, sort_keys=True))
+    else:
+        print(render_text(report, args.plain), end="")
+    summary = report["summary"]
+    assert isinstance(summary, dict)
+    return 0 if summary["status"] == "pass" else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

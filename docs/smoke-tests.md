@@ -10,6 +10,13 @@ actual CLI, app, API, or generated artifact and expose an observable result.
 Automated tests, linters, type checks, builds, Git hygiene checks and source-text
 searches run before completion and any commit; do not use them to fill the handoff command list.
 
+## Public History Audit
+
+- Action: ./scripts/executable_audit-public-history --scope all --plain
+  Expected: The CLI scans every Git commit and unique blob in the local object
+  database, emits periodic progress to stderr during a long run, reports PASS
+  with zero findings, and exits 0 without printing matched values.
+
 ## Directory Sizes
 
 Install the pinned backend into a fresh disposable prefix. These checks inspect a small disposable backend directory; a real backup scan is an explicit opt-in.

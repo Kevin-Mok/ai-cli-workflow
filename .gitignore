@@ -2,5 +2,36 @@ commit-msg.txt
 .nvimlog
 __pycache__/
 *.py[cod]
+
+# Local credentials, authentication state, and account-specific overrides.
+.env
+.env.*
+!.env.example
+*.local
+*.local.*
+*.key
+*.pem
+*.p12
+*.pfx
+auth.json
+credentials.json
+cookies.txt
+cookies.sqlite
+session.json
+session.jsonl
+
+# Machine-local chezmoi data and generated state.
+.chezmoi.toml
+.chezmoidata.toml
+.chezmoidata.yaml
+/dot_ssh/
+/dot_kube/private_config*
+/dot_minikube/
+/private_dot_gnupg/
+
+# The private knowledge vault is deliberately not part of the public repo.
+/second-brain/**
+!/second-brain/README.md
+
 # Rebuilt from committed per-trial evidence; summary.json keeps aggregate scores.
 /benchmarks/metaprompt-selection/runs/selection-2026-10-03/results.json

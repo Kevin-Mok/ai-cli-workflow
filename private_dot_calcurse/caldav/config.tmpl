@@ -1,0 +1,19 @@
+# Public-safe calcurse-caldav template. Supply values through untracked chezmoi
+# data; never put passwords or OAuth tokens in this repository.
+
+[General]
+Binary = calcurse
+Hostname = {{ .calendarHost }}
+Path = {{ .calendarPath }}
+AuthMethod = basic
+InsecureSSL = No
+SyncFilter = cal,todo
+DryRun = No
+Verbose = Yes
+
+[Auth]
+Username = {{ .calendarUsername }}
+
+#[OAuth2]
+#ClientID = example-client-id
+#ClientSecret = <load-from-an-external-secret-store>

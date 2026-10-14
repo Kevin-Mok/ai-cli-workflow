@@ -1,0 +1,15 @@
+defaults
+logfile ~/.config/msmtp/msmtp.log
+tls on
+tls_trust_file /etc/ssl/certs/ca-certificates.crt
+
+account mail
+host {{ .mailHost }}
+port {{ .mailPort }}
+auth on
+user {{ .mailAddress }}
+passwordeval "pass show mail/smtp"
+tls_starttls {{ .mailTlsStarttls }}
+from {{ .mailAddress }}
+
+account default : mail

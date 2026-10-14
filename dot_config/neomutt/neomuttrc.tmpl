@@ -1,8 +1,8 @@
-set from = "user@example.invalid"
-set realname = "Vole"
+set from = "{{ .mailAddress }}"
+set realname = "{{ .mailRealName }}"
 
 set mbox_type = Maildir
-set folder = "~/mail/firemail"
+set folder = "~/mail/default"
 set spoolfile = "+INBOX"
 set record = "+Sent"
 set postponed = "+Drafts"
@@ -15,4 +15,4 @@ set charset = "utf-8"
 auto_view text/html
 alternative_order text/plain text/html
 
-macro index <F5> "<shell-escape>mbsync firemail<enter><enter>" "Sync mail"
+macro index <F5> "<shell-escape>mbsync default<enter><enter>" "Sync mail"

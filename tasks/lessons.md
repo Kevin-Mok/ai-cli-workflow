@@ -188,3 +188,29 @@
 - 2026-10-13: After a fetch-first push rejection, fetch the authorized branch before probing an ls-remote hash. merge-base exit128 means the object check failed; only exit1 establishes a valid non-ancestor result. Preserve local commits and dirty overlays during a reviewed normal merge.
 
 - 2026-10-13: While guarding the real Git index with an owned index.lock, validate write-tree through a copied GIT_INDEX_FILE. write-tree itself takes an index lock; calling it on the guarded real index blocks the helper before commit creation.
+
+## 2026-10-14: Public history sanitization
+
+- Disable Git LFS filters for read-only status checks in restricted sandboxes,
+  then verify apparent modifications against pointer OIDs and sizes before
+  treating them as user edits.
+- Enumerate paths from every unique historical tree. A representative path from
+  `rev-list --objects` can miss a second path that reuses the same blob.
+- Validate the actual shell/interpreter contract for history-rewrite helpers;
+  executable bits and a Python shebang do not help when an index filter invokes
+  the file through `/bin/sh`.
+- Route NUL-containing blobs to a binary review path before applying text
+  regexes. Compressed image/audio bytes can coincidentally match secret
+  patterns, while visual and metadata review answer a different question.
+- Verify every saved mapping or evidence artifact is nonempty before deleting
+  original refs or reflogs. Command success alone does not prove an output file
+  contains the intended evidence.
+- Expect a worktree patch to become stale when the history rewrite changes its
+  context. Preserve a status manifest and explicit copies of untracked files so
+  selective recovery can be verified exactly.
+- A clean Git-blob scan does not inspect resolved Git LFS bytes. Inventory every
+  retained LFS path, resolve each payload, and review its visible or embedded
+  content before calling a public-history rewrite safe.
+- When restoring untracked files after a destructive rewrite, recreate each
+  destination parent directory before copying and verify every manifest path is
+  present afterward.
