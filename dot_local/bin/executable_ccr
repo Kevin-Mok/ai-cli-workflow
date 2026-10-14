@@ -1,0 +1,18 @@
+#!/bin/bash
+# Keep optional CCR separate from shell-managed npm globals and agent defaults.
+set -euo pipefail
+umask 077
+package="${HOME}/.local/share/claude-code-router/lib/node_modules/@musistudio/claude-code-router"
+if [ ! -f "${package}/dist/main/cli.js" ] || [ ! -f "${package}/dist/models.json" ]; then
+    if [ "${CLI_PLAIN:-0}" != 1 ]; then printf '⚠️ ' >&2; fi
+    printf '%s\n' 'CCR is not installed. Run the repo pinned installer with Node.js 22+; see docs/claude-code-router.md.' >&2
+    exit 1
+fi
+# The release treats --version as a profile name; handle it without startup.
+if [ "${1:-}" = '--version' ]; then
+    exec node -p 'require(process.argv[1]).version' "${package}/package.json"
+fi
+# Nonempty local catalog path suppresses the upstream hourly catalog download.
+export CCR_MODEL_CATALOG_PATH="${package}/dist/models.json"
+export CCR_WEB_HOST="127.0.0.1"
+exec node "${package}/dist/main/cli.js" "$@"

@@ -28,6 +28,7 @@ is done.
 | Claude Code global config | [`dot_claude/CLAUDE.md`](dot_claude/CLAUDE.md.tmpl) and [`dot_claude/settings.json`](dot_claude/settings.json) | Wires `dot_codex/AGENTS.md` into Claude Code globally via `@path` import so both Codex and Claude share the same behavioral baseline without a separate copy. |
 | Local skills | [`dot_agents/skills/`](dot_agents/skills/) and [`dot_agents/skills/README.md`](dot_agents/skills/README.md) | Packages recurring jobs into reusable local capabilities shared across Codex (`~/.agents/skills/`) and Claude Code (`~/.claude/skills/<name>/` directory symlinks) via a post-apply chezmoi script. |
 | Ponytail Codex plugin | [`run_onchange_after_install-codex-ponytail-plugin.sh.tmpl`](run_onchange_after_install-codex-ponytail-plugin.sh.tmpl) and [`dot_codex/config.toml`](dot_codex/config.toml) | Installs [Ponytail](https://github.com/DietrichGebert/ponytail) (pinned to `v5.2.0`) so Codex prefers the smallest correct change and gets `ponytail-review`/`ponytail-audit` skills; trust its hooks once via `/hooks`. |
+| Optional Claude Code Router | [Pinned installer](run_onchange_after_install-claude-code-router.sh.tmpl), [first-run config](dot_claude-code-router/create_private_config.json), [usage and evaluation](docs/claude-code-router.md) | Installs CCR 3.1.3 for explicit provider/model routing with both Claude Code and Codex. Profiles, gateway and request logging start disabled; cheaper routes need cost/quality measurement. |
 | Graphiti MCP with Neo4j | [`dot_codex/config.toml`](dot_codex/config.toml), [`scripts/executable_codex`](scripts/executable_codex), and [`docs/graphiti-mcp-codex.md`](docs/graphiti-mcp-codex.md) | Adds a retrievable memory layer for multi-session work where provenance and evolving context matter. |
 | Shell and terminal tooling | [`dot_config/fish/config.fish.tmpl`](dot_config/fish/config.fish.tmpl), [`dot_tmux.conf`](dot_tmux.conf), [`dot_config/st/config.def.h.tmpl`](dot_config/st/config.def.h.tmpl), [`dot_config/kitty/kitty.conf`](dot_config/kitty/kitty.conf), and [`dot_config/i3/config.tmpl`](dot_config/i3/config.tmpl) | Optimizes for terminal-first execution and multiple parallel panes, with `kitty` as the default terminal, `st` kept ready as the low-friction alternate, and tmux handling the heavier session workflow. |
 | Python and Bash automation | [`scripts/`](scripts/) and [`dot_config/fish/functions/refresh-config.fish`](dot_config/fish/functions/refresh-config.fish) | Keeps repeatable operations small, inspectable, and version-controlled instead of burying them in chat or muscle memory. |
@@ -542,6 +543,15 @@ version is:
 ## Install And Bootstrap
 
 The minimum bootstrap path is `git` plus `chezmoi`.
+
+The optional [Claude Code Router](docs/claude-code-router.md) installer needs
+Node.js 22+, npm, curl and coreutils. It installs a checksum-verified release
+in a private user prefix without starting a service. The `ccr` launcher disables
+automatic model-catalog downloads; its create-only seed disables profiles and
+request logging on first use. Existing SQLite config takes precedence. Use
+`ccr --version` and `ccr --help` after installation, then follow the linked
+management-only onboarding before enabling a **Only opened from CCR** profile.
+No token savings are assumed, and normal Codex/Claude sessions keep their defaults.
 
 If you want to use the repo's local AI operating layer, install OpenAI's
 Codex CLI separately first and make sure the real `codex` binary is on

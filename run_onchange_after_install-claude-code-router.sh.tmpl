@@ -1,0 +1,70 @@
+#!/bin/bash
+# Verified npm release; bump version and checksum together to upgrade.
+# No server, agent, hook, MCP registration or chezmoi apply is launched here.
+set -euo pipefail
+version="3.1.3"
+sha512="7551d1bbd49bff11bd760afc9c7266bdde57548439cab11e2a63283d410173dc6d83291f453db3efa35123e7f29697a2333602eb4cfabeb57ac7fdc8639da9be"
+prefix="${HOME}/.local/share/claude-code-router"
+package="${prefix}/lib/node_modules/@musistudio/claude-code-router"
+
+say() {
+    local glyph="$1"; shift
+    if [ "${CLI_PLAIN:-0}" != 1 ]; then printf '%s ' "$glyph" >&2; fi
+    printf '%s\n' "$*" >&2
+}
+
+for tool in node npm curl sha512sum; do
+    if ! command -v "$tool" >/dev/null 2>&1; then
+        say '⚠️' "CCR: ${tool} missing; skipping. Install Node.js 22+ and npm, curl, coreutils, then rerun this script."
+        exit 0
+    fi
+done
+node_version="$(node --version)"
+node_major="${node_version#v}"; node_major="${node_major%%.*}"
+if ! [[ "$node_major" =~ ^[0-9]+$ ]] || [ "$node_major" -lt 22 ]; then
+    say '⚠️' "CCR: Node.js 22+ required (found ${node_version}); skipping. Rerun this script after upgrading Node."
+    exit 0
+fi
+
+if [ -f "${package}/package.json" ] && [ -f "${package}/dist/main/cli.js" ] && [ -f "${package}/dist/models.json" ]; then
+    installed="$(node -p 'require(process.argv[1]).version' "${package}/package.json")"
+    if [ "$installed" = "$version" ]; then
+        say '✅' "CCR ${version}: already installed; routing remains opt-in."
+        exit 0
+    fi
+fi
+
+tmp="$(mktemp -d)"
+job=""
+trap '[ -z "$job" ] || { kill "$job" 2>/dev/null || true; wait "$job" 2>/dev/null || true; }; rm -rf "$tmp"' EXIT
+
+with_progress() {
+    local phase="$1"; shift
+    "$@" >"${tmp}/operation.log" 2>&1 &
+    job=$!
+    local elapsed=0
+    while kill -0 "$job" 2>/dev/null; do
+        sleep 1
+        elapsed=$((elapsed + 1))
+        if [ $((elapsed % 10)) -eq 0 ]; then say '⏳' "CCR: ${phase} active (${elapsed}s elapsed)."; fi
+    done
+    if ! wait "$job"; then
+        job=""
+        say '❌' "CCR: ${phase} failed. Check network, Node.js 22+ and native SQLite build prerequisites; rerun with CLI_DETAILS=1 for diagnostics."
+        if [ "${CLI_DETAILS:-0}" = 1 ]; then cat "${tmp}/operation.log" >&2; fi
+        return 1
+    fi
+    job=""
+}
+
+say '📦' "CCR ${version}: downloading verified npm release."
+with_progress download curl --fail --location --silent --show-error --connect-timeout 15 --max-time 120 \
+    "https://registry.npmjs.org/@musistudio/claude-code-router/-/claude-code-router-${version}.tgz" --output "${tmp}/router.tgz"
+if ! printf '%s  %s\n' "$sha512" "${tmp}/router.tgz" | sha512sum --check --status; then
+    say '❌' 'CCR: release checksum failed; no package installation attempted.'
+    exit 1
+fi
+
+say '⏳' "CCR ${version}: installing into ${prefix} (native SQLite may compile)."
+with_progress 'npm installation' npm install --global --prefix "$prefix" --no-audit --no-fund "${tmp}/router.tgz"
+say '✅' "CCR ${version}: installed. No service started; see docs/claude-code-router.md before enabling profiles."

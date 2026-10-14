@@ -8606,6 +8606,15 @@
       "reviewed_on": "2026-10-13",
       "findings": [],
       "decision": "No new reusable learning: a direct missing-bracket typo failed before execution; the existing local-nested-language-literal-emission parser prerequisite applies. Checked script compilation and actual delivery/state verification both passed; no product behavior changed."
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config-worktrees/tool-claude-code-router/docs/postmortem/2026-10-13-router-evaluation-environment.md"
+      ],
+      "decision": "Reviewed scoped environment/path/attribute and test-fixture failures; existing execution-environment and path-discovery guidance applies. No generalized LFS repair inferred from command-local bypass; shared corpus coverage remains a separate warning.",
+      "findings": [],
+      "reviewed_on": "2026-10-13",
+      "sha256": "1e7f6d6d91d0bb77f1d98b694e1d886906f023f5fee0d4e9e965bec1c478896a"
     }
   ],
   "review": {

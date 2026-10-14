@@ -1,0 +1,33 @@
+{
+  "autoStart": false,
+  "launchAtLogin": false,
+  "gateway": {
+    "enabled": false,
+    "host": "127.0.0.1",
+    "coreHost": "127.0.0.1"
+  },
+  "observability": {
+    "requestLogs": false,
+    "agentAnalysis": false,
+    "requestLogBodyCapture": "none",
+    "requestLogMaxBodyBytes": 0,
+    "requestLogSuccessSampleRate": 0
+  },
+  "profile": {
+    "enabled": false,
+    "claudeCode": { "enabled": false },
+    "codex": { "enabled": false },
+    "profiles": []
+  },
+  "proxy": {
+    "enabled": false,
+    "systemProxy": false,
+    "captureNetwork": false
+  },
+  "contextArchive": { "enabled": false, "mcpEnabled": false },
+  "toolHub": { "enabled": false, "browserAutomation": false },
+  "mediaTools": { "enabled": false },
+  "botGateway": { "enabled": false, "shellEnabled": false },
+  "plugins": [],
+  "providerPlugins": []
+}

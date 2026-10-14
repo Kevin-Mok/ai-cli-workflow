@@ -10,6 +10,39 @@ actual CLI, app, API, or generated artifact and expose an observable result.
 Automated tests, linters, type checks, builds, Git hygiene checks and source-text
 searches run before completion and any commit; do not use them to fill the handoff command list.
 
+## Claude Code Router
+
+Use the source checkout; no sudo is needed. After a later deliberate apply,
+ensure `~/.local/bin` and Node 22+ are on PATH. These checks use no paid provider.
+
+- Action: ccr --version
+  Expected: `3.1.3`, with no service or agent launch. This version option is
+  provided by the repo wrapper, not the upstream CLI.
+- Action: ccr --help
+  Expected: Real CLI usage lists `start`, `ui`, `serve`, `stop` and profile
+  commands; exit 0. No service starts.
+- Action: python3 -B scripts/smoke_claude_code_router.py
+  Expected: A temporary HOME is created, real management startup/migration
+  succeeds, the gateway stays stopped, empty/disabled profiles and logging
+  persist to SQLite, bad management token gets 401, and no Claude/Codex settings
+  are created. The process stops and temporary runtime is cleaned up. Use
+  `--package-dir PATH` to select a disposable package, `--plain` for ASCII.
+- Action: ccr serve --no-open --no-gateway
+  Expected: Foreground management-only service prints a private authenticated
+  loopback URL (preferred port 3458, fallback if occupied); no gateway or agent
+  starts on a fresh seed. Stop with Ctrl+C. Do not share its token URL.
+- Action: Review an existing CCR installation through management-only UI before
+  enabling its gateway; review profile scope and observability settings.
+  Expected: Existing JSON contents and SQLite are preserved. The seed does not
+  overwrite SQLite. Only explicitly enabled **Only opened from CCR** profiles
+  may be used; avoid Global scope and keep request/body logging off.
+- Action: With a selected provider and local-only key, enable Server and launch
+  one opted-in profile against a disposable coding task; compare it to direct
+  agent use, including tool calls and streaming.
+  Expected: Confirm provider/model selection, completed task quality, latency
+  and total billed usage including retries. This paid/agent trial is **not yet
+  verified** and must not be inferred from management startup checks.
+
 ## Directory Sizes
 
 Install the pinned backend into a fresh disposable prefix. These checks inspect a small disposable backend directory; a real backup scan is an explicit opt-in.
