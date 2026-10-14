@@ -245,6 +245,11 @@ targets leave local commits intact. Planning-only requests remain read-only.
   `__main__` harness, inline `unittest` coverage, runtime diffs, and
   structure helpers when needed, without generating the algorithmic
   solution.
+- [`next-tasks`](next-tasks/SKILL.md): Explicit-only quota spender that reads
+  recent git history, repo docs, prompt docs, and agent sessions run in the
+  repo, lists up to 5 tasks it can
+  finish and prove on its own, each with its evidence and how it will be
+  verified, then does only the one I pick and shows the diff and test results.
 
 ## Docs, Knowledge, And Output Control
 
