@@ -114,10 +114,22 @@ This plan turns this private-dotfiles copy into a public-safe Git repository. It
   private-literal scan. Forty-four temporary rewrite/review/backup artifacts
   were deleted; the last mode-`0600` audit-rule file is retained only through
   the staged final scan and is deleted before the verification commit.
+- 2026-10-14: independent closeout review confirmed the corrected 1,726-file
+  report count and found no remaining incorrect claim. Two read-only verifier
+  commands then exposed heading and option-parsing assumptions without changing
+  the repository or report; the corrected checks and the incident record are
+  included in the final documentation milestone.
+- 2026-10-14: the required post-commit all-object audit caught an unsafe ambient
+  Git identity in that closeout milestone. The unpushed tip was recreated with
+  the established public identity; its replaced object and reflog were pruned,
+  and the terminal evidence gate was repeated before completion.
 
 ## Review Notes
 
 - The user directly authorized destructive history rewriting and remote removal, but explicitly prohibited pushing. No separate approval is needed for those in-repository actions; sandbox elevation remains narrowly scoped to `.git` mutation.
 - The plan treats the existing license identity as intentionally public and author emails as private. If scanning produces contrary evidence, pause and revise this assumption before rewrite.
 - Independent review found no incorrect final-source claim. Its only transient-evidence qualification is recorded in the external report: pruned staging blobs and a rejected pre-execution request cannot be recreated after the fact.
+- Final follow-up review verified the external report's corrected worktree count,
+  zero generic privacy findings, unchanged source state, and report-only task
+  inventory under `/tmp`.
 - Final publication commands belong only in the external report and are for the user to run later; this task will not execute them.

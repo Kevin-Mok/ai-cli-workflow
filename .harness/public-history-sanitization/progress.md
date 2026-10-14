@@ -61,6 +61,13 @@ Updated: 2026-10-14
 - Wrote and privately scanned the external report, then deleted 44 temporary
   rewrite/review/backup artifacts. The final audit-rule file is deleted after
   the staged private-rule scan and before the verification-only commit.
+- Independent closeout review verified the report's corrected 1,726-file count,
+  zero generic report findings, an unchanged clean repository, and an exact
+  report-only task inventory under `/tmp`.
+- Recorded and corrected two no-impact closeout-verifier assumptions, then used
+  the terminal all-object gate to catch and replace an unsafe ambient identity
+  in the unpushed closeout commit. The task now has 37 incident reports; the
+  final milestone includes both records, local lessons, and matching evidence.
 
 ## Decisions
 
@@ -71,11 +78,10 @@ Updated: 2026-10-14
 
 ## Remaining Work
 
-- Stage and privately scan this verification record, delete the final temporary
-  audit-rule file, commit without pushing, and run terminal generic audit,
-  object/LFS hygiene, and clean-status checks.
+- No implementation or history-rewrite work remains. Publication is intentionally
+  left to the user using the commands in the external report.
 
 ## Next Action
 
-Commit the final verification record and perform the last post-commit audit
-without pushing.
+Review the external report, rotate the three identified credentials, and use
+its publication commands only when ready. No push was performed by this task.

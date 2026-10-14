@@ -214,3 +214,13 @@
 - When restoring untracked files after a destructive rewrite, recreate each
   destination parent directory before copying and verify every manifest path is
   present afterward.
+- Closeout checks should derive prose headings from the current artifact before
+  asserting them. When a search pattern can begin with hyphens, terminate
+  command options explicitly (`rg -- <pattern>`) so the verifier tests content
+  instead of its own argument-parsing assumption. See [the closeout verifier
+  incident](../docs/postmortem/2026-10-14-closeout-verifier-assumptions.md).
+- A clean staged-blob scan cannot validate identity headers that are created by
+  the commit itself. Supply the approved public author and committer explicitly
+  for every sanitation-task commit, then run the all-object scanner after the
+  commit and prune the replaced object if metadata must be corrected. See [the
+  closeout identity incident](../docs/postmortem/2026-10-14-closeout-commit-private-identity.md).
