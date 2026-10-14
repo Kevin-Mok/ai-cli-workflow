@@ -31,11 +31,8 @@ The first `git status --short` invocation failed while Git LFS tried to create a
 
 ## Current Status
 
-Mitigated for inspection. The LFS-disabled status command succeeded, protected
-files were backed up, and object-level audits can proceed without invoking
-worktree filters. The recurrence is contained by keeping every source-repository
-status probe explicit about disabled LFS filters. History mutation and final
-restoration checks remain pending.
+Resolved. The sanitized graph is installed and the final source no longer has
+an LFS attribute, tracked LFS path, or local LFS object.
 
 ## Root Cause
 
@@ -43,7 +40,12 @@ The command runner permits repository working-tree writes but not default-sandbo
 
 ## Resolution And Verification
 
-Pending completion of the rewrite. Final evidence must show that approved Git mutation succeeded, protected file hashes remained unchanged, normal repository inspection has an explicit LFS-safe path, and no private objects remain.
+The guarded transplant first byte-matched all four protected media paths to
+their backups and copied the complete source overlay. After installing the
+sanitized refs, it removed the private remote, expired reflogs, pruned Git
+objects, and pruned all four LFS payloads. Normal status is now clean;
+`git lfs ls-files --all --long` is empty, `git lfs fsck` passes, the LFS object
+store has zero files, and the full object scan has zero findings.
 
 ## Follow-Up
 

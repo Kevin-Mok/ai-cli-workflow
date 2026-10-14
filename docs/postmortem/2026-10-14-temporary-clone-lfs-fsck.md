@@ -31,8 +31,8 @@ and `git lfs prune --force` removed the sole local candidate payload.
 
 ## Current Status
 
-Resolved in the candidate: `git lfs ls-files` is empty, the removed path is
-absent from the all-ref object inventory, the LFS store retains no payload, and
-the all-object privacy audit passes. Final source-repository pruning is still a
-delivery gate. The external postmortem-memory ledger remains outside the
-user-authorized folder and is intentionally untouched.
+Resolved in both the candidate and final source: `git lfs ls-files` is empty,
+the removed path is absent from the all-ref object inventory, both LFS stores
+retain no payload, and the final all-object privacy audit passes. The external
+postmortem-memory ledger remains outside the user-authorized folder and is
+intentionally untouched.

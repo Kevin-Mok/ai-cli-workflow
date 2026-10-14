@@ -14,7 +14,7 @@ This plan turns this private-dotfiles copy into a public-safe Git repository. It
 - Repository: `/home/example/ai-cli-dotfiles-public`; branch `main`.
 - Baseline: 698 commits reachable across all refs, 689 on `main`, 19 local/remote-tracking ref tips, and no tags observed before rewriting.
 - Baseline remote: one `private-origin` HTTPS remote; it must be removed only after verification.
-- Protected pre-existing working-tree state: four Git LFS media paths appeared modified when LFS filters were disabled. Their exact bytes and metadata were copied to `/tmp/ai-cli-dotfiles-public-protected-20261013/` before classification. All four were later judged unsuitable for publication; the backup remains private only until final verification and cleanup.
+- Protected pre-existing working-tree state: four Git LFS media paths appeared modified when LFS filters were disabled. Their exact bytes and metadata were copied to a private temporary backup before classification. All four were later judged unsuitable for publication; the backup was deleted after final source verification.
 - The sandbox cannot write `.git/lfs/tmp`; Git/ref mutation requires the narrow approved execution route. A living report is at `docs/postmortem/2026-10-13-lfs-status-sandbox.md`.
 - `gitleaks`, `trufflehog`, and `detect-secrets` were not on `PATH` at initial inspection. Use any scanner that is already available later, plus a repository-local or temporary deterministic scanner and manual review; do not make external installation a prerequisite.
 - Do not use a worktree, push, publish, deploy, or touch another project. Do not run `refresh-config`, because it writes outside this repository and could import live private values, contrary to the user's explicit scope.
@@ -27,7 +27,7 @@ This plan turns this private-dotfiles copy into a public-safe Git repository. It
 - Replacement rules and raw findings must never be committed. Store them only in a mode-`0600` temporary area under `/tmp`, refer to findings by category/label in tracked docs, and delete the temporary raw audit artifacts after the final rescan.
 - Preserve commit topology and order. Preserve messages unless a matched fragment is sensitive. Preserve author/committer timestamps. Drop only commits whose rewritten tree and sanitized metadata add no change relative to their rewritten parent.
 - Rewrite all retained refs in one deterministic pass. Keep a temporary private backup bundle in `/tmp` until rewritten-history verification succeeds, then delete it and expire/prune unreachable private objects from this copy.
-- Add one final public-readiness commit for `.gitignore`, `README.md`, this ExecPlan, task status, and the completed incident record. The final commit is new and is not counted as an original historical commit.
+- Add a public-readiness commit for `.gitignore`, `README.md`, audit tooling, this ExecPlan, task status, and incident records, followed by one verification-only documentation commit after transplant. These new commits are not counted as original historical commits.
 
 ## Ordered Implementation Checklist
 
@@ -38,15 +38,15 @@ This plan turns this private-dotfiles copy into a public-safe Git repository. It
 - [x] Build a mode-`0600` temporary rule set and a deterministic audit/rewrite harness; validate it on representative fixtures before real history mutation.
 - [x] Create and validate a temporary private backup bundle; record original per-ref tips, topology/order signatures, and commit counts.
 - [x] Rewrite every retained ref, including commit messages and author/committer emails/names, preserving timestamps and topology.
-- [ ] Convert safe unique remote-tracking histories to local archival branches and remove `private-origin` without pushing.
+- [x] Convert safe unique remote-tracking histories to local archival branches and remove `private-origin` without pushing.
 - [x] Remove the four protected LFS media paths from public history, add public-safe `.gitignore` entries, and add README guidance for supplying personal values locally.
 - [x] Confirm the MIT license remains byte-for-byte unchanged unless sanitization proves its public author line conflicts with the stated assumption.
-- [ ] Run full-history secret/PII scans, manual grep/review, sensitive-path checks, commit-message/identity checks, and unreachable-object checks; resolve every confirmed finding or mark uncertainty explicitly.
+- [x] Run full-history secret/PII scans, manual grep/review, sensitive-path checks, commit-message/identity checks, and unreachable-object checks; resolve every confirmed finding or mark uncertainty explicitly.
 - [x] Run repository regression checks and the README recruiter-sync gate without applying live chezmoi state.
-- [ ] Update this plan, task status, incident report, harness handoff, and `/tmp/ai-cli-dotfiles-public-REPORT.md` with exact evidence.
-- [ ] Obtain an independent evidence-reviewer claim table, fix incorrect claims, and retain unresolved items visibly.
-- [ ] Commit the public-readiness changes with their matching plan/status docs, verify again, prune private unreachable objects, and confirm no remote remains.
-- [ ] Delete temporary raw findings and private backup material from `/tmp`; keep only the requested final report.
+- [x] Update this plan, task status, incident report, harness handoff, and `/tmp/ai-cli-dotfiles-public-REPORT.md` with exact evidence.
+- [x] Obtain an independent evidence-reviewer claim table, fix incorrect claims, and retain unresolved items visibly.
+- [x] Commit the public-readiness changes with their matching plan/status docs, verify again, prune private unreachable objects, and confirm no remote remains.
+- [x] Delete temporary raw findings and private backup material from `/tmp`; keep only the requested final report.
 
 ## Risks, Edge Cases, Rollback Points, And Protected State
 
@@ -87,27 +87,37 @@ This plan turns this private-dotfiles copy into a public-safe Git repository. It
   objects. A rule-location regression is covered by the 11-test audit/sanitizer
   suite.
 - 2026-10-14: the public README, local-only ignore rules, account templates,
-  feedback placeholder, and private-vault placeholder were restored after the
-  final rewrite. Final-tip commit, source-repository transplant, remote removal,
-  and post-commit rescan remain.
+  feedback placeholder, and private-vault placeholder were committed as
+  `f497ac7`. The verified graph was transplanted into the requested repository;
+  `private-origin`, original/import refs, reflogs, and all four local LFS objects
+  were removed without a push.
 - 2026-10-14: the original LICENSE blob was restored in every retained tree where it exists and
   now matches the source checksum. Independent preservation verification mapped
   all 688 retained commits to original dates and approved message rewrites;
   parent expansion produced zero topology mismatches. The 10 dropped commits
   are exactly the empty rewrite results. Rewrite invalidated and removed 170
   historical commit signatures as expected.
-- 2026-10-14: all 11 focused auditor/sanitizer tests pass, the current 1,721-file
+- 2026-10-14: all 11 focused auditor/sanitizer tests pass, the current 1,726-file
   worktree scan has zero findings, and the README recruiter-sync gate reports
   `pass_no_change`. Dedicated gitleaks/trufflehog-style scanners remain
   unavailable, so the deterministic all-object scanner and independent manual
   metadata/path/blob/binary reviews are the recorded compensating evidence.
-- 2026-10-14: targeted postmortem-memory checks classified all 30 task incident
+- 2026-10-14: targeted postmortem-memory checks classified all 35 task incident
   reports as new and produced no other check error. Registering their hashes and
   findings in the separate canonical private repository remains intentionally
   outstanding because this task explicitly forbids modifying another folder.
+- 2026-10-14: the post-transplant all-object audit passed across 689 commits and
+  5,175 unique blobs with zero findings. The repository has 18 neutral local
+  heads, no remotes, no LFS paths or object files, no replace refs or reflogs,
+  no unreachable objects, and a clean worktree before final evidence updates.
+- 2026-10-14: the external redacted report was written and passed the same
+  private-literal scan. Forty-four temporary rewrite/review/backup artifacts
+  were deleted; the last mode-`0600` audit-rule file is retained only through
+  the staged final scan and is deleted before the verification commit.
 
 ## Review Notes
 
 - The user directly authorized destructive history rewriting and remote removal, but explicitly prohibited pushing. No separate approval is needed for those in-repository actions; sandbox elevation remains narrowly scoped to `.git` mutation.
 - The plan treats the existing license identity as intentionally public and author emails as private. If scanning produces contrary evidence, pause and revise this assumption before rewrite.
+- Independent review found no incorrect final-source claim. Its only transient-evidence qualification is recorded in the external report: pruned staging blobs and a rejected pre-execution request cannot be recreated after the fact.
 - Final publication commands belong only in the external report and are for the user to run later; this task will not execute them.

@@ -9,8 +9,7 @@ Updated: 2026-10-14
 - `.harness/public-history-sanitization/checks.md`: independent evidence review and resolution table.
 - `.harness/public-history-sanitization/progress.md`: current handoff.
 - `docs/postmortem/2026-10-13-lfs-status-sandbox.md`: living record for the initial Git LFS status failure.
-- `/tmp/ai-cli-dotfiles-public-protected-20261013/`: protected copies of four pre-existing LFS worktree files.
-- `/tmp/ai-cli-dotfiles-public-REPORT.md`: pending final redacted report.
+- `/tmp/ai-cli-dotfiles-public-REPORT.md`: final redacted report retained after closeout cleanup.
 
 ## Done / Checks Run
 
@@ -42,12 +41,26 @@ Updated: 2026-10-14
   mismatches; 10 original commits were pruned empty and 170 invalidated commit
   signatures were removed.
 - Expanded the focused suite to 11 passing tests, including exact reviewed
-  placeholder paths. The current 1,721-file worktree scan has zero findings and
+  placeholder paths. The current 1,726-file worktree scan has zero findings and
   the README recruiter-sync gate reports `pass_no_change`.
-- Ran the canonical postmortem-memory targeted check for all 30 task incident
+- Ran the canonical postmortem-memory targeted check for all 35 task incident
   reports: all were classified as new, with no other helper error. The required
   external ledger registration is outside the authorized folder and remains an
   explicit follow-up rather than an in-scope write.
+- Committed the public-readiness tip as `f497ac7`, then used a guarded transplant
+  that verified the exact source status, byte-matched all four protected media
+  backups, and copied the complete pre-reset overlay before changing refs.
+- Installed 18 neutral local heads, removed `private-origin` without pushing,
+  expired reflogs, pruned unreachable Git objects, and removed all four local
+  LFS payloads. The post-transplant audit passed across 689 commits and 5,175
+  blobs; Git/LFS fsck, ref hygiene, license, and clean-status checks passed.
+- Independent final-source review reported no incorrect claim and verified the
+  live ref/object/LFS state, retained binaries, documentation, templates, and
+  ignores. Its transient-evidence and local-no-push qualifications are retained
+  explicitly in the external report.
+- Wrote and privately scanned the external report, then deleted 44 temporary
+  rewrite/review/backup artifacts. The final audit-rule file is deleted after
+  the staged private-rule scan and before the verification-only commit.
 
 ## Decisions
 
@@ -58,17 +71,11 @@ Updated: 2026-10-14
 
 ## Remaining Work
 
-- Finish the public-tip evidence documents and resolve the first independent
-  review's stale-count and binary/LFS findings.
-- Re-run README recruiter-sync, complete history-preservation comparisons, and
-  verify the MIT license plus the empty LFS inventory.
-- Commit the public-readiness tip, rescan all resulting objects, transplant the
-  sanitized refs into the requested repository, remove `private-origin`, prune
-  private objects and temporary raw audit material, and write the external
-  report.
+- Stage and privately scan this verification record, delete the final temporary
+  audit-rule file, commit without pushing, and run terminal generic audit,
+  object/LFS hygiene, and clean-status checks.
 
 ## Next Action
 
-Finish the public-tip documentation/tooling, verify and commit it, then perform
-the final source-repository transplant and all-object rescan before removing the
-temporary private backup.
+Commit the final verification record and perform the last post-commit audit
+without pushing.

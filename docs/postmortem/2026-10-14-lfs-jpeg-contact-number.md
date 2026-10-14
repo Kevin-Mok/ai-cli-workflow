@@ -18,7 +18,7 @@ The candidate public history was not safe to publish. Publishing it with LFS con
 
 ## Current status
 
-Resolved in the isolated candidate. Source-repository transplant verification remains part of the final delivery gate.
+Resolved in the final source repository.
 
 ## Root cause
 
@@ -35,6 +35,8 @@ The image path was removed from every retained commit with empty-commit pruning 
 - `git lfs ls-files` reports no paths, and `git lfs prune --force` reported one deleted local object with none retained.
 - `git fsck --full --unreachable --no-reflogs` reports no unreachable objects.
 - A fresh private-rule audit passed across 688 commits and 5,128 unique blobs with zero findings.
+- After transplant, the final source has no LFS paths or object files, LFS fsck
+  passes, and the private-rule audit passes across 689 commits and 5,175 blobs.
 
 ## Follow-up
 
