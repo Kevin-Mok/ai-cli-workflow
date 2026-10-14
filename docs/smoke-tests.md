@@ -10,6 +10,29 @@ actual CLI, app, API, or generated artifact and expose an observable result.
 Automated tests, linters, type checks, builds, Git hygiene checks and source-text
 searches run before completion and any commit; do not use them to fill the handoff command list.
 
+## Grok Bot CLI Handoff
+
+Run from this repository's root; Python 3 and Git are required, no sudo or
+chezmoi apply. The [workflow guide](grok-cli-workflow.md) explains the protocol.
+
+- Action: python3 dot_agents/skills/grok-cli-handoff/scripts/handoff.py template --task example
+  Expected: Markdown envelope for `example` with Unknown authorization, host,
+  repo/branch and evidence fields, plus project/task STOP paths. No file writes.
+- Action: python3 dot_agents/skills/grok-cli-handoff/scripts/handoff.py preflight --repo /home/example/linux-config-worktrees/grok-cli-workflow --branch feat/grok-cli-workflow --task example
+  Expected: On that checkout/branch with no markers, `✅ Ready` and exit 0;
+  explicitly says state check, not authorization. Replace root/branch/task for
+  another target. Wrong root, branch or detached HEAD exits 2. No agent launched.
+- Action: python3 dot_agents/skills/grok-cli-handoff/scripts/smoke.py --plain
+  Expected: Disposable fixture reports clear checkout exit 0, task STOP exit 3
+  while another task remains clear, project STOP exit 3 and wrong branch exit 2.
+  Cleanup leaves no live marker or config changes; no paid or remote call.
+- Action: On a future authorized live task, have example-user send STOP to its Grok coordinator.
+  Expected: No new actions/dispatches; coordinator writes the applicable marker,
+  relays STOP, interrupts only recorded owned jobs and records acknowledgments
+  or unreachable hosts. Resume requires example-user's fresh scoped authorization.
+  This live transport check was not run for this PR; markers alone do not kill
+  running processes.
+
 ## Directory Sizes
 
 Install the pinned backend into a fresh disposable prefix. These checks inspect a small disposable backend directory; a real backup scan is an explicit opt-in.

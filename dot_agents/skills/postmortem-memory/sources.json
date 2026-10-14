@@ -4896,6 +4896,15 @@
   "reports": [
     {
       "aliases": [
+        "/home/example/linux-config-worktrees/grok-cli-workflow/docs/postmortem/2026-10-13-grok-workflow-sandbox.md"
+      ],
+      "decision": "No new shared finding: existing execution-boundary and scoped-state guidance applies. The current restricted-checkout LFS workaround is recorded in the repo lesson; unrelated baseline corpus and instruction failures are disclosed without broad repairs.",
+      "findings": [],
+      "reviewed_on": "2026-10-13",
+      "sha256": "b93d2790f231a11e1e4ee23c481a4fb7f8886994b60b38addd533e5f833b5229"
+    },
+    {
+      "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-10-09-codex-picker-archive-startup.md"
       ],
       "findings": [

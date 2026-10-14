@@ -188,3 +188,9 @@
 - 2026-10-13: After a fetch-first push rejection, fetch the authorized branch before probing an ls-remote hash. merge-base exit128 means the object check failed; only exit1 establishes a valid non-ancestor result. Preserve local commits and dirty overlays during a reviewed normal merge.
 
 - 2026-10-13: While guarding the real Git index with an owned index.lock, validate write-tree through a copied GIT_INDEX_FILE. write-tree itself takes an index lock; calling it on the guarded real index blocks the helper before commit creation.
+
+- 2026-10-13: In a restricted linked checkout, Git LFS status may need to write
+  the shared Git cache. `git -c lfs.storage=/tmp/grok-workflow-lfs status --short`
+  preserves real LFS comparisons using a writable temporary cache. Disabling
+  the clean filter falsely marks materialized LFS assets dirty; do not use that
+  as the protected baseline. See [incident evidence](../docs/postmortem/2026-10-13-grok-workflow-sandbox.md).

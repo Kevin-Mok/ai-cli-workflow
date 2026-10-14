@@ -96,6 +96,12 @@ high-leverage properties:
 - Skill growth in [`dot_agents/skills/`](dot_agents/skills/) turns
   repeated prompting into reusable local tools for shipping, research,
   browser automation, design work, docs lookup, and media tasks.
+- [`grok-cli-handoff`](dot_agents/skills/grok-cli-handoff/SKILL.md) carries
+  remote Grok Bot work into local Codex/Claude with explicit authority and
+  verification references. Its Python/Git preflight checks the receiving root,
+  branch and cooperative STOP markers; it launches no agents. Both CLIs share
+  the existing skill installation path. The [workflow guide](docs/grok-cli-workflow.md)
+  covers use without applying config, cancellation limits and a disposable demo.
 - [`commit-plan`](dot_agents/skills/commit-plan/SKILL.md) makes commit
   hygiene inspectable: before anything is staged, it can review a dirty
   worktree the way a senior SWE would review a PR draft, separating

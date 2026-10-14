@@ -64,6 +64,8 @@ education work:
 
 ## Planning And Coordination
 
+- For remote Grok Bot → local CLI delegation, use `grok-cli-handoff` for
+  authorization references, checkout evidence, and cooperative STOP handling.
 - Use Plan Mode for non-trivial work: three or more steps, multiple files, or an
   architecture decision. Create and maintain `plans/<task-slug>.md` according
   to `.agent/PLANS.md`.

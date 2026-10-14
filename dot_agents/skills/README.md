@@ -253,6 +253,10 @@ targets leave local commits intact. Planning-only requests remain read-only.
 
 ## Docs, Knowledge, And Output Control
 
+- [`grok-cli-handoff`](grok-cli-handoff/SKILL.md): Transfers remote Grok Bot
+  tasks to local Codex/Claude with an authorization/evidence envelope, read-only
+  checkout preflight and cooperative task/project STOP markers. Reuses existing
+  plans and memory; adds no paid services or remote cancellation transport.
 - [`long-task-harness`](long-task-harness/SKILL.md): Runs multi-session
   work with a saved brief, acceptance criteria, `/goal`, an
   `evidence-reviewer` claim -> evidence pass, and a `progress.md` handoff.
