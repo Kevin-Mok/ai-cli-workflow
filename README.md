@@ -201,7 +201,7 @@ After each commit, Codex reports a [high-level status overview](docs/commit-stat
 in both the active plan (or `docs/task-status.md`) and its response, alongside
 direct verification commands that exercise the implemented behavior, with example
 expected output immediately after each command, verified results, remaining work,
-blockers and the next step. Every task completion also includes 5–10 direct
+blockers and the next step. Every task completion also includes exactly 3 direct
 verification commands with working directory, sudo requirements and labeled
 expected output after each command, even when no commit or push occurs. This
 applies to documentation, configuration, analysis and planning as well as features.

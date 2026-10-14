@@ -133,3 +133,64 @@ This plan turns this private-dotfiles copy into a public-safe Git repository. It
   zero generic privacy findings, unchanged source state, and report-only task
   inventory under `/tmp`.
 - Final publication commands belong only in the external report and are for the user to run later; this task will not execute them.
+
+## 2026-10-14 Jenkins Credential Follow-up
+
+### Purpose And Scope
+
+Remove the reviewer-reported historical Jenkins API credential and any other
+confirmed Jenkins/CI, bearer, basic-auth, or similar credential values from all
+18 local branch histories. Preserve messages, dates, topology, and non-secret
+content where possible. Do not push. Write the disclosure-safe handoff to
+`/tmp/ai-cli-jenkins-REPORT.md`.
+
+### Checklist
+
+- [x] Capture clean initial status, all local and remote-tracking refs, and the
+  configured `origin` URL before mutation.
+- [x] Reuse the prior sanitization plan, lessons, deterministic all-object
+  auditor, and postmortem-memory guidance.
+- [x] Inventory credential candidates without printing values; classify every
+  match and create a mode-`0600` exact replacement file.
+- [x] Save and validate a private rollback bundle and pre-rewrite branch-tip
+  manifest under `/tmp`.
+- [x] Run `git-filter-repo --replace-text` across every local branch, preserving
+  metadata except object IDs necessarily changed by sanitized content.
+- [x] Re-add the requested SSH `origin` URL after the rewrite removed it.
+- [x] Verify all reachable and unreachable objects, refs, branch coverage,
+  reflogs, and worktree content; expire reflogs and prune unreachable objects.
+- [x] Update this plan, the incident record, task status, and the disclosure-safe
+  external report with exact evidence and force-push commands.
+- [x] Commit the matching tracked documentation without pushing, then repeat
+  the all-object and repository-state verification against the final tip.
+
+### Evidence And Review Notes
+
+- The pre-rewrite rollback bundle verified as complete for 18 local branches and
+  691 reachable commits. Raw replacement and inventory files stayed mode `0600`
+  under `/tmp` and no credential value appeared in tracked reports or output.
+- Review confirmed two distinct Jenkins API tokens and one hard-coded
+  third-party bearer credential. Eleven other broad-pattern candidates were
+  synthetic fixtures, code identifiers, or prose and were intentionally left
+  unchanged.
+- The rewrite changed 430 commit IDs, retained 261 identical commit IDs, and
+  dropped no commits. The verified mapping has zero author, committer, date,
+  message, or topology mismatches.
+- Direct replacement affected 428 historical snapshots of
+  `dot_config/fish/config.fish.tmpl`, two snapshots of
+  `aliases/key_aliases.tmpl`, and 30 snapshots of the vendored client file;
+  overlapping snapshots yield 430 directly sanitized commits.
+- Before the documentation closeout commit, the exact-value verifier scanned
+  5,883 commit/blob/tag objects with zero forbidden occurrences. The repository
+  auditor independently passed 691 commits and 5,192 unique blobs with zero
+  findings; no reflogs or unreachable objects remained before the requested
+  immediate prune.
+- `origin` is restored as the requested SSH remote. No
+  fetch or push ran. The force-with-lease commands are recorded only in the
+  external report for later operator execution.
+- `refresh-config` is intentionally not run: it would mutate live configuration
+  and could import a live credential into the sanitized repository, outside the
+  requested history-only scope.
+- Rollback was the validated temporary bundle until final object verification.
+  After verified pruning, the rewrite is intentionally irreversible in this
+  checkout; the public remote remains unchanged until the user force-pushes.
