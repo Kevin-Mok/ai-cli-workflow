@@ -1,0 +1,5 @@
+# rtk (https://github.com/rtk-ai/rtk) user config. Telemetry is already off by
+# default; pin it off so a stray `rtk init` / `rtk telemetry enable` prompt is moot.
+[telemetry]
+enabled = false
+consent_given = false

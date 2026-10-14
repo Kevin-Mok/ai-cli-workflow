@@ -1,0 +1,33 @@
+#!/bin/bash
+# Install rtk (https://github.com/rtk-ai/rtk), a CLI proxy that compresses shell
+# command output before it reaches Claude Code / Codex context.
+# Idempotent; chezmoi reruns it only when this file changes (bump version + sums to upgrade).
+# Uses the GitHub release tarball + checksums.txt instead of the upstream curl|sh installer.
+# Hooks are wired declaratively in dot_claude/settings.json and dot_codex/hooks.json;
+# telemetry is pinned off in dot_config/rtk/config.toml (it is opt-in upstream anyway).
+set -euo pipefail
+version="1.0.0"
+install_dir="${HOME}/.local/bin"
+
+if command -v rtk >/dev/null 2>&1 && [ "$(rtk --version 2>/dev/null)" = "rtk ${version}" ]; then
+    exit 0
+fi
+
+case "$(uname -s)-$(uname -m)" in
+    Linux-x86_64) target="x86_64-unknown-linux-musl"; sha256="b0b69fbed72f55d8eae18587c0b6bc140a8a8b39d5b7c6e6df33795249940926" ;;
+    Linux-aarch64) target="aarch64-unknown-linux-gnu"; sha256="9438c2c99d428fa6fbe7f4d1c01a87babd5feec17ee6d7bb3372a613a21db7d3" ;;
+    *) echo "rtk: unsupported platform $(uname -s)-$(uname -m); skipping" >&2; exit 0 ;;
+esac
+
+asset="rtk-${target}.tar.gz"
+base="https://github.com/rtk-ai/rtk/releases/download/v${version}"
+tmp="$(mktemp -d)"
+trap 'rm -rf "$tmp"' EXIT
+
+curl -fsSL "${base}/${asset}" -o "${tmp}/${asset}"
+# Pinned hash (from v${version} checksums.txt) so a re-tagged release cannot slip through.
+echo "${sha256}  ${tmp}/${asset}" | sha256sum -c --quiet -
+tar -xzf "${tmp}/${asset}" -C "$tmp" rtk
+mkdir -p "$install_dir"
+install -m 0755 "${tmp}/rtk" "${install_dir}/rtk"
+echo "rtk: installed $("${install_dir}/rtk" --version) to ${install_dir}"
