@@ -4944,6 +4944,16 @@
   ],
   "reports": [
     {
+      "sha256": "dc03d518aeefb5d943420508fcc7dc9e28ff5fe4f9d1952ebc340927c3d3687a",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-16-pre-push-worktree-sandbox.md",
+        "/tmp/pre-push-history-review/docs/postmortem/2026-10-16-pre-push-worktree-sandbox.md"
+      ],
+      "reviewed_on": "2026-10-16",
+      "findings": [],
+      "decision": "No new reusable learning: sandbox Git metadata needs normal approval; invoking the README Bash helper with Python repeats the existing ext-explicit-wrapper-shell interpreter-inspection guidance. Approved setup and correct Bash invocation succeeded. Public aliases retain the repository placeholder convention and a byte-identical temporary verification copy."
+    },
+    {
       "sha256": "5fe18c7edc227f1477656679e80e1d1df4b40c3025016667c8c46e6520d3a474",
       "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-10-16-metaprompt-gate-handoff.md"

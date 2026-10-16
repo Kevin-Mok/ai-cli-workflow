@@ -70,7 +70,7 @@ def git_bytes(repo: Path, *arguments: str, stdin: bytes | None = None) -> bytes:
     return completed.stdout
 
 
-def object_inventory(repo: Path, scope: str) -> tuple[list[str], list[str]]:
+def object_inventory(repo: Path, scope: str, revision: str | None = None) -> tuple[list[str], list[str]]:
     if scope == "all":
         checks = git_bytes(
             repo,
@@ -79,7 +79,7 @@ def object_inventory(repo: Path, scope: str) -> tuple[list[str], list[str]]:
             "--batch-check=%(objectname) %(objecttype)",
         )
     else:
-        raw = git_bytes(repo, "rev-list", "--objects", "--all")
+        raw = git_bytes(repo, "rev-list", "--objects", *([revision] if revision else ["--all"]))
         object_ids = [
             line.split(b" ", 1)[0].decode("ascii")
             for line in raw.splitlines()
@@ -104,8 +104,8 @@ def object_inventory(repo: Path, scope: str) -> tuple[list[str], list[str]]:
     return sorted(set(blobs)), sorted(set(commits))
 
 
-def path_inventory(repo: Path) -> list[str]:
-    tree_output = git_bytes(repo, "log", "--all", "--format=%T")
+def path_inventory(repo: Path, revision: str | None = None) -> list[str]:
+    tree_output = git_bytes(repo, "log", "--format=%T", *([revision] if revision else ["--all"]))
     tree_ids = sorted(set(tree_output.decode("ascii").splitlines()))
     paths: set[str] = set()
     for tree_id in tree_ids:
@@ -169,6 +169,7 @@ def scan_content(
     content: bytes,
     location_type: str,
     literal_rules: tuple[tuple[bytes, str, bool, frozenset[str]], ...] = (),
+    approved_identities=(),
 ) -> set[str]:
     categories: set[str] = set()
     # The nil UUID is an empty placeholder, including inside nested JSON strings.
@@ -193,7 +194,16 @@ def scan_content(
         if not is_safe_credential(match.group(1)):
             categories.add("credential")
             break
-    for email in EMAIL_RE.findall(content):
+    email_content = content
+    if location_type == "commit" and approved_identities:
+        headers, separator, message = content.partition(b"\n\n")
+        def public_header(match):
+            name, email = match.group(2, 3)
+            approved = any(name == item["name"].encode() and email == item["email"].encode() for item in approved_identities)
+            return b"" if approved else match.group(0)
+        headers = re.sub(rb"(?m)^(author|committer) (.*?) <([^<>\n]+)> [0-9]+ [+-][0-9]{4}$", public_header, headers)
+        email_content = headers + separator + message
+    for email in EMAIL_RE.findall(email_content):
         domain = email.rsplit(b"@", 1)[1].lower()
         if domain not in SAFE_EMAIL_DOMAINS:
             categories.add("email")
@@ -241,7 +251,7 @@ def finding(category: str, location_type: str, object_id: str) -> dict[str, str]
 
 def load_rules(path: Path | None) -> dict[str, object]:
     if path is None:
-        return {"literals": (), "path_globs": (), "allowed_paths": ()}
+        return {"literals": (), "path_globs": (), "allowed_paths": (), "approved_public_identities": ()}
     try:
         mode = path.stat().st_mode & 0o777
     except OSError as error:
@@ -254,6 +264,13 @@ def load_rules(path: Path | None) -> dict[str, object]:
         raise AuditError("Private rule file is invalid") from error
     if not isinstance(payload, dict):
         raise AuditError("Private rule file must contain an object")
+    identities = payload.get("approved_public_identities", [])
+    if not isinstance(identities, list) or any(
+        not isinstance(item, dict) or set(item) != {"name", "email"}
+        or not all(isinstance(v, str) and v and "\n" not in v for v in item.values())
+        for item in identities
+    ):
+        raise AuditError("Invalid public identity policy")
     literals: list[tuple[bytes, str, bool, frozenset[str]]] = []
     for item in payload.get("forbidden_literals", []):
         if not isinstance(item, dict):
@@ -292,14 +309,22 @@ def load_rules(path: Path | None) -> dict[str, object]:
         "literals": tuple(literals),
         "path_globs": tuple(path_globs),
         "allowed_paths": tuple(allowed_paths),
+        "approved_public_identities": tuple(identities),
     }
 
 
 def audit(
-    repo: Path, rules_path: Path | None = None, scope: str = "reachable"
+    repo: Path, rules_path: Path | None = None, scope: str = "reachable",
+    revision: str | None = None,
 ) -> dict[str, object]:
     if not (repo / ".git").exists() and not (repo / "HEAD").exists():
         raise AuditError("Audit target is not a Git repository")
+    if revision is not None:
+        oid = r"(?:[0-9a-f]{40}|[0-9a-f]{64})"
+        if scope != "reachable" or not re.fullmatch(oid + r"(?:\.\." + oid + r")?", revision):
+            raise AuditError("Invalid history revision")
+        if git_bytes(repo, "rev-parse", "--is-shallow-repository").strip() != b"false":
+            raise AuditError("Complete local history is required")
     rules = load_rules(rules_path)
     literal_rules = rules["literals"]
     path_globs = rules["path_globs"]
@@ -307,12 +332,12 @@ def audit(
     assert isinstance(literal_rules, tuple)
     assert isinstance(path_globs, tuple)
     assert isinstance(allowed_paths, tuple)
-    blobs, inventory_commits = object_inventory(repo, scope)
+    blobs, inventory_commits = object_inventory(repo, scope, revision)
     if scope == "all":
         commits = inventory_commits
     else:
         commits = sorted(
-            set(git_bytes(repo, "rev-list", "--all").decode("ascii").splitlines())
+            set(git_bytes(repo, "rev-list", *([revision] if revision else ["--all"])).decode("ascii").splitlines())
         )
         if set(commits) - set(inventory_commits):
             raise AuditError("Commit inventory is incomplete")
@@ -328,7 +353,7 @@ def audit(
                 binary_blobs += 1
             else:
                 for category in sorted(
-                    scan_content(content, location_type, literal_rules)
+                    scan_content(content, location_type, literal_rules, rules["approved_public_identities"])
                 ):
                     findings.append(finding(category, location_type, object_id))
             completed_count += 1
@@ -339,7 +364,7 @@ def audit(
                     file=sys.stderr,
                 )
                 last_progress = now
-    paths = path_inventory(repo) if path_globs else []
+    paths = path_inventory(repo, revision) if path_globs else []
     for path in paths:
         if path not in allowed_paths and any(
             fnmatch.fnmatchcase(path, pattern) for pattern in path_globs
@@ -362,7 +387,7 @@ def audit(
             "unique_blobs": len(blobs),
             "binary_blobs": binary_blobs,
             "unique_paths": len(paths),
-            "scope": scope,
+            "scope": "revision" if revision else scope,
             "elapsed_seconds": round(time.monotonic() - started, 3),
         },
         "findings": findings,
@@ -399,6 +424,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--repo", type=Path, default=Path.cwd())
     parser.add_argument("--format", choices=("text", "json"), default="text")
     parser.add_argument("--plain", action="store_true")
+    parser.add_argument("--revision", help="Full commit OID or OLD..NEW OIDs; new refs use the full NEW ancestry.")
     parser.add_argument(
         "--rules",
         type=Path,
@@ -420,6 +446,7 @@ def main() -> int:
             args.repo.resolve(),
             args.rules.resolve() if args.rules is not None else None,
             args.scope,
+            args.revision,
         )
     except (AuditError, OSError, subprocess.SubprocessError) as error:
         if args.format == "json":
