@@ -22,7 +22,7 @@ live settings, recovery material and generated state remain excluded.
 - [x] Fix destination symlink containment with observed RED/GREEN; mark completed
   migration guidance historical and repair stale notification documentation.
 - [x] Run focused validation, README gate and full dirty-byte review.
-- [ ] Run the staged gate separately for each actual commit candidate.
+- [x] Run the staged gate separately for each actual commit candidate.
 - [x] Commit configuration privacy/refresh prerequisites with matching docs.
 - [x] Commit migration helper, guard, plans/prompt/incident and matching docs.
 - [x] Commit portable storage offload tool and docs.
@@ -30,8 +30,8 @@ live settings, recovery material and generated state remain excluded.
 - [x] Commit the clipboard startup improvement and checks.
 - [x] Commit pinned Context Mode tooling and docs.
 - [x] Commit metaprompt depth and existing-thread navigation with docs.
-- [ ] Commit Markdown-aware workflow audit parsing and graph smoke checks.
-- [ ] Commit privacy gate, commit policy, tests, plan and troubleshooting memory.
+- [x] Commit Markdown-aware workflow audit parsing and graph smoke checks.
+- [x] Commit privacy gate, commit policy, tests, plan and troubleshooting memory.
 - [ ] Inspect all staged diffs, audit outgoing commit bytes/metadata, push once,
   verify remote outcome and report any residual paths.
 
@@ -175,3 +175,30 @@ graph smoke CLI/MCP helpers and usage reviewed. Live doctor exits0 and reports
 37 existing missing-private-note/provenance/reference errors plus one duplicate
 skill warning. Graph binary is absent, so real graph execution was skipped.
 Shipping validation report/memory updated together. Only privacy group remains.
+
+### Milestone 9 — feat(privacy): guard staged content and commit workflows
+
+Milestone8 committed as 787df02. Final group includes shared privacy
+scanner/history/LFS/checkpoint integration, narrow reviewed-blob approvals, commit
+policy, defining regressions, prompt/plan, README/smoke guidance and memory.
+Focused privacy/checkpoint/history84 checks pass. Installed scanner is current.
+Latest dirty-byte audit:29 paths,0 findings/errors,index unchanged; README
+pass_no_change. Each earlier candidate and installed commit hook passed.
+After this milestone: fresh outgoing-tree/actual-metadata audit, one normal push
+and remote confirmation. Baseline fixture/live-validation/doctor warnings remain
+explicit; no claim of perfect secret detection or live provider/storage QA.
+
+Required final refresh-config completed successfully with scripts/externals/
+removals excluded and no live-config import. README gate again pass_no_change.
+
+Final candidate checkpoint:24 dirty paths,0 privacy findings/errors, unchanged
+index during audit, no unstaged source diff and no oversized files. Every one of
+the nine staged snapshots passed its exact privacy check; normal hooks remain
+active. This final commit is the privacy milestone above. The remaining external
+actions are the final committed-series audit and one origin/main push; their
+observed result will be reported in the delivery handoff after this commit.
+
+Completed prerequisites, in order: a230322 config; bbe1202 migration;6ef819f
+storage;eb903a2 notifications;b016e6e clipboard;e9df19b Context Mode;
+956ebc0 metaprompt;787df02 audits. No unsafe/unattributed tracked residual is
+known. Private rules and temporary audit evidence remain outside version control.

@@ -546,6 +546,92 @@ unreachable local objects, `--format text|json` for human or machine output,
 `--plain` for ASCII status text, and `--rules PATH` for a mode-`0600` private
 literal/path rule file that is never committed.
 
+### Local pre-commit privacy gate
+
+Activate the local gate after cloning with
+`python3 scripts/executable_privacy-gate install`. Check installation with
+`python3 scripts/executable_privacy-gate status`; repeat `install` after changing
+the scanner. Installation snapshots the scanner into the effective Git hooks
+directory, preserves and chains an existing pre-commit hook, and leaves
+`core.hooksPath` unchanged. Linked worktrees share that directory. A configured
+shared hooks directory also shares this gate; choose the hook scope deliberately.
+The snapshot continues working if unstaged edits change the source scanner.
+
+Before daily commits, `python3 scripts/executable_privacy-gate check` scans the
+entire exact index candidate, including unchanged files and names, rather than
+the worktree or added patch lines. Git commits invoke the installed gate
+automatically. It checks again after a preserved hook modifies the index.
+A refusal leaves the gate's HEAD/index inputs unchanged; repair the private data
+locally, stage the safe replacement or removal, and retry. Existing hooks retain
+their own side effects and output. The three commit skills require the same check;
+Second Brain checks its immutable tree before its hook-bypassing plumbing commit.
+Private vault paths are refused in this public checkout, including checkpoint
+candidates; keep the actual vault external.
+
+Use `--plain` for ASCII output and `--details` for hashed location references.
+No matched values, source lines or filenames appear in gate diagnostics. Resolve
+references locally by hashing the exact path bytes with SHA-256 and comparing
+the first 12 hex characters. Findings exit 1; incomplete inspection exits 2.
+Nothing is uploaded, and no provider/model call runs. Large scans print elapsed
+progress every ten seconds. Unresolved index conflicts, unsupported submodules,
+missing objects, unavailable rules, and scanner failures refuse inspection.
+
+Shared detection covers recognizable OpenAI/Anthropic, GitHub, AWS access-ID,
+Google API and Slack token shapes; credential assignments (including JSON keys),
+PEM/base64 private-key headers and SSH key material; email/home/IP identifiers;
+and known keyed runtime UUIDs, including nested serialized JSON. Nil runtime UUIDs,
+example domains, documentation networks and exact placeholder values remain safe.
+There are no blanket fixture-directory exemptions. Candidate path rules block raw
+benchmark runs, private credentials, private vault data, and recovery locations
+even when force-added. Review false positives locally; use a neutral example
+rather than exempting a directory.
+
+Reviewed legacy source expressions, synthetic redaction fixtures and public
+recovery runbooks are listed in `scripts/privacy_gate_approvals.json` using only
+path references, full content SHA-256 hashes, specific categories and public review
+reasons. Each approval applies to those exact bytes at that exact path; any edit
+requires a fresh review. All other categories still run, and explicit private forbidden literals/path globs
+always override public approvals. There is no test-directory
+or general recovery-document exemption. The installer snapshots this manifest;
+missing or malformed policy blocks inspection. After a scanner/policy update,
+repeat `install` before relying on the installed hook.
+
+If the gate reports an email category only for `identity-author` or
+`identity-committer`, decide whether that Git identity is public. Keep it unchanged
+only after explicitly approving its exact name/email pair in the private rules
+file described below; otherwise configure an appropriate public identity locally.
+Do not add an email-domain exemption or copy real identity rules into this repo.
+
+Optional private policy uses `--rules PATH` or local Git config `privacyGate.rules`.
+Keep that mode-`0600` JSON file outside the repository. It accepts the history
+auditor's `forbidden_literals` and `forbidden_path_globs`; the gate deliberately
+ignores `allowed_paths` so private policy cannot weaken built-in restrictions.
+An optional `approved_public_identities` array holds exact `{ "name": "Example
+Maintainer", "email": "maintainer@example.invalid" }` pairs. This approval only
+permits that identity's Git metadata; the same address in file bytes is still
+checked. It does not alter Git identity settings or approve arbitrary addresses.
+Keep real approvals and private literals out of tracked documentation.
+
+Every candidate blob, including binary raw bytes, is checked. LFS pointers require
+a readable local payload with matching size and SHA-256; nothing is fetched.
+Missing payloads refuse the commit. Compressed, encrypted, visual, or otherwise
+encoded payloads are not semantically inspected. These heuristic patterns cannot
+detect every possible secret; review all public content. History auditing remains
+a separate operation and does not establish candidate safety.
+
+This is local enforcement. `--no-verify`, another `core.hooksPath`, removing the
+hook, alternate scanners, and direct plumbing commits can bypass it. Commit
+messages and arbitrary custom identity headers are outside pre-commit coverage;
+review them and audit history separately. No CI or server gate is installed.
+Concurrent external index mutations outside Git's commit locking remain outside
+the local scanner's control.
+
+Rollback with `python3 scripts/executable_privacy-gate uninstall`: it restores the
+preserved hook and removes only the gate bundle. If the hook has changed, removal
+refuses to overwrite it; review locally. If the bundle was damaged, reinstall
+from reviewed source before removing it. See [the implementation record](plans/pre-commit-privacy-gate.md)
+and [the smoke checklist](docs/smoke-tests.md#local-pre-commit-privacy-gate).
+
 ## Install And Bootstrap
 
 The minimum bootstrap path is `git` plus `chezmoi`.

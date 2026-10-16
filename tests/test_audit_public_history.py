@@ -414,6 +414,19 @@ class PublicHistoryAuditTests(unittest.TestCase):
         self.assertEqual(report["summary"]["status"], "pass")
         self.assertEqual(report["coverage"]["binary_blobs"], 1)
 
+    def test_replacement_refs_cannot_hide_original_history_bytes(self) -> None:
+        secret = "ghp_" + "aB7C9dE2" * 5
+        target = self.repo / "settings.txt"
+        target.write_text(secret)
+        self.commit("fixture original")
+        original = subprocess.run(["git", "rev-parse", "HEAD:settings.txt"], cwd=self.repo, capture_output=True, check=True).stdout.strip().decode()
+        safe = subprocess.run(["git", "hash-object", "-w", "--stdin"], cwd=self.repo, input=b"safe public bytes\n", capture_output=True, check=True).stdout.strip().decode()
+        subprocess.run(["git", "replace", original, safe], cwd=self.repo, capture_output=True, check=True)
+        result = self.run_audit("--scope", "all")
+        self.assertEqual(result.returncode, 1, "original history bytes must remain visible")
+        self.assertIn("provider_token", json.loads(result.stdout)["summary"]["categories"])
+        self.assertTrue(secret not in result.stdout + result.stderr, "fixture value leaked")
+
 
 if __name__ == "__main__":
     unittest.main()

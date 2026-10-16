@@ -63,3 +63,13 @@ After a successful run, report:
 - the validation commands or manual checks that were run
 - the branch and push destination
 - whether the worktree is now clean or what still remains dirty
+
+## Public privacy gate
+
+Immediately before every commit attempt, run
+`python3 scripts/executable_privacy-gate check` from the repository root,
+using the same `GIT_INDEX_FILE` when committing an isolated candidate. Treat
+findings and scanner errors as blocking safety failures; repair and restage the
+candidate before retrying. Preserve the active Git hooks. Plumbing commits must
+pass the exact immutable tree OID with `--tree OID` to the same shared gate.
+See the root README privacy-gate section for activation, private rules and limits.

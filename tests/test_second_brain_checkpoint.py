@@ -133,6 +133,7 @@ class SecondBrainCheckpointTest(unittest.TestCase):
         dry_run: bool = False,
         no_push: bool = False,
         snapshot=None,
+        privacy_gate=None,
     ) -> dict:
         snapshot_effect = snapshot or self.unchanged_snapshot
         with (
@@ -144,8 +145,24 @@ class SecondBrainCheckpointTest(unittest.TestCase):
             ),
             mock.patch.object(checkpoint, "_run_doctor_gate"),
             mock.patch.object(checkpoint, "_run_readme_gate"),
+            # Private-vault mechanics are isolated from the public-repo policy;
+            # test_checkpoint_privacy_gate exercises the real shared gate.
+            mock.patch.object(checkpoint, "_run_privacy_gate", side_effect=privacy_gate),
         ):
             return checkpoint.run_checkpoint(dry_run=dry_run, no_push=no_push)
+
+    def test_public_gate_blocks_private_vault_before_plumbing_commit(self) -> None:
+        checkpoint = self.require_checkpoint_module()
+        scripts = self.repo / "scripts"
+        scripts.mkdir(exist_ok=True)
+        for name in ("executable_privacy-gate", "privacy_gate.py", "executable_audit-public-history", "privacy_gate_approvals.json"):
+            shutil.copyfile(SCRIPTS_ROOT / name, scripts / name)
+        self.write_allowed("second-brain/00 Context/Decisions.md", "public fixture bytes\n")
+        real_gate = checkpoint._run_privacy_gate
+        with self.assertRaisesRegex(checkpoint.CheckpointError, "privacy gate"):
+            self.run_checkpoint(checkpoint, no_push=True, privacy_gate=real_gate)
+        self.assertEqual(self.git("rev-parse", "HEAD").stdout.strip(), self.initial_head)
+        self.assertEqual(self.git("diff", "--cached", "--name-only").stdout, "")
 
     def write_allowed(self, relative: str, content: str) -> Path:
         path = self.repo / relative

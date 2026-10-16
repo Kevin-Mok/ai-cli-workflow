@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import subprocess
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -62,6 +63,19 @@ def _run_readme_gate(repo: Path) -> None:
     lines = completed.stdout.splitlines()
     if completed.returncode != 0 or not lines or lines[0] != "pass_no_change":
         raise CheckpointError("checkpoint README recruiter gate did not pass")
+
+
+def _run_privacy_gate(repo: Path, tree: str) -> None:
+    gate = repo / "scripts" / "executable_privacy-gate"
+    try:
+        completed = subprocess.run(
+            [sys.executable, str(gate), "--repo", str(repo), "--tree", tree, "check"],
+            cwd=repo, capture_output=True, check=False,
+        )
+    except OSError as error:
+        raise CheckpointError("checkpoint privacy gate could not run") from error
+    if completed.returncode:
+        raise CheckpointError("checkpoint privacy gate refused the candidate; inspect it locally")
 
 
 def _unstage_allowlist(repo: Path) -> None:
@@ -140,6 +154,7 @@ def run_checkpoint(
             tree = _write_tree(repo)
             paths = _tree_paths(repo, parent, tree)
             _validate_allowed_paths(paths)
+            _run_privacy_gate(repo, tree)
             _scan_staged(repo, paths, tree=tree)
         except CheckpointError:
             _unstage_allowlist(repo)

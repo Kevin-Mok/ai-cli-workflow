@@ -26,7 +26,13 @@ PEM_PRIVATE_KEY_RE = re.compile(rb"-----BEGIN " + PRIVATE_KEY_LABEL_RE + rb"----
 BASE64_RE = re.compile(rb"(?<![A-Za-z0-9+/])[A-Za-z0-9+/]{32,}={0,2}(?![A-Za-z0-9+/=])")
 SSH_KEY_RE = re.compile(rb"(?m)^\s*(?:ssh-(?:rsa|dss|ed25519)|ecdsa-sha2-[^\s]+)\s+[A-Za-z0-9+/]{40,}={0,2}(?:\s|$)")
 CREDENTIAL_RE = re.compile(
-    rb"(?im)\b(?:api[_-]?(?:key|token)|access[_-]?key|auth[_-]?token|client[_-]?secret|password|passwd|refresh[_-]?token|secret[_-]?key)\b\s*[:=]\s*[\"']?([^\s\"'#,;]{8,})"
+    rb"(?im)\b(?:api[_-]?(?:key|token)|access[_-]?key|auth[_-]?token|client[_-]?secret|password|passwd|refresh[_-]?token|secret[_-]?key)\b[\"']?\s*[:=]\s*[\"']?([^\s\"'#,;]{8,})"
+)
+PROVIDER_TOKEN_RE = re.compile(
+    rb"(?<![A-Za-z0-9_])(?:sk-(?:(?:proj|ant-api\d+|svcacct)-)?[A-Za-z0-9_-]{20,}"
+    rb"|gh[pousr]_[A-Za-z0-9]{36,}|github_pat_[A-Za-z0-9_]{40,}"
+    rb"|(?:AKIA|ASIA)[A-Z0-9]{16}|AIza[A-Za-z0-9_-]{35}"
+    rb"|xox[baprs]-[A-Za-z0-9-]{20,})(?![A-Za-z0-9_])"
 )
 RUNTIME_IDENTIFIER_RE = re.compile(
     rb'(?<![\w-])(?:x-codex-installation-id|root_turn_id|thread_id|turn_id|session_id|prompt_cache_key)'
@@ -37,8 +43,6 @@ RUNTIME_IDENTIFIER_RE = re.compile(
 SAFE_EMAIL_DOMAINS = {
     b"example.com",
     b"example.invalid",
-    b"noreply.github.com",
-    b"users.noreply.github.com",
 }
 SAFE_HOME_USERS = {b"example", b"user"}
 DOCUMENTATION_NETWORKS = (
@@ -46,17 +50,7 @@ DOCUMENTATION_NETWORKS = (
     ipaddress.ip_network("198.51.100.0/24"),
     ipaddress.ip_network("203.0.113.0/24"),
 )
-SAFE_VALUE_MARKERS = (
-    b"example",
-    b"placeholder",
-    b"redacted",
-    b"changeme",
-    b"dummy",
-    b"<",
-    b"${",
-    b"{{",
-    b"test-fixture",
-)
+
 
 
 class AuditError(RuntimeError):
@@ -65,7 +59,7 @@ class AuditError(RuntimeError):
 
 def git_bytes(repo: Path, *arguments: str, stdin: bytes | None = None) -> bytes:
     completed = subprocess.run(
-        ["git", "--no-optional-locks", *arguments],
+        ["git", "--no-replace-objects", "--no-optional-locks", *arguments],
         cwd=repo,
         input=stdin,
         capture_output=True,
@@ -128,7 +122,7 @@ def path_inventory(repo: Path) -> list[str]:
 
 def read_objects(repo: Path, object_ids: Iterable[str]) -> Iterable[tuple[str, bytes]]:
     process = subprocess.Popen(
-        ["git", "--no-optional-locks", "cat-file", "--batch"],
+        ["git", "--no-replace-objects", "--no-optional-locks", "cat-file", "--batch"],
         cwd=repo,
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
@@ -160,7 +154,10 @@ def read_objects(repo: Path, object_ids: Iterable[str]) -> Iterable[tuple[str, b
 
 def is_safe_credential(value: bytes) -> bool:
     lowered = value.lower()
-    return any(marker in lowered for marker in SAFE_VALUE_MARKERS)
+    return lowered in {b"example", b"placeholder", b"redacted", b"changeme", b"dummy", b"test-fixture"} or (
+        any(lowered.startswith(start) and lowered.endswith(end)
+            for start, end in ((b"${", b"}"), (b"{{", b"}}"), (b"<", b">")))
+    )
 
 
 def is_binary_content(content: bytes) -> bool:
@@ -180,6 +177,8 @@ def scan_content(
         for value in RUNTIME_IDENTIFIER_RE.findall(content)
     ):
         categories.add("runtime_identifier")
+    if PROVIDER_TOKEN_RE.search(content):
+        categories.add("provider_token")
     if PEM_PRIVATE_KEY_RE.search(content) or SSH_KEY_RE.search(content):
         categories.add("private_key")
     for candidate in BASE64_RE.findall(content):

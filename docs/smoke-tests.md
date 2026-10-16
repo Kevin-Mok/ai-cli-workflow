@@ -17,6 +17,50 @@ searches run before completion and any commit; do not use them to fill the hando
   database, emits periodic progress to stderr during a long run, reports PASS
   with zero findings, and exits 0 without printing matched values.
 
+## Local Pre-commit Privacy Gate
+
+Use disposable repositories for all negative candidates; never stage a secret
+or make a test commit in this checkout. Installation alone creates no commit.
+
+- Action: `python3 scripts/executable_privacy-gate install`, then repeat it.
+  Expected: Both runs exit 0, preserve a prior hook and its permissions, and keep
+  core.hooksPath unchanged. The scanner snapshot is refreshed on reinstall.
+- Action: `python3 scripts/executable_privacy-gate status --plain`.
+  Expected: Exit 0 and `Privacy gate active (scanner current).` without private
+  filenames or values. Linked worktrees see the shared installation.
+- Action: `python3 scripts/executable_privacy-gate check --plain --details`.
+  Expected: The complete current index and effective author/committer identities
+  are inspected locally. Safe candidates exit 0; findings exit 1 with safe
+  categories/hashed path references; incomplete inspection exits 2. Existing
+  pending/private identity findings must be repaired locally before committing.
+- Action: `python3 tests/test_pre_commit_privacy_gate.py` and
+  `python3 -m unittest discover -s tests -p test_checkpoint_privacy_gate.py`.
+  Expected: Disposable actual Git commits prove safe commits/repairs, token/key/
+  runtime/private-path refusal, index divergence, unusual paths, linked worktrees,
+  local LFS verification, missing scanner/rules/object and conflict refusals,
+  unchanged HEAD/index on refusal, and exact-tree plumbing integration. All
+  synthetic values and secret-bearing filenames remain absent from captured output.
+- Action: In a disposable installation run
+  `python3 scripts/executable_privacy-gate uninstall`.
+  Expected: Only the owned hook/bundle is removed, any previous hook is restored,
+  and core.hooksPath remains unchanged. A changed active hook refuses removal.
+
+### Resolving privacy-gate findings
+
+- Action: After updating the scanner or reviewed-content policy, repeat
+  `python3 scripts/executable_privacy-gate install`, then run `status --plain`
+  and `check --plain`.
+  Expected: The scanner snapshot is current. Existing reviewed source references,
+  synthetic fixtures and public recovery runbooks pass only while their exact
+  path/content/category approvals match. An edited approved blob requires review;
+  adding a real-looking token is still refused. A missing/malformed approval
+  manifest refuses inspection rather than silently disabling the gate.
+- Action: For an approved public Git identity, keep the exact name/email pair only
+  in a mode-0600 rules file outside the checkout and configure local
+  `privacyGate.rules`. Run `check --plain` again.
+  Expected: Only the approved metadata identity is permitted. Git user.name/email
+  remain unchanged; the same email in arbitrary file content remains detectable.
+  Never publish the private rules file or approve an identity without the user.
 
 ## Directory Sizes
 

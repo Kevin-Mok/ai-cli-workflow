@@ -308,3 +308,21 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Verification evidence: All three metadata replacement defining tests observed unavailable != ready before correction, then passed; all 36 recap tests passed, including unchanged-content call caps, lock cancellation and rejection of delayed old writes.
 - Limitations: Verified with 36 scoped synthetic recap tests; no live provider or private session payloads. Matching generation identity does not certify that an old input filename still exists. Only validated canonical same-UUID/hash input may replace it; different content needs a new attempt identity.
 - Source: [Codex priority refresh](/home/example/linux-config/docs/postmortem/2026-10-09-codex-priority-inspection.md) (SHA-256 `55a2a381970a`; reviewed in [sources.json](../sources.json)).
+
+## local-privacy-reviewed-content-approvals
+
+- Status: verified_fix; confidence: confirmed; scope: runtime.
+- Symptoms: reviewed source/fixture blobs and public recovery runbooks blocked;
+  an initial public approval incorrectly suppressed explicit private policy.
+- Applicability: local staged-content privacy gates with reviewed legacy fixtures.
+- Diagnostics: inspect exact indexed bytes privately; test altered approved blobs,
+  missing/malformed policy and explicit private literal/path/metadata precedence.
+- Remedy: bind category-specific approval to exact path/full-content hashes;
+  snapshot validated policy and apply private prohibitions after public approvals.
+  Store exact metadata identity approval only in external mode-0600 policy.
+- Verification: 84 focused tests pass after defining RED; source, installed status
+  and actual hook pass without HEAD/index changes. Independent review verified
+  approval hashes/reasons and private-policy precedence.
+- Limits: byte edits require fresh review; heuristic/binary/encoding and local-hook
+  bypass limits remain. Neutral aliases require private machine-path mapping.
+- Source: [privacy gate false positives](../../../../docs/postmortem/2026-10-16-privacy-gate-false-positives.md).

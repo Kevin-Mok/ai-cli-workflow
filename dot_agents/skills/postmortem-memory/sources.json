@@ -4893,6 +4893,31 @@
       "limitations": "This probe verifies the lock interaction only; independently verify commit parents/scope and push reachability."
     },
     {
+      "id": "local-privacy-reviewed-content-approvals",
+      "topic": "state-security",
+      "reference": "references/state-security.md#local-privacy-reviewed-content-approvals",
+      "status": "verified_fix",
+      "confidence": "confirmed",
+      "verification_scope": "runtime",
+      "symptoms": [
+        "Privacy gate blocks reviewed source references and synthetic fixtures",
+        "Recovery name policy blocks public runbooks",
+        "Public fixture approval suppresses explicit private prohibition"
+      ],
+      "applicability": "Local staged privacy gates retaining previously reviewed public fixtures or documentation.",
+      "diagnostics": [
+        "Inspect exact indexed bytes and redact all matched values/secret-bearing paths.",
+        "Compare exact content/path/category approvals and exercise modifications.",
+        "Combine public approvals with explicit private literal/path rules to test precedence."
+      ],
+      "remedy": "Bind reviewed public approvals to exact path references, full content hashes and specific categories; snapshot and validate policy, fail closed on missing/malformed policy, and union explicit private prohibitions after approvals. Keep exact approved Git metadata identities only in external private mode-0600 policy.",
+      "verification": "45 gate tests, 1 immutable-tree integration, 14 history regressions and 24 checkpoint tests pass. Source check, installed status and actual hook exit 0; HEAD/index unchanged. Private literal/path/metadata precedence regressions followed observed RED.",
+      "limitations": "Approvals become stale after any byte edit and require fresh review. Heuristics do not decode compressed/encrypted/visual data; hooks remain locally bypassable. Neutral public ledger aliases need a separate private machine-path mapping.",
+      "sources": [
+        "64e92215b266ec615c4706eff9c2ddc6f953d7e5adde2d9063147717babec900"
+      ]
+    },
+    {
       "id": "local-notification-missing-clip",
       "topic": "operational-drift",
       "reference": "references/operational-drift.md#local-notification-missing-clip",
@@ -8648,6 +8673,25 @@
       "reviewed_on": "2026-10-13",
       "findings": [],
       "decision": "No new reusable learning: a direct missing-bracket typo failed before execution; the existing local-nested-language-literal-emission parser prerequisite applies. Checked script compilation and actual delivery/state verification both passed; no product behavior changed."
+    },
+    {
+      "sha256": "acee12b66e4d6831d8cc68ad733e835ac80e3654ead8522cd2c0451a84d38f31",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-16-privacy-gate-lfs-probe.md"
+      ],
+      "reviewed_on": "2026-10-16",
+      "findings": [],
+      "decision": "No new reusable learning: unsupported LFS capability and guessed discovery filenames require validating actual installed interfaces. Supported local LFS discovery is covered by disposable safe/private/missing payload cases. Pre-existing journal missing-note fixture remains out of scope. Public source aliases use the same neutral checkout prefix as the existing sanitized ledger; real machine home paths remain outside public source. Completion-title transport was unavailable; keeping the original title is the prescribed fallback and adds no reusable product learning."
+    },
+    {
+      "sha256": "64e92215b266ec615c4706eff9c2ddc6f953d7e5adde2d9063147717babec900",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-16-privacy-gate-false-positives.md"
+      ],
+      "reviewed_on": "2026-10-16",
+      "findings": [
+        "local-privacy-reviewed-content-approvals"
+      ]
     },
     {
       "sha256": "046b3b7c29548b6f4fae359a3e35a4b9667b4e4ecb73d43930cf3ec4644aaa42",

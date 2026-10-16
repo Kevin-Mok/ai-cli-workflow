@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "path_ref": "07c46c0c572a",
+      "content_sha256": "98272daa130af55d3a8974b000662550839e12bc3b73e554756ab384ba517074",
+      "categories": [
+        "sensitive_path"
+      ],
+      "reason": "Reviewed public recovery documentation; not recovery data. Any byte edit requires review."
+    },
+    {
+      "path_ref": "56fec96215c1",
+      "content_sha256": "65ebd9bd42b4d621ddc16e758dc1941eb082b14b7544385579ff43cfb374cda3",
+      "categories": [
+        "sensitive_path"
+      ],
+      "reason": "Reviewed public recovery documentation; not recovery data. Any byte edit requires review."
+    },
+    {
+      "path_ref": "714d893a8e24",
+      "content_sha256": "281cd2e0f1c558eb6a3323971abfc4b4487357c9a7a43c36ee51db67e752589b",
+      "categories": [
+        "sensitive_path"
+      ],
+      "reason": "Reviewed public recovery documentation; not recovery data. Any byte edit requires review."
+    },
+    {
+      "path_ref": "4507ac90d5ab",
+      "content_sha256": "5501b9bf1ebc08c9571945a6a49b9e0d3f7f260dc2c3d0841a54acad20628a49",
+      "categories": [
+        "credential"
+      ],
+      "reason": "Reviewed upstream source: credential matches are variable references or environment-key mapping, not stored credentials."
+    },
+    {
+      "path_ref": "555f4db03b99",
+      "content_sha256": "7a8922f0c83ea1fcd42c8c9a49dc5959a64538735ee31df58d557fb46a23c564",
+      "categories": [
+        "credential"
+      ],
+      "reason": "Reviewed upstream source: credential matches are variable references or environment-key mapping, not stored credentials."
+    },
+    {
+      "path_ref": "42ff7117b2b8",
+      "content_sha256": "cf19740f5510865013706c01e5d98de131cccb8a86a3b942acb84a2cdd55c4b5",
+      "categories": [
+        "credential"
+      ],
+      "reason": "Reviewed upstream source: credential matches are variable references or environment-key mapping, not stored credentials."
+    },
+    {
+      "path_ref": "5086f4fdf82d",
+      "content_sha256": "5b748800ecfebc8436c3bca3c8d9349a39c086010e4655c62cb3dc208b6636d7",
+      "categories": [
+        "credential"
+      ],
+      "reason": "Reviewed upstream source: credential matches are variable references or environment-key mapping, not stored credentials."
+    },
+    {
+      "path_ref": "d87d8db63ab0",
+      "content_sha256": "d54673c1e49df5d3b3916ad73573985b31a4be01e52830f66c6826034a854454",
+      "categories": [
+        "sensitive_path"
+      ],
+      "reason": "Reviewed public recovery documentation; not recovery data. Any byte edit requires review."
+    },
+    {
+      "path_ref": "32f657b25379",
+      "content_sha256": "e7428f0decd7f8c7901eaf3384498c88ddd22f2323f201c318fc77e8bf1b3cd7",
+      "categories": [
+        "credential"
+      ],
+      "reason": "Reviewed synthetic privacy/redaction fixtures or environment lookups; no live credential. Any byte edit requires review."
+    },
+    {
+      "path_ref": "5c6e626c7075",
+      "content_sha256": "15fb3a8927c362672c085816b38da83bfa6771274186020e676a3dd38acfe1ce",
+      "categories": [
+        "credential"
+      ],
+      "reason": "Reviewed synthetic privacy/redaction fixtures or environment lookups; no live credential. Any byte edit requires review."
+    },
+    {
+      "path_ref": "eb729ea0a43d",
+      "content_sha256": "1e3525d4c3c71d0fb3d4c5e099cb3f76bb02378b5b4393aec9ecaf6de05660cc",
+      "categories": [
+        "credential"
+      ],
+      "reason": "Reviewed synthetic privacy/redaction fixtures or environment lookups; no live credential. Any byte edit requires review."
+    },
+    {
+      "path_ref": "e7185e6e4d8d",
+      "content_sha256": "7c6073be81b8a6de613de25df814aa565c01cf9ff2e54663f1202243debd86d1",
+      "categories": [
+        "provider_token"
+      ],
+      "reason": "Reviewed synthetic privacy/redaction fixtures or environment lookups; no live credential. Any byte edit requires review."
+    },
+    {
+      "path_ref": "2c6d6f2876a3",
+      "content_sha256": "d76014077f576e58757a13391a511b0f73bf11cf873fd30da95739d115dda42d",
+      "categories": [
+        "credential"
+      ],
+      "reason": "Reviewed synthetic privacy/redaction fixtures or environment lookups; no live credential. Any byte edit requires review."
+    },
+    {
+      "path_ref": "f543f3b46e0d",
+      "content_sha256": "5d6704ceb7d9123d202575adfd67aedae19ccc2f6fbd330ffdc7624d0b39c74c",
+      "categories": [
+        "credential"
+      ],
+      "reason": "Reviewed synthetic privacy/redaction fixtures or environment lookups; no live credential. Any byte edit requires review."
+    }
+  ]
+}
