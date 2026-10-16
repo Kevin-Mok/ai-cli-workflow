@@ -4891,6 +4891,30 @@
       "remedy": "Copy the guarded index and validate through a separate GIT_INDEX_FILE; avoid lock-taking operations on the real index until its guard is released. Keep atomic same-filesystem publication and normal hooks.",
       "verification": "Under the owned real-index lock, copied-index write-tree returned0 with the reviewed merge tree and real index bytes unchanged; helper was corrected accordingly.",
       "limitations": "This probe verifies the lock interaction only; independently verify commit parents/scope and push reachability."
+    },
+    {
+      "id": "local-notification-missing-clip",
+      "topic": "operational-drift",
+      "reference": "references/operational-drift.md#local-notification-missing-clip",
+      "status": "verified_fix",
+      "confidence": "confirmed",
+      "verification_scope": "runtime",
+      "symptoms": [
+        "Notification popups display but neither configured clip nor speech plays",
+        "Selected audio path names an absent checkout file"
+      ],
+      "applicability": "Local notification sequences that validate a selected MP3 before synthesizing or playing speech.",
+      "diagnostics": [
+        "Run installed status --details and inspect clip existence and timestamped errors.",
+        "Compare installed and checkout clip copies before changing speech runtime or hooks.",
+        "Verify desktop mute separately when socket access is available."
+      ],
+      "remedy": "Select an existing local clip with the existing set command; keep the asset outside the checkout and verify preview with a title. No voice reinstall or daemon restart is needed for a path repair.",
+      "verification": "Installed status changed from exit 1 missing clip to exit 0 enabled/ready; offline Piper check and real clip-then-speech preview exit 0. User confirmed hearing both stages. Installed routing probes passed 14/14 and 6/6 cases, with an independent accepted-question check.",
+      "limitations": "The operation that removed the checkout clip was not established. Silent routing fixtures do not prove hardware output; user confirmation applies to the real preview. A later natural completion/question remains an acceptance check.",
+      "sources": [
+        "046b3b7c29548b6f4fae359a3e35a4b9667b4e4ecb73d43930cf3ec4644aaa42"
+      ]
     }
   ],
   "reports": [
@@ -8615,6 +8639,16 @@
       "reviewed_on": "2026-10-13",
       "findings": [],
       "decision": "No new reusable learning: a direct missing-bracket typo failed before execution; the existing local-nested-language-literal-emission parser prerequisite applies. Checked script compilation and actual delivery/state verification both passed; no product behavior changed."
+    },
+    {
+      "sha256": "046b3b7c29548b6f4fae359a3e35a4b9667b4e4ecb73d43930cf3ec4644aaa42",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-16-notification-missing-clip.md"
+      ],
+      "reviewed_on": "2026-10-16",
+      "findings": [
+        "local-notification-missing-clip"
+      ]
     }
   ],
   "review": {

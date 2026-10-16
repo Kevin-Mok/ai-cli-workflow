@@ -172,3 +172,14 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Limitations: Subjective future completion playback remains manual. A serialization lock prevents overlap but does not suppress obsolete event queues.
 - Sources:
   - [2026-10-08-notification-permission-audio-flood.md](/home/example/linux-config/docs/postmortem/2026-10-08-notification-permission-audio-flood.md) (SHA-256 `a75ba67aec3c`; one alias retained in sources.json).
+
+## local-notification-missing-clip
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **runtime**.
+- Symptoms: visible notification popups with neither clip nor speech; selected MP3 points to an absent checkout asset.
+- Applicability: local clip-then-speech sequences that validate the selected MP3 before synthesis.
+- Diagnostic checks: run installed `status --details`, inspect selected file existence and timestamped errors, and compare installed versus checkout copies. Check desktop mute separately rather than inferring speaker health from service status.
+- Remedy: use the existing `set` command with an existing local clip outside the checkout, then `preview --title` to exercise both stages. A path correction needs neither a voice reinstall nor daemon restart.
+- Verification evidence: installed status RED exit 1 then GREEN exit 0; offline Piper check and real preview exited 0. User confirmed both stages audible. Installed silent probes passed 14/14 notification and 6/6 question cases; independent accepted-question probe passed.
+- Limitations: asset removal operation unknown; fixture playback proves routing rather than hardware output. User confirmed the real preview; a later natural event remains separate acceptance.
+- Source: [Notification speech blocked by a missing clip](../../../../docs/postmortem/2026-10-16-notification-missing-clip.md).

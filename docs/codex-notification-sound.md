@@ -1,19 +1,21 @@
 # Codex notification sound
 
-Play your own MP3 for Codex notifications, with optional offline speech of the exact saved conversation title or a short sentence about a queued question afterward. Configure a clip, install the voice, deploy the completion and question callbacks, resume affected conversations, then explicitly enable speech. MP3 sound stays disabled until you configure a path; speech is separately disabled by default. The selected [can-i-ask-you-a-question.mp3](../scripts/can-i-ask-you-a-question.mp3) is stored in this repo; the setting remains machine-local.
+Play your own MP3 for Codex notifications, with optional offline speech of the exact saved conversation title or a short sentence about a queued question afterward. Configure a clip, install the voice, deploy the completion and question callbacks, resume affected conversations, then explicitly enable speech. MP3 sound stays disabled until you configure a path; speech is separately disabled by default. Audio files and their selected paths remain machine-local; this checkout does not include the question MP3.
 
 ## Choose, preview and disable
 
-These commands require no sudo. The current clip lives at `/home/example/linux-config/scripts/can-i-ask-you-a-question.mp3` and is tracked through Git LFS. Quote filenames containing spaces when choosing another clip:
+These commands require no sudo. On an existing installation, the question clip may already be available at `~/scripts/can-i-ask-you-a-question.mp3`. Confirm it exists before selecting it, or supply another local MP3. Quote filenames containing spaces:
 
 ```sh
 ~/scripts/codex-notification-sound status
-~/scripts/codex-notification-sound set "$HOME/linux-config/scripts/can-i-ask-you-a-question.mp3"
+~/scripts/codex-notification-sound set "$HOME/scripts/can-i-ask-you-a-question.mp3"
 ~/scripts/codex-notification-sound preview
 ~/scripts/codex-notification-sound disable
 ```
 
-On GUI hosts, `refresh-config` also installs the repo clip at `~/scripts/can-i-ask-you-a-question.mp3`; the selected path can point to either copy. The clip is stored through Git LFS, while the local JSON is excluded from repo artifacts.
+Keep your clip outside the checkout so repository moves or cleanup do not invalidate its selected path. Refresh cannot restore an audio file absent from source. The local JSON is excluded from repo artifacts.
+
+If popups appear but both the clip and speech are silent, run `~/scripts/codex-notification-sound status --details` first. A missing selected clip stops the whole clip-then-speech sequence before synthesis starts. Use `set` with an existing local copy, then `preview --title "Notification audio check" --details` to verify both stages. No daemon restart or speech toggle is needed for a path correction. Historical errors remain in `status --details`; compare their timestamps with the new preview rather than deleting the log.
 
 `set` accepts an existing local file, resolves its absolute path, and writes an atomic, mode-0600 JSON setting. `disable` removes only that setting and leaves your MP3 intact. To switch clips, run `set` again. The editable setting is `${XDG_CONFIG_HOME:-$HOME/.config}/codex-notification-sound/sound.json`:
 

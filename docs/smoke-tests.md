@@ -895,7 +895,7 @@ Apply the [notification sources](codex-notification-sound.md), restart Dunst
 (which clears its history/queue), and start a fresh Kitty process. No sudo is
 needed. Activation is a one-time installation/update step; afterward open Kitty
 normally. Changing the clip needs only `set`. The popup checks below assume `speech disable`; optional speech is checked afterward. Live audio acceptance requires
-the included `scripts/can-i-ask-you-a-question.mp3` or another short MP3.
+an existing local short MP3; this checkout does not bundle audio assets.
 
 - Action: `~/scripts/codex-notification-activate --open-kitty`
   Expected: Your notification-bus Dunst restarts and a fresh Kitty process opens;
@@ -903,12 +903,14 @@ the included `scripts/can-i-ask-you-a-question.mp3` or another short MP3.
   unchanged (disabled on a fresh installation).
 - Action: `~/scripts/codex-notification-sound status`
   Expected: A fresh installation reports aligned sound/speech state and voice readiness.
-  `status --plain --details` uses ASCII and reveals machine-local JSON/error-log paths. The repo includes the selected MP3; no local sound-path
+  `status --plain --details` uses ASCII and reveals machine-local JSON/error-log paths. No clip or local sound-path
   setting is bundled. An already configured machine reports its selected path.
-- Action: `~/scripts/codex-notification-sound set "$HOME/linux-config/scripts/can-i-ask-you-a-question.mp3"`
+- Action: `~/scripts/codex-notification-sound set "$HOME/scripts/can-i-ask-you-a-question.mp3"` if that installed clip exists; otherwise select another existing local MP3.
   Expected: With an existing clip at that path, sound is enabled through local
-  mode-0600 JSON. The included MP3 stays in the repo; `set` only stores its path.
+  mode-0600 JSON. The MP3 stays intact; `set` only stores its path.
   Selecting another filename with spaces preserves the entire path.
+- Action: If visible popups have neither clip nor speech, run `~/scripts/codex-notification-sound status --details`, correct a missing clip path with `set`, then run `~/scripts/codex-notification-sound preview --title "Notification audio check" --details`.
+  Expected: A stale path reports an error before either audio stage. After selecting an existing clip, status reports it enabled and preserves the existing speech setting. With the voice ready, preview plays the clip then the sentence and exits 0 without a daemon restart. Historical error-log entries retain their old timestamps.
 - Action: `~/scripts/codex-notification-sound preview`
   Expected: One clip plays without a popup; exit 0 on success. Invalid/missing
   files or unavailable mpv report errors and exit 1 without affecting popups.
