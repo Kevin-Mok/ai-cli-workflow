@@ -24,7 +24,7 @@ live settings, recovery material and generated state remain excluded.
 - [x] Run focused validation, README gate and full dirty-byte review.
 - [ ] Run the staged gate separately for each actual commit candidate.
 - [x] Commit configuration privacy/refresh prerequisites with matching docs.
-- [ ] Commit migration helper, guard, plans/prompt/incident and matching docs.
+- [x] Commit migration helper, guard, plans/prompt/incident and matching docs.
 - [ ] Commit portable storage offload tool and docs.
 - [ ] Commit notification source outlines, speech updates, Dunst indicator and docs.
 - [ ] Commit the clipboard startup improvement and checks.
@@ -129,3 +129,10 @@ migration candidate is restaged; no commit is attempted with the stale snapshot.
 
 Milestone2 hold resolved: canonical URL RED/GREEN complete, all46 checks pass.
 Frozen candidate refreshed; recorded HEAD/journal guards remain intact.
+
+### Milestone 3 — feat(storage): add guarded home offload preview
+
+Milestone2 committed as bbe1202. Storage helper,11 passing fixture tests,
+README and smoke documentation are reviewed. Real /tmp preview refuses an
+unmounted destination with no moves. No apply ran. Six groups remain after this
+commit; known fixture/live-validation warnings remain unchanged.

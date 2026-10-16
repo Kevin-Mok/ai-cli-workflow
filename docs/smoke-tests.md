@@ -1256,6 +1256,12 @@ Action: Run the reviewed migration, then verify existing Claude client settings,
 
 Expected: Existing local integration files and project contracts retain their working bytes; public neutral defaults are retained only in source. Scripts, externals and removals remain excluded.
 
+## Portable home storage offload
+
+**Action:** Preview `scripts/executable_home-storage-offload --destination /mnt/storage` using your actual mounted destination. Inspect the estimate before adding `--apply`.
+
+**Expected:** Preview changes no files. Apply checks mount identity, space and content verification, preserves original folders for recovery during moves, then cleans only the documented caches. No private mount path is assumed or stored in source.
+
 ## Public benchmark evidence boundary
 
 **Action:** In a disposable repository using this checkout's `.gitignore`, create a raw JSON file under each benchmark `runs/` root and an aggregate report outside those roots; run normal `git add .`.

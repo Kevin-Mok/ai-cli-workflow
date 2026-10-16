@@ -976,6 +976,7 @@ The migration extracts missing mail/calendar identity data privately from workin
 
 No sudo is needed. Live cutover needs write access to the checkout parent, local configuration, and linked worktree Git metadata. It does not commit, push, revoke credentials, or delete the archive. Treat the recovery directory as sensitive. See [migration smoke checks](docs/smoke-tests.md#sanitized-repository-migration) and the [implementation record](plans/migrate-sanitized-repo.md).
 
+For portable home-storage offload, see [the guide](docs/home-storage-offload.md). The reviewed helper requires an explicit `--destination` mount path; machine-specific mount settings stay outside Git.
 
 Migration concurrency checks compare file content and logical index/recovery entries, excluding harmless Git stat-cache refreshes. New private journals retain initial and changed fingerprints; `--details` reports only changed categories/counts. The read-only preview also rejects changes observed during inventory. A clean preview covers its sampled interval; finish or pause other sessions before the live rename. Never bypass a material-change refusal.
 
