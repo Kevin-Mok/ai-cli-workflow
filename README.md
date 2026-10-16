@@ -544,18 +544,36 @@ boundary. Before publishing changes, run the repository's history auditor:
 The auditor defaults to reachable objects. Use `--scope all` to include
 unreachable local objects, `--format text|json` for human or machine output,
 `--plain` for ASCII status text, and `--rules PATH` for a mode-`0600` private
-literal/path rule file that is never committed.
+literal/path rule file that is never committed. `--revision OID` scans that tip's
+full ancestry; `--revision OLD..NEW` scans only that update (full object IDs).
+Revision scans require complete local history and cannot use `--scope all`.
 
-### Local pre-commit privacy gate
+### Local pre-commit and pre-push privacy gates
 
 Activate the local gate after cloning with
 `python3 scripts/executable_privacy-gate install`. Check installation with
 `python3 scripts/executable_privacy-gate status`; repeat `install` after changing
 the scanner. Installation snapshots the scanner into the effective Git hooks
-directory, preserves and chains an existing pre-commit hook, and leaves
+directory, preserves and chains existing pre-commit and pre-push hooks, and leaves
 `core.hooksPath` unchanged. Linked worktrees share that directory. A configured
 shared hooks directory also shares this gate; choose the hook scope deliberately.
 The snapshot continues working if unstaged edits change the source scanner.
+The same idempotent `install` upgrades an existing pre-commit-only installation;
+`status` checks both hooks and the scanner snapshot. `uninstall` restores both
+prior hooks and refuses to remove a hook that was changed after installation.
+
+Before a push, the installed pre-push gate runs `executable_audit-public-history`
+on each update Git supplies on stdin: remote-OID..local-OID for existing refs,
+the complete local-tip ancestry for new refs, and no audit for deleted refs.
+Unrelated local branches are excluded. Every finding or incomplete audit blocks
+the push. A clean tip cannot hide an unsafe earlier commit in the pushed range.
+Missing remote objects or shallow history require fetching complete history
+before retrying. Gate diagnostics show only safe category names, never matched
+values or raw auditor errors. The preserved pre-push hook (including Git LFS)
+then receives the same remote arguments and complete stdin, retaining its exit
+status and its own output. These are local hooks; bypassing hooks bypasses this
+protection. The auditor scans Git blobs, not resolved LFS payloads, and counts
+binary blobs for separate review rather than applying text patterns to them.
 
 Before daily commits, `python3 scripts/executable_privacy-gate check` scans the
 entire exact index candidate, including unchanged files and names, rather than
@@ -608,8 +626,10 @@ auditor's `forbidden_literals` and `forbidden_path_globs`; the gate deliberately
 ignores `allowed_paths` so private policy cannot weaken built-in restrictions.
 An optional `approved_public_identities` array holds exact `{ "name": "Example
 Maintainer", "email": "maintainer@example.invalid" }` pairs. This approval only
-permits that identity's Git metadata; the same address in file bytes is still
-checked. It does not alter Git identity settings or approve arbitrary addresses.
+permits that identity's Git metadata; the same address in file bytes or commit
+messages is still checked. The pre-push auditor uses this same policy for exact
+author/committer headers. Explicit private prohibitions still override approvals.
+It does not alter Git identity settings or approve arbitrary addresses.
 Keep real approvals and private literals out of tracked documentation.
 
 Every candidate blob, including binary raw bytes, is checked. LFS pointers require

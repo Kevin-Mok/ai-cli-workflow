@@ -17,17 +17,30 @@ searches run before completion and any commit; do not use them to fill the hando
   database, emits periodic progress to stderr during a long run, reports PASS
   with zero findings, and exits 0 without printing matched values.
 
-## Local Pre-commit Privacy Gate
+## Local Pre-commit and Pre-push Privacy Gates
 
 Use disposable repositories for all negative candidates; never stage a secret
 or make a test commit in this checkout. Installation alone creates no commit.
 
 - Action: `python3 scripts/executable_privacy-gate install`, then repeat it.
-  Expected: Both runs exit 0, preserve a prior hook and its permissions, and keep
-  core.hooksPath unchanged. The scanner snapshot is refreshed on reinstall.
+  Expected: Both runs exit 0, preserve prior pre-commit/pre-push hooks and their
+  permissions, and keep core.hooksPath unchanged. The scanner snapshot is refreshed
+  on reinstall; a pre-commit-only installation gains the pre-push hook.
 - Action: `python3 scripts/executable_privacy-gate status --plain`.
   Expected: Exit 0 and `Privacy gate active (scanner current).` without private
   filenames or values. Linked worktrees see the shared installation.
+- Action: In a disposable repository with a local bare remote, push a clean
+  baseline, then commit and remove a synthetic fake token before installing the
+  gate. Install it and try pushing those two commits to an existing ref and a
+  new ref. Use a separate clean branch to verify a clean update.
+  Expected: The clean push exits 0. Both unsafe pushes are refused with safe
+  categories only; no fixture value is printed and remote refs do not change.
+  New refs scan full ancestry; existing refs scan only the supplied update range.
+- Action: In that disposable repository, delete a remote ref and reinstall the
+  gate twice with a prior pre-push hook that records stdin/argv and rejects pushes.
+  Expected: Deletion skips auditing. The prior hook receives unchanged stdin and
+  remote arguments, its rejection remains enforced, and uninstall restores both
+  previous hooks byte-for-byte with their original permissions.
 - Action: `python3 scripts/executable_privacy-gate check --plain --details`.
   Expected: The complete current index and effective author/committer identities
   are inspected locally. Safe candidates exit 0; findings exit 1 with safe

@@ -6,7 +6,7 @@ try:
     from privacy_gate import main
 except Exception:
     prefix = "" if "--plain" in sys.argv else "🔒 "
-    print(prefix + "Privacy gate ERROR: scanner unavailable; commit refused.", file=sys.stderr)
+    print(prefix + "Privacy gate ERROR: scanner unavailable; operation refused.", file=sys.stderr)
     raise SystemExit(2)
 
 if __name__ == "__main__":
