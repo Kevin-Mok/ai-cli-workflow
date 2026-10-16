@@ -1,4 +1,4 @@
 interface:
   display_name: "Metaprompt"
-  short_description: "Create and refine prompts with Sentry's eval workflow"
-  default_prompt: "Use $metaprompt to create or improve my prompt with Sentry's eight-section workflow, save the optimized prompt, and distinguish prepared evaluations from executed results."
+  short_description: "Create and deepen prompts with Sentry's eval workflow"
+  default_prompt: "Use $metaprompt to create or deepen my prompt with Sentry's eight-section workflow, save the optimized prompt, and distinguish prepared evaluations from executed results."

@@ -311,3 +311,9 @@ pre-existing legacy-reference hash assertion failures confirmed in HEAD.
 source. See the [fresh-context plan](../plans/update-metaprompt-run-fresh-context.md)
 for evidence, scope, rollback and handoff. This verifies the native handoff and
 one harmless executor task; it does not benchmark downstream task quality.
+
+## Local depth pass and terminal handoff
+
+The local depth pass records concrete methods, primary evidence, and an outside check before saving the optimized prompt. It makes the prompt deeper, not bigger: optional scope needs acceptance, unaccepted options stay outside the saved prompt, and the model does not grade its own output. The Sentry native files retain their own eight-file integrity inventory; the legacy compiler's SOURCE records reviewed public reference hashes.
+
+Metaprompt & Run creates the execution thread once and then uses [open_thread.py](../dot_agents/skills/metaprompt-run/scripts/open_thread.py) to navigate the live Kitty terminal. Pass the returned UUID, exact current compiler title and workspace directory using the skill's documented invocation. Discovery accepts only owned local Unix sockets and one uniquely matching title. It reuses an existing executor tab and verifies the active resume process; failed navigation preserves the existing task.

@@ -5,10 +5,13 @@ previous installation if needed. Check the pinned source, stage and review
 a candidate, back up the existing installation, then follow the checks and
 refresh steps before using the updated skill.
 
-- Upstream repository: [getsentry/skills](https://github.com/getsentry/skills).
-- Pinned revision: `d18b7aa8ba878354e5c348310230e652f7690f9c`.
+- Upstream repo: https://github.com/getsentry/skills
+- Upstream commit: d18b7aa8ba878354e5c348310230e652f7690f9c
+- Original source path: skills/prompt-optimizer/SKILL.md
 - Native path: `skills/prompt-optimizer`.
-- Imported on: `2026-10-04`, from the locally verified benchmark snapshot.
+- Imported on: 2026-10-04
+- Import basis: locally verified benchmark snapshot; see selection evidence below.
+- Local adaptation: expose the metaprompt alias, canonical template variables, artifact saving, a depth pass adapted from Felix Rieseberg's Depth prompt (published 2026-10-13), local UI metadata, and the reviewed update helper; preserve native files in the integrity inventory.
 - Selection evidence: [completed comparison](../../../docs/metaprompt-selection.md).
   Sentry achieved 14/16 end-to-end successes; raw/minimal reached 15/16. The
   recorded limitations and costs remain applicable; no new efficacy claim is
@@ -31,13 +34,26 @@ request. Prepared evals and actual executed comparisons must be distinguished.
 Local UI metadata, this provenance document, the manifest, and the reviewed
 update helper are outside the native content inventory.
 
+The depth pass is a local adapter step. It does not change `UPSTREAM.md` or
+any file named in [UPSTREAM.json](UPSTREAM.json). After upstream Step 1 and
+before Step 4, it records what a top professional would add, the rawest source
+they would start from, the methods and tools they would use, and an outside
+check other than the model or the user. Accepted answers feed `Success
+Criteria`, `Eval Set`, and the saved prompt. The pass is deeper, not bigger:
+`Optimization Log` names each depth tweak, skipped item, and rejected scope
+growth. Methods are named instead of personas. Optional altitude and range
+notes stay in that log until accepted; an unaccepted option stays out of the
+saved prompt. The model is not the only success check. The pass adapts Felix
+Rieseberg's Depth prompt from
+https://felixrieseberg.com/how-to-be-more-ambitious-a-tutorial-for-humans-with-models/
+(published 2026-10-13).
+
 This replaces the previous Majkey adaptation. Its references, helper scripts,
 asset and upstream UI metadata are retired from the active package; the local
 update helper is retained and now targets Sentry. `$metaprompt-alxve` remains
 unchanged. The outgoing source and installed packages are backed up at
-`/tmp/metaprompt-sentry-migration-mp4gysfi`; this machine-local rollback copy is
-not a durable archive and should be retained separately if long-term recovery
-of the uncommitted Majkey adaptation is needed.
+a private recovery archive. Retain that archive separately when long-term
+recovery of the previous adaptation is needed.
 
 ## Reviewed updates
 
@@ -63,9 +79,9 @@ A failed write may leave a partial candidate; inspect it and retry in a fresh
 path. A newer path commit alone does not establish substantive maintenance.
 
 Review the staged native files and license, relevant commit diffs, runtime
-requirements and output contract. Preserve the local alias, artifact-saving
-contract, metadata and updater. Update the pin, inventory, provenance and
-integration test together. Back up outgoing source and installed bytes before
+requirements and output contract. Preserve the local alias, depth pass,
+artifact-saving contract, metadata and updater. Update the pin, inventory,
+provenance and integration test together. Back up outgoing source and installed bytes before
 removing obsolete imported files; remove only attributed files still matching
 that backup, preserving unknown or modified live children. Chezmoi apply alone
 can retain old files after they disappear from the source tree.

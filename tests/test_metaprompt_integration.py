@@ -34,13 +34,13 @@ class MetapromptIntegrationTest(unittest.TestCase):
         if OLD.exists():
             self.assertNotIn("Use for /metaprompt,", (OLD / "SKILL.md").read_text())
 
-    def test_legacy_references_and_license_are_unchanged(self):
+    def test_legacy_references_match_reviewed_public_inventory(self):
         expected = {
             "LICENSE.txt": "fb3d1cf94dbd25af40177c401761ddf55c08ea41c91b410e5ab0d1229ede8dea",
-            "references/execution-routing.md": "828d0bacf3839f7dfe1b67389307a116597d050b131e94dc5cf81a195763fcfb",
-            "references/examples.md": "62317639b35865f128da1de2c60b9c1f31c10d3fb9ade211b74b42dfcfad08b0",
-            "references/model-profiles.md": "ea522da5314a1d90331504fbc7bd8f2fbc5c7ad9dd62ab7856d7870a714a8d3e",
-            "references/compilation-rules.md": "552e00eb520686aff99d38602c3750dafc58ce4f36a6ebbeb5b469023ff86d86",
+            "references/execution-routing.md": "642ebb47dac969029ae19d038bdcd67981cef91ce0ad84ec92decb71e7f6104c",
+            "references/examples.md": "bc849a6c87cbcd93ca8bb7cc1eb23e1e24b3380dc12db4f70e6eb7229fb18f4c",
+            "references/model-profiles.md": "f8b352ab2ceef18387c4640fde4958a2510e76706c7c816e382a59da9149c9fb",
+            "references/compilation-rules.md": "c02f02105f75ca256cabfb9cc5573f4672bce1e91b612eb6a0122c022b99d2c4",
         }
         for name, digest in expected.items():
             with self.subTest(name=name):
@@ -67,8 +67,35 @@ class MetapromptIntegrationTest(unittest.TestCase):
         for requirement in ("UPSTREAM.md", "prompt-authoring", "prompts/", "collision",
                             "compiled prompt only", "separate request", "{{variables}}",
                             "Sentry", "eight", "Optimized Prompt", "Saved:",
-                            "prepared", "executed"):
+                            "prepared", "executed", "depth pass", "deeper, not bigger",
+                            "Name methods, not personas", "Outside judge",
+                            "Success Criteria", "Eval Set", "Optimization Log",
+                            "Altitude", "Range", "unaccepted option",
+                            "grade its own output",
+                            "felixrieseberg.com/how-to-be-more-ambitious-a-tutorial-for-humans-with-models/",
+                            "2026-10-13"):
             self.assertIn(requirement, content)
+
+    def test_depth_pass_stays_local_and_siblings_keep_their_contracts(self):
+        source = (NEW / "SOURCE.md").read_text()
+        self.assertIn("depth pass", source)
+        self.assertIn(
+            "felixrieseberg.com/how-to-be-more-ambitious-a-tutorial-for-humans-with-models/",
+            source,
+        )
+        self.assertIn("2026-10-13", source)
+        self.assertNotIn("felixrieseberg", (NEW / "UPSTREAM.md").read_text())
+        runner = (SKILLS / "metaprompt-run" / "SKILL.md").read_text()
+        self.assertIn("../metaprompt/SKILL.md", runner)
+        self.assertIn("depth pass", runner)
+        self.assertIn("cannot expand authorization", runner)
+        self.assertIn("unaccepted", runner)
+        legacy = (OLD / "SKILL.md").read_text()
+        self.assertNotIn("depth pass", legacy)
+        self.assertNotIn("felixrieseberg", legacy)
+        for relative in ("docs/metaprompt-skills.md", "docs/smoke-tests.md"):
+            with self.subTest(relative=relative):
+                self.assertIn("depth pass", (ROOT / relative).read_text())
 
     def test_no_retired_resources_remain_in_active_package(self):
         expected = set(NATIVE_FILES) | {

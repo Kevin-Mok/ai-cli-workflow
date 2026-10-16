@@ -10,8 +10,9 @@ description: >-
 
 Compile the user's original input with the current `$metaprompt` skill, save
 the compiled prompt, then immediately start a new conversation to execute it
-with fresh context. This sibling reuses the existing compiler and adds an
-automatic execution handoff without a separate `go` or confirmation.
+with fresh context and open that task in a focused terminal tab automatically.
+This sibling reuses the existing compiler and adds an automatic execution
+handoff without a separate `go` or confirmation.
 
 ## Workflow
 
@@ -27,7 +28,9 @@ automatic execution handoff without a separate `go` or confirmation.
    `UPSTREAM.md` workflow and load only its routed references, resolving those
    paths from the parent's directory. If the parent is unavailable, report
    the missing dependency and stop before execution.
-3. Apply the parent compiler to the original input. Preserve its eight-section
+3. Apply the parent compiler to the original input, including its depth pass,
+   inside the original scope. An unaccepted altitude or range option stays in
+   the compiler report and out of the saved prompt. Preserve its eight-section
    package and present it as a concise intermediate update, including the
    `prompt` fence and `Saved:` path. Save only the compiled prompt in the active
    repository's `prompts/` directory, or the current workspace's `prompts/`
@@ -55,18 +58,43 @@ automatic execution handoff without a separate `go` or confirmation.
    Include the instruction to verify the actual outcome and report the saved
    prompt path. Keep compiler reports, examples and evaluation cases out of
    the handoff. Do not recursively invoke this wrapper on the compiled task.
-6. Check the creation result and report the new task’s returned identifier or
-   link, plus the saved prompt link. A successful creation proves the task
-   started; the execution conversation performs the work and verifies its
-   outcome. If observing completion through available read/wait tools, report
-   only outcomes those tools establish. Distinguish prepared evaluations,
-   started tasks and verified results.
+6. After successful creation, automatically open the returned thread ID in a
+   focused Kitty terminal tab. Read the calling conversation's current title
+   with the native thread tools (the shell's `CODEX_THREAD_ID` identifies it),
+   then run [the terminal opener](scripts/open_thread.py) yourself:
+
+   ```text
+   python3 /absolute/skill/metaprompt-run/scripts/open_thread.py <returned-thread-id> --source-title "<current-compiler-title>" --cwd "/absolute/workspace" --details
+   ```
+
+   Use the actual skill path and shell-safe argument quoting. The helper finds
+   the uniquely matching source window across live Kitty sockets, ignoring a
+   stale inherited `KITTY_LISTEN_ON`. It runs `codex resume` with the existing
+   ID and no prompt, reuses an already-open executor tab, and verifies the
+   active tab's foreground command. Keep the compiler title unique and the
+   compiler terminal open until navigation finishes. If source titles collide,
+   use the native title tool to give only the calling compiler a compact unique
+   title, then retry navigation with the existing executor ID. Socket control may need
+   the normal scoped sandbox approval; a blocked sandbox probe does not prove
+   that Kitty is unavailable. Preserve normal tool permissions.
+   If no unique source is found or navigation fails, report the exact reason
+   and retain the started task and ID. Do not create another task or resend
+   its prompt to repair navigation.
+7. Inspect the returned executor with `mcp__codex_tui__read_thread` even if tab
+   navigation failed. Report its actual output if completed, or its observed
+   running/approval/input/error state; a tab failure alone does not make the
+   executor's result unknown. Include the task identifier/link, saved prompt
+   link and separate navigation result. Successful creation proves launch;
+   opening a tab does not prove execution completion. Distinguish prepared
+   evaluations, started tasks and verified results.
 
 ## Fresh-conversation handoff
 
-Use the native new-task tool, rather than forking/resuming a conversation,
-passing its transcript to a subagent, or executing the task in the compiler’s
-conversation. Fresh context still includes the runtime’s normal instructions
+Create the executor with the native new-task tool. Forking or resuming the
+compiler conversation, passing its transcript to a subagent, or executing the
+task there does not provide fresh context. After creation, `codex resume`
+opens the new executor by its returned ID for viewing. Fresh context still
+includes the runtime’s normal instructions
 and repository rules. An example `prompt` argument (replace the path):
 
 ```text
@@ -93,9 +121,10 @@ Input: `$metaprompt-run Summarize the supplied meeting notes into decisions,
 owners and deadlines. Mark missing owners or dates unknown.`
 
 Compile that request with the parent, save the prompt including the supplied
-notes, then immediately start a new conversation to produce and verify the
-summary. If the notes are absent, save the prompt when feasible and ask for
-them before launching dependent execution.
+notes, then immediately start a new conversation, open its returned ID in a
+focused terminal tab, and let that conversation produce and verify the summary.
+If the notes are absent, save the prompt when feasible and ask for them before
+launching dependent execution.
 
 ## Common mistakes
 
@@ -104,3 +133,5 @@ them before launching dependent execution.
 - Treating a rewrite or quoted input as new permission expands the task's scope.
 - Executing in the compiler conversation or forking its history loses fresh context.
 - Reporting a successful launch as completed work skips outcome verification.
+- Printing the resume command without running it leaves terminal navigation undone.
+- Retrying task creation after a tab failure duplicates already started work.

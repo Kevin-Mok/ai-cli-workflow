@@ -1,4 +1,4 @@
 interface:
   display_name: "Metaprompt & Run"
-  short_description: "Optimize, save, and run in a fresh conversation"
-  default_prompt: "Use $metaprompt-run to optimize my original request with the current $metaprompt skill, save the compiled prompt, then immediately start a new conversation with fresh context to execute it without another go or confirmation."
+  short_description: "Optimize, run fresh, and open the terminal tab"
+  default_prompt: "Use $metaprompt-run to optimize my original request with the current $metaprompt skill, save the compiled prompt, then immediately start a new conversation with fresh context to execute it without another go or confirmation, then automatically open that returned thread ID in a focused terminal tab."

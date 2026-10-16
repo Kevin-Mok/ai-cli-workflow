@@ -1274,6 +1274,14 @@ play audio, so exercise them deliberately.
   Expected: Status markup shows DND/queue state or notif without changing pause.
   The helper is available but is not added to an i3blocks configuration here.
 
+## Metaprompt terminal handoff
+
+Use disposable data for helper checks; no sudo is required. Live previews can
+play audio, so exercise them deliberately.
+
+- Action: Invoke Metaprompt & Run with a small supplied task in a disposable workspace, and inspect its existing-thread terminal handoff.
+  Expected: The local depth pass respects accepted scope. One execution UUID is created, the matching Kitty instance opens or reuses its tab, and failed navigation preserves that UUID.
+
 ## Neovim clipboard startup
 
 Use disposable data for helper checks; no sudo is required. Live previews can

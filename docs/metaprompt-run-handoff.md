@@ -86,3 +86,9 @@ check existence before relying on them. Verified results are recorded in the pla
 No implementation actions remain. Focused Git delivery is now authorized.
 Completed October 5: status review, guide/plan reconciliation and
 `git diff --check` (exit 0). See the plan's authorized delivery section.
+
+## Existing-thread terminal handoff
+
+The metaprompt runner creates the execution task once, then `dot_agents/skills/metaprompt-run/scripts/open_thread.py` opens that returned UUID in the compiler conversation's live Kitty instance. The helper discovers only same-user local Unix sockets, requires a unique current source title, reuses an existing executor tab, and verifies the active `codex resume` process before reporting success.
+
+If source discovery is ambiguous, launch fails, or verification times out, keep the existing task and inspect terminal state. Do not create another execution task or resend its initial prompt merely to retry navigation. Use the skill's documented invocation with the returned UUID, current compiler title, and exact workspace directory. The helper requires installed `kitten` and `codex`; `--plain` selects ASCII status and `--details` explains navigation failures.

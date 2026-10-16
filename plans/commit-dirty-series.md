@@ -28,7 +28,7 @@ live settings, recovery material and generated state remain excluded.
 - [x] Commit portable storage offload tool and docs.
 - [x] Commit notification source outlines, speech updates, Dunst indicator and docs.
 - [x] Commit the clipboard startup improvement and checks.
-- [ ] Commit pinned Context Mode tooling and docs.
+- [x] Commit pinned Context Mode tooling and docs.
 - [ ] Commit metaprompt depth and existing-thread navigation with docs.
 - [ ] Commit Markdown-aware workflow audit parsing and graph smoke checks.
 - [ ] Commit privacy gate, commit policy, tests, plan and troubleshooting memory.
@@ -158,3 +158,12 @@ Milestone5 committed as b016e6e. Context Mode installer/wrapper/demo and docs
 reviewed; installer fixtures6/6 pass. Fresh real MCP index/search/empty demos all
 exit0 with disposable state and unchanged client settings. Default pinned package
 1.0.169 is installed. No installer or provider request ran. Three groups remain.
+
+### Milestone 7 — feat(metaprompt): tune depth and reuse existing threads
+
+Milestone6 committed as e9df19b. Skill/provenance/navigation changes reviewed;
+open-thread and integration checks pass. Broader discovery138/139 retains one
+unchanged fail-closed host-envelope expectation warning. No new thread/provider
+call ran. Two groups remain after this candidate. Live doctor reports37 errors/
+one warning from absent private notes and existing provenance/reference gaps;
+recorded in shipping incident for milestone8, without restoring private data.
