@@ -25,9 +25,9 @@ blocks findings without exposing values, and installs with the existing gate.
 - [x] Add revision selection and shared identity rules to the auditor; add stdin
   pre-push command and reversible two-hook installation.
 - [x] Update README and grouped smoke checks; run focused and existing gate tests.
-- [ ] Review diff, verify disposable actual pushes and installation, and commit
+- [x] Review diff, verify disposable actual pushes and installation, and commit
   code/docs/this plan together as `feat(privacy): audit history before pushes`.
-- [ ] Push only the feature branch and open a PR targeting main.
+- [x] Push only the feature branch and open a PR targeting main.
 
 ## Risks and rollback
 
@@ -62,14 +62,22 @@ Roll back by uninstalling the gate; no history or user content is rewritten.
 - Baseline diagnostic at origin/main: new-branch full ancestry blocks 692
   pre-existing findings (677 unapproved commit emails, 11 credential blobs,
   4 provider-token blobs). The exact configured identity approval is reused;
-  legacy identities and blobs are not silently approved. Local hook activation
-  remains a separate install step; disposable fixtures verify both hooks.
+  legacy identities and blobs are not silently approved. After feature-branch
+  publication, both live hooks were installed; repeated installation and status
+  exited 0. Prior-hook bytes and original permissions were verified unchanged.
 - Postmortem ledger records an explicit no-new-learning decision. Targeted check
   exited 0 against a byte-identical public-safe temporary copy, avoiding real
   machine paths in the public ledger.
 - Delivery milestone: `feat(privacy): audit history before pushes` includes source,
   tests, README, smoke checks, this plan and required incident bookkeeping.
-  Verified implementation complete; feature-branch publication/PR pending.
+  Implementation commit: 64ed464. Feature branch published with a normal push;
+  no main push or hook bypass. PR: https://github.com/Kevin-Mok/ai-cli-workflow/pull/1
+  targets main. The committed origin/main..HEAD scan exited 0.
+- Follow-up milestone: `docs: record pre-push gate activation` records live install
+  and publication receipts. No implementation work remains; next action is PR
+  review/merge. The final normal feature-branch push exercises the installed
+  hook on this documentation update. Legacy full-history remediation remains
+  outside this task; the hook deliberately continues to block those findings.
 
 ## Cursor handoff
 
