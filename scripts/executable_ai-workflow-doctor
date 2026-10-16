@@ -9,7 +9,6 @@ import json
 import math
 import re
 import shutil
-import string
 import subprocess
 import sys
 import unicodedata
@@ -18,6 +17,10 @@ from pathlib import Path
 from typing import Any, Iterable
 from urllib.parse import unquote, urlsplit
 
+# Resolve only this entrypoint's siblings, including under Python's -I mode.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+from ai_workflow_markdown import link_targets, unfenced_lines
 from ai_workflow_second_brain import second_brain_findings
 
 
@@ -43,8 +46,6 @@ SMART_TRANSLATION = str.maketrans(
         "\u2014": "-",
     }
 )
-INLINE_LINK_START_RE = re.compile(r"!?\[[^\]\n]*\]\(")
-REFERENCE_LINK_RE = re.compile(r"^\s*\[[^\]]+\]:\s*(.+?)\s*$")
 HEADING_RE = re.compile(r"^(#{2,3})\s+(.+?)\s*#*\s*$")
 SOURCE_FIELD_RE = re.compile(r"^\s*-\s*([^:]+):\s*(.*?)\s*$")
 
@@ -262,133 +263,6 @@ def duplicate_findings(
             )
         )
     return findings
-
-
-def unfenced_lines(text: str) -> list[tuple[int, str]]:
-    output: list[tuple[int, str]] = []
-    fence: tuple[str, int] | None = None
-    for line_number, line in enumerate(text.splitlines(), start=1):
-        indentation = len(line) - len(line.lstrip(" "))
-        stripped = line[indentation:] if indentation <= 3 else line
-        marker_character = stripped[:1] if indentation <= 3 else ""
-        marker_length = (
-            len(stripped) - len(stripped.lstrip(marker_character))
-            if marker_character in (chr(96), "~")
-            else 0
-        )
-        if fence is not None:
-            trailing = stripped[marker_length:]
-            if (
-                marker_character == fence[0]
-                and marker_length >= fence[1]
-                and not trailing.strip(" \t")
-            ):
-                fence = None
-            continue
-        if marker_length >= 3 and indentation <= 3:
-            if fence is None:
-                fence = (marker_character, marker_length)
-            continue
-        output.append((line_number, line))
-    return output
-
-
-def unescape_destination_character(
-    value: str, cursor: int
-) -> tuple[str, int] | None:
-    if (
-        value[cursor] == "\\"
-        and cursor + 1 < len(value)
-        and value[cursor + 1] in string.punctuation
-    ):
-        return value[cursor + 1], cursor + 2
-    return None
-
-
-def inline_link_targets(line: str) -> list[str]:
-    targets: list[str] = []
-    for match in INLINE_LINK_START_RE.finditer(line):
-        cursor = match.end()
-        if cursor < len(line) and line[cursor] == "<":
-            cursor += 1
-            buffer: list[str] = []
-            while cursor < len(line):
-                escaped = unescape_destination_character(line, cursor)
-                if escaped:
-                    character, cursor = escaped
-                    buffer.append(character)
-                    continue
-                if line[cursor] == ">":
-                    targets.append("".join(buffer))
-                    break
-                buffer.append(line[cursor])
-                cursor += 1
-            continue
-
-        buffer = []
-        parenthesis_depth = 0
-        while cursor < len(line):
-            escaped = unescape_destination_character(line, cursor)
-            if escaped:
-                character, cursor = escaped
-                buffer.append(character)
-                continue
-            character = line[cursor]
-            if character == "(":
-                parenthesis_depth += 1
-            elif character == ")":
-                if parenthesis_depth == 0:
-                    targets.append("".join(buffer).strip())
-                    break
-                parenthesis_depth -= 1
-            elif character.isspace() and parenthesis_depth == 0:
-                targets.append("".join(buffer).strip())
-                break
-            buffer.append(character)
-            cursor += 1
-    return targets
-
-
-def reference_link_target(value: str) -> str:
-    value = value.strip()
-    if value.startswith("<"):
-        buffer: list[str] = []
-        cursor = 1
-        while cursor < len(value):
-            escaped = unescape_destination_character(value, cursor)
-            if escaped:
-                character, cursor = escaped
-                buffer.append(character)
-                continue
-            if value[cursor] == ">":
-                return "".join(buffer)
-            buffer.append(value[cursor])
-            cursor += 1
-        return ""
-
-    buffer = []
-    cursor = 0
-    while cursor < len(value) and not value[cursor].isspace():
-        escaped = unescape_destination_character(value, cursor)
-        if escaped:
-            character, cursor = escaped
-            buffer.append(character)
-            continue
-        buffer.append(value[cursor])
-        cursor += 1
-    return "".join(buffer)
-
-
-def link_targets(text: str) -> list[tuple[int, str]]:
-    targets: list[tuple[int, str]] = []
-    for line_number, line in unfenced_lines(text):
-        for target in inline_link_targets(line):
-            targets.append((line_number, target))
-        definition = REFERENCE_LINK_RE.match(line)
-        if definition:
-            target = reference_link_target(definition.group(1))
-            targets.append((line_number, target))
-    return targets
 
 
 def reference_findings(

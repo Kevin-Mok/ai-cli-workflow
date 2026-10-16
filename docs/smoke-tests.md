@@ -1298,6 +1298,14 @@ play audio, so exercise them deliberately.
 - Action: Run the Context Mode demo from the repository root with --case index, --case search and --case empty after the pinned package is installed.
   Expected: Disposable MCP state reports index/stats, matching retrieval and no-result behavior respectively. Existing client configuration is unchanged.
 
+## Code-review graph checks
+
+Use disposable data for helper checks; no sudo is required. Live previews can
+play audio, so exercise them deliberately.
+
+- Action: Run the code-review-graph smoke helper in --mode cli and --mode mcp with an existing reviewed binary.
+  Expected: CLI caller/incremental checks pass; MCP exposes exactly four query tools and leaves an unbuilt graph unbuilt.
+
 ## Public benchmark evidence boundary
 
 **Action:** In a disposable repository using this checkout's `.gitignore`, create a raw JSON file under each benchmark `runs/` root and an aggregate report outside those roots; run normal `git add .`.

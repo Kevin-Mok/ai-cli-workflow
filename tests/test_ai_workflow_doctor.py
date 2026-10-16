@@ -155,10 +155,9 @@ class AiWorkflowDoctorTests(unittest.TestCase):
         (repo / ".git").mkdir()
         shutil.copytree(REPO_ROOT / "second-brain", repo / "second-brain")
         learning = repo / "second-brain" / "00 Context" / "Learnings.md"
-        learning.write_text(
-            learning.read_text(encoding="utf-8") + "\n{{review later}}\n",
-            encoding="utf-8",
-        )
+        learning.parent.mkdir(parents=True, exist_ok=True)
+        initial = learning.read_text(encoding="utf-8") if learning.exists() else "# Learnings\n"
+        learning.write_text(initial + "\n{{review later}}\n", encoding="utf-8")
 
         report = self.json_report(repo)
         keys = {finding["key"] for finding in report["findings"]}
@@ -327,6 +326,128 @@ class AiWorkflowDoctorTests(unittest.TestCase):
         self.assertIn("AGENTS.md:4", text_report)
         self.assertIn("target=docs/missing.md", text_report)
 
+    def test_inline_code_examples_are_not_audited_as_links(self) -> None:
+        examples = {
+            "single delimiter": "Example `[name](docs/example.md)`.",
+            "long delimiter": "Example ``[name](docs/example.md)``.",
+            "embedded delimiter": "Example ``before ` [name](docs/example.md) ` after``.",
+            "exact run": "Example `before `` [name](docs/example.md) `` after`.",
+            "multiline": "Example `before\n[name](docs/example.md)\nafter`.",
+            "literal backslash inside": "Example `[name](docs/example.md)\\`.",
+            "escaped backslash outside": "Example \\\\`[name](docs/example.md)`.",
+            "triple delimiter": "Example ```[name](docs/example.md)```.",
+            "unmatched earlier run": "Example ``` unmatched `[name](docs/example.md)`.",
+        }
+        for name, markdown in examples.items():
+            with self.subTest(name=name):
+                directory, repo = self.make_repo({"AGENTS.md": f"# Root\n\n{markdown}\n"})
+                self.addCleanup(directory.cleanup)
+
+                completed = self.run_doctor(repo, "--check", "--format", "json")
+                report = json.loads(completed.stdout)
+
+                self.assertEqual(completed.returncode, 0, report["findings"])
+                self.assertEqual(report["summary"]["errors"], 0)
+                self.assertNotIn("broken_local_reference", self.finding_codes(report))
+
+    def test_code_span_boundaries_preserve_real_broken_links(self) -> None:
+        examples = {
+            "unclosed": ("Example `unclosed [missing](docs/real.md).", 3),
+            "escaped delimiter": ("Example \\` [missing](docs/real.md) \\`.", 3),
+            "odd escaping": ("Example \\\\\\` [missing](docs/real.md) \\\\\\`.", 3),
+            "mismatched runs": ("Example ` [missing](docs/real.md) ``.", 3),
+            "blank paragraph boundary": ("Example `unclosed\n\n[missing](docs/real.md)\n\n`later", 5),
+            "fence boundary": ("Example `unclosed\n~~~text\nfenced\n~~~\n[missing](docs/real.md)\n`later", 7),
+            "heading boundary": ("# Heading `unclosed\n[missing](docs/real.md) `", 4),
+            "list item boundary": ("- First `unclosed\n- [missing](docs/real.md) `", 4),
+            "quote boundary": ("Paragraph `unclosed\n> [missing](docs/real.md) `", 4),
+            "code then real link": ("`[example](docs/example.md)` [missing](docs/real.md).", 3),
+            "triple code then real link": ("```[example](docs/example.md)``` [missing](docs/real.md).", 3),
+            "code in link label": ("[missing `label`](docs/real.md)", 3),
+        }
+        for name, (markdown, expected_line) in examples.items():
+            with self.subTest(name=name):
+                directory, repo = self.make_repo({"AGENTS.md": f"# Root\n\n{markdown}\n"})
+                self.addCleanup(directory.cleanup)
+
+                completed = self.run_doctor(repo, "--check", "--format", "json")
+                report = json.loads(completed.stdout)
+                broken = [item for item in report["findings"] if item["code"] == "broken_local_reference"]
+
+                self.assertEqual(completed.returncode, 1, report["findings"])
+                self.assertEqual([item["details"]["target"] for item in broken], ["docs/real.md"])
+                self.assertEqual(broken[0]["locations"], [{"line": expected_line, "path": "AGENTS.md"}])
+
+    def test_backticks_in_real_link_destinations_are_preserved(self) -> None:
+        directory, repo = self.make_repo(
+            {"AGENTS.md": "# Root\n\n[inline](docs/`inline`.md)\n[reference]: docs/`reference`.md\n"}
+        )
+        self.addCleanup(directory.cleanup)
+
+        completed = self.run_doctor(repo, "--check", "--format", "json")
+        report = json.loads(completed.stdout)
+        broken = [item for item in report["findings"] if item["code"] == "broken_local_reference"]
+
+        self.assertEqual(completed.returncode, 1)
+        self.assertEqual(
+            {item["details"]["target"] for item in broken},
+            {"docs/`inline`.md", "docs/`reference`.md"},
+        )
+
+    def test_setext_and_thematic_boundaries_preserve_real_broken_links(self) -> None:
+        for separator in ("---", "===", "***", "___", "* * *", "_ _ _", "- - -"):
+            with self.subTest(separator=separator):
+                directory, repo = self.make_repo({
+                    "AGENTS.md": (
+                        f"Heading `unclosed\n{separator}\n"
+                        "[missing](docs/real.md) `\n"
+                    ),
+                })
+                self.addCleanup(directory.cleanup)
+
+                completed = self.run_doctor(repo, "--check", "--format", "json")
+                report = json.loads(completed.stdout)
+                broken = [
+                    item for item in report["findings"]
+                    if item["code"] == "broken_local_reference"
+                ]
+
+                self.assertEqual(completed.returncode, 1, report["findings"])
+                self.assertEqual(
+                    [item["details"]["target"] for item in broken], ["docs/real.md"]
+                )
+                self.assertEqual(
+                    broken[0]["locations"], [{"line": 3, "path": "AGENTS.md"}]
+                )
+
+    def test_backticks_in_link_titles_do_not_hide_following_links(self) -> None:
+        titles = (
+            '"`title"', "'`title'", "(`title)", '"escaped \\\" `title"',
+            '"first line\n`title"',
+        )
+        for title in titles:
+            with self.subTest(title=title):
+                directory, repo = self.make_repo({
+                    "AGENTS.md": (
+                        f"[missing](docs/real.md {title}) "
+                        "[second](docs/second.md) `\n"
+                    ),
+                })
+                self.addCleanup(directory.cleanup)
+
+                completed = self.run_doctor(repo, "--check", "--format", "json")
+                report = json.loads(completed.stdout)
+                broken = [
+                    item for item in report["findings"]
+                    if item["code"] == "broken_local_reference"
+                ]
+
+                self.assertEqual(completed.returncode, 1, report["findings"])
+                self.assertEqual(
+                    [item["details"]["target"] for item in broken],
+                    ["docs/real.md", "docs/second.md"],
+                )
+
     def test_duplicate_skill_slugs_across_active_roots_are_reported(self) -> None:
         directory, repo = self.make_repo(
             {
@@ -365,6 +486,28 @@ class AiWorkflowDoctorTests(unittest.TestCase):
         self.assertNotIn(
             "scripts/executable_ai-workflow-doctor --repo <repo>", skill
         )
+
+    def test_installed_entrypoint_loads_siblings_in_isolated_python(self) -> None:
+        directory, repo = self.make_repo()
+        self.addCleanup(directory.cleanup)
+        installed = repo / "installed-scripts"
+        installed.mkdir()
+        shutil.copy2(DOCTOR, installed / "ai-workflow-doctor")
+        for name in ("ai_workflow_markdown.py", "ai_workflow_second_brain.py"):
+            shutil.copy2(DOCTOR.parent / name, installed / name)
+
+        completed = subprocess.run(
+            [
+                sys.executable, "-B", "-I", str(installed / "ai-workflow-doctor"),
+                "--repo", str(repo), "--check", "--format", "json",
+            ],
+            cwd=Path(tempfile.gettempdir()),
+            text=True,
+            capture_output=True,
+        )
+
+        self.assertEqual(completed.returncode, 0, completed.stderr)
+        self.assertEqual(json.loads(completed.stdout)["summary"]["errors"], 0)
 
     def test_plan_contract_is_required_only_when_instructions_reference_it(self) -> None:
         directory, repo = self.make_repo(remove=(".agent/PLANS.md",))
@@ -550,6 +693,48 @@ class AiWorkflowDoctorTests(unittest.TestCase):
         self.assertNotIn(
             "unverifiable_source_provenance",
             self.finding_codes(self.json_report(repo, "--verify-sources")),
+        )
+
+    def test_snapshot_provenance_preserves_hash_and_unavailable_archive_checks(self) -> None:
+        digest = "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
+        source = (
+            "# Source\n\n"
+            "- Source archive: archive\n"
+            "- Source path: SKILL.md\n"
+            f"- Source SHA-256: {digest}\n"
+            "- Imported on: 2026-10-12\n"
+            "- Import basis: user-selected local snapshot.\n"
+            "- Local adaptation: metadata only.\n"
+            "- Upstream revision: unavailable; no commit is claimed.\n"
+        )
+        directory, repo = self.make_repo({
+            "archive/SKILL.md": "abc",
+            "dot_agents/skills/example/SOURCE.md": source,
+        })
+        self.addCleanup(directory.cleanup)
+        valid = self.json_report(repo, "--verify-sources", "--check")
+        self.assertEqual(valid["summary"]["errors"], 0)
+
+        (repo / "archive/SKILL.md").write_text("tampered", encoding="utf-8")
+        tampered = self.run_doctor(repo, "--verify-sources", "--check", "--format", "json")
+        self.assertEqual(tampered.returncode, 1)
+        self.assertEqual(
+            json.loads(tampered.stdout)["findings"][0]["details"]["invalid_fields"],
+            ["source hash"],
+        )
+
+        sidecar = repo / "dot_agents/skills/example/SOURCE.md"
+        sidecar.write_text(source.replace("archive\n", "unavailable\n"), encoding="utf-8")
+        unavailable = self.json_report(repo, "--verify-sources", "--check")
+        self.assertEqual(unavailable["summary"], {"errors": 0, "warnings": 1, "status": "pass"})
+        self.assertEqual(unavailable["findings"][0]["code"], "unverifiable_source_provenance")
+
+        sidecar.write_text(source.replace(f"- Source SHA-256: {digest}\n", ""), encoding="utf-8")
+        unidentified = self.run_doctor(repo, "--check", "--format", "json")
+        self.assertEqual(unidentified.returncode, 1)
+        self.assertEqual(
+            json.loads(unidentified.stdout)["findings"][0]["details"]["invalid_fields"],
+            ["immutable revision"],
         )
 
     def test_semantic_conflicts_are_human_review_warnings_and_nonblocking(self) -> None:

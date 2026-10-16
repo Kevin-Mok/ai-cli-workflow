@@ -53,3 +53,15 @@ recovery documentation before any index writes. The user chose to wait. Its
 completed documentation commit was verified on the remote before this pass
 resumed; all unrelated source and staged work remained preserved. This was the
 scope guard working as intended, not a reason to absorb an active session's work.
+
+## Live workflow audit findings
+
+Read-only workflow-doctor exited0 while reporting status fail:37 errors and one
+warning. Findings cover intentionally absent private Second Brain paths, existing
+source-provenance/reference gaps and a duplicate skill. Parser tests26/26 pass;
+this delivery does not claim the sanitized checkout has a clean full audit. No
+private notes were restored and no existing provenance was invented.
+
+The temporary cumulative-snapshot update initially lacked its new report parent
+directory and stopped before staging; creating that temporary directory fixed the
+preparation. No index or tracked implementation was affected by that refusal.

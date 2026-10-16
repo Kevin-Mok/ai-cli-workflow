@@ -29,7 +29,7 @@ live settings, recovery material and generated state remain excluded.
 - [x] Commit notification source outlines, speech updates, Dunst indicator and docs.
 - [x] Commit the clipboard startup improvement and checks.
 - [x] Commit pinned Context Mode tooling and docs.
-- [ ] Commit metaprompt depth and existing-thread navigation with docs.
+- [x] Commit metaprompt depth and existing-thread navigation with docs.
 - [ ] Commit Markdown-aware workflow audit parsing and graph smoke checks.
 - [ ] Commit privacy gate, commit policy, tests, plan and troubleshooting memory.
 - [ ] Inspect all staged diffs, audit outgoing commit bytes/metadata, push once,
@@ -167,3 +167,11 @@ unchanged fail-closed host-envelope expectation warning. No new thread/provider
 call ran. Two groups remain after this candidate. Live doctor reports37 errors/
 one warning from absent private notes and existing provenance/reference gaps;
 recorded in shipping incident for milestone8, without restoring private data.
+
+### Milestone 8 — fix(audit): parse Markdown references by context
+
+Milestone7 committed as 956ebc0. Markdown-aware doctor/parser26 checks pass;
+graph smoke CLI/MCP helpers and usage reviewed. Live doctor exits0 and reports
+37 existing missing-private-note/provenance/reference errors plus one duplicate
+skill warning. Graph binary is absent, so real graph execution was skipped.
+Shipping validation report/memory updated together. Only privacy group remains.
