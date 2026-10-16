@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Safely snapshot the live Codex config into the chezmoi source tree."""
+"""Validate the live Codex config without copying private settings into source."""
 
 from __future__ import annotations
 
@@ -21,7 +21,7 @@ def _cli_message(text, icon):
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="snapshot-codex-config",
-        description=_cli_message("Validate and atomically snapshot the live Codex config.", '🧰'),
+        description=_cli_message("Validate the live Codex config; keep live settings private.", '🧰'),
     )
     parser.add_argument(
         "--dry-run",
@@ -38,12 +38,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         )
         return 2
 
-    if result.dry_run:
-        print(_cli_message("Codex config snapshot dry run passed; no files changed.", '✅'))
-    elif result.changed:
-        print(_cli_message("Codex config snapshot completed.", '✅'))
-    else:
-        print(_cli_message("Codex config snapshot already current.", '✅'))
+    print(_cli_message("Codex config validated; live settings remain private.", '✅'))
     return 0
 
 

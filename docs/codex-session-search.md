@@ -4,7 +4,7 @@ Use `codex-search` to find saved conversations across projects or return to the 
 
 ## Install and use
 
-Chezmoi installs [the executable source](../scripts/executable_codex-search) as `~/scripts/codex-search`. Run `refresh-config` after tracked configuration changes; it snapshots live Codex and Git config into tracked source, applies chezmoi, regenerates shortcuts and reloads fish abbreviations. Protect unrelated dirty source before that refresh. Python 3.11+ must be on PATH; pattern search also needs `rg` (ripgrep). `fzf` is optional and only required by `--pick`. Running the tool requires no sudo. On the repo's non-GUI hosts, `.chezmoiignore` excludes scripts; invoke the source directly there.
+Chezmoi installs [the executable source](../scripts/executable_codex-search) as `~/scripts/codex-search`. Run `refresh-config` after tracked configuration changes; it applies reviewed files, regenerates shortcuts and reloads fish abbreviations. Live Codex/Git values remain private; scripts, externals and removals are excluded, and conflicts stop without adoption. Python 3.11+ must be on PATH; pattern search also needs `rg` (ripgrep). `fzf` is optional and only required by `--pick`. Running the tool requires no sudo. On the repo's non-GUI hosts, `.chezmoiignore` excludes scripts; invoke the source directly there.
 
 If `--pick` reports that fzf is missing, the search command itself is working;
 install the optional picker dependency or put a trusted `fzf` binary on PATH.

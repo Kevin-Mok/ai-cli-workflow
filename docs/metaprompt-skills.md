@@ -185,10 +185,10 @@ cannot fetch old Majkey revisions: restore the complete outgoing package from
 the backup recorded in [the replacement plan](../plans/replace-metaprompt-with-sentry.md)
 if reversing this replacement. The backup is machine-local and temporary.
 
-Before deployment inspect `chezmoi status` and the live Codex snapshot dry-run.
-The required `refresh-config` snapshots live Codex and Git configs, applies
-chezmoi, regenerates shortcuts, and reloads fish abbreviations. It has no
-target flag and can adopt conflicting live files; preserve unrelated edits.
+Before deployment inspect `chezmoi status` and validate local configuration.
+The required `refresh-config` applies reviewed files, regenerates shortcuts,
+and reloads fish abbreviations. It excludes scripts, externals and removals,
+never copies live Codex/Git settings into source, and stops on conflicts.
 Deployment evidence and any scope restrictions belong in the active plan.
 
 ## Automated and manual verification

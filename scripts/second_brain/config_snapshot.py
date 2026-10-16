@@ -1,8 +1,7 @@
-"""Validate and atomically snapshot the live Codex config into chezmoi."""
+"""Validate the Codex config boundary without importing private live settings."""
 
 from __future__ import annotations
 
-import hashlib
 import os
 import stat
 import subprocess
@@ -11,8 +10,6 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from .content_security import redact
-from .safe_contract import PathError
-from .safe_files import atomic_replace_if_unchanged
 
 
 MAX_CONFIG_BYTES = 1_000_000
@@ -38,36 +35,22 @@ def snapshot_codex_config(
     target_override: Path | None = None,
     expected_target: Path | None = None,
 ) -> SnapshotResult:
-    """Copy one valid live Codex config into its expected chezmoi target."""
+    """Validate the legacy snapshot boundary; keep live settings out of source."""
 
     source = _source_path(source_override)
     target = _target_path(source, target_override)
     _validate_expected_mapping(source, target, expected_target)
 
     source_content, source_metadata = _read_regular(source, "source")
-    target_content, target_metadata = _read_regular(target, "target")
+    _target_content, target_metadata = _read_regular(target, "target")
     if _same_identity(source_metadata, target_metadata):
         raise ConfigSnapshotError("source and target must be different files")
     _validate_toml(source_content)
     _validate_public_content(source_content)
 
-    changed = source_content != target_content
-    if dry_run or not changed:
-        return SnapshotResult(changed=changed, dry_run=dry_run)
-
+    _assert_regular_unchanged(source, "source", source_metadata)
     _assert_regular_unchanged(target, "target", target_metadata)
-    try:
-        atomic_replace_if_unchanged(
-            target.parent,
-            target,
-            hashlib.sha256(target_content).hexdigest(),
-            source_content,
-            mode=stat.S_IMODE(target_metadata.st_mode),
-            expected_mode=stat.S_IMODE(target_metadata.st_mode),
-        )
-    except (OSError, PathError) as error:
-        raise ConfigSnapshotError("atomic config snapshot failed") from error
-    return SnapshotResult(changed=True, dry_run=False)
+    return SnapshotResult(changed=False, dry_run=dry_run)
 
 
 def _source_path(override: Path | None) -> Path:

@@ -121,10 +121,7 @@ class SecondBrainCheckpointJournalTest(unittest.TestCase):
         self.assertEqual(report["result"], "committed")
         self.assertEqual(
             report["paths"],
-            [
-                "dot_codex/config.toml",
-                "second-brain/00 Context/Decisions.md",
-            ],
+            ["second-brain/00 Context/Decisions.md"],
         )
 
 

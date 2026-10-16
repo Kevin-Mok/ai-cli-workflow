@@ -126,10 +126,7 @@ class FishEmojiOutputTest(unittest.TestCase):
         pretty = self.run_fish(body)
         plain = self.run_fish(body, plain=True)
         self.assertEqual(pretty.returncode, 0, pretty.stderr)
-        self.assertEqual(len(pretty.stdout.splitlines()), 5)
-        self.assertTrue(pretty.stdout.startswith('📋 Copied '), pretty.stdout)
-        self.assertIn('✅ Applied chezmoi.', pretty.stdout)
-        self.assertIn('🔄 Reloading fish.', pretty.stdout)
+        self.assertEqual(pretty.stdout, "✅ REFRESH COMPLETE\n")
         self.assertTrue(plain.stdout.isascii(), plain.stdout)
         self.assertEqual(plain.returncode, 0, plain.stderr)
 

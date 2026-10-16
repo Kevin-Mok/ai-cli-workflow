@@ -8649,6 +8649,15 @@
       "findings": [
         "local-notification-missing-clip"
       ]
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-16-shipping-validation.md"
+      ],
+      "reviewed_on": "2026-10-16",
+      "findings": [],
+      "sha256": "4ff192040e964d8f598c094205e4f27bc07d042f00bfa0661a3febd8c0f9e602",
+      "decision": "No new general rule: existing sandbox-loopback/PTY guidance applies; approved isolated socket reruns pass. Three pre-existing fixture failures remain explicitly reported; public-helper output expectation was repaired without weakening privacy assertions. Discovery supplies the package import root."
     }
   ],
   "review": {

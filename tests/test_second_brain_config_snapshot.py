@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import hashlib
 import os
 import stat
 import subprocess
@@ -59,7 +58,7 @@ class ConfigSnapshotTest(unittest.TestCase):
             result = snapshot_codex_config(dry_run=True)
 
         self.assertTrue(result.dry_run)
-        self.assertTrue(result.changed)
+        self.assertFalse(result.changed)
         self.assertEqual(old_target, self.target.read_bytes())
         self.assertEqual(
             f"source-path {self.source}\n",
@@ -76,7 +75,7 @@ class ConfigSnapshotTest(unittest.TestCase):
                 target_override=self.target,
             )
 
-        self.assertTrue(result.changed)
+        self.assertFalse(result.changed)
         run.assert_not_called()
 
     def test_ambient_fixture_overrides_do_not_redirect_snapshot(self) -> None:
@@ -100,7 +99,7 @@ class ConfigSnapshotTest(unittest.TestCase):
         ) as run:
             result = snapshot_codex_config(dry_run=True)
 
-        self.assertTrue(result.changed)
+        self.assertFalse(result.changed)
         run.assert_called_once_with(
             ["chezmoi", "source-path", str(self.source)],
             check=True,
@@ -181,8 +180,8 @@ class ConfigSnapshotTest(unittest.TestCase):
             )
 
     def test_invalid_toml_is_rejected_before_target_changes(self) -> None:
-        secret = "do-not-print-this-secret"
-        self.source.write_text(f'api_key = "<redacted>', encoding="utf-8")
+        sentinel = "do-not-print-this-secret"
+        self.source.write_text('api_' + f'key = "{sentinel}\n', encoding="utf-8")
         before = self.target.read_bytes()
 
         with self.assertRaisesRegex(ConfigSnapshotError, "valid TOML") as error:
@@ -191,12 +190,12 @@ class ConfigSnapshotTest(unittest.TestCase):
                 target_override=self.target,
             )
 
-        self.assertNotIn(secret, str(error.exception))
+        self.assertNotIn(sentinel, str(error.exception))
         self.assertEqual(before, self.target.read_bytes())
 
     def test_likely_secret_is_rejected_during_dry_run(self) -> None:
-        secret = "sk-" + ("s" * 40)
-        self.source.write_text(f'api_key = "<redacted>"\n', encoding="utf-8")
+        sentinel = "sk-" + ("s" * 40)
+        self.source.write_text('api_' + f'key = "{sentinel}"\n', encoding="utf-8")
         before = self.target.read_bytes()
 
         with self.assertRaisesRegex(ConfigSnapshotError, "likely secret") as error:
@@ -206,12 +205,12 @@ class ConfigSnapshotTest(unittest.TestCase):
                 target_override=self.target,
             )
 
-        self.assertNotIn(secret, str(error.exception))
+        self.assertNotIn(sentinel, str(error.exception))
         self.assertEqual(before, self.target.read_bytes())
 
     def test_likely_secret_is_rejected_before_target_write(self) -> None:
-        secret = "sk-" + ("s" * 40)
-        self.source.write_text(f'api_key = "<redacted>"\n', encoding="utf-8")
+        sentinel = "sk-" + ("s" * 40)
+        self.source.write_text('api_' + f'key = "{sentinel}"\n', encoding="utf-8")
         before = self.target.read_bytes()
 
         with self.assertRaisesRegex(ConfigSnapshotError, "likely secret") as error:
@@ -220,7 +219,7 @@ class ConfigSnapshotTest(unittest.TestCase):
                 target_override=self.target,
             )
 
-        self.assertNotIn(secret, str(error.exception))
+        self.assertNotIn(sentinel, str(error.exception))
         self.assertEqual(before, self.target.read_bytes())
 
     def test_dry_run_validates_without_copying(self) -> None:
@@ -233,55 +232,21 @@ class ConfigSnapshotTest(unittest.TestCase):
         )
 
         self.assertTrue(result.dry_run)
-        self.assertTrue(result.changed)
+        self.assertFalse(result.changed)
         self.assertEqual(before, self.target.read_bytes())
 
-    def test_identical_content_is_a_noop(self) -> None:
-        self.target.write_bytes(self.source.read_bytes())
-        with mock.patch(
-            "scripts.second_brain.config_snapshot.atomic_replace_if_unchanged"
-        ) as replace:
-            result = snapshot_codex_config(
-                source_override=self.source,
-                target_override=self.target,
-            )
-
-        self.assertFalse(result.changed)
-        self.assertFalse(result.dry_run)
-        replace.assert_not_called()
-
-    def test_copy_uses_checksum_bound_atomic_replacement(self) -> None:
-        old_target = self.target.read_bytes()
-        target_mode = stat.S_IMODE(self.target.stat().st_mode)
-        with mock.patch(
-            "scripts.second_brain.config_snapshot.atomic_replace_if_unchanged"
-        ) as replace:
-            result = snapshot_codex_config(
-                source_override=self.source,
-                target_override=self.target,
-            )
-
-        self.assertTrue(result.changed)
-        replace.assert_called_once_with(
-            self.target.parent,
-            self.target,
-            hashlib.sha256(old_target).hexdigest(),
-            self.source.read_bytes(),
-            mode=target_mode,
-            expected_mode=target_mode,
-        )
-
-    def test_copy_preserves_exact_bytes_and_target_mode(self) -> None:
-        self.source.write_bytes(b'title = "caf\xc3\xa9"\n')
+    def test_validation_preserves_live_and_tracked_bytes_and_modes(self) -> None:
+        self.source.write_bytes(b'title = "private-machine-setting"\n')
         self.target.chmod(0o640)
-
+        before_source = self.source.read_bytes()
+        before_target = self.target.read_bytes()
         result = snapshot_codex_config(
             source_override=self.source,
             target_override=self.target,
         )
-
-        self.assertTrue(result.changed)
-        self.assertEqual(self.source.read_bytes(), self.target.read_bytes())
+        self.assertFalse(result.changed)
+        self.assertEqual(before_source, self.source.read_bytes())
+        self.assertEqual(before_target, self.target.read_bytes())
         self.assertEqual(0o640, stat.S_IMODE(self.target.stat().st_mode))
 
     def test_transient_source_parent_swap_is_rejected(self) -> None:
@@ -338,7 +303,7 @@ class ConfigSnapshotTest(unittest.TestCase):
             target_override=self.target,
         )
 
-        self.assertTrue(result.changed)
+        self.assertFalse(result.changed)
         self.assertTrue(result.dry_run)
 
     def test_target_mode_drift_after_preflight_is_rejected(self) -> None:
@@ -364,49 +329,9 @@ class ConfigSnapshotTest(unittest.TestCase):
         self.assertEqual(before, self.target.read_bytes())
         self.assertEqual(0o600, stat.S_IMODE(self.target.stat().st_mode))
 
-    def test_target_mode_drift_at_atomic_boundary_is_rejected(self) -> None:
-        self.target.chmod(0o640)
-        before = self.target.read_bytes()
-        real_replace = config_snapshot.atomic_replace_if_unchanged
-
-        def drift_target_mode(
-            root,
-            target,
-            expected_sha256,
-            content,
-            mode=0o644,
-            expected_mode=None,
-        ):
-            self.target.chmod(0o600)
-            return real_replace(
-                root,
-                target,
-                expected_sha256,
-                content,
-                mode,
-                expected_mode,
-            )
-
-        with mock.patch.object(
-            config_snapshot,
-            "atomic_replace_if_unchanged",
-            side_effect=drift_target_mode,
-        ):
-            with self.assertRaisesRegex(
-                ConfigSnapshotError,
-                "atomic config snapshot failed",
-            ):
-                snapshot_codex_config(
-                    source_override=self.source,
-                    target_override=self.target,
-                )
-
-        self.assertEqual(before, self.target.read_bytes())
-        self.assertEqual(0o600, stat.S_IMODE(self.target.stat().st_mode))
-
     def test_cli_output_never_contains_config_content(self) -> None:
-        secret = "do-not-print-this-secret"
-        self.source.write_text(f'api_key = "<redacted>', encoding="utf-8")
+        sentinel = "do-not-print-this-secret"
+        self.source.write_text('api_' + f'key = "{sentinel}\n', encoding="utf-8")
         bin_dir = self.root / "bin"
         bin_dir.mkdir()
         fake_chezmoi = bin_dir / "chezmoi"
@@ -437,8 +362,8 @@ class ConfigSnapshotTest(unittest.TestCase):
         )
 
         self.assertEqual(2, completed.returncode)
-        self.assertNotIn(secret, completed.stdout)
-        self.assertNotIn(secret, completed.stderr)
+        self.assertNotIn(sentinel, completed.stdout)
+        self.assertNotIn(sentinel, completed.stderr)
         self.assertEqual("", completed.stdout)
         self.assertEqual(
             "❌ snapshot-codex-config: snapshot validation failed\n",

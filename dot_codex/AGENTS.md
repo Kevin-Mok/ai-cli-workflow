@@ -209,10 +209,10 @@ education work:
   under `prompts/`, not only in chat.
 - After every tracked configuration change, run `refresh-config` before completion
   unless explicitly told not to; this applies to every change, not only environment
-  behavior changes. The helper
-  snapshots live `~/.codex/config.toml` into tracked
-  `dot_codex/config.toml`, applies chezmoi, regenerates shortcuts, and reloads
-  fish; do not describe it as repo-to-home-only sync.
+  behavior changes. The helper applies reviewed chezmoi files, regenerates
+  shortcuts, and reloads fish. Keep live Codex/Git settings in private local
+  configuration; refresh excludes scripts, externals, and removals and stops
+  on conflicts without importing live files into tracked source.
 
 ## Feedback And Lessons
 

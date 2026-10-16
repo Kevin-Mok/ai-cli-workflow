@@ -960,10 +960,7 @@ exit 99
         self.assertEqual(report["result"], "committed")
         self.assertEqual(
             report["paths"],
-            [
-                "dot_codex/config.toml",
-                "second-brain/00 Context/Decisions.md",
-            ],
+            ["second-brain/00 Context/Decisions.md"],
         )
         self.assertNotIn(payload_sentinel, visible_output)
         self.assertNotIn(config_sentinel, visible_output)

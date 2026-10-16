@@ -17,6 +17,7 @@ searches run before completion and any commit; do not use them to fill the hando
   database, emits periodic progress to stderr during a long run, reports PASS
   with zero findings, and exits 0 without printing matched values.
 
+
 ## Directory Sizes
 
 Install the pinned backend into a fresh disposable prefix. These checks inspect a small disposable backend directory; a real backup scan is an explicit opt-in.
@@ -562,13 +563,12 @@ checks use invented temporary data; real notes are never repository fixtures.
   its normal chezmoi mapping.
   Expected: The dry run validates both owned regular files, the strict size
   boundary, TOML, likely-secret content, and mapping without changing the
-  tracked target; the normal run is either an exact noop or one atomic,
-  mode-preserving target update, and neither result prints config contents.
+  tracked target; the normal run is also read-only, and neither result prints config contents.
 - Action: On an attached branch with a configured upstream and clean index,
   make one sanitized allowlisted note change strictly smaller than 1,000,000
   bytes, then run `scripts/executable_second-brain checkpoint --dry-run`.
   Expected: Content-free JSON lists only allowlisted candidates, including the
-  config target when its live bytes differ; no path is staged, committed, or
+  config target only when its tracked bytes were deliberately edited; no path is staged, committed, or
   pushed, while sensitive, secret-like, oversized, or non-LFS content fails
   closed.
 - Action: In a disposable clone with a local test upstream, exercise a safe
@@ -672,19 +672,13 @@ checks use invented temporary data; real notes are never repository fixtures.
   stops processes that keep the mount busy, reports `Unmounted Pixel 9
   from /mnt/pixel-9`, and exits cleanly if the phone is already
   unmounted.
-- Action: If tracked `dot_codex/config.toml` contains an intentional protected
-  change, run `snapshot-codex-config --dry-run`, then compare the live and
-  tracked files byte-for-byte before `refresh-config`.
-  Expected: The dry-run validates both files without changing either one; a
-  failed byte comparison identifies the divergence, so the operator stops and
-  reconciles ownership instead of overwriting the protected tracked version.
-- Action: Run `fish -ic 'refresh-config'` after changing tracked repo
-  configuration on a machine where chezmoi and the shell helpers are available
-  and the live Codex config is approved to overwrite the tracked copy.
-  Expected: The live `~/.codex/config.toml` and `~/.gitconfig` overwrite their
-  tracked sources, ChezMoi force-applies only those two targets without prompts,
-  then applies other targets normally; shortcuts regenerate, the helper returns to the invoking Fish session, and
-  one bold `REFRESH COMPLETE` line confirms the successful workflow.
+- Action: Run `snapshot-codex-config --dry-run` with its normal mapping.
+  Expected: Both files are validated without writes; private values stay local.
+- Action: Run `fish -ic 'refresh-config'` after reviewing source changes and
+  local differences privately.
+  Expected: Live Codex/Git files do not enter source; scripts, externals and
+  removals are excluded. Conflicts stop without adoption. Shortcuts regenerate,
+  elapsed progress appears during slow apply, and REFRESH COMPLETE confirms success.
 - Action: Run `fish -c 'backup-phone-storage'` from a machine that can
   reach the phone over SSH on port `8022`.
   Expected: If Termux has `rsync` installed, `rsync` copies the shared
