@@ -25,7 +25,7 @@ live settings, recovery material and generated state remain excluded.
 - [ ] Run the staged gate separately for each actual commit candidate.
 - [x] Commit configuration privacy/refresh prerequisites with matching docs.
 - [x] Commit migration helper, guard, plans/prompt/incident and matching docs.
-- [ ] Commit portable storage offload tool and docs.
+- [x] Commit portable storage offload tool and docs.
 - [ ] Commit notification source outlines, speech updates, Dunst indicator and docs.
 - [ ] Commit the clipboard startup improvement and checks.
 - [ ] Commit pinned Context Mode tooling and docs.
@@ -136,3 +136,11 @@ Milestone2 committed as bbe1202. Storage helper,11 passing fixture tests,
 README and smoke documentation are reviewed. Real /tmp preview refuses an
 unmounted destination with no moves. No apply ran. Six groups remain after this
 commit; known fixture/live-validation warnings remain unchanged.
+
+### Milestone 4 — feat(notifications): outline sources and expose DND state
+
+Milestone3 committed as 6ef819f. Notification source/speech/Dunst/tmux changes,
+matching runtime smoke helpers and corrected public docs are reviewed. Focused
+notification suites passed; isolated completion/question smoke scenarios freshly
+passed, including zero playback for workers, empty and secret questions. No live
+audio/provider request ran. Five groups remain after this candidate.

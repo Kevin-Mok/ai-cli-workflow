@@ -19,7 +19,7 @@ def _cli_message(text, icon):
     return ('' if plain else icon + ' ') + text
 
 PIPER_VERSION = '1.8.0'
-VOICE = 'en_US-Voice Contributor-high'
+VOICE = 'en_US-ryan-high'
 SYNTHESIS_TIMEOUT = 30
 _plain = False
 _details = False
@@ -71,7 +71,7 @@ def check() -> None:
                 raise ValueError('Piper produced empty speech audio')
     prefix = '' if _plain else '✅ '
     print(prefix + 'Offline speech is ready.')
-    print('  Voice   English / Voice Contributor high')
+    print('  Voice   English / Ryan high')
     print(f'  Piper   {PIPER_VERSION}')
     if _details:
         print(f'Voice: {model}')
@@ -79,7 +79,7 @@ def check() -> None:
 
 def install() -> None:
     """Download Piper and its voice under XDG data, then verify offline speech."""
-    print(('' if _plain else '⬇️ ') + 'Installing English / Voice Contributor high...', flush=True)
+    print(('' if _plain else '⬇️ ') + 'Installing English / Ryan high...', flush=True)
     root = data_directory()
     root.mkdir(parents=True, exist_ok=True)
     cache = root / 'cache'
@@ -123,7 +123,7 @@ def main(argv: list[str] | None = None) -> int:
     _ = parser.add_argument('--plain', action='store_true', help='use ASCII output')
     _ = parser.add_argument('--details', action='store_true', help='show installation logs, paths and diagnostics')
     commands = parser.add_mutually_exclusive_group(required=True)
-    _ = commands.add_argument('--install', action='store_true', help='install Piper 1.8.0 and English / Voice Contributor high; requires internet')
+    _ = commands.add_argument('--install', action='store_true', help='install Piper 1.8.0 and English / Ryan high; requires internet')
     _ = commands.add_argument('--check', action='store_true', help='verify the installed voice by offline synthesis')
     args = SetupArguments()
     _ = parser.parse_args(argv, namespace=args)

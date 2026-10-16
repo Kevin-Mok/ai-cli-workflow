@@ -44,6 +44,8 @@ class AuditionTests(unittest.TestCase):
             (self.models / (voice[1] + '.onnx')).write_bytes(b'model fixture')
             (self.models / (voice[1] + '.onnx.json')).write_text(json.dumps({'audio': {'sample_rate': 22050}}))
         self.out = Path(self.temp.name) / 'audio with spaces'
+        self.clip = Path(self.temp.name) / 'question clip.mp3'
+        self.clip.write_bytes(b'fixture; player is stubbed')
 
     def process(self, argv, **kwargs):
         events = self.events
@@ -74,7 +76,7 @@ class AuditionTests(unittest.TestCase):
 
     def run_helper(self, args):
         with contextlib.redirect_stdout(self.output), contextlib.redirect_stderr(self.errors), patch.object(self.helper.subprocess, 'Popen', side_effect=self.process), patch.object(self.helper.shutil, 'which', return_value='/fake/mpv'):
-            return self.helper.main(args + ['--plain'])
+            return self.helper.main(args + ['--plain', '--clip', str(self.clip)])
 
     def test_list_has_ten_numbered_alternatives_and_no_runtime_calls(self):
         self.assertEqual(self.run_helper(['--list']), 0)
@@ -113,8 +115,8 @@ class AuditionTests(unittest.TestCase):
         self.assertEqual(self.events, [])
 
     def test_name_selector_and_named_samples_work_in_dry_run(self):
-        self.assertEqual(self.run_helper(['--voice', 'Voice Contributor', '--sample', 'celebrate', '--dry-run']), 0)
-        self.assertIn('Voice Contributor', self.output.getvalue())
+        self.assertEqual(self.run_helper(['--voice', 'ryan', '--sample', 'celebrate', '--dry-run']), 0)
+        self.assertIn('Ryan', self.output.getvalue())
         self.assertIn('All done!', self.output.getvalue())
         self.assertEqual(self.events, [])
 

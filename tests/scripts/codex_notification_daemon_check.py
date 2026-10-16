@@ -29,9 +29,10 @@ class DaemonTests(unittest.TestCase):
             binary.mkdir()
             events = base / 'events.jsonl'
             player = binary / 'mpv'
-            player.write_text('#!/usr/bin/python3\nimport json, os, sys\nwith open(os.environ["SOUND_TEST_EVENTS"], "a") as f: f.write(json.dumps(sys.argv[1:])+"\\n")\n')
+            player.write_text('#!/usr/bin/python3\nimport json, os, sys\nfrom pathlib import Path\npath = Path(sys.argv[-1])\nif path.suffix == ".wav": Path(os.environ["SOUND_TEST_SPEECH"]).write_text(path.read_text())\nwith open(os.environ["SOUND_TEST_EVENTS"], "a") as f: f.write(json.dumps(sys.argv[1:])+"\\n")\n')
             player.chmod(0o755)
-            env = {**os.environ, 'PATH': f'{binary}:{os.environ["PATH"]}', 'XDG_CONFIG_HOME': str(base / 'config'), 'XDG_STATE_HOME': str(base / 'state'), 'SOUND_TEST_EVENTS': str(events)}
+            spoken = base / 'spoken.txt'
+            env = {**os.environ, 'PATH': f'{binary}:{os.environ["PATH"]}', 'XDG_CONFIG_HOME': str(base / 'config'), 'XDG_STATE_HOME': str(base / 'state'), 'XDG_DATA_HOME': str(base / 'data'), 'SOUND_TEST_EVENTS': str(events), 'SOUND_TEST_SPEECH': str(spoken)}
             config = base / 'config/dunst/dunstrc'
             config.parent.mkdir(parents=True)
             content = (ROOT / 'dot_config/dunst/dunstrc').read_text().replace('~/scripts/codex-notification-sound', str(helper))
@@ -120,7 +121,32 @@ class DaemonTests(unittest.TestCase):
                     self.assertEqual(call('dunstctl', 'count', 'history'), '0')
                     notify('codex-kitty', 'after activation fixture')
                     expect_count(6)
+                    python = base / 'data/codex-notification-speech/venv/bin/python'
+                    python.parent.mkdir(parents=True)
+                    python.write_text('#!/usr/bin/python3\nimport sys\nfrom pathlib import Path\nPath(sys.argv[sys.argv.index("--output_file")+1]).write_text(sys.stdin.read())\n')
+                    python.chmod(0o755)
+                    model = base / 'data/codex-notification-speech/voices/en_US-ryan-high.onnx'
+                    model.parent.mkdir()
+                    model.write_bytes(b'fixture')
+                    model.with_suffix('.onnx.json').write_text('{}')
+                    speech.write_text(json.dumps({'enabled': True}))
+                    notify('Grok Bot other', 'Unrelated Grok lookalike')
+                    expect_count(6)
+                    call('notify-send', '--app-name', 'Grok Bot', '--expire-time', '15000',
+                         'Do not read this title', 'Read this Grok message; $(not a shell command)')
+                    expect_count(8)
+                    grok_calls = [json.loads(line) for line in events.read_text().splitlines()][6:]
+                    self.assertEqual(grok_calls[0][-2:], ['--', str(clip)])
+                    self.assertEqual(Path(grok_calls[1][-1]).suffix, '.wav')
+                    self.assertEqual(spoken.read_text(), 'Read this Grok message; $(not a shell command)\n')
+                    notify('Grok Bot', 'Grok title-only message')
+                    expect_count(10)
+                    self.assertEqual(spoken.read_text(), 'Grok title-only message\n')
+                    call('dunstctl', 'close-all')
+                    call('dunstctl', 'history-pop')
+                    expect_count(10)
                     print('Private Dunst: completion/approval=one each; unrelated/duplicates/normal history/suppressed=silent; queued=plays on display; recalled duplicate stack=one sound; speech-enable=silent; disable=MP3 restored')
+                    print('Private Dunst: Grok Bot=clip then message; title fallback=spoken; lookalikes/history=silent; Codex speech switch=independent')
                 finally:
                     if restarted_pid is not None:
                         os.kill(restarted_pid, signal.SIGTERM)

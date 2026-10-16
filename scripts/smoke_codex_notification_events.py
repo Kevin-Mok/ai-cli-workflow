@@ -32,7 +32,7 @@ def probe(kind: str, source: Path) -> tuple[int, str | None]:
         sessions.mkdir(parents=True)
         helpers = root / 'helpers'
         helpers.mkdir()
-        for name in ('codex-notification-event', 'codex-notification-sound'):
+        for name in ('codex-notification-event', 'codex-notification-sound', 'codex_notification_source.py'):
             path = source / name
             if not path.exists():
                 path = source / ('executable_' + name)
@@ -54,7 +54,7 @@ def probe(kind: str, source: Path) -> tuple[int, str | None]:
             python.parent.mkdir(parents=True)
             python.write_text('#!' + sys.executable + '\nimport sys\nfrom pathlib import Path\nPath(sys.argv[sys.argv.index("--output_file")+1]).write_text(sys.stdin.read())\n')
             python.chmod(0o700)
-            model = data / 'voices/en_US-Voice Contributor-high.onnx'
+            model = data / 'voices/en_US-ryan-high.onnx'
             model.parent.mkdir()
             model.write_bytes(b'fixture')
             model.with_suffix('.onnx.json').write_text('{}')

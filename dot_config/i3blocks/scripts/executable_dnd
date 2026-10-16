@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# Do Not Disturb status for dunst. Click to toggle.
+if [[ "${BLOCK_BUTTON:-}" == 1 ]]; then dunstctl set-paused toggle; fi
+if [[ "$(dunstctl is-paused 2>/dev/null)" == true ]]; then
+  waiting=$(dunstctl count waiting 2>/dev/null || echo 0)
+  if (( waiting > 0 )); then echo "<span color='#ff6b6b'>DND ($waiting)</span>"; else echo "<span color='#ff6b6b'>DND</span>"; fi
+else
+  echo "<span color='#6b7a8f'>notif</span>"
+fi

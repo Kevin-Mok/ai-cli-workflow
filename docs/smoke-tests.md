@@ -1262,6 +1262,18 @@ Expected: Existing local integration files and project contracts retain their wo
 
 **Expected:** Preview changes no files. Apply checks mount identity, space and content verification, preserves original folders for recovery during moves, then cleans only the documented caches. No private mount path is assumed or stored in source.
 
+## Notification source outlines
+
+Use disposable data for helper checks; no sudo is required. Live previews can
+play audio, so exercise them deliberately.
+
+- Action: Run the configured notification preview from its source Kitty terminal or tmux pane, then exercise a real completion/question event.
+  Expected: A verified source has an outline only during player playback; focus stays unchanged. Closing or unavailable outline support does not suppress audio.
+
+- Action: Run `dot_config/i3blocks/scripts/executable_dnd` with no click event.
+  Expected: Status markup shows DND/queue state or notif without changing pause.
+  The helper is available but is not added to an i3blocks configuration here.
+
 ## Public benchmark evidence boundary
 
 **Action:** In a disposable repository using this checkout's `.gitignore`, create a raw JSON file under each benchmark `runs/` root and an aggregate report outside those roots; run normal `git add .`.

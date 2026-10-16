@@ -38,35 +38,28 @@ Run the numbered audition script to compare ten offline Piper alternatives, hear
 ~/scripts/codex-voice-auditions --voice 1 --sample celebrate --length-scale 0.9 --offline
 ```
 
-Numbers are stable: **1 Amy, 2 Bryce, 3 HFC Female, 4 HFC Male, 5 Contact A, 6 Voice Contributor, 7 Alan, 8 Alba, 9 Cori, 10 Jenny Dioco**. The first six are US voices; the final four are UK voices. Voice Contributor and Cori use high-quality models; the others use medium. These single-speaker IDs were verified in the [upstream voice catalog](https://huggingface.co/rhasspy/piper-voices/raw/main/voices.json). `--voice` also accepts a full name (quote names with spaces) or model ID. `--samples` displays the shared `short`, `celebrate` and `technical` lines; default `all` reads all three. `--text` supplies literal custom wording, up to 4,000 characters.
+Numbers are stable: **1 Amy, 2 Bryce, 3 HFC Female, 4 HFC Male, 5 Joe, 6 Ryan, 7 Alan, 8 Alba, 9 Cori, 10 Jenny Dioco**. The first six are US voices; the final four are UK voices. Ryan and Cori use high-quality models; the others use medium. These single-speaker IDs were verified in the [upstream voice catalog](https://huggingface.co/rhasspy/piper-voices/raw/main/voices.json). `--voice` also accepts a full name (quote names with spaces) or model ID. `--samples` displays the shared `short`, `celebrate` and `technical` lines; default `all` reads all three. `--text` supplies literal custom wording, up to 4,000 characters.
 
 Install the existing speech environment first using `setup-codex-notification-speech --install` if needed. The first audition downloads only selected missing models into the existing XDG data voices folder; subsequent runs reuse them. Ten model downloads require substantial local storage. `--offline` prohibits downloads. Generation and playback are local; naturalness and upbeat delivery depend on the individual voice. The audition pace is slightly brisk at `--length-scale 0.95`; `1.0` is normal and `0.9` faster. This pace does not change notification playback settings.
 
 Before every audible sample, the script displays its number/name, starts speech generation while the included "Can I ask you a question?" clip plays, then prints the remaining gap and plays the voice. The gap measures process handoff after clip completion, rather than physical speaker onset. It reflects cold-process synthesis, not a cached recording. `--clip PATH` lets you use another question clip. Actual notification playback also synthesizes while its configured MP3 plays, reducing the remaining gap while preserving strict MP3-then-speech order and serialized sequences. Synthesis retains a 30-second deadline and MP3 failure cleans up its owned synthesis process.
 
-WAVs and a manifest containing sample text, pace, voice IDs and timings are saved under `${XDG_DATA_HOME:-$HOME/.local/share}/codex-notification-speech/auditions`. Each run replaces samples for selected voices and the manifest; failed generation preserves earlier valid WAVs. Use a separate `--output-dir PATH` to keep multiple wording/pace comparisons. `--render-only` exports WAVs without audio or clip timing. `--dry-run` prints the selected numbers and wording without dependencies or downloads. `--plain` is ASCII; `--details` reveals full paths/diagnostics. Slow subprocess phases report elapsed activity every five seconds. Interrupting stops owned workers and retains completed samples. Voice Contributor (number 6) is now the selected notification voice at pace 0.95. Auditions remain independent of notification settings.
+WAVs and a manifest containing sample text, pace, voice IDs and timings are saved under `${XDG_DATA_HOME:-$HOME/.local/share}/codex-notification-speech/auditions`. Each run replaces samples for selected voices and the manifest; failed generation preserves earlier valid WAVs. Use a separate `--output-dir PATH` to keep multiple wording/pace comparisons. `--render-only` exports WAVs without audio or clip timing. `--dry-run` prints the selected numbers and wording without dependencies or downloads. `--plain` is ASCII; `--details` reveals full paths/diagnostics. Slow subprocess phases report elapsed activity every five seconds. Interrupting stops owned workers and retains completed samples. Ryan (number 6) is now the selected notification voice at pace 0.95. Auditions remain independent of notification settings.
 
 For direct checks from the checkout (no sudo), substitute `./scripts/executable_codex-voice-auditions` for the installed command above. Run `python3 -B tests/test_codex_voice_auditions.py` and `python3 -B tests/test_codex_notification_sound.py` for automated coverage; subjective voice choice needs listening.
 
-## Short Voice Contributor introduction
+## Speech-only preview
 
-Use `rintro` in interactive fish to play the saved Voice Contributor introduction immediately. Add `--text` for custom words; both modes speak without the question clip and leave notification settings unchanged. No sudo or cloud service is needed.
-
-```sh
-rintro
-rintro --text "Welcome back! Your changes are ready."
-rintro --help
-```
-
-`rintro` is an autoloadable fish function forwarding arguments to `~/scripts/Voice Contributor-intro`. After deployment it works in existing and new fish shells without reloading abbreviations, including `fish -c 'rintro --help'`. Other shells can invoke `~/scripts/Voice Contributor-intro` directly.
-
-Default text is exactly: "Hello, everyone. I am example-user's Junior Software Engineer.." The [saved intro MP3](../scripts/Voice Contributor-intro.mp3) is Voice Contributor high at pace 0.95, tracked through Git LFS, and contains speech only. Default playback needs mpv but no synthesis startup. Custom `--text "WORDS"` uses local Piper with the same voice/pace; quote the complete phrase to preserve spaces and punctuation.
-
-The general equivalent is `~/scripts/codex-notification-sound preview --speech-only --title "WORDS" --plain`. Speech-only requires a nonblank title, works without a configured/valid question clip, shares the existing audio lock and returns nonzero on missing voice or synthesis failure. Ordinary notification previews and completions retain the question clip. `--help` reads nothing; unsupported/missing wrapper arguments exit 2 with usage.
+Use `~/scripts/codex-notification-sound preview --speech-only --title "Your task title" --plain`
+to hear a title without the question clip. This uses local Piper with Ryan high
+at pace 0.95 and leaves notification settings unchanged. A nonblank title and
+installed voice are required; synthesis failures return nonzero. No saved
+introduction/celebration recording or replay wrapper is included in this checkout.
 
 ## Optional offline title speech
 
-The selected notification voice is **6 — Voice Contributor (US, high)**, using the celebrate audition pace of **0.95**. The committed [Voice Contributor celebrate MP3](../scripts/Voice Contributor-celebrate.mp3), tracked with Git LFS, reads "All done! The tests passed, and your changes are ready. Take a look at what I built!" and is a replayable reference sample. Play it with `mpv --no-config --no-video ~/scripts/Voice Contributor-celebrate.mp3`; it contains Voice Contributor speech only, while the question intro remains a separate clip. Notifications still speak the exact task title; `celebrate` supplies the upbeat test wording. Install the pinned Piper 1.8.0 English `en_US-Voice Contributor-high` voice, then check it:
+The default notification voice is **6 — Ryan (US, high)** at pace **0.95**.
+Install the pinned Piper 1.8.0 runtime and `en_US-ryan-high` voice, then check it:
 
 ```sh
 ~/scripts/setup-codex-notification-speech --install
@@ -74,9 +67,9 @@ The selected notification voice is **6 — Voice Contributor (US, high)**, using
 ~/scripts/codex-notification-sound preview --title "Smoke-test VPS backup"
 ```
 
-No sudo is needed. Installation needs internet and Python's `venv`/pip support. The isolated environment, voice, download cache and temporary installation files stay under `${XDG_DATA_HOME:-$HOME/.local/share}/codex-notification-speech`. `--check` synthesizes a temporary WAV offline and deletes it; playback contacts no service. `status` uses aligned, width-aware output with helpful icons; add `--plain` for ASCII or `--details` for full paths and recent diagnostics. Both notification commands accept these display flags and emit no ANSI colors, respecting `NO_COLOR`. `status` reports speech activation, selected Voice Contributor model/pace and voice file readiness; `--check` verifies the pinned runtime and actual synthesis.
+No sudo is needed. Installation needs internet and Python's `venv`/pip support. The isolated environment, voice, download cache and temporary installation files stay under `${XDG_DATA_HOME:-$HOME/.local/share}/codex-notification-speech`. `--check` synthesizes a temporary WAV offline and deletes it; playback contacts no service. `status` uses aligned, width-aware output with helpful icons; add `--plain` for ASCII or `--details` for full paths and recent diagnostics. Both notification commands accept these display flags and emit no ANSI colors, respecting `NO_COLOR`. `status` reports speech activation, selected Ryan model/pace and voice file readiness; `--check` verifies the pinned runtime and actual synthesis.
 
-After `refresh-config` deploys the completion callback, start or resume affected Codex conversations to load it, then enable speech:
+After explicitly deploying the reviewed event scripts and hook configuration, start or resume affected Codex conversations to load them, then enable speech:
 
 ```sh
 ~/scripts/codex-notification-sound speech enable
@@ -100,7 +93,7 @@ The contracts are described in [Codex hooks](https://learn.chatgpt.com/docs/hook
 
 ## Queued-question speech
 
-When the TUI shows “Queued follow-up inputs · 1 question”, the question hook plays your selected “Can I ask you a question?” MP3 once, then Voice Contributor speaks one concise sentence about the actual question. For example, “The checks passed. Should I deploy now?” becomes “Codex asks: Should I deploy now?” The task title and answer choices are not read.
+When the TUI shows “Queued follow-up inputs · 1 question”, the question hook plays your selected “Can I ask you a question?” MP3 once, then Ryan speaks one concise sentence about the actual question. For example, “The checks passed. Should I deploy now?” becomes “Codex asks: Should I deploy now?” The task title and answer choices are not read.
 
 The [question hooks](../dot_codex/hooks.json) use `PostToolUse` for `request_user_input_async` after its response confirms `accepted=true`, so rejected requests stay silent. Blocking `request_user_input` uses `PreToolUse`, before waiting for an answer, and validates required question fields first. Both require matching top-level cli/vscode transcript identity under CODEX_HOME. Helper/internal conversations, permission reviews, empty/malformed prompts and secret questions stay silent. The bridge accepts the native async `title` or blocking `question` fields, keeps at most three prompts plus a remaining-question count in one sentence capped at 280 characters, strips controls, and prefers the actual ask over preceding context. This is local text extraction and Piper synthesis, with no cloud summarization.
 
@@ -121,7 +114,7 @@ The first three verify one clip then one exact question sentence with two silent
 
 ## Installation and activation
 
-Repository sources are [Kitty's callback](../dot_config/kitty/notifications.py), [Dunst's rule](../dot_config/dunst/dunstrc) and [the playback command](../scripts/executable_codex-notification-sound). Apply with the normal `refresh-config` workflow after checking its live-to-source Codex/Git snapshots against protected work.
+Repository sources are [Kitty's callback](../dot_config/kitty/notifications.py), [Dunst's rule](../dot_config/dunst/dunstrc) and [the playback command](../scripts/executable_codex-notification-sound). Apply with the normal `refresh-config` workflow after reviewing source changes and local differences privately. Refresh never imports live Codex/Git settings, excludes scripts/externals/removals, and stops on conflicts.
 
 Run the activation helper once after initial installation, or after changing the Kitty notification callback or Dunst rule:
 
@@ -181,3 +174,17 @@ With speech disabled, the first should show one synthetic popup and play once. W
 ## Rollback
 
 For immediate speech rollback, run `~/scripts/codex-notification-sound speech disable`. To disable all configured audio, run `~/scripts/codex-notification-sound disable`; popups continue normally. For complete removal, remove only the `codex_notification_sound` rule, restore `always_run_script=true` if there are no intervening script-rule changes, and remove the completion `notify` entry and the two question entries in `hooks.json`, then remove this task's Kitty callback, event bridge, sound helper, setup helper and activation helper from both the tracked and installed paths. Apply the remaining config, restart Dunst and start a fresh Kitty process. Do not reset unrelated dirty files. Your MP3 is never deleted.
+
+## Optional source outline
+
+During player playback, the optional source module outlines the verified Kitty window or tmux pane without changing focus. Capture occurs before worker detachment; process start times, ancestry, server and pane identity are rechecked before display. Missing support or ambiguous/stale identity leaves audio available without an outline.
+
+The outline is present only while the player runs. Errors and handled termination restore the prior display style, and cleanup preserves concurrent tmux style edits. On X11 the click-through ring requires optional python3-xlib and SHAPE 1.1. A temporary preview from the source terminal exercises capture; a real completion or question event also checks pre-detachment provenance.
+
+## Grok Bot speech
+
+The Dunst rule for app name `Grok Bot` uses the same local player. It speaks the
+nonblank notification body, falling back to its title, with Ryan after any
+configured clip. This route is independent of the Codex speech switch; disable
+or change its Dunst rule separately if needed. `smoke grok` emits a real desktop
+notification and can play audio, so use it only when ready to listen.

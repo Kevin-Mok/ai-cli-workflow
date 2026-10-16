@@ -320,3 +320,8 @@
 [codex_notification_sound]
     appname = codex-kitty
     script = ~/scripts/codex-notification-sound
+
+# Grok Bot reads its notification message after the configured question clip.
+[grok_bot_notification_sound]
+    appname = Grok Bot
+    script = ~/scripts/codex-notification-sound
