@@ -1282,6 +1282,14 @@ play audio, so exercise them deliberately.
 - Action: Start Neovim normally on X11 with xclip installed and no explicit clipboard provider; repeat with an explicit provider or Wayland session.
   Expected: Neovim 0.11.1 or newer selects xclip without a synchronous xsel clipboard read; explicit and Wayland providers keep their normal selection.
 
+## Context Mode retrieval
+
+Use disposable data for helper checks; no sudo is required. Live previews can
+play audio, so exercise them deliberately.
+
+- Action: Run the Context Mode demo from the repository root with --case index, --case search and --case empty after the pinned package is installed.
+  Expected: Disposable MCP state reports index/stats, matching retrieval and no-result behavior respectively. Existing client configuration is unchanged.
+
 ## Public benchmark evidence boundary
 
 **Action:** In a disposable repository using this checkout's `.gitignore`, create a raw JSON file under each benchmark `runs/` root and an aggregate report outside those roots; run normal `git add .`.

@@ -27,7 +27,7 @@ live settings, recovery material and generated state remain excluded.
 - [x] Commit migration helper, guard, plans/prompt/incident and matching docs.
 - [x] Commit portable storage offload tool and docs.
 - [x] Commit notification source outlines, speech updates, Dunst indicator and docs.
-- [ ] Commit the clipboard startup improvement and checks.
+- [x] Commit the clipboard startup improvement and checks.
 - [ ] Commit pinned Context Mode tooling and docs.
 - [ ] Commit metaprompt depth and existing-thread navigation with docs.
 - [ ] Commit Markdown-aware workflow audit parsing and graph smoke checks.
@@ -151,3 +151,10 @@ Milestone4 committed as eb903a2. Minimal clipboard provider selection preserves
 explicit providers, Wayland and legacy behavior; all6 disposable startup checks
 pass. README/smoke entries match the implementation. Four groups remain after
 this candidate. No new blocker; previously recorded warnings remain.
+
+### Milestone 6 — feat(context): add pinned local retrieval tooling
+
+Milestone5 committed as b016e6e. Context Mode installer/wrapper/demo and docs
+reviewed; installer fixtures6/6 pass. Fresh real MCP index/search/empty demos all
+exit0 with disposable state and unchanged client settings. Default pinned package
+1.0.169 is installed. No installer or provider request ran. Three groups remain.

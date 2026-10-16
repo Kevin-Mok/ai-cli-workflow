@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# Bypass start.mjs: it installs dependencies and mutates client configuration.
+set -euo pipefail
+package="$HOME/.local/share/context-mode/1.0.169/node_modules/context-mode"
+if [ ! -f "$package/cli.bundle.mjs" ]; then
+    printf '❌ Context Mode is missing; run the pinned repo installer first.\n' >&2
+    exit 1
+fi
+case "${1:-}" in
+    --version) exec node -p '"context-mode " + require(process.argv[1]).version' "$package/package.json" ;;
+    upgrade|hook|insight|statusline)
+        printf '❌ This retrieval pilot excludes hooks, self-upgrades, and Insight.\n' >&2
+        exit 2 ;;
+esac
+exec node "$package/cli.bundle.mjs" "$@"
