@@ -1,3 +1,4 @@
+{{ if not (get . "migrationOffline" | default false) }}
 [".codex/superpowers"]
     type = "archive"
     url = {{ (gitHubLatestRelease "obra/superpowers").TarballURL | quote }}
@@ -38,3 +39,5 @@
     refreshPeriod = "24h"
     [".codex/plugins/higgsfield".pull]
         args = ["--ff-only"]
+
+{{ end }}

@@ -8652,6 +8652,51 @@
     },
     {
       "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-15-migration-checkout-change.md"
+      ],
+      "reviewed_on": "2026-10-16",
+      "findings": [],
+      "sha256": "2eb7a0992f323466286eab5a74c30af8e05c96ded99dbc479e9b6ffd73529ab5",
+      "decision": "Historical migration incident reviewed with its exact evidence/limits and later completed-state boundary. Existing semantic-index, recovery and byte-validation guidance applies; no new live operations or private machine aliases were introduced by shipping."
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-15-migration-transfer-rejection.md"
+      ],
+      "reviewed_on": "2026-10-16",
+      "findings": [],
+      "sha256": "14c9f03d4c0b0cf6a3b14aecae55bcdc0a8852ceafd244bae7d044a62192c950",
+      "decision": "Historical migration incident reviewed with its exact evidence/limits and later completed-state boundary. Existing semantic-index, recovery and byte-validation guidance applies; no new live operations or private machine aliases were introduced by shipping."
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-16-migration-binary-render.md"
+      ],
+      "reviewed_on": "2026-10-16",
+      "findings": [],
+      "sha256": "af833e3af8a205f9b6ea8c8171115090ad7b2d0582cc52116e13bf72e29bd694",
+      "decision": "Historical migration incident reviewed with its exact evidence/limits and later completed-state boundary. Existing semantic-index, recovery and byte-validation guidance applies; no new live operations or private machine aliases were introduced by shipping."
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-16-migration-preparation.md"
+      ],
+      "reviewed_on": "2026-10-16",
+      "findings": [],
+      "sha256": "2224ec0b0052103451fdac1a6335a2359f464046aa1415efd2e5b82899fa514d",
+      "decision": "Historical migration incident reviewed with its exact evidence/limits and later completed-state boundary. Existing semantic-index, recovery and byte-validation guidance applies; no new live operations or private machine aliases were introduced by shipping."
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-16-migration-transfer-containment.md"
+      ],
+      "reviewed_on": "2026-10-16",
+      "findings": [],
+      "sha256": "7c7644343d3be131cbc4c2c98ea59aa531a6dba4e960254003aa5c5f8011bccb",
+      "decision": "Existing source/destination containment guidance applies. Exact canonical GitHub origin spellings are accepted; wrong repository and recorded HEAD drift remain refused. All 46 migration regressions pass; no live cutover ran."
+    },
+    {
+      "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-10-16-shipping-validation.md"
       ],
       "reviewed_on": "2026-10-16",

@@ -1210,6 +1210,52 @@ Run from the PC using the [project runbook](/home/example/coding/example-client-
 - Action: Run the project status and finish stages after acceptance.
   Expected: Exact owned domain UUIDs/network none, normal shutdown and BACKING IMAGE UNCHANGED. Public TLS/external bots/production upgrades remain separate evidence.
 
+## Sanitized repository migration
+
+These checks inspect the replacement checkout and private recovery journal. Use the default state directory, or pass the same `--state-dir` used at cutover. No sudo is required. Run from `~/linux-config`.
+
+### Preview and repeat execution
+
+**Action:** Run `python3 scripts/executable_migrate-ai-cli-workflow --dry-run` after migration.
+
+**Expected:** Verification succeeds and reports already migrated; no files change. Before migration the preview inventories paths and worktrees, validates local identity data, and performs no clone or cutover.
+
+### Verify recovery and configuration
+
+**Action:** Run `python3 scripts/executable_migrate-ai-cli-workflow --verify`, then inspect the private journal's accepted/quarantined path lists. Run a fresh fish shell's `refresh-config` and verify once more.
+
+**Expected:** Origin/main/upstream identify the sanitized repository, chezmoi uses the active checkout, reviewed bytes and archived worktree content remain intact, and private Git/Codex settings are unchanged. Refresh applies reviewed files, shows elapsed progress, excludes scripts/externals/removals, and never copies live settings or adopts conflicts.
+
+### Audit pending and historical content
+
+**Action:** Run `./scripts/executable_audit-public-history --scope all`. The migration verifier independently scans pending file bytes using the sanitized auditor.
+
+**Expected:** No historical or pending findings. This is a bounded scanner result, not proof that no possible secret exists.
+
+### Recovery rehearsal
+
+**Action:** Use disposable repositories and temporary HOME to run the migration integration tests before a live cutover. In a recovery situation, run the migration helper's `--rollback` with its recorded state directory.
+
+**Expected:** Dirty nested/external worktrees survive; clone/render/apply failures preserve or restore the old checkout; interrupted recovery succeeds only when current state matches recorded before/intended states. Subsequent user edits cause refusal and remain untouched. The sanitized candidate remains privately recoverable after rollback.
+
+### Rejected-transfer retry
+
+**Action:** After a content-rejected attempt reports rollback, inspect only path/category diagnostics using `--details`, fix the reviewed source, and regenerate its source/destination hashes. Keep the old recovery directory and use a new `--state-dir` for retry, verification, and rollback.
+
+**Expected:** Real credentials remain rejected; synthetic fixture source passes the same transfer guard used by apply. Logs name rejected paths without exposing values. The previous journal/candidate remain intact, and the new attempt never reuses a rolled-back state directory.
+
+### Concurrent-change refusal
+
+**Action:** Stop other sessions using the active checkout, then preview with `--dry-run --details` and an unused `--state-dir`. Keep every prior failed directory. Review category/count diagnostics if the preview or apply refuses.
+
+**Expected:** Index stat-cache refresh alone does not trigger refusal. Changed HEAD, staged blobs/modes/flags, resolve-undo, working files or ignored entries remain protected. New failed-attempt journals keep the initial and differing fingerprints privately. No cutover or live writes occur after a preparation refusal. A successful preview cannot guarantee writers remain idle afterward.
+
+### Migration preserves local integrations
+
+Action: Run the reviewed migration, then verify existing Claude client settings, MCP declarations and the local Second Brain project contract.
+
+Expected: Existing local integration files and project contracts retain their working bytes; public neutral defaults are retained only in source. Scripts, externals and removals remain excluded.
+
 ## Public benchmark evidence boundary
 
 **Action:** In a disposable repository using this checkout's `.gitignore`, create a raw JSON file under each benchmark `runs/` root and an aggregate report outside those roots; run normal `git add .`.

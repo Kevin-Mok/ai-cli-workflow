@@ -1,0 +1,735 @@
+#!/usr/bin/env python3
+"""Replace an active checkout with independent public history and private recovery."""
+from __future__ import annotations
+
+import argparse
+import configparser
+import hashlib
+import importlib.machinery
+import importlib.util
+import json
+import os
+from pathlib import Path
+import re
+import shutil
+import stat
+import subprocess
+import sys
+import time
+import tempfile
+import tomllib
+
+URL = 'https://github.com/Kevin-Mok/ai-cli-workflow'
+ORIGIN_URLS = (URL, URL + '.git', 'git' + '@' + 'github.com:Kevin-Mok/ai-cli-workflow.git',
+               'ssh://git' + '@' + 'github.com/Kevin-Mok/ai-cli-workflow.git')
+EXCLUDES = 'scripts,externals,remove'
+KEYS = ('mailHost', 'mailPort', 'mailTlsStarttls', 'mailAddress', 'mailRealName',
+        'calendarHost', 'calendarPath', 'calendarUsername')
+
+
+class MigrationError(RuntimeError):
+    """A content-free, actionable refusal."""
+
+
+def digest(content):
+    return hashlib.sha256(content).hexdigest()
+
+
+def say(message, plain=False, icon='🔄'):
+    print(('' if plain else icon + ' ') + message, flush=True)
+
+
+def run(args, cwd=None, env=None, plain=False):
+    # Do not echo subprocess diagnostics: render/apply errors can contain secrets.
+    with subprocess.Popen([str(a) for a in args], cwd=cwd, env=env,
+                          stdout=subprocess.PIPE, stderr=subprocess.PIPE) as process:
+        start = time.monotonic()
+        while True:
+            try:
+                out, _err = process.communicate(timeout=10)
+                break
+            except subprocess.TimeoutExpired:
+                say(f'Working: {Path(str(args[0])).name}; elapsed {int(time.monotonic()-start)}s', plain)
+        if process.returncode:
+            raise MigrationError(f'{Path(str(args[0])).name} failed (exit {process.returncode}); diagnostics withheld')
+        return out
+
+
+def git(repo, *args):
+    return run(['git', '--no-optional-locks', '-c', 'core.hooksPath=/dev/null', '-c', 'core.fsmonitor=false', '-C', repo, *args])
+
+
+def snapshot(path):
+    if path.is_symlink():
+        return {'kind': 'link', 'value': os.readlink(path)}
+    if not path.exists():
+        return {'kind': 'absent'}
+    st = path.stat()
+    if path.is_file() and st.st_nlink == 1:
+        return {'kind': 'file', 'sha256': digest(path.read_bytes()), 'mode': stat.S_IMODE(st.st_mode)}
+    if path.is_dir():
+        return {'kind': 'dir', 'mode': stat.S_IMODE(st.st_mode)}
+    raise MigrationError('Unsupported file type or hardlink; review privately')
+
+
+def inventory(repo):
+    names = git(repo, 'ls-files', '--cached', '--others', '--exclude-standard', '-z').split(b'\0')
+    files = {os.fsdecode(n): snapshot(repo / os.fsdecode(n)) for n in names if n}
+    return {'head': git(repo, 'rev-parse', 'HEAD').decode().strip(),
+            'index': digest(git(repo, 'ls-files', '--stage', '-v', '-z') + b'\0' +
+                            git(repo, 'diff', '--cached', '--raw', '--no-abbrev', '--no-ext-diff', '--no-textconv', '-z', 'HEAD') + b'\0' +
+                            git(repo, 'ls-files', '--resolve-undo', '--stage', '-z')), 'files': files, 'ignored': ignored_metadata(repo),
+            'worktrees': digest(git(repo, 'worktree', 'list', '--porcelain', '-z'))}
+
+
+def checkout_changes(before, after):
+    result = {name: before.get(name) != after.get(name) for name in ('head', 'index', 'worktrees')}
+    for name in ('files', 'ignored'):
+        left, right = before.get(name, {}), after.get(name, {})
+        result[name] = sorted(path for path in set(left) | set(right) if left.get(path) != right.get(path))
+    return result
+
+
+def change_summary(changes):
+    labels = {'head': 'HEAD changed', 'index': 'index entries changed', 'worktrees': 'worktree registrations changed'}
+    parts = [label for name, label in labels.items() if changes[name]]
+    parts.extend(f'{name} changed: {len(changes[name])}' for name in ('files', 'ignored') if changes[name])
+    return '; '.join(parts)
+
+
+def ignored_metadata(repo):
+    names = git(repo, 'ls-files', '--others', '--ignored', '--exclude-standard', '-z').split(b'\0')
+    result = {}
+    for raw in names:
+        if not raw:
+            continue
+        name = os.fsdecode(raw)
+        if name.startswith('.worktrees/') or '__pycache__' in Path(name).parts:
+            continue
+        path = repo / name
+        info = path.lstat()
+        result[name] = [info.st_mode, info.st_size, info.st_mtime_ns, info.st_ctime_ns]
+    return result
+
+
+def worktrees(repo, archive, plain=False):
+    result = []
+    for entry in git(repo, 'worktree', 'list', '--porcelain', '-z').split(b'\0\0'):
+        fields = entry.split(b'\0')
+        if not fields or not fields[0].startswith(b'worktree '):
+            continue
+        path = Path(os.fsdecode(fields[0][9:]))
+        if path == repo:
+            continue
+        if not (path / '.git').is_file() or (path / '.git').is_symlink():
+            raise MigrationError('A linked worktree is missing or unsupported; restore it before migration')
+        say('Inspect linked worktree: ' + path.name, plain)
+        mapped = archive / path.relative_to(repo) if path.is_relative_to(repo) else path
+        result.append({'before': str(path), 'after': str(mapped),
+                       'gitfile': (path / '.git').read_text(),
+                       'fingerprint': tree_fingerprint(path),
+                       'head': git(path, 'rev-parse', 'HEAD').decode().strip()})
+    return result
+
+
+def tree_fingerprint(repo):
+    value = inventory(repo)
+    value.pop('worktrees')
+    return value
+
+
+def private_dir(path):
+    if path.resolve() != path.absolute() or path.is_symlink() or (path.exists() and (not path.is_dir() or path.stat().st_mode & 0o077 or path.stat().st_uid != os.getuid())):
+        raise MigrationError('Recovery directory must be a private real directory (0700)')
+    path.mkdir(mode=0o700, parents=True, exist_ok=True)
+    os.chmod(path, 0o700)
+
+
+def write_private(path, data):
+    fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC | os.O_NOFOLLOW, 0o600)
+    os.fchmod(fd, 0o600)
+    with os.fdopen(fd, 'wb') as stream:
+        stream.write(data)
+        stream.flush()
+        os.fsync(stream.fileno())
+
+
+def atomic_private(path, content):
+    descriptor, name = tempfile.mkstemp(prefix='.migration-write-', dir=path.parent)
+    temporary = Path(name)
+    try:
+        with os.fdopen(descriptor, 'wb') as stream:
+            stream.write(content)
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.replace(temporary, path)
+    finally:
+        temporary.unlink(missing_ok=True)
+
+
+def save(state_dir, state):
+    tmp = state_dir / 'state.next'
+    write_private(tmp, json.dumps(state, indent=2).encode())
+    os.replace(tmp, state_dir / 'state.json')
+    descriptor = os.open(state_dir, os.O_RDONLY | os.O_DIRECTORY)
+    try:
+        os.fsync(descriptor)
+    finally:
+        os.close(descriptor)
+
+
+def load(state_dir):
+    path = state_dir / 'state.json'
+    if not path.exists():
+        raise MigrationError('No migration journal found; preview with --dry-run before the first --apply')
+    if path.is_symlink() or not path.is_file() or path.stat().st_mode & 0o077 or path.stat().st_uid != os.getuid():
+        raise MigrationError('Recovery journal must be a private regular file')
+    data = json.loads(path.read_text())
+    if data.get('version') != 1:
+        raise MigrationError('Unknown recovery journal version')
+    return data
+
+
+def auditor(repo):
+    path = repo / 'scripts/executable_audit-public-history'
+    if not path.is_file():
+        raise MigrationError('Sanitized history auditor is missing')
+    loader = importlib.machinery.SourceFileLoader('migration_public_auditor', str(path))
+    spec = importlib.util.spec_from_loader(loader.name, loader)
+    module = importlib.util.module_from_spec(spec)
+    loader.exec_module(module)
+    return module
+
+
+def content_safe(content, module=None):
+    if b'\0' in content or len(content) > 3_000_000:
+        return False
+    if re.search(rb'(?:gh[pousr]_[A-Za-z0-9]{20,}|sk-[A-Za-z0-9_-]{20,}|-----BEGIN [A-Z ]*PRIVATE KEY-----)', content):
+        return False
+    if re.search(rb'(?im)\b(?:password|api_key|secret|access_token)\s*[:=]\s*[\"\']?[A-Za-z0-9_/-]{8,}', content):
+        return False
+    return not (module and module.scan_content(content, 'blob'))
+
+
+def pending_paths(repo):
+    paths = set(git(repo, 'ls-files', '-m', '-o', '--exclude-standard', '-z').split(b'\0'))
+    paths.update(git(repo, 'diff', '--cached', '--name-only', '-z', 'HEAD').split(b'\0'))
+    return sorted(os.fsdecode(p) for p in paths if p)
+
+
+def reviewed_transfer(repo, candidate, review, fixture, details=False):
+    if review is None or review.is_symlink() or not review.is_file() or review.stat().st_size > 1_000_000:
+        raise MigrationError('A private reviewed transfer manifest is required for --apply')
+    if not fixture and review.stat().st_mode & 0o077:
+        raise MigrationError('Transfer manifest must have private permissions (0600)')
+    files = json.loads(review.read_text()).get('files', {})
+    accepted = []
+    module = None if fixture else auditor(candidate)
+    for name, record in files.items():
+        relative = Path(name)
+        if (relative.is_absolute() or '..' in relative.parts or not relative.parts
+                or any(p in ('.git', '.worktrees', 'second-brain', 'private', 'personal-context') for p in relative.parts)
+                or name.endswith('.tmpl') or name in ('.chezmoiignore', 'dot_codex/config.toml')
+                or any(p in ('dot_aws', 'dot_ssh', 'dot_password-store') for p in relative.parts)):
+            raise MigrationError('Protected/private/template transfer refused')
+        source = Path(record.get('source', str(repo / relative)))
+        target = candidate / relative
+        if source.is_symlink() or not source.is_file() or source.resolve() != source.absolute():
+            raise MigrationError('Reviewed source must be one physical regular file')
+        content = source.read_bytes()
+        if digest(content) != record['sha256']:
+            raise MigrationError('Reviewed source changed; repeat content review')
+        if (target.resolve() != target.absolute()
+                or not target.resolve().is_relative_to(candidate.resolve())
+                or any(parent.exists() and not parent.is_dir()
+                       for parent in (candidate / part for part in relative.parents))
+                or target.is_symlink() or (target.exists() and not target.is_file())):
+            raise MigrationError('Unsafe reviewed destination')
+        base = digest(target.read_bytes()) if target.exists() else None
+        if base != record.get('base_sha256'):
+            raise MigrationError('Sanitized destination changed; repeat content review')
+        if not content_safe(content, module):
+            raise MigrationError('Secret or private-content transfer rejected; values withheld' +
+                                 (': ' + json.dumps(name, ensure_ascii=True) if details else ''))
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(content)
+        target.chmod(stat.S_IMODE(source.stat().st_mode))
+        accepted.append(name)
+    pending = set(pending_paths(repo))
+    return accepted, sorted(pending - set(accepted))
+
+
+def audit_pending(repo, fixture=False):
+    if fixture:
+        return
+    module = auditor(repo)
+    for name in pending_paths(repo):
+        path = repo / name
+        if path.is_symlink():
+            content = os.readlink(path).encode()
+        elif path.is_file():
+            content = path.read_bytes()
+        elif not path.exists():
+            continue
+        else:
+            raise MigrationError('Pending content includes unsupported entry')
+        if not content_safe(content, module):
+            raise MigrationError('Pending-content audit failed; private values withheld; review candidate privately')
+
+
+def local_config(home):
+    path = home / '.config/chezmoi/chezmoi.toml'
+    if path.is_symlink() or not path.is_file():
+        raise MigrationError('Local chezmoi TOML configuration is required')
+    original = path.read_bytes()
+    doc = tomllib.loads(original.decode())
+    data = doc.get('data', {})
+    additions = {}
+    smtp = home / '.config/msmtp/config'
+    if smtp.is_file():
+        fields = {}
+        for line in smtp.read_text().splitlines():
+            parts = line.strip().split(None, 1)
+            if len(parts) == 2:
+                fields[parts[0]] = parts[1]
+        mapping = {'mailHost': 'host', 'mailPort': 'port', 'mailTlsStarttls': 'tls_starttls', 'mailAddress': 'from'}
+        for key, field in mapping.items():
+            if key not in data and field in fields:
+                additions[key] = int(fields[field]) if key == 'mailPort' else fields[field]
+    mutt = home / '.config/neomutt/neomuttrc'
+    if mutt.is_file():
+        match = re.search(r'^set realname\s*=\s*["\'](.*?)["\']\s*$', mutt.read_text(), re.M)
+        if match and 'mailRealName' not in data:
+            additions['mailRealName'] = match[1]
+    calendar = home / '.calcurse/caldav/config'
+    if calendar.is_file():
+        parser = configparser.ConfigParser(interpolation=None)
+        parser.read(calendar)
+        for key, section, field in [('calendarHost', 'General', 'Hostname'), ('calendarPath', 'General', 'Path'), ('calendarUsername', 'Auth', 'Username')]:
+            if key not in data and parser.has_option(section, field):
+                additions[key] = parser.get(section, field)
+    if any(k not in data and k not in additions for k in KEYS):
+        raise MigrationError('Missing required local mail/calendar data; populate privately before cutover')
+    if any('example.' in str((data | additions)[k]) or not str((data | additions)[k]).strip() for k in KEYS):
+        raise MigrationError('Placeholder or empty local identity data refused')
+    rendered = insert_data(original.decode(), additions)
+    tomllib.loads(rendered)
+    return path, rendered.encode()
+
+
+def insert_data(text, values):
+    lines = ''.join('    ' + k + ' = ' + json.dumps(v) + '\n' for k, v in values.items())
+    if re.search(r'(?m)^\[data\]\s*$', text):
+        return re.sub(r'(?m)^\[data\]\s*$', lambda match: '[data]\n' + lines.rstrip(), text, count=1)
+    return text + '\n[data]\n' + lines
+
+
+def chez(candidate, home, config, state_dir, *args):
+    return run(['chezmoi', '--source', candidate, '--destination', home, '--config', config,
+                '--persistent-state', state_dir / 'chezmoi-state.boltdb', '--refresh-externals=never', *args])
+
+
+def backup_file(state_dir, path, state):
+    name = str(path)
+    if name in state['backups']:
+        return
+    before = snapshot(path)
+    if before['kind'] == 'file':
+        blob = str(len(state['backups']))
+        write_private(state_dir / ('backup-' + blob), path.read_bytes())
+        before['backup'] = 'backup-' + blob
+    state['backups'][name] = before
+
+
+def prepare_config(candidate, args, state):
+    home, state_dir = args.home, args.state_dir
+    config, content = local_config(home)
+    state['config'] = str(config)
+    backup_file(state_dir, config, state)
+    # Preserve working local identities/integrations instead of applying neutral examples.
+    preserved = ['.codex/config.toml', '.gitconfig', '.config/chezmoi/chezmoi.toml',
+                 '.config/msmtp/config', '.config/neomutt/neomuttrc', '.calcurse/caldav/config',
+                 '.claude.json', '.claude/settings.json', '.claude/context-mode.mcp.json',
+                 '.claude/code-review-graph.mcp.json', '.claude/token-savior.mcp.json']
+    block = '\n# Keep machine settings outside public source.\n{{ range (get . "migrationPreservedTargets" | default (list)) }}\n{{ . }}\n{{ end }}\n'
+    ignore = candidate / '.chezmoiignore'
+    ignore.write_text(ignore.read_text() + block)
+    external = candidate / '.chezmoiexternal.toml.tmpl'
+    if external.is_file():
+        external.write_text('{{ if not (get . \"migrationOffline\" | default false) }}\n' + external.read_text() + '\n{{ end }}\n')
+    private_config = state_dir / 'chezmoi.toml'
+    # Dotted data fields precede any table declarations.
+    content = insert_data(content.decode(), {'migrationPreservedTargets': preserved, 'migrationOffline': True}).encode()
+    write_private(private_config, content)
+    dump = json.loads(chez(candidate, home, private_config, state_dir, 'dump', '--format=json', '--exclude', EXCLUDES))
+    # The dump itself stays in memory; no rendered values enter logs or public files.
+    for name, entry in dump.items():
+        path = Path(name)
+        if not path.is_absolute():
+            path = home / path
+        if not path.is_relative_to(home) or path == home:
+            raise MigrationError('Rendered target escapes HOME')
+        # Targets containing neutral substitutions must not replace working local settings.
+        encoded = json.dumps(entry).encode()
+        if path.exists() and any(marker in encoded for marker in (b'/home/example', b'example-user', b'example.invalid', b'ExampleProject')):
+            preserved.append(str(path.relative_to(home)))
+    content = re.sub(rb'(?m)^    migrationPreservedTargets = .*\n',
+                     lambda match: ('    migrationPreservedTargets = ' + json.dumps(preserved) + '\n').encode(), content, count=1)
+    write_private(private_config, content)
+    targets = [os.fsdecode(p) for p in chez(candidate, home, private_config, state_dir, 'managed', '--nul-path-separator', '--path-style=absolute', '--include=files,symlinks,dirs', '--exclude', EXCLUDES).split(b'\0') if p]
+    for name in targets:
+        path = Path(name)
+        if not path.is_relative_to(home) or path == home:
+            raise MigrationError('Managed target escapes HOME')
+        if any(parent.is_symlink() for parent in path.parents if parent != home and parent.is_relative_to(home)):
+            raise MigrationError('Managed target has symlink ancestor; preserve it privately first')
+        backup_file(state_dir, path, state)
+    final_dump = json.loads(chez(candidate, home, private_config, state_dir, 'dump', '--format=json', '--exclude', EXCLUDES))
+    intended = state.setdefault('intended_live', {})
+    for name, entry in final_dump.items():
+        path = str(home / name)
+        if entry['type'] == 'file':
+            # JSON replaces invalid UTF-8; read those rendered files as raw bytes.
+            rendered_content = chez(candidate, home, private_config, state_dir, 'cat', path) if '\ufffd' in entry['contents'] else entry['contents'].encode()
+            intended[path] = {'kind': 'file', 'sha256': digest(rendered_content), 'mode': entry['perm']}
+        elif entry['type'] == 'symlink':
+            intended[path] = {'kind': 'link', 'value': entry['linkname']}
+        elif entry['type'] == 'dir':
+            intended[path] = {'kind': 'dir', 'mode': entry['perm']}
+        else:
+            raise MigrationError('Unsupported rendered target type')
+    prepare_refresh(candidate, args, state, final_dump)
+    state['apply_targets'] = targets
+    state['private_config_hash'] = digest(content)
+    state['side_effects'] = [p.name for p in candidate.iterdir() if p.name.startswith(('run_', '.chezmoiexternal', '.chezmoiremove'))]
+    # Render preflight is nonmutating, and excluded hooks/removals are never executed.
+    chez(candidate, home, private_config, state_dir, 'apply', '--dry-run', '--exclude', EXCLUDES, '--no-tty')
+
+
+def prepare_refresh(candidate, args, state, rendered):
+    helper = candidate / 'scripts/executable_sync-shortcuts'
+    if args.allow_local_fixture:
+        return
+    if not helper.is_file():
+        raise MigrationError('Reviewed shortcut generator missing')
+    root = args.state_dir / 'refresh-home'
+    private_dir(root)
+    inputs = ['aliases/key_dirs', 'aliases/key_files', 'aliases/key_aliases']
+    outputs = ['aliases/.key_aliases', '.config/fish/key_abbr.fish', '.config/ranger/key_mappings.conf',
+               '.bashrc', '.zshrc', '.config/fish/config.fish', '.config/ranger/rc.conf']
+    for name in inputs + outputs:
+        live = args.home / name
+        if live.is_symlink():
+            raise MigrationError('Shortcut source/output symlink needs private review')
+        path = root / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        entry = rendered.get(name)
+        if entry and entry['type'] == 'file':
+            path.write_text(entry['contents'].replace(str(args.home), str(root)))
+            path.chmod(entry['perm'])
+        elif live.is_file():
+            shutil.copy2(live, path)
+            path.write_bytes(path.read_bytes().replace(str(args.home).encode(), str(root).encode()))
+    env = dict(os.environ, HOME=str(root))
+    run(['bash', helper], env=env, plain=args.plain)
+    state['intermediate_live'] = dict(state['intended_live'])
+    for name in outputs:
+        live, path = args.home / name, root / name
+        backup_file(args.state_dir, live, state)
+        content = path.read_bytes().replace(str(root).encode(), str(args.home).encode())
+        state['intended_live'][str(live)] = {'kind': 'file', 'sha256': digest(content), 'mode': stat.S_IMODE(path.stat().st_mode)}
+    state['refresh_reviewed'] = True
+
+
+def fresh_refresh(args, state):
+    if not state.get('refresh_reviewed'):
+        return
+    # A clean fish process loads only the replacement helpers; no inherited function definitions.
+    prefix = args.home / '.config/fish/functions'
+    quote = lambda path: "'" + str(path).replace("'", "\\'") + "'"
+    command = ('source ' + quote(prefix / 'cli-message.fish') + '; source ' + quote(prefix / 'refresh-config.fish') +
+               '; function chezmoi; command chezmoi --persistent-state ' + quote(args.state_dir / 'chezmoi-state.boltdb') +
+               ' --refresh-externals=never $argv; end; function sync-shortcuts; bash ' +
+               quote(args.repo / 'scripts/executable_sync-shortcuts') + '; end; refresh-config')
+    say('Run replacement refresh helper in a fresh fish shell; generated outputs are journaled.', args.plain)
+    run(['fish', '--no-config', '-c', command], cwd=args.repo, plain=args.plain)
+
+
+def repair(root, trees, after):
+    paths = [t['after' if after else 'before'] for t in trees]
+    if paths:
+        git(root, 'worktree', 'repair', *paths)
+
+
+def verify(args, state):
+    repo = args.repo
+    if state['phase'] != 'complete':
+        raise MigrationError('Migration incomplete; use recorded --rollback before another apply')
+    origins = ORIGIN_URLS if state['url'] in ORIGIN_URLS else (state['url'],)
+    if git(repo, 'remote', 'get-url', 'origin').decode().strip() not in origins:
+        raise MigrationError('Origin no longer targets sanitized repository')
+    if git(repo, 'branch', '--show-current').decode().strip() != 'main' or git(repo, 'rev-parse', '--abbrev-ref', '@{u}').decode().strip() != 'origin/main':
+        raise MigrationError('Expected main tracking origin/main')
+    if (repo / '.git/objects/info/alternates').exists() or (repo / '.git').is_symlink():
+        raise MigrationError('Independent Git object storage required')
+    if git(repo, 'rev-parse', 'HEAD').decode().strip() != state['new_head']:
+        raise MigrationError('Sanitized HEAD changed since migration')
+    for name, expected in state.get('accepted_hashes', {}).items():
+        if not (repo / name).is_file() or digest((repo / name).read_bytes()) != expected:
+            raise MigrationError('Accepted functionality changed or is missing')
+    for tree in state['worktrees']:
+        path = Path(tree['after'])
+        common = git(path, 'rev-parse', '--path-format=absolute', '--git-common-dir').decode().strip()
+        if Path(common).resolve() != (args.state_dir / 'archive/.git').resolve():
+            raise MigrationError('Archived linked worktree attachment mismatch')
+        if tree_fingerprint(path) != tree['fingerprint']:
+            raise MigrationError('Archived linked worktree content changed')
+    if not args.skip_config:
+        for name, expected in state.get('intended_live', {}).items():
+            if snapshot(Path(name)) != expected:
+                raise MigrationError('Live apply did not match the recorded intended output')
+        actual = run(['chezmoi', 'source-path']).decode().strip()
+        if Path(actual).resolve() != repo:
+            raise MigrationError('Chezmoi source is not the replacement checkout')
+        for name in ('.codex/config.toml', '.gitconfig'):
+            path = args.home / name
+            if snapshot(path) != state['local_identities'][name]:
+                raise MigrationError('Working local integration settings changed')
+    audit_pending(repo, args.allow_local_fixture)
+    say('Sanitized checkout, configuration source, and recovery links verified.', args.plain, '✅')
+
+
+def rollback(args, state):
+    repo, sd = args.repo, args.state_dir
+    archive, candidate = sd / 'archive', sd / 'candidate'
+    if state['phase'] == 'rolled_back':
+        say('Already rolled back; no changes required.', args.plain, '✅')
+        return
+    if archive.exists() and state.get('after_repo') and repo.exists() and tree_fingerprint(repo) != state['after_repo']:
+        raise MigrationError('Rollback refused: checkout changed after migration')
+    if state.get('live_started'):
+        if not state.get('intended_live'):
+            raise MigrationError('Rollback refused: interrupted apply has no intended-state journal')
+        for name, before in state['backups'].items():
+            original = {k: v for k, v in before.items() if k != 'backup'}
+            current = snapshot(Path(name))
+            expected = state['intended_live'].get(name, original)
+            intermediate = state.get('intermediate_live', {}).get(name, original)
+            if current not in (original, intermediate, expected):
+                raise MigrationError('Rollback refused: live settings changed outside recorded apply')
+    for tree in state['worktrees']:
+        path = Path(tree['after'] if archive.exists() else tree['before'])
+        if archive.exists() and state.get('worktree_links') and (path / '.git').read_text() != state['worktree_links'].get(str(path)):
+            raise MigrationError('Rollback refused: linked worktree pointer changed')
+    # Before live apply, only checkout paths/worktree pointers may have changed.
+    if archive.exists():
+        if repo.exists():
+            if candidate.exists():
+                raise MigrationError('Rollback destination occupied; retain both checkouts for review')
+            repo.rename(candidate)
+        state['phase'] = 'restoring'
+        save(sd, state)
+        archive.rename(repo)
+    if state['phase'] == 'restoring':
+        repair(repo, state['worktrees'], False)
+    for name, before in sorted(state.get('backups', {}).items(), key=lambda item: len(Path(item[0]).parts), reverse=True):
+        path = Path(name)
+        if not state.get('live_started'):
+            continue
+        if before['kind'] == 'dir':
+            if path.is_dir():
+                path.chmod(before['mode'])
+            continue
+        if before['kind'] == 'absent':
+            if path.is_symlink() or path.is_file():
+                path.unlink()
+            continue
+        path.parent.mkdir(parents=True, exist_ok=True)
+        fd, temporary = tempfile.mkstemp(prefix='.migration-restore-', dir=path.parent)
+        temporary = Path(temporary)
+        try:
+            if before['kind'] == 'link':
+                os.close(fd)
+                temporary.unlink()
+                temporary.symlink_to(before['value'])
+            else:
+                with os.fdopen(fd, 'wb') as stream:
+                    stream.write((sd / before['backup']).read_bytes())
+                    os.fchmod(stream.fileno(), before['mode'])
+                    stream.flush()
+                    os.fsync(stream.fileno())
+            os.replace(temporary, path)
+        finally:
+            temporary.unlink(missing_ok=True)
+    # Remove only newly created, now-empty directories; never recurse over user files.
+    for name, before in sorted(state.get('backups', {}).items(), key=lambda item: len(Path(item[0]).parts), reverse=True):
+        path = Path(name)
+        if state.get('live_started') and before['kind'] == 'absent' and path.is_dir():
+            try:
+                path.rmdir()
+            except OSError:
+                pass
+    state['phase'] = 'rolled_back'
+    save(sd, state)
+    say('Original checkout, settings, and linked worktrees restored; candidate retained privately.', args.plain, '✅')
+
+
+def apply(args):
+    repo, sd = args.repo, args.state_dir
+    if repo.resolve() != repo or args.home.resolve() != args.home:
+        raise MigrationError('Checkout and HOME must use physical paths without symlink ancestors')
+    if sd.resolve().is_relative_to(repo) or repo.is_relative_to(sd.resolve()):
+        raise MigrationError('Recovery directory must be outside the active checkout')
+    if (sd / 'state.json').exists():
+        state = load(sd)
+        if state['phase'] == 'complete':
+            verify(args, state)
+            say('Already migrated; no changes required.', args.plain, '✅')
+            return
+        if state['phase'] == 'rolled_back':
+            raise MigrationError('Previous attempt rolled back; preserve it and choose a new --state-dir for retry')
+        raise MigrationError('Existing recovery journal: use --rollback before another migration')
+    if not (repo / '.git').is_dir() or (repo / '.git').is_symlink():
+        raise MigrationError('Active path must be an ordinary main checkout')
+    initial = inventory(repo)
+    trees = worktrees(repo, sd / 'archive', args.plain)
+    private_dir(sd)
+    lock = sd / 'migration.lock'
+    try:
+        descriptor = os.open(lock, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    except FileExistsError:
+        raise MigrationError('Migration lock exists; inspect interrupted recovery privately') from None
+    os.close(descriptor)
+    state = {'version': 1, 'repo': str(repo), 'home': str(args.home), 'url': args.url,
+             'phase': 'preparing', 'initial_checkout': initial, 'worktrees': trees, 'backups': {}, 'local_identities': {}, 'intended_live': {}}
+    save(sd, state)
+    try:
+        say('Clone independent sanitized main; no old Git data will be copied.', args.plain)
+        candidate = sd / 'candidate'
+        run(['git', '-c', 'core.hooksPath=/dev/null', 'clone', '--template=', '--no-local', '--single-branch', '--branch', 'main', args.url, candidate], plain=args.plain)
+        state['new_head'] = git(candidate, 'rev-parse', 'HEAD').decode().strip()
+        accepted, quarantined = reviewed_transfer(repo, candidate, args.review, args.allow_local_fixture, args.details)
+        state['accepted'], state['quarantined'] = accepted, quarantined
+        for name in accepted:
+            say('Accepted: ' + name, args.plain, '✅')
+        for name in quarantined:
+            # Names are JSON-escaped to prevent terminal escape/control injection.
+            say('Quarantined in private archive: ' + json.dumps(name, ensure_ascii=True), args.plain, '📦')
+        if not args.skip_config:
+            for name in ('.codex/config.toml', '.gitconfig'):
+                state['local_identities'][name] = snapshot(args.home / name)
+            prepare_config(candidate, args, state)
+            say(f'Render preflight complete; {len(state["apply_targets"])} targets backed up; scripts, externals, removals excluded.', args.plain)
+            run([sys.executable, candidate / 'scripts/executable_audit-public-history', '--repo', candidate, '--scope', 'all', '--plain'], plain=args.plain)
+        audit_pending(candidate, args.allow_local_fixture)
+        current = inventory(repo)
+        if current != initial:
+            changes = checkout_changes(initial, current)
+            state['checkout_changes'] = changes
+            raise MigrationError('Active checkout changed during preparation; cutover refused' +
+                                 (': ' + change_summary(changes) if args.details else ''))
+        for tree in trees:
+            current = tree_fingerprint(Path(tree['before']))
+            if current != tree['fingerprint']:
+                changes = checkout_changes(tree['fingerprint'], current)
+                state['worktree_changes'] = {'path': tree['before'], 'changes': changes}
+                raise MigrationError('Linked worktree changed during preparation; cutover refused' +
+                                     (': ' + change_summary(changes) if args.details else ''))
+        for name, before in state['backups'].items():
+            current = snapshot(Path(name))
+            if current != {k: v for k, v in before.items() if k != 'backup'}:
+                raise MigrationError('Live settings changed during preparation; cutover refused')
+        state['phase'] = 'cutover'
+        state['after_repo'] = tree_fingerprint(candidate)
+        state['accepted_hashes'] = {name: digest((candidate / name).read_bytes()) for name in accepted}
+        save(sd, state)
+        os.chdir(repo.parent)
+        repo.rename(sd / 'archive')
+        candidate.rename(repo)
+        repair(sd / 'archive', trees, True)
+        state['worktree_links'] = {tree['after']: (Path(tree['after']) / '.git').read_text() for tree in trees}
+        state['phase'] = 'applying'
+        state['after_repo'] = tree_fingerprint(repo)
+        save(sd, state)
+        if not args.skip_config:
+            config = Path(state['config'])
+            # Keep machine source binding explicit in local configuration only.
+            text = (sd / 'chezmoi.toml').read_text()
+            text = re.sub(r'(?m)^sourceDir\s*=.*$', lambda match: 'sourceDir = ' + json.dumps(str(repo)), text)
+            if not re.search(r'(?m)^sourceDir\s*=', text):
+                text = 'sourceDir = ' + json.dumps(str(repo)) + '\n' + text
+            state['intended_live'][str(config)] = {'kind': 'file', 'sha256': digest(text.encode()), 'mode': 0o600}
+            state['live_started'] = True
+            save(sd, state)
+            atomic_private(config, text.encode())
+            chez(repo, args.home, config, sd, 'apply', '--force', '--exclude', EXCLUDES, '--no-tty')
+            fresh_refresh(args, state)
+        state['after_repo'] = tree_fingerprint(repo)
+        state['after_live'] = {name: snapshot(Path(name)) for name in state['backups']}
+        state['phase'] = 'complete'
+        save(sd, state)
+        verify(args, state)
+        say('Private archive/recovery: ' + str(sd), args.plain, '📦')
+    except BaseException:
+        # Record partial live writes for safe explicit/automatic recovery.
+        save(sd, state)
+        rollback(args, state)
+        raise
+    finally:
+        lock.unlink(missing_ok=True)
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    modes = parser.add_mutually_exclusive_group()
+    for mode in ('dry-run', 'apply', 'verify', 'rollback'):
+        modes.add_argument('--' + mode, action='store_true')
+    parser.add_argument('--repo', type=Path, default=Path.home() / 'linux-config')
+    parser.add_argument('--home', type=Path, default=Path.home())
+    parser.add_argument('--url', default=URL)
+    parser.add_argument('--state-dir', type=Path, default=Path.home() / '.local/state/ai-cli-workflow-migration')
+    parser.add_argument('--review', type=Path, help='Private hash-bound, content-reviewed transfer manifest')
+    parser.add_argument('--plain', action='store_true')
+    parser.add_argument('--details', action='store_true', help='Content-free diagnostics only')
+    parser.add_argument('--allow-local-fixture', action='store_true', help=argparse.SUPPRESS)
+    parser.add_argument('--skip-config', action='store_true', help=argparse.SUPPRESS)
+    args = parser.parse_args()
+    args.repo, args.home, args.state_dir = (p.absolute() for p in (args.repo, args.home, args.state_dir))
+    try:
+        fixture = args.allow_local_fixture and args.url.startswith('file://') and args.home.is_relative_to(Path('/tmp'))
+        if args.skip_config and not fixture or args.allow_local_fixture and not fixture:
+            raise MigrationError('Fixture options require a temporary HOME and file URL')
+        if not fixture and args.url != URL:
+            raise MigrationError('Production migration requires the settled sanitized HTTPS URL')
+        if args.verify or args.rollback:
+            state = load(args.state_dir)
+            if state['repo'] != str(args.repo) or state['home'] != str(args.home):
+                raise MigrationError('Recovery journal identity mismatch')
+            (rollback if args.rollback else verify)(args, state)
+        elif args.apply:
+            apply(args)
+        elif (args.state_dir / 'state.json').exists():
+            state = load(args.state_dir)
+            verify(args, state)
+            say('Already migrated; no changes required.', args.plain, '✅')
+        else:
+            before = inventory(args.repo)
+            trees = worktrees(args.repo, args.state_dir / 'archive', args.plain)
+            if not args.skip_config:
+                local_config(args.home)
+            current = inventory(args.repo)
+            if current != before:
+                changes = checkout_changes(before, current)
+                raise MigrationError('Active checkout changed during read-only inventory; no changes made' +
+                                     (': ' + change_summary(changes) if args.details else ''))
+            say(f'Dry run: {len(before["files"])} pending/tracked paths; {len(trees)} linked worktrees; no changes made.', args.plain, '✅')
+            say('Apply requires reviewed transfer hashes; unreviewed edits remain in the private archive.', args.plain)
+        return 0
+    except (MigrationError, OSError, ValueError, KeyError, tomllib.TOMLDecodeError) as error:
+        message = str(error) if isinstance(error, MigrationError) else 'Invalid or unavailable migration input; inspect paths privately'
+        say(message, args.plain, '❌')
+        return 1
+
+
+if __name__ == '__main__':
+    sys.exit(main())

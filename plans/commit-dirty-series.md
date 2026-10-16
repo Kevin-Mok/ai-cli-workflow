@@ -23,7 +23,7 @@ live settings, recovery material and generated state remain excluded.
   migration guidance historical and repair stale notification documentation.
 - [x] Run focused validation, README gate and full dirty-byte review.
 - [ ] Run the staged gate separately for each actual commit candidate.
-- [ ] Commit configuration privacy/refresh prerequisites with matching docs.
+- [x] Commit configuration privacy/refresh prerequisites with matching docs.
 - [ ] Commit migration helper, guard, plans/prompt/incident and matching docs.
 - [ ] Commit portable storage offload tool and docs.
 - [ ] Commit notification source outlines, speech updates, Dunst indicator and docs.
@@ -109,3 +109,23 @@ snapshot validation remains a reported local refusal without writes. Safe refres
 completed successfully. Remaining: migration, storage, notifications, clipboard,
 Context Mode, metaprompt, workflow auditing and privacy-gate groups; no safety
 blocker for this candidate. Three known baseline fixture failures remain recorded.
+
+
+### Milestone 2 — feat(migration): add guarded private checkout cutover
+
+Milestone1 committed as a230322. This milestone includes the migration helper,
+46-test suite, completed historical prompt/plans, private-template controls,
+matching README/smoke/lessons and incident-memory records. Destination symlink
+escape reproduced RED before the minimal containment guard; all45 migration
+checks passed. No live apply or rollback ran. Remaining: storage, notifications,
+clipboard, Context Mode, metaprompt, workflow audit and privacy gate. No safety
+blocker for this candidate; previously recorded runtime/fixture warnings remain.
+
+
+Milestone2 hold: the safe read-only preview found an HTTPS-only remote comparison
+rejecting the authorized canonical SSH origin. No migration writes occurred.
+Worker adds a defining regression and finite canonical URL acceptance before the
+migration candidate is restaged; no commit is attempted with the stale snapshot.
+
+Milestone2 hold resolved: canonical URL RED/GREEN complete, all46 checks pass.
+Frozen candidate refreshed; recorded HEAD/journal guards remain intact.

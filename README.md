@@ -964,6 +964,21 @@ Dunst uses Hack Nerd Font Mono 23.25 pt, 1.5 times the previous 15.5 pt. After r
 
 Terminal/Codex popup titles and bodies render `**bold**` as bold text; literal HTML and Markdown inside code remain literal. Run `~/scripts/notification-markdown-test --activate-all` to activate existing reachable Kitty instances and send a native bold sample. Use `--case literal` for escaping/code checks, `--case plain` for plain-text delivery, `--plain` for ASCII output and `--details` for activation diagnostics. New Kitty processes load the callback automatically. This covers strong emphasis rather than full Markdown or other apps' native notifications.
 
+## Migrate an existing private checkout
+
+Use [`migrate-ai-cli-workflow`](scripts/executable_migrate-ai-cli-workflow) to replace `~/linux-config` with an independent HTTPS clone of this repository on `main`. The old checkout and its linked worktrees remain private recovery material; no old Git objects, branches, hooks, or configuration are imported. Review pending edits first, rehearse with disposable fixtures, preview, apply, then verify.
+
+The default and `--dry-run` inspect without writes. `--apply` requires reviewed content hashes supplied through a private `--review` manifest; unreviewed edits stay in the archive. `--state-dir` defaults to `~/.local/state/ai-cli-workflow-migration` (0700). `--verify` checks repository identity, accepted bytes, pending content, local settings, and archived worktree links. `--rollback` uses that recorded directory and refuses to overwrite later edits. After a failed attempt reports rollback, preserve its recovery directory and select a new `--state-dir` for retry; pass that same directory to all later verification/rollback commands. Use `--details` to identify rejected relative paths without printing their contents. `--plain` provides ASCII output; `--details` never prints rendered settings or raw diagnostics.
+
+A review manifest has a `files` object keyed by relative destination path. Each entry contains `sha256` for the reviewed source bytes and `base_sha256` for the sanitized destination (null for a new file). An optional absolute `source` selects a privately prepared, sanitized overlay. Templates and sensitive paths cannot be imported. Hashes bind a human content review; scans do not establish that every possible secret is absent.
+
+The migration extracts missing mail/calendar identity data privately from working local settings, then renders before cutover. Live Git/Codex, Claude integration and mail/calendar files remain local through `migrationPreservedTargets` in untracked chezmoi data. Neutral example configurations, including local project contracts, never replace working private values. Private `migrationOffline` data suppresses external-template network evaluation; installers, externals, and removals stay excluded. Review those hooks individually before any later deliberate use. Backups cover managed files, links and directory modes, not arbitrary installer effects.
+
+No sudo is needed. Live cutover needs write access to the checkout parent, local configuration, and linked worktree Git metadata. It does not commit, push, revoke credentials, or delete the archive. Treat the recovery directory as sensitive. See [migration smoke checks](docs/smoke-tests.md#sanitized-repository-migration) and the [implementation record](plans/migrate-sanitized-repo.md).
+
+
+Migration concurrency checks compare file content and logical index/recovery entries, excluding harmless Git stat-cache refreshes. New private journals retain initial and changed fingerprints; `--details` reports only changed categories/counts. The read-only preview also rejects changes observed during inventory. A clean preview covers its sampled interval; finish or pause other sessions before the live rename. Never bypass a material-change refusal.
+
 ## License
 
 This repository is licensed under the [MIT License](LICENSE).

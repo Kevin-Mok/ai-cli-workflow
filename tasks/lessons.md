@@ -225,4 +225,5 @@
   commit and prune the replaced object if metadata must be corrected. See [the
   closeout identity incident](../docs/postmortem/2026-10-14-closeout-commit-private-identity.md).
 
+2026-10-15 - Migration guards must compare logical Git index/recovery entries, not stat-cache bytes; save private initial/difference fingerprints and keep real concurrent edits blocked.
 - 2026-10-16: When notification popups display but both clip and speech are silent, check the selected clip before changing hooks or reinstalling Piper. A stale checkout path stops both stages; prefer an existing audio asset outside the checkout. See [missing notification clip](../docs/postmortem/2026-10-16-notification-missing-clip.md).
