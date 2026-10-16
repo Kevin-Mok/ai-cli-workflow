@@ -1,5 +1,8 @@
 # Metaprompt pilot protocol
 
+
+Raw run artifacts are private local output under the ignored `runs/` directory. Public aggregate findings are retained in `docs/metaprompt-benchmark.md`; the public history excludes request traces, runtime identifiers and raw ledgers.
+
 For a native save contract, the verified saved prompt must match the single
 displayed prompt fence, ignoring terminal newline characters only. Contradictory
 saved and displayed prompts are compilation failures; extraction cannot choose

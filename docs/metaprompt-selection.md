@@ -1,5 +1,10 @@
 # Native metaprompt skill selection
 
+
+Raw request/response traces, runtime identifiers, trial ledgers and generated run files are private local evidence. Both benchmark `runs/` directories are ignored and removed from public history. This page retains reviewed aggregate findings and their limits; the public checkout no longer includes raw records for independently auditing those historical measurements. The harness and synthetic fixtures remain available for a new, separately budgeted run.
+
+Source verification currently detects pin mismatches already present in the starting public revision. Preview and synthetic tests remain available, but do not start another inference run or silently repin frozen inputs. See the [source-pin incident](postmortem/2026-10-16-benchmark-source-pins.md).
+
 **Choose Sentry's `prompt-optimizer` if you want a metaprompt skill.** It had
 the highest observed end-to-end success among the three eligible native skills:
 **14/16**, versus Wshobson's **13/16** and Senior's **11/16**. Its repository had
@@ -24,8 +29,8 @@ October 4, `$metaprompt` was migrated to the chosen Sentry package; see the
 [replacement plan](../plans/replace-metaprompt-with-sentry.md) for deployment
 verification. The benchmark's native results and frozen inputs are unchanged.
 
-The [primary summary](../benchmarks/metaprompt-selection/runs/selection-2026-10-03/summary.json)
-and [request-level analysis](../benchmarks/metaprompt-selection/runs/selection-2026-10-03/analysis.json)
+The primary summary
+and request-level analysis
 agree on Sentry. Accounting reconciles with no integrity errors or missing
 usage fields. The [handoff](metaprompt-selection-handoff.md) preserves the
 earlier pause and now records completion.
@@ -140,9 +145,9 @@ intervals do not establish general superiority.
 `selection-template-draft` puts `{{message_data}}. Keys ...` inline. Substituting
 multiline data joins its final `Fact: funding unknown` line to the following
 instructions, although the contract asks for exact line copying. The
-[raw result](../benchmarks/metaprompt-selection/runs/selection-2026-10-03/trials/selection-template-draft--raw.json)
+raw result
 retained those instructions in the final fact; the
-[minimal result](../benchmarks/metaprompt-selection/runs/selection-2026-10-03/trials/selection-template-draft--minimal.json)
+minimal result
 retained the period. The key expects only `funding unknown`. All three native
 arms passed, but that case provides ambiguous evidence of an optimizer benefit.
 
@@ -305,7 +310,7 @@ handoffs completed; readiness does not require perfect candidate answers.
 The six held-out compiler limits were Wshobson on extraction-quotes, coding-pairs
 and coding-chunks; Senior on summary-corrections and template-filter; Sentry on
 create-writing-draft. Each exhausted the ten-request compiler allowance. For
-example, [Wshobson's chunks record](../benchmarks/metaprompt-selection/runs/selection-2026-10-03/trials/selection-coding-chunks--wshobson-patterns.json)
+example, Wshobson's chunks record
 contains ten compiler requests and no solver stage. These are measured capped
 workflow failures, with no observed downstream answer to grade.
 
@@ -313,10 +318,10 @@ Four other failures expose the frozen adapter's final-prompt parser:
 
 | Saved trial | Presentation the parser missed | Separate native-process observation |
 | --- | --- | --- |
-| [Senior extraction-quotes](../benchmarks/metaprompt-selection/runs/selection-2026-10-03/trials/selection-sharpen-extraction-quotes--alireza-senior.json) | `FINAL PROMPT — candidate, structural gate failed`, prompt fence, second metric fence, and `Saved as` artifact line | Actual static clarity regression 90 → 85 |
-| [Sentry template-conflict](../benchmarks/metaprompt-selection/runs/selection-2026-10-03/trials/selection-template-conflict--sentry-prompt-optimizer.json) | `Optimized Prompt — FINAL HANDOFF` heading, with the artifact link on the next line | The native section matcher also rejected the heading suffix; all eight human-readable sections were present |
-| [Senior coding-headers](../benchmarks/metaprompt-selection/runs/selection-2026-10-03/trials/selection-coding-headers--alireza-senior.json) | `FINAL PROMPT — prompts/final_prompt.txt`, underline, then prompt text | Same-case baseline/final public evaluation pair not observed |
-| [Senior coding-chunks](../benchmarks/metaprompt-selection/runs/selection-2026-10-03/trials/selection-coding-chunks--alireza-senior.json) | Same em-dash form with a backticked artifact path | Same-case evaluation pair not observed |
+| Senior extraction-quotes | `FINAL PROMPT — candidate, structural gate failed`, prompt fence, second metric fence, and `Saved as` artifact line | Actual static clarity regression 90 → 85 |
+| Sentry template-conflict | `Optimized Prompt — FINAL HANDOFF` heading, with the artifact link on the next line | The native section matcher also rejected the heading suffix; all eight human-readable sections were present |
+| Senior coding-headers | `FINAL PROMPT — prompts/final_prompt.txt`, underline, then prompt text | Same-case baseline/final public evaluation pair not observed |
+| Senior coding-chunks | Same em-dash form with a backticked artifact path | Same-case evaluation pair not observed |
 
 Visible final artifacts exist in these records, but none reached a solver.
 Preserving the frozen scores prevents tuning the parser against held-out
@@ -343,7 +348,7 @@ and downstream correctness are three different measurements. Senior's actual
 rule allows an unchanged imperfect public score with no previously passing case
 lost; no invented 100% public-eval gate was added.
 
-For concrete successful execution, [Sentry's headers trial](../benchmarks/metaprompt-selection/runs/selection-2026-10-03/trials/selection-coding-headers--sentry-prompt-optimizer.json)
+For concrete successful execution, Sentry's headers trial
 records `read_files` of `headers.py` and `public_tests.py`, a failing public
 `run_tests`, a target-only write changing the implementation to preserve order
 and duplicates while stripping/lowercasing strings, then a passing `run_tests`.
@@ -410,8 +415,8 @@ Reference answers pass deterministic checks; supplied coding bugs fail public an
 hidden assertions before repair.
 
 The following commands make subscription model requests or freeze/report the
-specified run. They describe the reusable workflow, not an instruction to rerun
-already consumed trials:
+specified run. They describe the reusable workflow. The public checkout omits prior ledgers;
+restore private records or explicitly authorize a fresh budget before execution:
 
 ```bash
 python3 scripts/metaprompt-selection.py develop --development-round 1 --jobs 2
@@ -422,7 +427,7 @@ python3 scripts/metaprompt-selection.py report
 python3 scripts/metaprompt-selection-analysis.py --run benchmarks/metaprompt-selection/runs/selection-2026-10-03
 ```
 
-Inspect [run artifacts](../benchmarks/metaprompt-selection/runs/selection-2026-10-03/)
+Inspect privately retained run artifacts
 for the durable trial/request ledgers, development settings, frozen protocol,
 individual compiler/solver transcripts and aggregate results. Confirm that each
 arm has the same sixteen held-out cases and four cases per workflow, original
@@ -432,9 +437,9 @@ Review native reports and compiled prompts for lost constraints, invented facts,
 unsupported evaluation claims and premature task execution. Do not tune against
 held-out results or edit frozen inputs to improve scores.
 
-The committed `summary.json` contains every aggregate field printed by `report`.
+The private local `summary.json` contains every aggregate field printed by `report`.
 The command also rebuilds a local, ignored `results.json`, whose `rows` duplicate
-all 100 committed individual trial records (about 75 MiB). Regenerate the compact
+all 100 private individual trial records (about 75 MiB). Regenerate the compact
 summary without inference with
 `python3 scripts/metaprompt-selection.py report > benchmarks/metaprompt-selection/runs/selection-2026-10-03/summary.json`.
 The derivative analyzer reads individual trials and ledgers directly. No frozen

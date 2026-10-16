@@ -319,8 +319,10 @@ listing is cached-only; opening a picker can generate recaps unless disabled.
   [the source record](../dot_agents/skills/metaprompt/SOURCE.md).
 - Action: `python3 scripts/metaprompt-selection.py verify`, then
   `python3 scripts/metaprompt-selection.py dry-run`.
-  Expected: three pinned native finalists, 27 verified package files, 26 valid
-  reference answers and seven coding RED/GREEN pairs; the schedule contains
+  Expected: `verify` currently exits 1 for the pre-existing source-pin mismatch
+  documented in [the incident](postmortem/2026-10-16-benchmark-source-pins.md).
+  Do not repin frozen inputs or start inference to bypass it. `dry-run` exits 0;
+  the schedule contains
   20 development and 80 held-out attempts within the 100-trial/2,000-request
   ceilings. Count the actual schedule: its original allocation summary retains
   the pre-calibration 90/2 values. Neither command invokes a model. See the
@@ -331,7 +333,7 @@ listing is cached-only; opening a picker can generate recaps unless disabled.
   checks against synthetic responses with zero remote inference; pinned staging
   and rollback pass only in temporary directories, preserving collisions,
   modified copies, extra files and symlinks.
-- Action: After an executed selection, run
+- Action: Only with privately restored frozen selection records, run
   `python3 scripts/metaprompt-selection.py report`, then
   `python3 scripts/metaprompt-selection-analysis.py --run benchmarks/metaprompt-selection/runs/selection-2026-10-03`.
   Expected: recommendation and workflow rates derive from the complete paired
@@ -340,8 +342,9 @@ listing is cached-only; opening a picker can generate recaps unless disabled.
   correctness, and no skill is installed by reporting. Analysis verifies the
   frozen hashes and request evidence, writes `analysis.json`, and includes
   exploratory paired intervals without making model calls. For the completed
-  run, `report` also prints the committed compact `summary.json` fields; its
-  ignored `results.json` duplicates the retained per-trial records. For
+  run, `report` also prints the private compact `summary.json` fields; its
+  private `results.json` duplicates per-trial records. These raw artifacts are
+  absent from a public checkout and must remain ignored after restoration. For
   `selection-2026-10-03`, confirm 80 held-out rows, 100 total attempts,
   754 requests, no integrity errors, and Sentry selected at 14/16 against
   Wshobson 13/16, Senior 11/16 and both controls 15/16. The equally omitted
@@ -349,19 +352,21 @@ listing is cached-only; opening a picker can generate recaps unless disabled.
   raw/minimal are 15/15 and Sentry's weighted success is 85.42%. Native gate
   flags must retain the documented heading-matcher and no-mandatory-gate caveats.
 - Action: python3 scripts/metaprompt-benchmark.py verify
-  Expected: Verifies seven variants, 71 pinned candidate files, and 32 synthetic
-  fixtures (8 development, 24 held-out); makes no model calls or installed changes.
+  Expected: Currently exits 2 for the pre-existing candidate source-pin
+  mismatch documented in [the incident](postmortem/2026-10-16-benchmark-source-pins.md).
+  Makes no model calls or installed changes; do not silently repin frozen inputs.
 - Action: python3 scripts/metaprompt-benchmark.py dry-run
   Expected: Shows gpt-6.1-sol at medium reasoning, the 50-request cap, fixed pilot
   schedule, and pending cases. Does not use quota or reset an existing ledger.
-- Action: python3 scripts/metaprompt-benchmark.py report
+- Action: With privately restored frozen pilot records, run `python3 scripts/metaprompt-benchmark.py report`.
   Expected: Verifies frozen inputs and rebuilds machine-readable results from
   the frozen schedule and saved attempts without model calls. Changed frozen
   inputs stop reporting. Failures, pending pairs, unknown costs and limited coverage remain visible;
   see [benchmark replay and runtime status](metaprompt-benchmark.md).
-- Action: python3 scripts/metaprompt-benchmark-analysis.py
+- Action: With privately restored frozen pilot records, run `python3 scripts/metaprompt-benchmark-analysis.py`.
   Expected: Derives request-level costs, including aborted episodes, from the
-  frozen saved evidence. The 49 measured requests plus one setup attempt
+  frozen saved evidence. A public checkout lacks these records; keep restored
+  output private and ignored. The 49 measured requests plus one setup attempt
   reconcile to the unchanged 50-request ledger; no model calls are made.
 - Action: Finish a change with a user-observable CLI, browser, package, API, or
   rendered-config surface after automated tests pass.
@@ -1208,3 +1213,13 @@ Run from the PC using the [project runbook](/home/example/coding/example-client-
   Expected: Original UUID/files/configured database/local-service checks and a current-session complete report gate the separate desktop clone; signed same-release packages install without guest Internet. Record actual GNOME login/reboot screenshots.
 - Action: Run the project status and finish stages after acceptance.
   Expected: Exact owned domain UUIDs/network none, normal shutdown and BACKING IMAGE UNCHANGED. Public TLS/external bots/production upgrades remain separate evidence.
+
+## Public benchmark evidence boundary
+
+**Action:** In a disposable repository using this checkout's `.gitignore`, create a raw JSON file under each benchmark `runs/` root and an aggregate report outside those roots; run normal `git add .`.
+
+**Expected:** Both raw files remain ignored; the aggregate report is eligible for staging. Actual run directories, request/response traces and raw ledgers remain private.
+
+**Action:** In a disposable Git repository, commit JSON containing an installation or session UUID, including nested serialized JSON, then remove it and run `executable_audit-public-history --repo <fixture> --scope all --plain`.
+
+**Expected:** The auditor reports `runtime_identifier` without printing values and exits 1. Removing the latest file alone does not clear its historical finding. Use synthetic fixture values only.

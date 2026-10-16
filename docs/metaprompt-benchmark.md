@@ -1,5 +1,10 @@
 # Metaprompt benchmark
 
+
+Raw request/response traces, runtime identifiers, trial ledgers and generated run files are private local evidence. Both benchmark `runs/` directories are ignored and removed from public history. This page retains reviewed aggregate findings and their limits; the public checkout no longer includes raw records for independently auditing those historical measurements. The harness and synthetic fixtures remain available for a new, separately budgeted run.
+
+Source verification currently detects pin mismatches already present in the starting public revision. Preview and synthetic tests remain available, but do not start another inference run or silently repin frozen inputs. See the [source-pin incident](postmortem/2026-10-16-benchmark-source-pins.md).
+
 For tasks as explicit as the tested summary contract, **use the original task
 prompt**. The fixed minimal contract tied it. Talki and GitHub also passed that
 case, with added compilation cost and no measured improvement. **There is no
@@ -52,10 +57,10 @@ unexecuted under this explicit budget reduction.
 
 ## Representative evidence
 
-- [Alxve summary trial](../benchmarks/metaprompt/runs/pilot-2026-10-03/trials/hold-summary-partial--metaprompt-alxve--r0.json): the native save/fence/Run/Weight/go contract succeeded, but its exported prompt instructed another model to edit the task prompt and produce a changelog. The solver rewrote instructions instead of returning decision JSON. The [coding trial](../benchmarks/metaprompt/runs/pilot-2026-10-03/trials/hold-coding-window--metaprompt-alxve--r0.json) repeated this wrong-task failure. The harness preserved that indirection; it did not silently add another optimization stage.
-- [Maintained summary trial](../benchmarks/metaprompt/runs/pilot-2026-10-03/trials/hold-summary-partial--metaprompt--r0.json): four requests read `UPSTREAM.md`, the router, general-task guidance and style guidance; no final prompt or saved artifact was produced before the limit. Sentry similarly listed files and read three references. Missing native-output flags here are consequences of the limit.
-- [Raw coding trial](../benchmarks/metaprompt/runs/pilot-2026-10-03/trials/hold-coding-window--raw--r0.json): fixture discovery/read exhausted the solver allowance. No code answer was graded. This is the clearest limitation of the pilot's coding comparison.
-- [Talki summary trial](../benchmarks/metaprompt/runs/pilot-2026-10-03/trials/hold-summary-partial--talki--r0.json) and [GitHub summary trial](../benchmarks/metaprompt/runs/pilot-2026-10-03/trials/hold-summary-partial--github--r0.json): both preserved the missing-data and JSON requirements and matched the baselines' correct result.
+- Alxve summary trial: the native save/fence/Run/Weight/go contract succeeded, but its exported prompt instructed another model to edit the task prompt and produce a changelog. The solver rewrote instructions instead of returning decision JSON. The coding trial repeated this wrong-task failure. The harness preserved that indirection; it did not silently add another optimization stage.
+- Maintained summary trial: four requests read `UPSTREAM.md`, the router, general-task guidance and style guidance; no final prompt or saved artifact was produced before the limit. Sentry similarly listed files and read three references. Missing native-output flags here are consequences of the limit.
+- Raw coding trial: fixture discovery/read exhausted the solver allowance. No code answer was graded. This is the clearest limitation of the pilot's coding comparison.
+- Talki summary trial and GitHub summary trial: both preserved the missing-data and JSON requirements and matched the baselines' correct result.
 
 A separate post-run agent audit inspected all finalized outputs without changing
 scores. It found no observed premature execution of the embedded task by a
@@ -90,7 +95,7 @@ concerns maintenance and compiler examples, not downstream superiority.
 ## Protocol and validity limits
 
 The [preregistered protocol](../benchmarks/metaprompt/PROTOCOL.md) and
-[frozen inventory](../benchmarks/metaprompt/runs/pilot-2026-10-03/protocol.json)
+frozen inventory
 record sources, fixtures, hidden keys, fixed minimal wording, extraction rules,
 settings and shuffled order (seed 20261003). Final inventory SHA-256:
 `685a65243d5251a82e1f8b75e54bb564e4b2c7758ae7ec536653ee3cd1bb76eb`.
@@ -131,13 +136,14 @@ confined fixture MCP tools receive per-tool approval. Native host actions remain
 disabled/filtered; recognized host AGENTS and live-skill injections are excluded.
 Actual CLI fixture read/write was verified with injected responses and zero
 upstream model calls. These equal harness adaptations differ from a normal
-interactive Codex workspace. Stored evidence omits credentials, headers, caches
-and opaque encrypted reasoning; log redaction does not alter backend requests.
+interactive Codex workspace. The recorder omits transport authentication headers and opaque encrypted
+reasoning. Raw payloads can retain runtime correlation metadata, so run
+artifacts stay private; storage filtering does not alter backend requests.
 
 ## Uncertainty and selection
 
 Paired case-cluster bootstrap results are in the
-[machine-readable results](../benchmarks/metaprompt/runs/pilot-2026-10-03/results.json).
+machine-readable results.
 Against either raw or minimal, Talki/GitHub have a 0-point difference with nominal
 95% interval [0, 0]; the other skills have a −50-point difference with interval
 [−50, −50]. **These collapsed intervals are not meaningful precision:** there is
@@ -175,7 +181,7 @@ configuration failure; that attempt remains archived. Three other archived
 infrastructure attempts forwarded zero inference requests. Held-out runs had no
 infrastructure retries.
 
-[Request-level analysis](../benchmarks/metaprompt/runs/pilot-2026-10-03/analysis.json)
+Request-level analysis
 measures all 49 authenticated requests, including capped episodes: **329,058 input
 tokens**, of which **158,080 were cached**, and **5,757 output tokens**, including
 719 reasoning tokens. Summed measured stage wall time was **339.0 seconds**,
@@ -228,8 +234,6 @@ no model quota:
 ```bash
 python3 scripts/metaprompt-benchmark.py verify
 python3 scripts/metaprompt-benchmark.py dry-run
-python3 scripts/metaprompt-benchmark.py report
-python3 scripts/metaprompt-benchmark-analysis.py
 python3 -m unittest discover -s tests -p 'test_metaprompt_benchmark*.py' -v
 ```
 
@@ -240,10 +244,10 @@ python3 scripts/metaprompt-benchmark.py run --phase development
 python3 scripts/metaprompt-benchmark.py run --phase holdout
 ```
 
-This saved run is complete and at its cap, so both execution commands skip all
-trials and make no requests. Do not delete/reset its ledger. `report` validates
-frozen inputs and rebuilds results from the frozen schedule; analysis then derives
-costs. Only diagnosed pre-holdout development infrastructure fixes may use
+The original private run finished at its cap. A public checkout does not
+include its ledger, so the execution commands above are not read-only rechecks.
+Restore privately retained records or authorize a new budget before execution.
+The offline `report` and analysis commands also require those private records. Only diagnosed pre-holdout development infrastructure fixes may use
 `refreeze-development` and `--retry-infrastructure`; this scored run cannot be
 refrozen. Another experiment needs a separately authorized budget and new run.
 

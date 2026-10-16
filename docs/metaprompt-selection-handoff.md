@@ -1,11 +1,16 @@
 # Metaprompt selection: completed handoff
 
+This historical handoff records the completed selection and its limits. Raw run
+records were subsequently removed from public history and retained privately;
+offline replay requires their private restoration. Current source verification
+has the known [pin mismatch](postmortem/2026-10-16-benchmark-source-pins.md).
+
 **Subsequent installation:** on October 4 the user explicitly requested the
 chosen skill replace `$metaprompt`. That separate
 [replacement](../plans/replace-metaprompt-with-sentry.md) is now deployed and
 verified as Sentry. The benchmark history and earlier no-install boundary below
 describe the completed experiment; they do not describe the current installed
-default. All frozen benchmark artifacts remain unchanged.
+default. The frozen experiment is retained privately; public aggregate findings remain.
 
 **Completed on 2026-10-04 after the user resumed. No benchmark work remains.**
 The final [report](metaprompt-selection.md) recommends **Sentry prompt-optimizer**
@@ -71,11 +76,11 @@ an actual choice, not another inconclusive table.
 - DC1 — **met** — pin/hash audit → 3 finalists, 27 package files; all 54 frozen
   files match → [manifest](../benchmarks/metaprompt-selection/sources.json).
 - DC2 — **met** — schedule/records → 80 held-out outcomes, 100 total attempts →
-  [run](../benchmarks/metaprompt-selection/runs/selection-2026-10-03/).
+  private run records (not included in the public checkout).
 - DC3 — **met** — final reconciliation → 754 observed = 754 charged; all
   requested/served gpt-6.1-sol/medium, HTTP 200, complete usage, no orphan labels,
   every stage at most ten requests →
-  [analysis](../benchmarks/metaprompt-selection/runs/selection-2026-10-03/analysis.json).
+  private analysis (not included in the public checkout).
 - DC4 — **met** — recommendation, costs, sensitivities, source receipts and
   optional installation/rollback published; README/guide/smoke/plan updated →
   [report](metaprompt-selection.md), [plan](../plans/select-maintained-metaprompt-skill.md).
@@ -96,8 +101,8 @@ an actual choice, not another inconclusive table.
 - [Saved specification](../prompts/select-maintained-metaprompt-skill.md).
 - [Analyzer](../scripts/metaprompt-selection-analysis.py): unfrozen derivative.
 - [Report](metaprompt-selection.md): final choice, measurements and limitations.
-- [Primary summary](../benchmarks/metaprompt-selection/runs/selection-2026-10-03/summary.json).
-- [Detailed analysis](../benchmarks/metaprompt-selection/runs/selection-2026-10-03/analysis.json).
+- Primary summary: private `summary.json`; absent from the public checkout.
+- Detailed analysis: private `analysis.json`; absent from the public checkout.
 - [Postmortem](postmortem/2026-10-03-metaprompt-selection-validation.md): defects and attribution.
 
 ## Blockers
@@ -107,8 +112,10 @@ documented; no benchmark failure was hidden or repaired after freeze.
 
 ## Future work boundary
 
-No implementation step remains. A later audit may regenerate the report and
-analysis offline and run the documented tests. Installation, default replacement,
+No experiment implementation step remains. A later audit may regenerate the
+report and analysis offline only after restoring the frozen records privately
+and reviewing the known source-pin mismatch. Synthetic tests need no raw records.
+Installation, default replacement,
 new trials, parser repairs in a new harness version, or delivery commits require
 a new applicable request. Preserve the frozen artifacts and unrelated dirty work.
 

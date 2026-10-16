@@ -4895,6 +4895,15 @@
   ],
   "reports": [
     {
+      "sha256": "4767bb3649002a0a57d60bcdb0769e00aa26d53fce4dbd904ba6a8fa3ba252e3",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-16-benchmark-source-pins.md"
+      ],
+      "reviewed_on": "2026-10-16",
+      "findings": [],
+      "decision": "No verified remedy: the real source/pin mismatch predates this privacy cleanup and remains unresolved. Both source files and manifests match starting HEAD; previews and 97 synthetic regressions pass but do not establish source integrity. Preserve frozen evidence and require a separate provenance review/new baseline before inference. Exact machine aliases remain private."
+    },
+    {
       "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-10-09-codex-picker-archive-startup.md"
       ],

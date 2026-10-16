@@ -1,1 +1,3 @@
 # Public-safe append-only feedback log. Do not add personal or secret material.
+2026-10-16 - Remove identifying raw benchmark artifacts before public commits/pushes, including their Git history; keep run output private/ignored and publish only reviewed aggregate findings. Persist this rule in AGENTS.repo.md.
+2026-10-16 - Treat this repository as public: ignore artifacts containing sensitive information, keep them private, and never force-add them to public commits. Record this rule in AGENTS.repo.md.

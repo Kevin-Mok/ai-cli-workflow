@@ -8,6 +8,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+import uuid
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -131,6 +132,116 @@ class PublicHistoryAuditTests(unittest.TestCase):
         combined_output = completed.stdout + completed.stderr
         self.assertNotIn(forbidden_name, combined_output)
         self.assertNotIn(forbidden_path, combined_output)
+
+    def test_runtime_identifiers_in_historical_and_nested_json_are_redacted(self) -> None:
+        identifiers = []
+        for key in (
+            "x-codex-installation-id", "root_turn_id", "thread_id", "turn_id",
+            "session_id", "prompt_cache_key",
+        ):
+            for encoding_depth in range(3):
+                identifier = str(uuid.uuid4())
+                identifiers.append(identifier)
+                payload = json.dumps({key: identifier})
+                for _ in range(encoding_depth):
+                    payload = json.dumps({"response": payload})
+                (self.repo / f"{key}-{encoding_depth}.json").write_text(
+                    payload, encoding="utf-8"
+                )
+        self.commit("add runtime recordings")
+        for path in self.repo.glob("*.json"):
+            path.write_text("{}\n", encoding="utf-8")
+        self.commit("remove runtime recordings")
+
+        completed = self.run_audit()
+
+        self.assertEqual(completed.returncode, 1, completed.stderr)
+        report = json.loads(completed.stdout)
+        self.assertEqual(report["coverage"]["commits"], 2)
+        self.assertEqual(
+            report["summary"]["categories"], {"runtime_identifier": len(identifiers)}
+        )
+        self.assertEqual(
+            {finding["location_type"] for finding in report["findings"]}, {"blob"}
+        )
+        outputs = completed.stdout + completed.stderr
+        for arguments in (("--format", "text"), ("--format", "text", "--plain")):
+            text_result = self.run_audit(*arguments)
+            self.assertEqual(text_result.returncode, 1, text_result.stderr)
+            self.assertIn("runtime_identifier", text_result.stdout)
+            outputs += text_result.stdout + text_result.stderr
+        for identifier in identifiers:
+            self.assertNotIn(identifier, outputs)
+
+    def test_runtime_identifier_in_commit_metadata_is_redacted(self) -> None:
+        identifier = str(uuid.uuid4())
+        (self.repo / "safe.txt").write_text("safe=true\n", encoding="utf-8")
+        self.commit(json.dumps({"session_id": identifier}))
+
+        completed = self.run_audit()
+
+        self.assertEqual(completed.returncode, 1, completed.stderr)
+        report = json.loads(completed.stdout)
+        self.assertEqual(report["summary"]["categories"], {"runtime_identifier": 1})
+        self.assertEqual(report["findings"][0]["location_type"], "commit")
+        self.assertNotIn(identifier, completed.stdout + completed.stderr)
+
+    def test_runtime_identifier_in_unreachable_blob_is_redacted(self) -> None:
+        identifier = str(uuid.uuid4())
+        (self.repo / "safe.txt").write_text("safe=true\n", encoding="utf-8")
+        self.commit("add safe settings")
+        subprocess.run(
+            ["git", "hash-object", "-w", "--stdin"],
+            cwd=self.repo,
+            input=json.dumps({"root_turn_id": identifier}).encode("utf-8"),
+            capture_output=True,
+            check=True,
+        )
+
+        completed = self.run_audit("--scope", "all")
+
+        self.assertEqual(completed.returncode, 1, completed.stderr)
+        report = json.loads(completed.stdout)
+        self.assertEqual(report["summary"]["categories"], {"runtime_identifier": 1})
+        self.assertEqual(report["findings"][0]["location_type"], "blob")
+        self.assertNotIn(identifier, completed.stdout + completed.stderr)
+
+    def test_unrelated_uuids_and_nil_runtime_placeholders_pass(self) -> None:
+        (self.repo / "example.json").write_text(
+            json.dumps(
+                {
+                    "fixture_id": str(uuid.uuid4()),
+                    "other_session_id": str(uuid.uuid4()),
+                    "session_id": str(uuid.UUID(int=0)),
+                    "thread_id": "REDACTED",
+                    "notes": str(uuid.uuid4()),
+                }
+            ),
+            encoding="utf-8",
+        )
+        self.commit("add public examples")
+
+        completed = self.run_audit()
+
+        self.assertEqual(completed.returncode, 0, completed.stderr)
+        self.assertEqual(json.loads(completed.stdout)["findings"], [])
+
+    def test_raw_benchmark_runs_are_ignored_but_public_summaries_can_be_staged(self) -> None:
+        (self.repo / ".gitignore").write_bytes((REPO_ROOT / ".gitignore").read_bytes())
+        for benchmark in ("metaprompt", "metaprompt-selection"):
+            run = self.repo / "benchmarks" / benchmark / "runs" / "trial" / "raw.json"
+            run.parent.mkdir(parents=True)
+            run.write_text("{}\n", encoding="utf-8")
+            (run.parents[2] / "summary.json").write_text("{}\n", encoding="utf-8")
+        subprocess.run(["git", "add", "."], cwd=self.repo, check=True)
+
+        staged = subprocess.run(
+            ["git", "ls-files"], cwd=self.repo, capture_output=True, text=True, check=True
+        ).stdout.splitlines()
+
+        for benchmark in ("metaprompt", "metaprompt-selection"):
+            self.assertNotIn(f"benchmarks/{benchmark}/runs/trial/raw.json", staged)
+            self.assertIn(f"benchmarks/{benchmark}/summary.json", staged)
 
     def test_private_literal_rule_can_match_case_insensitively(self) -> None:
         forbidden_name = "Fixture Private Person"

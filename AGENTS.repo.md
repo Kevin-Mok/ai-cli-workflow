@@ -15,3 +15,7 @@ stored under [`plans/`](plans/) and committed alongside the related work.
 Treat model and model-reasoning-effort changes in `dot_codex/config.toml` as
 personal local preferences. Ordinary commit workflows must leave them out
 unless the user explicitly asks to include them.
+
+This is a public repository. Keep any artifact containing sensitive information private, ignore it before generation or adoption, and never force-add it to a public commit. This includes credentials, live configuration, private notes, request/response captures, runtime identifiers, recovery archives and machine-local logs. Review and publish a neutral aggregate summary only when useful.
+
+Before a public commit or push, remove identifying raw benchmark run artifacts, including recorded requests/responses and installation, session, thread, turn, and cache identifiers. Keep `benchmarks/metaprompt/runs/` and `benchmarks/metaprompt-selection/runs/` private and ignored; publish only reviewed aggregate findings. If identifying artifacts were committed, remove their historical copies as part of an explicitly authorized history cleanup. Audit pending file contents as well as Git history, and preserve recovery material outside the public repository.

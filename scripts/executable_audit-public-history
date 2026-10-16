@@ -28,6 +28,11 @@ SSH_KEY_RE = re.compile(rb"(?m)^\s*(?:ssh-(?:rsa|dss|ed25519)|ecdsa-sha2-[^\s]+)
 CREDENTIAL_RE = re.compile(
     rb"(?im)\b(?:api[_-]?(?:key|token)|access[_-]?key|auth[_-]?token|client[_-]?secret|password|passwd|refresh[_-]?token|secret[_-]?key)\b\s*[:=]\s*[\"']?([^\s\"'#,;]{8,})"
 )
+RUNTIME_IDENTIFIER_RE = re.compile(
+    rb'(?<![\w-])(?:x-codex-installation-id|root_turn_id|thread_id|turn_id|session_id|prompt_cache_key)'
+    rb'\\*"\s*:\s*\\*"([0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12})\\*"',
+    re.I,
+)
 
 SAFE_EMAIL_DOMAINS = {
     b"example.com",
@@ -169,6 +174,12 @@ def scan_content(
     literal_rules: tuple[tuple[bytes, str, bool, frozenset[str]], ...] = (),
 ) -> set[str]:
     categories: set[str] = set()
+    # The nil UUID is an empty placeholder, including inside nested JSON strings.
+    if any(
+        value != b"00000000-0000-0000-0000-000000000000"
+        for value in RUNTIME_IDENTIFIER_RE.findall(content)
+    ):
+        categories.add("runtime_identifier")
     if PEM_PRIVATE_KEY_RE.search(content) or SSH_KEY_RE.search(content):
         categories.add("private_key")
     for candidate in BASE64_RE.findall(content):

@@ -33,5 +33,6 @@ session.jsonl
 /second-brain/**
 !/second-brain/README.md
 
-# Rebuilt from committed per-trial evidence; summary.json keeps aggregate scores.
-/benchmarks/metaprompt-selection/runs/selection-2026-10-03/results.json
+# Raw benchmark requests, responses and runtime identifiers stay private.
+/benchmarks/metaprompt/runs/
+/benchmarks/metaprompt-selection/runs/

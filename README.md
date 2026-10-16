@@ -511,6 +511,13 @@ values. Keep machine and identity data in the untracked chezmoi configuration at
 `~/.config/chezmoi/chezmoi.toml`, and keep passwords, tokens, SSH material,
 browser state, and private notes in their dedicated local stores.
 
+Raw benchmark output under `benchmarks/metaprompt/runs/` and
+`benchmarks/metaprompt-selection/runs/` stays private and ignored. Do not publish
+request/response traces, installation/session/turn identifiers, cache keys or
+raw ledgers. The benchmark guides retain reviewed aggregate findings. The
+history auditor reports keyed runtime UUIDs as `runtime_identifier`; inspect
+pending files separately because a history scan does not inspect uncommitted bytes.
+
 The mail and calendar templates expect these non-secret chezmoi data keys:
 
 ```toml
