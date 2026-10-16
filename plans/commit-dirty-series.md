@@ -26,7 +26,7 @@ live settings, recovery material and generated state remain excluded.
 - [x] Commit configuration privacy/refresh prerequisites with matching docs.
 - [x] Commit migration helper, guard, plans/prompt/incident and matching docs.
 - [x] Commit portable storage offload tool and docs.
-- [ ] Commit notification source outlines, speech updates, Dunst indicator and docs.
+- [x] Commit notification source outlines, speech updates, Dunst indicator and docs.
 - [ ] Commit the clipboard startup improvement and checks.
 - [ ] Commit pinned Context Mode tooling and docs.
 - [ ] Commit metaprompt depth and existing-thread navigation with docs.
@@ -144,3 +144,10 @@ matching runtime smoke helpers and corrected public docs are reviewed. Focused
 notification suites passed; isolated completion/question smoke scenarios freshly
 passed, including zero playback for workers, empty and secret questions. No live
 audio/provider request ran. Five groups remain after this candidate.
+
+### Milestone 5 — fix(nvim): avoid blocking X11 clipboard detection
+
+Milestone4 committed as eb903a2. Minimal clipboard provider selection preserves
+explicit providers, Wayland and legacy behavior; all6 disposable startup checks
+pass. README/smoke entries match the implementation. Four groups remain after
+this candidate. No new blocker; previously recorded warnings remain.

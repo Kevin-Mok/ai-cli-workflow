@@ -1,3 +1,8 @@
+" Automatic xsel detection reads the clipboard and can block startup indefinitely.
+if has('nvim-0.11.1') && !exists('g:clipboard') && empty($WAYLAND_DISPLAY) && !empty($DISPLAY) && executable('xclip')
+  let g:clipboard = 'xclip'
+endif
+
 set runtimepath^=~/.vim runtimepath+=~/.vim/after
 let &packpath = &runtimepath
 source ~/.vimrc
