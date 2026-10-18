@@ -268,8 +268,11 @@ This category matters because it turns design direction into a
 repeatable local capability instead of a one-off prompting exercise.
 
 The managed public design stack adds Impeccable, 21st, Review Animations,
-Scroll World, UI/UX Pro Max, and Higgsfield through chezmoi externals. Its
-daily refresh, bootstrap behavior, upstream links, and explicit authentication
+Scroll World, and Higgsfield through chezmoi externals.
+[UI/UX Pro Max](dot_agents/skills/ui-ux-pro-max/SKILL.md) is a pinned,
+MIT-licensed offline Python/CSV design search skill shared by Codex CLI
+(`$ui-ux-pro-max`) and Claude Code (`/ui-ux-pro-max`), explicit-invoke only.
+The stack's daily refresh, bootstrap behavior, upstream links, and explicit authentication
 boundaries are documented in
 [the design-skill guide](docs/design-skills.md).
 
@@ -787,7 +790,7 @@ source in this repo.
 | `refresh-config` | Apply reviewed chezmoi files and reload shortcuts. | No flags; `CLI_PLAIN=1` provides ASCII decoration. Excludes scripts, externals, and removals; reports elapsed progress, stops on conflicts, and never imports live settings. Diagnostics remain in a private temporary log. |
 | [`./scripts/executable_fix-vps-codex.sh`](docs/fix-vps-codex.md) | Run locally to repair Codex npm permissions on a VPS using SSH keys, without sudo. Reuses compatible Node/npm and verifies a normal update through a second SSH session. | Defaults to `example-user@192.0.2.10`; `--host`, `--port`, and `--identity` override the connection. `--dry-run` reads diagnostics without repair writes or npm execution; `--help` shows prerequisites. Requires remote Linux, Python 3.8+, bash or fish, and an already trusted host key. |
 | `sync-superpowers-release` | Refresh the externally managed `obra/superpowers` skill bundle from the latest GitHub release archive through chezmoi. | `--dry-run` previews the release refresh without writing files. `LINUX_CONFIG_SOURCE` points the helper at this repo when it is not checked out at `$HOME/linux-config`. |
-| `sync-design-skills` | Refresh the managed public design skill sources and update UI/UX Pro Max. | `--dry-run` previews the external refresh without updating UI/UX Pro Max. `--bootstrap` installs UI/UX Pro Max on a fresh host. It never authenticates accounts, generates media, spends credits, or upgrades the Higgsfield CLI. |
+| `sync-design-skills` | Refresh the managed public design skill externals; preserve vendored UI/UX Pro Max. | `--dry-run` previews the external refresh. `--bootstrap` is a compatibility no-op; normal shared-skill deployment supplies pinned UI/UX Pro Max. It never authenticates accounts, generates media, spends credits, or upgrades the Higgsfield CLI. |
 | `setup-design-skills-timer` | Validate, enable, or disable the daily 05:00 design-skill refresh timer. | Exactly one of `--check`, `--enable`, or `--disable` is required. `--enable` validates and activates the `Persistent=true` user timer without sudo. |
 | `setup-superpowers-release-timer` | Validate, enable, or disable the optional user-scoped release-sync timer. It runs daily at 05:00 local time and catches up missed runs with `Persistent=true`; no sudo is required. Refreshed skills are picked up by newly started Codex sessions; already-running sessions remain unchanged until restarted. | Timer setup requires the standard `$HOME/linux-config` checkout. Exactly one of `--check`, `--enable`, or `--disable` is required. `--check` validates the managed sources and installed units without changing state; `--enable` applies and activates the timer; recovery-oriented `--disable` stops it without needing chezmoi or a source checkout. |
 | `./scripts/executable_ai-workflow-doctor` | Audit the repo's AI instruction and skill surface, or capture a stable before/after measurement for workflow optimization. | `--repo PATH` selects the repository. `--format text\|json` selects human or machine output. `--snapshot PATH` writes a deterministic JSON baseline; `--compare PATH` compares the current report with one. `--verify-sources` resolves declared local source archives when available. `--check` exits nonzero for objective errors while review findings remain non-blocking warnings. |
