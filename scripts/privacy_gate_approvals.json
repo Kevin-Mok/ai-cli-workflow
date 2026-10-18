@@ -112,6 +112,14 @@
         "credential"
       ],
       "reason": "Reviewed synthetic privacy/redaction fixtures or environment lookups; no live credential. Any byte edit requires review."
+    },
+    {
+      "path_ref": "fca847cfd825",
+      "content_sha256": "704be83f2bad30c7e6de01afb113ffa01e0c458762f48b7102f31ba2367b5553",
+      "categories": [
+        "credential"
+      ],
+      "reason": "Reviewed vendored upstream Angular guidance; empty-password form-control example, not a credential. Any byte edit requires review."
     }
   ]
 }

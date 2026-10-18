@@ -115,25 +115,27 @@ class DesignSkillRefreshHelperTest(unittest.TestCase):
         self.assertIn("apply --refresh-externals -v -n", self.calls()[0])
         self.assertNotIn("npx", self.calls()[0])
 
-    def test_bootstrap_installs_uiux_bundle_when_missing(self) -> None:
+    def test_bootstrap_preserves_vendored_uiux_without_network(self) -> None:
         completed = self.run_helper("--bootstrap")
 
         self.assertEqual(completed.returncode, 0, completed.stderr)
-        self.assertIn("Design skills bootstrap complete.", completed.stdout)
-        self.assertEqual(len(self.calls()), 1)
-        self.assertIn("npx --yes ui-ux-pro-max-cli init --ai codex --global", self.calls()[0])
+        self.assertIn("UI/UX Pro Max is vendored", completed.stdout)
+        self.assertEqual(self.calls(), [])
 
-    def test_normal_refresh_updates_existing_uiux_bundle_after_externals(self) -> None:
-        (self.home / ".agents" / "skills" / "ui-ux-pro-max").mkdir(parents=True)
+    def test_normal_refresh_preserves_existing_uiux_after_externals(self) -> None:
+        skill = self.home / ".agents" / "skills" / "ui-ux-pro-max"
+        skill.mkdir(parents=True)
+        (skill / "SKILL.md").write_text("explicit-only marker")
 
         completed = self.run_helper()
 
         self.assertEqual(completed.returncode, 0, completed.stderr)
         self.assertIn("Design skills refreshed.", completed.stdout)
-        self.assertEqual(len(self.calls()), 2)
+        self.assertEqual(len(self.calls()), 1)
         self.assertIn("chezmoi -S", self.calls()[0])
         self.assertIn("apply --refresh-externals -v", self.calls()[0])
-        self.assertIn("npx --yes ui-ux-pro-max-cli update --ai codex --global", self.calls()[1])
+        self.assertNotIn("npx", "\n".join(self.calls()))
+        self.assertEqual((skill / "SKILL.md").read_text(), "explicit-only marker")
 
 
 class DesignSkillsTimerTest(unittest.TestCase):
