@@ -21,7 +21,7 @@ ROOT = Path(__file__).resolve().parents[1]
 GATE = ROOT / "scripts" / "executable_privacy-gate"
 
 
-class PrivacyGateTests(unittest.TestCase):
+class PrivacyGateFixture(unittest.TestCase):
     def setUp(self):
         self.directory = tempfile.TemporaryDirectory()
         self.addCleanup(self.directory.cleanup)
@@ -85,6 +85,8 @@ class PrivacyGateTests(unittest.TestCase):
         self.assertEqual(self.git("ls-files", "--stage", "-z").stdout, before_index)
         return result
 
+
+class PrivacyGateTests(PrivacyGateFixture):
     def test_gate_entry_point_exists(self):
         self.assertTrue(GATE.is_file(), "privacy gate entry point is absent")
 
