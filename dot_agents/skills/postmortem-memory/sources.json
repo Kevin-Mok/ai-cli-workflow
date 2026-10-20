@@ -9026,6 +9026,24 @@
       "reviewed_on": "2026-10-20",
       "findings": [],
       "decision": "No new reusable finding: existing public privacy gate correctly blocks live home paths. Sanitize public candidate aliases without relaxing rules or discarding private local lookup aliases."
+    },
+    {
+      "sha256": "99ad9a9672874cb5840ce19c3fa904d22a1d265a2a48dc5635df17e3b58736f1",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-20-refresh-config-newer-mime.md"
+      ],
+      "reviewed_on": "2026-10-20",
+      "findings": [],
+      "decision": "No new reusable diagnostic learning: existing local-mime-drift-reconcile guidance covers the reviewed source reconciliation; normal unforced refresh completed with exit 0."
+    },
+    {
+      "sha256": "dad90b0d09686ba4c08b87a01871d78575c2616bbbb5977ae35c70607b21b2ac",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-20-session-index-race.md"
+      ],
+      "reviewed_on": "2026-10-20",
+      "findings": [],
+      "decision": "No new reusable finding: concurrent writers replaced the shared index after candidate verification; isolate the retry index and keep hooks/privacy enforcement."
     }
   ],
   "review": {
