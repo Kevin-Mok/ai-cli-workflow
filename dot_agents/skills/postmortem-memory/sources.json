@@ -5007,6 +5007,26 @@
       ],
       "verification": "All four pre-fix top/bottom edge tests fail for post-release drift; tiny guard tests fail before guard. Final26 focused tests pass. Actual installed Kitty/Xvfb held drag grows60/65rows; viewport stable after release and repeated copy; exact logical wrapped clipboard text, reseeding, app forwarding, native copy and Escape/live input verified.",
       "verification_scope": "runtime"
+    },
+    {
+      "applicability": "Graphical startup uses sudo to mount a disk containing wallpaper assets.",
+      "confidence": "supported",
+      "diagnostics": [
+        "Resolve the wallpaper symlink, inspect fstab and mounted UUID, check i3 PATH and sudo authentication without prompting."
+      ],
+      "id": "local-ubs-unattended-wallpaper-mount",
+      "limitations": "Boot and wallpaper acceptance require privileged installation and fresh login; a running compositor and configured hook do not prove wallpaper initialization.",
+      "reference": "references/operational-drift.md#local-ubs-unattended-wallpaper-mount",
+      "remedy": "Persist the already-mounted ext4 disk by UUID with the boot mount helper; preserve fstab backup and refuse conflicts. Authenticate once in a local terminal.",
+      "sources": [
+        "d18a9cc81b2332ce5f82d572abd29987ba72c43d881db3e3b465a4b69a78cd53"
+      ],
+      "status": "activation_pending",
+      "symptoms": [
+        "Wallpaper missing at i3 login but manual ubuntu-start works."
+      ],
+      "verification": "Two defining tests RED then GREEN; existing ubuntu-start and pywal checks pass. Host check confirms missing boot entry; sudo requires a password. No apply or reboot performed.",
+      "verification_scope": "code"
     }
   ],
   "reports": [
@@ -8889,6 +8909,34 @@
       "findings": [],
       "reviewed_on": "2026-10-20",
       "sha256": "8314d510811ed2fcf99852a53d080ea9fbafcdf20188497114a5790fdbf03072"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-20-ubs-startup-inspection-sandbox.md"
+      ],
+      "decision": "No new reusable finding: permission limits require scoped live-session reads; request i3-msg raw JSON explicitly for parser input. No startup defect established.",
+      "findings": [],
+      "reviewed_on": "2026-10-20",
+      "sha256": "3bad57317e9fb95d3e2829b807f3f8266ac46451f44107f6e35de923889b8a74"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-20-ubs-wallpaper-startup.md"
+      ],
+      "findings": [
+        "local-ubs-unattended-wallpaper-mount"
+      ],
+      "reviewed_on": "2026-10-20",
+      "sha256": "d18a9cc81b2332ce5f82d572abd29987ba72c43d881db3e3b465a4b69a78cd53"
+    },
+    {
+      "sha256": "0549cda1578747f8347282f0157f162eb1c1e544f91d0d4dcb9d6d0bac62f1ef",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-20-ubs-session-privacy-gate.md"
+      ],
+      "reviewed_on": "2026-10-20",
+      "findings": [],
+      "decision": "No new reusable finding: existing public privacy gate correctly blocks live home paths. Sanitize public candidate aliases without relaxing rules or discarding private local lookup aliases."
     }
   ],
   "review": {

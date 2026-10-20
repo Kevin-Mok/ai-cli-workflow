@@ -699,6 +699,14 @@ Codex CLI.
 
 ## Day-to-Day Use
 
+On the i3 desktop, `ubs` (`ubuntu-start`) needs the wallpaper disk mounted at
+`/mnt/linux-files-3`. Use `python3 scripts/enable-ubs-boot-mount.py --check`
+to preview the UUID-based boot mount, then run
+`sudo python3 scripts/enable-ubs-boot-mount.py --apply` once from the repo root.
+The installer backs up `/etc/fstab`, refuses conflicting entries, and enables
+an on-demand boot mount without changing sudo permissions or formatting data.
+An unavailable disk does not block boot; wallpaper still requires it to be connected.
+
 Treat this repository as the source of truth for most of the environment
 layer. Keep machine and identity values private. `refresh-config` applies reviewed sources without importing live settings.
 

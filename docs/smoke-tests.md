@@ -786,12 +786,21 @@ checks use invented temporary data; real notes are never repository fixtures.
 
 ## Codex And Graphiti
 
+- Action: Run `python3 scripts/enable-ubs-boot-mount.py --check` from the repo root
+  with the intended ext4 wallpaper disk mounted at `/mnt/linux-files-3`, then run
+  it once with `sudo` and `--apply`. Repeat `--check` afterward.
+  Expected: The preview shows the mounted disk's UUID. Apply prints an fstab
+  backup path; the repeated check says the boot mount is already configured.
+  Conflicting entries are refused. No disk is formatted or unmounted.
+
 - Action: Start a fresh Ubuntu/i3 session on the desktop host where
   `/dev/sdc1` is present and Graphiti is checked out at
   `/home/example/coding/graphiti/mcp_server`.
   Expected: `ubuntu-start` mounts `/dev/sdc1` at `/mnt/linux-files-3`
-  using `sudo` when elevation is needed, allowing the operator to enter
-  a password instead of silently skipping the mount. It does this before
+  after configuring `sudo python3 scripts/enable-ubs-boot-mount.py --apply`
+  once from the repo root. The UUID-based systemd automount makes the wallpaper
+  available without a sudo prompt in i3. Confirm the wallpaper is visible before
+  opening a terminal or running `ubs` manually. It mounts the disk before
   applying the `autorandr 4k-3-monitor` profile and the Sukana wallpaper
   through `/home/example/scripts/apply-pywal-theme`, starts at most one
   `picom` compositor, starts `dunst` for notifications

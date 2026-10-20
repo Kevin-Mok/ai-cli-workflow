@@ -236,3 +236,5 @@
 - 2026-10-20: Screensaver inactivity must track raw keyboard/mouse events rather than XScreenSaver idle, because players can reset the server timer without user input. Keep Chrome video geometry gating separate; normalize live monitor metadata to the strict four-number rectangle boundary and reconcile all native browser windows to avoid hidden-workspace profile aliases. See [screensaver runtime evidence](../docs/postmortem/2026-10-20-screensaver-x11-sandbox.md).
 
 - 2026-10-20: Test browser content-script initialization itself, not only exported geometry helpers. A classic-script helper named `parent` can overwrite `window.parent` through Annex B function hoisting and silently break cross-origin iframe relays; preserve WindowProxy globals and verify an actual cross-origin player.
+
+- 2026-10-20: An i3 autostart entry and running compositor do not prove wallpaper setup succeeded. Check the resolved wallpaper mount and unattended privilege boundary; never depend on a terminal sudo prompt for assets required during graphical login.

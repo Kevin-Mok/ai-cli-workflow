@@ -8,6 +8,14 @@ actually needs without tripping over the `graphiti-mcp` container's host port
 `8000` bind. Keep the same startup path quiet and resilient when optional
 desktop helpers are missing or already running.
 
+## Follow-up: unattended i3 startup
+
+The interactive-sudo assumption below is superseded by
+[UBS boot mount](ubs-boot-mount.md): a fresh i3 session cannot supply a terminal
+password prompt. Configure the existing wallpaper disk by UUID in fstab using
+`scripts/enable-ubs-boot-mount.py`; wallpaper currently uses the fixed Sukana
+path rather than shuffler output. The old completed checklist records history.
+
 ## Assumptions
 
 - `/mnt/linux-files-3` may be needed by wallpaper or Graphiti startup paths.

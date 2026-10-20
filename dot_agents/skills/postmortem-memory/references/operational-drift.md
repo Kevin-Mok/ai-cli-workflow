@@ -183,3 +183,14 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Verification evidence: installed status RED exit 1 then GREEN exit 0; offline Piper check and real preview exited 0. User confirmed both stages audible. Installed silent probes passed 14/14 notification and 6/6 question cases; independent accepted-question probe passed.
 - Limitations: asset removal operation unknown; fixture playback proves routing rather than hardware output. User confirmed the real preview; a later natural event remains separate acceptance.
 - Source: [Notification speech blocked by a missing clip](../../../../docs/postmortem/2026-10-16-notification-missing-clip.md).
+
+## local-ubs-unattended-wallpaper-mount
+
+- Status: **activation_pending**; root-cause confidence: **supported**; verification scope: **code**.
+- Symptoms: wallpaper missing at i3 login, restored by manual `ubs`.
+- Applicability: desktop assets live on a disk mounted through interactive sudo during graphical startup.
+- Diagnostics: resolve the wallpaper symlink, inspect fstab and the mounted UUID, then check i3 PATH and noninteractive sudo authentication. A configured hook and compositor process do not prove wallpaper success.
+- Remedy: use `scripts/enable-ubs-boot-mount.py` to preview and persist a UUID-based nofail systemd automount, with conflict refusal and fstab backup. Authenticate once in a terminal; preserve the current mount and sudo policy.
+- Verification: two defining tests RED then GREEN; existing startup/pywal regression scripts passed. Actual host preview confirms the missing entry and sudo requires a password.
+- Limitations: no privileged apply or fresh boot performed; wallpaper acceptance remains pending.
+- Source: [UBS wallpaper startup](../../../../docs/postmortem/2026-10-20-ubs-wallpaper-startup.md).
