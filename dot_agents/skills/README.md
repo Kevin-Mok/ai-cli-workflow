@@ -24,6 +24,9 @@ skills tighten one specific aspect of an existing interface.
 
 ## Frontend Direction And Generators
 
+- [`ui-ux-pro-max`](ui-ux-pro-max/SKILL.md): Explicit-only offline Python/CSV
+  search for design systems, palettes, fonts, charts and stack guidance. Pinned
+  vendored runtime shared by Codex (`$ui-ux-pro-max`) and Claude (`/ui-ux-pro-max`).
 - [`teach-impeccable`](teach-impeccable/SKILL.md): Performs one-time
   design-context capture, writes a `## Design Context` section to
   `.impeccable.md`, and gives later design work a persistent audience,
@@ -52,8 +55,8 @@ skills tighten one specific aspect of an existing interface.
 
 The daily chezmoi-managed sources are documented in
 [the design-skill guide](../../docs/design-skills.md). They install as
-Codex-native symlinks under `~/.codex/skills/`, plus the Higgsfield plugin
-and UI/UX Pro Max bundle.
+Codex-native symlinks under `~/.codex/skills/`, plus the Higgsfield
+plugin. UI/UX Pro Max is now vendored above and excluded from automatic updates.
 
 - `impeccable`: Unified design direction, critique, quality, and polish.
 - `21st-cli-use`, `21st-ai`, `21st-design-sync`, and `21st-registry`:
@@ -61,9 +64,6 @@ and UI/UX Pro Max bundle.
   management.
 - `review-animations` and `scroll-world`: Motion review and cinematic
   scroll-experience workflows.
-- `ui-ux-pro-max`: Official generated design intelligence; companions include
-  `brand`, `design`, `design-system`, `ui-styling`, `banner-design`,
-  and `slides`.
 - `higgsfield`: Managed visual-generation plugin; its CLI authentication and
   credit-bearing jobs remain explicitly user-driven.
 

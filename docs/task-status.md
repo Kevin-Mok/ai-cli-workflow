@@ -59,3 +59,10 @@ This document records delivery milestones and verification for completed reposit
 - Delivery: commit on main and attempt push to origin/main; earlier commit efacead remains local after a non-fast-forward rejection.
 - Remaining: unrelated postmortem references/ledger and tmux prompt excluded; configuration refresh still blocked by existing MIME settings drift.
 - Rollback: restore the prior confirmation wording; preserve append-only feedback history.
+
+## Remote integration — chore: merge upstream before guidance push
+
+- Complete: merged origin/main at 94eef13 with the two local confirmation guidance commits, preserving both histories.
+- Verification: automatic merge completed without conflicts; README, merge whitespace and exact candidate privacy checks run before commit.
+- Delivery: push the merged main to origin/main after commit; preserve unrelated edits via the named commit-confirmation-push-preserve-local stash until restoration.
+- Remaining: full refresh remains blocked by existing MIME settings drift; unrelated postmortem edits and tmux prompt stay outside the commit.
