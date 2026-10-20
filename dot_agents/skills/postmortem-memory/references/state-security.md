@@ -327,6 +327,17 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
   bypass limits remain. Neutral aliases require private machine-path mapping.
 - Source: [privacy gate false positives](../../../../docs/postmortem/2026-10-16-privacy-gate-false-positives.md).
 
+## ext-content-filter-counter-reconciliation
+
+- Status: **activation_pending**; root-cause confidence: **confirmed**; verification scope: **code**.
+- Symptoms: new chat stops counting but old chat remains in sent with zero retained
+- Applicability: Persisted message counters introducing a content eligibility rule after events have already been recorded.
+- Diagnostic checks: Compare qualifying history, retained flags and active event counts.; Reproduce four known chat events already unretained, then repeat recovery and reopen SQLite.
+- Remedy: Pass positively identified rejected IDs from complete history into the atomic merge; deactivate active matching events and decrement sent once. Protect reset-inactive, live-protected and deleted IDs. Request Message Content for classification.
+- Verification evidence: Exact four-chat and mixed deleted-tweet RED cases passed after correction; 216 tests passed including repeat recovery, reset, database reopen and rollback. Offline previews returned 4 to 0, 6 to 2, and 0 to 0.
+- Limitations: Missing/deleted message content cannot be classified. No live restart or Discord verification; activation remains pending.
+- Sources: [2026-10-20-pistol-chat-counting.md](/home/example/coding/twitter-cap-bot/docs/postmortem/2026-10-20-pistol-chat-counting.md) (SHA-256 `99cdb6d17d12`; aliases retained in [sources.json](../sources.json)).
+
 ## local-quota-reset-jitter-anchor
 
 - Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **runtime**.

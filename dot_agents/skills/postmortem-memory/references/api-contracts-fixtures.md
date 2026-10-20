@@ -589,6 +589,39 @@ security checks with the arguments you passed.
 - Limits: Content controls height; fixed ratio is not guaranteed. Values depend on DPI and frame. Other legacy settings remain outside scope.
 - Source: [Dunst ignored sizing](../../../../docs/postmortem/2026-10-13-dunst-ignored-sizing.md).
 
+## ext-libvirt-explicit-key-count
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **runtime**.
+- Symptoms: Headless restored login fails immediately after successful console detection without reaching the secure password prompt.
+- Applicability: libvirt-python virDomain.sendKey callers passing explicit nkeycodes and flags.
+- Diagnostic checks: Inspect the installed Python signature and C override, not just virsh screenshot success. Verify explicit nkeycodes equals the nonempty keycode list length; test single keys, Shift chords and whole-input validation.
+- Remedy: Pass len(keycodes) as the fourth argument and flags as the fifth; retain key encoding, hold time, input validation, worker deadlines and credential redaction.
+- Verification evidence: Strict key-count RED/GREEN passes for ordinary keys, Shift chords and newline with no partial invalid input. Operator subsequently reached the secure password prompt; read-only screenshot shows the complete readiness command and output. This verifies the rejected-key-count path advanced; no complete login receipt or service acceptance is claimed.
+- Limitations: Native key delivery is supported by runtime evidence, but post-password OCR failed. Full authenticated acceptance and the new calibrated-frame transport still need a live verified receipt.
+- Source: [Restored console acceptance](/home/example/coding/triway-nextjs/docs/postmortem/2026-10-19-headless-console-acceptance.md).
+
+## ext-calibrated-console-evidence
+
+- Status: **activation_pending**; root-cause confidence: **confirmed**; verification scope: **code**.
+- Symptoms: A visible post-password readiness nonce is misread by OCR and the headless test times out.
+- Applicability: Machine-generated evidence read through a native monospaced VGA screenshot, with exact nonce and checksum requirements.
+- Diagnostic checks: Compare the captured frame visually with OCR without publishing private console contents. Distinguish screen recognition from input delivery and login predicates; test exact nonce, altered payload and checksum rejection.
+- Remedy: Print clear/home and a fixed calibration alphabet in normal monochrome output. Read same-frame glyph masks exactly; keep ordinary prompts on OCR and preserve downstream nonce, checksum, identity and checklist validation. Cap dimensions before full-frame allocation and name only trusted failure stages.
+- Verification evidence: Actual saved frame contains complete command and standalone marker while PSM6/11/3, DPI and integer scaling misread characters. Synthetic calibrated frames roundtrip through the actual report decoder and reject wrong nonce, payload and checksum. Focused107 tests/one skip, full infra434/two skips and app48 pass; scoped system-Python mypy passes3 files.
+- Limitations: New calibrated output has not been exercised by a live authenticated run. Requires uniform bright-on-dark glyph cells at clear/home, at most4096x2160 and4,194,304pixels; unsupported/incomplete frames block. Startup warnings and full server/GNOME recovery remain separate. Calibration alone is not authentication.
+- Source: [Restored console acceptance](/home/example/coding/triway-nextjs/docs/postmortem/2026-10-19-headless-console-acceptance.md).
+
+## ext-console-prompt-cursor
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **code**.
+- Symptoms: A viewer-visible fresh login prompt times out when OCR appends a mark for its blinking underline cursor.
+- Applicability: Ordinary VGA login/password prompt recognition before local restored-account acceptance.
+- Diagnostic checks: Compare cursor-on/off native screenshots privately and inspect only known prompt suffixes. Verify actual worker OCR; isolate cursor pixels before changing OCR preprocessing or nonce validation.
+- Remedy: Accept the exact ordinary prompt label/colon with at most one trailing horizontal cursor (em dash, underscore, hyphen) and horizontal whitespace. Keep username/shell text and multiple marks blocked; preserve exact machine nonce/checksum gates.
+- Verification evidence: Two720x400 native frames differ only in9x2 cursor pixels. Same cursor-on frame: old predicate false, new true. Three defining RED/GREEN parser/integration/actual-Tesseract raster tests pass;87 focused and471 infra/two skips pass, mypy and independent review pass.
+- Limitations: Ordinary prompt code fix only. Unknown OCR suffixes block. No real guest input or authenticated login/server/GNOME acceptance was performed; native private captures removed.
+- Source: [Restored startup and prompt incident](/home/example/coding/triway-nextjs/docs/postmortem/2026-10-20-restored-login-startup-prerequisite.md) (SHA-256 f2df6f5e846e43055f3d9bbbfb2c6c3c48725101540f58b08a9227b4d707c8e4).
+
 ## local-dunst-replace-notification-id
 
 - Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **runtime**.

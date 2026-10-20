@@ -194,3 +194,15 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Verification: two defining tests RED then GREEN; existing startup/pywal regression scripts passed. Actual host preview confirms the missing entry and sudo requires a password.
 - Limitations: no privileged apply or fresh boot performed; wallpaper acceptance remains pending.
 - Source: [UBS wallpaper startup](../../../../docs/postmortem/2026-10-20-ubs-wallpaper-startup.md).
+
+
+## local-weather-epoch-hour-and-refresh
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **code**.
+- Symptoms: UTC hour flooring skips half-hour-zone current forecasts; mount-only dashboards keep stale data.
+- Applicability: Hourly source selection with epoch timestamps and freshness-limited feeds in open browser tabs.
+- Diagnostic checks: Reproduce Kolkata16:40 and execute the real page effect under a controlled clock/network/document lifecycle.
+- Remedy: Select the latest supplied forecast instant at or before now. Refresh periodically and on visible-tab resume, prevent overlap, bound requests, clear expired data and clean up abort controllers/listeners/timers.
+- Verification evidence: Reproductions RED,36 route+4 effect cases GREEN; typecheck/build passed. Deployment metadata and live API/desktop/mobile checked.
+- Limitations: Controlled effect tests do not establish a ninety-minute unattended browser soak.
+- Source: [Weather selection and refresh](/home/example/coding/scrape-weather/.worktrees/weather-app/docs/postmortem/2026-10-20-hour-selection-and-refresh.md) (SHA-256 `a70c4c1ebde8`; reviewed alias in [sources.json](../sources.json)).
