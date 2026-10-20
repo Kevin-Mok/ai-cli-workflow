@@ -5051,6 +5051,15 @@
   ],
   "reports": [
     {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-20-redshift-super-shortcuts.md"
+      ],
+      "decision": "No new learning: established scoped desktop-access, config-preservation and concurrent-edit validation guidance covers the observed failures; confirmed user scale and runtime activation are recorded in the report.",
+      "findings": [],
+      "reviewed_on": "2026-10-20",
+      "sha256": "5411b5012e2f1b1e55ed523683e0011c30022ef5bd45edd72e1334680f9a8cb6"
+    },
+    {
       "decision": "No new learning: only public path/transport spelling was neutralized; diagnosis, outcome and original measurement hashes are unchanged.",
       "findings": [],
       "reviewed_on": "2026-10-20",

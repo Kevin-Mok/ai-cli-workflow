@@ -1,10 +1,10 @@
 # Smooth Redshift preset curve
 
-Make Super+3–9 progress smoothly from 2100 to 6000 K by changing existing presets and applying the scoped live bindings.
+Make Super+1–9 progress smoothly from 1800 to 6000 K with reciprocal-temperature spacing, updating both modifier families and activating the scoped live presets.
 
 ## Context and decisions
 
-Use rounded reciprocal-temperature spacing: 2100, 2350, 2700, 3100, 3700, 4600, 6000 K. User explicitly requested both Super and Alt+Super modifiers. Keep keys 1/2, reset and adjustment values. Move workspace 11 to Super+F11 and remove conflicting Godot binding as in existing source. No controller changes or commit requested. Preserve pre-existing edits in README, smoke docs, config and checker, plus all unrelated dirty files captured in initial git status. i3 is intentionally unmanaged by chezmoi; preserve private live config and change only preset lines after refresh.
+Latest confirmed range: rounded reciprocal-temperature spacing of 1800, 1950, 2200, 2450, 2750, 3200, 3800, 4650, 6000 K over keys 1–9. Earlier evidence below records the preceding 3–9 range. User explicitly requested both Super and Alt+Super modifiers. Preserve reset and adjustment values. Move workspace 11 to Super+F11 and remove conflicting Godot binding as in existing source. No controller changes or commit requested. Preserve pre-existing edits in README, smoke docs, config and checker, plus all unrelated dirty files captured in initial git status. i3 is intentionally unmanaged by chezmoi; preserve private live config and change only preset lines after refresh.
 
 ## Checklist
 
@@ -46,3 +46,25 @@ Suggested commit: feat(i3): smooth Redshift presets across both shortcuts
 Commit subject: feat(i3): smooth Redshift presets across both shortcuts. User requested commit-session after runtime verification. Scope helper could not detect writes or baseline; use the explicit initial status and successful writes recorded in this conversation. Both modifier families and their required collision removal/workspace relocation were explicitly authorized in this session. Include only this session’s curve, aliases, tests/docs, plan and inspection report registration. Preserve the newer all-nine-key follow-up and unrelated existing staged/unstaged work using an isolated index. README recruiter gate passed. No pending implementation blockers; next step is scoped commit and one upstream push to origin/main after exact-candidate checks.
 
 Exact candidate verification: isolated source checker passed; controller regression re-run from repository root passed all 6 tests. Root README gate passed. Privacy check is required immediately before commit; preserve all hooks. Candidate contains only this session’s original 2100–6000 K range; newer follow-up remains uncommitted.
+
+## Follow-up: spread 1800–6000 K across all nine keys
+
+Latest user request supersedes the earlier 3–9 range. Use reciprocal-temperature spacing between 1800 and 6000 K over eight intervals, rounding to the nearest 50 K: 1800, 1950, 2200, 2450, 2750, 3200, 3800, 4650, 6000 K. Preserve both modifier families, reset, adjustments and workspaces. Initial dirty status captured; preserve all previous task work. Update existing checker first, then source/docs; refresh and apply only preset values to intentionally unmanaged live config.
+
+- [x] Inspect current source, docs, helper and prior evidence.
+- [x] Observe defining checker RED with new expectations.
+- [x] Update all nine presets and matching README/smoke checks.
+- [x] Run regressions, refresh, validate and activate live presets.
+- [x] Verify actual endpoint/midpoint keys, restore starting temperature, and record review.
+
+Rollback: restore only previous preset values in both modifier families. Existing private live paths and unrelated settings must remain byte-for-byte unchanged. No commit/push requested. Physical comfort remains manual.
+
+Follow-up RED: source checker exited 1 with the previous preset tuple versus all-nine-key expectations. Updated both modifier families and matching docs afterward.
+
+Follow-up GREEN and activation: source smoke exited 0; all 6 tests/test_redshift_control.py tests passed; nearest-50 reciprocal interpolation assertion produced the exact selected tuple. refresh-config exited 0 with REFRESH COMPLETE. Private candidate passed checker and i3 -C (exit 0; existing wheel deprecations only). Scoped patch changed only the preset values/comment, preserving unrelated live bytes. Reload returned success:true. Installed and running checkers passed both modifiers, reset/adjustments and workspace invariants. Actual X11 key injection: Super+1=1800, Super+5=2750, Super+9=6000, Alt+Super+2=1950 K; restored starting temperature. Private backup: /tmp/redshift-range-pwe9_k1i/config.before. git diff --check passed. No unexpected failure in this follow-up; intentional RED is exempt from incident recording.
+
+Current manual checks: Super+1/5/9 display 1800/2750/6000 K; repeat with Alt+Super; 0/grave reset. Docs updated in README and docs/smoke-tests.md, including Super+3=2200 followed by adjustments 2450/2200 K. Subjective smoothness remains a human check. No commit or push performed; suggested commit: feat(i3): spread Redshift curve across nine presets. Cursor continuation: verify the latest all-nine-key section of this plan and source/installed/live mappings; preserve unrelated dirty work and private i3 settings.
+
+Independent review confirmed both modifier families, reciprocal math, collision checks and README/smoke consistency. Reviewer found stale active values in the earlier shortcut plan; corrected its keys 1/3 to 1800/2200 K and linked this current range follow-up.
+
+Historical curve milestones above are superseded by the current ten-key mapping and delivery milestone in plans/even-redshift-presets.md.

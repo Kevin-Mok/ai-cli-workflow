@@ -1028,11 +1028,10 @@ this.
 - [`dot_config/i3/config.tmpl`](dot_config/i3/config.tmpl) is the main
   desktop control plane for workspace movement, app assignments,
   launcher bindings, display and audio shortcuts, and layout control.
-  Hold **Super** (Windows key) or **Alt+Super** and press **3–9** for Redshift temperatures
-  of **2100K, 2350K, 2700K, 3100K, 3700K, 4600K, and 6000K**.
-  Rounded reciprocal-temperature steps give finer control at the warm end.
-  Keys **1, 2** select **1200K, 1800K**; **Super+0** or
-  **Super+grave** removes the filter; **Alt+Super+0/grave** also resets. **Alt+number** still switches workspaces;
+  Hold **Super** (Windows key) or **Alt+Super** and press **1–9, then 0** for Redshift temperatures
+  of **1800K, 2300K, 2850K, 3350K, 3900K, 4400K, 4950K, 5450K, 6000K, and 6500K**.
+  Even kelvin steps span 1800–6500 K, rounded to the nearest 50 K.
+  **Super+0** selects 6500 K. **Super+grave** or **Alt+Super+grave** removes the filter. **Alt+number** still switches workspaces;
   **Super+F11** selects workspace 11.
   **Ctrl+Alt+Up/Down** increases/decreases temperature by **250 K** (cooler/warmer),
   bounded at 1000–6500 K. Presets, `rds`, `rx` and login share the saved temperature.
