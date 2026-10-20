@@ -9159,6 +9159,33 @@
       "reviewed_on": "2026-10-20",
       "findings": [],
       "decision": "No new learning: documented restricted orchestration globals and existing metaprompt-run scoped Kitty socket access cover this handoff incident. ASCII length check and escalated opener were verified."
+    },
+    {
+      "sha256": "0fe1418c54c0dd884a7f33ba6ee3c823b7f4425d70fa43c4f098b3e4f6f0e926",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-20-description-handoff-runtime.md"
+      ],
+      "reviewed_on": "2026-10-20",
+      "findings": [],
+      "decision": "No new reusable finding: one-off unsupported TextEncoder assumption; existing metaprompt-run documents scoped Kitty socket escalation and reusing the executor ID. ASCII validation and native read_thread verified recovery."
+    },
+    {
+      "sha256": "add026423878f21e0ef55dd1885bdb2cdbc6209f40dd237b267d2fc5d53df14e",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-20-github-description-network.md"
+      ],
+      "reviewed_on": "2026-10-20",
+      "findings": [],
+      "decision": "No new learning: scoped network escalation worked around an existing sandbox permission boundary; no application defect was established."
+    },
+    {
+      "sha256": "8c93597a8ca4d5dea7dbeb144d395c6a812723b59155bd4b61e3dcc51bab67cd",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-20-description-evidence-excerpt.md"
+      ],
+      "reviewed_on": "2026-10-20",
+      "findings": [],
+      "decision": "No new learning: independent evidence validation caught a safe excerpt omitted during credential redaction; no remote writes preceded the check."
     }
   ],
   "review": {
