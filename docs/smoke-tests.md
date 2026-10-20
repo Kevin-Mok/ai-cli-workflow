@@ -1372,3 +1372,16 @@ play audio, so exercise them deliberately.
 **Action:** In a disposable Git repository, commit JSON containing an installation or session UUID, including nested serialized JSON, then remove it and run `executable_audit-public-history --repo <fixture> --scope all --plain`.
 
 **Expected:** The auditor reports `runtime_identifier` without printing values and exits 1. Removing the latest file alone does not clear its historical finding. Use synthetic fixture values only.
+
+### Media conveyor screensaver
+
+- Action: Install with `./scripts/executable_media-screensaver install`, enable the unpacked extension from `~/scripts/media_screensaver/browser` in each Chrome/Chromium profile, reload existing tabs and run `~/scripts/media-screensaver status`.
+  Expected: The stable extension ID is fpologomejgfmlemideffbaallaejhbb, status explains current bridge coverage, and native state contains only geometry/playback/IDs with private permissions. An uncovered visible browser profile suppresses automatic activation.
+- Action: Record `xrandr --listmonitors`, run `~/scripts/media-screensaver demo --report /tmp/conveyor-demo.jsonl` with a fresh report path, and watch item #1 for 35 seconds without touching keyboard/mouse.
+  Expected: Item #1 travels left → middle → right → exit on successive ten-second advances with 750ms slides, letterboxing stays black, and report playback timestamps continue across moves. After exit there are no child players and monitor geometry matches the original.
+- Action: Preview a small library containing portrait photos, HEIC, one-second clips, a longer video and a corrupt file; repeat with `--media /nonexistent/synthetic-media`.
+  Expected: Portrait/HEIC images fit without cropping, short videos loop, long videos stop on exit, corrupt items are skipped without stopping other cards, and the missing directory reports an actionable error. Originals are unchanged.
+- Action: In a covered active Chrome tab, play a visible video on the middle output, move it to each side, pause/resume, enter fullscreen, and repeat with a second window, an iframe player, a background tab, and audio-only playback.
+  Expected: Only actively playing visible active-tab video intersecting the middle output blocks activation; pause/end, side-only video and audio do not. Moving/resuming qualifying video dismisses the running screensaver promptly. Uncertain geometry/coverage suppresses activation with a status reason.
+- Action: Start `~/scripts/media-screensaver daemon`, leave the desktop untouched for five minutes, then move the mouse/type; repeat while the bridge is disabled and while the session locks/suspends normally.
+  Expected: A healthy unblocked bridge permits activation after 300 idle seconds; activity dismisses and releases all pipelines. Missing/stale bridge prevents automatic activation but allows manual preview. Existing lock, suspend and display settings remain intact.

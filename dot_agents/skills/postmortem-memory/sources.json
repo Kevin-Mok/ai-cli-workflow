@@ -8829,6 +8829,15 @@
       "findings": [],
       "sha256": "a81cd7dd9413d0f931722dcdfc6a7fbfdbef63016565aec377c328648fefa654",
       "decision": "No new reusable learning: existing stale-preservation, fetch-before-ancestry and exact-reviewed-approval guidance applies. Keep the verified scoped commits, fetch missing remote objects, preserve active hooks and unrelated concurrent staging, and integrate via a clean isolated normal merge. Exact candidate and installed history checks pass;36 integration tests pass. Physical acceptance remains pending."
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-20-screensaver-x11-sandbox.md"
+      ],
+      "decision": "Reviewed final environment/integration evidence. Existing strict-contract and execution-environment guidance covers the general lessons; task-local raw-input, metadata normalization and classic WindowProxy lessons are in tasks/lessons.md. No duplicate reusable finding. Implementation, scoped install and real35-second/Chrome matrix verified; real300-second/suspend acceptance and full refresh remain limited as reported.",
+      "findings": [],
+      "reviewed_on": "2026-10-20",
+      "sha256": "1483a731c3ab99964eb276ae97eee9dee9d1c3242e1e4798b40c004b885c0489"
     }
   ],
   "review": {

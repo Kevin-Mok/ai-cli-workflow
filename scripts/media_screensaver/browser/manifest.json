@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "Media Screensaver Video Gate",
+  "description": "Reports only playing-video geometry to the local screensaver.",
+  "version": "1.0.0",
+  "minimum_chrome_version": "119",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuxCNancoTfvgQkwGDsu7e6ENIF70dVoRUqw/HgI0p1ylvRU92jLnrbufXa9L8h/RZ6bpnATrcR2Ht6N7QxqdfKkRF6FkgoYe4N3cFKQ4Crxj4uqkaHY5eCTmaPANshLhyNZMLFu4t2O16vdUzcpN2kbW8erRW4AS40eMQLvxTBKPfm7M9KtiBthBv+Hfj4fd1I8k3yq6iDSCcJ4/H9lR00q9LtnGc2C5Nwby1FLAM3wxPErNy0P79TLE2Q8VX2vBskBrHH3KHOsPyC/2jICu5B5pQaWH1gvOm5AFZkvRS8YnUgpjCJVKzqCPmoTTBVseFqSZ/UPEvGvtSR+Bss323QIDAQAB",
+  "permissions": ["nativeMessaging", "scripting", "webNavigation"],
+  "host_permissions": ["<all_urls>"],
+  "background": {"service_worker": "background.js"},
+  "content_scripts": [{
+    "matches": ["<all_urls>"],
+    "js": ["content.js"],
+    "run_at": "document_start",
+    "all_frames": true,
+    "match_about_blank": true,
+    "match_origin_as_fallback": true
+  }]
+}

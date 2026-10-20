@@ -975,6 +975,16 @@ this.
 - [`scripts/executable_apply-desktop-display-layout`](scripts/executable_apply-desktop-display-layout)
   saves the three-monitor desktop order used by i3: 2048px left, 4K
   middle, and 1080p right.
+- [`media-screensaver`](scripts/executable_media-screensaver) adds a separate
+  X11 conveyor across all three live outputs. Install with
+  `./scripts/executable_media-screensaver install`, enable its local browser
+  extension, then run `~/scripts/media-screensaver preview` or `daemon`.
+  `--media DIR` selects a recursive photo/video library; `--seconds N` bounds a
+  preview; `--report PATH` records item IDs/timestamps; `--plain` and `--details`
+  control output. `status`, `probe` and `demo` expose browser coverage, codec
+  checks and disposable media. Automatic activation waits five idle minutes and
+  fails closed when Chrome video coverage is unavailable. See
+  [installation, browser enablement and limitations](docs/media-screensaver.md).
 - [`flavibot-browser`](scripts/executable_flavibot-browser) opens the FlaviBot
   music player in Chrome with a separate `~/.local/share/flavibot-chrome` data
   directory. Run `~/scripts/flavibot-browser` after `refresh-config`, then sign
