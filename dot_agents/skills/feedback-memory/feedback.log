@@ -3,3 +3,4 @@
 2026-10-16 - Treat this repository as public: ignore artifacts containing sensitive information, keep them private, and never force-add them to public commits. Record this rule in AGENTS.repo.md.
 2026-10-15 - Address the user as "Sire" in chat; persist the preference in AGENTS.repo.md.
 2026-10-20 - Put commit and push confirmation at both the top and bottom of delivery replies, including the commit hash and push destination; end with the confirmation so pushed status is immediately visible. Only confirm successful operations actually performed or verified.
+2026-10-20 - Include the full Git commit message (subject and body) plus a brief summary of the committed changes in the bottom commit confirmation; retain the hash and actual push status.

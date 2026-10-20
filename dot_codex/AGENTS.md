@@ -274,9 +274,12 @@ education work:
   implementation. Stage only intended files or hunks and inspect the staged diff
   before committing.
 - Open and close commit delivery replies with the commit hash and actual push
-  status, including the remote and branch. Make this confirmation the final line
-  so readers can immediately see whether changes were pushed. Confirm success
-  only after verification; state clearly when a push failed or was not performed.
+  status, including the remote and branch. The bottom confirmation must also
+  include the full commit message (subject and body, as recorded by Git) and a
+  brief plain-language summary of the committed changes. End with the hash and
+  push status so readers can immediately see whether changes were pushed.
+  Confirm success only after verification; state clearly when a push failed or
+  was not performed.
 - After each commit, promptly report the result in Codex output with a high-level
   overview of where the task stands: completed work, verified results, remaining
   work, blockers (or none), and the next step. Maintain the same overview in the

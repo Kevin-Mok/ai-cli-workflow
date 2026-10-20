@@ -50,3 +50,12 @@ This document records delivery milestones and verification for completed reposit
 - Delivery: commit on main, then push to origin/main after candidate privacy review.
 - Remaining: unrelated tmux/postmortem/prompt changes excluded. Full refresh remains blocked by unrelated live MIME settings drift.
 - Rollback: remove the four-line delivery rule; preserve the append-only feedback history.
+
+## Expanded confirmation — docs: include full commit message in handoff
+
+- Complete: bottom confirmations include the full Git subject/body, a plain-language change summary, hash, and actual push status.
+- Scope: directly observed AGENTS.md and append-only feedback edits; helper could not detect writes for this session.
+- Verification: README gate pass_no_change; scoped diff whitespace check passed; exact candidate privacy review required before commit.
+- Delivery: commit on main and attempt push to origin/main; earlier commit efacead remains local after a non-fast-forward rejection.
+- Remaining: unrelated postmortem references/ledger and tmux prompt excluded; configuration refresh still blocked by existing MIME settings drift.
+- Rollback: restore the prior confirmation wording; preserve append-only feedback history.
