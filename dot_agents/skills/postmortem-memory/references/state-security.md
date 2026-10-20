@@ -326,3 +326,14 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Limits: byte edits require fresh review; heuristic/binary/encoding and local-hook
   bypass limits remain. Neutral aliases require private machine-path mapping.
 - Source: [privacy gate false positives](../../../../docs/postmortem/2026-10-16-privacy-gate-false-positives.md).
+
+## local-quota-reset-jitter-anchor
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **runtime**.
+- Symptoms: Consumption undercounts working time, shows duplicate same-minute reset rows and retires frequent valid quota readings.
+- Applicability: Integer allowance deadlines drifting six to ten seconds within one coherent usage progression.
+- Diagnostic checks: Inspect exact reset seconds and stale counts; reproduce signed ±6/±8/±10 drift and original-cohort returns. Check ±11 against the original anchor even after an intermediate reading.
+- Remedy: Fixed ten-second tolerance from the original cohort anchor, retaining retirement, conflicts and real gaps. Keep matched work distinct from total model work.
+- Verification evidence: Six regression cases observed RED; 85 focused tests, mypy and Ruff passed. Installed/source replay gives one row, 2 matched plus 1 genuine gap-excluded point, over three matched hours and one stale reading.
+- Limitations: A real reset within ten seconds is indistinguishable; larger drift still splits. Missing observations and individual-model cost uncertainty remain.
+- Source: [2026-10-20-consumption-reset-jitter.md](/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-20-consumption-reset-jitter.md) (SHA-256 `248455f7bbd2`; registered in sources.json).

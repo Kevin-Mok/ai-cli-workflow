@@ -35,6 +35,29 @@
   ],
   "findings": [
     {
+      "applicability": "Account-wide Codex allowance replay with integer reset deadlines drifting six to ten seconds within a coherent quota progression.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Inspect exact reset seconds, accepted percentage chronology and stale counts before changing denominator scope.",
+        "Compare reset 0, jitter \u00b16/\u00b18/\u00b110 and returns to the original anchor; assert one cohort and conserved matched work.",
+        "Test \u00b111 beyond the original anchor after an intermediate \u00b15 reading; retain real reset retirement and gap exclusions."
+      ],
+      "id": "local-quota-reset-jitter-anchor",
+      "limitations": "A real reset within ten seconds is indistinguishable from timestamp drift. Fixed-anchor jitter beyond ten seconds still splits cohorts. Missing readings remain excluded; low-confidence shared quota rates do not identify individual model costs. Live work durations grow.",
+      "reference": "references/state-security.md#local-quota-reset-jitter-anchor",
+      "remedy": "Use a fixed ten-second tolerance from the original cohort anchor; preserve chronological retirement, conflicts, stale percentages and actual observation-gap exclusions. Do not replace matched work with all model time.",
+      "sources": [
+        "248455f7bbd2d130e3e5b1ff6c474f84c068dc862b5748961f11c9b5b0e085eb"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "Daily consumption work is much smaller than model totals and two reset rows display the same minute.",
+        "Frequent valid quota readings are classified as retired after a sparse deadline drifts by several seconds."
+      ],
+      "verification": "Six signed-jitter cases observed RED as duplicate rows; focused 85 tests, mypy and Ruff passed. Source and installed reports collapsed false cohorts; installed JSON had 2 matched plus 1 genuine gap-excluded point, 3.412598611 matched hours vs 3.427554167 model hours and only one stale reading. Installed burn.py matched tested source.",
+      "verification_scope": "runtime"
+    },
+    {
       "applicability": "Recent-session pickers that can show identity metadata before dialogue and AI evidence finish indexing.",
       "confidence": "confirmed",
       "diagnostics": [
@@ -4987,6 +5010,25 @@
     }
   ],
   "reports": [
+    {
+      "aliases": [
+        "/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-20-consumption-session-privacy-gate.md"
+      ],
+      "decision": "No new reusable learning: existing exact-candidate privacy and session-scope rules apply. Tracker HEAD and original index share 35 baseline findings; preserve narrow scope and do not bypass the gate. Focused accounting tests and installed fix pass; tracker publication remains blocked pending broader cleanup authorization.",
+      "findings": [],
+      "reviewed_on": "2026-10-20",
+      "sha256": "6549292b65a73088f5cd81f93cc40f7f11ea9599694e889db5787d5ab9fc952b"
+    },
+    {
+      "aliases": [
+        "/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-20-consumption-reset-jitter.md"
+      ],
+      "findings": [
+        "local-quota-reset-jitter-anchor"
+      ],
+      "reviewed_on": "2026-10-20",
+      "sha256": "248455f7bbd2d130e3e5b1ff6c474f84c068dc862b5748961f11c9b5b0e085eb"
+    },
     {
       "sha256": "196350d470702719f958ecac502ca5420bf566722a6888267000f040e2d74939",
       "aliases": [
