@@ -215,7 +215,7 @@ tbo "cd /mnt/usb-8tb/obs"
 #s "xset dpms force off"
 #s "~/linux-config/scripts/executable_dual-monitor-slideshow"
 s "systemctl suspend"
-ss "xset s off -dpms && fdfind -t f -e jpg -e png -e jpeg -e gif -e webp . /mnt/linux-files-3/slideshow | shuf | sxiv -S 5 -s f -i &"
+# ss "xset s off -dpms && fdfind -t f -e jpg -e png -e jpeg -e gif -e webp . /mnt/linux-files-3/slideshow | shuf | sxiv -S 5 -s f -i &"
 # sl "i3lock-fancy && systemctl suspend"
 # so "xset dpms force off"
 xx "exit"
@@ -232,6 +232,7 @@ XL "xmodmap ~/.Xmodmap-laptop && xset r rate $XSET_DELAY $XSET_RATE"
 bt "~/linux-config/dot_config/i3blocks/scripts/executable_battery"
 {{ end }}
 
+ss "~/scripts/media-screensaver preview"
 # ]]] power options  # 
 
 # sound [[[ #

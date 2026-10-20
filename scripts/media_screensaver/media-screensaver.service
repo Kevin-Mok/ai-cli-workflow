@@ -1,0 +1,14 @@
+[Unit]
+Description=Media screensaver after five idle minutes
+PartOf=graphical-session.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+ExecStart=%h/scripts/media-screensaver daemon
+Restart=always
+RestartSec=5
+TimeoutStopSec=10
+KillMode=control-group
+UMask=0077
+Environment=PYTHONUNBUFFERED=1

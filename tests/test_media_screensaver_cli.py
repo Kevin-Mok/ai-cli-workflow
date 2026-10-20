@@ -94,12 +94,28 @@ class CLITests(unittest.TestCase):
             for _,process in launches:
                 if process.poll() is None: process.kill(); process.wait()
 
+    def test_service_imports_desktop_environment_before_start(self):
+        import sys
+        sys.path.insert(0, str(ROOT / 'scripts'))
+        from media_screensaver import main
+        from unittest.mock import patch
+        calls = []
+        def execute(command, **kwargs):
+            calls.append(command)
+            return subprocess.CompletedProcess(command, 0)
+        with patch.dict(os.environ, DISPLAY=':99', XAUTHORITY='/tmp/test-auth', XDG_SESSION_ID='test'), patch.object(main.subprocess, 'run', side_effect=execute):
+            self.assertEqual(main.main(['service', '--plain']), 0)
+        self.assertEqual(calls, [
+            ['systemctl', '--user', 'daemon-reload'],
+            ['systemctl', '--user', 'import-environment', 'DISPLAY', 'XAUTHORITY', 'XDG_SESSION_ID'],
+            ['systemctl', '--user', 'start', 'media-screensaver.service']])
+
     def test_install_and_native_manifest_use_stable_absolute_entrypoints(self):
         with tempfile.TemporaryDirectory() as directory:
             env = dict(os.environ, HOME=directory, XDG_CONFIG_HOME=directory + '/.config')
             i3 = Path(directory) / '.config/i3/config'
             i3.parent.mkdir(parents=True)
-            i3.write_text('# existing lock and display settings\n')
+            i3.write_text('# existing lock and display settings\n' + f'exec --no-startup-id {directory}/scripts/media-screensaver daemon\n')
             p = subprocess.run([str(CLI), 'install', '--plain'], env=env, capture_output=True, text=True)
             self.assertEqual(p.returncode, 0, p.stderr)
             installed = Path(directory) / 'scripts/media-screensaver'
@@ -119,6 +135,11 @@ class CLITests(unittest.TestCase):
             self.assertEqual(p.returncode, 0, p.stderr)
             self.assertEqual(unrelated.read_text(), 'keep')
             self.assertTrue(i3.read_text().startswith('# existing lock and display settings\n'))
-            self.assertEqual(i3.read_text().count(str(installed) + ' daemon'), 1)
+            self.assertEqual(i3.read_text().count(str(installed) + ' service'), 1)
+            self.assertNotIn(str(installed) + ' daemon', i3.read_text())
+            unit = Path(directory) / '.config/systemd/user/media-screensaver.service'
+            self.assertTrue(unit.is_file(), 'supervised idle service must be installed')
+            self.assertIn('Restart=always', unit.read_text())
+            self.assertIn('ExecStart=%h/scripts/media-screensaver daemon', unit.read_text())
 
 if __name__ == '__main__': unittest.main()

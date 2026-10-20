@@ -1375,13 +1375,20 @@ play audio, so exercise them deliberately.
 
 ### Media conveyor screensaver
 
+- Action: Load the generated fish abbreviations, type `ss` and press Space to inspect its expansion, then run it.
+  Expected: It expands to `~/scripts/media-screensaver preview` and starts immediate playback even without the browser bridge; physical input dismisses it. The previous slideshow mapping remains commented in the command template.
+
 - Action: Install with `./scripts/executable_media-screensaver install`, enable the unpacked extension from `~/scripts/media_screensaver/browser` in each Chrome/Chromium profile, reload existing tabs and run `~/scripts/media-screensaver status`.
   Expected: The stable extension ID is fpologomejgfmlemideffbaallaejhbb, status explains current bridge coverage, and native state contains only geometry/playback/IDs with private permissions. An uncovered visible browser profile suppresses automatic activation.
+- Action: If status reports an unavailable browser bridge, verify **Load unpacked** was completed in every Chrome profile (installing the native host alone is insufficient), enable the extension and reload existing tabs, then run `~/scripts/media-screensaver status` again.
+  Expected: A connected bridge replaces the generic unavailable-bridge reason with readiness or a specific playback/coverage reason. Keyboard/mouse use resets the idle count normally; restarting the service alone does not install the extension.
 - Action: Record `xrandr --listmonitors`, run `~/scripts/media-screensaver demo --report /tmp/conveyor-demo.jsonl` with a fresh report path, and watch item #1 for 35 seconds without touching keyboard/mouse.
   Expected: Item #1 travels left → middle → right → exit on successive ten-second advances with 750ms slides, letterboxing stays black, and report playback timestamps continue across moves. After exit there are no child players and monitor geometry matches the original.
 - Action: Preview a small library containing portrait photos, HEIC, one-second clips, a longer video and a corrupt file; repeat with `--media /nonexistent/synthetic-media`.
   Expected: Portrait/HEIC images fit without cropping, short videos loop, long videos stop on exit, corrupt items are skipped without stopping other cards, and the missing directory reports an actionable error. Originals are unchanged.
 - Action: In a covered active Chrome tab, play a visible video on the middle output, move it to each side, pause/resume, enter fullscreen, and repeat with a second window, an iframe player, a background tab, and audio-only playback.
   Expected: Only actively playing visible active-tab video intersecting the middle output blocks activation; pause/end, side-only video and audio do not. Moving/resuming qualifying video dismisses the running screensaver promptly. Uncertain geometry/coverage suppresses activation with a status reason.
-- Action: Start `~/scripts/media-screensaver daemon`, leave the desktop untouched for five minutes, then move the mouse/type; repeat while the bridge is disabled and while the session locks/suspends normally.
-  Expected: A healthy unblocked bridge permits activation after 300 idle seconds; activity dismisses and releases all pipelines. Missing/stale bridge prevents automatic activation but allows manual preview. Existing lock, suspend and display settings remain intact.
+- Action: Start `~/scripts/media-screensaver service`, confirm `systemctl --user status media-screensaver.service` is active, leave the desktop untouched for five minutes, then move the mouse/type; repeat while the bridge is disabled and while the session locks/suspends normally.
+  Expected: The unit runs the idle daemon and is started on subsequent i3 logins. A healthy unblocked bridge permits activation after 300 idle seconds; activity dismisses and releases all pipelines. Missing/stale bridge prevents automatic activation but allows manual preview. Existing lock, suspend and display settings remain intact.
+- Action: With the idle service active, run `systemctl --user kill --signal=TERM --kill-whom=main media-screensaver.service`, wait six seconds, and inspect its status and journal; then stop it with `systemctl --user stop media-screensaver.service` and start it again with `~/scripts/media-screensaver service`.
+  Expected: Termination is followed by a new daemon PID after five seconds and a fresh idle clock; deliberate stop leaves the service inactive and releases any owned preview. Starting again succeeds without duplicate monitors.

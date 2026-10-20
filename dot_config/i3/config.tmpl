@@ -25,8 +25,8 @@ exec --no-startup-id i3-msg 'workspace $ws6; exec vesktop'
 #exec --no-startup-id i3-msg 'workspace $ws6; exec signal-desktop'
 exec --no-startup-id /home/example/scripts/speechnotes-dictation --prewarm
 exec --no-startup-id /home/example/scripts/ubuntu-start
-# Media conveyor queries idle without changing existing lock or suspend behavior.
-exec --no-startup-id {{ .chezmoi.homeDir }}/scripts/media-screensaver daemon
+# Supervised media conveyor queries idle without changing existing lock or suspend behavior.
+exec --no-startup-id {{ .chezmoi.homeDir }}/scripts/media-screensaver service
 # exec --no-startup-id i3-msg 'workspace $ws5; exec $term -e twitchy'
 # exec --no-startup-id i3-msg 'workspace $ws5; exec firefox -P nft'
 #exec --no-startup-id i3-msg workspace $ws6; exec discord

@@ -191,6 +191,23 @@ def daemon(args):
     return 0
 
 
+def service(args):
+    if not os.environ.get('DISPLAY'):
+        raise ValueError('Start the service from the X11 desktop session (DISPLAY is missing).')
+    output(args, 'progress', 'Starting supervised five-minute idle monitor...')
+    for command in (
+        ['daemon-reload'],
+        ['import-environment'] + [key for key in ('DISPLAY', 'XAUTHORITY', 'XDG_SESSION_ID') if key in os.environ],
+        ['start', 'media-screensaver.service'],
+    ):
+        result = subprocess.run(['systemctl', '--user'] + command, capture_output=True, text=True, timeout=30)
+        if result.returncode:
+            output(args, 'error', 'User service could not start; run install first and inspect systemctl --user status media-screensaver.service.', result.stderr)
+            return 1
+    output(args, 'success', 'Idle service started; automatic activation after five idle minutes when browser and lock checks allow.')
+    return 0
+
+
 def install(args):
     home = Path.home()
     target = home / 'scripts'
@@ -217,14 +234,20 @@ def install(args):
         manifest.parent.mkdir(parents=True, exist_ok=True)
         manifest.write_text(json.dumps(dict(name=bridge.HOST_NAME, description='Local playback geometry for the media screensaver',
                                            path=str(native), type='stdio', allowed_origins=['chrome-extension://' + bridge.EXTENSION_ID + '/']), indent=2) + '\n')
+    unit = config / 'systemd/user/media-screensaver.service'
+    unit.parent.mkdir(parents=True, exist_ok=True)
+    unit.write_text((source / 'media-screensaver.service').read_text())
     i3 = config / 'i3/config'
     if i3.is_file():
-        startup = f'exec --no-startup-id {installed} daemon'
-        current = i3.read_text()
+        startup = f'exec --no-startup-id {installed} service'
+        legacy = f'exec --no-startup-id {installed} daemon'
+        current = ''.join(line for line in i3.read_text().splitlines(keepends=True) if line.strip() != legacy)
         if startup not in current.splitlines():
-            i3.write_text(current + ('' if current.endswith('\n') else '\n') + startup + '\n')
-        output(args, 'info', 'Registered idle monitor for the next i3 session; existing settings preserved.')
+            current += ('' if current.endswith('\n') else '\n') + startup + '\n'
+        i3.write_text(current)
+        output(args, 'info', 'Registered idle service for the next i3 session; existing settings preserved.')
     output(args, 'success', f'Installed launcher: {installed}')
+    output(args, 'info', f'Start now from the desktop: {installed} service')
     output(args, 'info', f'Load unpacked browser extension: {package / "browser"}')
     output(args, 'info', f'Expected extension ID: {bridge.EXTENSION_ID}')
     output(args, 'info', 'Enable the extension in every Chrome/Chromium profile; allow incognito if used. See docs/media-screensaver.md.')
@@ -280,7 +303,7 @@ def main(argv=None):
     plain_help = '--plain' in (sys.argv[1:] if argv is None else argv) or os.environ.get('CLI_PLAIN') == '1'
     parser = argparse.ArgumentParser(description=('' if plain_help else '🖥️ ') + 'X11 three-monitor media conveyor; see docs/media-screensaver.md.',
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument('command', nargs='?', choices=['preview', 'daemon', 'status', 'install', 'probe', 'demo', '_auto'], default='preview', metavar='{preview,daemon,status,install,probe,demo}')
+    parser.add_argument('command', nargs='?', choices=['preview', 'daemon', 'service', 'status', 'install', 'probe', 'demo', '_auto'], default='preview', metavar='{preview,daemon,service,status,install,probe,demo}')
     parser.add_argument('--media', type=Path, default=MEDIA, help='recursive media library (default: %(default)s)')
     parser.add_argument('--seconds', type=float, default=0, help='close preview after this many seconds (0: until activity)')
     parser.add_argument('--report', type=Path, help='new private JSONL timing report; item IDs only')
@@ -292,6 +315,7 @@ def main(argv=None):
         if args.command == 'install': return install(args)
         if args.command == 'probe': return probe(args)
         if args.command == 'daemon': return daemon(args)
+        if args.command == 'service': return service(args)
         if args.command == 'demo':
             from .fixtures import demo
             return demo(args)
@@ -303,7 +327,7 @@ def main(argv=None):
             output(args, 'info', ('Automatic activation ready: ' if allowed else 'Automatic activation suppressed: ') + reason)
             status = directory / 'status.json'
             running = status.exists() and time.time() - status.stat().st_mtime < 3
-            output(args, 'info', 'Idle monitor: ' + ('running' if running else 'stopped; launch media-screensaver daemon'))
+            output(args, 'info', 'Idle monitor: ' + ('running' if running else 'stopped; launch media-screensaver service'))
             return 0
         return preview(args, automatic=args.command == '_auto') or 0
     except KeyboardInterrupt:

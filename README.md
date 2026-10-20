@@ -978,7 +978,9 @@ this.
 - [`media-screensaver`](scripts/executable_media-screensaver) adds a separate
   X11 conveyor across all three live outputs. Install with
   `./scripts/executable_media-screensaver install`, enable its local browser
-  extension, then run `~/scripts/media-screensaver preview` or `daemon`.
+  extension, then run `~/scripts/media-screensaver service` for a supervised idle monitor
+  or `preview` (fish abbreviation `ss`) for immediate playback. i3 starts the service at login, and systemd
+  restarts it after an exit. `daemon` remains available in the foreground.
   `--media DIR` selects a recursive photo/video library; `--seconds N` bounds a
   preview; `--report PATH` records item IDs/timestamps; `--plain` and `--details`
   control output. `status`, `probe` and `demo` expose browser coverage, codec

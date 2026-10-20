@@ -8880,6 +8880,15 @@
       "findings": [],
       "reviewed_on": "2026-10-20",
       "sha256": "1483a731c3ab99964eb276ae97eee9dee9d1c3242e1e4798b40c004b885c0489"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-20-screensaver-service-inspection.md"
+      ],
+      "decision": "No new learning: existing path discovery, local drift and CLI-option verification apply. Service recovery and scoped tests passed; Chrome extension activation remains pending. Public aliases use canonical example paths; exact local registrations remain machine-local.",
+      "findings": [],
+      "reviewed_on": "2026-10-20",
+      "sha256": "8314d510811ed2fcf99852a53d080ea9fbafcdf20188497114a5790fdbf03072"
     }
   ],
   "review": {
