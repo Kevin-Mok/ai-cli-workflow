@@ -28,7 +28,7 @@ if [ -f "${HOME}/.Xmodmap" ]; then
   start_command xmodmap xmodmap "${HOME}/.Xmodmap"
 fi
 
-start_command redshift redshift -m randr -O 3000
+start_command redshift "${HOME}/scripts/redshift-control" set 3000
 if [ -n "${XSET_DELAY:-}" ] && [ -n "${XSET_RATE:-}" ]; then
   start_command xset xset r rate "${XSET_DELAY}" "${XSET_RATE}"
 fi

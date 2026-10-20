@@ -28,10 +28,14 @@ else:
     label = args.config
 temperatures = (1200, 1800, 2100, 2400, 2700, 3000, 4800, 5400, 6000)
 expected = [(str(n), str(value)) for n, value in enumerate(temperatures, 1)]
-actual = re.findall(r'^bindsym \$mod\+Mod4\+([0-9]) exec redshift -x && redshift -O (\d+)$', text, re.M)
+actual = re.findall(r'^bindsym \$mod\+Mod4\+([0-9]) exec --no-startup-id ~/scripts/redshift-control set (\d+)$', text, re.M)
 if actual != expected:
     raise SystemExit(_cli_message(f'FAIL: {label}: expected {expected}; found {actual}', '❌'))
 for key in ('0', 'grave'):
-    if not re.search(rf'^bindsym \$mod\+Mod4\+{key} exec redshift -x$', text, re.M):
+    if not re.search(rf'^bindsym \$mod\+Mod4\+{key} exec --no-startup-id ~/scripts/redshift-control reset$', text, re.M):
         raise SystemExit(_cli_message(f'FAIL: {label}: {key} must reset the filter', '❌'))
-print(_cli_message(f'PASS: {label}: 2–6 = 1800, 2100, 2400, 2700, 3000 K; 1/7–9 unchanged; 0/grave reset', '✅'))
+for key, step in (('Up', 250), ('Down', -250)):
+    binding = f'bindsym Control+$mod+{key} exec --no-startup-id ~/scripts/redshift-control adjust {step}'
+    if text.splitlines().count(binding) != 1:
+        raise SystemExit(_cli_message(f'FAIL: {label}: missing or duplicate {key} adjustment', '❌'))
+print(_cli_message(f'PASS: {label}: 2–6 = 1800, 2100, 2400, 2700, 3000 K; 1/7–9 unchanged; 0/grave reset; Ctrl+Alt+Up/Down = +/-250 K', '✅'))

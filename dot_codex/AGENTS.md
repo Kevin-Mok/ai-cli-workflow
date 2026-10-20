@@ -55,10 +55,6 @@ education work:
   deleting ambiguous leftovers.
 - Never stage secrets, credentials, caches, generated output, or machine-local
   files unless they clearly belong in version control.
-- When a local managed file is newer than its repository source, always copy
-  its changes into this repo before applying configuration. Compare modification
-  times and review the diff; preserve templates and unrelated repo edits when
-  merging. Keep secrets and machine-local data outside tracked source.
 - Surface assumptions before implementation. If conflicting evidence or a
   missing choice could materially change the result, stop, name the conflict,
   and ask. Push back directly on unsafe or unsound approaches and propose a
@@ -216,8 +212,7 @@ education work:
   behavior changes. The helper applies reviewed chezmoi files, regenerates
   shortcuts, and reloads fish. Keep live Codex/Git settings in private local
   configuration; refresh excludes scripts, externals, and removals and stops
-  on conflicts; reconcile newer local files into source using the rule above
-  before retrying.
+  on conflicts without importing live files into tracked source.
 
 ## Feedback And Lessons
 

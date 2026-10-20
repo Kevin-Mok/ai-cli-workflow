@@ -689,8 +689,15 @@ checks use invented temporary data; real notes are never repository fixtures.
 
 ## Keyboard And Input
 
+- Action: Select Alt+Super+3 (2100 K), then Ctrl+Alt+Up and Ctrl+Alt+Down.
+  Expected: Cooler 2350 K, then warmer 2100 K. Repeated presses clamp at
+  1000 and 6500 K. Alt+Super+0 resets; the next Down selects 6250 K.
+  `~/scripts/redshift-control adjust 250` and `adjust -250` exercise the same
+  helper and print the resulting kelvin value. Raw external Redshift commands
+  are not tracked; choose a preset first if they have changed the filter.
+
 - Action: Run `python3 scripts/smoke_redshift_keys.py`, then `python3 scripts/smoke_redshift_keys.py ~/.config/i3/config` and `python3 scripts/smoke_redshift_keys.py --live` after refreshing and reloading i3.
-  Expected: Each prints PASS for 2–6 = 1800, 2100, 2400, 2700, 3000 K, unchanged keys 1/7–9, and 0/grave reset. No sudo is needed; the live check requires a running i3 session.
+  Expected: Each prints PASS for 2–6 = 1800, 2100, 2400, 2700, 3000 K, unchanged keys 1/7–9, and 0/grave reset plus Ctrl+Alt+Up/Down = +/-250 K. No sudo is needed; the live check requires a running i3 session.
 
 - Action: After `refresh-config` and an i3 reload, hold Alt+Super and press the number-row keys `1` through `9`; press Alt+Super+0 or Alt+Super+grave to reset.
   Expected: Redshift selects 1200K, 1800K, 2100K, 2400K, 2700K, 3000K, 4800K, 5400K, and 6000K; 0 and grave restore the default color temperature.

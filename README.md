@@ -1032,6 +1032,10 @@ this.
   of **1800K, 2100K, 2400K, 2700K, and 3000K** in 300K steps.
   Keys **1, 7, 8, 9** select **1200K, 4800K, 5400K, 6000K**; **Alt+Super+0** or
   **Alt+Super+grave** removes the filter.
+  **Ctrl+Alt+Up/Down** increases/decreases temperature by **250 K** (cooler/warmer),
+  bounded at 1000–6500 K. Presets, `rds`, `rx` and login share the saved temperature.
+  The first adjustment defaults to 6500 K if no value has been saved; direct
+  external Redshift commands are not tracked.
 - [`dot_config/i3blocks/`](dot_config/i3blocks/) plus
   [`dot_config/dunst/dunstrc`](dot_config/dunst/dunstrc) and
   [`dot_config/picom/picom.conf`](dot_config/picom/picom.conf) cover the
