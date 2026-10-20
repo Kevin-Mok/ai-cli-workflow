@@ -41,3 +41,12 @@ This document records delivery milestones and verification for completed reposit
 - Rollback: the verified temporary bundle is retained only through final local
   verification, then destroyed so the scrubbed checkout cannot recover the
   removed values.
+
+## Commit confirmation — docs: repeat commit and push confirmation
+
+- Complete: canonical AGENTS guidance requires the commit hash and actual push status at both ends of delivery replies; durable feedback records the preference.
+- Scope: direct-write attribution for session 01a15a20-5ada-7791-b991-6d09afcb0242; only the new refresh incident ledger entry is included from the mixed ledger file.
+- Verification: README gate returned pass_no_change; diff whitespace and targeted postmortem ledger checks passed.
+- Delivery: commit on main, then push to origin/main after candidate privacy review.
+- Remaining: unrelated tmux/postmortem/prompt changes excluded. Full refresh remains blocked by unrelated live MIME settings drift.
+- Rollback: remove the four-line delivery rule; preserve the append-only feedback history.

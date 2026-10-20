@@ -4988,6 +4988,15 @@
   ],
   "reports": [
     {
+      "sha256": "196350d470702719f958ecac502ca5420bf566722a6888267000f040e2d74939",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-20-commit-confirmation-refresh.md"
+      ],
+      "reviewed_on": "2026-10-20",
+      "findings": [],
+      "decision": "No new learning: existing local-mime-drift-reconcile and local-refresh-snapshot-ownership guidance covers the unrelated noninteractive MIME conflict and ownership boundary; full refresh remains blocked."
+    },
+    {
       "sha256": "5fe18c7edc227f1477656679e80e1d1df4b40c3025016667c8c46e6520d3a474",
       "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-10-16-metaprompt-gate-handoff.md"
