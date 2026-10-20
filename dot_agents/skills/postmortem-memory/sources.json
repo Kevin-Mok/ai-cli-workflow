@@ -5047,6 +5047,27 @@
       "sources": [
         "740c8dbad026eb73c5007af6139d211f1de0339142ee373767fc8f1899691cd1"
       ]
+    },
+    {
+      "id": "local-i3-probe-ipc-unicode",
+      "reference": "references/api-contracts-fixtures.md#local-i3-probe-ipc-unicode",
+      "status": "verified_fix",
+      "confidence": "confirmed",
+      "verification_scope": "runtime",
+      "symptoms": [
+        "i3-msg monitor subscription prints no readiness acknowledgement",
+        "Workspace restoration creates literal Unicode-escape names"
+      ],
+      "applicability": "Live i3 shortcut diagnostics using IPC subscription readiness and Unicode workspace command text.",
+      "diagnostics": [
+        "Inspect monitor acknowledgement semantics; distinguish binding/focus events from sampled focus; compare exact restored names and visible outputs."
+      ],
+      "remedy": "Use raw IPC for explicit subscription acknowledgement; send literal UTF-8 workspace names with auto-back-and-forth disabled; cover setup and restoration with cleanup.",
+      "verification": "Final raw-key probe exited 0: left Alt and keycode108 with1/2/0 emitted Mod1 bindings and focused1/2/10; restored visible10/3/1 and focus3. No escaped-name workspace remained.",
+      "limitations": "Diagnostic probe correction only; no mapping change or physical firmware acceptance. Default sandbox X11 restriction remains. Initial sampled-focus mismatch has no isolated cause.",
+      "sources": [
+        "741c6ffae883e42c9d17292a338d2a552ff03cb2783e4888f074c3f6a4a3cd88"
+      ]
     }
   ],
   "reports": [
@@ -9119,6 +9140,16 @@
       "reviewed_on": "2026-10-20",
       "findings": [],
       "decision": "No new learning: local-discover-paths-before-reads already documents guessed executable paths and refresh-config as a Fish function; successful refresh does not prove unmanaged i3 activation."
+    },
+    {
+      "sha256": "741c6ffae883e42c9d17292a338d2a552ff03cb2783e4888f074c3f6a4a3cd88",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-20-keycode-108-x11-access.md"
+      ],
+      "reviewed_on": "2026-10-20",
+      "findings": [
+        "local-i3-probe-ipc-unicode"
+      ]
     }
   ],
   "review": {

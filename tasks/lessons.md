@@ -238,3 +238,5 @@
 - 2026-10-20: Test browser content-script initialization itself, not only exported geometry helpers. A classic-script helper named `parent` can overwrite `window.parent` through Annex B function hoisting and silently break cross-origin iframe relays; preserve WindowProxy globals and verify an actual cross-origin player.
 
 - 2026-10-20: An i3 autostart entry and running compositor do not prove wallpaper setup succeeded. Check the resolved wallpaper mount and unattended privilege boundary; never depend on a terminal sudo prompt for assets required during graphical login.
+
+- 2026-10-20: For live i3 probes, verify binding/focus events and restore exact UTF-8 workspace names with auto-back-and-forth disabled. i3-msg monitor mode omits the subscription acknowledgement; use raw IPC if readiness must be confirmed. See [the keycode 108 probe](../docs/postmortem/2026-10-20-keycode-108-x11-access.md).

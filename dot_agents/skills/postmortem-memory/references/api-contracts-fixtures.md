@@ -599,3 +599,15 @@ security checks with the arguments you passed.
 - Verification evidence: Live Redshift calls reused 109/109 at unchanged 3000 K; six controller tests passed after defining RED, including malformed saved notification IDs.
 - Limitations: Expiry or daemon restart may allocate a new ID; subjective animation was not inspected.
 - Source: [Redshift notification identity](../../../../docs/postmortem/2026-10-20-redshift-notification-id.md) (SHA-256 `740c8dbad026eb73c5007af6139d211f1de0339142ee373767fc8f1899691cd1`).
+
+
+## local-i3-probe-ipc-unicode
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **runtime**.
+- Symptoms: An i3 monitor probe waits forever for an acknowledgement; workspace cleanup creates names containing literal Unicode escapes.
+- Applicability: Live i3 shortcut probes subscribing to IPC events and restoring Unicode workspace names through command text.
+- Diagnostic checks: Distinguish binding events from later mutable focus. Inspect monitor reply semantics and compare restored exact workspace names and visible outputs.
+- Remedy: Use raw IPC when explicit subscription readiness is required: i3-msg monitor mode discards the acknowledgement. Send literal UTF-8 names in i3 command text, disable auto-back-and-forth for cleanup, and put setup inside cleanup coverage.
+- Verification evidence: Final XTest probe exited 0 for both Alt keys with 1/2/0, recording Mod1 bindings and workspace focus events; restored visible workspaces 10/3/1 and focus 3. No escaped-name workspace remained.
+- Limitations: Corrects the diagnostic probe; no keyboard mapping change or physical firmware acceptance is established. The default sandbox still cannot reach X11.
+- Source: [Keycode 108 desktop probe](../../../../docs/postmortem/2026-10-20-keycode-108-x11-access.md).

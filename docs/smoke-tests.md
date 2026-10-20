@@ -714,6 +714,8 @@ checks use invented temporary data; real notes are never repository fixtures.
 
 - Action: After `refresh-config` and an i3 reload, hold Super, then repeat with Alt+Super, and press the number-row keys `1` through `9`, then `0`; press Super+grave to reset.
   Expected: Redshift selects 1800K, 2300K, 2850K, 3350K, 3900K, 4400K, 4950K, 5450K, 6000K, and 6500K; 0 selects 6500 K and grave resets the filter. Alt+number still switches workspaces; Super+F11 selects workspace 11, and Super+1 selects 1800 K without switching workspaces.
+- Action: In the default i3 mode, hold Right Alt (X11 keycode 108) and press number-row `1`, `2`, then `0`; repeat with Left Alt and return to the original workspace. Run `xev -event keyboard` and press Right Alt alone if the physical key is uncertain; inspect `xmodmap -pm` for its modifier.
+  Expected: Both Alt keys select workspaces 1, 2, and 10. `xev` reports keycode 108 and `Alt_R`; `xmodmap -pm` lists `Alt_R (0x6c)` under `mod1`. Test physical keys after login as well; synthetic events do not validate keyboard firmware.
 - Action: Start a fresh X session on a desktop host that applies this repo's shell and `Xmodmap` config, open a terminal, type a short word, and press Backspace once.
   Expected: Exactly one character is deleted and opening a new bash shell does not rewrite the active keyboard remap.
 - Action: Open Neovim with the tracked config, enter the command-line window with `q:`, wait long enough for `CursorHold`, then exit back to the file.
