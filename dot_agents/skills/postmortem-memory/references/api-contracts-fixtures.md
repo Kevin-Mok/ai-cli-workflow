@@ -644,3 +644,14 @@ security checks with the arguments you passed.
 - Verification evidence: Final XTest probe exited 0 for both Alt keys with 1/2/0, recording Mod1 bindings and workspace focus events; restored visible workspaces 10/3/1 and focus 3. No escaped-name workspace remained.
 - Limitations: Corrects the diagnostic probe; no keyboard mapping change or physical firmware acceptance is established. The default sandbox still cannot reach X11.
 - Source: [Keycode 108 desktop probe](../../../../docs/postmortem/2026-10-20-keycode-108-x11-access.md).
+
+## local-video-rotation-fixture-metadata
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **runtime**.
+- Symptoms: rotation pixels remain unchanged even with an automatic orientation filter.
+- Applicability: FFmpeg MP4/MOV fixtures for GStreamer orientation.
+- Diagnostics: assert ffprobe display-matrix side data before interpreting pixels; trace image-orientation tags. FFmpeg rotation degrees have the opposite sign from GStreamer tags.
+- Remedy: fixture remux uses input `-noautorotate -display_rotation`, then verifies metadata. Initialize GTK with a usable X11 display before creating gtksink.
+- Verification: matrix90 produced rotate-270; baseline renderer failed six metadata cases and current focused seven-test suite passed.
+- Limitations: synthetic pixels do not establish every personal clip; two local samples were verified separately. Xvfb needs scoped X11 access here and lacks DRI2.
+- Source: [orientation fixture incident](/home/example/linux-config/docs/postmortem/2026-10-20-orientation-test-gtk-init.md) (SHA-256 `b5450bc880ee68896d17866fb8ff89eb462e5a2c6d6f903129d420b0cffcf93e`).

@@ -5174,6 +5174,27 @@
       ],
       "verification": "Kolkata and refresh reproductions observed RED;36 route and4 actual-effect cases GREEN, typecheck/build pass. Production commit metadata and desktop/mobile checks verified separately.",
       "verification_scope": "code"
+    },
+    {
+      "id": "local-video-rotation-fixture-metadata",
+      "reference": "references/api-contracts-fixtures.md#local-video-rotation-fixture-metadata",
+      "status": "verified_fix",
+      "confidence": "confirmed",
+      "verification_scope": "runtime",
+      "symptoms": [
+        "Rotation pixel tests remain unchanged even with an automatic orientation filter."
+      ],
+      "applicability": "Synthetic FFmpeg MP4/MOV fixtures testing GStreamer orientation metadata.",
+      "diagnostics": [
+        "Inspect ffprobe display-matrix side data before interpreting pixel results.",
+        "Trace image-orientation tags at the filter input; FFmpeg degrees and GStreamer tags use opposite sign conventions."
+      ],
+      "remedy": "Use -noautorotate -display_rotation before the input during fixture remux; assert resulting side data before running the baseline pixel test. Initialize GTK with a usable X11 display before creating gtksink.",
+      "verification": "FFprobe confirmed 90-degree matrix; tag trace delivered rotate-270. Baseline renderer failed six verified rotation pixel cases; current focused seven-test suite passed.",
+      "limitations": "Synthetic fixtures do not establish every personal clip. Two local samples were verified separately. X11 requires scoped escalation in this runtime; Xvfb lacks DRI2.",
+      "sources": [
+        "b5450bc880ee68896d17866fb8ff89eb462e5a2c6d6f903129d420b0cffcf93e"
+      ]
     }
   ],
   "reports": [
@@ -9415,6 +9436,25 @@
       "reviewed_on": "2026-10-20",
       "findings": [],
       "decision": "No new reusable finding: known neutral-public-root portability warning, optional-path discovery and scoped execution guidance applies. Postmortem tests25/26pass; targeted real-path checks and exact candidate privacy checks establish only their stated scope."
+    },
+    {
+      "sha256": "91e505319de474309da89d7144593a126211b9b22a05ace052825f7b29eb1e10",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-20-hevin-shortcut-refresh.md"
+      ],
+      "reviewed_on": "2026-10-20",
+      "findings": [],
+      "decision": "No new learning: repeats reviewed sandbox-boundary, source-ownership and observed-contract guidance; live binding activation verified, physical-key visual acceptance pending."
+    },
+    {
+      "sha256": "b5450bc880ee68896d17866fb8ff89eb462e5a2c6d6f903129d420b0cffcf93e",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-20-orientation-test-gtk-init.md"
+      ],
+      "reviewed_on": "2026-10-20",
+      "findings": [
+        "local-video-rotation-fixture-metadata"
+      ]
     }
   ],
   "review": {

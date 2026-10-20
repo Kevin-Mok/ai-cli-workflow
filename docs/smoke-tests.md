@@ -1406,6 +1406,16 @@ play audio, so exercise them deliberately.
 
 ### Media conveyor screensaver
 
+- Action: Run `~/scripts/media-screensaver orient` (or add `--media DIR`) and choose a video; move the mouse and use the keyboard inside the review window.
+  Expected: The chooser starts in the selected library, playback loops muted, rotation and Save/Cancel controls stay visible, and ordinary input does not dismiss review.
+- Action: Open `~/scripts/media-screensaver orient --file '/absolute/path/problem.mov'`, rotate left/right until upright, save and reopen; reset with Use metadata and save. Repeat a change using Cancel and window close.
+  Expected: Left/right describe the displayed picture, two clicks turn it 180°, saved corrections survive reopening, Use metadata removes them when saved, and Cancel/close preserve the previous saved value. Originals have unchanged hashes. Space-containing paths work.
+- Action: Preview a small directory with that corrected video for 35 seconds without physical input; include already-upright portrait/landscape clips, missing-metadata and rotated-metadata clips. Replace a disposable corrected file and reopen review; separately back up the private orientation JSON, make it malformed, and try review/save before restoring the backup.
+  Expected: Metadata plus additional correction stays upright across all slots and loops, with preserved aspect ratio and black bars. Changed files ignore stale corrections. Malformed JSON warns, playback remains available, Save fails visibly without replacing data, and Cancel releases playback.
+
+- Action: After refreshing and reloading i3, press Super+Shift+S and release the keys; wait without moving the mouse, then move it.
+  Expected: Releasing the shortcut starts the Hevin preview without opening a terminal; subsequent physical input dismisses it. Super+S still opens Spotify and Alt+S still selects stacking layout.
+
 - Action: Load the generated fish abbreviations, type `ss` and press Space to inspect its expansion, then run it.
   Expected: It expands to `~/scripts/media-screensaver preview` and starts immediate playback even without the browser bridge; physical input dismisses it. The previous slideshow mapping remains commented in the command template.
 

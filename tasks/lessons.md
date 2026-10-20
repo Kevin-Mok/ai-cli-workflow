@@ -240,3 +240,5 @@
 - 2026-10-20: An i3 autostart entry and running compositor do not prove wallpaper setup succeeded. Check the resolved wallpaper mount and unattended privilege boundary; never depend on a terminal sudo prompt for assets required during graphical login.
 
 - 2026-10-20: For live i3 probes, verify binding/focus events and restore exact UTF-8 workspace names with auto-back-and-forth disabled. i3-msg monitor mode omits the subscription acknowledgement; use raw IPC if readiness must be confirmed. See [the keycode 108 probe](../docs/postmortem/2026-10-20-keycode-108-x11-access.md).
+
+- 2026-10-20: Before interpreting video-orientation pixel tests, assert the fixture display matrix with ffprobe. FFmpeg6.1.1 ignored the legacy rotate metadata remux here; input -noautorotate -display_rotation produced real metadata. FFmpeg degrees and GStreamer orientation tags have opposite signs; derive expected pixels independently. See [orientation fixture incident](../docs/postmortem/2026-10-20-orientation-test-gtk-init.md).

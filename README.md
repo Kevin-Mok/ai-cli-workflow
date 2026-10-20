@@ -987,12 +987,15 @@ this.
   X11 conveyor across all three live outputs. Install with
   `./scripts/executable_media-screensaver install`, enable its local browser
   extension, then run `~/scripts/media-screensaver service` for a supervised idle monitor
-  or `preview` (fish abbreviation `ss`) for immediate playback. i3 starts the service at login, and systemd
+  or `preview` (fish abbreviation `ss`, i3 **Super+Shift+S**) for immediate playback. i3 starts the service at login, and systemd
   restarts it after an exit. `daemon` remains available in the foreground.
   `--media DIR` selects a recursive photo/video library; `--seconds N` bounds a
   preview; `--report PATH` records item IDs/timestamps; `--plain` and `--details`
   control output. `status`, `probe` and `demo` expose browser coverage, codec
-  checks and disposable media. Automatic activation waits five idle minutes and
+  checks and disposable media. Video orientation metadata is honored automatically;
+  `orient` opens a separate review chooser, or `orient --file FILE` reviews one video
+  and saves a private additional rotation without rewriting the original.
+  Automatic activation waits five idle minutes and
   fails closed when Chrome video coverage is unavailable. See
   [installation, browser enablement and limitations](docs/media-screensaver.md).
 - [`flavibot-browser`](scripts/executable_flavibot-browser) opens the FlaviBot

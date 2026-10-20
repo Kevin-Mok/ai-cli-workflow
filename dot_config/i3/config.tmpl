@@ -106,6 +106,7 @@ bindsym Mod4+$mod+r exec pass show -c career/redhat && $type_delay_cmd && xdotoo
 # bindsym Mod4+$mod+r exec $term -e ranger
 # bindsym Mod4+$mod+r exec notify-send "watson restart" "$(watson restart)"
 bindsym Mod4+$mod+s exec $type_delay_cmd && xdotool type 'https://shortener.example.com/'
+bindsym --release Mod4+Shift+s exec --no-startup-id {{ .chezmoi.homeDir }}/scripts/media-screensaver preview
 bindsym Mod4+$mod+t exec xclip -selection clipboard ~/.password-store/social/trapbot && $type_delay_cmd && xdotool key 'Control_L+v'
 bindsym Mod4+u exec $type_delay_cmd && xdotool type user@example.invalid'
 # bindsym Mod4+$mod+u exec pass -c uoft/acorn

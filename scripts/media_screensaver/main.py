@@ -303,8 +303,9 @@ def main(argv=None):
     plain_help = '--plain' in (sys.argv[1:] if argv is None else argv) or os.environ.get('CLI_PLAIN') == '1'
     parser = argparse.ArgumentParser(description=('' if plain_help else '🖥️ ') + 'X11 three-monitor media conveyor; see docs/media-screensaver.md.',
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument('command', nargs='?', choices=['preview', 'daemon', 'service', 'status', 'install', 'probe', 'demo', '_auto'], default='preview', metavar='{preview,daemon,service,status,install,probe,demo}')
+    parser.add_argument('command', nargs='?', choices=['preview', 'daemon', 'service', 'status', 'install', 'probe', 'demo', 'orient', '_auto'], default='preview', metavar='{preview,daemon,service,status,install,probe,demo,orient}')
     parser.add_argument('--media', type=Path, default=MEDIA, help='recursive media library (default: %(default)s)')
+    parser.add_argument('--file', type=Path, help='video for orient (otherwise opens a chooser in --media)')
     parser.add_argument('--seconds', type=float, default=0, help='close preview after this many seconds (0: until activity)')
     parser.add_argument('--report', type=Path, help='new private JSONL timing report; item IDs only')
     parser.add_argument('--plain', action='store_true', default=os.environ.get('CLI_PLAIN') == '1', help='ASCII output')
@@ -312,6 +313,9 @@ def main(argv=None):
     args = parser.parse_args(argv)
     if args.seconds < 0 or not __import__('math').isfinite(args.seconds): parser.error('--seconds must be finite and nonnegative')
     try:
+        if args.command == 'orient':
+            from .review import run
+            return run(args, lambda kind, message: output(args, kind, message))
         if args.command == 'install': return install(args)
         if args.command == 'probe': return probe(args)
         if args.command == 'daemon': return daemon(args)

@@ -5,6 +5,7 @@ import signal
 import subprocess
 import tempfile
 import time
+import warnings
 
 import gi
 gi.require_version('Gtk', '3.0')
@@ -13,6 +14,7 @@ gi.require_version('Gst', '1.0')
 from gi.repository import Gdk, GdkPixbuf, GLib, Gst, Gtk
 
 from .core import Conveyor, VIDEOS, placement
+from .orientation import OrientationStore
 
 Gst.init(None)
 # gtksink uses system memory; prefer libav over CUDA-only decoders on this CPU sink.
@@ -89,7 +91,7 @@ def load_photo(path):
 
 
 class Card:
-    def __init__(self, entry, failed):
+    def __init__(self, entry, failed, warning=None):
         self.entry = entry
         self.failed = failed
         self.pipeline = None
@@ -104,6 +106,25 @@ class Card:
             sink = Gst.ElementFactory.make('gtksink')
             if self.pipeline is None or sink is None:
                 raise ValueError('GStreamer playbin/gtksink missing; install the documented packages.')
+            self.rotation = 0
+            try:
+                self.rotation = OrientationStore().load(entry.path)
+            except (OSError, ValueError) as error:
+                (warning or (lambda message: warnings.warn(message)))(str(error))
+            filters = Gst.Bin.new(None)
+            auto = Gst.ElementFactory.make('videoflip')
+            self.correction = Gst.ElementFactory.make('videoflip')
+            if auto is None or self.correction is None:
+                raise ValueError('GStreamer videoflip missing; install gstreamer1.0-plugins-good.')
+            auto.set_property('video-direction', 8)  # Auto: honor image-orientation tags.
+            self.correction.set_property('video-direction', self.rotation // 90)
+            filters.add(auto)
+            filters.add(self.correction)
+            if not auto.link(self.correction):
+                raise ValueError('Could not link video orientation filters.')
+            filters.add_pad(Gst.GhostPad.new('sink', auto.get_static_pad('sink')))
+            filters.add_pad(Gst.GhostPad.new('src', self.correction.get_static_pad('src')))
+            self.pipeline.set_property('video-filter', filters)
             self.widget = sink.get_property('widget')
             sink.set_property('force-aspect-ratio', True)
             self.pipeline.set_property('video-sink', sink)
@@ -132,6 +153,10 @@ class Card:
                     self.pixbuf = load_photo(entry.path)
                 except GLib.Error:
                     GLib.idle_add(self.reject, 'Image decoding failed')
+
+    def rotate(self, degrees):
+        self.rotation = degrees % 360
+        self.correction.set_property('video-direction', self.rotation // 90)
 
     def reject(self, reason):
         if not self.closed:
@@ -284,7 +309,7 @@ def run(paths, monitors, *, seconds, gate, automatic, emit, report=None):
                     cards.pop(identity).close()
             for entry in list(conveyor.entries):
                 if entry.identity not in cards:
-                    card = Card(entry, failed)
+                    card = Card(entry, failed, warning=lambda message: emit('warning', message))
                     cards[entry.identity] = card
                     layout.put(card.widget, 0, 0)
                     card.widget.show_all()
