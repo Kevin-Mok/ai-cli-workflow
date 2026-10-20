@@ -498,7 +498,7 @@
       "symptoms": [
         "intermittent Gitea 502",
         "root route quick but profile hangs",
-        "healthz intermittently 20–50 seconds",
+        "healthz intermittently 20\u201350 seconds",
         "single thread near full CPU"
       ],
       "topic": "operational-drift",
@@ -3512,7 +3512,7 @@
       "symptoms": [
         "Float sums change when a counted interval is partitioned by model."
       ],
-      "verification": "Fractional RED→GREEN regressions, native record-byte invariance, full 86-test suite and strict typing passed.",
+      "verification": "Fractional RED\u2192GREEN regressions, native record-byte invariance, full 86-test suite and strict typing passed.",
       "verification_scope": "code"
     },
     {
@@ -3552,7 +3552,7 @@
       "symptoms": [
         "uv tool install --force reinstalls a cached local wheel after source-only edits under the same package version."
       ],
-      "verification": "Isolated real-uv repeated setup test RED→GREEN; real setup rebuilt package, models help and v2 schema passed, 14 installed source modules matched.",
+      "verification": "Isolated real-uv repeated setup test RED\u2192GREEN; real setup rebuilt package, models help and v2 schema passed, 14 installed source modules matched.",
       "verification_scope": "runtime"
     },
     {
@@ -9150,6 +9150,15 @@
       "findings": [
         "local-i3-probe-ipc-unicode"
       ]
+    },
+    {
+      "sha256": "8c340d7ccb275518a76ac3da94fcfcb5adfc9aa25facbce8205b8c132eeb14e3",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-20-redshift-handoff-byte-check.md"
+      ],
+      "reviewed_on": "2026-10-20",
+      "findings": [],
+      "decision": "No new learning: documented restricted orchestration globals and existing metaprompt-run scoped Kitty socket access cover this handoff incident. ASCII length check and escalated opener were verified."
     }
   ],
   "review": {
