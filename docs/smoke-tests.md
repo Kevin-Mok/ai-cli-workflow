@@ -1035,22 +1035,27 @@ After refresh-config, try the stored introduction and custom text in your existi
 
 ### tmux pane history scrolling
 
-Scroll, select and copy with familiar gestures. Shift+wheel works without
-holding a mouse button. Drag a selection once, release the button, then copy
+Scroll, select and copy with familiar gestures. Start a left-button selection,
+drag to the pane's first text row, and keep holding there to scroll into older
+output while extending the same selection. Stay inside the text area, below
+Kitty's titlebar; no wheel movement is needed. Release, then copy
 with Ctrl+Shift+C; the highlight and viewport remain in place. Escape returns
 to live input. The history-mode status line shows the copy and exit shortcuts.
 Use the disposable helper below after refresh-config; no sudo is needed.
+Use a pane at least three text rows tall for the tmux 3.4 edge-release workaround.
 
-- Action: Run /home/example/scripts/tmux-scrollback-smoke, then hold Shift and wheel up over the text with no mouse button held.
+- Action: Run ~/scripts/tmux-scrollback-smoke, then hold Shift and wheel up over the text with no mouse button held.
   Expected: Earlier numbered HISTORY lines appear. Plain wheel also browses history at a shell, and Alt+wheel remains available. New panes retain up to 50,000 rows; record 000001 is reachable in the 3,000-record fixture. Existing panes retain their old limit and discarded output cannot be recovered.
-- Action: While viewing history, drag across part of a numbered line, release the mouse button, move the pointer away, then press Ctrl+Shift+C. Press it a second time and paste into another app.
-  Expected: The blue highlight persists after release. The clipboard contains exactly the selected text; repeated copying keeps the same text and viewport. The status line shows Copied to confirm the action. No mouse button needs to be held while pressing the shortcut. A copy request without a selection shows a selection hint instead of clearing the clipboard.
+- Action: In the fixture, left-drag from a numbered line to the first text row. Keep the button held and the pointer stationary inside that row until more than two screens scroll past; do not hold Shift. Release, move away, press Ctrl+Shift+C and paste into an editor. Include a long WRAPPED logical line ending in END.
+  Expected: Older numbered rows continue appearing without wheel events. One continuous blue selection grows across screens and persists after release. The pasted text includes every selected record and wrapped logical line in order, without extra newlines at soft wraps; the viewport stops when released and stays in place through repeated copying. The status line shows Copied.
+- Action: Copy unrelated text in another application, return to the retained tmux selection, press Ctrl+Shift+C again and paste into the editor.
+  Expected: The entire original selection replaces the unrelated clipboard text. No mouse button needs to be held while copying. A copy request without a selection shows a selection hint instead of clearing the clipboard.
 - Action: Press Escape, type hello and Enter, then press Ctrl+D at empty live input to close the fixture.
   Expected: Escape returns to the live tail in one step and INPUT hello confirms normal typing. Wheel-down alone also exits wheel-entered copy mode if you have not started a selection; after selecting, use Escape. Only the disposable fixture closes.
-- Action: Run /home/example/scripts/tmux-scrollback-smoke --app-mouse. Try plain wheel/click, then Shift+wheel up, drag/release and Ctrl+Shift+C.
-  Expected: Ordinary application gestures produce APP_MOUSE records. Shift+wheel explicitly opens tmux history despite app mouse ownership; the same released-selection copy flow works. Escape returns to the application. Alt+wheel remains an alternative. tmux history is separate from an application's private document history.
+- Action: Run ~/scripts/tmux-scrollback-smoke --app-mouse. Try plain wheel/click, then Shift+wheel up, release Shift and repeat the held-edge drag/release/copy check.
+  Expected: Ordinary application gestures produce APP_MOUSE records. Shift+wheel explicitly opens tmux history despite app mouse ownership; the same multi-screen selection/copy flow works. Escape returns to the application. Alt+C also opens history without a wheel. Alt+wheel remains an alternative. tmux history is separate from an application's private document history.
 - Action: In a fresh raw Kitty shell without tmux, select text normally and copy with Ctrl+Shift+C. In tmux, hold Shift while dragging to deliberately select the visible Kitty screen, then copy with Ctrl+Shift+C.
-  Expected: Native Kitty selection copying remains available. Ctrl+Shift+C chooses the native Kitty selection when one exists, otherwise the highlighted tmux selection. tmux launched from an ordinary fish shell supports the same shortcut.
+  Expected: Native Kitty selection copying remains available. Ctrl+Shift+C chooses the native Kitty selection when one exists, otherwise the highlighted tmux selection. Native Shift-drag cannot select tmux-owned older output. The shortcut works both from an interactive fish shell and the i3 launcher using fish -c tmux-attach; the shell may own the foreground process group while tmux is another member.
 - Action: Separately try dragging the right edge of the tmux fixture.
   Expected: Installed tmux 3.4 has no draggable pane history scrollbar (native support first appears in 3.6); edge dragging selects text rather than giving raw Kitty thumb parity. The scroll/copy flow above uses pane-owned history.
 

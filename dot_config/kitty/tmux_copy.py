@@ -24,7 +24,9 @@ def handle_result(args: list[str], answer: object, target_window_id: int, boss: 
         command = window.child.cmdline_of_pid(group)
     except (OSError, TypeError):
         command = window.child.foreground_cmdline
-    tmux_foreground = bool(command and os.path.basename(command[0]).split(":", 1)[0] == "tmux")
+    # Noninteractive fish can lead the group while tmux is another member.
+    commands = [command] + [process.get("cmdline") for process in window.child.foreground_processes]
+    tmux_foreground = any(cmd and os.path.basename(cmd[0]).split(":", 1)[0] == "tmux" for cmd in commands)
     if tmux_foreground:
         # Dedicated tmux User0; no global keyboard-protocol changes required.
         window.write_to_child(b"\x1b[99~")

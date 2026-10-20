@@ -466,3 +466,29 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Verification: Defining RED covered Shift/release/OSC52 gaps. Fourteen PTY tests pass including second clipboard output and no-selection input. Actual Kitty/XTest copies exact released shell/app selections, restores selected text after clipboard reseeding, preserves viewport and returns via Escape. Native raw fish Kitty and fish-launched tmux copy checks pass. Independent review finds no important issue.
 - Limitations: Isolated graphical display evidence, not physical desktop/imwheel acceptance. tmux3.4 native scrollbar remains absent; prior discarded history remains. Adapter detects local foreground tmux, not arbitrary remote SSH applications.
 - Source: [tmux scroll/copy UX](../../../../docs/postmortem/2026-10-13-tmux-scroll-copy-ux.md) (SHA-256 `07ca32cdf9a4f8d1d57f456abe187a2e66f5b8d87640ac592d39fd2354cc88c6`).
+
+## local-tmux-foreground-group-members
+
+- Status: verified_fix
+- Confidence: confirmed
+- Verification scope: runtime
+- Symptoms: Ctrl+Shift+C does not copy released tmux selection when launched with fish -c tmux-attach, despite active mapping and clipboard permission.
+- Applicability: Kitty0.49.2 local tmux3.4 sharing a tty foreground process group with a noninteractive fish launcher.
+- Diagnostics: Inspect live tty foreground group leader and all group members; a fish leader does not exclude tmux ownership.; Reproduce matching launch nesting and verify actual clipboard after release and after replacing clipboard contents.; Relative custom kitten names resolve via Kitty config directory, even when another kitty.conf is loaded; use an explicit source path for predeployment tests.
+- Remedy: Keep direct tcgetpgrp/cmdline lookup for empty process-map cases and also inspect Kitty foreground_processes member commands for tmux. Preserve native-selection priority and shifted/ASCII key fallback.
+- Verification: Fish-wrapper GUI and routing test fail before correction; 26 final focused tests pass. Installed emacs shell and vi app GUI checks restore exact multi-screen wrapped selection after clipboard reseeding. Live fake-target routing detects tmux in both original fish-owned groups without sending production keys.
+- Limitations: Local foreground tmux only; arbitrary SSH nesting is outside this adapter. Native Kitty selection deliberately takes priority. Isolated Xvfb evidence does not establish physical desktop acceptance.
+- Source: [tmux drag/copy investigation](../../../../docs/postmortem/2026-10-19-tmux-drag-scroll-copy.md) (SHA-256 `43c89ef5553cf9396553b3430993099a6cf10cd3e7725cfdd563e01554417949`).
+
+## local-tmux-edge-release-timer
+
+- Status: verified_workaround
+- Confidence: confirmed
+- Verification scope: runtime
+- Symptoms: Held top-edge selection scrolls multiple screens but viewport continues scrolling after mouse release even when selection_active is0.
+- Applicability: tmux3.4 release callback validity ordering; normal text panes in emacs and vi copy modes.
+- Diagnostics: Hold first text-row drag stationary, release, sample scroll_position for several 50ms ticks; short selections or wheel-only tests miss the defect.; Version-matched source: server-client invokes drag release before m.valid1; cmd_mouse_pane rejects invalid event so timer cancellation is skipped.; Test tiny panes separately: with one or two text rows there is no interior position for cursor parking.
+- Remedy: In existing MouseDragEnd bindings freeze selection first, then move copy cursor one row inward only when at an edge and pane_height>2. The next timer tick stops rearming without changing frozen selected text. Preserve original tiny-pane behavior; require at least three rows for workaround.
+- Verification: All four pre-fix top/bottom edge tests fail for post-release drift; tiny guard tests fail before guard. Final26 focused tests pass. Actual installed Kitty/Xvfb held drag grows60/65rows; viewport stable after release and repeated copy; exact logical wrapped clipboard text, reseeding, app forwarding, native copy and Escape/live input verified.
+- Limitations: Supported-command workaround, not upstream binary repair. Tiny-pane timer limitation remains; requires at least three text rows. No physical shared-desktop acceptance from isolated XTest.
+- Source: [tmux drag/copy investigation](../../../../docs/postmortem/2026-10-19-tmux-drag-scroll-copy.md) (SHA-256 `43c89ef5553cf9396553b3430993099a6cf10cd3e7725cfdd563e01554417949`).

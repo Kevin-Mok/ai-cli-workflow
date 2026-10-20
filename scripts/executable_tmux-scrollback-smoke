@@ -26,8 +26,10 @@ def main():
         parser.error("--lines must be positive")
     if args.emit:
         for n in range(1, args.lines + 1):
-            print(f"HISTORY {n:06d} | tmux-owned output: wheel to browse; drag selects text.")
-        message("🧪", "Shift+wheel up/down: browse history. Drag text, release, then Ctrl+Shift+C to copy.")
+            suffix = " WRAPPED logical line: " + "word " * 35 + "END" if n % 10 == 0 else ""
+            print(f"HISTORY {n:06d} | tmux-owned output: drag selects text.{suffix}")
+        message("🧪", "Drag text to the first text row; keep holding there to select older screens. Release, then Ctrl+Shift+C.")
+        message("🖱", "Stay inside the pane, below the titlebar; do not hold Shift while dragging. Shift+wheel also browses history.")
         message("ℹ️", "tmux 3.4 has no draggable pane scrollbar. Kitty's thumb cannot browse this history.")
         message("⌨️", "Escape returns to live input. Type hello and Enter; Ctrl+D at empty input closes this fixture.")
         if not args.app_mouse:

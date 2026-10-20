@@ -230,3 +230,5 @@
 2026-10-16 - Exercise privacy gates against the actual candidate before calling activation usable. Retain reviewed legacy fixtures/documentation only with exact path/blob/category approvals; explicit private forbidden literals and paths must always override those approvals, including approved Git identity metadata.
 
 - 2026-10-16: When notification popups display but both clip and speech are silent, check the selected clip before changing hooks or reinstalling Piper. A stale checkout path stops both stages; prefer an existing audio asset outside the checkout. See [missing notification clip](../docs/postmortem/2026-10-16-notification-missing-clip.md).
+
+- 2026-10-19: A noninteractive fish launcher can lead a foreground group containing tmux; inspect members as well as leader. Test stationary edge dragging and viewport stability after release: tmux3.4 can leave its edge timer alive. Freeze selection before guarded inward cursor parking, and require more than two text rows. Verify exact wrapped clipboard text and repeat copy after clipboard replacement. See [drag/copy diagnosis](../docs/postmortem/2026-10-19-tmux-drag-scroll-copy.md).

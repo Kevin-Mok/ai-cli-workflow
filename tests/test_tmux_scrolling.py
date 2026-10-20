@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = r'''
 import os, sys, tty
 for n in range(1, 3001):
-    print(f"HISTORY {n:06d}")
+    print(f"HISTORY {n:06d}" + (" | WRAPPED " + "word " * 35 + "END" if n % 10 == 0 else ""))
 print("READY: a enables application mouse; z disables; type hello and Enter")
 sys.stdout.flush()
 tty.setraw(0)
@@ -157,6 +157,63 @@ class MouseScrolling(unittest.TestCase):
         self.wait_for(lambda: self.fmt("pane_in_mode") == "0")
         os.write(self.master, b"hello\r")
         self.wait_for(lambda: "INPUT hello" in self.tmux("capture-pane", "-p"))
+
+    def test_stationary_top_edge_drag_selects_multiple_screens_and_wrapped_lines(self):
+        import base64
+        self.mouse(0, 1, 8)
+        self.mouse(32, 1, 7)
+        self.mouse(32, 1, 1)  # First text row; no wheel events or repeated motion.
+        self.wait_for(lambda: int(self.fmt("scroll_position") or 0) > 48, timeout=5)
+        self.assertEqual(self.fmt("selection_active"), "1")
+        self.mouse(0, 1, 1, release=True)
+        self.assertEqual(self.fmt("selection_present"), "1")
+        self.assertEqual(self.fmt("selection_active"), "0")
+        position = self.fmt("scroll_position")
+        time.sleep(.25)  # Several 50ms timer ticks must not scroll after release.
+        self.assertEqual(self.fmt("scroll_position"), position)
+        self.output.clear()
+        os.write(self.master, b"\x1b[99~")
+        self.wait_for(lambda: b"]52;" in self.output)
+        match = re.search(rb"\x1b\]52;[^;]*;([^\x07\x1b]+)", bytes(self.output))
+        copied = base64.b64decode(match.group(1)).decode()
+        history = "\n".join(
+            f"HISTORY {n:06d}" + (" | WRAPPED " + "word " * 35 + "END" if n % 10 == 0 else "")
+            for n in range(1, 3001)
+        )
+        self.assertGreater(copied.count("\n"), 24)
+        self.assertIn(" | WRAPPED " + "word " * 35 + "END", copied)
+        self.assertIn(copied.rstrip("\n"), history, "Soft wraps must preserve the original logical text")
+        self.assertEqual(self.fmt("scroll_position"), position)
+
+    def test_bottom_edge_release_preserves_text_and_stops_scrolling(self):
+        self.tmux("copy-mode")
+        self.tmux("send-keys", "-X", "-N", "100", "scroll-up")
+        self.mouse(0, 1, 8)
+        self.mouse(32, 1, 9)
+        self.mouse(32, 1, 23)
+        self.wait_for(lambda: int(self.fmt("scroll_position")) < 80)
+        self.assertEqual(self.fmt("selection_active"), "1")
+        self.mouse(0, 1, 23, release=True)
+        self.assertEqual(self.fmt("selection_active"), "0")
+        position = self.fmt("scroll_position")
+        self.tmux("send-keys", "-X", "copy-selection-no-clear")
+        copied = self.tmux("show-buffer")
+        time.sleep(.25)
+        self.assertEqual(self.fmt("scroll_position"), position)
+        self.tmux("send-keys", "-X", "copy-selection-no-clear")
+        self.assertEqual(self.tmux("show-buffer"), copied)
+        self.assertIn("HISTORY", copied)
+
+    def test_tiny_pane_release_does_not_force_cursor_to_other_edge(self):
+        self.tmux("set-window-option", "window-size", "manual")
+        self.tmux("resize-window", "-x", "80", "-y", "2")
+        self.assertEqual(self.fmt("pane_height"), "2")
+        self.mouse(0, 1, 2)
+        self.mouse(32, 1, 1)
+        self.assertEqual(self.fmt("copy_cursor_y"), "0")
+        self.mouse(0, 1, 1, release=True)
+        self.assertEqual(self.fmt("selection_active"), "0")
+        self.assertEqual(self.fmt("copy_cursor_y"), "0", "Tiny panes have no interior row for parking")
 
     def test_explicit_copy_sends_selected_text_to_terminal_clipboard_and_keeps_view(self):
         import base64

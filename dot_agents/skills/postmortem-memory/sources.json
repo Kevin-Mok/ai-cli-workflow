@@ -4940,6 +4940,50 @@
       "sources": [
         "046b3b7c29548b6f4fae359a3e35a4b9667b4e4ecb73d43930cf3ec4644aaa42"
       ]
+    },
+    {
+      "applicability": "Kitty0.49.2 local tmux3.4 sharing a tty foreground process group with a noninteractive fish launcher.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Inspect live tty foreground group leader and all group members; a fish leader does not exclude tmux ownership.",
+        "Reproduce matching launch nesting and verify actual clipboard after release and after replacing clipboard contents.",
+        "Relative custom kitten names resolve via Kitty config directory, even when another kitty.conf is loaded; use an explicit source path for predeployment tests."
+      ],
+      "id": "local-tmux-foreground-group-members",
+      "limitations": "Local foreground tmux only; arbitrary SSH nesting is outside this adapter. Native Kitty selection deliberately takes priority. Isolated Xvfb evidence does not establish physical desktop acceptance.",
+      "reference": "references/artifact-verification.md#local-tmux-foreground-group-members",
+      "remedy": "Keep direct tcgetpgrp/cmdline lookup for empty process-map cases and also inspect Kitty foreground_processes member commands for tmux. Preserve native-selection priority and shifted/ASCII key fallback.",
+      "sources": [
+        "43c89ef5553cf9396553b3430993099a6cf10cd3e7725cfdd563e01554417949"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "Ctrl+Shift+C does not copy released tmux selection when launched with fish -c tmux-attach, despite active mapping and clipboard permission."
+      ],
+      "verification": "Fish-wrapper GUI and routing test fail before correction; 26 final focused tests pass. Installed emacs shell and vi app GUI checks restore exact multi-screen wrapped selection after clipboard reseeding. Live fake-target routing detects tmux in both original fish-owned groups without sending production keys.",
+      "verification_scope": "runtime"
+    },
+    {
+      "applicability": "tmux3.4 release callback validity ordering; normal text panes in emacs and vi copy modes.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Hold first text-row drag stationary, release, sample scroll_position for several 50ms ticks; short selections or wheel-only tests miss the defect.",
+        "Version-matched source: server-client invokes drag release before m.valid1; cmd_mouse_pane rejects invalid event so timer cancellation is skipped.",
+        "Test tiny panes separately: with one or two text rows there is no interior position for cursor parking."
+      ],
+      "id": "local-tmux-edge-release-timer",
+      "limitations": "Supported-command workaround, not upstream binary repair. Tiny-pane timer limitation remains; requires at least three text rows. No physical shared-desktop acceptance from isolated XTest.",
+      "reference": "references/artifact-verification.md#local-tmux-edge-release-timer",
+      "remedy": "In existing MouseDragEnd bindings freeze selection first, then move copy cursor one row inward only when at an edge and pane_height>2. The next timer tick stops rearming without changing frozen selected text. Preserve original tiny-pane behavior; require at least three rows for workaround.",
+      "sources": [
+        "43c89ef5553cf9396553b3430993099a6cf10cd3e7725cfdd563e01554417949"
+      ],
+      "status": "verified_workaround",
+      "symptoms": [
+        "Held top-edge selection scrolls multiple screens but viewport continues scrolling after mouse release even when selection_active is0."
+      ],
+      "verification": "All four pre-fix top/bottom edge tests fail for post-release drift; tiny guard tests fail before guard. Final26 focused tests pass. Actual installed Kitty/Xvfb held drag grows60/65rows; viewport stable after release and repeated copy; exact logical wrapped clipboard text, reseeding, app forwarding, native copy and Escape/live input verified.",
+      "verification_scope": "runtime"
     }
   ],
   "reports": [
@@ -8756,6 +8800,17 @@
       "findings": [],
       "sha256": "af480f140155d4c3a45f142af2753d63fc3e7887ed0cbb956ce5e561b8fa8265",
       "decision": "No new general rule: existing sandbox-loopback/PTY guidance applies; approved isolated socket reruns pass. Three pre-existing fixture failures remain explicitly reported; public-helper output expectation was repaired without weakening privacy assertions. Discovery supplies the package import root. Live doctor reports existing sanitized-checkout/provenance gaps; no private notes restored or clean-audit claim. Temporary snapshot parent creation repaired preparation only."
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-19-tmux-drag-scroll-copy.md"
+      ],
+      "findings": [
+        "local-tmux-foreground-group-members",
+        "local-tmux-edge-release-timer"
+      ],
+      "reviewed_on": "2026-10-19",
+      "sha256": "43c89ef5553cf9396553b3430993099a6cf10cd3e7725cfdd563e01554417949"
     }
   ],
   "review": {
