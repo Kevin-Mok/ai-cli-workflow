@@ -144,17 +144,28 @@ bindsym Control+$mod+p --release exec "scrot -u ~/tmp/screenshot-$(date +%F_%T).
 # Ctrl+Alt+Up/Down: cooler/warmer in 250 K steps.
 bindsym Control+$mod+Up exec --no-startup-id ~/scripts/redshift-control adjust 250
 bindsym Control+$mod+Down exec --no-startup-id ~/scripts/redshift-control adjust -250
-# Alt+Super+2–6: 1800K through 3000K in 300K steps; 0/grave reset.
+# Super+3–9: rounded reciprocal-temperature steps; Super+0/grave reset.
+bindsym Mod4+1 exec --no-startup-id ~/scripts/redshift-control set 1200
 bindsym $mod+Mod4+1 exec --no-startup-id ~/scripts/redshift-control set 1200
+bindsym Mod4+2 exec --no-startup-id ~/scripts/redshift-control set 1800
 bindsym $mod+Mod4+2 exec --no-startup-id ~/scripts/redshift-control set 1800
+bindsym Mod4+3 exec --no-startup-id ~/scripts/redshift-control set 2100
 bindsym $mod+Mod4+3 exec --no-startup-id ~/scripts/redshift-control set 2100
-bindsym $mod+Mod4+4 exec --no-startup-id ~/scripts/redshift-control set 2400
+bindsym Mod4+4 exec --no-startup-id ~/scripts/redshift-control set 2350
+bindsym $mod+Mod4+4 exec --no-startup-id ~/scripts/redshift-control set 2350
+bindsym Mod4+5 exec --no-startup-id ~/scripts/redshift-control set 2700
 bindsym $mod+Mod4+5 exec --no-startup-id ~/scripts/redshift-control set 2700
-bindsym $mod+Mod4+6 exec --no-startup-id ~/scripts/redshift-control set 3000
-bindsym $mod+Mod4+7 exec --no-startup-id ~/scripts/redshift-control set 4800
-bindsym $mod+Mod4+8 exec --no-startup-id ~/scripts/redshift-control set 5400
+bindsym Mod4+6 exec --no-startup-id ~/scripts/redshift-control set 3100
+bindsym $mod+Mod4+6 exec --no-startup-id ~/scripts/redshift-control set 3100
+bindsym Mod4+7 exec --no-startup-id ~/scripts/redshift-control set 3700
+bindsym $mod+Mod4+7 exec --no-startup-id ~/scripts/redshift-control set 3700
+bindsym Mod4+8 exec --no-startup-id ~/scripts/redshift-control set 4600
+bindsym $mod+Mod4+8 exec --no-startup-id ~/scripts/redshift-control set 4600
+bindsym Mod4+9 exec --no-startup-id ~/scripts/redshift-control set 6000
 bindsym $mod+Mod4+9 exec --no-startup-id ~/scripts/redshift-control set 6000
+bindsym Mod4+0 exec --no-startup-id ~/scripts/redshift-control reset
 bindsym $mod+Mod4+0 exec --no-startup-id ~/scripts/redshift-control reset
+bindsym Mod4+grave exec --no-startup-id ~/scripts/redshift-control reset
 bindsym $mod+Mod4+grave exec --no-startup-id ~/scripts/redshift-control reset
 
 #  ]]] redshift # 
@@ -433,7 +444,6 @@ bindsym $mod+Shift+F5 workspace $ws5; exec $browser_secondary
 # bindsym Mod4+$mod+t workspace $ws5; exec thunderbird
 # bindsym Mod4+$mod+w workspace $ws5; exec $term -e twitchy
 # bindsym Mod4+w workspace $ws5; exec $term -e twitchy
-bindsym Mod4+5 workspace $ws5; exec godot
 bindsym Mod4+F5 workspace $ws5; exec cd ~/coding/ada-mario && godot -e
 # for_window [class="Move_mouse_with_head"] floating enable; move absolute position 0 0
 for_window [class="Face_detector"] floating enable
@@ -536,7 +546,7 @@ bindsym $mod+7 workspace $ws7
 bindsym $mod+8 workspace $ws8
 bindsym $mod+9 workspace $ws9
 bindsym $mod+0 workspace $ws10
-bindsym Mod4+1 workspace $ws11
+bindsym Mod4+F11 workspace $ws11
 # bindsym Mod4+2 workspace $ws12
 # bindsym Mod4+3 workspace $ws13
 # bindsym Mod4+4 workspace $ws14

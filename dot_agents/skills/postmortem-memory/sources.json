@@ -9101,6 +9101,15 @@
       "reviewed_on": "2026-10-20",
       "findings": [],
       "decision": "No new learning: local-discover-paths-before-reads already documents inventory before reads and refresh-config as a Fish function. Correct function read and refresh succeeded; absent Makefile lookup was corrected by enumerating runners."
+    },
+    {
+      "sha256": "1d67190d9da2987d1a3de840a9088906912ae48ab2dce358350c40a88a74d05a",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-20-redshift-curve-inspection.md"
+      ],
+      "reviewed_on": "2026-10-20",
+      "findings": [],
+      "decision": "No new learning: local-discover-paths-before-reads already documents guessed executable paths and refresh-config as a Fish function; successful refresh does not prove unmanaged i3 activation."
     }
   ],
   "review": {

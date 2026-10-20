@@ -710,10 +710,10 @@ checks use invented temporary data; real notes are never repository fixtures.
   still print their value and exit 0. Restore the preferred preset afterward.
 
 - Action: Run `python3 scripts/smoke_redshift_keys.py`, then `python3 scripts/smoke_redshift_keys.py ~/.config/i3/config` and `python3 scripts/smoke_redshift_keys.py --live` after refreshing and reloading i3.
-  Expected: Each prints PASS for 2–6 = 1800, 2100, 2400, 2700, 3000 K, unchanged keys 1/7–9, and 0/grave reset plus Ctrl+Alt+Up/Down = +/-250 K. No sudo is needed; the live check requires a running i3 session.
+  Expected: Each prints PASS for 3–9 = 2100, 2350, 2700, 3100, 3700, 4600, 6000 K, unchanged keys 1/2, both Super and Alt+Super presets, and 0/grave reset plus Ctrl+Alt+Up/Down = +/-250 K. Alt+digits remain workspace shortcuts; Super+F11 selects workspace 11. No sudo is needed; the live check requires a running i3 session.
 
-- Action: After `refresh-config` and an i3 reload, hold Alt+Super and press the number-row keys `1` through `9`; press Alt+Super+0 or Alt+Super+grave to reset.
-  Expected: Redshift selects 1200K, 1800K, 2100K, 2400K, 2700K, 3000K, 4800K, 5400K, and 6000K; 0 and grave restore the default color temperature.
+- Action: After `refresh-config` and an i3 reload, hold Super, then repeat with Alt+Super, and press the number-row keys `1` through `9`; press Super+0 or Super+grave to reset.
+  Expected: Redshift selects 1200K, 1800K, 2100K, 2350K, 2700K, 3100K, 3700K, 4600K, and 6000K; 0 and grave restore the default color temperature. Alt+number still switches workspaces; Super+F11 selects workspace 11, and Super+1 selects 1200 K without switching workspaces.
 - Action: Start a fresh X session on a desktop host that applies this repo's shell and `Xmodmap` config, open a terminal, type a short word, and press Backspace once.
   Expected: Exactly one character is deleted and opening a new bash shell does not rewrite the active keyboard remap.
 - Action: Open Neovim with the tracked config, enter the command-line window with `q:`, wait long enough for `CursorHold`, then exit back to the file.
