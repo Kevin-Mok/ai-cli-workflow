@@ -432,6 +432,14 @@ listing is cached-only; opening a picker can generate recaps unless disabled.
   install.
   Expected: The installed skill copy matches the repo-tracked source so
   future sessions see the same instructions and metadata.
+- Action: Run `python3 dot_agents/skills/ui-ux-pro-max/scripts/search.py "education dashboard" --design-system -p "LessonOps" -f markdown` from the source checkout.
+  Expected: A candidate design system prints without credentials, network access or persisted files.
+- Action: Run `python3 dot_agents/skills/ui-ux-pro-max/scripts/search.py "keyboard focus" --stack react`.
+  Expected: React stack guidance prints; inspect the version/status applicability before using it.
+- Action: Run `python3 dot_agents/skills/ui-ux-pro-max/scripts/search.py "zxqvnevermatch987654321" --domain ux`.
+  Expected: Zero matches are disclosed explicitly, with no fabricated recommendation.
+- Action: After normal shared-skill deployment, invoke `$ui-ux-pro-max` in Codex and `/ui-ux-pro-max` in Claude Code, then start a generic design request without either invocation.
+  Expected: Explicit requests load the shared skill and supporting files; a generic request does not automatically load this skill. Deployment is required; not performed during evaluation.
 - Action: sync-design-skills --dry-run
   Expected: Chezmoi previews only the five managed public-source refreshes and
   does not run the UI/UX Pro Max updater, authenticate any service, generate

@@ -11,9 +11,9 @@ usage() {
   cat <<'USAGE'
 Usage: sync-design-skills [--dry-run|--bootstrap]
 
-Refresh the managed public design skills and UI/UX Pro Max bundle.
+Refresh the managed public design skill externals; UI/UX Pro Max stays vendored.
 --dry-run previews external refreshes without modifying skill files.
---bootstrap installs UI/UX Pro Max on a new host without refreshing externals.
+--bootstrap is a compatibility no-op; chezmoi deploys the vendored UI/UX Pro Max skill.
 USAGE
 }
 
@@ -33,8 +33,7 @@ if [[ ! -d "$source_dir" ]]; then
 fi
 
 if [[ "$mode" == bootstrap ]]; then
-  npx --yes ui-ux-pro-max-cli init --ai codex --global
-  echo "$(cli_emoji '✅')Design skills bootstrap complete."
+  echo "$(cli_emoji '✅')UI/UX Pro Max is vendored; no separate bootstrap is needed."
   exit 0
 fi
 
@@ -49,6 +48,7 @@ apply_args=(-S "$source_dir" apply --refresh-externals -v)
 if [[ "$mode" == dry-run ]]; then
   apply_args+=(-n)
 fi
+echo "$(cli_emoji '🔄')Refreshing managed design sources; chezmoi will report each operation."
 chezmoi "${apply_args[@]}" "${targets[@]}"
 
 if [[ "$mode" == dry-run ]]; then
@@ -56,9 +56,4 @@ if [[ "$mode" == dry-run ]]; then
   exit 0
 fi
 
-if [[ -d "$HOME/.agents/skills/ui-ux-pro-max" ]]; then
-  npx --yes ui-ux-pro-max-cli update --ai codex --global
-else
-  npx --yes ui-ux-pro-max-cli init --ai codex --global
-fi
-echo "$(cli_emoji 'ℹ️')Design skills refreshed. Restart Codex sessions to load updates."
+echo "$(cli_emoji 'ℹ️')Design skills refreshed. UI/UX Pro Max stays pinned. Restart agent sessions to load updates."

@@ -8818,8 +8818,8 @@
       ],
       "reviewed_on": "2026-10-20",
       "findings": [],
-      "sha256": "9eed5881ed087e711128e6243e8b127191f9e02656d78cd3e224ef10dda0d2d7",
-      "decision": "No new reusable learning: existing local-stale-preservation-baseline and local-skip-worktree-and-scoped-state guidance applies. Exact committed tree, parent, twelve-path scope and clean index pass. Concurrent unrelated working-byte changes do not prove overwrite; retain current bytes and the verified commit. No restore, history rewrite or implementation change."
+      "sha256": "a81cd7dd9413d0f931722dcdfc6a7fbfdbef63016565aec377c328648fefa654",
+      "decision": "No new reusable learning: existing stale-preservation, fetch-before-ancestry and exact-reviewed-approval guidance applies. Keep the verified scoped commits, fetch missing remote objects, preserve active hooks and unrelated concurrent staging, and integrate via a clean isolated normal merge. Exact candidate and installed history checks pass;36 integration tests pass. Physical acceptance remains pending."
     }
   ],
   "review": {
