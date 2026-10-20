@@ -66,3 +66,12 @@ This document records delivery milestones and verification for completed reposit
 - Verification: automatic merge completed without conflicts; README, merge whitespace and exact candidate privacy checks run before commit.
 - Delivery: push the merged main to origin/main after commit; preserve unrelated edits via the named commit-confirmation-push-preserve-local stash until restoration.
 - Remaining: full refresh remains blocked by existing MIME settings drift; unrelated postmortem edits and tmux prompt stay outside the commit.
+
+## Summary ending — docs: put full commit message last in summaries
+
+- Complete: canonical instructions and durable feedback put skipped checks/risks before the bold commit status, with the full recorded commit message last.
+- Scope: direct-write fallback for session 01a15b52-f3a9-7e12-8679-288fba9267a0; the scope helper could not recognize this conversation's writes. Only AGENTS guidance, the appended feedback entry, and this milestone are included.
+- Verification: refresh-config exited 0; README gate returned pass_no_change; scoped whitespace check passed. Exact candidate privacy gate must pass immediately before commit.
+- Delivery: commit on main and push to origin/main after candidate review.
+- Remaining: pre-existing postmortem references, staged/unstaged ledger edits, incident documents, plan, and prompts remain excluded; no implementation changes or runtime tests needed.
+- Rollback: restore the previous AGENTS wording; retain append-only feedback history.

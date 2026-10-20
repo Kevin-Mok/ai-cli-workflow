@@ -278,11 +278,14 @@ education work:
 - Keep relevant documentation and ExecPlan updates in the same commit as their
   implementation. Stage only intended files or hunks and inspect the staged diff
   before committing.
-- Open and close commit delivery replies with the commit hash and actual push
-  status, including the remote and branch. The bottom confirmation must also
-  include the full commit message (subject and body, as recorded by Git) and a
-  brief plain-language summary of the committed changes. End with the hash and
-  push status so readers can immediately see whether changes were pushed.
+- Open commit delivery replies with the commit hash and actual push status,
+  including the remote and branch. End summaries with skipped checks and material
+  risks, then the bold hash and actual push status, followed by
+  `Full commit message:` and the subject in inline code (include any recorded
+  body in a fenced text block). For example:
+  Skipped subjective animation inspection. Expired notifications may receive a
+  fresh ID. **383e5fd — pushed to `origin/main`.**
+  Full commit message: `feat(i3): update Redshift notifications in place`
   Confirm success only after verification; state clearly when a push failed or
   was not performed.
 - After each commit, promptly report the result in Codex output with a high-level
