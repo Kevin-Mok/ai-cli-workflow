@@ -218,7 +218,7 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Verification evidence: Independent backup read confirmed version 2, 37,678,191 bytes, mode 0600 and recorded SHA-256. Later checked version-3 backup retained 268,207 quota observations; installed service and 16 modules verified healthy.
 - Limitations: Recovery occurred after restart and is not a successful original pre-install backup. It preserved pre-upgrade state; it does not retroactively repair the original unchecked shell sequence.
 - Sources:
-  - [2026-10-06-burn-install-backup-preflight.md](/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-06-burn-install-backup-preflight.md) (SHA-256 `86f1c43db1e7`; 1 alias retained in [sources.json](../sources.json)).
+  - [2026-10-06-burn-install-backup-preflight.md](/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-06-burn-install-backup-preflight.md) (SHA-256 `7873cc3332ad`; 1 alias retained in [sources.json](../sources.json)).
 
 
 ## local-codex-nonfatal-exec-metadata

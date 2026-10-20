@@ -3703,7 +3703,7 @@
       "reference": "references/execution-environments.md#local-managed-backup-preflight",
       "remedy": "Use standard-library-only path derivation or explicit managed uv execution, make backup success a checked fail-fast precondition, and verify actual backup metadata before install. Recovery secured the still-version-2 ledger before first upgrade save.",
       "sources": [
-        "86f1c43db1e7bdb9dc917d191c6c135fb806b34fdbfc4945d532203ff3523820"
+        "7873cc3332ad6763edfd5a10390385868aa67ecd02a285023bb8da36f3cd7c44"
       ],
       "status": "verified_workaround",
       "symptoms": [
@@ -5031,13 +5031,103 @@
   ],
   "reports": [
     {
-      "aliases": [
-        "/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-20-consumption-session-privacy-gate.md"
-      ],
-      "decision": "No new reusable learning: existing exact-candidate privacy and session-scope rules apply. Tracker HEAD and original index share 35 baseline findings; preserve narrow scope and do not bypass the gate. Focused accounting tests and installed fix pass; tracker publication remains blocked pending broader cleanup authorization.",
+      "decision": "No new learning: only public path/transport spelling was neutralized; diagnosis, outcome and original measurement hashes are unchanged.",
       "findings": [],
       "reviewed_on": "2026-10-20",
-      "sha256": "6549292b65a73088f5cd81f93cc40f7f11ea9599694e889db5787d5ab9fc952b"
+      "sha256": "9f380832381a9e3daaad96bd9ea57b08042282797ec99a2f0986ac428b89c948",
+      "aliases": [
+        "/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-08-directory-share-commit-test-path.md"
+      ]
+    },
+    {
+      "decision": "No new learning: only public path/transport spelling was neutralized; diagnosis, outcome and original measurement hashes are unchanged.",
+      "findings": [],
+      "reviewed_on": "2026-10-20",
+      "sha256": "ea4704b4f30c2eaebfcf6350db68a9097b28294f84c4cdb4dc9bf1aec7d7a660",
+      "aliases": [
+        "/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-08-token-cost-environment.md"
+      ]
+    },
+    {
+      "decision": "No new learning: only public path/transport spelling was neutralized; diagnosis, outcome and original measurement hashes are unchanged.",
+      "findings": [],
+      "reviewed_on": "2026-10-20",
+      "sha256": "1d9608a97b2d30057165245197f3447c503acb541bc8a4ee911a0b2db466ace5",
+      "aliases": [
+        "/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-08-token-cost-verification.md"
+      ]
+    },
+    {
+      "decision": "No new learning: only public path/transport spelling was neutralized; diagnosis, outcome and original measurement hashes are unchanged.",
+      "findings": [],
+      "reviewed_on": "2026-10-20",
+      "sha256": "0059b113bc07fa539776d7e65879e8ebcf0ddb048de736bf7aaccde13b85d020",
+      "aliases": [
+        "/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-14-commit-push-sandbox.md"
+      ]
+    },
+    {
+      "decision": "No new learning: only public path/transport spelling was neutralized; diagnosis, outcome and original measurement hashes are unchanged.",
+      "findings": [],
+      "reviewed_on": "2026-10-20",
+      "sha256": "42b5e3bc4f71e52271a9e9d23d3983f229e53d660fdb31a29dee708ea0c2a554",
+      "aliases": [
+        "/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-14-cto-overview-runtime.md"
+      ]
+    },
+    {
+      "decision": "No new learning: only public path/transport spelling was neutralized; diagnosis, outcome and original measurement hashes are unchanged.",
+      "findings": [],
+      "reviewed_on": "2026-10-20",
+      "sha256": "61dfd39b57f1689d4d18c8bf7128d1856cf9609d18da1bf33ca098eb89fd1c7f",
+      "aliases": [
+        "/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-14-delivery-push-rejected.md"
+      ]
+    },
+    {
+      "decision": "No new learning: only public path/transport spelling was neutralized; diagnosis, outcome and original measurement hashes are unchanged.",
+      "findings": [],
+      "reviewed_on": "2026-10-20",
+      "sha256": "885d485b1d5c4c9710d30260aeb0e5c89bef619eac4c73b79a5234a2bd3001a9",
+      "aliases": [
+        "/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-14-incremental-tracking-redesign.md"
+      ]
+    },
+    {
+      "decision": "No new learning: only public path/transport spelling was neutralized; diagnosis, outcome and original measurement hashes are unchanged.",
+      "findings": [],
+      "reviewed_on": "2026-10-20",
+      "sha256": "6c50970d7ec33fc03b30dc42eb4bd285e9c6de078102cab0c4e9458226e07feb",
+      "aliases": [
+        "/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-14-report-readability-preflight.md"
+      ]
+    },
+    {
+      "decision": "No new learning: only public path/transport spelling was neutralized; diagnosis, outcome and original measurement hashes are unchanged.",
+      "findings": [],
+      "reviewed_on": "2026-10-20",
+      "sha256": "b3d5ad82581d0f67798cc88dbc050c87651f9d025c04334fbde8f8b2a47f1db6",
+      "aliases": [
+        "/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-14-session-commit-snapshot-preflight.md"
+      ]
+    },
+    {
+      "decision": "No new learning: only public path/transport spelling was neutralized; diagnosis, outcome and original measurement hashes are unchanged.",
+      "findings": [],
+      "reviewed_on": "2026-10-20",
+      "sha256": "db780d24bc8bfa007b9f0428f3c13f6f4691f32d76e9203885c6514329362ec7",
+      "aliases": [
+        "/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-15-overview-startup.md"
+      ]
+    },
+    {
+      "decision": "No new reusable learning: existing exact-byte approval and private-policy precedence guidance applies. User-authorized path/URL neutralization, three reviewed public-source approvals and existing identity-policy reuse make the exact tracker cleanup candidate pass. Tracker120 and gate45 regressions pass. Required refresh remains incomplete on unrelated MIME drift; no force/adoption or private-policy change.",
+      "findings": [],
+      "reviewed_on": "2026-10-20",
+      "sha256": "2a1c3e694d70764f1d5b60f228712a042400814485efa0742be7d39c8fe1756d",
+      "aliases": [
+        "/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-20-consumption-session-privacy-gate.md"
+      ]
     },
     {
       "aliases": [
@@ -7315,14 +7405,14 @@
       "sha256": "9646e1b4d92a098a828a3b24db554c4922377a7539ee47914fcff652b7361b94"
     },
     {
-      "aliases": [
-        "/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-06-burn-install-backup-preflight.md"
-      ],
       "findings": [
         "local-managed-backup-preflight"
       ],
-      "reviewed_on": "2026-10-06",
-      "sha256": "86f1c43db1e7bdb9dc917d191c6c135fb806b34fdbfc4945d532203ff3523820"
+      "reviewed_on": "2026-10-20",
+      "sha256": "7873cc3332ad6763edfd5a10390385868aa67ecd02a285023bb8da36f3cd7c44",
+      "aliases": [
+        "/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-06-burn-install-backup-preflight.md"
+      ]
     },
     {
       "aliases": [
@@ -7447,13 +7537,13 @@
       "sha256": "0cbc28a2acf4a74e458fff92a48dd4ea2903b82286bec8a142d4e4dec8c82632"
     },
     {
+      "decision": "No new learning: only public path/transport spelling was neutralized; diagnosis, outcome and original measurement hashes are unchanged.",
+      "findings": [],
+      "reviewed_on": "2026-10-20",
+      "sha256": "79c33f43a15b68561a548cd195d4db4c3a12ed3a877d110ee5dce99a937fcdb6",
       "aliases": [
         "/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-06-publication-path-discovery.md"
-      ],
-      "decision": "No new learning: path recovery repeats ext-optional-path-discovery. Automatic approval review rejected shell rm -rf cleanup before execution; Python TemporaryDirectory with explicit subprocess cwd provided a verified workaround. Fresh staged checkout sync installed 22 packages, CLI help and all 72 smoke checks passed, exit 0. Existing task-owned temporary-directory and ownership guidance applies; original command remains rejected.",
-      "findings": [],
-      "reviewed_on": "2026-10-06",
-      "sha256": "e0e28aee3f78dc8b8a3803a28aef35ed37ca2dbd7b758f5841a45c63d9ba3e3d"
+      ]
     },
     {
       "aliases": [
@@ -8131,13 +8221,13 @@
       "sha256": "7235e231d548f5d7cbdc5112bc0a3ebfbaedfd62cfaa1ad240ec3de4469b8c2c"
     },
     {
+      "decision": "No new learning: only public path/transport spelling was neutralized; diagnosis, outcome and original measurement hashes are unchanged.",
+      "findings": [],
+      "reviewed_on": "2026-10-20",
+      "sha256": "274626296b2adba4d972b6107132f7fc07c1aba06c47f164c334833ee98f26f9",
       "aliases": [
         "/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-08-overview-command-environment.md"
-      ],
-      "decision": "No new reusable learning: ext-sandbox-loopback and local-discover-paths-before-reads cover runner startup and path discovery. Approved scoped execution succeeded; default bwrap remains unresolved. Earlier task commits changed the dirty set during snapshot capture; committed pre-overview CLI comparisons passed. Documentation probe excludes illustrative prose and shell operators; 51 actual examples parse.",
-      "findings": [],
-      "reviewed_on": "2026-10-08",
-      "sha256": "947b48a3cbbde16c4eefbddcac16dd265cb863536e641b62a0aa146961f2e1e4"
+      ]
     },
     {
       "aliases": [
@@ -8365,7 +8455,6 @@
     },
     {
       "aliases": [
-        "/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-08-token-cost-environment.md",
         "/home/example/coding/track-codex-sessions/.worktrees/token-cost-reporting/docs/postmortem/2026-10-08-token-cost-environment.md"
       ],
       "decision": "No new reusable learning: ext-sandbox-loopback and local-discover-paths-before-reads cover the repeated runner startup failure and guessed optional source paths. Approved scoped execution and actual-path reads succeed; default sandbox startup remains unresolved.",

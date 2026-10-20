@@ -120,6 +120,30 @@
         "credential"
       ],
       "reason": "Reviewed vendored upstream Angular guidance; empty-password form-control example, not a credential. Any byte edit requires review."
+    },
+    {
+      "path_ref": "14b45a0de171",
+      "content_sha256": "65c7a7a5645bf077fef670d17e7a37c4a712bf1f7c2e5d2e479f512852cfb6cf",
+      "categories": [
+        "sensitive_path"
+      ],
+      "reason": "Public CLI source for portable store verification and legacy export; not private recovery data."
+    },
+    {
+      "path_ref": "fbec5165b341",
+      "content_sha256": "ed6234c8f92bac327bb0a1843d7d1220e443de34e4dc2f1e92eab08fb9694bc2",
+      "categories": [
+        "sensitive_path"
+      ],
+      "reason": "Public implementation for validating and exporting tracker history; no private recovery artifacts."
+    },
+    {
+      "path_ref": "a698fd281f68",
+      "content_sha256": "df4fc3d96b87326899ce398746765abfc366e7df9bab00b2ecf94b607c72aef9",
+      "categories": [
+        "sensitive_path"
+      ],
+      "reason": "Public recovery tests use temporary synthetic stores and contain no private recovery data."
     }
   ]
 }
