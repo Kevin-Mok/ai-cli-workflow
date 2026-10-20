@@ -1036,6 +1036,9 @@ this.
   bounded at 1000–6500 K. Presets, `rds`, `rx` and login share the saved temperature.
   The first adjustment defaults to 6500 K if no value has been saved; direct
   external Redshift commands are not tracked.
+  Successful helper operations show **🌡️ Redshift — 2100 K** (using the applied
+  temperature) in Dunst. Rapid adjustments edit the same two-second popup in place;
+  missing or failed notifications never fail the temperature change.
 - [`dot_config/i3blocks/`](dot_config/i3blocks/) plus
   [`dot_config/dunst/dunstrc`](dot_config/dunst/dunstrc) and
   [`dot_config/picom/picom.conf`](dot_config/picom/picom.conf) cover the

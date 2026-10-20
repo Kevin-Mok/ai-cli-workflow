@@ -695,6 +695,19 @@ checks use invented temporary data; real notes are never repository fixtures.
   `~/scripts/redshift-control adjust 250` and `adjust -250` exercise the same
   helper and print the resulting kelvin value. Raw external Redshift commands
   are not tracked; choose a preset first if they have changed the filter.
+  Each successful preset, adjustment and reset also shows `🌡️ Redshift` with
+  the applied value (for example `2100 K`; reset `6500 K`) in Dunst for two
+  seconds. Rapid adjustments edit the existing popup in place by reusing its
+  notification ID, including at the limits. After expiry, the next change
+  creates a fresh popup.
+  Fish `redshift-set` and login calls to the shared helper also notify.
+
+- Action: In an i3 desktop session, run `~/scripts/redshift-control set 2100`,
+  then `~/scripts/redshift-control adjust 250` and `~/scripts/redshift-control reset`.
+  Expected: Terminal output stays unchanged; Dunst shows 2100, 2350 and 6500 K.
+  A failed Redshift operation shows no success popup and preserves saved state.
+  If notify-send or the notification service is unavailable, successful changes
+  still print their value and exit 0. Restore the preferred preset afterward.
 
 - Action: Run `python3 scripts/smoke_redshift_keys.py`, then `python3 scripts/smoke_redshift_keys.py ~/.config/i3/config` and `python3 scripts/smoke_redshift_keys.py --live` after refreshing and reloading i3.
   Expected: Each prints PASS for 2–6 = 1800, 2100, 2400, 2700, 3000 K, unchanged keys 1/7–9, and 0/grave reset plus Ctrl+Alt+Up/Down = +/-250 K. No sudo is needed; the live check requires a running i3 session.

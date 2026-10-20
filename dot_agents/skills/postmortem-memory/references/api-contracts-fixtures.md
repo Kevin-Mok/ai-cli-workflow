@@ -588,3 +588,14 @@ security checks with the arguments you passed.
 - Verification: Refresh/activation and five focused tests passed. At Xft.dpi=135, supported width 169 rendered 250x270 and width 347 rendered 501x134; removed-sizing warnings absent.
 - Limits: Content controls height; fixed ratio is not guaranteed. Values depend on DPI and frame. Other legacy settings remain outside scope.
 - Source: [Dunst ignored sizing](../../../../docs/postmortem/2026-10-13-dunst-ignored-sizing.md).
+
+## local-dunst-replace-notification-id
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **runtime**.
+- Symptoms: Dunst stack-tag replacement allocates new notification IDs.
+- Applicability: Helpers that must edit the current notification in place.
+- Diagnostic checks: Compare returned IDs while the popup is active; history deduplication alone does not establish identity.
+- Remedy: Capture notify-send --print-id and reuse --replace-id under the existing caller lock; tolerate delivery failures.
+- Verification evidence: Live Redshift calls reused 109/109 at unchanged 3000 K; six controller tests passed after defining RED, including malformed saved notification IDs.
+- Limitations: Expiry or daemon restart may allocate a new ID; subjective animation was not inspected.
+- Source: [Redshift notification identity](../../../../docs/postmortem/2026-10-20-redshift-notification-id.md) (SHA-256 `740c8dbad026eb73c5007af6139d211f1de0339142ee373767fc8f1899691cd1`).

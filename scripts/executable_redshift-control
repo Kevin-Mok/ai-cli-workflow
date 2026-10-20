@@ -28,6 +28,21 @@ def apply(action, value):
         pending = directory / "temperature.tmp"
         pending.write_text(str(target) + "\n")
         pending.replace(state)
+        try:
+            notification = directory / "notification-id"
+            previous = notification.read_text().strip() if notification.exists() else "0"
+            if not previous.isascii() or not previous.isdecimal() or int(previous) >= 2**32:
+                previous = "0"
+            result = subprocess.run(["notify-send", "--print-id", f"--replace-id={previous}",
+                            "-a", "Redshift", "-u", "low", "-t", "2000",
+                            "-h", "string:x-dunst-stack-tag:redshift-temperature",
+                            "🌡️ Redshift", f"{target} K"], check=True, timeout=2,
+                           stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True)
+            identifier = getattr(result, "stdout", "")
+            if isinstance(identifier, str) and identifier.strip().isascii() and identifier.strip().isdecimal():
+                notification.write_text(identifier.strip() + "\n")
+        except (OSError, ValueError, subprocess.SubprocessError):
+            pass  # Desktop notification delivery must not undo a successful change.
         return target
 
 

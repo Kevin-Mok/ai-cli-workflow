@@ -5027,6 +5027,26 @@
       ],
       "verification": "Two defining tests RED then GREEN; existing ubuntu-start and pywal checks pass. Host check confirms missing boot entry; sudo requires a password. No apply or reboot performed.",
       "verification_scope": "code"
+    },
+    {
+      "id": "local-dunst-replace-notification-id",
+      "reference": "references/api-contracts-fixtures.md#local-dunst-replace-notification-id",
+      "status": "verified_fix",
+      "confidence": "confirmed",
+      "verification_scope": "runtime",
+      "symptoms": [
+        "Dunst stack tag replaces popup but allocates a different notification ID"
+      ],
+      "applicability": "Desktop helpers that must edit the existing Dunst notification in place.",
+      "diagnostics": [
+        "Compare notify-send --print-id results across consecutive updates while the popup remains active; one history entry alone does not prove stable identity."
+      ],
+      "remedy": "Capture the successful notify-send --print-id response and reuse it with --replace-id, serializing callers and tolerating notification failures.",
+      "verification": "Live calls reused ID 109/109 at 3000 K and then 3150 K; six controller tests passed including invalid UTF-8 and oversized IDs after defining RED.",
+      "limitations": "Expired notifications or a restarted daemon may allocate a fresh ID. Subjective animation appearance was not inspected.",
+      "sources": [
+        "740c8dbad026eb73c5007af6139d211f1de0339142ee373767fc8f1899691cd1"
+      ]
     }
   ],
   "reports": [
@@ -9062,6 +9082,25 @@
       "reviewed_on": "2026-10-20",
       "findings": [],
       "decision": "No new independent finding: existing shared-index race guidance applies; isolated index alone cannot prevent concurrent parent movement. Corrective candidate preserves parent bytes and uses guarded publication."
+    },
+    {
+      "sha256": "740c8dbad026eb73c5007af6139d211f1de0339142ee373767fc8f1899691cd1",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-20-redshift-notification-id.md"
+      ],
+      "reviewed_on": "2026-10-20",
+      "findings": [
+        "local-dunst-replace-notification-id"
+      ]
+    },
+    {
+      "sha256": "e73fe2a7f89004dfbc377cda4a20d260109875e879382fcc052e0264fb7c673c",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-20-redshift-notification-inspection.md"
+      ],
+      "reviewed_on": "2026-10-20",
+      "findings": [],
+      "decision": "No new learning: local-discover-paths-before-reads already documents inventory before reads and refresh-config as a Fish function. Correct function read and refresh succeeded; absent Makefile lookup was corrected by enumerating runners."
     }
   ],
   "review": {
