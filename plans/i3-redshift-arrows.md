@@ -38,3 +38,13 @@ Commit preparation: privacy gate rejected one live-home ledger alias; public can
 Created e4c6ca1, but main advanced to e1cdb24 during hooks; the resulting commit reversed unrelated parent changes. Do not push this intermediate state. Corrective milestone: fix(git): preserve concurrent session changes. Restore only those parent bytes and ledger records, preserve Redshift behavior, retain active hooks/privacy gate, and use explicit-parent commit publication with an old-HEAD guard. The series will be pushed once after combined-tree verification. See docs/postmortem/2026-10-20-redshift-commit-head-race.md.
 
 Recovery verification: disposable stale-parent update-ref returned 128 and preserved the newer branch. The corrective commit runs active hooks, checks its immutable tree with privacy-gate --tree, explicitly records its parent and publishes by compare-and-swap. Verify six restored blobs and the final net session scope before pushing.
+
+### Verified delivery
+
+- [x] e4c6ca1 implements Redshift shortcuts and matching docs/tests.
+- [x] 26d6452 preserves the concurrent session’s changes without history rewrite.
+- [x] All six restored blobs match e1cdb24; net diff contains only session scope.
+- [x] Privacy candidate/tree/history gates and active hooks pass.
+- [x] Pushed verified series to origin/main (e1cdb24..26d6452).
+
+Final documentation milestone: docs(i3): record verified Redshift delivery. Record resolved race, successful publication and harmless failed index cleanup; leave unrelated work untouched. No implementation work remains. Subjective warmth and fresh-login behavior remain unobserved.
