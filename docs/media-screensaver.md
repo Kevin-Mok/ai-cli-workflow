@@ -14,6 +14,16 @@ The installer writes `~/.config/systemd/user/media-screensaver.service` and repl
 
 The service runs the existing idle monitor and restarts it after five seconds if it exits. Inspect it with `systemctl --user status media-screensaver.service` or `journalctl --user -u media-screensaver.service -n 20 --no-pager`. Stop it with `systemctl --user stop media-screensaver.service`; restart with `systemctl --user restart media-screensaver.service`. A deliberate stop stays stopped until the next service start or i3 login. The daemon reports readiness or suppression every 30 seconds in the journal. Before migrating an already-running foreground daemon, stop it with Ctrl+C; duplicate prevention permits only one idle monitor. Service restarts reset the five-minute activity clock.
 
+## Daily 10:00 AM schedule
+
+Update the installed launcher with `./scripts/executable_media-screensaver install`, then run `./scripts/executable_setup-screensaver-timer` from your X11 desktop terminal. Neither command needs sudo. The installer checks that the installed launcher supports scheduled playback, writes only `media-screensaver-daily.service` and `.timer` under the systemd user configuration directory, imports the current display/session environment, reloads systemd and enables the timer. Re-running updates those same units.
+
+The timer launches at **10:00 AM in the machine's local timezone**, within roughly one second. The desktop must be logged in. It does not wake the computer: a timer due during suspend may launch on resume. Runs missed while powered off or with the timer inactive are not caught up (`Persistent=false`). Later i3 logins refresh the display environment through the existing `media-screensaver service` startup command. The separate five-minute idle service remains unchanged. A shared playback lock prevents simultaneous daily, idle and manual previews.
+
+The `scheduled` command skips locked sessions and uses automatic browser-video checks, without waiting five idle minutes. Missing browser coverage can suppress the daily preview; enable the extension as described below. Keyboard/mouse input dismisses playback normally. Inspect the next run with `systemctl --user list-timers --all media-screensaver-daily.timer`; inspect playback with `journalctl --user -u media-screensaver-daily.service -n 20 --no-pager`. Test a launch from the unlocked desktop with `systemctl --user start media-screensaver-daily.service`.
+
+Disable future daily launches with `./scripts/executable_setup-screensaver-timer --disable`. This leaves already-running playback alone; dismiss it with input or stop `media-screensaver-daily.service`. Installer options `--plain` (or `CLI_PLAIN=1`) and `--details` control ASCII output and raw errors. Regression tests: `python3 -B -m unittest discover -s tests -p test_screensaver_timer.py`.
+
 ## Enable the browser bridge
 
 1. Open `chrome://extensions` in each Chrome/Chromium profile used on this desktop.

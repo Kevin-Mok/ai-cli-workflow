@@ -1001,7 +1001,9 @@ this.
   checks and disposable media. Video orientation metadata is honored automatically;
   `orient` opens a separate review chooser, or `orient --file FILE` reviews one video
   and saves a private additional rotation without rewriting the original.
-  Automatic activation waits five idle minutes and
+  [`setup-screensaver-timer`](scripts/executable_setup-screensaver-timer) installs a separate
+  daily **10:00 AM local-time** user timer after updating the launcher; suspend can delay playback.
+  Automatic idle activation waits five idle minutes and
   fails closed when Chrome video coverage is unavailable. See
   [installation, browser enablement and limitations](docs/media-screensaver.md).
 - [`flavibot-browser`](scripts/executable_flavibot-browser) opens the FlaviBot

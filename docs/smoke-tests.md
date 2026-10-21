@@ -1438,6 +1438,11 @@ play audio, so exercise them deliberately.
 
 ### Media conveyor screensaver
 
+- Action: Update with `./scripts/executable_media-screensaver install`, then run `./scripts/executable_setup-screensaver-timer` twice from an X11 desktop terminal; inspect `systemctl --user list-timers --all media-screensaver-daily.timer`.
+  Expected: Both installs succeed without sudo, the timer is active with the next local 10:00 AM trigger, and the existing idle service is unchanged. Enabling after 10:00 AM does not catch up an inactive timer; suspend across 10:00 AM may launch on resume. Missing/outdated launcher or missing DISPLAY produces an actionable error.
+- Action: Start `media-screensaver-daily.service` from the unlocked desktop, dismiss with physical input; repeat while locked and while browser bridge coverage is unavailable. Disable with `./scripts/executable_setup-screensaver-timer --disable`.
+  Expected: Allowed playback starts without a five-minute wait and input dismisses it. Locked/uncertain-lock sessions skip launch; missing browser coverage suppresses automatic playback. Disabling removes future daily triggers and leaves running playback alone.
+
 - Action: Run `~/scripts/media-screensaver orient` (or add `--media DIR`) and choose a video; move the mouse and use the keyboard inside the review window.
   Expected: The chooser starts in the selected library, playback loops muted, rotation and Save/Cancel controls stay visible, and ordinary input does not dismiss review.
 - Action: Open `~/scripts/media-screensaver orient --file '/absolute/path/problem.mov'`, rotate left/right until upright, save and reopen; reset with Use metadata and save. Repeat a change using Cancel and window close.

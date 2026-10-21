@@ -72,6 +72,22 @@ def gate(directory, middle):
 
 
 def preview(args, automatic=False):
+    try:
+        directory = bridge.runtime_dir()
+    except (OSError, RuntimeError):
+        if automatic:
+            raise ValueError('Browser bridge unavailable; automatic preview suppressed.')
+        return _preview(args, automatic=False)
+    with (directory / 'preview.lock').open('a') as lock:
+        try:
+            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            output(args, 'info', 'Screensaver playback is already running; duplicate launch skipped.')
+            return 0
+        return _preview(args, automatic=automatic)
+
+
+def _preview(args, automatic=False):
     paths = scan(args)
     geometry = monitors()
     from .renderer import run
@@ -303,7 +319,7 @@ def main(argv=None):
     plain_help = '--plain' in (sys.argv[1:] if argv is None else argv) or os.environ.get('CLI_PLAIN') == '1'
     parser = argparse.ArgumentParser(description=('' if plain_help else '🖥️ ') + 'X11 three-monitor media conveyor; see docs/media-screensaver.md.',
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument('command', nargs='?', choices=['preview', 'daemon', 'service', 'status', 'install', 'probe', 'demo', 'orient', '_auto'], default='preview', metavar='{preview,daemon,service,status,install,probe,demo,orient}')
+    parser.add_argument('command', nargs='?', choices=['preview', 'daemon', 'service', 'status', 'install', 'probe', 'demo', 'orient', 'scheduled', '_auto'], default='preview', metavar='{preview,daemon,service,status,install,probe,demo,orient,scheduled}')
     parser.add_argument('--media', type=Path, default=MEDIA, help='recursive media library (default: %(default)s)')
     parser.add_argument('--file', type=Path, help='video for orient (otherwise opens a chooser in --media)')
     parser.add_argument('--seconds', type=float, default=0, help='close preview after this many seconds (0: until activity)')
@@ -316,6 +332,11 @@ def main(argv=None):
         if args.command == 'orient':
             from .review import run
             return run(args, lambda kind, message: output(args, kind, message))
+        if args.command == 'scheduled':
+            if locked():
+                output(args, 'info', 'Daily screensaver skipped: session is locked or lock state is unavailable.')
+                return 0
+            return preview(args, automatic=True) or 0
         if args.command == 'install': return install(args)
         if args.command == 'probe': return probe(args)
         if args.command == 'daemon': return daemon(args)
