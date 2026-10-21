@@ -248,3 +248,7 @@
 - 2026-10-20: Quote optional scalar variables in Fish `test` comparisons: an unset unquoted variable disappears and can break even a combined condition whose other clause is false. Exercise missing/empty environment variables and preserve the console/display startup gate. See [Fish login startup](../docs/postmortem/2026-10-20-fish-login-missing-vtnr.md).
 
 - 2026-10-20: A refresh conflict can be mode-only even when source/live contents match. Inspect exact-target diff and effective managed/ignored rules; raw template differences do not establish deployment scope. Chezmoi's scripts exclusion covers run hooks, not ordinary scripts-directory files. See [launcher mode conflict](../docs/postmortem/2026-10-20-refresh-screensaver-mode-conflict.md).
+
+- 2026-10-20: Package-policy fixtures must exceed the pipe buffer to catch early-parser exits under pipefail. Consume full output and report query failures explicitly; Bash producer broken pipes can return 1 rather than 141. See [Chrome updater silent exit](../docs/postmortem/2026-10-20-chrome-updater-silent-exit.md).
+
+- 2026-10-20: APT metadata refresh can advance the candidate mid-update. Read the candidate after refreshing metadata and again after installation; compare with dpkg Debian version ordering and accept installed >= candidate. Do not let equal cached versions skip a normal refresh. See [Chrome verification follow-up](../docs/postmortem/2026-10-20-chrome-updater-silent-exit.md).

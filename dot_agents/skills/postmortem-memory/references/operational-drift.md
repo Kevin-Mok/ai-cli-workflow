@@ -218,3 +218,14 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Verification evidence: Reproductions RED,36 route+4 effect cases GREEN; typecheck/build passed. Deployment metadata and live API/desktop/mobile checked.
 - Limitations: Controlled effect tests do not establish a ninety-minute unattended browser soak.
 - Source: [Weather selection and refresh](/home/example/coding/scrape-weather/.worktrees/weather-app/docs/postmortem/2026-10-20-hour-selection-and-refresh.md) (SHA-256 `a70c4c1ebde8`; reviewed alias in [sources.json](../sources.json)).
+
+## local-package-candidate-refresh
+
+- Status: **verified_fix**; confidence: **confirmed**; verification scope: **code**.
+- Symptoms: a successful Chrome upgrade is rejected against a candidate saved before apt update.
+- Applicability: APT updaters comparing installed and repository versions.
+- Diagnostics: simulate candidate advancement on metadata refresh, cached equality, newer installed versions and incomplete upgrades.
+- Remedy: refresh before candidate selection/display and decision; re-read after installation; compare using dpkg Debian ordering and accept installed >= candidate. Label read-only cached checks explicitly.
+- Verification: eleven updater cases and Bash syntax checks pass after RED. Live installed/candidate both156.0.8078.47-1; binary reports156.0.8078.47.
+- Limits: no second privileged update or browser relaunch by the agent; configured repository availability and pinning determine the candidate.
+- Source: [Chrome updater follow-up](../../../../docs/postmortem/2026-10-20-chrome-updater-silent-exit.md).

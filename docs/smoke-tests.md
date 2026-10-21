@@ -1182,7 +1182,7 @@ wrapping all 10,000 records fits inside the configured 50,000-line buffer.
   a Mosh session through the PC's forwarded `60000:61000/udp` range without
   exposing an SSH server from Android.
 - Action: Run `sudo ./scripts/executable_update-chrome.sh` on a Debian or Ubuntu host with the Google Chrome apt repo configured.
-  Expected: The script prints the installed and candidate Chrome versions, refreshes apt metadata, upgrades `google-chrome-stable` when needed, and ends with matching installed and candidate versions.
+  Expected: The script immediately prints that it is checking Chrome, refreshes APT metadata, then displays the installed and refreshed candidate versions. It upgrades `google-chrome-stable` only when installed is older, re-reads the candidate after installation, and accepts installed versions equal to or newer than that candidate. A failed policy query prints an actionable error instead of exiting silently. `--check` remains read-only and uses cached metadata. Relaunch Chrome and check `chrome://settings/help` afterward.
 - Action: Run `sudo ./scripts/executable_update-vesktop.sh` on a Debian or Ubuntu host with network access to Vesktop's official download endpoint.
   Expected: The script prints the installed and latest upstream Vesktop versions, downloads and installs the official amd64 `.deb` when needed, and ends with matching installed and latest versions.
 

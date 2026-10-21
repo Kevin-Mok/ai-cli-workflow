@@ -32,14 +32,14 @@ Usage:
 
 What this does:
   - Verifies that google-chrome-stable is installed from apt
-  - Shows the installed and candidate versions
+  - Shows the installed and candidate versions (--check uses cached metadata)
   - Runs apt update and upgrades google-chrome-stable when needed
 
 Options:
-  --check      Only print installed and candidate versions. Do not update.
+  --check      Only print installed and cached candidate versions. Do not update.
   -h, --help   Show this help text.
 
-This script re-execs itself with sudo when you are not already root and an update is needed.
+This script re-execs itself with sudo to refresh apt metadata and update Chrome.
 EOF
 }
 
@@ -65,7 +65,17 @@ get_installed_version() {
 }
 
 get_candidate_version() {
-  "$APT_CACHE_BIN" policy "$PACKAGE_NAME" 2>/dev/null | awk '/Candidate:/ {print $2; exit}'
+  local candidate
+  # Drain output so apt-cache cannot fail with SIGPIPE under pipefail.
+  if ! candidate="$(LC_ALL=C "$APT_CACHE_BIN" policy "$PACKAGE_NAME" 2>/dev/null | awk '/Candidate:/ && !found {print $2; found=1}')"; then
+    print_fail "Could not read the Chrome candidate version. Check apt-cache policy google-chrome-stable."
+    return 1
+  fi
+  if [ -z "$candidate" ] || [ "$candidate" = "(none)" ]; then
+    print_fail "No candidate version found for ${PACKAGE_NAME}. Check apt sources."
+    return 1
+  fi
+  printf '%s\n' "$candidate"
 }
 
 check_only=0
@@ -89,17 +99,20 @@ while [ $# -gt 0 ]; do
   shift
 done
 
+print_note "Checking installed Chrome and the APT candidate version..."
 installed_version="$(get_installed_version)"
 if [ -z "$installed_version" ]; then
   print_fail "${PACKAGE_NAME} is not installed via dpkg on this system"
   exit 1
 fi
 
-candidate_version="$(get_candidate_version)"
-if [ -z "$candidate_version" ] || [ "$candidate_version" = "(none)" ]; then
-  print_fail "No candidate version found for ${PACKAGE_NAME}. Check apt sources."
-  exit 1
+if [ "$check_only" -eq 0 ]; then
+  require_root "${original_args[@]}"
+  print_section "Updating apt Metadata"
+  "$APT_GET_BIN" update
 fi
+
+candidate_version="$(get_candidate_version)"
 
 print_section "Chrome Version Status"
 print_note "Installed: ${installed_version}"
@@ -109,25 +122,21 @@ if [ "$check_only" -eq 1 ]; then
   exit 0
 fi
 
-if [ "$installed_version" = "$candidate_version" ]; then
+if dpkg --compare-versions "$installed_version" ge "$candidate_version"; then
   print_note "Google Chrome is already up to date."
   exit 0
 fi
-
-require_root "${original_args[@]}"
-
-print_section "Updating apt Metadata"
-"$APT_GET_BIN" update
 
 print_section "Upgrading Google Chrome"
 "$APT_GET_BIN" install -y --only-upgrade "$PACKAGE_NAME"
 
 updated_version="$(get_installed_version)"
+candidate_version="$(get_candidate_version)"
 print_section "Verification"
 print_note "Installed: ${updated_version}"
 print_note "Candidate: ${candidate_version}"
 
-if [ "$updated_version" != "$candidate_version" ]; then
+if ! dpkg --compare-versions "$updated_version" ge "$candidate_version"; then
   print_fail "Chrome did not reach the candidate version"
   exit 1
 fi

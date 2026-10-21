@@ -67,6 +67,8 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 
 ## ext-pipefail-full-output-drain
 
+Chrome updater follow-up: a large Bash policy producer returned status 1 on the broken pipe (not necessarily 141). Drain policy output fully and handle a failed query explicitly before interpreting its result. The six-scenario regression passes; a subsequent user sudo run confirms visible activity and installation, while the original silent-failure environment remains unconfirmed. See [Chrome updater silent exit](../../../../docs/postmortem/2026-10-20-chrome-updater-silent-exit.md).
+
 - Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **code**.
 - Symptoms: installer only prints banner then exits; apt-cache pipeline status 141; early parser exit under pipefail causes SIGPIPE
 - Applicability: Shell pipelines whose producer can exceed the pipe buffer and whose parser exits after an early match.

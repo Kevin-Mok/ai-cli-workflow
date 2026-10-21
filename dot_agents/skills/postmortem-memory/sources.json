@@ -879,7 +879,8 @@
       "reference": "references/editing-shell-transport.md#ext-pipefail-full-output-drain",
       "remedy": "Drain all producer output while selecting the candidate; use the same full-drain rule for collection presence checks. Print chosen packages before authentication.",
       "sources": [
-        "cf43ab9afa7c028cf197fab9dc201b6284468455e658c5d48fc7e15dcbab565f"
+        "cf43ab9afa7c028cf197fab9dc201b6284468455e658c5d48fc7e15dcbab565f",
+        "f639234b2d59019f7b42fd072a913b0f7047b4b44a7e317ae4dd466407e00a00"
       ],
       "status": "verified_fix",
       "symptoms": [
@@ -5256,6 +5257,28 @@
       "sources": [
         "69f79a196a4b8c80a4b36ac72a6ab0ca196c8e270163cd9bbadd7048ed1ee2b1"
       ]
+    },
+    {
+      "id": "local-package-candidate-refresh",
+      "reference": "references/operational-drift.md#local-package-candidate-refresh",
+      "topic": "operational-drift",
+      "status": "verified_fix",
+      "confidence": "confirmed",
+      "verification_scope": "code",
+      "symptoms": [
+        "Chrome installs a newer version but verification rejects it against the pre-refresh candidate."
+      ],
+      "applicability": "APT updater scripts that compare installed versions with repository candidates.",
+      "diagnostics": [
+        "Reproduce metadata advancing between initial policy read and apt update.",
+        "Exercise cached equality, installed-newer versions and incomplete upgrade fixtures."
+      ],
+      "remedy": "Refresh metadata before choosing/displaying the candidate; re-read policy after installation and use dpkg version ordering to accept installed >= candidate. Keep cached read-only checks explicit.",
+      "verification": "Eleven Chrome updater scenarios and Bash syntax checks pass after observed RED. Live installed/candidate both156.0.8078.47-1 and binary version156.0.8078.47.",
+      "limitations": "Agent did not rerun privileged update or relaunch the browser. Latest means configured refreshed APT candidate, subject to repository availability and pinning.",
+      "sources": [
+        "f639234b2d59019f7b42fd072a913b0f7047b4b44a7e317ae4dd466407e00a00"
+      ]
     }
   ],
   "reports": [
@@ -9555,6 +9578,17 @@
       "findings": [
         "local-screensaver-launcher-mode-drift"
       ]
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-20-chrome-updater-silent-exit.md"
+      ],
+      "findings": [
+        "ext-pipefail-full-output-drain",
+        "local-package-candidate-refresh"
+      ],
+      "reviewed_on": "2026-10-20",
+      "sha256": "f639234b2d59019f7b42fd072a913b0f7047b4b44a7e317ae4dd466407e00a00"
     }
   ],
   "review": {
