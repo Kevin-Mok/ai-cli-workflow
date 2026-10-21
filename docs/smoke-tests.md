@@ -1413,7 +1413,7 @@ play audio, so exercise them deliberately.
 - Action: Preview a small directory with that corrected video for 35 seconds without physical input; include already-upright portrait/landscape clips, missing-metadata and rotated-metadata clips. Replace a disposable corrected file and reopen review; separately back up the private orientation JSON, make it malformed, and try review/save before restoring the backup.
   Expected: Metadata plus additional correction stays upright across all slots and loops, with preserved aspect ratio and black bars. Changed files ignore stale corrections. Malformed JSON warns, playback remains available, Save fails visibly without replacing data, and Cancel releases playback.
 
-- Action: After refreshing and reloading i3, press Super+Shift+S and release the keys; wait without moving the mouse, then move it.
+- Action: After refreshing and reloading i3, press left Alt (keycode 64)+Shift+S and release the keys; repeat with Super+Shift+S; wait without moving the mouse, then move it.
   Expected: Releasing the shortcut starts the Hevin preview without opening a terminal; subsequent physical input dismisses it. Super+S still opens Spotify and Alt+S still selects stacking layout.
 
 - Action: Load the generated fish abbreviations, type `ss` and press Space to inspect its expansion, then run it.

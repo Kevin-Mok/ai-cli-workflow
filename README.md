@@ -987,7 +987,7 @@ this.
   X11 conveyor across all three live outputs. Install with
   `./scripts/executable_media-screensaver install`, enable its local browser
   extension, then run `~/scripts/media-screensaver service` for a supervised idle monitor
-  or `preview` (fish abbreviation `ss`, i3 **Super+Shift+S**) for immediate playback. i3 starts the service at login, and systemd
+  or `preview` (fish abbreviation `ss`, i3 **Alt+Shift+S** or **Super+Shift+S**) for immediate playback. i3 starts the service at login, and systemd
   restarts it after an exit. `daemon` remains available in the foreground.
   Each launch fills all three outputs with random photos/videos, then advances
   the conveyor every ten seconds.

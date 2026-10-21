@@ -75,3 +75,12 @@ This document records delivery milestones and verification for completed reposit
 - Delivery: commit on main and push to origin/main after candidate review.
 - Remaining: pre-existing postmortem references, staged/unstaged ledger edits, incident documents, plan, and prompts remain excluded; no implementation changes or runtime tests needed.
 - Rollback: restore the previous AGENTS wording; retain append-only feedback history.
+
+## Screensaver shortcut — feat(i3): add Alt+Shift+S screensaver shortcut
+
+- Complete: left Alt (keycode 64, Mod1)+Shift+S launches the existing media preview on key release; Super+Shift+S remains available. Tracked template, README, usage and smoke checklist agree.
+- Scope: direct-write fallback for session 01a15bd7-794d-7263-bbaa-935a7367f78c; the helper reports no recognized writes despite the pre-write baseline and observed edits in the conversation. Include only the shortcut/doc hunks, its incident and corresponding no-new-learning ledger record, plus this milestone.
+- Verification: defining assertion observed RED then GREEN; focused independent checks4/4passed. Live i3 validation exited0 with existing wheel-command deprecation warnings; refresh-config exited0; reload succeeded. Injected Alt+Shift+S emitted the expected IPC binding, displayed the screensaver and Escape dismissed it. README gate returned pass_no_change; targeted incident ledger check and whitespace check passed. Exact staged privacy review is required before commit.
+- Delivery: commit on main and push to origin/main after scoped staged review and privacy checks. No remaining implementation work or blockers.
+- Remaining: preserve all unrelated baseline dirty work, including other hunks in README, smoke tests and the ledger. Physical keyboard acceptance remains manual; injected X11 behavior is verified.
+- Rollback: remove the new Alt binding from tracked and live i3 configuration, then reload i3. Live i3 is unmanaged by chezmoi; no private live configuration is committed.

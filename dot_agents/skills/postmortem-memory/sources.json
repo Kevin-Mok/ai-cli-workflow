@@ -5221,6 +5221,15 @@
   "reports": [
     {
       "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-20-screensaver-shortcut-desktop-access.md"
+      ],
+      "decision": "No new reusable learning: scoped X11 access is already documented; the modifier-case assertion and scan-root mistakes were diagnostic invocation errors corrected against actual payloads and the directory-root contract. Live binding/window/dismissal verification passed.",
+      "findings": [],
+      "reviewed_on": "2026-10-20",
+      "sha256": "750ee0f51a2cd033f544cece72c5d79598f36eac2bfba5c7b323c5599baab4a2"
+    },
+    {
+      "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-10-20-redshift-super-shortcuts.md"
       ],
       "decision": "No new learning: established scoped desktop-access, config-preservation and concurrent-edit validation guidance covers the observed failures; confirmed user scale and runtime activation are recorded in the report.",
