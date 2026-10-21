@@ -1002,7 +1002,7 @@ Apply the [notification sources](codex-notification-sound.md), restart Dunst
 (which clears its history/queue), and start a fresh Kitty process. No sudo is
 needed. Activation is a one-time installation/update step; afterward open Kitty
 normally. Changing the clip needs only `set`. The popup checks below assume `speech disable`; optional speech is checked afterward. Live audio acceptance requires
-an existing local short MP3; this checkout does not bundle audio assets.
+an existing local short MP3; this checkout bundles `scripts/sire.mp3`.
 
 - Action: `~/scripts/codex-notification-activate --open-kitty`
   Expected: Your notification-bus Dunst restarts and a fresh Kitty process opens;
@@ -1010,9 +1010,9 @@ an existing local short MP3; this checkout does not bundle audio assets.
   unchanged (disabled on a fresh installation).
 - Action: `~/scripts/codex-notification-sound status`
   Expected: A fresh installation reports aligned sound/speech state and voice readiness.
-  `status --plain --details` uses ASCII and reveals machine-local JSON/error-log paths. No clip or local sound-path
+  `status --plain --details` uses ASCII and reveals machine-local JSON/error-log paths. No local sound-path
   setting is bundled. An already configured machine reports its selected path.
-- Action: `~/scripts/codex-notification-sound set "$HOME/scripts/can-i-ask-you-a-question.mp3"` if that installed clip exists; otherwise select another existing local MP3.
+- Action: Run `chezmoi apply "$HOME/scripts/sire.mp3"`, then `~/scripts/codex-notification-sound set "$HOME/scripts/sire.mp3"`.
   Expected: With an existing clip at that path, sound is enabled through local
   mode-0600 JSON. The MP3 stays intact; `set` only stores its path.
   Selecting another filename with spaces preserves the entire path.
@@ -1021,6 +1021,8 @@ an existing local short MP3; this checkout does not bundle audio assets.
 - Action: `~/scripts/codex-notification-sound preview`
   Expected: One clip plays without a popup; exit 0 on success. Invalid/missing
   files or unavailable mpv report errors and exit 1 without affecting popups.
+- Action: With Sire selected and the voice installed, run `~/scripts/codex-notification-sound preview --title "Your notification is ready."`.
+  Expected: "Sire" plays once, then Ryan reads "Your notification is ready."; the old question phrase is absent. The original question MP3 remains intact.
 - Action: `~/scripts/codex-notification-sound smoke tagged`
   Expected: One synthetic Dunst popup and one playback. This checks the Dunst
   rule/player; it does not establish real Codex origin detection.

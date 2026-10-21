@@ -9589,6 +9589,15 @@
       ],
       "reviewed_on": "2026-10-20",
       "sha256": "f639234b2d59019f7b42fd072a913b0f7047b4b44a7e317ae4dd466407e00a00"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-21-sire-session-validation.md"
+      ],
+      "decision": "No new reusable remedy established: generic validator rejects existing invocation metadata; notification smoke cleanup failure remains unresolved. Optional missing-path reads follow existing discovery guidance. Preserve warning scope; do not invent a verified fix.",
+      "findings": [],
+      "reviewed_on": "2026-10-21",
+      "sha256": "1c741979fed72130841ff464c8c37a15d575531e01f00d95dd05216168af9445"
     }
   ],
   "review": {

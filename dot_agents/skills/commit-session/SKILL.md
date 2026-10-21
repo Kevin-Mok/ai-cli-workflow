@@ -23,6 +23,7 @@ Use this skill for explicit write requests that should ship only the files dirti
    - Use `commitable` as the initial candidate set. If the helper fails, is unavailable, or returns `unsafe` or `empty`, record the reason and build a fallback from successful edits and writes directly observed in the active conversation.
    - Review dirty matching plans, docs, tests, and companion files against the baseline and observed writes; include all with current-session attribution. Do not infer ownership solely from timestamps.
    - Report no eligible changes only after both helper evidence and direct write evidence have been considered.
+   - Make a best-effort nonempty commit of safe session work. When the user says `force commit-session` and the work was local-only or the candidate set is empty, preserve the smallest useful task-related deliverable in the repository: a reusable nonprivate asset, reproducible instructions, or a factual update to the relevant task document. Review and validate it, then rerun scoping and include directly observed writes. Do not stop at "nothing to commit" while such a deliverable can safely be preserved.
 5. Review diffs for the helper candidates and directly evidenced fallback files.
    - `commitable` can include directly observed edits, including files that were already dirty at the session baseline, and files that became dirty after the session baseline.
    - For mixed files, include separable current-session hunks and leave unrelated hunks untouched. Exclude suspicious content while continuing with other eligible files. Directly touching a baseline-dirty file makes it a priority for review, not blanket authorization for unrelated hunks.
@@ -58,6 +59,7 @@ Use this skill for explicit write requests that should ship only the files dirti
 - Review newly eligible generated or companion files before staging them; baseline-delta scoping is intentionally permissive, not blind.
 - Never bundle unrelated dirty changes just because they happen to be present in the same repository.
 - Never stage secrets, credentials, caches, build output, or machine-local files unless they clearly belong in version control.
+- `force` keeps session containment and privacy gates intact. It does not authorize unrelated changes, private settings, fabricated work, an empty commit, bypassed hooks, or force-push. If no meaningful safe artifact exists or a safety/permission blocker persists, report that exact blocker instead of claiming a commit.
 
 ## Scope Helper
 

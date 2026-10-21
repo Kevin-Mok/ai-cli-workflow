@@ -1,19 +1,20 @@
 # Codex notification sound
 
-Play your own MP3 for Codex notifications, with optional offline speech of the exact saved conversation title or a short sentence about a queued question afterward. Configure a clip, install the voice, deploy the completion and question callbacks, resume affected conversations, then explicitly enable speech. MP3 sound stays disabled until you configure a path; speech is separately disabled by default. Audio files and their selected paths remain machine-local; this checkout does not include the question MP3.
+Play your own MP3 for Codex notifications, with optional offline speech of the exact saved conversation title or a short sentence about a queued question afterward. Configure a clip, install the voice, deploy the completion and question callbacks, resume affected conversations, then explicitly enable speech. MP3 sound stays disabled until you configure a path; speech is separately disabled by default. The checkout includes a short "Sire" intro; selected paths remain machine-local. The older question MP3 is not bundled.
 
 ## Choose, preview and disable
 
-These commands require no sudo. On an existing installation, the question clip may already be available at `~/scripts/can-i-ask-you-a-question.mp3`. Confirm it exists before selecting it, or supply another local MP3. Quote filenames containing spaces:
+These commands require no sudo. After applying the GUI dotfiles, select the bundled `~/scripts/sire.mp3`, which says only "Sire" in Ryan's voice before the notification message is read. It was generated offline with `en_US-ryan-high` at pace 0.95 from the text `Sire.`. On an existing installation, the older question clip may also be available at `~/scripts/can-i-ask-you-a-question.mp3`; selecting Sire leaves it intact. Quote filenames containing spaces:
 
 ```sh
 ~/scripts/codex-notification-sound status
-~/scripts/codex-notification-sound set "$HOME/scripts/can-i-ask-you-a-question.mp3"
+chezmoi apply "$HOME/scripts/sire.mp3"
+~/scripts/codex-notification-sound set "$HOME/scripts/sire.mp3"
 ~/scripts/codex-notification-sound preview
 ~/scripts/codex-notification-sound disable
 ```
 
-Keep your clip outside the checkout so repository moves or cleanup do not invalidate its selected path. Refresh cannot restore an audio file absent from source. The local JSON is excluded from repo artifacts.
+The targeted `chezmoi apply` installs only the bundled clip; `refresh-config` excludes scripts and is not enough to install this asset. Keep your selected clip outside the checkout so repository moves or cleanup do not invalidate its path. Refresh cannot restore an audio file absent from source. The local JSON is excluded from repo artifacts.
 
 If popups appear but both the clip and speech are silent, run `~/scripts/codex-notification-sound status --details` first. A missing selected clip stops the whole clip-then-speech sequence before synthesis starts. Use `set` with an existing local copy, then `preview --title "Notification audio check" --details` to verify both stages. No daemon restart or speech toggle is needed for a path correction. Historical errors remain in `status --details`; compare their timestamps with the new preview rather than deleting the log.
 
