@@ -2,6 +2,18 @@
 
 Use these reviewed findings to compare a failure with prior evidence. Check applicability and diagnostics before choosing a remedy; keep its verification scope and limits explicit.
 
+## local-screensaver-launcher-mode-drift
+
+- Status: **verified_workaround**; root-cause confidence: **confirmed**; verification scope: **workaround**.
+- Symptoms: refresh stops at a changed media-screensaver target with prompt EOF even when launcher contents match.
+- Applicability: Explicit installer mode0755 differs from chezmoi's executable mode0775 under configured umask002.
+- Diagnostic checks: Compare source/live/rendered bytes and exact target diff, including permissions. Inspect actual managed/ignored targets before assuming a raw template will deploy.
+- Remedy: When bytes agree and the permission delta is reviewed, reconcile only that exact target through chezmoi; keep the broad apply unforced and retry normal configured Fish refresh.
+- Verification evidence: Target verify failed before repair and passed afterward with unchanged content. Real refresh completed all phases, exit0, with an empty private log. Installed status, original Fish startup and both focused regression checks passed.
+- Limitations: Explicit reinstall can restore0755 and recreate drift; installer permission policy was not changed. Hook exclusion does not exclude ordinary executable files under the scripts directory. Do not force unknown content or permissions.
+- Sources:
+  - [Refresh launcher mode conflict](../../../../docs/postmortem/2026-10-20-refresh-screensaver-mode-conflict.md); reviewed hash and aliases in [sources.json](../sources.json).
+
 ## ext-buildx-install-activation
 
 - Status: **activation_pending**; root-cause confidence: **confirmed**; verification scope: **code**.

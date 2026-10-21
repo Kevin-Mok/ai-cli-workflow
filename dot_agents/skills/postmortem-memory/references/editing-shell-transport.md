@@ -2,6 +2,18 @@
 
 Use these reviewed findings to compare a failure with prior evidence. Check applicability and diagnostics before choosing a remedy; keep its verification scope and limits explicit.
 
+## local-fish-optional-scalar-test
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **runtime**.
+- Symptoms: Fish login prints `test: Missing argument at index 6` when an optional VT variable is unset.
+- Applicability: Fish conditions comparing optional scalar environment variables, including combined `test -a` expressions.
+- Diagnostic checks: Run the actual condition with unset and empty variables; cover both DISPLAY states and login/non-login shells. Substitute only the side-effecting X executable.
+- Remedy: Quote the optional scalar comparison operand so an unset value remains an empty argument. Preserve existing X startup eligibility and argv.
+- Verification evidence: Defining RED reproduced two missing-VT failures; all eight source scenarios passed after quoting. Three installed login startups passed with exit 0 and zero stderr bytes after allowing normal local startup writes.
+- Limitations: No physical-console X session was launched. Inspect actual managed/ignored scope before inferring deployment from a raw template; this host's local Fish config is unmanaged. Subsequent normal refresh completed after a launcher-mode conflict was reconciled. Existing alias/GPG regressions were blocked by baseline fixture defects.
+- Sources:
+  - [Fish login missing VT](../../../../docs/postmortem/2026-10-20-fish-login-missing-vtnr.md); full hash and aliases live in [sources.json](../sources.json).
+
 ## ext-fish-safe-argv-transport
 
 - Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **runtime**.

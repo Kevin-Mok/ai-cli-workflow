@@ -5216,6 +5216,46 @@
       ],
       "verification": "Direct-screen RED black video becomes red with green neighbors after workaround, including resize/movement;57 tests pass and source/installed real three-output synthetic checks pass with cleanupplayers0.",
       "verification_scope": "runtime"
+    },
+    {
+      "id": "local-fish-optional-scalar-test",
+      "reference": "references/editing-shell-transport.md#local-fish-optional-scalar-test",
+      "status": "verified_fix",
+      "confidence": "confirmed",
+      "verification_scope": "runtime",
+      "symptoms": [
+        "Fish login test: Missing argument at index 6 when XDG_VTNR is unset."
+      ],
+      "applicability": "Fish conditions comparing optional scalar environment variables, including combined test -a expressions.",
+      "diagnostics": [
+        "Execute the actual guard with missing/empty VT, both display states, console 1/2 and non-login shells; replace only startx with a harmless executable."
+      ],
+      "remedy": "Quote the optional scalar comparison operand while preserving X startup eligibility and argv.",
+      "verification": "Defining RED failed for two unset-VT cases; all eight source cases passed after quoting. Three installed login shells returned exit 0 with zero stderr bytes after normal local startup writes were allowed.",
+      "limitations": "No real X session launched. Actual managed-target inspection shows the local Fish config is unmanaged; subsequent full refresh passed after launcher-mode reconciliation. Existing alias/GPG regressions are blocked by baseline fixture defects.",
+      "sources": [
+        "ae60f00db9ce8344c3d24784a64f5845e1d35b2026b86cd3bb9db51df3669f60"
+      ]
+    },
+    {
+      "id": "local-screensaver-launcher-mode-drift",
+      "reference": "references/operational-drift.md#local-screensaver-launcher-mode-drift",
+      "status": "verified_workaround",
+      "confidence": "confirmed",
+      "verification_scope": "workaround",
+      "symptoms": [
+        "refresh-config stops at media-screensaver changed-target prompt/EOF despite identical launcher content."
+      ],
+      "applicability": "Explicit installer mode0755 conflicts with executable target0775 under chezmoi umask002.",
+      "diagnostics": [
+        "Compare source/live/rendered bytes, target modes and actual managed/ignored scope."
+      ],
+      "remedy": "Reconcile only the reviewed exact target when contents match; retain unforced broad apply and use normal configured Fish for refresh.",
+      "verification": "Defining target verify RED(exit1), exact-target mode reconcile with unchanged bytes, verify GREEN(exit0), real refresh all phases exit0 and empty private log. Installed status, missing-VT Fish startup and both focused regressions pass.",
+      "limitations": "Explicit reinstall can recreate mode0755 drift. scripts exclusion means run hooks, not ordinary files in scripts directory. Do not force unreviewed content or modes.",
+      "sources": [
+        "69f79a196a4b8c80a4b36ac72a6ab0ca196c8e270163cd9bbadd7048ed1ee2b1"
+      ]
     }
   ],
   "reports": [
@@ -9495,6 +9535,26 @@
       ],
       "reviewed_on": "2026-10-20",
       "sha256": "0c1afa3d2375d7d900ff98510f5c7cd838c65d3689601149506e1cf750c9c294"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-20-fish-login-missing-vtnr.md"
+      ],
+      "findings": [
+        "local-fish-optional-scalar-test"
+      ],
+      "reviewed_on": "2026-10-20",
+      "sha256": "ae60f00db9ce8344c3d24784a64f5845e1d35b2026b86cd3bb9db51df3669f60"
+    },
+    {
+      "sha256": "69f79a196a4b8c80a4b36ac72a6ab0ca196c8e270163cd9bbadd7048ed1ee2b1",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-20-refresh-screensaver-mode-conflict.md"
+      ],
+      "reviewed_on": "2026-10-20",
+      "findings": [
+        "local-screensaver-launcher-mode-drift"
+      ]
     }
   ],
   "review": {

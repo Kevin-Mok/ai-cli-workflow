@@ -44,7 +44,7 @@ abbr ssa "ssh user@example.invalid"
 
 {{ if eq .chezmoi.username "example-user" }}
 if status is-login
-  if test -z "$DISPLAY" -a $XDG_VTNR = 1
+  if test -z "$DISPLAY" -a "$XDG_VTNR" = 1
       exec startx -- -keeptty
   end
 end

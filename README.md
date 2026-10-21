@@ -715,6 +715,10 @@ layer. Keep machine and identity values private. `refresh-config` applies review
 2. Preview the resulting home-directory diff with
    `chezmoi -S "$PWD" diff`.
 3. Run `refresh-config` to apply reviewed chezmoi files and regenerate shortcuts. Live Codex/Git settings stay private; refresh excludes scripts, externals, and removals and never adopts conflicts.
+   Here, `scripts` means chezmoi run hooks; ordinary managed files under
+   `~/scripts/` still apply. A permission-only difference can stop refresh just
+   like a content edit. Inspect the private log and the exact target diff before
+   reconciling a conflict; keep the broad apply unforced.
 4. Apply changes with `chezmoi -S "$PWD" apply` when you want the direct
    chezmoi path instead of the higher-level refresh helper.
 5. Preview the protected daily Git operation with

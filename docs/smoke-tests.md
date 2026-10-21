@@ -62,6 +62,36 @@ or make a test commit in this checkout. Installation alone creates no commit.
   remain unchanged; the same email in arbitrary file content remains detectable.
   Never publish the private rules file or approve an identity without the user.
 
+## Fish login startup
+
+- Action: Open a new login terminal in the desktop session with `XDG_VTNR`
+  unset (for example, `env -u XDG_VTNR fish --login`). Exit the child shell
+  after checking its prompt.
+  Expected: The normal prompt appears without `test: Missing argument` and no
+  second graphical session starts.
+- Action: Run `env -u DISPLAY -u XDG_VTNR fish --login -c 'echo startup-ok'`,
+  then `env DISPLAY=:1 XDG_VTNR=1 fish --login -c 'echo startup-ok'`.
+  Expected: Both reach `startup-ok` without the missing-argument diagnostic;
+  a missing VT or an active display prevents automatic X startup.
+- Action: On the real local virtual console 1 with no active display, log in
+  normally when a graphical session is desired.
+  Expected: The existing `startx -- -keeptty` path still launches X. Do not run
+  this physical-console check inside an existing graphical session.
+
+## Refresh conflict recovery
+
+- Action: When refresh reports a changed target, open its private log and inspect
+  `chezmoi diff` for that exact path before reconciling it. For the screensaver
+  launcher, compare both contents and modes; after reviewing the change, use
+  an exact-target apply, then rerun `refresh-config` normally.
+  Expected: Reviewed mode-only drift is resolved without changing content;
+  `chezmoi verify` for that target exits0, refresh reaches `REFRESH COMPLETE`,
+  and unrelated conflicts retain overwrite protection. The `scripts` exclusion
+  covers chezmoi run hooks, not ordinary files inside `~/scripts/`.
+- Action: Run the installed `media-screensaver status --plain` after recovery.
+  Expected: Status exits0 and reports monitor order and idle-monitor state.
+  Missing browser-bridge suppression is reported honestly; no preview starts.
+
 ## Directory Sizes
 
 Install the pinned backend into a fresh disposable prefix. These checks inspect a small disposable backend directory; a real backup scan is an explicit opt-in.
