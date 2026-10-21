@@ -126,6 +126,8 @@ class Card:
             filters.add_pad(Gst.GhostPad.new('src', self.correction.get_static_pad('src')))
             self.pipeline.set_property('video-filter', filters)
             self.widget = sink.get_property('widget')
+            # GTK3/X11 buffered gtksink frames can leave black regions among photo siblings.
+            self.widget.set_double_buffered(False)
             sink.set_property('force-aspect-ratio', True)
             self.pipeline.set_property('video-sink', sink)
             self.pipeline.set_property('audio-sink', Gst.ElementFactory.make('fakesink'))

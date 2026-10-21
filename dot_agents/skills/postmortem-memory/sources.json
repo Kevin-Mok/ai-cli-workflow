@@ -5195,6 +5195,27 @@
       "sources": [
         "b5450bc880ee68896d17866fb8ff89eb462e5a2c6d6f903129d420b0cffcf93e"
       ]
+    },
+    {
+      "applicability": "Media screensaver Gtk.Layout with gtksink and Gtk.DrawingArea siblings on the inspected X11 desktop.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Synchronize GDK and sample separate Xlib root pixels before any GDK capture; captures can omit native children or change presentation.",
+        "Verify distinct video/photo colors before and after movement/resizing, including intact photo neighbors."
+      ],
+      "id": "local-gtk3-mixed-card-presentation",
+      "limitations": "Deprecated GTK3 API with possible flicker/stacking/performance costs; X11-specific workaround, not upstream repair. Exact photographed partial mask and prolonged full-resolution smoothness remain unconfirmed.",
+      "reference": "references/artifact-verification.md#local-gtk3-mixed-card-presentation",
+      "remedy": "Disable double buffering only on the video widget before mapping; native-window forcing alone was insufficient. Reassess during a renderer upgrade.",
+      "sources": [
+        "0c1afa3d2375d7d900ff98510f5c7cd838c65d3689601149506e1cf750c9c294"
+      ],
+      "status": "verified_workaround",
+      "symptoms": [
+        "GTK3/X11 gtksink video is black among photo siblings despite advancing playback."
+      ],
+      "verification": "Direct-screen RED black video becomes red with green neighbors after workaround, including resize/movement;57 tests pass and source/installed real three-output synthetic checks pass with cleanupplayers0.",
+      "verification_scope": "runtime"
     }
   ],
   "reports": [
@@ -9455,6 +9476,16 @@
       "findings": [
         "local-video-rotation-fixture-metadata"
       ]
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-20-screensaver-launch-black-box.md"
+      ],
+      "findings": [
+        "local-gtk3-mixed-card-presentation"
+      ],
+      "reviewed_on": "2026-10-20",
+      "sha256": "0c1afa3d2375d7d900ff98510f5c7cd838c65d3689601149506e1cf750c9c294"
     }
   ],
   "review": {

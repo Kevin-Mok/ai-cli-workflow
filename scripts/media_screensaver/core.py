@@ -72,15 +72,17 @@ class Conveyor:
         self.sequence = 0
         self.next_advance = start + CADENCE
         self.slide_start = start - SLIDE
-        self._enter()
+        for slot in range(3):
+            self._enter(slot)
+        self.last = self.entries[0].path if self.entries else None
 
-    def _enter(self):
+    def _enter(self, slot=0):
         if not self.paths:
             return
         choices = [p for p in self.paths if p != self.last] or self.paths
         self.last = random.choice(choices)
         self.sequence += 1
-        self.entries.append(Entry(self.sequence, self.last))
+        self.entries.append(Entry(self.sequence, self.last, slot))
 
     def progress(self, now: float) -> float:
         return max(0., min(1., (now - self.slide_start) / SLIDE))

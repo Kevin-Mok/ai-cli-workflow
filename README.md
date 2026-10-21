@@ -989,6 +989,8 @@ this.
   extension, then run `~/scripts/media-screensaver service` for a supervised idle monitor
   or `preview` (fish abbreviation `ss`, i3 **Super+Shift+S**) for immediate playback. i3 starts the service at login, and systemd
   restarts it after an exit. `daemon` remains available in the foreground.
+  Each launch fills all three outputs with random photos/videos, then advances
+  the conveyor every ten seconds.
   `--media DIR` selects a recursive photo/video library; `--seconds N` bounds a
   preview; `--report PATH` records item IDs/timestamps; `--plain` and `--details`
   control output. `status`, `probe` and `demo` expose browser coverage, codec

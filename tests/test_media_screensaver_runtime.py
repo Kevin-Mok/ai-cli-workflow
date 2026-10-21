@@ -79,6 +79,72 @@ class RuntimeTests(unittest.TestCase):
                 card.close()
                 window.destroy()
 
+    def test_video_remains_visible_beside_photo_windows(self):
+        from gi.repository import Gtk, Gdk, GdkPixbuf
+        from media_screensaver.core import Entry
+        with tempfile.TemporaryDirectory() as directory:
+            photo = Path(directory) / 'green.png'
+            video = Path(directory) / 'red.mp4'
+            pixels = GdkPixbuf.Pixbuf.new(GdkPixbuf.Colorspace.RGB, False, 8, 160, 90)
+            pixels.fill(0x00ff00ff)
+            pixels.savev(str(photo), 'png', [], [])
+            subprocess.run(['ffmpeg', '-v', 'error', '-f', 'lavfi', '-i',
+                            'color=c=red:size=160x90:rate=20', '-t', '2', '-c:v',
+                            'libx264', '-pix_fmt', 'yuv420p', str(video)], check=True)
+            errors = []
+            window = Gtk.Window(type=Gtk.WindowType.POPUP)
+            window.move(0, 0)
+            window.set_default_size(600, 200)
+            layout = Gtk.Layout()
+            window.add(layout)
+            cards = []
+            for identity, (path, x) in enumerate(((photo, 0), (video, 230), (photo, 400)), 1):
+                card = runtime.Card(Entry(identity, path), lambda *args: errors.append(args))
+                card.widget.set_size_request(160, 90)
+                layout.put(card.widget, x, 50)
+                cards.append(card)
+            window.show_all()
+            try:
+                end = time.monotonic() + 1
+                while time.monotonic() < end:
+                    while Gtk.events_pending(): Gtk.main_iteration_do(False)
+                    time.sleep(.01)
+                self.assertFalse(errors)
+                self.assertGreater(cards[1].position(), .3)
+                # Flush GTK, then read the actual X11 screen including native child windows.
+                from Xlib import X, display
+                Gdk.Display.get_default().sync()
+                _, origin_x, origin_y = window.get_window().get_origin()
+                connection = display.Display()
+                try:
+                    def bgr(x, y):
+                        pixel = connection.screen().root.get_image(
+                            origin_x + x, origin_y + y, 1, 1, X.ZPixmap, 0xffffffff)
+                        data = pixel.data.encode('latin1') if isinstance(pixel.data, str) else pixel.data
+                        return tuple(data[:3])
+                    self.assertEqual(bgr(30, 65), (0, 255, 0))
+                    self.assertEqual(bgr(430, 65), (0, 255, 0))
+                    self.assertGreater(bgr(260, 65)[2], 240, 'video is black behind photo sibling windows')
+                    self.assertGreater(bgr(310, 95)[2], 240)
+                    before = cards[1].position()
+                    cards[1].widget.set_size_request(200, 112)
+                    layout.move(cards[1].widget, 180, 30)
+                    end = time.monotonic() + .35
+                    while time.monotonic() < end:
+                        while Gtk.events_pending(): Gtk.main_iteration_do(False)
+                        time.sleep(.01)
+                    Gdk.Display.get_default().sync()
+                    self.assertGreater(cards[1].position(), before + .1)
+                    self.assertEqual(bgr(30, 65), (0, 255, 0))
+                    self.assertEqual(bgr(430, 65), (0, 255, 0))
+                    self.assertGreater(bgr(210, 45)[2], 240)
+                    self.assertGreater(bgr(280, 85)[2], 240)
+                finally:
+                    connection.close()
+            finally:
+                for card in cards: card.close()
+                window.destroy()
+
     def test_portrait_photo_is_letterboxed_instead_of_cropped(self):
         from gi.repository import Gtk, GdkPixbuf
         from media_screensaver.core import Entry

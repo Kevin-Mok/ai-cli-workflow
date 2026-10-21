@@ -5,6 +5,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 try:
@@ -43,9 +44,28 @@ class ConveyorTests(unittest.TestCase):
         c.tick(30.8)
         self.assertEqual(len(c.entries), 3)
 
+    def test_launch_populates_every_screen_with_random_media(self):
+        paths = [Path('a.jpg'), Path('b.mov'), Path('c.png')]
+        # Controlled draws exercise both media kinds without a probabilistic assertion.
+        with patch.object(core.random, 'choice', side_effect=[paths[1], paths[0], paths[2], paths[2]]):
+            c = core.Conveyor(paths, start=100)
+            self.assertEqual([(e.slot, e.path) for e in c.entries],
+                             [(0, paths[1]), (1, paths[0]), (2, paths[2])])
+            self.assertEqual(c.progress(100), 1)
+            c.tick(110.75)
+            self.assertEqual(sorted(e.slot for e in c.entries), [0, 1, 2])
+            self.assertEqual(next(e.path for e in c.entries if e.slot == 0), paths[2])
+
+    def test_launch_repeats_single_available_item_on_all_screens(self):
+        c = core.Conveyor([Path('only.mp4')], start=0)
+        self.assertEqual([(e.slot, e.path) for e in c.entries],
+                         [(0, Path('only.mp4')), (1, Path('only.mp4')), (2, Path('only.mp4'))])
+        c.tick(10.75)
+        self.assertEqual(sorted(e.slot for e in c.entries), [0, 1, 2])
+
     def test_random_selection_avoids_adjacent_duplicates_when_possible(self):
         c = core.Conveyor([Path("a.jpg"), Path("b.jpg"), Path("c.mp4")], start=0)
-        last = c.entries[-1].path
+        last = c.entries[0].path
         for i in range(1, 100):
             c.tick(i * 10 + 1)
             current = c.entries[-1].path

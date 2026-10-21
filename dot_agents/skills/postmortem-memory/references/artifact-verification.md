@@ -492,3 +492,16 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Verification: All four pre-fix top/bottom edge tests fail for post-release drift; tiny guard tests fail before guard. Final26 focused tests pass. Actual installed Kitty/Xvfb held drag grows60/65rows; viewport stable after release and repeated copy; exact logical wrapped clipboard text, reseeding, app forwarding, native copy and Escape/live input verified.
 - Limitations: Supported-command workaround, not upstream binary repair. Tiny-pane timer limitation remains; requires at least three text rows. No physical shared-desktop acceptance from isolated XTest.
 - Source: [tmux drag/copy investigation](../../../../docs/postmortem/2026-10-19-tmux-drag-scroll-copy.md) (SHA-256 `43c89ef5553cf9396553b3430993099a6cf10cd3e7725cfdd563e01554417949`).
+
+## local-gtk3-mixed-card-presentation
+
+- Status: verified_workaround
+- Confidence: confirmed
+- Verification scope: runtime
+- Symptoms: GTK3/X11 gtksink video appears black beside photo widgets while playback timestamps advance.
+- Applicability: The media screensaver's Gtk.Layout with gtksink and Gtk.DrawingArea siblings on the inspected X11 desktop.
+- Diagnostics: Reproduce with distinct solid-color photos/video; synchronize GDK and sample the actual screen through a separate Xlib connection before any GDK screenshot. GDK parent/child captures can omit native children or change presentation. Check pixels after movement/resizing and check neighboring photos too.
+- Remedy: Disable GTK double buffering only on the video widget before mapping. Native-window forcing alone was insufficient. Retain a direct-screen regression; re-evaluate this legacy setter during a renderer upgrade.
+- Verification: Direct screen video was black before the workaround; afterward red video and green neighbors remained visible before/after resizing and movement. All57 screensaver tests passed. Source and installed synthetic checks passed on the actual three-output desktop and released all playback pipelines.
+- Limitations: Deprecated GTK3 API with potential flicker, stacking and performance costs; X11-specific workaround, not an upstream repair. The exact partial mask in the user's photograph and prolonged full-resolution smoothness remain unconfirmed.
+- Source: [screensaver launch investigation](../../../../docs/postmortem/2026-10-20-screensaver-launch-black-box.md).
