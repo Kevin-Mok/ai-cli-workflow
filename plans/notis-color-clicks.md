@@ -35,3 +35,17 @@ Final checks: bash -n passed; python3 -m unittest tests/test_i3blocks_dnd.py pas
 Commit subject: `fix(i3blocks): match Notis theme and mouse actions`. Implementation and deployment verified; focused tests, Bash syntax and README gate pass. Session-only hunks will be committed together with this plan; unrelated dirty files remain excluded. Next step: privacy gate, commit and push origin/main. No blockers. Scope helper could not detect nested tool writes; use directly observed session writes and the captured initial dirty baseline.
 
 Privacy review caught machine-specific report aliases; replaced only the two session aliases with the established /home/example public placeholder before retrying the gate.
+
+## Queue smoke-check milestone
+
+The implementation milestone was committed as 1e9e4c9 and pushed to origin/main.
+Follow-up live verification queued two distinct notifications: dunstctl reported
+2 waiting and the installed helper emitted red DND (2). DND remained enabled for
+the user to exercise recovery; delivery of both popups was not observed by the
+agent. Added the repeatable queue/resume check to docs/smoke-tests.md.
+
+Commit subject: `docs(i3blocks): capture two-notification queue check`.
+Scope is only this smoke-check entry and matching plan update, using directly
+observed writes because the scope helper cannot detect nested tool writes.
+README gate passes; no executable behavior changed. Other dirty work remains
+excluded. Next step: inspect staged docs, run privacy gate, commit and push.

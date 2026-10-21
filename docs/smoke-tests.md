@@ -1409,6 +1409,13 @@ play audio, so exercise them deliberately.
   Repeated clicks keep the selected state. External pause changes appear
   within two seconds; restore the original pause state after checking.
 
+- Action: Right-click the notification block to enable DND. Note the existing
+  `dunstctl count waiting`, then send two distinct `notify-send` test notifications.
+  Left-click the block to enable notifications after checking the queue.
+  Expected: No test popup appears while paused; waiting count increases by two
+  and the bar shows `DND (N)` within two seconds. On resume, both test popups
+  are delivered and the block returns to `Notis`. Restore the original pause state.
+
 ## Metaprompt terminal handoff
 
 Use disposable data for helper checks; no sudo is required. Live previews can
