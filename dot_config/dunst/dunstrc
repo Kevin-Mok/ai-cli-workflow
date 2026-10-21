@@ -322,6 +322,11 @@
     summary = "* (#*, *)"
     script = ~/scripts/codex-notification-sound
 
+# Sender-only DMs use the appname observed in live Dunst history.
+[vesktop_dm_speech]
+    appname = vesktop
+    script = ~/scripts/codex-notification-sound
+
 # Kitty tags only notifications from a local foreground Codex executable.
 [codex_notification_sound]
     appname = codex-kitty

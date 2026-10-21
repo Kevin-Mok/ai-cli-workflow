@@ -114,6 +114,23 @@ class PlaybackTests(unittest.TestCase):
             with self.subTest(title=title, body=body):
                 self.assertIsNone(self.helper.discord_message(title, body))
 
+    def test_vesktop_dm_uses_app_identity_and_visible_nonblank_fields(self):
+        self.helper.set_speech(True, discord=True)
+        with patch.object(self.helper, 'play', return_value=0) as player:
+            self.helper.main(['vesktop', '<b>(A) Alex</b>', '<i>hello</i> &amp; $(echo hi)', '', 'NORMAL'])
+            player.assert_called_once_with('(A) Alex says hello & $(echo hi)', speech_only=True)
+            player.reset_mock()
+            for app, title, body in [('FormatProbe', 'Alex', 'hello'),
+                                     ('vesktop-other', 'Alex', 'hello'),
+                                     ('vesktop', ' <b> </b>', 'hello'),
+                                     ('vesktop', 'Alex', ' <i> </i>'),
+                                     ('vesktop', 'Alex (#, Server)', 'hello')]:
+                self.helper.main([app, title, body, '', 'NORMAL'])
+            player.assert_not_called()
+            self.helper.set_speech(False, discord=True)
+            self.helper.main(['vesktop', 'Alex', 'disabled', '', 'NORMAL'])
+            player.assert_not_called()
+
     def test_discord_switch_and_callback_are_independent_and_speech_only(self):
         self.helper.set_speech(True)
         event = ['FormatProbe', '(A) Alex (#😊normie, Active)', 'hai', '', 'NORMAL']

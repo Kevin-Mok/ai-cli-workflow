@@ -100,7 +100,7 @@ def discord_enabled() -> bool:
         return False
 
 
-def discord_message(title: str, body: str) -> str | None:
+def discord_message(title: str, body: str, appname: str = "") -> str | None:
     def visible(text: str) -> str:
         class MarkupText(HTMLParser):
             tags = {'b', 'i', 's', 'u', 'a', 'span', 'small', 'big', 'tt',
@@ -118,9 +118,11 @@ def discord_message(title: str, body: str) -> str | None:
         parser.feed(text)
         parser.close()
         return ' '.join(''.join(parts).split())
-    sender, separator, suffix = visible(title).rpartition(' (#')
+    title, message = visible(title), visible(body)
+    if appname == 'vesktop' and ' (#' not in title:
+        return f'{title} says {message}' if title and message else None
+    sender, separator, suffix = title.rpartition(' (#')
     match = re.fullmatch(r'([^,]+), (.+)\)', suffix)
-    message = visible(body)
     if not separator or not sender.strip() or not match or not message or not all(value.strip() for value in match.groups()):
         return None
     # shortcut: same-format apps also match; add identity only with real samples.
@@ -303,7 +305,7 @@ def main(argv: list[str] | None = None) -> int:
             if message:
                 play(message)
         elif args[0] != APP_NAME and discord_enabled():
-            message = discord_message(args[1], args[2])
+            message = discord_message(args[1], args[2], args[0])
             if message:
                 play(message, speech_only=True)
         return 0  # Sound failure never makes the notification script fail.
@@ -320,14 +322,14 @@ def main(argv: list[str] | None = None) -> int:
     preview.add_argument('--speech-only', action='store_true', help='speak --title without the configured clip; requires nonblank text')
     speech = commands.add_parser('speech', help='switch hook audio; disable restores Dunst audio', parents=[presentation])
     speech.add_argument('state', choices=('enable', 'disable'))
-    discord = commands.add_parser('discord-speech', help='switch format-matched Discord speech independently', parents=[presentation])
+    discord = commands.add_parser('discord-speech', help='switch Discord channel and Vesktop DM speech independently', parents=[presentation])
     discord.add_argument('state', choices=('enable', 'disable'))
     event_player = commands.add_parser('event-play', help=argparse.SUPPRESS, parents=[presentation])
     event_player.add_argument('--source', help=argparse.SUPPRESS)
     commands.add_parser('disable', help='remove the local setting; keep your clip', parents=[presentation])
     commands.add_parser('status', help='show setting path and enabled/disabled state', parents=[presentation])
     smoke = commands.add_parser('smoke', help='exercise the Dunst rule or emit an unrelated Kitty OSC 9 popup', parents=[presentation])
-    smoke.add_argument('kind', choices=('tagged', 'kitty', 'grok', 'discord', 'discord-unicode', 'discord-unrelated'))
+    smoke.add_argument('kind', choices=('tagged', 'kitty', 'grok', 'discord', 'discord-unicode', 'discord-dm', 'discord-unrelated'))
     options = parser.parse_args(args)
     _plain = bool(getattr(options, 'plain', False)) or os.environ.get('CLI_PLAIN') == '1'
     _details = bool(getattr(options, 'details', False))
@@ -386,9 +388,12 @@ def main(argv: list[str] | None = None) -> int:
                     title, body = {
                         'discord': ('(A) Alex (#normie, Active)', 'hai'),
                         'discord-unicode': ('Alex (#😊normie, Another Server)', 'hello'),
+                        'discord-dm': ('Alex', 'hello from a direct message'),
                         'discord-unrelated': ('Voice: listening', 'nerd-dictation is ready'),
                     }[options.kind]
-                    display('Sending synthetic Discord format probe.', '🧪')
+                    if options.kind == 'discord-dm':
+                        app = 'vesktop'
+                    display('Sending synthetic Discord notification probe.', '🧪')
                 result = subprocess.run([sender, '--app-name', app, '--expire-time', '5000', title, body], check=False)
                 return result.returncode
         return 0

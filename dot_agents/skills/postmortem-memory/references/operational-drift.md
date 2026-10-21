@@ -239,3 +239,16 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Verification: defining RED, successful refresh and installed output #d0bce2 matching wal color7.
 - Limitations: rendered screenshot comparison remains manual.
 - Source: [Notis theme color](../../../../docs/postmortem/2026-10-21-notis-theme-color.md), SHA-256 `ce3b8711656b014f31a740873edebcd486fb92613b9082b676ebca0415130792`.
+
+## local-vesktop-dm-notification-identity
+
+- **status**: verified_fix
+- **symptoms**: Discord sender-only direct messages display without speech.
+- **applicability**: Dunst callbacks for the observed Vesktop desktop client.
+- **diagnostics**: Inspect appname and nonblank title/body without printing message content; compare both Dunst route and parser.
+- **confidence**: confirmed
+- **remedy**: Route exact vesktop appname to the shared callback and allow nonblank visible sender/body when no channel suffix is present.
+- **verification**: Unit RED/GREEN, isolated Dunst DM speech-only regression and installed synthetic WAV playback.
+- **verification_scope**: runtime
+- **limitations**: Appname is routing metadata, not authentication. Other clients need observed metadata. Non-message Vesktop notifications can also speak. Subjective listening and a new real incoming DM remain manual.
+- **Report**: [2026-10-21-discord-dm-speech.md](../../../../docs/postmortem/2026-10-21-discord-dm-speech.md)

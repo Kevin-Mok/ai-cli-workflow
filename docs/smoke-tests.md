@@ -1495,7 +1495,7 @@ play audio, so exercise them deliberately.
 - Action: With the idle service active, run `systemctl --user kill --signal=TERM --kill-whom=main media-screensaver.service`, wait six seconds, and inspect its status and journal; then stop it with `systemctl --user stop media-screensaver.service` and start it again with `~/scripts/media-screensaver service`.
   Expected: Termination is followed by a new daemon PID after five seconds and a fresh idle clock; deliberate stop leaves the service inactive and releases any owned preview. Starting again succeeds without duplicate monitors.
 
-### Discord format notification speech
+### Discord channel and DM notification speech
 
 Apply the helper and Dunst rule using the notification guide, restart Dunst once,
 and enable `discord-speech`. No sudo. The probes are synthetic and play local audio.
@@ -1506,9 +1506,11 @@ and enable `discord-speech`. No sudo. The probes are synthetic and play local au
   Expected: Normal popup `(A) Alex (#normie, Active)` / `hai`; Ryan says `(A) Alex says hai` with no intro clip.
 - Action: Run `~/scripts/codex-notification-sound smoke discord-unicode`.
   Expected: Normal Unicode-channel popup; Ryan says `Alex says hello`, without channel/server text.
+- Action: Run `~/scripts/codex-notification-sound smoke discord-dm`.
+  Expected: Synthetic Vesktop popup `Alex` / `hello from a direct message`; Ryan says `Alex says hello from a direct message` with one WAV and no intro clip.
 - Action: Run `~/scripts/codex-notification-sound smoke discord-unrelated`.
   Expected: Normal `Voice: listening` popup with body `nerd-dictation is ready`; no speech.
 - Action: Disable `discord-speech`, repeat a matching probe, then enable it again. Check status before and after.
   Expected: Matching popup is silent while disabled; Codex speech and selected clip remain unchanged.
 - Action: Receive a real Discord channel notification without sending a message for this test.
-  Expected: If its complete title matches, hear sender says message once, with normal popup behavior. Sender-only DMs remain silent; client-muted messages never reaching Dunst remain silent. Record subjective listening separately.
+  Expected: If its complete title matches, hear sender says message once, with normal popup behavior. Sender-only Vesktop DMs speak sender says message; unknown-app sender-only notifications remain silent. Client-muted messages never reaching Dunst remain silent. Record subjective listening separately.

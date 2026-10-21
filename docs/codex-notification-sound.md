@@ -192,7 +192,7 @@ notification and can play audio, so use it only when ready to listen.
 
 ## Discord channel-message speech
 
-Read desktop channel messages locally with Ryan as `SENDER says MESSAGE`, without
+Read desktop channel messages and Vesktop direct messages locally with Ryan as `SENDER says MESSAGE`, without
 an introductory clip. Deploy the helper and Dunst rule, restart Dunst once, then
 explicitly enable this independent switch (no sudo):
 
@@ -201,6 +201,7 @@ explicitly enable this independent switch (no sudo):
 ~/scripts/codex-notification-sound status --plain
 ~/scripts/codex-notification-sound smoke discord
 ~/scripts/codex-notification-sound smoke discord-unicode
+~/scripts/codex-notification-sound smoke discord-dm
 ~/scripts/codex-notification-sound smoke discord-unrelated
 ```
 
@@ -214,7 +215,12 @@ Matching requires the complete title `SENDER (#CHANNEL, SERVER)` plus a nonblank
 body. Sender parentheses, Unicode and emoji are preserved; actual notification
 markup is removed and whitespace normalized. Escaped literal markup remains text.
 The app name is deliberately unrestricted, so another app using the same format
-also speaks. Sender-only DM titles are excluded. Codex and Grok retain their own
+also speaks. Sender-only titles are accepted for exact appname `vesktop`, observed
+in live Dunst history. The `smoke discord-dm` fixture uses that app with title
+`Alex` and body `hello from a direct message`, speaking `Alex says hello from a
+direct message`. Unidentified sender-only titles remain silent. Vesktop status
+notifications with nonblank title/body may also speak; appname is routing metadata,
+not authentication. Other clients require their own observed identity. Codex and Grok retain their own
 routes. Message text is passed as data to Piper, never shell commands or logged.
 
 The machine-local `discord-speech.json` beside `speech.json` is atomically written
