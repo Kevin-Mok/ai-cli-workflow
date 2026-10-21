@@ -17,7 +17,7 @@ AUDIO_LOW_SYMBOL=${AUDIO_LOW_SYMBOL:-''}
 
 AUDIO_MUTED_SYMBOL=${AUDIO_MUTED_SYMBOL:-''}
 
-. "/home/example/.cache/wal/colors.sh"
+. "$HOME/.cache/wal/colors.sh"
 # DEFAULT_COLOR=${DEFAULT_COLOR:-"#ffffff"}
 DEFAULT_COLOR="$color7"
 MUTED_COLOR=${MUTED_COLOR:-"#a0a0a0"}
@@ -128,10 +128,10 @@ function set_default_playback_device_next {
 # triggers {{{ #
 
 case "$BLOCK_BUTTON" in
-    1) set_default_playback_device_next ;;
+    1) amixer -q -D $MIXER sset $SCONTROL $CAPABILITY unmute ;;
     # 2) amixer -q -D $MIXER sset $SCONTROL $CAPABILITY toggle ;;
     2) amixer -q -D $MIXER sset $SCONTROL $CAPABILITY 15% ;;
-    3) set_default_playback_device_next -1 ;;
+    3) amixer -q -D $MIXER sset $SCONTROL $CAPABILITY mute ;;
     4) amixer -q -D $MIXER sset $SCONTROL $CAPABILITY $AUDIO_DELTA%+ ;;
     5) amixer -q -D $MIXER sset $SCONTROL $CAPABILITY $AUDIO_DELTA%- ;;
 esac

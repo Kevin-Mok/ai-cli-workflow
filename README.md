@@ -1058,6 +1058,8 @@ this.
   [`dot_config/dunst/dunstrc`](dot_config/dunst/dunstrc) and
   [`dot_config/picom/picom.conf`](dot_config/picom/picom.conf) cover the
   status-bar, notification, and compositing layer.
+  The volume block left-click unmutes and right-click mutes; middle-click sets
+  15% volume, and scrolling adjusts volume by 3%.
   The secondary (left desktop monitor) bar includes a clickable `notif`/`DND`
   indicator immediately left of volume; it refreshes notification pause state every
   two seconds.

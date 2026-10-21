@@ -917,6 +917,10 @@ checks use invented temporary data; real notes are never repository fixtures.
   Expected: When GPG needs the store password, `pinentry-curses` prompts in that initiating terminal and `pass` continues to the configured editor after successful authentication.
 - Action: Run `/home/example/scripts/apply-desktop-display-layout`, reload i3, and inspect `xrandr --query`.
   Expected: `DVI-D-0` is 2048x1152 at `+0+0`, `DP-2` is 3840x2160 at `+2048+0`, `HDMI-0` is 1920x1080 at `+5888+0`, and i3 shows bars on all three monitors with the new middle 4K bar using the combined active `spotify`, `volume`, and `calendar` blocks.
+- Action: Right-click the volume block twice, then left-click twice on each bar.
+  Expected: Right-click keeps audio muted; left-click keeps audio unmuted. Neither
+  changes the playback device. Middle-click still sets 15%, and scrolling still
+  changes volume by 3%.
 - Action: ~/scripts/flavibot-browser
   Expected: After refresh-config, opens https://flavibot.xyz/music-player in a separate Chrome process using ~/.local/share/flavibot-chrome. Sign in once and start playback. Later launches reuse that directory; existing Chrome profiles are untouched. Follow the [short usage guide](flavibot-browser.md) for daily use. Reserve this window for FlaviBot and use ordinary Chrome for YouTube.
 - Action: ~/.config/i3blocks/scripts/now_playing_mpris

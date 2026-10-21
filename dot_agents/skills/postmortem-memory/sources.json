@@ -9661,6 +9661,15 @@
       "reviewed_on": "2026-10-21",
       "findings": [],
       "decision": "No new learning: broad process observations need provenance; clean attributed repeat verified zero fixture/other players and no new audio errors. Initial concurrent MP3 remains unattributed; no product defect or listening acceptance claimed."
+    },
+    {
+      "sha256": "d8ea061a6fb3423cfa0252b2f0ec28119ab5e48dca7aeee5ab180333ca7c818d",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-21-volume-test-discovery.md"
+      ],
+      "reviewed_on": "2026-10-21",
+      "findings": [],
+      "decision": "No new learning: existing local-discover-paths-before-reads already covers guessed test filenames."
     }
   ],
   "review": {

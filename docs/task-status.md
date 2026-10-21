@@ -93,3 +93,12 @@ This document records delivery milestones and verification for completed reposit
 - Delivery: one focused commit on main, then push to origin/main after staged privacy review. Initial review blocked a machine-specific ledger home path; the public candidate uses the repository-standard placeholder.
 - Remaining: unrelated dirty work excluded; full refresh stopped safely at the pre-existing media-screensaver conflict. Visual and click verification remain manual.
 - Rollback: remove only the DND stanza from source and preserved live secondary config, then reload i3.
+
+## Volume clicks — feat(i3blocks): mute and unmute with clicks
+
+- Complete: left-click explicitly unmutes; right-click explicitly mutes. Middle-click and scrolling retain their behavior; pywal colors load from HOME.
+- Scope: direct-write fallback for session 01a15fe6-bffc-72d2-90b7-01a0f98f2637; scope helper detected no writes. Include only session additions in mixed README, smoke tests and incident ledger.
+- Verification: defining regression observed RED then GREEN; fresh regression and Bash syntax checks pass. Refresh exited 0; exact installed source comparison passed. Real mixer checks for buttons 3/3/1/1 returned off/off/on/on and restored the original unmuted state. README gate pass_no_change.
+- Delivery: one focused commit on main, then push to origin/main after exact staged privacy review. No implementation blockers remain.
+- Remaining: preserve all unrelated baseline work. Physical mouse clicks remain manual.
+- Rollback: restore the prior two click handlers and apply the volume script.
