@@ -102,3 +102,13 @@ This document records delivery milestones and verification for completed reposit
 - Delivery: one focused commit on main, then push to origin/main after exact staged privacy review. No implementation blockers remain.
 - Remaining: preserve all unrelated baseline work. Physical mouse clicks remain manual.
 - Rollback: restore the prior two click handlers and apply the volume script.
+
+## Super mute toggle — feat(i3): toggle speaker mute with Super+M
+
+- Complete: left Super (keycode 133)+M uses the existing speaker mute toggle and refreshes i3blocks. AGENTS.repo and append-only feedback require validating and reloading i3 after successful rf when i3 configuration changes. README and audio smoke checks describe the shortcut.
+- Scope: direct-write fallback from the active conversation; helper recognized no writes. Include only observed shortcut/guidance/doc edits, the desktop-access report and its no-new-learning ledger entry. Mixed files retain unrelated hunks; public ledger aliases use the established placeholder home.
+- Verification: refresh-config exited 0; i3 config validation exited 0 with existing wheel-command deprecations; reload returned success. Two injected Super+M presses toggled mute yes/no/yes and restored the initial state. README gate pass_no_change; targeted incident-memory check and whitespace check passed. Exact staged privacy review is required before commit.
+- Automated validation warning: postmortem-memory tests passed 25/26; full-corpus coverage fails on absent placeholder home roots. Targeted report check passes. No unrelated corpus repair included.
+- Delivery: one focused commit on main, then push to origin/main after staged checks. No remaining shortcut implementation work or blockers.
+- Remaining: preserve all pre-existing and unattributed dirty files. Physical keyboard and subjective listening checks remain manual.
+- Rollback: restore the previous Super+M binding in tracked and preserved live i3 config, then reload i3. Preserve append-only feedback history.

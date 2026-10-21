@@ -9670,6 +9670,15 @@
       "reviewed_on": "2026-10-21",
       "findings": [],
       "decision": "No new learning: existing local-discover-paths-before-reads already covers guessed test filenames."
+    },
+    {
+      "sha256": "9ef960efa77aa862bc54254f65870cf8e691b422078073b52b27b57a91b3630e",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-21-mute-shortcut-desktop-access.md"
+      ],
+      "reviewed_on": "2026-10-21",
+      "findings": [],
+      "decision": "No new learning: restricted desktop access and intentionally migration-preserved live config; approved scoped operation recovered access and verified Super+M twice. Existing Bubblewrap advice is analogous, not an exact root-cause match."
     }
   ],
   "review": {

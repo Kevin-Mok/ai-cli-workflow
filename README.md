@@ -1040,6 +1040,7 @@ this.
 - [`dot_config/i3/config.tmpl`](dot_config/i3/config.tmpl) is the main
   desktop control plane for workspace movement, app assignments,
   launcher bindings, display and audio shortcuts, and layout control.
+  **Super+M** (left Super is X11 keycode **133**) toggles speaker mute/unmute and refreshes the volume block.
   Hold **Alt+Super** (Windows key) and press **1–9, then 0** for Redshift temperatures
   of **1800K, 2300K, 2850K, 3350K, 3900K, 4400K, 4950K, 5450K, 6000K, and 6500K**.
   Even kelvin steps span 1800–6500 K, rounded to the nearest 50 K.
