@@ -229,3 +229,13 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Verification: eleven updater cases and Bash syntax checks pass after RED. Live installed/candidate both156.0.8078.47-1; binary reports156.0.8078.47.
 - Limits: no second privileged update or browser relaunch by the agent; configured repository availability and pinning determine the candidate.
 - Source: [Chrome updater follow-up](../../../../docs/postmortem/2026-10-20-chrome-updater-silent-exit.md).
+
+## local-i3blocks-neighbor-theme-color
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **runtime**.
+- Symptoms/applicability: i3blocks label differs from neighboring text despite inheriting the global default.
+- Diagnostics: compare global bar color with neighboring helpers and wal color7.
+- Remedy: use the same wallpaper theme color; preserve readable fallback if the palette is unavailable.
+- Verification: defining RED, successful refresh and installed output #d0bce2 matching wal color7.
+- Limitations: rendered screenshot comparison remains manual.
+- Source: [Notis theme color](../../../../docs/postmortem/2026-10-21-notis-theme-color.md), SHA-256 `ce3b8711656b014f31a740873edebcd486fb92613b9082b676ebca0415130792`.

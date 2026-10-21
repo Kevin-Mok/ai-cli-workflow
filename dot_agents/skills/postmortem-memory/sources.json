@@ -5279,6 +5279,26 @@
       "sources": [
         "f639234b2d59019f7b42fd072a913b0f7047b4b44a7e317ae4dd466407e00a00"
       ]
+    },
+    {
+      "id": "local-i3blocks-neighbor-theme-color",
+      "reference": "references/operational-drift.md#local-i3blocks-neighbor-theme-color",
+      "status": "verified_fix",
+      "symptoms": [
+        "Notis remains blue while neighboring volume/date text is lavender."
+      ],
+      "applicability": "i3blocks helpers whose neighboring blocks override the global color with wallpaper theme values.",
+      "diagnostics": [
+        "Compare global bar color against neighboring helper output and wal color7."
+      ],
+      "confidence": "confirmed",
+      "remedy": "Use the same wal color7 as neighboring blocks; retain readable fallback when unavailable.",
+      "verification": "Focused RED reproduced mismatch; installed Notis emits #d0bce2 matching current color7 after refresh.",
+      "verification_scope": "runtime",
+      "limitations": "Output and deployed identity verified; subjective screenshot inspection remains manual.",
+      "sources": [
+        "ce3b8711656b014f31a740873edebcd486fb92613b9082b676ebca0415130792"
+      ]
     }
   ],
   "reports": [
@@ -9679,6 +9699,25 @@
       "reviewed_on": "2026-10-21",
       "findings": [],
       "decision": "No new learning: restricted desktop access and intentionally migration-preserved live config; approved scoped operation recovered access and verified Super+M twice. Existing Bubblewrap advice is analogous, not an exact root-cause match."
+    },
+    {
+      "sha256": "b113940da96886b2ed09257dc904527213cdc153940be33cfc088d31484885f6",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-21-dnd-inspection-paths.md"
+      ],
+      "reviewed_on": "2026-10-21",
+      "findings": [],
+      "decision": "No new learning: existing path-discovery guidance covers inspection failures; refresh activation was blocked by an explicit home-directory sandbox and retried with authorized access."
+    },
+    {
+      "sha256": "ce3b8711656b014f31a740873edebcd486fb92613b9082b676ebca0415130792",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-21-notis-theme-color.md"
+      ],
+      "reviewed_on": "2026-10-21",
+      "findings": [
+        "local-i3blocks-neighbor-theme-color"
+      ]
     }
   ],
   "review": {

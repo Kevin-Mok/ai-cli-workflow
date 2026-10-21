@@ -1398,12 +1398,15 @@ play audio, so exercise them deliberately.
   Expected: A verified source has an outline only during player playback; focus stays unchanged. Closing or unavailable outline support does not suppress audio.
 
 - Action: Run `dot_config/i3blocks/scripts/executable_dnd` with no click event.
-  Expected: Status markup shows DND/queue state or notif without changing pause.
+  Expected: Output shows red DND/queue markup or `Notis` using wallpaper color7
+  (the same color as volume/date) without changing pause.
 
 - Action: After applying the secondary-bar configuration and reloading i3,
-  inspect the left monitor's bar and click its `notif`/`DND` indicator twice.
+  inspect the left monitor's bar, right-click its `Notis`/`DND` indicator twice,
+  then left-click it twice.
   Expected: The indicator appears immediately left of volume, switches to DND when
-  paused, and returns to notif when resumed. External pause changes appear
+  paused by right-click, and returns to `Notis` matching volume/date on left-click.
+  Repeated clicks keep the selected state. External pause changes appear
   within two seconds; restore the original pause state after checking.
 
 ## Metaprompt terminal handoff

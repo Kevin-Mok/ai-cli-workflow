@@ -1,9 +1,19 @@
 #!/usr/bin/env bash
-# Do Not Disturb status for dunst. Click to toggle.
-if [[ "${BLOCK_BUTTON:-}" == 1 ]]; then dunstctl set-paused toggle; fi
+# Do Not Disturb status for dunst. Left enables notifications; right pauses.
+case "${BLOCK_BUTTON:-}" in
+  1) dunstctl set-paused false ;;
+  3) dunstctl set-paused true ;;
+esac
 if [[ "$(dunstctl is-paused 2>/dev/null)" == true ]]; then
   waiting=$(dunstctl count waiting 2>/dev/null || echo 0)
   if (( waiting > 0 )); then echo "<span color='#ff6b6b'>DND ($waiting)</span>"; else echo "<span color='#ff6b6b'>DND</span>"; fi
 else
-  echo "<span color='#6b7a8f'>notif</span>"
+  if [[ -r "$HOME/.cache/wal/colors.sh" ]]; then
+    source "$HOME/.cache/wal/colors.sh"
+  fi
+  if [[ -n "${color7:-}" ]]; then
+    echo "<span color=\"$color7\">Notis</span>"
+  else
+    echo "Notis"
+  fi
 fi

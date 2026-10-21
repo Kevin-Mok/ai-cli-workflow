@@ -1061,9 +1061,10 @@ this.
   status-bar, notification, and compositing layer.
   The volume block left-click unmutes and right-click mutes; middle-click sets
   15% volume, and scrolling adjusts volume by 3%.
-  The secondary (left desktop monitor) bar includes a clickable `notif`/`DND`
+  The secondary (left desktop monitor) bar includes a clickable `Notis`/`DND`
   indicator immediately left of volume; it refreshes notification pause state every
-  two seconds.
+  two seconds. `Notis` uses the same wallpaper theme color as volume/date;
+  paused `DND` stays red. Left-click enables notifications; right-click enables DND.
 
 ### Productivity, File Management, And Scripts
 
