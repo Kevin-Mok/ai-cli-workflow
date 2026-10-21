@@ -9598,6 +9598,15 @@
       "findings": [],
       "reviewed_on": "2026-10-21",
       "sha256": "1c741979fed72130841ff464c8c37a15d575531e01f00d95dd05216168af9445"
+    },
+    {
+      "sha256": "0c64ec3b7209b53fdc09e66fee170c2a831514d72108488d282b1a0be7f9c0e7",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-21-redshift-workspace-shortcut.md"
+      ],
+      "reviewed_on": "2026-10-21",
+      "findings": [],
+      "decision": "User-directed reversal of an intentional shortcut; existing source/installed/live verification and sandbox/managed-file conflict guidance suffice. No new reusable finding."
     }
   ],
   "review": {

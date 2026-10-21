@@ -146,8 +146,7 @@ bindsym Control+$mod+p --release exec "scrot -u ~/tmp/screenshot-$(date +%F_%T).
 # Ctrl+Alt+Up/Down: cooler/warmer in 250 K steps.
 bindsym Control+$mod+Up exec --no-startup-id ~/scripts/redshift-control adjust 250
 bindsym Control+$mod+Down exec --no-startup-id ~/scripts/redshift-control adjust -250
-# Super+1–0: evenly spaced 1800–6500 K, rounded to 50 K; grave resets.
-bindsym Mod4+1 exec --no-startup-id ~/scripts/redshift-control set 1800
+# Alt+Super+1–0 (also Super+2–0): evenly spaced 1800–6500 K, rounded to 50 K; grave resets.
 bindsym $mod+Mod4+1 exec --no-startup-id ~/scripts/redshift-control set 1800
 bindsym Mod4+2 exec --no-startup-id ~/scripts/redshift-control set 2300
 bindsym $mod+Mod4+2 exec --no-startup-id ~/scripts/redshift-control set 2300
@@ -548,6 +547,7 @@ bindsym $mod+7 workspace $ws7
 bindsym $mod+8 workspace $ws8
 bindsym $mod+9 workspace $ws9
 bindsym $mod+0 workspace $ws10
+bindsym Mod4+1 workspace $ws11
 bindsym Mod4+F11 workspace $ws11
 # bindsym Mod4+2 workspace $ws12
 # bindsym Mod4+3 workspace $ws13
