@@ -9616,6 +9616,51 @@
       "reviewed_on": "2026-10-21",
       "findings": [],
       "decision": "No new general learning: a one-off omitted i3blocks stanza was added using the existing DND script. Runtime protocol RED/GREEN and reload verified; unrelated refresh conflict and manual-click limitation remain explicit in the report."
+    },
+    {
+      "sha256": "0896ca071592a3c22f78a82db0bea94c97e429cd883cc4ce9624d858e845bf7c",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-21-discord-speech-inspection.md"
+      ],
+      "reviewed_on": "2026-10-21",
+      "findings": [],
+      "decision": "No new learning: local-discover-paths-before-reads already covers guessed optional paths and Fish refresh functions. Corrected read exited 0; no runtime changes from the failed probe."
+    },
+    {
+      "sha256": "4ecce2e3ad33c1e612ed2741c593e0c50677f28ce96ac7f67b01ccd2c5a43ac7",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-21-discord-private-dbus-sandbox.md"
+      ],
+      "reviewed_on": "2026-10-21",
+      "findings": [],
+      "decision": "No new learning: approved socket-capable execution already documented by local-sandbox-loopback-approved-route. Elevated private D-Bus fixture reached expected feature RED; live daemon untouched. Fish startup read-probe diagnostics additionally demonstrate using no-config for bounded function invocation."
+    },
+    {
+      "sha256": "4914e28a10f7178a6e7058141800a52389096d2384b6c71d2bff0e831791cbc4",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-21-discord-broader-check.md"
+      ],
+      "reviewed_on": "2026-10-21",
+      "findings": [],
+      "decision": "No new learning: existing approved-route, fixture-accuracy and launcher-mode guidance covers the evidence. Full report reviewed; workaround verified at runtime, unrelated stale broader expectation remains, and no whole-suite-green claim is made."
+    },
+    {
+      "sha256": "1928cccc0a850c0804959cc91e47b4d22401adbb6f83f4b5df54837dba13ed26",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-21-discord-speech-refresh.md"
+      ],
+      "reviewed_on": "2026-10-21",
+      "findings": [],
+      "decision": "No new learning: existing approved-route, fixture-accuracy and launcher-mode guidance covers the evidence. Full report reviewed; workaround verified at runtime, unrelated stale broader expectation remains, and no whole-suite-green claim is made."
+    },
+    {
+      "sha256": "4267c583201606ebdb733b7b20e92329de3f63e6a874c118577dcc9074deacf6",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-21-discord-live-probe-overlap.md"
+      ],
+      "reviewed_on": "2026-10-21",
+      "findings": [],
+      "decision": "No new learning: broad process observations need provenance; clean attributed repeat verified zero fixture/other players and no new audio errors. Initial concurrent MP3 remains unattributed; no product defect or listening acceptance claimed."
     }
   ],
   "review": {

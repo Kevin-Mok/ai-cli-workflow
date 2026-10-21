@@ -88,6 +88,59 @@ class PlaybackTests(unittest.TestCase):
         self.clip.write_bytes(b'test fixture')
         self.setting = self.config / 'codex-notification-sound/sound.json'
 
+    def test_preview_urgency_word_is_not_a_dunst_callback(self):
+        for title in ('NORMAL', 'LOW', 'CRITICAL'):
+            with patch.object(self.helper, 'play', return_value=0) as player, patch.object(self.helper, 'capture_source', return_value=None):
+                self.assertEqual(self.helper.main(['preview', '--plain', '--speech-only', '--title', title]), 0)
+                player.assert_called_once_with(title, speech_only=True, source=None)
+
+    def test_discord_format_preserves_sender_and_visible_content(self):
+        cases = [
+            ('(A) Alex (#😊normie, Active)', 'hai', '(A) Alex says hai'),
+            ('Alex (#😊normie, Another Server 🎉)', 'hello', 'Alex says hello'),
+            ('Alex (#c, S)', '<markup><a href="https://example.org/?q=a>b">hello</a></markup>', 'Alex says hello'),
+            ('<b>Alex</b> (#general, Server)', '<i>hello</i> &amp; &lt;friend&gt;\n world', 'Alex says hello & <friend> world'),
+            ('A $(touch nope); (#c, S)', '`echo x` <3 &lt;b&gt;literal&lt;/b&gt;', 'A $(touch nope); says `echo x` <3 <b>literal</b>'),
+        ]
+        for title, body, expected in cases:
+            with self.subTest(title=title):
+                self.assertEqual(self.helper.discord_message(title, body), expected)
+
+    def test_discord_rejects_incomplete_or_unrelated_notifications(self):
+        for title, body in [('Voice: listening', 'nerd-dictation is ready'),
+                            ('Alex', 'DM'), ('Alex (#c, S) (#, T)', 'hi'), (' (#c, S)', 'hi'), ('Alex (# , S)', 'hi'),
+                            ('Alex (#c, )', 'hi'), ('Alex (#c, S) trailing', 'hi'),
+                            ('Alex (#c, S)', ' <b> </b> '), ('Alex (c, S)', 'hi')]:
+            with self.subTest(title=title, body=body):
+                self.assertIsNone(self.helper.discord_message(title, body))
+
+    def test_discord_switch_and_callback_are_independent_and_speech_only(self):
+        self.helper.set_speech(True)
+        event = ['FormatProbe', '(A) Alex (#😊normie, Active)', 'hai', '', 'NORMAL']
+        with patch.object(self.helper, 'play', return_value=1) as player:
+            self.assertEqual(self.helper.main(event), 0)
+            player.assert_not_called()
+            self.assertEqual(self.helper.main(['discord-speech', 'enable', '--plain']), 0)
+            self.assertEqual(self.helper.main(event), 0)
+            player.assert_called_once_with('(A) Alex says hai', speech_only=True)
+            for app in ('status', '--odd-app'):
+                player.reset_mock()
+                self.assertEqual(self.helper.main([app, *event[1:]]), 0)
+                player.assert_called_once_with('(A) Alex says hai', speech_only=True)
+            self.assertTrue(self.helper.speech_enabled())
+            player.reset_mock()
+            self.helper.main(['FormatProbe', 'Voice: listening', 'nerd-dictation is ready', '', 'NORMAL'])
+            player.assert_not_called()
+            self.assertEqual(self.helper.main(['discord-speech', 'disable', '--plain']), 0)
+            self.helper.main(event)
+            player.assert_not_called()
+            self.assertTrue(self.helper.speech_enabled())
+        path = self.setting.with_name('discord-speech.json')
+        self.assertEqual(path.stat().st_mode & 0o777, 0o600)
+        for invalid in ('broken', '[]', '{"enabled": "true"}'):
+            path.write_text(invalid)
+            self.assertFalse(self.helper.discord_enabled())
+
     def configure(self):
         self.assertEqual(self.helper.main(['set', str(self.clip)]), 0)
         self.assertEqual(json.loads(self.setting.read_text()), {'path': str(self.clip)})

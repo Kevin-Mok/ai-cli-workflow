@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
-"""Local clip and Ryan speech for Codex and Grok Bot notifications. No sudo needed."""
+"""Local clip and Ryan speech for Codex, Grok and Discord notifications. No sudo needed."""
 import argparse
 from contextlib import AbstractContextManager, ExitStack, contextmanager, nullcontext
 import fcntl
 from datetime import datetime, timezone
 import json
+from html.parser import HTMLParser
+import re
 import os
 from pathlib import Path
 import shutil
@@ -90,6 +92,41 @@ def speech_enabled() -> bool:
         return False
 
 
+def discord_enabled() -> bool:
+    try:
+        data = json.loads(setting_path().with_name('discord-speech.json').read_text(encoding='utf-8'))
+        return isinstance(data, dict) and data.get('enabled') is True
+    except (OSError, ValueError, UnicodeError):
+        return False
+
+
+def discord_message(title: str, body: str) -> str | None:
+    def visible(text: str) -> str:
+        class MarkupText(HTMLParser):
+            tags = {'b', 'i', 's', 'u', 'a', 'span', 'small', 'big', 'tt',
+                    'strike', 'sub', 'sup', 'markup', 'font'}
+            def handle_starttag(self, tag, attrs):
+                if tag not in self.tags:
+                    parts.append(self.get_starttag_text() or '')
+            def handle_endtag(self, tag):
+                if tag not in self.tags:
+                    parts.append(f'</{tag}>')
+            def handle_data(self, data):
+                parts.append(data)
+        parts: list[str] = []
+        parser = MarkupText(convert_charrefs=True)
+        parser.feed(text)
+        parser.close()
+        return ' '.join(''.join(parts).split())
+    sender, separator, suffix = visible(title).rpartition(' (#')
+    match = re.fullmatch(r'([^,]+), (.+)\)', suffix)
+    message = visible(body)
+    if not separator or not sender.strip() or not match or not message or not all(value.strip() for value in match.groups()):
+        return None
+    # shortcut: same-format apps also match; add identity only with real samples.
+    return f'{sender.strip()} says {message}'
+
+
 def voice_paths() -> tuple[Path, Path]:
     root = Path(os.environ.get('XDG_DATA_HOME') or Path.home() / '.local/share') / 'codex-notification-speech'
     return root / 'venv/bin/python', root / 'voices' / f'{VOICE}.onnx'
@@ -100,8 +137,8 @@ def voice_ready() -> bool:
     return os.access(python, os.X_OK) and model.is_file() and model.with_suffix('.onnx.json').is_file()
 
 
-def set_speech(enabled: bool) -> int:
-    path = setting_path().with_name('speech.json')
+def set_speech(enabled: bool, *, discord: bool = False) -> int:
+    path = setting_path().with_name('discord-speech.json' if discord else 'speech.json')
     path.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.NamedTemporaryFile(mode='w', encoding='utf-8', dir=path.parent, delete=False) as output:
         temporary = Path(output.name)
@@ -111,8 +148,8 @@ def set_speech(enabled: bool) -> int:
         os.replace(temporary, path)
     finally:
         temporary.unlink(missing_ok=True)
-    display(f'Speech: {"enabled" if enabled else "disabled"}', '🗣️')
-    if enabled:
+    display(f'{"Discord speech" if discord else "Speech"}: {"enabled" if enabled else "disabled"}', '🗣️')
+    if enabled and not discord:
         display('Resume affected sessions to load completion notifications.')
     return 0
 
@@ -256,14 +293,19 @@ def main(argv: list[str] | None = None) -> int:
     args = list(sys.argv[1:] if argv is None else argv)
     # Dunst passes exactly five positional arguments. Notification text is
     # never parsed as a command or used to select audio.
-    human_commands = {'set', 'preview', 'speech', 'disable', 'status', 'smoke', 'event-play'}
-    if len(args) == 5 and args[0] not in human_commands and not args[0].startswith('-'):
+    cli_options = bool(args and args[0] in {'set', 'preview', 'speech', 'discord-speech', 'disable', 'status', 'smoke', 'event-play'}
+                       and len(args) > 1 and args[1].startswith('--'))
+    if len(args) == 5 and args[4] in ('LOW', 'NORMAL', 'CRITICAL') and not cli_options:
         if args[0] == APP_NAME and not speech_enabled():
             play()
         elif args[0] == 'Grok Bot':
             message = args[2].strip() or args[1].strip()
             if message:
                 play(message)
+        elif args[0] != APP_NAME and discord_enabled():
+            message = discord_message(args[1], args[2])
+            if message:
+                play(message, speech_only=True)
         return 0  # Sound failure never makes the notification script fail.
 
     presentation = argparse.ArgumentParser(add_help=False, description=_cli_message('codex notification sound', '🎙️'))
@@ -278,12 +320,14 @@ def main(argv: list[str] | None = None) -> int:
     preview.add_argument('--speech-only', action='store_true', help='speak --title without the configured clip; requires nonblank text')
     speech = commands.add_parser('speech', help='switch hook audio; disable restores Dunst audio', parents=[presentation])
     speech.add_argument('state', choices=('enable', 'disable'))
+    discord = commands.add_parser('discord-speech', help='switch format-matched Discord speech independently', parents=[presentation])
+    discord.add_argument('state', choices=('enable', 'disable'))
     event_player = commands.add_parser('event-play', help=argparse.SUPPRESS, parents=[presentation])
     event_player.add_argument('--source', help=argparse.SUPPRESS)
     commands.add_parser('disable', help='remove the local setting; keep your clip', parents=[presentation])
     commands.add_parser('status', help='show setting path and enabled/disabled state', parents=[presentation])
     smoke = commands.add_parser('smoke', help='exercise the Dunst rule or emit an unrelated Kitty OSC 9 popup', parents=[presentation])
-    smoke.add_argument('kind', choices=('tagged', 'kitty', 'grok'))
+    smoke.add_argument('kind', choices=('tagged', 'kitty', 'grok', 'discord', 'discord-unicode', 'discord-unrelated'))
     options = parser.parse_args(args)
     _plain = bool(getattr(options, 'plain', False)) or os.environ.get('CLI_PLAIN') == '1'
     _details = bool(getattr(options, 'details', False))
@@ -292,8 +336,8 @@ def main(argv: list[str] | None = None) -> int:
     if options.command == 'preview':
         return play(options.title, speech_only=options.speech_only, source=capture_source())
     try:
-        if options.command == 'speech':
-            return set_speech(options.state == 'enable')
+        if options.command in ('speech', 'discord-speech'):
+            return set_speech(options.state == 'enable', discord=options.command == 'discord-speech')
         if options.command == 'event-play':
             if speech_enabled():
                 title = json.load(sys.stdin)
@@ -311,6 +355,7 @@ def main(argv: list[str] | None = None) -> int:
             display('Codex notification audio', '🔊')
             display(f'  Sound   {"enabled" if clip else "disabled"}')
             display(f'  Speech  {"enabled" if speech_enabled() else "disabled"}')
+            display(f'  Discord speech  {"enabled" if discord_enabled() else "disabled"}')
             display(f'  Voice   {"ready" if voice_ready() else "not installed"}')
             display(f'  Model   {VOICE_LABEL}')
             display(f'  Pace    {LENGTH_SCALE} (slightly brisk)')
@@ -336,6 +381,14 @@ def main(argv: list[str] | None = None) -> int:
                     raise ValueError('notify-send is unavailable on PATH')
                 app, title, body = ('Grok Bot', 'Grok Bot sound check', 'Grok Bot notification speech is ready.') if options.kind == 'grok' else (
                     APP_NAME, 'Codex sound rule check', 'Synthetic Dunst rule check; real Codex checks are separate.')
+                if options.kind.startswith('discord'):
+                    app = 'FormatProbe'
+                    title, body = {
+                        'discord': ('(A) Alex (#normie, Active)', 'hai'),
+                        'discord-unicode': ('Alex (#😊normie, Another Server)', 'hello'),
+                        'discord-unrelated': ('Voice: listening', 'nerd-dictation is ready'),
+                    }[options.kind]
+                    display('Sending synthetic Discord format probe.', '🧪')
                 result = subprocess.run([sender, '--app-name', app, '--expire-time', '5000', title, body], check=False)
                 return result.returncode
         return 0

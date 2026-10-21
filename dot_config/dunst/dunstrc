@@ -316,6 +316,12 @@
 #
 # vim: ft=cfg
 
+# Coarse format filter; the callback validates the complete title and body.
+# Keep this before app-specific rules so their callbacks retain precedence.
+[discord_format_speech]
+    summary = "* (#*, *)"
+    script = ~/scripts/codex-notification-sound
+
 # Kitty tags only notifications from a local foreground Codex executable.
 [codex_notification_sound]
     appname = codex-kitty

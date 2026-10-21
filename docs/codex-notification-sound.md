@@ -14,7 +14,7 @@ chezmoi apply "$HOME/scripts/sire.mp3"
 ~/scripts/codex-notification-sound disable
 ```
 
-The targeted `chezmoi apply` installs only the bundled clip; `refresh-config` excludes scripts and is not enough to install this asset. Keep your selected clip outside the checkout so repository moves or cleanup do not invalidate its path. Refresh cannot restore an audio file absent from source. The local JSON is excluded from repo artifacts.
+The targeted `chezmoi apply` installs only the bundled clip. Refresh excludes chezmoi script hooks, not ordinary executable files or assets under `~/scripts`; verify the active ignore rules for the host. Keep your selected clip outside the checkout so repository moves or cleanup do not invalidate its path. Refresh cannot restore an audio file absent from source. The local JSON is excluded from repo artifacts.
 
 If popups appear but both the clip and speech are silent, run `~/scripts/codex-notification-sound status --details` first. A missing selected clip stops the whole clip-then-speech sequence before synthesis starts. Use `set` with an existing local copy, then `preview --title "Notification audio check" --details` to verify both stages. No daemon restart or speech toggle is needed for a path correction. Historical errors remain in `status --details`; compare their timestamps with the new preview rather than deleting the log.
 
@@ -115,7 +115,7 @@ The first three verify one clip then one exact question sentence with two silent
 
 ## Installation and activation
 
-Repository sources are [Kitty's callback](../dot_config/kitty/notifications.py), [Dunst's rule](../dot_config/dunst/dunstrc) and [the playback command](../scripts/executable_codex-notification-sound). Apply with the normal `refresh-config` workflow after reviewing source changes and local differences privately. Refresh never imports live Codex/Git settings, excludes scripts/externals/removals, and stops on conflicts.
+Repository sources are [Kitty's callback](../dot_config/kitty/notifications.py), [Dunst's rule](../dot_config/dunst/dunstrc) and [the playback command](../scripts/executable_codex-notification-sound). Apply with the normal `refresh-config` workflow after reviewing source changes and local differences privately. The current refresh function excludes chezmoi script hooks, externals and removals, and stops on conflicts; ordinary managed files under `~/scripts` can still be applied. Review live settings and managed-file differences before applying.
 
 Run the activation helper once after initial installation, or after changing the Kitty notification callback or Dunst rule:
 
@@ -135,7 +135,7 @@ Codex already uses OSC 9 with `tui.notifications=true`. The callback resolves th
 
 Dunst matches that exact application name and double-forks the sound helper, so waiting for mpv does not block Kitty, Codex or Dunst. Playback uses argument lists without a shell and passes the entire filename after `--`. mpv ignores user configuration and opens no video window. The callback formats strong-emphasis text; timeout, actions and click-to-focus remain native; Codex/Kitty's existing focus suppression remains in place.
 
-`always_run_script=false` is global in Dunst 1.9.2. There are no other active script rules in this repo. It prevents sound for empty-format suppressed notifications and repeated calls for already-sounded objects. Native duplicate stacking remains enabled: an identical displayed notification adds no immediate sound or popup. Most history recalls stay silent; Dunst replaces a stacked duplicate with an unsounded object, which can sound once when later recalled or restored. Notifications queued while Dunst is paused sound only when displayed. Future `skip_display=true` rules would require separate review because Dunst invokes scripts before that suppression.
+`always_run_script=false` is global in Dunst 1.9.2. The Grok and Discord format rules share this callback. It prevents sound for empty-format suppressed notifications and repeated calls for already-sounded objects. Native duplicate stacking remains enabled: an identical displayed notification adds no immediate sound or popup. Most history recalls stay silent; Dunst replaces a stacked duplicate with an unsounded object, which can sound once when later recalled or restored. Notifications queued while Dunst is paused sound only when displayed. Future `skip_display=true` rules would require separate review because Dunst invokes scripts before that suppression.
 
 This is local process identification, not a security boundary. SSH and tmux foreground clients cannot reliably expose remote/nested Codex origin and remain ordinary Kitty notifications. Every popup that local Codex actually emits is eligible, including approvals; this does not enable notifications that Codex itself suppresses. With speech disabled, the deployed completion callback and permission bridge are no-ops; Dunst retains this behavior. With speech enabled, the event bridge owns audio as described above.
 
@@ -189,3 +189,43 @@ nonblank notification body, falling back to its title, with Ryan after any
 configured clip. This route is independent of the Codex speech switch; disable
 or change its Dunst rule separately if needed. `smoke grok` emits a real desktop
 notification and can play audio, so use it only when ready to listen.
+
+## Discord channel-message speech
+
+Read desktop channel messages locally with Ryan as `SENDER says MESSAGE`, without
+an introductory clip. Deploy the helper and Dunst rule, restart Dunst once, then
+explicitly enable this independent switch (no sudo):
+
+```sh
+~/scripts/codex-notification-sound discord-speech enable
+~/scripts/codex-notification-sound status --plain
+~/scripts/codex-notification-sound smoke discord
+~/scripts/codex-notification-sound smoke discord-unicode
+~/scripts/codex-notification-sound smoke discord-unrelated
+```
+
+The three synthetic probes use app `FormatProbe`: `(A) Alex (#normie, Active)` /
+`hai`, `Alex (#😊normie, Another Server)` / `hello`, and `Voice: listening` /
+`nerd-dictation is ready`. Expect normal popups, speech `(A) Alex says hai`,
+`Alex says hello`, and silence respectively. These test the installed desktop
+path; subjective listening and a real incoming Discord message are separate checks.
+
+Matching requires the complete title `SENDER (#CHANNEL, SERVER)` plus a nonblank
+body. Sender parentheses, Unicode and emoji are preserved; actual notification
+markup is removed and whitespace normalized. Escaped literal markup remains text.
+The app name is deliberately unrestricted, so another app using the same format
+also speaks. Sender-only DM titles are excluded. Codex and Grok retain their own
+routes. Message text is passed as data to Piper, never shell commands or logged.
+
+The machine-local `discord-speech.json` beside `speech.json` is atomically written
+with mode 0600 and defaults to disabled when absent or malformed. The independent
+switch does not change Codex speech or the selected clip. Discord uses the existing
+shared playback lock and voice, with no cloud service. Dunst pause/suppression and
+its documented duplicate/history behavior still apply; messages that never reach
+Dunst cannot speak. A queued message checks the switch when its callback runs.
+
+Rollback immediately with `~/scripts/codex-notification-sound discord-speech disable`.
+Popup delivery continues normally. Install the changed helper explicitly with
+`chezmoi apply "$HOME/scripts/codex-notification-sound"`; run `refresh-config`
+for tracked config, then `~/scripts/codex-notification-activate` for the new rule.
+The restart clears Dunst history/queues; it preserves terminals and audio workers.
