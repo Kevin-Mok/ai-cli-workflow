@@ -9607,6 +9607,15 @@
       "reviewed_on": "2026-10-21",
       "findings": [],
       "decision": "User-directed reversal of an intentional shortcut; existing source/installed/live verification and sandbox/managed-file conflict guidance suffice. No new reusable finding."
+    },
+    {
+      "sha256": "7c46255921af307c34ac1db264a88330a6d844c15440466ff22c489c945c4e8c",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-21-left-monitor-dnd-block.md"
+      ],
+      "reviewed_on": "2026-10-21",
+      "findings": [],
+      "decision": "No new general learning: a one-off omitted i3blocks stanza was added using the existing DND script. Runtime protocol RED/GREEN and reload verified; unrelated refresh conflict and manual-click limitation remain explicit in the report."
     }
   ],
   "review": {

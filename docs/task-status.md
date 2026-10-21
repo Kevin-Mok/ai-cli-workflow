@@ -84,3 +84,12 @@ This document records delivery milestones and verification for completed reposit
 - Delivery: commit on main and push to origin/main after scoped staged review and privacy checks. No remaining implementation work or blockers.
 - Remaining: preserve all unrelated baseline dirty work, including other hunks in README, smoke tests and the ledger. Physical keyboard acceptance remains manual; injected X11 behavior is verified.
 - Rollback: remove the new Alt binding from tracked and live i3 configuration, then reload i3. Live i3 is unmanaged by chezmoi; no private live configuration is committed.
+
+## Left monitor DND — fix(i3blocks): show DND before volume
+
+- Complete: the secondary bar includes the existing clickable DND helper immediately left of volume, refreshing every two seconds. Source and preserved live config were updated; i3 reloaded successfully.
+- Scope: session 01a15f91-de0d-7691-ab2b-7b47ceafde79; the helper detected no writes, so directly observed conversation edits govern. Only the DND hunks in README, smoke tests and postmortem ledger are included.
+- Verification: live protocol reproduced the absent block before the fix and emitted `dnd → volume → calendar` afterward. Pause state stayed false. Targeted postmortem check and whitespace check passed; README gate returned pass_no_change.
+- Delivery: one focused commit on main, then push to origin/main after staged privacy review. Initial review blocked a machine-specific ledger home path; the public candidate uses the repository-standard placeholder.
+- Remaining: unrelated dirty work excluded; full refresh stopped safely at the pre-existing media-screensaver conflict. Visual and click verification remain manual.
+- Rollback: remove only the DND stanza from source and preserved live secondary config, then reload i3.

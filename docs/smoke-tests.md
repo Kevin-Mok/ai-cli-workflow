@@ -1392,7 +1392,12 @@ play audio, so exercise them deliberately.
 
 - Action: Run `dot_config/i3blocks/scripts/executable_dnd` with no click event.
   Expected: Status markup shows DND/queue state or notif without changing pause.
-  The helper is available but is not added to an i3blocks configuration here.
+
+- Action: After applying the secondary-bar configuration and reloading i3,
+  inspect the left monitor's bar and click its `notif`/`DND` indicator twice.
+  Expected: The indicator appears immediately left of volume, switches to DND when
+  paused, and returns to notif when resumed. External pause changes appear
+  within two seconds; restore the original pause state after checking.
 
 ## Metaprompt terminal handoff
 

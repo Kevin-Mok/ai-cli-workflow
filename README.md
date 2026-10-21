@@ -1057,6 +1057,9 @@ this.
   [`dot_config/dunst/dunstrc`](dot_config/dunst/dunstrc) and
   [`dot_config/picom/picom.conf`](dot_config/picom/picom.conf) cover the
   status-bar, notification, and compositing layer.
+  The secondary (left desktop monitor) bar includes a clickable `notif`/`DND`
+  indicator immediately left of volume; it refreshes notification pause state every
+  two seconds.
 
 ### Productivity, File Management, And Scripts
 
