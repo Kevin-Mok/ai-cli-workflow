@@ -699,6 +699,8 @@ Codex CLI.
 
 ## Day-to-Day Use
 
+In Kitty and tmux, **Ctrl+A** selects all retained text in the active terminal or pane, including offscreen history. **Ctrl+Shift+C** copies it; **Escape** leaves tmux copy mode. Ctrl+A replaces application line-start behavior. History is limited to 50,000 configured lines; existing tmux panes keep their original history limit.
+
 On the i3 desktop, `ubs` (`ubuntu-start`) needs the wallpaper disk mounted at
 `/mnt/linux-files-3`. Use `python3 scripts/enable-ubs-boot-mount.py --check`
 to preview the UUID-based boot mount, then run

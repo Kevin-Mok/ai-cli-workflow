@@ -264,3 +264,5 @@
 - 2026-10-22: Dunst executes every matching script rule; order does not override prior scripts. Use one shared callback with classification and test real client identity plus channel format together, not only FormatProbe. Avoid message-text deduplication that would suppress legitimate repeat messages.
 
 - 2026-10-22: Calibrate mpv speech with rendered output, not a linear percentage assumption: native50 volume measured roughly18dB below100. Distinguish an unsupported/silent per-stream capture from real silence; the sink monitor gave usable live levels. Preserve user-selected persistent volume over calibration guesses.
+
+- 2026-10-22: Successful refresh-config can skip migration-preserved targets such as `.tmux.conf`. Check chezmoi ignore membership and live bindings; merge only authorized changes into preserved files without changing their ownership. See [terminal activation](../docs/postmortem/2026-10-22-terminal-helper-path-probe.md).

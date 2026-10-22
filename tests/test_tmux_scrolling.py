@@ -99,6 +99,26 @@ class MouseScrolling(unittest.TestCase):
         os.close(self.master)
         self.temp.cleanup()
 
+    def test_ctrl_a_selects_all_history_and_can_repeat_in_both_copy_tables(self):
+        for mode in ("emacs", "vi"):
+            self.tmux("set-window-option", "mode-keys", mode)
+            for _ in range(2):
+                os.write(self.master, b"\x01")
+                self.wait_for(lambda: self.fmt("selection_present") == "1")
+                self.assertEqual(self.fmt("selection_active"), "0")
+                self.tmux("send-keys", "-X", "copy-selection-no-clear")
+                copied = self.tmux("show-buffer")
+                expected = "\n".join(
+                    f"HISTORY {n:06d}" + (" | WRAPPED " + "word " * 35 + "END" if n % 10 == 0 else "")
+                    for n in range(1, 3001)
+                )
+                self.assertTrue(copied.startswith(expected + "\nREADY:"), "Selection must include all offscreen and wrapped text")
+                self.assertTrue(copied.endswith("type hello and Enter"))
+            os.write(self.master, b"\x1b")
+            self.wait_for(lambda: self.fmt("pane_in_mode") == "0")
+        os.write(self.master, b"hello\r")
+        self.wait_for(lambda: "INPUT hello" in self.tmux("capture-pane", "-p"))
+
     def test_wheel_history_selection_and_live_input(self):
         before = min(int(n) for n in re.findall(r"HISTORY (\d+)", self.tmux("capture-pane", "-p")))
         self.output.clear()

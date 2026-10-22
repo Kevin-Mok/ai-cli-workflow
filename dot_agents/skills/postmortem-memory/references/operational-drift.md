@@ -313,3 +313,16 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - **verification_scope**: runtime
 - **limitations**: Fixed gain cannot track future stream loudness. Exact Vole Twitch slider unavailable. Earlier broad suite retains unrelated socket/path-fixture failures.
 - **Report**: [Discord speech volume calibration](../../../../docs/postmortem/2026-10-22-discord-direction-isolates.md)
+
+## local-chezmoi-preserved-target-activation
+
+- **status**: verified_workaround
+- **symptoms**: refresh-config succeeds but tracked tmux bindings remain absent from live config
+- **applicability**: Chezmoi migration-preserved targets excluded by .chezmoiignore.
+- **diagnostics**: Check exact deployed behavior and whether the target appears in chezmoi ignored or migrationPreservedTargets.
+- **confidence**: confirmed
+- **remedy**: For an authorized small change, merge only its binding block into the preserved live target and reload; preserve unrelated local content and ownership.
+- **verification**: refresh-config exit 0; filtered ignore membership confirmed; targeted merge and live tmux bindings verified in root and both copy-mode tables.
+- **verification_scope**: runtime
+- **limitations**: This does not make preserved targets managed; future changes still require explicit reconciliation.
+- **Report**: [Terminal selection activation](../../../../docs/postmortem/2026-10-22-terminal-helper-path-probe.md)
