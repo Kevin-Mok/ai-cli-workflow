@@ -838,6 +838,14 @@ checks use invented temporary data; real notes are never repository fixtures.
 
 ## Codex And Graphiti
 
+- Action: At a fresh i3 login, before opening Fish, hold a key in a text field.
+  Then run `xset q`. For manual startup, run
+  `env -u XSET_DELAY -u XSET_RATE ~/scripts/ubuntu-start` and query again.
+  Expected: Repetition starts after 200 ms at 90 repeats/second; `xset q`
+  reports those values even without Fish exports. A nonempty `XSET_DELAY`
+  or `XSET_RATE` overrides only that value; an empty value uses its default.
+  Missing optional `xset` does not prevent other startup helpers from running.
+
 - Action: Run `python3 scripts/enable-ubs-boot-mount.py --check` from the repo root
   with the intended ext4 wallpaper disk mounted at `/mnt/linux-files-3`, then run
   it once with `sudo` and `--apply`. Repeat `--check` afterward.

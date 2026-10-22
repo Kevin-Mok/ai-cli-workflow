@@ -95,3 +95,37 @@ if [ "$picom_starts" -ne 0 ]; then
   printf 'expected picom startup to be guarded instead of bare `picom &`\n' >&2
   exit 1
 fi
+
+# An i3 login has no Fish exports; run startup with only the X11 boundary present.
+fixture="$(mktemp -d)"
+trap 'rm -rf "$fixture"' EXIT
+mkdir -p "$fixture/bin" "$fixture/home"
+cat > "$fixture/bin/xset" <<'STUB'
+#!/bin/bash
+printf '%s\n' "$*" > "$XSET_LOG"
+STUB
+chmod +x "$fixture/bin/xset"
+
+check_repeat() {
+  local expected="$1"
+  shift
+  rm -f "$fixture/xset.log"
+  env -u XSET_DELAY -u XSET_RATE HOME="$fixture/home" PATH="$fixture/bin" \
+    XSET_LOG="$fixture/xset.log" "$@" /bin/bash "$script_path" 2>"$fixture/stderr"
+  local actual=""
+  if [ -f "$fixture/xset.log" ]; then
+    actual="$(cat "$fixture/xset.log")"
+  fi
+  if [ "$actual" != "$expected" ]; then
+    printf 'expected startup repeat command "%s", got "%s"\n' "$expected" "$actual" >&2
+    exit 1
+  fi
+}
+
+check_repeat 'r rate 200 90'
+check_repeat 'r rate 200 90' XSET_DELAY= XSET_RATE=
+check_repeat 'r rate 300 90' XSET_DELAY=300
+check_repeat 'r rate 200 60' XSET_RATE=60
+check_repeat 'r rate 300 60' XSET_DELAY=300 XSET_RATE=60
+rm "$fixture/bin/xset"
+check_repeat ''

@@ -253,6 +253,8 @@
 
 - 2026-10-20: APT metadata refresh can advance the candidate mid-update. Read the candidate after refreshing metadata and again after installation; compare with dpkg Debian version ordering and accept installed >= candidate. Do not let equal cached versions skip a normal refresh. See [Chrome verification follow-up](../docs/postmortem/2026-10-20-chrome-updater-silent-exit.md).
 
+- 2026-10-21: Graphical startup must supply its own keyboard repeat defaults rather than depend on Fish exports. Test missing/empty exports and independent overrides; distinguish requested X11 rates from server-reported values. See [UBS repeat diagnosis](../docs/postmortem/2026-10-21-ubs-key-repeat.md).
+
 - 2026-10-21: Sender-only Discord DMs cannot pass a channel-title filter. Inspect privacy-safe Dunst app metadata and update both the daemon route and shared parser; the observed client identifies as `vesktop`. See [DM speech](../docs/postmortem/2026-10-21-discord-dm-speech.md).
 
 - 2026-10-22: A successful daily screensaver timer and DPMS wake do not prove sustained visibility. An unavailable browser bridge can immediately dismiss automatic-policy playback; explicit schedules need deliberate gate policy and playback-scoped XScreenSaver inhibition. Verify release and original settings after exceptions; distinguish input-dismissed desktop probes from duration acceptance. See [morning blackout](../docs/postmortem/2026-10-22-screensaver-morning-blackout.md).

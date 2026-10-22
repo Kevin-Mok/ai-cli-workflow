@@ -230,6 +230,17 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Limits: no second privileged update or browser relaunch by the agent; configured repository availability and pinning determine the candidate.
 - Source: [Chrome updater follow-up](../../../../docs/postmortem/2026-10-20-chrome-updater-silent-exit.md).
 
+## local-ubs-repeat-without-shell-exports
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **runtime**.
+- Symptoms: UBS skips fast keyboard repeat without Fish exports.
+- Applicability: i3 starts ubuntu-start directly before shell exports exist.
+- Diagnostics: execute startup with missing, empty, partial and full repeat exports; inspect xset arguments and live X11 settings.
+- Remedy: default absent/empty XSET_DELAY and XSET_RATE independently to 200/90; preserve overrides and the optional-command guard.
+- Verification: defining regression RED then GREEN, four shell regressions and syntax passed; scoped refresh installed the correction; live checks confirmed defaults and partial/full overrides, restoring 200/90.
+- Limitations: fresh i3 login and physical typing remain untested; requested rate 60 reports 62 on this server, so compare command arguments separately from effective rates.
+- Source: [UBS keyboard repeat](../../../../docs/postmortem/2026-10-21-ubs-key-repeat.md).
+
 ## local-i3blocks-neighbor-theme-color
 
 - Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **runtime**.

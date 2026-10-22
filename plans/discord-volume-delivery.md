@@ -8,7 +8,7 @@ Initial branch main tracks origin/main at 98a57d2; staged changes were empty. Th
 
 ## Ordered series
 
-- [ ] docs(memory): record reviewed troubleshooting evidence — generalized external findings, report registrations, saved Discord implementation prompt and handoff incident.
+- [x] docs(memory): record reviewed troubleshooting evidence — generalized external findings, report registrations, saved Discord implementation prompt and handoff incident.
 - [ ] fix(i3): apply repeat defaults without fish exports — startup code/test, matching plan/incident, README/smoke/lesson and memory additions.
 - [ ] fix(notifications): read Discord once and add speech volume control — isolate parsing, one Dunst callback, bot exclusions, persisted 75% volume, tests, matching plan/incident and documentation.
 - [ ] Recheck residuals and push the verified series once to origin/main.
@@ -28,3 +28,5 @@ Review candidate JSON semantically to avoid committing incidental key/list reord
 Milestone 1 — docs(memory): record reviewed troubleshooting evidence. Candidate evidence was reviewed against source reports; all20 new source hashes match. Removed one unsupported historical test-count assertion while retaining its supported pass/limit statement. Public paths and executor IDs are neutralized without modifying local evidence bytes. README and focused checks pass; privacy check is the final commit gate. Remaining: startup and notification commits, then one push. No blockers beyond any privacy findings.
 
 Next step: commit the reviewed evidence candidate. No push has been performed yet.
+
+Milestone1 committed as0028565; privacy gate and active hook passed. No push yet. Milestone2 — fix(i3): apply repeat defaults without fish exports — includes the startup correction, focused regression, matching plan/incident, README/manual checks, lesson and reviewed memory. All four shell regressions, syntax and targeted memory checks pass. Next: notification commit and one upstream push; no implementation blockers.

@@ -5388,6 +5388,26 @@
       ],
       "verification": "Fresh failed frame: login prompt, no calibrated/readiness marker. Operator confirms manual same-password login/use works; subsequent frame has account shell prompt and startx-related output. Static review finds no command/marker mismatch. Manual shell-mode/printf results remain unavailable. Viewer opened normally; no guest keys, VM/account/cache actions by agent.",
       "verification_scope": "runtime"
+    },
+    {
+      "applicability": "i3 launches ubuntu-start directly, before shell-only XSET_DELAY and XSET_RATE exports exist.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Execute startup with missing, empty, partial and full exports; record xset arguments and query the live X server."
+      ],
+      "id": "local-ubs-repeat-without-shell-exports",
+      "limitations": "Actual fresh i3 login and physical typing untested. This X server reports 62 for a requested rate of 60; distinguish exact arguments from effective server rates. Scoped installation preserved unrelated older live script differences.",
+      "reference": "references/operational-drift.md#local-ubs-repeat-without-shell-exports",
+      "remedy": "Default missing or empty delay and rate independently to 200 and 90 in ubuntu-start; preserve nonempty overrides and optional xset guard.",
+      "sources": [
+        "a7bc73007b5411bbf81844f5d0cc130bca4584625d0a24305f712e112657b561"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "UBS skips fast keyboard repeat when launched without Fish exports."
+      ],
+      "verification": "Defining shell regression RED then GREEN; four shell regressions and Bash syntax passed. Scoped refresh installed the change; real X11 verified missing/empty 200/90, partial overrides 300/90 and 200/50, both 300/50, then restored 200/90.",
+      "verification_scope": "runtime"
     }
   ],
   "reports": [
@@ -9991,6 +10011,16 @@
       "findings": [],
       "reviewed_on": "2026-10-21",
       "sha256": "ee0d33e139d6d51d2780a9831dca9676a91094c61cf3f5797cbf903a2539accf"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-21-ubs-key-repeat.md"
+      ],
+      "findings": [
+        "local-ubs-repeat-without-shell-exports"
+      ],
+      "reviewed_on": "2026-10-21",
+      "sha256": "a7bc73007b5411bbf81844f5d0cc130bca4584625d0a24305f712e112657b561"
     }
   ],
   "review": {

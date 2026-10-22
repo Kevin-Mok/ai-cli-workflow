@@ -29,9 +29,8 @@ if [ -f "${HOME}/.Xmodmap" ]; then
 fi
 
 start_command redshift "${HOME}/scripts/redshift-control" set 3000
-if [ -n "${XSET_DELAY:-}" ] && [ -n "${XSET_RATE:-}" ]; then
-  start_command xset xset r rate "${XSET_DELAY}" "${XSET_RATE}"
-fi
+# i3 startup does not inherit Fish's exported repeat settings.
+start_command xset xset r rate "${XSET_DELAY:-200}" "${XSET_RATE:-90}"
 if command -v dunst >/dev/null 2>&1; then
   if ! command -v pgrep >/dev/null 2>&1 || ! pgrep -x dunst >/dev/null 2>&1; then
     dunst &
