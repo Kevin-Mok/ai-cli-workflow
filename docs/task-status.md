@@ -130,3 +130,12 @@ This document records delivery milestones and verification for completed reposit
 - Delivery: one focused commit on main, then push to origin/main after isolated candidate review. No remaining shortcut implementation work or blockers.
 - Remaining: preserve unrelated staged and unstaged work. Interactive keystroke expansion remains manual; existing fish sessions may need reloading.
 - Rollback: remove the new tw mapping, restore its commented predecessor, deploy the reviewed directory template and regenerate shortcuts.
+
+## Kitty scrollback — chore(kitty): increase scrollback to 500k lines
+
+- Complete: Kitty retains up to 500,000 native history lines; tmux remains at 50,000 lines per pane. README and scrolling smoke checks match the configuration.
+- Scope: directly observed config and documentation edits; the session helper did not recognize the writes, so direct-write fallback governs. Unrelated dirty work remains excluded.
+- Verification: Kitty-scoped refresh-config exited 0; Kitty parsed both source and installed configuration as 500000. README gate returned pass_no_change; scoped whitespace checks passed. Exact staged privacy review is required immediately before commit.
+- Delivery: one focused commit on main, then push to origin/main after staged review. No implementation blockers remain.
+- Remaining: existing Kitty windows retain their original cap; create fresh windows to use the new limit. Full-buffer stress testing remains manual.
+- Rollback: restore scrollback_lines to 50000 and apply the Kitty configuration with refresh-config.

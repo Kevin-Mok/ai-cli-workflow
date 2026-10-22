@@ -1183,7 +1183,9 @@ The fixture uses the normal Kitty configuration without overrides. Ordinary
 Codex launches use the persistent tui.alternate_screen = "never" setting;
 restart or resume an existing Codex session to pick up that default.
 Keep the fixture at least 40 columns wide through the first history check so
-wrapping all 10,000 records fits inside the configured 50,000-line buffer.
+wrapping all 10,000 records fits inside the configured 500,000-line buffer.
+Kitty's native history limit is 500,000 lines; tmux keeps its separate
+50,000-line limit per pane.
 
 - Action: /home/example/scripts/kitty-scrollback-smoke
   Expected: A separate window titled “Kitty scrollback smoke test” opens with 10,000 numbered history records and wrapped text. A narrow window first prompts you to widen it to at least 40 columns and press Enter. No sudo, model request, or configuration change is needed. The window keeps the current pywal colors and 0.9 opacity, with a thin rounded scrollbar at the right edge; hovering makes it wider and easier to grab.
