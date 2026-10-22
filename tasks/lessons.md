@@ -258,3 +258,9 @@
 - 2026-10-21: Sender-only Discord DMs cannot pass a channel-title filter. Inspect privacy-safe Dunst app metadata and update both the daemon route and shared parser; the observed client identifies as `vesktop`. See [DM speech](../docs/postmortem/2026-10-21-discord-dm-speech.md).
 
 - 2026-10-22: A successful daily screensaver timer and DPMS wake do not prove sustained visibility. An unavailable browser bridge can immediately dismiss automatic-policy playback; explicit schedules need deliberate gate policy and playback-scoped XScreenSaver inhibition. Verify release and original settings after exceptions; distinguish input-dismissed desktop probes from duration acceptance. See [morning blackout](../docs/postmortem/2026-10-22-screensaver-morning-blackout.md).
+
+- 2026-10-22: Discord channel titles may isolate every field with U+2068/U+2069. Strip U+2066–U+2069 before matching the channel suffix and before the Vesktop DM fallback; exercise the coarse Dunst route too. See [direction-isolate speech](../docs/postmortem/2026-10-22-discord-direction-isolates.md).
+
+- 2026-10-22: Dunst executes every matching script rule; order does not override prior scripts. Use one shared callback with classification and test real client identity plus channel format together, not only FormatProbe. Avoid message-text deduplication that would suppress legitimate repeat messages.
+
+- 2026-10-22: Calibrate mpv speech with rendered output, not a linear percentage assumption: native50 volume measured roughly18dB below100. Distinguish an unsupported/silent per-stream capture from real silence; the sink monitor gave usable live levels. Preserve user-selected persistent volume over calibration guesses.

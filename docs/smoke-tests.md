@@ -1509,6 +1509,13 @@ play audio, so exercise them deliberately.
 - Action: With the idle service active, run `systemctl --user kill --signal=TERM --kill-whom=main media-screensaver.service`, wait six seconds, and inspect its status and journal; then stop it with `systemctl --user stop media-screensaver.service` and start it again with `~/scripts/media-screensaver service`.
   Expected: Termination is followed by a new daemon PID after five seconds and a fresh idle clock; deliberate stop leaves the service inactive and releases any owned preview. Starting again succeeds without duplicate monitors.
 
+### Notification speech volume
+
+- Action: Run `~/scripts/codex-notification-sound speech-volume 75`, then run it again without the number.
+  Expected: Both report `Speech volume: 75%`; the value persists for future speech. Browser/system and intro-clip volume remain unchanged.
+- Action: Run `~/scripts/codex-notification-sound speech-volume 101`, then query the value.
+  Expected: Clear 0–100 validation error, exit2; previous volume remains75.
+
 ### Discord channel and DM notification speech
 
 Apply the helper and Dunst rule using the notification guide, restart Dunst once,
@@ -1522,6 +1529,10 @@ and enable `discord-speech`. No sudo. The probes are synthetic and play local au
   Expected: Normal Unicode-channel popup; Ryan says `Alex says hello`, without channel/server text.
 - Action: Run `~/scripts/codex-notification-sound smoke discord-dm`.
   Expected: Synthetic Vesktop popup `Alex` / `hello from a direct message`; Ryan says `Alex says hello from a direct message` with one WAV and no intro clip.
+- Action: Run `~/scripts/codex-notification-sound smoke discord-isolates`.
+  Expected: Unicode channel popup with invisible direction isolates; Ryan says only `Alex says hello` exactly once, without channel/server text or an intro clip. The fixture uses Vesktop identity to catch overlapping rules. While watching a stream, speech should sit below it at the default 75% software volume; browser/system volume stays unchanged.
+- Action: Run `~/scripts/codex-notification-sound smoke discord-saucybot` and `~/scripts/codex-notification-sound smoke discord-twitter-cap-bot`.
+  Expected: Both bot popups appear, with no speech or intro clip. Sender-name matching ignores case and covers channel messages and DMs.
 - Action: Run `~/scripts/codex-notification-sound smoke discord-unrelated`.
   Expected: Normal `Voice: listening` popup with body `nerd-dictation is ready`; no speech.
 - Action: Disable `discord-speech`, repeat a matching probe, then enable it again. Check status before and after.

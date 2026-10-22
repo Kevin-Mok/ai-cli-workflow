@@ -274,3 +274,42 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Verification: eight timer and 58 broader tests passed. Isolated Xvfb verifies inhibition beyond the configured timeout, automatic blanking after exception cleanup and unchanged settings. Deployed sources matched; real playback entered three items but physical input ended duration probes.
 - Limitations: real uninterrupted duration and next-morning hardware acceptance remain unobserved. Forced blanking and lockers retain control. Newly detected browser video or user input may dismiss playback.
 - Source: [Morning blackout](../../../../docs/postmortem/2026-10-22-screensaver-morning-blackout.md); exact hash/alias in sources.json.
+
+## local-discord-direction-isolates
+
+- **status**: verified_fix
+- **symptoms**: Discord channel/server metadata is spoken as part of the sender; browser channel notifications miss speech.
+- **applicability**: Discord desktop notification titles containing Unicode direction isolates, including observed Vesktop metadata.
+- **diagnostics**: Inspect title codepoints and app routing; U+2068 before # prevents the literal channel delimiter and triggers the Vesktop DM fallback.
+- **confidence**: confirmed
+- **remedy**: Remove U+2066–U+2069 before visible-text parsing; keep full suffix validation before speaking sender says message.
+- **verification**: Unit83 and private Dunst1 pass after expected RED; type check0. Installed isolated Vesktop channel WAV1/MP3 0, both excluded bot probes silent. Source/live bytes match after refresh and activation.
+- **verification_scope**: runtime
+- **limitations**: Subjective listening and a new real incoming notification remain unobserved. Same-format apps can match; broader suite has unrelated socket and path-fixture failures.
+- **Report**: [Discord direction isolates](../../../../docs/postmortem/2026-10-22-discord-direction-isolates.md)
+
+## local-dunst-overlapping-audio-rules
+
+- **status**: verified_fix
+- **symptoms**: The same Vesktop channel notification is spoken twice.
+- **applicability**: Dunst1.9.2 configurations with multiple matching script rules.
+- **diagnostics**: Compare exact-client channel notifications against generic format fixtures; each matching rule invokes its script.
+- **confidence**: confirmed
+- **remedy**: Use one shared audio callback and classify in Python; avoid text deduplication that suppresses legitimate separate deliveries. Exclude normalized SaucyBot and Twitter Cap Bot senders from Discord speech.
+- **verification**: Private daemon RED observed22 instead of21 playbacks. GREEN unit83/private daemon1/type0; installed Vesktop channel WAV1, excluded bots WAV0, no MP3.
+- **verification_scope**: runtime
+- **limitations**: Synthetic installed acceptance; subjective listening and next real incoming message remain manual. Global callback starts for unrelated displayed notifications but returns without playing.
+- **Report**: [Discord speech and duplicate callbacks](../../../../docs/postmortem/2026-10-22-discord-direction-isolates.md)
+
+## local-mpv-nonlinear-speech-volume
+
+- **status**: verified_fix
+- **symptoms**: Notification TTS dominates streaming audio; a linear percentage assumption makes attenuation too strong.
+- **applicability**: Local Ryan notification speech played through mpv software volume.
+- **diagnostics**: Compare live sink-monitor loudness and actual mpv-rendered PCM; silent per-stream captures do not establish silence.
+- **confidence**: confirmed
+- **remedy**: Use native mpv software gain only for speech WAVs, persist a validated0..100 setting atomically, and keep the user-selected75 default. Do not alter browser, system or intro-clip volume.
+- **verification**: Actual rendering at100=-16.08LUFS and50=-34.13LUFS; installed set/query and one WAV at50 verified. User selected75 and confirmed replay.85 tests/type0; installed saved/fresh queries75 and source/live match after refresh.
+- **verification_scope**: runtime
+- **limitations**: Fixed gain cannot track future stream loudness. Exact Vole Twitch slider unavailable. Earlier broad suite retains unrelated socket/path-fixture failures.
+- **Report**: [Discord speech volume calibration](../../../../docs/postmortem/2026-10-22-discord-direction-isolates.md)

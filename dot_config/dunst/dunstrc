@@ -316,23 +316,6 @@
 #
 # vim: ft=cfg
 
-# Coarse format filter; the callback validates the complete title and body.
-# Keep this before app-specific rules so their callbacks retain precedence.
-[discord_format_speech]
-    summary = "* (#*, *)"
-    script = ~/scripts/codex-notification-sound
-
-# Sender-only DMs use the appname observed in live Dunst history.
-[vesktop_dm_speech]
-    appname = vesktop
-    script = ~/scripts/codex-notification-sound
-
-# Kitty tags only notifications from a local foreground Codex executable.
-[codex_notification_sound]
-    appname = codex-kitty
-    script = ~/scripts/codex-notification-sound
-
-# Grok Bot reads its notification message after the configured question clip.
-[grok_bot_notification_sound]
-    appname = Grok Bot
+# Dunst runs every matching script rule; dispatch once and classify in Python.
+[notification_audio]
     script = ~/scripts/codex-notification-sound

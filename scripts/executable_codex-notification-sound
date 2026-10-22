@@ -38,6 +38,7 @@ APP_NAME = 'codex-kitty'
 VOICE = 'en_US-ryan-high'
 VOICE_LABEL = 'Ryan (US, high)'
 LENGTH_SCALE = 0.95
+DEFAULT_SPEECH_VOLUME = 75
 SYNTHESIS_TIMEOUT = 30
 _plain = False
 _details = False
@@ -100,6 +101,17 @@ def discord_enabled() -> bool:
         return False
 
 
+def speech_volume() -> int:
+    try:
+        data = json.loads(setting_path().with_name('speech-volume.json').read_text(encoding='utf-8'))
+        value = data.get('percent') if isinstance(data, dict) else None
+        if type(value) is int and 0 <= value <= 100:
+            return value
+    except (OSError, ValueError, UnicodeError):
+        pass
+    return DEFAULT_SPEECH_VOLUME
+
+
 def discord_message(title: str, body: str, appname: str = "") -> str | None:
     def visible(text: str) -> str:
         class MarkupText(HTMLParser):
@@ -117,16 +129,21 @@ def discord_message(title: str, body: str, appname: str = "") -> str | None:
         parser = MarkupText(convert_charrefs=True)
         parser.feed(text)
         parser.close()
-        return ' '.join(''.join(parts).split())
+        # Discord isolates each title field; strip controls before suffix parsing.
+        return ' '.join(re.sub('[\u2066-\u2069]', '', ''.join(parts)).split())
     title, message = visible(title), visible(body)
     if appname == 'vesktop' and ' (#' not in title:
-        return f'{title} says {message}' if title and message else None
-    sender, separator, suffix = title.rpartition(' (#')
-    match = re.fullmatch(r'([^,]+), (.+)\)', suffix)
-    if not separator or not sender.strip() or not match or not message or not all(value.strip() for value in match.groups()):
+        sender = title
+    else:
+        sender, separator, suffix = title.rpartition(' (#')
+        match = re.fullmatch(r'([^,]+), (.+)\)', suffix)
+        if not separator or not match or not all(value.strip() for value in match.groups()):
+            return None
+    sender = sender.strip()
+    if not sender or not message or sender.casefold() in {'saucybot', 'twitter cap bot'}:
         return None
     # shortcut: same-format apps also match; add identity only with real samples.
-    return f'{sender.strip()} says {message}'
+    return f'{sender} says {message}'
 
 
 def voice_paths() -> tuple[Path, Path]:
@@ -139,17 +156,21 @@ def voice_ready() -> bool:
     return os.access(python, os.X_OK) and model.is_file() and model.with_suffix('.onnx.json').is_file()
 
 
-def set_speech(enabled: bool, *, discord: bool = False) -> int:
-    path = setting_path().with_name('discord-speech.json' if discord else 'speech.json')
+def save_audio_setting(name: str, data: dict[str, bool | int]) -> None:
+    path = setting_path().with_name(name)
     path.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.NamedTemporaryFile(mode='w', encoding='utf-8', dir=path.parent, delete=False) as output:
         temporary = Path(output.name)
-        json.dump({'enabled': enabled}, output)
+        json.dump(data, output)
         output.write('\n')
     try:
         os.replace(temporary, path)
     finally:
         temporary.unlink(missing_ok=True)
+
+
+def set_speech(enabled: bool, *, discord: bool = False) -> int:
+    save_audio_setting('discord-speech.json' if discord else 'speech.json', {'enabled': enabled})
     display(f'{"Discord speech" if discord else "Speech"}: {"enabled" if enabled else "disabled"}', '🗣️')
     if enabled and not discord:
         display('Resume affected sessions to load completion notifications.')
@@ -190,7 +211,9 @@ def play(title: str | None = None, *, speech_only: bool = False, source: object 
                 with outline(source):
                     result = subprocess.run(
                         [player, '--no-config', '--no-video', '--no-terminal',
-                         '--audio-display=no', '--', str(path)],
+                         '--audio-display=no',
+                         *([f'--volume={speech_volume()}'] if path.suffix == '.wav' else []),
+                         '--', str(path)],
                         stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
                         stderr=subprocess.DEVNULL, timeout=60, check=False)
                 if result.returncode:
@@ -295,7 +318,7 @@ def main(argv: list[str] | None = None) -> int:
     args = list(sys.argv[1:] if argv is None else argv)
     # Dunst passes exactly five positional arguments. Notification text is
     # never parsed as a command or used to select audio.
-    cli_options = bool(args and args[0] in {'set', 'preview', 'speech', 'discord-speech', 'disable', 'status', 'smoke', 'event-play'}
+    cli_options = bool(args and args[0] in {'set', 'preview', 'speech', 'speech-volume', 'discord-speech', 'disable', 'status', 'smoke', 'event-play'}
                        and len(args) > 1 and args[1].startswith('--'))
     if len(args) == 5 and args[4] in ('LOW', 'NORMAL', 'CRITICAL') and not cli_options:
         if args[0] == APP_NAME and not speech_enabled():
@@ -322,6 +345,8 @@ def main(argv: list[str] | None = None) -> int:
     preview.add_argument('--speech-only', action='store_true', help='speak --title without the configured clip; requires nonblank text')
     speech = commands.add_parser('speech', help='switch hook audio; disable restores Dunst audio', parents=[presentation])
     speech.add_argument('state', choices=('enable', 'disable'))
+    volume = commands.add_parser('speech-volume', help='set TTS volume (0–100), or show the saved value', parents=[presentation])
+    volume.add_argument('percent', nargs='?', type=int, help='speech-only volume; default 75')
     discord = commands.add_parser('discord-speech', help='switch Discord channel and Vesktop DM speech independently', parents=[presentation])
     discord.add_argument('state', choices=('enable', 'disable'))
     event_player = commands.add_parser('event-play', help=argparse.SUPPRESS, parents=[presentation])
@@ -329,8 +354,10 @@ def main(argv: list[str] | None = None) -> int:
     commands.add_parser('disable', help='remove the local setting; keep your clip', parents=[presentation])
     commands.add_parser('status', help='show setting path and enabled/disabled state', parents=[presentation])
     smoke = commands.add_parser('smoke', help='exercise the Dunst rule or emit an unrelated Kitty OSC 9 popup', parents=[presentation])
-    smoke.add_argument('kind', choices=('tagged', 'kitty', 'grok', 'discord', 'discord-unicode', 'discord-dm', 'discord-unrelated'))
+    smoke.add_argument('kind', choices=('tagged', 'kitty', 'grok', 'discord', 'discord-unicode', 'discord-isolates', 'discord-dm', 'discord-saucybot', 'discord-twitter-cap-bot', 'discord-unrelated'))
     options = parser.parse_args(args)
+    if options.command == 'speech-volume' and options.percent is not None and not 0 <= options.percent <= 100:
+        parser.error('speech volume must be between 0 and 100')
     _plain = bool(getattr(options, 'plain', False)) or os.environ.get('CLI_PLAIN') == '1'
     _details = bool(getattr(options, 'details', False))
     if options.command == 'set':
@@ -338,6 +365,11 @@ def main(argv: list[str] | None = None) -> int:
     if options.command == 'preview':
         return play(options.title, speech_only=options.speech_only, source=capture_source())
     try:
+        if options.command == 'speech-volume':
+            if options.percent is not None:
+                save_audio_setting('speech-volume.json', {'percent': options.percent})
+            display(f'Speech volume: {speech_volume()}%', '🔉')
+            return 0
         if options.command in ('speech', 'discord-speech'):
             return set_speech(options.state == 'enable', discord=options.command == 'discord-speech')
         if options.command == 'event-play':
@@ -361,6 +393,7 @@ def main(argv: list[str] | None = None) -> int:
             display(f'  Voice   {"ready" if voice_ready() else "not installed"}')
             display(f'  Model   {VOICE_LABEL}')
             display(f'  Pace    {LENGTH_SCALE} (slightly brisk)')
+            display(f'  Speech volume  {speech_volume()}%')
             if clip:
                 display(f'  Clip    {clip.name}')
             display('Use setup-codex-notification-speech --check to verify the voice.')
@@ -388,10 +421,13 @@ def main(argv: list[str] | None = None) -> int:
                     title, body = {
                         'discord': ('(A) Alex (#normie, Active)', 'hai'),
                         'discord-unicode': ('Alex (#😊normie, Another Server)', 'hello'),
+                        'discord-isolates': ('\u2068Alex\u2069 (\u2068#「💼」work\u2069, \u2068Server\u2069)', 'hello'),
                         'discord-dm': ('Alex', 'hello from a direct message'),
+                        'discord-saucybot': ('SaucyBot (#work, Server)', 'Synthetic ignored bot message'),
+                        'discord-twitter-cap-bot': ('Twitter Cap Bot (#work, Server)', 'Synthetic ignored bot message'),
                         'discord-unrelated': ('Voice: listening', 'nerd-dictation is ready'),
                     }[options.kind]
-                    if options.kind == 'discord-dm':
+                    if options.kind in ('discord-dm', 'discord-isolates', 'discord-saucybot', 'discord-twitter-cap-bot'):
                         app = 'vesktop'
                     display('Sending synthetic Discord notification probe.', '🧪')
                 result = subprocess.run([sender, '--app-name', app, '--expire-time', '5000', title, body], check=False)

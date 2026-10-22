@@ -106,6 +106,22 @@ class PlaybackTests(unittest.TestCase):
             with self.subTest(title=title):
                 self.assertEqual(self.helper.discord_message(title, body), expected)
 
+    def test_discord_direction_isolates_do_not_turn_channels_into_dms(self):
+        title = '\u2068Alex\u2069 (\u2068#「💼」work\u2069, \u2068Server\u2069)'
+        for app in ('vesktop', 'Google Chrome', 'FormatProbe'):
+            with self.subTest(app=app):
+                self.assertEqual(self.helper.discord_message(title, '\u2068hello\u2069', app), 'Alex says hello')
+        self.assertEqual(self.helper.discord_message('\u2066(A) Alex\u2069', '\u2067hello\u2069', 'vesktop'), '(A) Alex says hello')
+        self.assertIsNone(self.helper.discord_message('\u2068\u2069', 'hello', 'vesktop'))
+        self.assertIsNone(self.helper.discord_message('Alex (\u2068#, Server\u2069)', 'hello', 'vesktop'))
+
+    def test_discord_ignored_bots_are_silent_in_channels_and_dms(self):
+        for sender in ('SaucyBot', 'saucybot', 'Twitter Cap Bot', 'TWITTER CAP BOT'):
+            for title in (sender, f'\u2068{sender}\u2069 (\u2068#work\u2069, \u2068Server\u2069)'):
+                with self.subTest(title=title):
+                    self.assertIsNone(self.helper.discord_message(title, 'bot message', 'vesktop'))
+        self.assertEqual(self.helper.discord_message('SaucyBot fan (#work, Server)', 'hello', 'vesktop'), 'SaucyBot fan says hello')
+
     def test_discord_rejects_incomplete_or_unrelated_notifications(self):
         for title, body in [('Voice: listening', 'nerd-dictation is ready'),
                             ('Alex', 'DM'), ('Alex (#c, S) (#, T)', 'hi'), (' (#c, S)', 'hi'), ('Alex (# , S)', 'hi'),
@@ -367,6 +383,40 @@ class SpeechTests(PlaybackTests):
                 self.assertFalse(Path((self.root / 'wav-path').read_text()).exists())
                 self.assertFalse((self.root / 'nope').exists())
 
+    def test_speech_is_attenuated_without_lowering_the_intro_clip(self):
+        self.configure()
+        env, player, ready, voice = self.speech_fixture()
+        with env, player, ready, voice:
+            self.assertEqual(self.helper.main(['preview', '--title', 'Quiet notification']), 0)
+        speech_args = json.loads((self.root / 'wav-player.args').read_text())
+        clip_args = json.loads((self.root / 'mp3-player.args').read_text())
+        self.assertIn('--volume=75', speech_args)
+        self.assertFalse(any(arg.startswith('--volume=') for arg in clip_args))
+
+    def test_speech_volume_command_persists_and_rejects_invalid_percentages(self):
+        import contextlib
+        import io
+        self.assertEqual(self.helper.main(['speech-volume', '37', '--plain']), 0)
+        setting = self.setting.with_name('speech-volume.json')
+        self.assertEqual(json.loads(setting.read_text()), {'percent': 37})
+        self.assertEqual(setting.stat().st_mode & 0o777, 0o600)
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            self.assertEqual(self.helper.main(['speech-volume', '--plain']), 0)
+        self.assertIn('37%', output.getvalue())
+        for invalid in ('-1', '101', 'nope'):
+            with contextlib.redirect_stderr(io.StringIO()), self.assertRaises(SystemExit) as error:
+                self.helper.main(['speech-volume', invalid])
+            self.assertEqual(error.exception.code, 2)
+            self.assertEqual(json.loads(setting.read_text()), {'percent': 37})
+        env, player, ready, voice = self.speech_fixture(synthesis='immediate')
+        with env, player, ready, voice:
+            self.assertEqual(self.speech_only_preview('Quiet sample'), 0)
+        self.assertIn('--volume=37', json.loads((self.root / 'wav-player.args').read_text()))
+        for malformed in ('broken', '[]', '{"percent": true}', '{"percent": 101}', '{"percent": 3.5}'):
+            setting.write_text(malformed)
+            self.assertEqual(self.helper.speech_volume(), 75)
+
     def test_speech_only_rejects_missing_or_blank_title_before_children(self):
         import contextlib
         import io
@@ -533,6 +583,7 @@ class SpeechTests(PlaybackTests):
                 with (root/'events').open('a') as output:
                     output.write(value+'\\n')
             path=pathlib.Path(sys.argv[-1])
+            (root/(path.suffix[1:]+'-player.args')).write_text(json.dumps(sys.argv[1:]))
             if path.suffix=='.mp3':
                 event('clip start')
                 deadline=time.monotonic()+.6

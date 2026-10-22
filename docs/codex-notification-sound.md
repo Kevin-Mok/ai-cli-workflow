@@ -135,7 +135,7 @@ Codex already uses OSC 9 with `tui.notifications=true`. The callback resolves th
 
 Dunst matches that exact application name and double-forks the sound helper, so waiting for mpv does not block Kitty, Codex or Dunst. Playback uses argument lists without a shell and passes the entire filename after `--`. mpv ignores user configuration and opens no video window. The callback formats strong-emphasis text; timeout, actions and click-to-focus remain native; Codex/Kitty's existing focus suppression remains in place.
 
-`always_run_script=false` is global in Dunst 1.9.2. The Grok and Discord format rules share this callback. It prevents sound for empty-format suppressed notifications and repeated calls for already-sounded objects. Native duplicate stacking remains enabled: an identical displayed notification adds no immediate sound or popup. Most history recalls stay silent; Dunst replaces a stacked duplicate with an unsounded object, which can sound once when later recalled or restored. Notifications queued while Dunst is paused sound only when displayed. Future `skip_display=true` rules would require separate review because Dunst invokes scripts before that suppression.
+`always_run_script=false` is global in Dunst 1.9.2. One notification_audio rule invokes the shared callback once; Python classifies Codex, Grok and Discord. Overlapping script rules would each run and cause duplicate audio. It prevents sound for empty-format suppressed notifications and repeated calls for already-sounded objects. Native duplicate stacking remains enabled: an identical displayed notification adds no immediate sound or popup. Most history recalls stay silent; Dunst replaces a stacked duplicate with an unsounded object, which can sound once when later recalled or restored. Notifications queued while Dunst is paused sound only when displayed. Future `skip_display=true` rules would require separate review because Dunst invokes scripts before that suppression.
 
 This is local process identification, not a security boundary. SSH and tmux foreground clients cannot reliably expose remote/nested Codex origin and remain ordinary Kitty notifications. Every popup that local Codex actually emits is eligible, including approvals; this does not enable notifications that Codex itself suppresses. With speech disabled, the deployed completion callback and permission bridge are no-ops; Dunst retains this behavior. With speech enabled, the event bridge owns audio as described above.
 
@@ -174,7 +174,7 @@ With speech disabled, the first should show one synthetic popup and play once. W
 
 ## Rollback
 
-For immediate speech rollback, run `~/scripts/codex-notification-sound speech disable`. To disable all configured audio, run `~/scripts/codex-notification-sound disable`; popups continue normally. For complete removal, remove only the `codex_notification_sound` rule, restore `always_run_script=true` if there are no intervening script-rule changes, and remove the completion `notify` entry and the two question entries in `hooks.json`, then remove this task's Kitty callback, event bridge, sound helper, setup helper and activation helper from both the tracked and installed paths. Apply the remaining config, restart Dunst and start a fresh Kitty process. Do not reset unrelated dirty files. Your MP3 is never deleted.
+For immediate speech rollback, run `~/scripts/codex-notification-sound speech disable`. To disable all configured audio, run `~/scripts/codex-notification-sound disable`; popups continue normally. For complete removal of all shared audio (including Grok and Discord), remove the `notification_audio` rule. Keep `always_run_script=false` for remaining script rules. Remove the completion `notify` entry and the two question entries in `hooks.json`, then remove this task's Kitty callback, event bridge, sound helper, setup helper and activation helper from both the tracked and installed paths. Apply the remaining config, restart Dunst and start a fresh Kitty process. Do not reset unrelated dirty files. Your MP3 is never deleted.
 
 ## Optional source outline
 
@@ -190,6 +190,18 @@ configured clip. This route is independent of the Codex speech switch; disable
 or change its Dunst rule separately if needed. `smoke grok` emits a real desktop
 notification and can play audio, so use it only when ready to listen.
 
+## Speech volume
+
+Notification speech defaults to 75% mpv software volume; intro clips keep
+their existing level, and browser/system volume stays unchanged. The default was selected by listening alongside Twitch after comparing live-stream
+and Ryan sample levels.
+It is a fixed gain, so stream loudness and future browser volume changes can change
+the balance. Set it with `codex-notification-sound speech-volume 75` (0–100);
+omit the number to show the current value. The setting is saved privately and
+applies to future speech across Discord, Codex and Grok. mpv uses a nonlinear
+scale: 50% is about −18 dB, rather than half the signal amplitude.
+Check while watching with `codex-notification-sound smoke discord-isolates`.
+
 ## Discord channel-message speech
 
 Read desktop channel messages and Vesktop direct messages locally with Ryan as `SENDER says MESSAGE`, without
@@ -201,6 +213,7 @@ explicitly enable this independent switch (no sudo):
 ~/scripts/codex-notification-sound status --plain
 ~/scripts/codex-notification-sound smoke discord
 ~/scripts/codex-notification-sound smoke discord-unicode
+~/scripts/codex-notification-sound smoke discord-isolates
 ~/scripts/codex-notification-sound smoke discord-dm
 ~/scripts/codex-notification-sound smoke discord-unrelated
 ```
@@ -214,6 +227,12 @@ path; subjective listening and a real incoming Discord message are separate chec
 Matching requires the complete title `SENDER (#CHANNEL, SERVER)` plus a nonblank
 body. Sender parentheses, Unicode and emoji are preserved; actual notification
 markup is removed and whitespace normalized. Escaped literal markup remains text.
+Discord's invisible Unicode direction isolates (U+2066–U+2069) are removed before
+matching, so channel/server metadata stays out of speech. The `smoke discord-isolates`
+probe uses Vesktop identity and reproduces this client format; it should speak `Alex says hello` exactly once.
+Normalized sender names `SaucyBot` and `Twitter Cap Bot` are excluded from speech,
+case-insensitively, for both channels and DMs. Their popups remain visible.
+Use `smoke discord-saucybot` and `smoke discord-twitter-cap-bot` to check silence.
 The app name is deliberately unrestricted, so another app using the same format
 also speaks. Sender-only titles are accepted for exact appname `vesktop`, observed
 in live Dunst history. The `smoke discord-dm` fixture uses that app with title
