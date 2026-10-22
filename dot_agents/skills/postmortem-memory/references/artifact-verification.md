@@ -517,7 +517,7 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Remedy: Keep the production 3.4 server and clients unchanged; use the versioned 3.8 binary only for isolated scrollbar previews until edge-selection compatibility is investigated.
 - Verification: Combined suite passes 24/24 on 3.4 and 20/24 on 3.8. Native scrollbar drag passes independently in both shell and app fixtures; six original session identities/window counts and server PID remain unchanged.
 - Limitations: Root cause of edge-selection differences unresolved; no physical desktop acceptance or production migration. Successful scrollbar drag is not full selection-workflow compatibility.
-- Source: [school-2 scrollbar preparation](../../../../docs/postmortem/2026-10-22-school-2-scrollbar-preparation.md) (SHA-256 `e18f213cfce479da14f556a53d0f1b247ee2da93d89537730264f011b2d20ec1`).
+- Source: [school-2 scrollbar preparation](../../../../docs/postmortem/2026-10-22-school-2-scrollbar-preparation.md) (SHA-256 `da97cda60650610bed5f0eff10cf92242e2d05ff708d246ad217f2bc1c0f5a23`).
 
 ## local-kitty-preview-inherited-path
 
@@ -530,4 +530,4 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Remedy: Prefer the installed user-local Kitty executable and prepend the selected versioned tmux directory to preview child PATH so plugins use matching clients. Preserve required modern mappings.
 - Verification: Legacy parser reproduced line-30 error; modern parser reported zero bad lines. Both defining launcher assertions failed before fixes and passed afterward. Actual isolated GUI under system PATH displayed history, scrollbar and INPUT hello; helper exited 0 and installed bytes matched source.
 - Limitations: User-local Kitty fallback elsewhere still requires a compatible PATH binary. Isolated GUI checks do not establish physical desktop acceptance or resolve four pre-existing 3.8 edge-selection failures.
-- Source: [school-2 scrollbar preparation](../../../../docs/postmortem/2026-10-22-school-2-scrollbar-preparation.md) (SHA-256 `e18f213cfce479da14f556a53d0f1b247ee2da93d89537730264f011b2d20ec1`).
+- Source: [school-2 scrollbar preparation](../../../../docs/postmortem/2026-10-22-school-2-scrollbar-preparation.md) (SHA-256 `da97cda60650610bed5f0eff10cf92242e2d05ff708d246ad217f2bc1c0f5a23`).

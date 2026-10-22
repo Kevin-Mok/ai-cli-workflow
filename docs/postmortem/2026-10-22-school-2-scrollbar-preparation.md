@@ -67,3 +67,9 @@ Installed helper bytes match tracked source via cmp. No Kitty config edits or br
 The first exact candidate scan blocked a home_path reference in the new ledger alias. Public staging must use the established /home/example placeholder while the working ledger retains the physical alias for local targeted checks. The unrelated working-ledger edits remain uncommitted. Retry the privacy gate against the isolated sanitized candidate; no bypass or hook change.
 
 Privacy retry passed for the isolated candidate after replacing only the public ledger alias with /home/example. Working physical-alias knowledge remains usable and its targeted check passes; no private alias is included in the commit.
+
+## Commit index reconciliation failure
+
+Commit dbc6146 (feat(tmux): add isolated native scrollbar preview) succeeded with all nine scoped files and privacy hooks passing. The follow-on shared-index reconciliation failed on the newly tracked incident file because git update-index --cacheinfo omitted --add. The commit remains intact; push was not reached. Working files and unrelated dirty changes were not discarded. Recovery: compare current staged entries against the saved pre-commit baseline and committed entries, then update only matching session entries using --add; preserve concurrent staging. Record the correction in a focused follow-up commit and push the verified series once.
+
+Index recovery completed using --add after matching each entry to the saved baseline or already committed value. Shared index has no residual staged changes; dbc6146 is preserved. Lookup `tmux commit index reconciliation` returned local-git-index-same-filesystem-publish: its preserve-commit/concurrent-index checks apply, but its cross-device rename remedy does not apply to this missing --add argument. No additional memory finding is warranted for this standard Git invocation correction; record the actionable engineering lesson and refresh this report's existing evidence hashes.
