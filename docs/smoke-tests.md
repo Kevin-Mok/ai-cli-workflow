@@ -875,6 +875,21 @@ checks use invented temporary data; real notes are never repository fixtures.
 - Action: Launch `codex` from a shell where `~/scripts` shadows the real Codex binary and Graphiti is installed at `/home/example/coding/graphiti/mcp_server`.
   Expected: The wrapper creates or reuses `${XDG_STATE_HOME:-$HOME/.local/state}/codex-launch/graphiti.pid`, appends Graphiti startup output to `graphiti.log`, and then hands off to the real Codex CLI with the original arguments intact.
 
+## External 8 TB Automatic Mounting
+
+Preview the existing disk configuration, install the UUID-specific rules once with administrator authentication, then verify a safe power cycle. This setup mounts the disk on arrival and on access without requiring it to be powered on during boot.
+
+- Action: From the repo root, run `python3 scripts/enable-usb-8tb-automount.py --check`, then `sudo python3 scripts/enable-usb-8tb-automount.py --apply`. Repeat `--check`.
+  Expected: Preview reports installation pending until applied. Apply backs up the changed fstab, installs the udev rule and reloads systemd/udev. Repeated preview reports configuration installed (it does not certify runtime). An existing mounted filesystem remains mounted; automount startup is deferred until next boot if necessary. Conflicting entries/rules are refused. No data is formatted or erased.
+- Action: After installation, inspect `systemctl status 'mnt-usb\x2d8tb.mount' --no-pager` and `findmnt --mountpoint /mnt/usb-8tb` while the disk is on.
+  Expected: The mount is active and the ext4 source UUID is e2f4a51f-954a-4168-a1af-2c9645d3f00a. Do not count an autofs-only row as the disk being mounted.
+- Action: Close applications using the drive, unmount it successfully with `sudo umount /mnt/usb-8tb`, switch it off, then switch it on and wait for device discovery before running `findmnt --mountpoint /mnt/usb-8tb` without first browsing the directory.
+  Expected: The UUID-specific udev event eagerly mounts the ext4 disk again. Repeat this sequence to confirm reattachment. If unmount reports busy, leave the drive powered on and close its users; never pull power on a mounted filesystem.
+- Action: On a convenient reboot with the drive off, check that login succeeds, then turn the drive on and open `/mnt/usb-8tb`. Inspect the mount and automount units.
+  Expected: Boot proceeds without the disk; automount is available, the drive mounts when it arrives, and its files appear at the fixed path. An access while absent fails after approximately five seconds of device waiting; no files should be written into an unmounted backing directory.
+- Action: To undo installation, remove only `/etc/udev/rules.d/99-usb-8tb-automount.rules`, restore the printed fstab backup after checking for later edits, then reload systemd and udev. Reboot when convenient to retire the automount without disrupting users of the disk.
+  Expected: The previous boot-only mount policy returns. Disk contents remain untouched.
+
 ## USB SATA Disk Initialization
 
 - Action: bash scripts/hdd-init-wizard.sh --help
