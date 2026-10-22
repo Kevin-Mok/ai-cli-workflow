@@ -5441,7 +5441,7 @@
         "Compare exact-client channel notifications against generic format fixtures; each matching rule invokes its script."
       ],
       "confidence": "confirmed",
-      "remedy": "Use one shared audio callback and classify in Python; avoid text deduplication that suppresses legitimate separate deliveries. Exclude normalized SaucyBot and Twitter Cap Bot senders from Discord speech.",
+      "remedy": "Use one shared audio callback and classify in Python; avoid text deduplication that suppresses legitimate separate deliveries.",
       "verification": "Private daemon RED observed22 instead of21 playbacks. GREEN unit83/private daemon1/type0; installed Vesktop channel WAV1, excluded bots WAV0, no MP3.",
       "verification_scope": "runtime",
       "limitations": "Synthetic installed acceptance; subjective listening and next real incoming message remain manual. Global callback starts for unrelated displayed notifications but returns without playing.",
@@ -5529,6 +5529,26 @@
       "limitations": "User-local Kitty fallback elsewhere still requires a compatible PATH binary. Isolated GUI checks do not establish physical desktop acceptance or resolve four pre-existing 3.8 edge-selection failures.",
       "sources": [
         "da97cda60650610bed5f0eff10cf92242e2d05ff708d246ad217f2bc1c0f5a23"
+      ]
+    },
+    {
+      "id": "local-dunst-fixture-display-capacity",
+      "reference": "references/operational-drift.md#local-dunst-fixture-display-capacity",
+      "status": "verified_fix",
+      "symptoms": [
+        "New positive notification fixture does not start audio although its parser passes."
+      ],
+      "applicability": "Private Dunst regression suites with bounded notification_limit and retained muted popups.",
+      "diagnostics": [
+        "Check notification_limit and prior displayed fixture count before treating absent callback playback as a parser failure."
+      ],
+      "confidence": "confirmed",
+      "remedy": "Close prior fixture popups before a new independent positive block; preserve queue/suppression assertions and production limits.",
+      "verification": "Private regression expected22/observed21 before fixture drain; after close-all, one test passed with tweet/link and link-only assertions intact.",
+      "verification_scope": "runtime",
+      "limitations": "Private daemon fixture repair only; never close user desktop notifications to make a test pass. Full refresh remains blocked on unrelated permission drift.",
+      "sources": [
+        "0eaa737cd7a67a59ae482d3c668813e4a78366668ee605458ea109d66b780602"
       ]
     }
   ],
@@ -10230,6 +10250,16 @@
       "findings": [],
       "reviewed_on": "2026-10-22",
       "sha256": "79b8f337d6d8da16b0926043a66a44cf20bec9d7388f84873e35e7212c15327d"
+    },
+    {
+      "sha256": "0eaa737cd7a67a59ae482d3c668813e4a78366668ee605458ea109d66b780602",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-22-discord-embed-history-access.md"
+      ],
+      "reviewed_on": "2026-10-22",
+      "findings": [
+        "local-dunst-fixture-display-capacity"
+      ]
     }
   ],
   "review": {

@@ -140,8 +140,13 @@ def discord_message(title: str, body: str, appname: str = "") -> str | None:
         if not separator or not match or not all(value.strip() for value in match.groups()):
             return None
     sender = sender.strip()
-    if not sender or not message or sender.casefold() in {'saucybot', 'twitter cap bot'}:
+    if not sender or not message or sender.casefold() == 'twitter cap bot':
         return None
+    if sender.casefold() == 'saucybot':
+        return f'{sender} sends tweet'
+    if re.search(r'(?:[a-z][a-z0-9+.-]*://|www\.)', body, re.IGNORECASE):
+        tweet = re.search(r"(?:https?://|www\.)(?:www\.)?(?:x|twitter)\.com/[^/\s<>]+/status/\d+(?=[/?#\s<>\"']|$)", body, re.IGNORECASE)
+        return f'{sender} sends {"tweet" if tweet else "link"}'
     # shortcut: same-format apps also match; add identity only with real samples.
     return f'{sender} says {message}'
 
@@ -354,7 +359,7 @@ def main(argv: list[str] | None = None) -> int:
     commands.add_parser('disable', help='remove the local setting; keep your clip', parents=[presentation])
     commands.add_parser('status', help='show setting path and enabled/disabled state', parents=[presentation])
     smoke = commands.add_parser('smoke', help='exercise the Dunst rule or emit an unrelated Kitty OSC 9 popup', parents=[presentation])
-    smoke.add_argument('kind', choices=('tagged', 'kitty', 'grok', 'discord', 'discord-unicode', 'discord-isolates', 'discord-dm', 'discord-saucybot', 'discord-twitter-cap-bot', 'discord-unrelated'))
+    smoke.add_argument('kind', choices=('tagged', 'kitty', 'grok', 'discord', 'discord-unicode', 'discord-isolates', 'discord-dm', 'discord-links', 'discord-link-only', 'discord-saucybot', 'discord-twitter-cap-bot', 'discord-unrelated'))
     options = parser.parse_args(args)
     if options.command == 'speech-volume' and options.percent is not None and not 0 <= options.percent <= 100:
         parser.error('speech volume must be between 0 and 100')
@@ -423,7 +428,9 @@ def main(argv: list[str] | None = None) -> int:
                         'discord-unicode': ('Alex (#😊normie, Another Server)', 'hello'),
                         'discord-isolates': ('\u2068Alex\u2069 (\u2068#「💼」work\u2069, \u2068Server\u2069)', 'hello'),
                         'discord-dm': ('Alex', 'hello from a direct message'),
-                        'discord-saucybot': ('SaucyBot (#work, Server)', 'Synthetic ignored bot message'),
+                        'discord-links': ('Alex (#work, Server)', 'Read [the tweet](https://example.org/tweet) now'),
+                        'discord-link-only': ('Alex (#work, Server)', 'https://example.org/link-only'),
+                        'discord-saucybot': ('SaucyBot (#work, Server)', 'Tweet fixture: a stroller full of beers.\nhttps://example.org/tweet'),
                         'discord-twitter-cap-bot': ('Twitter Cap Bot (#work, Server)', 'Synthetic ignored bot message'),
                         'discord-unrelated': ('Voice: listening', 'nerd-dictation is ready'),
                     }[options.kind]

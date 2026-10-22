@@ -295,7 +295,7 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - **applicability**: Dunst1.9.2 configurations with multiple matching script rules.
 - **diagnostics**: Compare exact-client channel notifications against generic format fixtures; each matching rule invokes its script.
 - **confidence**: confirmed
-- **remedy**: Use one shared audio callback and classify in Python; avoid text deduplication that suppresses legitimate separate deliveries. Exclude normalized SaucyBot and Twitter Cap Bot senders from Discord speech.
+- **remedy**: Use one shared audio callback and classify in Python; avoid text deduplication that suppresses legitimate separate deliveries.
 - **verification**: Private daemon RED observed22 instead of21 playbacks. GREEN unit83/private daemon1/type0; installed Vesktop channel WAV1, excluded bots WAV0, no MP3.
 - **verification_scope**: runtime
 - **limitations**: Synthetic installed acceptance; subjective listening and next real incoming message remain manual. Global callback starts for unrelated displayed notifications but returns without playing.
@@ -326,3 +326,16 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - **verification_scope**: runtime
 - **limitations**: This does not make preserved targets managed; future changes still require explicit reconciliation.
 - **Report**: [Terminal selection activation](../../../../docs/postmortem/2026-10-22-terminal-helper-path-probe.md)
+
+## local-dunst-fixture-display-capacity
+
+- **status**: verified_fix
+- **symptoms**: New positive notification fixture does not start audio although its parser passes.
+- **applicability**: Private Dunst regression suites with bounded notification_limit and retained muted popups.
+- **diagnostics**: Check notification_limit and prior displayed fixture count before treating absent callback playback as a parser failure.
+- **confidence**: confirmed
+- **remedy**: Close prior fixture popups before a new independent positive block; preserve queue/suppression assertions and production limits.
+- **verification**: Private regression expected22/observed21 before fixture drain; after close-all, one test passed with tweet/link and link-only assertions intact.
+- **verification_scope**: runtime
+- **limitations**: Private daemon fixture repair only; never close user desktop notifications to make a test pass. Full refresh remains blocked on unrelated permission drift.
+- **Report**: [Discord embed verification](../../../../docs/postmortem/2026-10-22-discord-embed-history-access.md)

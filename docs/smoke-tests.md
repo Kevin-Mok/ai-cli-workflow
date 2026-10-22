@@ -1562,8 +1562,14 @@ and enable `discord-speech`. No sudo. The probes are synthetic and play local au
   Expected: Synthetic Vesktop popup `Alex` / `hello from a direct message`; Ryan says `Alex says hello from a direct message` with one WAV and no intro clip.
 - Action: Run `~/scripts/codex-notification-sound smoke discord-isolates`.
   Expected: Unicode channel popup with invisible direction isolates; Ryan says only `Alex says hello` exactly once, without channel/server text or an intro clip. The fixture uses Vesktop identity to catch overlapping rules. While watching a stream, speech should sit below it at the default 75% software volume; browser/system volume stays unchanged.
-- Action: Run `~/scripts/codex-notification-sound smoke discord-saucybot` and `~/scripts/codex-notification-sound smoke discord-twitter-cap-bot`.
-  Expected: Both bot popups appear, with no speech or intro clip. Sender-name matching ignores case and covers channel messages and DMs.
+- Action: Run `~/scripts/codex-notification-sound smoke discord-saucybot`.
+  Expected: Popup contains tweet fixture text and a URL; Ryan says only `SaucyBot sends tweet` exactly once, without contents, URL or intro clip.
+- Action: Run `~/scripts/codex-notification-sound smoke discord-links`.
+  Expected: Ryan says only `Alex sends link`; neither surrounding prose nor URL is spoken.
+- Action: Run `~/scripts/codex-notification-sound smoke discord-link-only`.
+  Expected: Popup appears; Ryan says only `Alex sends link`, with no intro clip.
+- Action: Run `~/scripts/codex-notification-sound smoke discord-twitter-cap-bot`.
+  Expected: Popup appears with no speech or intro clip. Twitter Cap Bot sender matching ignores case and covers channels and DMs.
 - Action: Run `~/scripts/codex-notification-sound smoke discord-unrelated`.
   Expected: Normal `Voice: listening` popup with body `nerd-dictation is ready`; no speech.
 - Action: Disable `discord-speech`, repeat a matching probe, then enable it again. Check status before and after.

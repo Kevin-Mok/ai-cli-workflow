@@ -98,7 +98,7 @@ class PlaybackTests(unittest.TestCase):
         cases = [
             ('(A) Alex (#😊normie, Active)', 'hai', '(A) Alex says hai'),
             ('Alex (#😊normie, Another Server 🎉)', 'hello', 'Alex says hello'),
-            ('Alex (#c, S)', '<markup><a href="https://example.org/?q=a>b">hello</a></markup>', 'Alex says hello'),
+            ('Alex (#c, S)', '<markup><a href="https://example.org/?q=a>b">hello</a></markup>', 'Alex sends link'),
             ('<b>Alex</b> (#general, Server)', '<i>hello</i> &amp; &lt;friend&gt;\n world', 'Alex says hello & <friend> world'),
             ('A $(touch nope); (#c, S)', '`echo x` <3 &lt;b&gt;literal&lt;/b&gt;', 'A $(touch nope); says `echo x` <3 <b>literal</b>'),
         ]
@@ -116,11 +116,38 @@ class PlaybackTests(unittest.TestCase):
         self.assertIsNone(self.helper.discord_message('Alex (\u2068#, Server\u2069)', 'hello', 'vesktop'))
 
     def test_discord_ignored_bots_are_silent_in_channels_and_dms(self):
-        for sender in ('SaucyBot', 'saucybot', 'Twitter Cap Bot', 'TWITTER CAP BOT'):
+        for sender in ('Twitter Cap Bot', 'TWITTER CAP BOT'):
             for title in (sender, f'\u2068{sender}\u2069 (\u2068#work\u2069, \u2068Server\u2069)'):
                 with self.subTest(title=title):
                     self.assertIsNone(self.helper.discord_message(title, 'bot message', 'vesktop'))
         self.assertEqual(self.helper.discord_message('SaucyBot fan (#work, Server)', 'hello', 'vesktop'), 'SaucyBot fan says hello')
+
+    def test_discord_links_announce_only_sender_and_kind(self):
+        bodies = [
+            'Read https://example.org/post?x=1 now',
+            'Read www.example.org/post now',
+            'Read <https://example.org/post> now',
+            'Read [the tweet](https://example.org/post) now',
+            '<a href="https://example.org/post">https://example.org/post</a>',
+            'https://example.org/post',
+            '[https://example.org](https://example.org)',
+            '<a href="https://example.org/post">the tweet</a>',
+            'https://x.com.evil.example/user/status/123',
+            'https://x.com/user',
+        ]
+        for body in bodies:
+            with self.subTest(body=body):
+                self.assertEqual(self.helper.discord_message('Alex (#work, Server)', body), 'Alex sends link')
+        for body in ('https://x.com/user/status/123', 'See https://twitter.com/user/status/123?s=1', 'www.x.com/user/status/123', '<a href="https://x.com/user/status/123">tweet text</a>'):
+            with self.subTest(body=body):
+                self.assertEqual(self.helper.discord_message('Alex', body, 'vesktop'), 'Alex sends tweet')
+
+    def test_saucybot_announces_only_sender_and_tweet(self):
+        for sender in ('SaucyBot', 'saucybot'):
+            for title in (sender, f'\u2068{sender}\u2069 (\u2068#work\u2069, \u2068Server\u2069)'):
+                for body in ('Tweet contents', 'Tweet contents\nhttps://example.org/tweet', 'https://example.org/tweet'):
+                    with self.subTest(title=title, body=body):
+                        self.assertEqual(self.helper.discord_message(title, body, 'vesktop'), f'{sender} sends tweet')
 
     def test_discord_rejects_incomplete_or_unrelated_notifications(self):
         for title, body in [('Voice: listening', 'nerd-dictation is ready'),

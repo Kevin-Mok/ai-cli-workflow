@@ -230,9 +230,17 @@ markup is removed and whitespace normalized. Escaped literal markup remains text
 Discord's invisible Unicode direction isolates (U+2066–U+2069) are removed before
 matching, so channel/server metadata stays out of speech. The `smoke discord-isolates`
 probe uses Vesktop identity and reproduces this client format; it should speak `Alex says hello` exactly once.
-Normalized sender names `SaucyBot` and `Twitter Cap Bot` are excluded from speech,
-case-insensitively, for both channels and DMs. Their popups remain visible.
-Use `smoke discord-saucybot` and `smoke discord-twitter-cap-bot` to check silence.
+Notifications containing links announce only `SENDER sends link`; X/Twitter
+status links announce `SENDER sends tweet`. Link destinations in markup count,
+even when their visible labels contain no URL. URL-only messages also announce
+the kind. SaucyBot nonblank notifications always announce `SaucyBot sends tweet`.
+No URL, tweet contents, caption or engagement counters are spoken. Ordinary text
+messages still use `SENDER says MESSAGE`. Nothing is fetched from the network.
+Use `smoke discord-links` and `smoke discord-link-only` to hear `Alex sends link`,
+and `smoke discord-saucybot` to hear `SaucyBot sends tweet`.
+The normalized sender `Twitter Cap Bot` remains excluded case-insensitively
+for channels and DMs. Use `smoke discord-twitter-cap-bot` to check silence.
+All these popups remain visible.
 The app name is deliberately unrestricted, so another app using the same format
 also speaks. Sender-only titles are accepted for exact appname `vesktop`, observed
 in live Dunst history. The `smoke discord-dm` fixture uses that app with title
