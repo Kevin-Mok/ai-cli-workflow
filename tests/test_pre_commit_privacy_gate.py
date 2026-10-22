@@ -301,6 +301,103 @@ class PrivacyGateTests(unittest.TestCase):
         self.stage("bad.txt", "ghp_" + "aB7C9dE2" * 5)
         self.blocked()
 
+    def pre_push(self, records):
+        return self.invoke([sys.executable, str(self.installed_bundle() / "executable_privacy-gate"), "pre-push", "--hook-args", "origin", "https://example.invalid/repo.git"], input=records)
+
+    def push_record(self, oid, remote_oid=b"0" * 40):
+        return b"refs/heads/fixture " + oid + b" refs/heads/fixture " + remote_oid + b"\n"
+
+    def test_installed_pre_push_protocol_accepts_safe_outgoing_commit(self):
+        self.baseline()
+        self.install()
+        oid = self.git("rev-parse", "HEAD").stdout.strip()
+        result = self.pre_push(self.push_record(oid))
+        self.assertEqual(result.returncode, 0, "safe outgoing commit must pass the installed pre-push protocol")
+
+    def test_pre_push_checks_outgoing_commit_even_when_index_is_safe(self):
+        secret = "ghp_" + "aB7C9dE2" * 5
+        self.stage("candidate.txt", secret)
+        self.commit()
+        oid = self.git("rev-parse", "HEAD").stdout.strip()
+        self.install()
+        self.stage("candidate.txt", "safe current index\n")
+        self.assertEqual(self.gate("check").returncode, 0, "fixture index must be safe")
+        result = self.pre_push(self.push_record(oid))
+        self.assertEqual(result.returncode, 1, "unsafe outgoing commit must be refused despite a safe index")
+        self.no_leak(result, secret)
+
+    def test_pre_push_checks_non_tip_outgoing_commit(self):
+        secret = "ghp_" + "aB7C9dE2" * 5
+        self.stage("candidate.txt", secret)
+        self.commit()
+        self.stage("candidate.txt", "safe latest commit\n")
+        self.commit()
+        self.install()
+        self.assertEqual(self.gate("check").returncode, 0, "fixture index must be safe")
+        oid = self.git("rev-parse", "HEAD").stdout.strip()
+        result = self.pre_push(self.push_record(oid))
+        self.assertEqual(result.returncode, 1, "a repaired tip must not hide an unsafe outgoing ancestor")
+        self.no_leak(result, secret)
+
+    def test_pre_push_checks_actual_commit_message_and_identity(self):
+        self.baseline()
+        secret = "ghp_" + "aB7C9dE2" * 5
+        for location in ("message", "identity"):
+            with self.subTest(location=location):
+                remote_oid = self.git("rev-parse", "HEAD").stdout.strip()
+                self.stage("safe.txt", "safe update for " + location + "\n")
+                if location == "identity":
+                    self.git("config", "user.name", secret)
+                self.git("commit", "-qm", secret if location == "message" else "fixture update")
+                self.git("config", "user.name", "Example Maintainer")
+                self.install()
+                self.assertEqual(self.gate("check").returncode, 0, "fixture index and current identity must be safe")
+                oid = self.git("rev-parse", "HEAD").stdout.strip()
+                result = self.pre_push(self.push_record(oid, remote_oid))
+                self.assertEqual(result.returncode, 1, "unsafe stored commit metadata must be refused")
+                self.no_leak(result, secret)
+                self.assertEqual(self.gate("uninstall").returncode, 0)
+
+    def test_preserved_pre_push_receives_protocol_and_failure_propagates(self):
+        self.baseline()
+        safe_oid = self.git("rev-parse", "HEAD").stdout.strip()
+        secret = "ghp_" + "aB7C9dE2" * 5
+        self.stage("candidate.txt", secret)
+        self.commit()
+        unsafe_oid = self.git("rev-parse", "HEAD").stdout.strip()
+        self.stage("candidate.txt", "safe current index\n")
+        self.install()
+        hooks = self.repo / ".git" / "hooks"
+        previous = hooks / "pre-push.privacy-gate-previous"
+        previous.write_text("#!/bin/sh\nprintf '%s\\n' \"$@\" > previous-push-args\ncat > previous-push-input\nexit 17\n")
+        previous.chmod(0o755)
+        hook = hooks / "pre-push"
+        hook.write_text('''#!/bin/sh
+hookdir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd) || exit 2
+exec python3 "$hookdir/privacy-gate.d/executable_privacy-gate" pre-push --hook-args "$@"
+''')
+        hook.chmod(0o755)
+        records = self.push_record(safe_oid)
+        remote = "https://example.invalid/repo.git"
+        result = self.invoke([str(hook), "origin", remote], input=records)
+        self.assertEqual((self.repo / "previous-push-args").read_bytes(), b"origin\n" + remote.encode() + b"\n")
+        self.assertEqual((self.repo / "previous-push-input").read_bytes(), records)
+        self.assertEqual(result.returncode, 17, "the preserved pre-push hook must retain its veto")
+        (self.repo / "previous-push-input").unlink()
+        result = self.invoke([str(hook), "origin", remote], input=self.push_record(unsafe_oid))
+        self.assertEqual(result.returncode, 1, "installed pre-push must scan before invoking the preserved hook")
+        self.assertFalse((self.repo / "previous-push-input").exists(), "unsafe outgoing history must not reach the preserved hook")
+        self.no_leak(result, secret)
+
+    def test_pre_push_malformed_ref_records_fail_closed(self):
+        self.baseline()
+        self.install()
+        for record in (b"refs/heads/private-fixture missing-fields\n", self.push_record(b"HEAD")):
+            result = self.pre_push(record)
+            self.assertEqual(result.returncode, 2, "malformed push input must fail closed")
+            self.assertIn(b"Privacy gate ERROR:", result.stdout + result.stderr, "malformed input must reach the fail-closed protocol handler")
+            self.no_leak(result, "private-fixture")
+
     def test_status_plain_and_reactivation(self):
         self.install()
         status = self.gate("status", "--plain")

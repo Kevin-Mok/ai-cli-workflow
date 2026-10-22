@@ -5619,17 +5619,17 @@
         "Inspect exact candidate categories and effective Git identities; distinguish recovery source filenames from archive directories; compare source and installed snapshots and run the actual hook without modifying HEAD/index."
       ],
       "id": "local-gate-public-metadata-defaults",
-      "limitations": "Standalone history auditor remains stricter; permitted public paths/identities can reveal metadata. Existing dynamic-import type-check error remains; no clean type result claimed.",
+      "limitations": "Standalone history auditor remains stricter. Allowed paths/identity metadata are public by policy. Existing dynamic-import typing error and warnings remain; annotated tag objects are outside this commit-only compatibility path. No new pre-push wrapper is installed.",
       "reference": "references/state-security.md#local-gate-public-metadata-defaults",
       "remedy": "Allow only specified built-in metadata heuristics before explicit private literal/path rules at index, LFS and metadata boundaries. Keep actual secrets, blob-email checks and private archives blocked; refresh installed snapshots.",
       "sources": [
-        "482327c6d64888827a6d6697a46f4ca65fb5a2ddc1ae3376782c111b1ca744ab"
+        "42c64ef09c480224ce2d1885044b2103dbf4832edf7a04b7dfefdd5f3ce725b3"
       ],
       "status": "verified_fix",
       "symptoms": [
         "Safe scoped commits blocked by home-path, ordinary recovery filename and Git identity email heuristics."
       ],
-      "verification": "Seven worker-observed defining RED failures; 49 gate, 14 history and one checkpoint regression passed. Both source candidate checks and actual installed hook/status passed; refresh-config completed after reviewed identical-byte permission drift reconciliation.",
+      "verification": "55 gate, 14 history and one checkpoint test pass after defining policy and hook-protocol RED cases. Both real candidate checks, installed pre-commit and actual unchanged pre-push wrapper pass. Exact outgoing trees, non-tip commits, stored identities/messages and prior-hook protocol/refusal ordering are verified. Installed skill/scanner match source; broad refresh succeeded once and later unrelated MIME mode drift was preserved.",
       "verification_scope": "runtime"
     }
   ],
@@ -10497,7 +10497,7 @@
         "local-gate-public-metadata-defaults"
       ],
       "reviewed_on": "2026-10-22",
-      "sha256": "482327c6d64888827a6d6697a46f4ca65fb5a2ddc1ae3376782c111b1ca744ab"
+      "sha256": "42c64ef09c480224ce2d1885044b2103dbf4832edf7a04b7dfefdd5f3ce725b3"
     }
   ],
   "review": {

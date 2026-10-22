@@ -602,6 +602,14 @@ Second Brain checks its immutable tree before its hook-bypassing plumbing commit
 Private vault paths are refused in this public checkout, including checkpoint
 candidates; keep the actual vault external.
 
+Existing pre-push wrappers that call `pre-push --hook-args` remain compatible
+with scanner snapshot updates. They inspect newly introduced commit trees and
+stored commit identities/messages under the same public-metadata policy, including
+non-tip commits. Incomplete/shallow history and malformed update records refuse
+inspection. Any preserved prior pre-push hook receives the original arguments and
+stdin after privacy checks, and its refusal is respected. This compatibility path
+does not install a new pre-push wrapper or audit annotated tag objects.
+
 Use `--plain` for ASCII output and `--details` for hashed location references.
 No matched values, source lines or filenames appear in gate diagnostics. Resolve
 references locally by hashing the exact path bytes with SHA-256 and comparing

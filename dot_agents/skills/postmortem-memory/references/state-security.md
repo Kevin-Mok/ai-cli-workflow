@@ -373,3 +373,6 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Verification: seven worker-observed RED failures preceded the fix; independent 49 gate, 14 history and one checkpoint test passed. Source checks on both real candidates and installed hook/status passed; refresh-config completed after matching-byte permission drift was reconciled only on four exact targets.
 - Limits: allowed metadata can disclose local paths and identity by user policy; explicit private rules can still prohibit it. Existing dynamic-import typing diagnostics remain. Installed hooks require snapshot refresh after source changes.
 - Source: [Public metadata commit blocking](../../../../docs/postmortem/2026-10-22-privacy-gate-public-metadata.md).
+
+
+- Hook compatibility follow-up: inspect every active entrypoint before replacing a shared scanner snapshot. Preserve existing pre-push --hook-args protocol and prior-hook ordering; check exact outgoing commit trees (including non-tip commits), stored identities and messages independently of the index. All55 gate/14 history/one checkpoint regressions and the actual unchanged wrapper pass. Installer lifecycle expansion and annotated-tag auditing are outside this repair.

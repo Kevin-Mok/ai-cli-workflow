@@ -45,6 +45,13 @@ or make a test commit in this checkout. Installation alone creates no commit.
   Expected: Only the owned hook/bundle is removed, any previous hook is restored,
   and core.hooksPath remains unchanged. A changed active hook refuses removal.
 
+- Action: In a disposable repository with an existing pre-push wrapper and saved
+  prior hook, send standard Git update records through the installed wrapper.
+  Expected: Safe outgoing commits pass; synthetic secrets in committed trees,
+  non-tip commits, commit messages or stored identities block even with a safe
+  current index. Malformed records fail closed. The prior hook receives unchanged
+  remote arguments/stdin only after privacy checks, and its exit code is preserved.
+
 ### Resolving privacy-gate findings
 
 - Action: After updating the scanner or reviewed-content policy, repeat

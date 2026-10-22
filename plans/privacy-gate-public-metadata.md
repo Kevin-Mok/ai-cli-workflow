@@ -45,7 +45,20 @@ Session scoping helper cannot recognize writes from this runner, so direct-write
 
 Completed: policy implementation, tests, installed activation and review. Remaining: inspect exact staged candidate, privacy gate, policy commit, dependent bot commit and one push per configured upstream. Both repositories use main -> origin/main. No implementation blocker; Discord activation and the pre-existing type-check error remain outside this delivery.
 
-Learning: report hash 482327c6d64888827a6d6697a46f4ca65fb5a2ddc1ae3376782c111b1ca744ab registered under local-gate-public-metadata-defaults; targeted checks passed for both the policy incident and cap incident with no errors or uncovered current aliases.
+Learning: report hash 42c64ef09c480224ce2d1885044b2103dbf4832edf7a04b7dfefdd5f3ce725b3 registered under local-gate-public-metadata-defaults; targeted checks passed for both the policy incident and cap incident with no errors or uncovered current aliases.
 
 
 Final delivery note: staged-memory snapshot validation passes without including unrelated dirty memory records. A later broad refresh stopped on unrelated MIME mode drift (live0600/source0664; bytes match). Preserve the more restrictive live mode. The requested skill/scanner already match installed source and the existing hook snapshot is current; earlier full refresh and actual hook check passed. No pending privacy-policy activation blocker. Remaining broad-refresh MIME conflict is reported separately, not repaired by changing unrelated configuration.
+
+
+Delivery update: policy prerequisite commit ae06c54 exists; dependent cap-fix commit2510257 is pushed to msg-cap-discord-bot origin/main. Policy push was blocked by the existing pre-push hook calling unsupported pre-push --hook-args. Revise the plan: add failing hook-protocol regression, restore CLI compatibility while validating exact outgoing commit trees, keep hooks enabled, verify and commit the focused repair before retrying only the policy repository push. No history rewrite or unrelated staging.
+
+
+Pre-push repair design: reuse the validated update-record/parser/prior-hook protocol from existing branch64ed464 without merging its unrelated installer/history-auditor feature. Inspect newly reachable immutable commit trees using the revised gate policy; scan actual stored author/committer and message bytes for secrets. Include non-tip commits, fail closed for malformed/missing/shallow history, and chain existing backups with exact argv/stdin only after privacy checks. The installer remains pre-commit-only; no new pre-push wrapper is installed. Annotated tag objects remain outside this compatibility path. Defining protocol RED: safe records exit2 instead of0 and unsafe committed content exit2 instead of1. Additional fixture initially quoted incorrectly, then tested an unwrapped prior hook; corrected to model the existing wrapper/backup arrangement and preserve unsafe-before-prior assertions.
+
+
+## Delivery milestone 2 — fix: preserve existing pre-push privacy protocol
+
+The source baseline on main never supported the already installed pre-push wrapper; its known protocol was found on an unmerged feature branch. Restore only compatibility, retaining current gate policy and active wrapper/previous-hook chain. No history rewrite, blanket gate bypass, new wrapper installation or unrelated branch merge. Fresh55 gate/14 history/one checkpoint tests pass; syntax/whitespace pass; independent review passes. Real installed pre-push wrapper passes against outgoing ae06c54 with unchanged wrapper/HEAD/index. The source scanner was deployed by exact-target chezmoi apply and the existing bundle refreshed; broad MIME mode drift stays preserved. Type-check remains non-clean: existing import error and134 warnings versus original114.
+
+Scope: gate/tests, README/smoke/lesson, this plan, updated incident and its scoped memory hash/finding/guidance. Keep all pre-existing dirty files/hunks excluded. Prepare the follow-up commit, then retry only ai-cli-workflow origin/main. Policy ae06c54 is local; cap fix2510257 is already pushed to msg-cap-discord-bot origin/main. Remaining after delivery: bot restart/private-channel checks; existing MIME/type-check limitations are documented.

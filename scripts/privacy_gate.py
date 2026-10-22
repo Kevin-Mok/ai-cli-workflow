@@ -264,14 +264,52 @@ def uninstall(repo: Path):
     shutil.rmtree(directory / BUNDLE)
 
 
+
+def pre_push(repo: Path, records: bytes, rules_path: Path | None = None):
+    if git(repo, "rev-parse", "--is-shallow-repository").strip() != b"false":
+        raise GateError("Complete outgoing history is required")
+    rules = rules_for(repo, rules_path)[0]
+    findings = []
+    checked_trees = set()
+    checked_commits = set()
+    for record in records.splitlines():
+        fields = record.split()
+        if len(fields) != 4:
+            raise GateError("Invalid push update")
+        _, local, _, remote = fields
+        if any(not re.fullmatch(rb"[0-9a-f]{40}|[0-9a-f]{64}", oid) for oid in (local, remote)) or len(local) != len(remote):
+            raise GateError("Invalid push object")
+        if local == b"0" * len(local):
+            continue
+        revision = local.decode("ascii")
+        git(repo, "rev-parse", revision + "^{commit}")
+        revisions = [revision] if remote == b"0" * len(remote) else [revision, "^" + remote.decode("ascii")]
+        for oid in git(repo, "rev-list", *revisions).splitlines():
+            if oid in checked_commits:
+                continue
+            checked_commits.add(oid)
+            commit = oid.decode("ascii")
+            tree = git(repo, "rev-parse", commit + "^{tree}").strip().decode("ascii")
+            if tree not in checked_trees:
+                checked_trees.add(tree)
+                findings.extend(check(repo, tree=tree, rules_path=rules_path))
+            for fmt, allowed in (("%an <%ae>%n%cn <%ce>", {"email", "home_path"}), ("%B", {"home_path"})):
+                content = git(repo, "show", "-s", "--format=" + fmt, commit)
+                categories = scanner.scan_content(content, "commit") - allowed
+                categories.update(literal_categories(content, "commit", rules["literals"]))
+                findings.extend((category, "history") for category in sorted(categories))
+    return findings
+
+
 def main() -> int:
     parser = SafeParser(description="Local privacy gate: inspect exact staged bytes without printing private values.")
-    parser.add_argument("command", nargs="?", choices=("check", "install", "status", "uninstall"), default="check")
+    parser.add_argument("command", nargs="?", choices=("check", "pre-push", "install", "status", "uninstall"), default="check")
     parser.add_argument("--repo", type=Path, default=Path.cwd())
     parser.add_argument("--tree", help="Exact immutable tree OID for commit-tree callers")
     parser.add_argument("--rules", type=Path, help="Private mode-0600 policy outside repository")
     parser.add_argument("--plain", action="store_true")
     parser.add_argument("--details", action="store_true", help="Show only safe categories and hashed location references")
+    parser.add_argument("--hook-args", nargs=argparse.REMAINDER, help=argparse.SUPPRESS)
     args = parser.parse_args()
     prefix = "" if args.plain else "🔒 "
     stop = threading.Event()
@@ -295,9 +333,11 @@ def main() -> int:
             print(prefix + ("Privacy gate active (scanner current)." if current else "Privacy gate inactive or needs reinstall."))
             return 0 if current else 1
         else:
-            findings = check(args.repo, tree=args.tree, rules_path=args.rules)
+            records = sys.stdin.buffer.read() if args.command == "pre-push" else b""
+            findings = pre_push(args.repo, records, args.rules) if args.command == "pre-push" else check(args.repo, tree=args.tree, rules_path=args.rules)
             if findings:
-                print(prefix + f"Privacy gate BLOCKED: {len(findings)} findings. Repair locally, stage the safe version, and retry.")
+                repair = "Repair pushed history locally and retry." if args.command == "pre-push" else "Repair locally, stage the safe version, and retry."
+                print(prefix + f"Privacy gate BLOCKED: {len(findings)} findings. {repair}")
                 for category in sorted({item[0] for item in findings}):
                     # Private policy category names are untrusted; never echo them.
                     safe = category if category in {"provider_token", "credential", "private_key", "email", "home_path", "ip_address", "runtime_identifier", "sensitive_path"} else "private_literal"
@@ -306,11 +346,20 @@ def main() -> int:
                     for _, location in findings:
                         print(f"{prefix}Location reference: {location}")
                 return 1
-            print(prefix + "Privacy gate PASS: exact candidate checked locally.")
+            if args.command == "pre-push":
+                if args.hook_args is not None:
+                    previous = HERE.parent / "pre-push.privacy-gate-previous"
+                    if previous.is_file() and os.access(previous, os.X_OK):
+                        result = subprocess.run([str(previous), *args.hook_args], input=records)
+                        if result.returncode:
+                            return result.returncode
+                print(prefix + "Privacy gate PASS: pushed history checked locally.")
+            else:
+                print(prefix + "Privacy gate PASS: exact candidate checked locally.")
         return 0
     except Exception:
         # Errors can contain Git output, filenames, rules, or interpreter details.
-        print(prefix + "Privacy gate ERROR: inspection incomplete; commit refused. Check index conflicts, local objects, private rules and scanner installation locally.", file=sys.stderr)
+        print(prefix + "Privacy gate ERROR: inspection incomplete; operation refused. Check index conflicts, local objects, private rules and scanner installation locally.", file=sys.stderr)
         return 2
     finally:
         stop.set()
