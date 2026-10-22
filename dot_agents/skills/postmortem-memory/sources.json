@@ -5363,7 +5363,7 @@
         "Reboots or unrelated verifier edits discard completed image checks."
       ],
       "topic": "state-security",
-      "verification": "Defining RED then candidate GREEN; safely installed after active comparison/password boundary. Installed infrastructure suite exits0:483 total,2 skips,0 failures; helper11/11 and helper mypy pass. Independent review clean; existing controller type warning unchanged. CLI action help passes. Live receipt promotion/reboot reuse and authenticated acceptance remain unverified. Operator-provided live CLI output confirms exact completed legacy promotion/reuse with the original timestamp and no reread; proof running, prerequisites pass. Earlier live-promotion pending statement is superseded; cross-reboot/stopped-start reuse and authenticated acceptance remain unverified.",
+      "verification": "Defining RED then candidate GREEN; safely installed after active comparison/password boundary. Installed infrastructure suite exits0:483 total,2 skips,0 failures; helper11/11 and helper mypy pass. Independent review clean; existing controller type warning unchanged. CLI action help passes. Live receipt promotion/reboot reuse and authenticated acceptance remain unverified. Operator-provided live CLI output confirms exact completed legacy promotion/reuse with original2026-10-21T17:43:11.946823+00:00 timestamp and no reread; proof running, prerequisites pass. Earlier live-promotion pending statement is superseded; cross-reboot/stopped-start reuse and authenticated acceptance remain unverified.",
       "verification_scope": "runtime"
     },
     {
@@ -5420,7 +5420,7 @@
       "reference": "references/operational-drift.md#local-discord-direction-isolates",
       "remedy": "Remove U+2066\u2013U+2069 before visible-text parsing; keep full suffix validation before speaking sender says message.",
       "sources": [
-        "8e48e4bc4e9e93330143d5da56f4bc003a1029ef10fb4b6ef9c5dba1b2cfee1b"
+        "3e1a73524f1921786d4dffd880d015e08a40f968a71404a1e265a75ead89fab3"
       ],
       "status": "verified_fix",
       "symptoms": [
@@ -5446,7 +5446,7 @@
       "verification_scope": "runtime",
       "limitations": "Synthetic installed acceptance; subjective listening and next real incoming message remain manual. Global callback starts for unrelated displayed notifications but returns without playing.",
       "sources": [
-        "8e48e4bc4e9e93330143d5da56f4bc003a1029ef10fb4b6ef9c5dba1b2cfee1b"
+        "3e1a73524f1921786d4dffd880d015e08a40f968a71404a1e265a75ead89fab3"
       ]
     },
     {
@@ -5466,7 +5466,7 @@
       "verification": "Actual rendering at100=-16.08LUFS and50=-34.13LUFS; installed set/query and one WAV at50 verified. User selected75 and confirmed replay.85 tests/type0; installed saved/fresh queries75 and source/live match after refresh.",
       "limitations": "Fixed gain cannot track future stream loudness. Exact Vole Twitch slider unavailable. Earlier broad suite retains unrelated socket/path-fixture failures.",
       "sources": [
-        "8e48e4bc4e9e93330143d5da56f4bc003a1029ef10fb4b6ef9c5dba1b2cfee1b"
+        "3e1a73524f1921786d4dffd880d015e08a40f968a71404a1e265a75ead89fab3"
       ]
     },
     {
@@ -10222,7 +10222,7 @@
         "local-mpv-nonlinear-speech-volume"
       ],
       "reviewed_on": "2026-10-22",
-      "sha256": "8e48e4bc4e9e93330143d5da56f4bc003a1029ef10fb4b6ef9c5dba1b2cfee1b"
+      "sha256": "3e1a73524f1921786d4dffd880d015e08a40f968a71404a1e265a75ead89fab3"
     },
     {
       "sha256": "14a228dd392acede5d69b5c314504689fd1f6837ec4128904f31d1c48c88cf5f",
@@ -10300,6 +10300,51 @@
       "findings": [],
       "reviewed_on": "2026-10-22",
       "sha256": "fb292b74505e718a13ece0b631921708e497091d6537ecba31e999b942ea597a"
+    },
+    {
+      "aliases": [
+        "/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-22-cli-ux-preflight.md"
+      ],
+      "decision": "No new reusable learning: local-discover-paths-before-reads already covers documented helper lookup and exact patch context. Sandbox cache/lock access and empty offline caches are environment constraints; verified fixture checks use approved ordinary paths without overriding HOME. Product presentation changes have independent evidence in the task plan.",
+      "findings": [],
+      "reviewed_on": "2026-10-22",
+      "sha256": "4cde6d3f5ddb417d5da32958efdce77e98dee13694b22b5f2aee903de26821f6"
+    },
+    {
+      "aliases": [
+        "/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-22-tracker-latency-tab-navigation.md"
+      ],
+      "decision": "No new durable learning: the current metaprompt-run skill explicitly documents that Kitty socket control may need normal scoped approval, that sandbox discovery failure does not establish Kitty absence, and that terminal recovery must reuse the already-created executor ID. The same opener succeeded with approved host socket access and verified the active target tab; no helper, product, or configuration change was needed. This is a verified navigation workaround, not a sandbox repair or application-performance result.",
+      "findings": [],
+      "reviewed_on": "2026-10-22",
+      "sha256": "cd21ea42efce790a8f2e9195dd40acda9252fc6a34d95ed5547d2a8ac40c0a5b"
+    },
+    {
+      "aliases": [
+        "/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-22-uv-help-cache-permission.md"
+      ],
+      "decision": "No new reusable learning: a restricted build-cache path blocked a source help lookup. The installed command provided verified help without writes. This is an environment-specific permission workaround, not a product defect.",
+      "findings": [],
+      "reviewed_on": "2026-10-22",
+      "sha256": "a2cc59f0b098b56f130324866dde46e83b4ba102264f184d5121b45c89d9a72e"
+    },
+    {
+      "aliases": [
+        "/home/example/coding/triway-nextjs/docs/postmortem/2026-10-22-resume-context-lookup.md"
+      ],
+      "decision": "No new reusable learning: unsupported optional search syntax, a missing local plan template, and restricted runner RPC/cache/mount access were isolated from product outcomes. Supported syntax and scoped normal-host checks work; final500-test infrastructure suite and helper type check pass. Live login/services/GNOME remain pending at local sudo; no product remedy is claimed.",
+      "findings": [],
+      "reviewed_on": "2026-10-22",
+      "sha256": "7b203cc722b393f555e93e97a01b0fec54b55488ff14d4d76d961e6323b79f8c"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-22-commit-push-environment.md"
+      ],
+      "decision": "No new learning: local title transport unavailable and isolated graphical startup blocked; existing environment access guidance applies. No product repair claimed.",
+      "findings": [],
+      "reviewed_on": "2026-10-22",
+      "sha256": "e37107a73b17c7d6ae0da8ea75b2722c6a794784b42e96b571299333645e8fda"
     }
   ],
   "review": {

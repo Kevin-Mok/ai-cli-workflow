@@ -339,7 +339,6 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - **verification_scope**: runtime
 - **limitations**: Private daemon fixture repair only; never close user desktop notifications to make a test pass. Full refresh remains blocked on unrelated permission drift.
 - **Report**: [Discord embed verification](../../../../docs/postmortem/2026-10-22-discord-embed-history-access.md)
-
 ## local-i3bar-layout-startup-recovery
 
 - Status: **verified_fix**; root-cause confidence: **supported**; verification scope: **runtime**.
