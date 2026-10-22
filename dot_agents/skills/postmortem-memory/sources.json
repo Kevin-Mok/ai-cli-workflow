@@ -10203,6 +10203,24 @@
         "local-tmux-38-edge-drag-compatibility",
         "local-kitty-preview-inherited-path"
       ]
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-22-mute-notification-refresh.md"
+      ],
+      "decision": "No new general learning: references/paths-ownership.md#local-refresh-snapshot-ownership already covers preserving unrelated divergent content and deploying exact owned targets. Broad refresh remains unresolved after a pre-existing tmux helper conflict reached EOF; scoped mute helper/bindings were deployed, i3 validated/reloaded, and two live Super+M presses verified mute/unmute plus in-place notification replacement with original audio state restored.",
+      "findings": [],
+      "reviewed_on": "2026-10-22",
+      "sha256": "7b94e2137f34d684b2dda1cc6576c0e45caf3d198619d4106c6dc8c1cb848a01"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-22-mute-commit-ledger-inspection.md"
+      ],
+      "decision": "No new reusable learning: inspect actual ledger schema before assuming field names; the reports array is confirmed. Read-only inspection failed without mutation. Session-only staging preserves unrelated ledger changes.",
+      "findings": [],
+      "reviewed_on": "2026-10-22",
+      "sha256": "7087a23975053aa1f714bd8d6ed17c7d6ab80c1582061075d41f8fff7d5ca7d9"
     }
   ],
   "review": {

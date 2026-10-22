@@ -87,7 +87,7 @@ bindsym Mod4+h exec $type_delay_cmd && xdotool type user@example.invalid'
 bindsym Mod4+$mod+i exec sleep .2 && xdotool type '.info latest'
 bindsym Mod4+l exec ~/scripts/dmenu-twitch
 # bindsym Mod4+m exec $term -e ~/scripts/vim-man
-bindsym Mod4+m exec amixer -q -D pulse sset Master toggle && pkill -RTMIN+1 i3blocks
+bindsym Mod4+m exec ~/scripts/audio-mute
 #bindsym Mod4+$mod+m exec pass -c finances/metamask
 bindsym Mod4+$mod+m exec pass -c finances/scotiabank
 bindsym Mod4+n exec $term -e nvim
@@ -730,7 +730,7 @@ bindsym Control+o exec ~/linux-config/scripts/change-sink line-out
 #  fn key [[[ # 
 
 bindsym XF86AudioLowerVolume exec amixer -q -D pulse sset Master 5%- && pkill -RTMIN+1 i3blocks
-bindsym XF86AudioMute exec amixer -q -D pulse sset Master toggle && pkill -RTMIN+1 i3blocks
+bindsym XF86AudioMute exec ~/scripts/audio-mute
 bindsym XF86AudioPlay exec "dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.PlayPause"
 # bindsym XF86AudioStop exec "dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Stop"
 bindsym XF86AudioPrev exec "dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Previous"
