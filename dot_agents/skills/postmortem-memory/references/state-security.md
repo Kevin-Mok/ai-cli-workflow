@@ -348,3 +348,16 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Verification evidence: Six regression cases observed RED; 85 focused tests, mypy and Ruff passed. Installed/source replay gives one row, 2 matched plus 1 genuine gap-excluded point, over three matched hours and one stale reading.
 - Limitations: A real reset within ten seconds is indistinguishable; larger drift still splits. Missing observations and individual-model cost uncertainty remain.
 - Source: [2026-10-20-consumption-reset-jitter.md](/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-20-consumption-reset-jitter.md) (SHA-256 `248455f7bbd2`; registered in sources.json).
+
+
+## ext-persistent-verification-profile
+
+- Status: **verified_fix**; confidence: **confirmed**; scope: **runtime**.
+- Symptoms: unchanged large-image retries repeat full reads after reboot or unrelated source edits.
+- Applicability: private completed evidence for immutable-image retries; final seals stay fresh.
+- Diagnostics: inspect incidental fingerprint inputs; exercise reboot/code stability, real mutations, partial evidence and cached-return races. Preserve an active old verifier's self-hashed files until its full check ends.
+- Remedy: explicit verification semantics profile plus strict file/evidence/verifier identity. Promote only exact known complete legacy receipts with original timestamp; recheck inputs and preserve root/operation-lock boundaries.
+- Verification: defining RED/GREEN; safe post-comparison installation; installed suite483 total/two skips/zero failures, helper11/11 and helper mypy pass, independent review clean. Existing controller type warning unchanged; CLI action help passes.
+- Operator evidence: live exact completed legacy promotion/reuse succeeded without reread, preserving the original UTC timestamp; running proof and prerequisites pass.
+- Limits: no cross-reboot/stopped-start reuse or authenticated acceptance yet. Metadata misses silent bitrot; privileged actors can forge the receipt; shared-library-only upgrades are unbound; USB renumbering may miss. Opaque legacy receipts need exact same-boot promotion.
+- Source: [repeated image verification](/home/example/coding/triway-nextjs/docs/postmortem/2026-10-21-repeated-image-verification.md) (SHA-256 `d1bc903e7471`; registered in sources.json).

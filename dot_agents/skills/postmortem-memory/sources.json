@@ -5341,6 +5341,53 @@
       ],
       "verification": "Eight timer and 58 broader tests passed; isolated Xvfb proves automatic blanking suspended past timeout and resumed after exception cleanup without settings changes. Deployed source matched and real playback entered three items, then input dismissed it. Strengthened pre-blanked fixture failed before the reset and passed afterward.",
       "verification_scope": "runtime"
+    },
+    {
+      "applicability": "Expensive local immutable-image retry verification with private completed receipts; excludes final fresh integrity seals.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Inspect the fingerprint for host boot IDs and whole-script hashes.",
+        "Reproduce unchanged cross-boot/code-edit reuse, real input changes, partial records and cache-hit mutation races.",
+        "Do not edit self-hashed verifier files while an older full check is running."
+      ],
+      "id": "ext-persistent-verification-profile",
+      "limitations": "Metadata cannot detect silent bitrot; privileged same-UID actors can forge the unkeyed receipt. QEMU shared-library-only changes are unbound; USB device renumbering may conservatively miss. Old opaque receipts require exact same-boot migration before reboot. Code tests are not live acceptance.",
+      "reference": "references/state-security.md#ext-persistent-verification-profile",
+      "remedy": "Bind an explicit semantic verification profile, strict file/evidence identities and verifier executable. Promote only an exact known completed legacy fingerprint with original timestamp, recheck inputs, retain root ownership/operation locking and fresh final checks.",
+      "sources": [
+        "d1bc903e7471f32adc9af4ceabe069165da0c3ea6075c39930cbda74a55a76b2"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "Unchanged backup images require full hashing and comparison on every cross-day retry.",
+        "Reboots or unrelated verifier edits discard completed image checks."
+      ],
+      "topic": "state-security",
+      "verification": "Defining RED then candidate GREEN; safely installed after active comparison/password boundary. Installed infrastructure suite exits0:483 total,2 skips,0 failures; helper11/11 and helper mypy pass. Independent review clean; existing controller type warning unchanged. CLI action help passes. Live receipt promotion/reboot reuse and authenticated acceptance remain unverified. Operator-provided live CLI output confirms exact completed legacy promotion/reuse with the original timestamp and no reread; proof running, prerequisites pass. Earlier live-promotion pending statement is superseded; cross-reboot/stopped-start reuse and authenticated acceptance remain unverified.",
+      "verification_scope": "runtime"
+    },
+    {
+      "applicability": "Automated console authentication followed by an exact interactive-login-shell challenge; distinguish it from manual account access.",
+      "confidence": "hypothesis",
+      "diagnostics": [
+        "Inspect known prompt/marker classifications without printing raw console/credentials.",
+        "Record manual account login separately from automated acceptance.",
+        "In the manual VM session, independently check status is-login, status is-interactive, and printf marker output before attributing failure to producer, decoder or key delivery."
+      ],
+      "id": "ext-delayed-guest-password-readiness",
+      "limitations": "Manual login is not automated acceptance. Delayed guest prompt may explain the historical long wait but not this fresh recurrence alone. Key timing/chords or printf shadowing remain unproven; no code fix has been made.",
+      "reference": "references/api-contracts-fixtures.md#ext-delayed-guest-password-readiness",
+      "remedy": "Preserve the completed image cache and manually authenticated session for bounded diagnostics. Do not repeat hashes, modify credentials, weaken nonce/checksum gates or change timing without a concrete reproducer. No verified remedy yet.",
+      "sources": [
+        "7c422ae8a36b4581b727c7f502b4bbc5b7074a0e6d62369a8e05c972370c09e7"
+      ],
+      "status": "unresolved",
+      "symptoms": [
+        "Automated login-shell readiness fails54s after prompt input while manual same-password login and normal user session work.",
+        "Earlier failure followed a90-minute local password wait; prompt expiry alone cannot explain the fresh retry."
+      ],
+      "verification": "Fresh failed frame: login prompt, no calibrated/readiness marker. Operator confirms manual same-password login/use works; subsequent frame has account shell prompt and startx-related output. Static review finds no command/marker mismatch. Manual shell-mode/printf results remain unavailable. Viewer opened normally; no guest keys, VM/account/cache actions by agent.",
+      "verification_scope": "runtime"
     }
   ],
   "reports": [
@@ -9798,6 +9845,152 @@
       "findings": [],
       "reviewed_on": "2026-10-22",
       "sha256": "c7ec38a211368c2340882df33113a0399605714e447e90682bc4bd7994c2c025"
+    },
+    {
+      "aliases": [
+        "/home/example/coding/twitch-following-extension/docs/postmortem/2026-10-21-following-menu-click.md"
+      ],
+      "decision": "No new general guidance: extension-specific Twitch combobox blur/mousedown/focusout behavior and genuine UID versus synthetic selector click distinction are recorded in the project lessons. Both regressions passed after RED; current content source was verified on live Twitch with synthetic disconnected runtime. Fresh unpacked activation and account-backed acceptance remain manual.",
+      "findings": [],
+      "reviewed_on": "2026-10-21",
+      "sha256": "fe861883fa28b87ed79d2f23ba7fc9146e910bfaf7187d703794fa78fedd8346"
+    },
+    {
+      "aliases": [
+        "/home/example/coding/twitch-following-extension/docs/postmortem/2026-10-21-commit-identity-privacy.md"
+      ],
+      "decision": "No new general guidance: existing local-privacy-reviewed-content-approvals contract applied. Default commit metadata blocked; established origin/main public GitHub noreply identities passed the unchanged staged-byte scanner with an exact temporary mode-0600 metadata approval and matching environment. No configured prohibitions/hooks/identity config changed; no private values recorded. Final commit repeats the same gate.",
+      "findings": [],
+      "reviewed_on": "2026-10-21",
+      "sha256": "0d0c1b8f33d4e00e152b5233bc380847fdeb4d651bc8813cbc5b79d23ccd84df"
+    },
+    {
+      "aliases": [
+        "/home/example/coding/twitch-following-extension/docs/postmortem/2026-10-21-memory-search-option.md"
+      ],
+      "decision": "No new application guidance: tracked helper lacks the installed --compact option; lookup works without it. Existing launcher namespace subprocess restriction confirmed by 62 passing tests outside the sandbox. Closed-menu geometry probe corrected by opening once before measuring. These tooling issues required no application remediation.",
+      "findings": [],
+      "reviewed_on": "2026-10-21",
+      "sha256": "0bc01dfb0d2cb4d8ba6e1b5c63cd0d6a098dbd04de6fed0dfb0587254ed945bc"
+    },
+    {
+      "aliases": [
+        "/home/example/coding/twitch-following-extension/docs/postmortem/2026-10-21-release-preparation.md"
+      ],
+      "decision": "No new general learning: both synthetic userinfo URL literals repaired equivalently; 40worker tests and unchanged exact privacy gate passed, no content approvals/suppression. Tool path/CLI/package sequencing repaired. test suite and isolated Chrome draft/configured checks pass. Release7d9b1bc pushed; anonymous public help/privacy/assets HTTP200 bytes match source. Real OAuth/store acceptance remain manual.",
+      "findings": [],
+      "reviewed_on": "2026-10-21",
+      "sha256": "fb01d394509c12cd75c8fd327b6dbb40b01491e7a3898d933b0c6a7e1d9af297"
+    },
+    {
+      "aliases": [
+        "/home/example/coding/twitch-following-extension/docs/postmortem/2026-10-21-browser-bridge-unavailable.md"
+      ],
+      "decision": "No new general remedy for unavailable Chrome bridge; live activation remains unverified. Known sandbox escalation restores launcher tests and Git staging. Existing local-privacy-reviewed-content-approvals contract resolves public identity metadata only; no new guidance.",
+      "findings": [],
+      "reviewed_on": "2026-10-21",
+      "sha256": "65becd5373a3bd9e07079265d7d6a03a6d244ee67717fb1de8cda62fb8ceb395"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-21-screensaver-timer-inspection.md"
+      ],
+      "decision": "No new learning: existing path-discovery, sandbox execution and privacy guidance apply. Exact physical ledger alias remains local because public privacy gate rejected it; narrowed candidate retains the nonprivate report.",
+      "findings": [],
+      "reviewed_on": "2026-10-21",
+      "sha256": "456cf8f9d4ffb907cb0d12f4b2234834c00071ca0519b67fca0cce6f2a84b166"
+    },
+    {
+      "aliases": [
+        "/home/example/coding/triway-nextjs/docs/postmortem/2026-10-21-repeated-image-verification.md"
+      ],
+      "findings": [
+        "ext-persistent-verification-profile"
+      ],
+      "reviewed_on": "2026-10-21",
+      "sha256": "d1bc903e7471f32adc9af4ceabe069165da0c3ea6075c39930cbda74a55a76b2"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-21-discord-handoff-byte-count.md"
+      ],
+      "decision": "No new learning: the restricted-runtime contract and reviewed Redshift handoff incident already cover missing TextEncoder and scoped Kitty socket access. Python verified the 301-byte handoff; one executor was created, terminal navigation verified, and native state read as in progress. Implementation acceptance remains with the executor.",
+      "findings": [],
+      "reviewed_on": "2026-10-21",
+      "sha256": "1ced5931743f7714bd9c1167e6106925eb07fba7277bb88d081280c7d738cd1b"
+    },
+    {
+      "aliases": [
+        "/home/example/coding/triway-nextjs/docs/postmortem/2026-10-21-login-shell-readiness.md"
+      ],
+      "findings": [
+        "ext-delayed-guest-password-readiness"
+      ],
+      "reviewed_on": "2026-10-21",
+      "sha256": "7c422ae8a36b4581b727c7f502b4bbc5b7074a0e6d62369a8e05c972370c09e7"
+    },
+    {
+      "aliases": [
+        "/home/example/coding/twitch-following-extension/docs/postmortem/2026-10-21-sticky-url-verification-environment.md"
+      ],
+      "decision": "No new reusable learning: inventory-first inspection and sandbox subprocess restrictions are already covered; BRIDGE_NOT_READY has no newly verified remedy. Product RED/GREEN and final verification are recorded separately in the task plan.",
+      "findings": [],
+      "reviewed_on": "2026-10-21",
+      "sha256": "ef8c5481c59e7c7a5e22276f79fe08968b78785811edb15ab33ebd30f026bb6c"
+    },
+    {
+      "aliases": [
+        "/home/example/coding/twitch-following-extension/docs/postmortem/2026-10-21-stale-following-preview.md"
+      ],
+      "decision": "No new general remedy: existing source-versus-activation evidence boundaries apply. Locally, an old injected preview and stale ZIP omitted the new handler. Recreated preview passed a real pointer click; rebuilt actual unpacked extension passed URL selection and new-document reload. Repo-specific lesson recorded in tasks/lessons.md.",
+      "findings": [],
+      "reviewed_on": "2026-10-21",
+      "sha256": "3e9e1e49e3e9c757797dac4451df01f8f8692e5032cbba5770369b8f2eca336e"
+    },
+    {
+      "aliases": [
+        "/home/example/coding/auto-refresh-cache/docs/postmortem/2026-10-21-verification-tooling.md"
+      ],
+      "decision": "No new generalized recovery learning: extension-specific schedule, Resume, trusted-popup and stale-Stop invariants are captured in project tests and tasks/lessons.md. Tool/version, localhost socket and headless native-permission limits were diagnosed directly. Final 22-test suite and isolated stable-Playwright browser checks passed, including worker/browser restart; native host prompt and live Twitch remain manual. Existing API-boundary/current-source discipline applies; no additional cross-project fix is inferred.",
+      "findings": [],
+      "reviewed_on": "2026-10-21",
+      "sha256": "0d439076aa463da306154e680c295810983f5aacb70f8db83c675d0253a86a93"
+    },
+    {
+      "aliases": [
+        "/home/example/coding/twitch-following-extension/docs/postmortem/2026-10-21-following-selected-checkmark.md"
+      ],
+      "decision": "No new general remedy: CSS importance and source-versus-activation distinctions are established. Repo-specific visibility!important behavior is recorded in tasks/lessons.md. Actual configured extension observed RED then GREEN for native tick visibility; preview/native restoration checks and remaining user-loaded-path limits are documented in this report.",
+      "findings": [],
+      "reviewed_on": "2026-10-21",
+      "sha256": "f415eed33a7fc4d804b83c5367ff810edb6064e3cb13f56bf8b1c3115fe4c9d0"
+    },
+    {
+      "aliases": [
+        "/home/example/coding/auto-refresh-cache/docs/postmortem/2026-10-21-toolbar-tooling.md"
+      ],
+      "decision": "No new generalized learning: the Impeccable skill already permits reading project context when its optional engine is absent. Existing localhost sandbox guidance covers the fixture failure. Direct-source fallback completed; 25 tests and real Chromium harness pass. No cache installation or production repair inferred. Commit privacy scan passed after sanitizing a workstation path and using an already approved public identity policy; established identity-policy and README fallback guidance applies.",
+      "findings": [],
+      "reviewed_on": "2026-10-21",
+      "sha256": "dd32c2c1b1ecc26d293fe075726ed3e7d8996afebede8f1b6b5ef578056c4ae4"
+    },
+    {
+      "aliases": [
+        "/home/example/coding/auto-refresh-cache/docs/postmortem/2026-10-21-store-release-verification.md"
+      ],
+      "decision": "No new generalized remedy. The existing localhost sandbox restriction was confirmed by listen EPERM and resolved for verification by permitted loopback execution; 29 tests and isolated Chromium passed. A documentation fetch timeout did not establish policy facts; official docs research and explicit manual native/store acceptance limits remain documented.",
+      "findings": [],
+      "reviewed_on": "2026-10-21",
+      "sha256": "ca339676b51dadd92e06913efc040176266d979e67619bf863f21ee2704ca6ad"
+    },
+    {
+      "aliases": [
+        "/home/example/Documents/workout-logs/docs/postmortem/2026-10-21-back-notes-launch.md"
+      ],
+      "decision": "No new reusable learning: orchestration globals and scoped Kitty socket access are already documented by the tool and runner skill. Launch/navigation recovery verified; executor outcome separate.",
+      "findings": [],
+      "reviewed_on": "2026-10-21",
+      "sha256": "ee0d33e139d6d51d2780a9831dca9676a91094c61cf3f5797cbf903a2539accf"
     }
   ],
   "review": {

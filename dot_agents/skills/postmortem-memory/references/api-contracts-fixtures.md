@@ -655,3 +655,15 @@ security checks with the arguments you passed.
 - Verification: matrix90 produced rotate-270; baseline renderer failed six metadata cases and current focused seven-test suite passed.
 - Limitations: synthetic pixels do not establish every personal clip; two local samples were verified separately. Xvfb needs scoped X11 access here and lacks DRI2.
 - Source: [orientation fixture incident](/home/example/linux-config/docs/postmortem/2026-10-20-orientation-test-gtk-init.md) (SHA-256 `b5450bc880ee68896d17866fb8ff89eb462e5a2c6d6f903129d420b0cffcf93e`).
+
+
+## ext-delayed-guest-password-readiness
+
+- Status: **unresolved**; confidence: **hypothesis**; scope: **runtime**.
+- Symptoms: fresh automated readiness fails54s after password input; manual same-password login and normal user session work. Earlier90-minute prompt delay cannot alone explain recurrence.
+- Applicability: console authentication followed by an exact interactive-login-shell challenge.
+- Diagnostics: classify prompts/markers privately, record manual access separately, and independently check login flag, interactive flag and printf output inside the manual VM shell.
+- Remedy: preserve completed image cache/manual session; do not repeat hashes, modify credentials, weaken exact gates or change timing without a reproducer. No verified remedy.
+- Verification: failed frame shows login prompt/no readiness; operator manual login/use succeeds and later frame shows account shell prompt/startx-related output. Independent producer/decoder static review finds no confirmed mismatch. No guest keys or VM/account/cache changes by agent.
+- Limits: shell-mode/printf results unavailable; key timing/chord or function-shadowing hypotheses unproven. Manual access is not automated acceptance.
+- Source: [login-shell readiness](/home/example/coding/triway-nextjs/docs/postmortem/2026-10-21-login-shell-readiness.md) (SHA-256 `7c422ae8a36b`).
