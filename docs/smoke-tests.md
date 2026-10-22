@@ -1320,6 +1320,12 @@ changed mappings; file source keys gain `n` in fish.
 - Action: In a fresh fish session, inspect `abbr --show | string match -- "abbr -a -- tbo *"` without running the expansion.
   Expected: `abbr -a -- tbo 'cd /mnt/usb-8tb/obs'`; the shortcut remains registered after refresh.
 
+- Action: Run `fish --no-config -c 'source ~/.config/fish/key_abbr.fish; abbr --show | string match "abbr -a -- va *"'` after refresh.
+  Expected: `abbr -a -- va 'cd ~/coding/twitch-grid'`. Repeating the absolute
+  directory request previews a no-op. If chezmoi excludes the live catalog,
+  reconcile only the reviewed catalog and regenerate shortcuts; preserve
+  unrelated managed-file conflicts.
+
 Live Codex usage: `$fish-alias cbn codex-time burn day`. To create the mapping,
 invoke this as an actual request, inspect the reported source/section/conflicts,
 then verify the refresh result. Repeating it must produce a no-op. Directory

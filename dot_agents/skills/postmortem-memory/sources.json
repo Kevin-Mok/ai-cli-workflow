@@ -10393,6 +10393,15 @@
       "findings": [],
       "reviewed_on": "2026-10-22",
       "sha256": "8856431a75f8aa998290a25d9d1e6bc2525254f42c3dcc0eeeb2fdea6b8181aa"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-22-fish-alias-inspection.md"
+      ],
+      "decision": "No new learning: existing path-discovery, sandbox-startup, and preserved-target activation findings cover these inspection and deployment failures. Scoped catalog refresh and live abbreviation inspection passed; unrelated Kitty conflict remains out of scope.",
+      "findings": [],
+      "reviewed_on": "2026-10-22",
+      "sha256": "cc0d8a69760ac9b565669bfca4f420d0d4940c070a5ef144bb1816235e84d4b5"
     }
   ],
   "review": {

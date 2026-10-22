@@ -139,3 +139,12 @@ This document records delivery milestones and verification for completed reposit
 - Delivery: one focused commit on main, then push to origin/main after staged review. No implementation blockers remain.
 - Remaining: existing Kitty windows retain their original cap; create fresh windows to use the new limit. Full-buffer stress testing remains manual.
 - Rollback: restore scrollback_lines to 50000 and apply the Kitty configuration with refresh-config.
+
+## Twitch Grid shortcut — feat(fish): add va directory shortcut
+
+- Complete: `va` expands to `cd ~/coding/twitch-grid` in the cdn section, with no conflicts. The smoke checklist and inspection incident describe deployment and verification.
+- Scope: direct-write fallback for session 01a164f7-98eb-7040-9aea-282edf65b987; the scope helper recognized no writes. Include only the shortcut, smoke check, incident, its no-new-learning ledger object, and this milestone. The public ledger alias uses the established placeholder home; local attribution stays in the existing working ledger.
+- Verification: scoped refresh-config exited 0; installed catalog matches the rendered template; Fish and Bash definitions were inspected without executing the mapping; repeated absolute request is a no-op. Generated Fish syntax and targeted incident-memory check passed. README gate returned pass_no_change. Exact staged whitespace and privacy review are required before commit.
+- Delivery: one focused commit on main, then push to origin/main after staged review. No remaining shortcut implementation work.
+- Remaining: preserve all unrelated dirty work, including other ledger changes. Unrestricted refresh retains the existing Kitty conflict; interactive keystroke expansion remains manual.
+- Rollback: remove only va from the directory template, deploy the reviewed catalog and regenerate shortcuts.
