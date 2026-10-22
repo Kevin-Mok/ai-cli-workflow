@@ -921,6 +921,15 @@ this.
 
 ### Editor, Terminal, And Media
 
+- [Monitor-aware Kitty fonts](docs/kitty-monitor-font-sizing.md) preserve each
+  terminal's main-display size (new terminals default to19pt) and
+  scale it to 0.743× on DVI-D-0 and 0.595× on HDMI-0. The i3-started user service
+  preserves manual zoom and watcher restarts without changing global DPI.
+  `~/scripts/kitty-monitor-font status` inspects metrics; `once` applies once,
+  `watch` follows i3 and `restore` stops the service and restores baselines.
+  `--plain` gives ASCII output; `--json` emits one-shot results. Verify with
+  `~/scripts/kitty-monitor-font-smoke --plain` (`--details` for diagnostics),
+  which uses isolated Kitty/Xvfb fixtures; physical calibration still needs review.
 - The 4K i3 bar keeps volume near the monitor center and fits the song beside it
   with an ellipsis when crowded, reserving volume space before song or calendar.
 - [`dot_config/kitty/kitty.conf`](dot_config/kitty/kitty.conf)

@@ -1,0 +1,134 @@
+#!/usr/bin/env python3
+"""Verify real Kitty font metrics in disposable processes on an isolated X server."""
+import argparse
+import json
+import os
+from pathlib import Path
+import select
+import signal
+import subprocess
+import tempfile
+import time
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--plain", action="store_true", help="ASCII progress")
+    parser.add_argument("--details", action="store_true", help="show raw diagnostics on failure")
+    args = parser.parse_args()
+
+    def say(text):
+        print(("" if args.plain else "🧪 ") + text, flush=True)
+
+    kitty = str(Path.home() / ".local/bin/kitty")
+    source = Path(__file__).resolve().parents[1] / "dot_config/kitty/monitor_font.py"
+    adapter = source if source.exists() else Path.home() / ".config/kitty/monitor_font.py"
+    processes = []
+    with tempfile.TemporaryDirectory(prefix="kitty-font-smoke-") as temp:
+        with open(Path(temp) / "diagnostics", "w+") as log:
+            def spawn(command, **kw):
+                process = subprocess.Popen(command, stdout=log, stderr=log,
+                                           start_new_session=True, **kw)
+                processes.append(process)
+                return process
+
+            def remote(address, *command):
+                return subprocess.check_output([kitty, "@", "--to", address, *command],
+                                               env=env, stderr=log, text=True, timeout=4)
+
+            def rows(address, mode="status", outputs=None):
+                return json.loads(remote(address, "kitten", "--match", "all", str(adapter),
+                                         mode, json.dumps(outputs or {})))
+
+            try:
+                say("Starting isolated X server; existing terminals stay on their desktop")
+                read_fd, write_fd = os.pipe()
+                try:
+                    spawn(["Xvfb", "-displayfd", str(write_fd), "-screen", "0", "1280x800x24",
+                           "-dpi", "135", "-nolisten", "tcp"], pass_fds=(write_fd,))
+                    os.close(write_fd)
+                    write_fd = None
+                    if not select.select([read_fd], [], [], 10)[0]:
+                        raise RuntimeError("Xvfb startup timed out")
+                    display = os.read(read_fd, 80).decode().strip()
+                    if not display.isdigit():
+                        raise RuntimeError("Xvfb did not supply a display")
+                finally:
+                    os.close(read_fd)
+                    if write_fd is not None:
+                        os.close(write_fd)
+                env = dict(os.environ, DISPLAY=":" + display)
+                addresses = []
+                for baseline in (12, 19):
+                    say(f"Starting {baseline}pt fixture")
+                    address = f"unix:{temp}/kitty-{baseline}"
+                    process = spawn([kitty, "--config", "NONE", "--override", "font_size=" + str(baseline),
+                                     "--override", "allow_remote_control=socket-only", "--listen-on", address,
+                                     "sh", "-c", "sleep 120"], env=env)
+                    deadline = time.monotonic() + 10
+                    while not list(Path(temp).glob(f"kitty-{baseline}*")):
+                        if process.poll() is not None or time.monotonic() > deadline:
+                            raise RuntimeError("Kitty fixture startup failed")
+                        time.sleep(.1)
+                    address = "unix:" + str(next(Path(temp).glob(f"kitty-{baseline}*")))
+                    addresses.append((address, baseline))
+                    initial = rows(address)
+                    assert len(initial) == 1 and initial[0]["current"] == baseline, initial
+                    xid = str(initial[0]["platform_window_id"])
+                    for _ in range(3):
+                        for output, ratio in (("DVI-D-0", (1152 / 287) / (2160 / 400)),
+                                              ("HDMI-0", (1080 / 336) / (2160 / 400))):
+                            rows(address, "apply", {xid: output})
+                            current = rows(address)[0]["current"]
+                            assert abs(current - baseline * ratio) < .02, current
+                        rows(address, "apply", {xid: "DP-2"})
+                        assert rows(address)[0]["current"] == baseline
+                    rows(address, "apply", {xid: "HDMI-0"})
+                    # A separate remote invocation simulates watcher restart.
+                    rows(address, "apply", {xid: "HDMI-0"})
+                    remote(address, "action", "--match", "id:1", "change_font_size current +1")
+                    zoomed = rows(address)[0]["current"]
+                    rows(address, "apply", {xid: "DP-2"})
+                    restored = rows(address)[0]["current"]
+                    assert abs(restored - zoomed / ((1080 / 336) / (2160 / 400))) < .02
+                    rows(address, "apply", {xid: "DVI-D-0"})
+                    rows(address, "restore")
+                    assert abs(rows(address)[0]["current"] - restored) < .02
+                    say(f"{baseline}pt: both sides, round trips, restart, targeted zoom and restore passed")
+                first, _ = addresses[0]
+                before = rows(addresses[1][0])[0]["current"]
+                remote(first, "launch", "--type=os-window", "sh", "-c", "sleep 120")
+                time.sleep(.5)
+                originals = {r["os_window_id"]: r["current"] for r in rows(first)}
+                old = rows(first)[0]
+                rows(first, "apply", {str(old["platform_window_id"]): "HDMI-0"})
+                after = rows(first)
+                assert len(after) == 2, after
+                assert abs(after[0]["current"] - originals[old["os_window_id"]] * ((1080 / 336) / (2160 / 400))) < .02, (originals, after)
+                assert after[1]["current"] == originals[after[1]["os_window_id"]], (originals, after)
+                assert rows(addresses[1][0])[0]["current"] == before, (before, rows(addresses[1][0]))
+                say("Unfocused adapter target leaves other OS windows and instances unchanged")
+                say("PASS: real Kitty font metrics; physical monitor calibration still requires visual review")
+                return 0
+            except (OSError, RuntimeError, ValueError, AssertionError, subprocess.SubprocessError) as error:
+                say(f"FAIL: isolated font check ({type(error).__name__}); use --details for diagnostics")
+                if args.details:
+                    import traceback
+                    traceback.print_exc()
+                    log.flush()
+                    log.seek(0)
+                    print(log.read())
+                return 1
+            finally:
+                for process in reversed(processes):
+                    if process.poll() is None:
+                        os.killpg(process.pid, signal.SIGTERM)
+                        try:
+                            process.wait(timeout=3)
+                        except subprocess.TimeoutExpired:
+                            os.killpg(process.pid, signal.SIGKILL)
+                            process.wait()
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

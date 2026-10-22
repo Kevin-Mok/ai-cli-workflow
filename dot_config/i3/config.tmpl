@@ -27,6 +27,8 @@ exec --no-startup-id /home/example/scripts/speechnotes-dictation --prewarm
 exec --no-startup-id /home/example/scripts/ubuntu-start
 # Supervised media conveyor queries idle without changing existing lock or suspend behavior.
 exec --no-startup-id {{ .chezmoi.homeDir }}/scripts/media-screensaver service
+# Capture this graphical session's i3 socket, including after an i3 restart.
+exec_always --no-startup-id sh -c 'systemctl --user import-environment DISPLAY XAUTHORITY I3SOCK; systemctl --user restart kitty-monitor-font.service'
 # exec --no-startup-id i3-msg 'workspace $ws5; exec $term -e twitchy'
 # exec --no-startup-id i3-msg 'workspace $ws5; exec firefox -P nft'
 #exec --no-startup-id i3-msg workspace $ws6; exec discord

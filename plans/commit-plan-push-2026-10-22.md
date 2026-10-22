@@ -16,8 +16,8 @@ implementation plans retain historical evidence; this plan records delivery.
 - [x] Capture status, branch/upstream, relevant policy and dirty-file inventory.
 - [x] Review independent docs/history and Kitty implementation with bounded agents.
 - [x] Run README gate (pass_no_change) and focused regression checks.
-- [ ] Commit substantive historical postmortem/memory maintenance first; exclude path-only private overlays.
-- [ ] Commit Kitty helper, configuration, tests, documentation and matching plans.
+- [x] Commit substantive historical postmortem/memory maintenance first; exclude path-only private overlays.
+- [x] Prepare and verify Kitty helper, configuration, tests, documentation and matching plans for the second commit.
 - [ ] Reconcile safe residuals, attempt one push, and report exact outcomes.
 
 ## Verification and risks
@@ -46,3 +46,20 @@ default roots. Focused Kitty18 tests and shell check pass, host isolated smoke
 passes, README gate passes. Explicit privacy gate required after final staging.
 Concurrent memory edits after the initial inventory remain protected residuals.
 Next: Kitty commit with its implementation, docs, plans and reviewed learning.
+
+### Milestone 2: Kitty monitor sizing
+
+Maintenance committed as 17c9278; no push yet. Prepared
+`feat(kitty): scale fonts by monitor and default to 19pt`. It includes both
+implementation plans, helpers, explicit OS-window adapter, i3/systemd startup,
+default19pt configuration, tests, README, smoke checks, runtime incident records,
+reviewed Kitty learning and the desktop-disruption preference.18 focused tests,
+display-layout check and host isolated smoke pass; README gate pass_no_change.
+Physical calibration remains unaccepted. Refresh stops on pre-existing conflict;
+no i3 reload or desktop moves performed during this delivery. Rollback and Cursor
+handoff remain in docs/kitty-monitor-font-sizing.md.
+
+Next: reconcile any safe initial residuals and push main to origin/main once.
+Protected residual categories: restored private home paths (public equivalents
+already committed), machine session marker, and concurrently appearing memory
+updates outside the initial reviewed snapshot. Do not claim a clean worktree.

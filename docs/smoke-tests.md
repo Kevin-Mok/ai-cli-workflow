@@ -1587,3 +1587,31 @@ and enable `discord-speech`. No sudo. The probes are synthetic and play local au
   windows keep their size.
 - **Action:** Press Ctrl+Super++ to enable i3 gaps, then Ctrl+Shift+0 to remove them.
   **Expected:** Gaps change as before; Ctrl++ remains available to Kitty.
+
+## Kitty monitor font sizing
+
+- **Action:** Open new default and Ctrl+Return terminals on the current output;
+  run `~/scripts/kitty-monitor-font status`.
+  **Expected:** Both use baseline19pt: main19pt, left14.12pt, right11.31pt.
+  Existing terminal zoom and placements remain unchanged. A new tmux window
+  inherits its containing Kitty font size.
+- **Action:** When convenient, explicitly launch12pt and19pt fixtures. Move
+  each window and its whole workspace to
+  DVI-D-0, HDMI-0 and DP-2; repeat three times with another terminal unfocused.
+  **Expected:** Left targets are8.92/14.12pt, right7.14/11.31pt, main12/19pt
+  within Kitty rounding. Returning to main restores exact baselines; independent
+  windows/instances are unaffected. Compare physical letter height visually.
+- **Action:** Zoom a side terminal, return to DP-2, launch a new side terminal,
+  and restart `kitty-monitor-font.service` while a terminal is scaled. Inspect
+  helper status after two seconds and move back to DP-2.
+  **Expected:** Zoom becomes the updated baseline; new terminals use their actual
+  launcher size; service restart causes no second shrink. Unknown outputs and
+  missing sockets are skipped; service heartbeat reports unavailable sockets.
+- **Action:** Run `~/scripts/kitty-monitor-font-smoke --plain`.
+  **Expected:** Disposable Xvfb/Kitty checks end in PASS for both baselines,
+  round trips, restart, zoom, restore and unfocused/cross-instance isolation.
+  Existing desktop windows stay untouched; this does not accept physical sizing.
+- **Action:** For rollback, remove the new i3 autostart line, refresh/reload i3,
+  then run `~/scripts/kitty-monitor-font restore` while Kitty remains running.
+  **Expected:** Service stops and tracked windows regain main baselines; no
+  global DPI, remote-control restrictions or launcher settings change.

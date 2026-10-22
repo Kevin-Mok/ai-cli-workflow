@@ -667,3 +667,14 @@ security checks with the arguments you passed.
 - Verification: failed frame shows login prompt/no readiness; operator manual login/use succeeds and later frame shows account shell prompt/startx-related output. Independent producer/decoder static review finds no confirmed mismatch. No guest keys or VM/account/cache changes by agent.
 - Limits: shell-mode/printf results unavailable; key timing/chord or function-shadowing hypotheses unproven. Manual access is not automated acceptance.
 - Source: [login-shell readiness](/home/example/coding/triway-nextjs/docs/postmortem/2026-10-21-login-shell-readiness.md) (SHA-256 `7c422ae8a36b`).
+
+## local-kitty-explicit-os-window-font-sizing
+
+- Status: verified_workaround; confidence: confirmed; verification scope: runtime.
+- Symptoms: Kitty0.49.2 matched font action changed the other OS window in a two-window fixture.
+- Applicability: monitor sizing requiring unfocused OS-window isolation.
+- Diagnostics: compare actual `os_window_font_size` metrics before/after commands in multiple OS windows and separate instances.
+- Remedy: no-UI kitten applies `boss._change_font_size` to explicit OS-window IDs; keep per-window baseline/last-applied state on the boss and interpret zoom using the previous output ratio.
+- Verification: real12/19pt isolated fixtures passed both ratios, repeated returns, restart, zoom, restore and unfocused/cross-instance isolation. Live disposable i3 windows followed both side outputs and repeated main returns; service restart preserved existing metrics.
+- Limitations: internal API version-sensitive; dispatch root cause unproved. Physical calibration remains manual; dedicated XID-targeted whole-workspace moves passed. Scoped deployment bypassed unrelated audio-mute refresh divergence without resolving it.
+- Source: [Kitty monitor runtime](../../../../docs/postmortem/2026-10-22-kitty-monitor-probe-access.md); reviewed hash retained in sources.json.

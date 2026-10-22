@@ -1,0 +1,10 @@
+[Unit]
+Description=Monitor-aware Kitty font sizing for i3
+
+[Service]
+ExecStart=%h/scripts/kitty-monitor-font watch
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=default.target

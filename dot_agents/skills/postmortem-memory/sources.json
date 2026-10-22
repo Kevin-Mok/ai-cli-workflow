@@ -5571,6 +5571,26 @@
       "sources": [
         "6ee98113af08763342ac6937eef41b0cac5e0b8acaf5fe7155f9f65779ce9207"
       ]
+    },
+    {
+      "applicability": "Monitor-aware Kitty X11 font changes requiring unfocused OS-window isolation.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Read actual os_window_font_size values before and after targeted commands in a two-OS-window fixture."
+      ],
+      "id": "local-kitty-explicit-os-window-font-sizing",
+      "limitations": "Internal API tied to Kitty0.49.2; exact matched-action dispatch root cause not established. Physical calibration remains manual; whole-workspace moves passed. Sandbox and unrelated audio-mute refresh conflict remain.",
+      "reference": "references/api-contracts-fixtures.md#local-kitty-explicit-os-window-font-sizing",
+      "remedy": "Use a no-UI kitten with explicit OS-window IDs and boss._change_font_size; store baseline and last-applied metrics on the Kitty boss to survive watcher restarts. Preserve last observed ratio when interpreting manual zoom.",
+      "sources": [
+        "001d1918675062d7635bc0e2bcf62d578922380c7bf4fc337a29506dd4519ee0"
+      ],
+      "status": "verified_workaround",
+      "symptoms": [
+        "Kitty0.49.2 matched font action changes another OS window in the same instance."
+      ],
+      "verification": "Isolated actual12/19pt fixtures passed both ratios, repeated returns, restart, zoom, restore and unfocused/cross-instance isolation. Live disposable windows followed real i3 moves; deployed service restart preserved existing metrics. Dedicated XID-targeted whole-workspace fixture passed both sides, main return and visible-workspace/focus restoration.",
+      "verification_scope": "runtime"
     }
   ],
   "reports": [
@@ -10345,6 +10365,34 @@
       "findings": [],
       "reviewed_on": "2026-10-22",
       "sha256": "e37107a73b17c7d6ae0da8ea75b2722c6a794784b42e96b571299333645e8fda"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-22-kitty-monitor-probe-access.md"
+      ],
+      "findings": [
+        "local-kitty-explicit-os-window-font-sizing"
+      ],
+      "reviewed_on": "2026-10-22",
+      "sha256": "001d1918675062d7635bc0e2bcf62d578922380c7bf4fc337a29506dd4519ee0"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-22-i3-disruptive-validation.md"
+      ],
+      "decision": "No new technical root-cause finding: read-only inspection confirms registered dock bars and a watcher with no reload commands; the screenshot disappearance remains unresolved. Known manual activation/live tests caused desktop disruption. The durable user workflow correction was recorded only in canonical feedback.log; no unverified bar fix is claimed.",
+      "findings": [],
+      "reviewed_on": "2026-10-22",
+      "sha256": "98c35691bc11de72cf3c5c7e75e98d28b5e23209f5204cd0804c6a0e1ece32b2"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-22-terminal-sizing-inspection.md"
+      ],
+      "decision": "No new reusable learning: discover refresh function paths; existing scoped deployment guidance covers the pre-existing refresh conflict. Default and isolated runtime activation verified; global conflict remains.",
+      "findings": [],
+      "reviewed_on": "2026-10-22",
+      "sha256": "8856431a75f8aa998290a25d9d1e6bc2525254f42c3dcc0eeeb2fdea6b8181aa"
     }
   ],
   "review": {
