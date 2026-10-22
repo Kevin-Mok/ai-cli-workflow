@@ -136,12 +136,28 @@ class PrivacyGateTests(unittest.TestCase):
 
     def test_private_paths_block_even_safe_bytes_and_force_add(self):
         self.install()
-        for name in ("benchmarks/metaprompt/runs/one/raw.json", "benchmarks/metaprompt-selection/runs/one/raw.json", ".env", "recovery/snapshot.json"):
+        for name in ("benchmarks/metaprompt/runs/one/raw.json", "benchmarks/metaprompt-selection/runs/one/raw.json", ".env", "recovery/snapshot.json", "recoveries/snapshot.json"):
             self.write(name, "public placeholder\n")
             self.git("add", "-f", "--", name)
             self.blocked(name)
             self.git("rm", "--cached", "--", name)
             (self.repo / name).unlink()
+
+    def test_indexed_home_paths_and_recovery_named_sources_commit(self):
+        self.install()
+        self.stage("setup.md", "Project: /home/private-fixture/coding/project\nMac: /Users/private-fixture/project\n")
+        self.stage("restart_recovery.py", "def recover():\n    return True\n")
+        self.stage("tests/test_restart_recovery.py", "assert True\n")
+        self.stage("docs/restart-recovery.md", "Restart history recovery instructions.\n")
+        self.commit()
+        self.stage("docs/restart-recovery.md", "Updated restart history recovery instructions.\n")
+        self.commit()
+
+    def test_token_in_recovery_named_source_is_refused(self):
+        self.install()
+        secret = "ghp_" + "aB7C9dE2" * 5
+        self.stage("restart_recovery.py", secret)
+        self.blocked(secret)
 
     def test_identity_email_in_content_is_not_globally_exempt(self):
         self.install()
@@ -316,7 +332,7 @@ class PrivacyGateTests(unittest.TestCase):
 
     def test_lfs_local_safe_payload_commits(self):
         self.install()
-        self.lfs_pointer(b"safe public LFS payload\n")
+        self.lfs_pointer(b"safe public LFS payload: /home/private-fixture/project\n")
         self.commit()
 
     def test_lfs_local_token_payload_is_refused(self):
@@ -331,7 +347,7 @@ class PrivacyGateTests(unittest.TestCase):
         self.assertEqual(result.returncode, 2, "missing LFS bytes must fail closed without download")
         self.no_leak(result, "asset.txt", str(self.repo))
 
-    def test_public_identity_exception_is_exact_and_metadata_only(self):
+    def test_identity_approval_is_optional_and_metadata_only(self):
         name = "Example Public Maintainer"
         address = "public" + "@private.example"
         rules = self.base / "identity-rules.json"
@@ -348,7 +364,7 @@ class PrivacyGateTests(unittest.TestCase):
         self.git("rm", "--cached", "--", "contact.txt")
         self.stage("safe.txt", "updated public example\n")
         self.git("config", "user.name", "Different Public Maintainer")
-        self.blocked(address)
+        self.commit()
 
     def test_installed_missing_scanner_fails_closed_without_traceback(self):
         self.install()
@@ -423,32 +439,51 @@ class PrivacyGateTests(unittest.TestCase):
         self.assertEqual(result.returncode, 2, "noncanonical LFS pointer must fail closed")
         self.no_leak(result, "asset.txt")
 
-    def test_private_metadata_email_without_dotted_domain_is_refused(self):
+    def test_git_metadata_name_and_email_need_no_approval(self):
         self.install()
-        address = "private-fixture" + "@private-host"
-        self.git("config", "user.email", address)
+        self.git("config", "user.name", "/home/private-fixture/Public Maintainer")
+        self.git("config", "user.email", "private-fixture@private-host")
         self.stage("safe.txt", "public example\n")
-        self.blocked(address)
+        self.commit()
 
-    def test_commit_author_option_cannot_override_safe_config_with_private_identity(self):
+    def test_commit_author_option_accepts_effective_metadata(self):
         self.baseline()
         self.install()
         self.stage("safe.txt", "safe public update\n")
         address = "private-author" + "@private.example"
-        head = self.git("rev-parse", "HEAD").stdout
-        index = self.git("ls-files", "--stage", "-z").stdout
-        result = self.git("commit", "-qm", "fixture update", "--author", "Private Fixture <" + address + ">", expected=1)
-        self.no_leak(result, address)
-        self.assertEqual(self.git("rev-parse", "HEAD").stdout, head)
-        self.assertEqual(self.git("ls-files", "--stage", "-z").stdout, index)
+        self.git("commit", "-qm", "fixture update", "--author", "Private Fixture <" + address + ">")
+        self.assertEqual(self.git("log", "-1", "--format=%ae").stdout.strip(), address.encode())
 
-    def test_commit_author_environment_cannot_override_safe_config_with_private_identity(self):
+    def test_commit_author_environment_accepts_effective_metadata(self):
         self.baseline()
         self.install()
         self.stage("safe.txt", "safe public update\n")
         address = "private-author" + "@private.example"
         self.env["GIT_AUTHOR_EMAIL"] = address
-        self.blocked(address)
+        self.commit()
+        self.assertEqual(self.git("log", "-1", "--format=%ae").stdout.strip(), address.encode())
+
+    def test_token_in_git_identity_is_refused(self):
+        self.install()
+        secret = "ghp_" + "aB7C9dE2" * 5
+        self.git("config", "user.name", secret)
+        self.stage("safe.txt", "public example\n")
+        self.blocked(secret)
+        self.git("config", "user.name", "Example Maintainer")
+        self.env["GIT_AUTHOR_EMAIL"] = secret + "@example.invalid"
+        self.blocked(secret)
+
+    def test_private_home_path_rule_overrides_blob_and_lfs_allowance(self):
+        literal = "/home/private-fixture/project"
+        rules = self.base / "private-rules.json"
+        rules.write_text(json.dumps({"forbidden_literals": [{"label": "PRIVATE_HOME", "category": "home_path", "value": literal}], "forbidden_path_globs": []}))
+        rules.chmod(0o600)
+        self.git("config", "privacyGate.rules", str(rules))
+        self.install()
+        self.stage("asset.txt", literal)
+        self.blocked(literal)
+        self.lfs_pointer(literal.encode())
+        self.blocked(literal)
 
     def test_reviewed_legacy_blob_passes_and_modified_token_is_refused(self):
         name = "dot_agents/skills/last30days/scripts/lib/bluesky.py"
@@ -491,7 +526,7 @@ class PrivacyGateTests(unittest.TestCase):
         self.assertTrue(hashlib.sha256(blob.stdout).hexdigest() == entry["content_sha256"], "reviewed fixture content changed")
         return os.fsdecode(raw_name), blob.stdout
 
-    def test_reviewed_recovery_document_approval_is_bound_to_exact_blob(self):
+    def test_reviewed_recovery_document_edits_allow_public_content_only(self):
         name, content = self.reviewed_recovery_fixture()
         target = self.repo / name
         target.parent.mkdir(parents=True, exist_ok=True)
@@ -502,7 +537,11 @@ class PrivacyGateTests(unittest.TestCase):
         self.commit()
         target.write_bytes(content + b"\nAdditional harmless public documentation.\n")
         self.git("add", "--", name)
-        self.blocked(name)
+        self.commit()
+        secret = "ghp_" + "aB7C9dE2" * 5
+        target.write_bytes(target.read_bytes() + secret.encode())
+        self.git("add", "--", name)
+        self.blocked(secret, name)
 
     def test_public_blob_approval_cannot_override_private_literal_rule(self):
         name = "dot_agents/skills/last30days/scripts/lib/bluesky.py"

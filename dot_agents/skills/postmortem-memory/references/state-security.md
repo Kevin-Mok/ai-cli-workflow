@@ -361,3 +361,15 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Operator evidence: live exact completed legacy promotion/reuse succeeded without reread, preserving original UTC timestamp2026-10-21T17:43:11.946823+00:00; running proof and prerequisites pass.
 - Limits: no cross-reboot/stopped-start reuse or authenticated acceptance yet. Metadata misses silent bitrot; privileged actors can forge the receipt; shared-library-only upgrades are unbound; USB renumbering may miss. Opaque legacy receipts need exact same-boot promotion.
 - Source: [repeated image verification](/home/example/coding/triway-nextjs/docs/postmortem/2026-10-21-repeated-image-verification.md) (SHA-256 `d1bc903e7471`; registered in sources.json).
+
+
+## local-gate-public-metadata-defaults
+
+- Status: verified_fix; confidence: confirmed; scope: runtime.
+- Symptoms: harmless home paths, effective Git identity emails and ordinary recovery filenames block an otherwise safe scoped commit.
+- Applicability: commit-gate defaults explicitly permitting public metadata; standalone historical audit policy can remain stricter.
+- Diagnostics: distinguish indexed source/docs from private archives, and Git metadata from authentication secrets. Compare source versus installed scanner snapshots; check exact candidate and actual hook without changing HEAD/index.
+- Remedy: suppress only permitted built-in heuristics, then reapply explicit private literal/path rules at indexed, LFS and metadata boundaries. Keep actual token/key/password and blob-email checks. Ordinary recovery filenames need no hash approval; private archive directories remain blocked. This supersedes the older metadata identity-allowlist requirement for the commit gate.
+- Verification: seven worker-observed RED failures preceded the fix; independent 49 gate, 14 history and one checkpoint test passed. Source checks on both real candidates and installed hook/status passed; refresh-config completed after matching-byte permission drift was reconciled only on four exact targets.
+- Limits: allowed metadata can disclose local paths and identity by user policy; explicit private rules can still prohibit it. Existing dynamic-import typing diagnostics remain. Installed hooks require snapshot refresh after source changes.
+- Source: [Public metadata commit blocking](../../../../docs/postmortem/2026-10-22-privacy-gate-public-metadata.md).

@@ -31,8 +31,8 @@ or make a test commit in this checkout. Installation alone creates no commit.
 - Action: `python3 scripts/executable_privacy-gate check --plain --details`.
   Expected: The complete current index and effective author/committer identities
   are inspected locally. Safe candidates exit 0; findings exit 1 with safe
-  categories/hashed path references; incomplete inspection exits 2. Existing
-  pending/private identity findings must be repaired locally before committing.
+  categories/hashed path references; incomplete inspection exits 2. Home paths, Git identity metadata and ordinary recovery filenames pass; actual
+  secrets, private archives and explicit private-policy matches remain blocked.
 - Action: `python3 tests/test_pre_commit_privacy_gate.py` and
   `python3 -m unittest discover -s tests -p test_checkpoint_privacy_gate.py`.
   Expected: Disposable actual Git commits prove safe commits/repairs, token/key/
@@ -51,16 +51,17 @@ or make a test commit in this checkout. Installation alone creates no commit.
   `python3 scripts/executable_privacy-gate install`, then run `status --plain`
   and `check --plain`.
   Expected: The scanner snapshot is current. Existing reviewed source references,
-  synthetic fixtures and public recovery runbooks pass only while their exact
-  path/content/category approvals match. An edited approved blob requires review;
+  synthetic fixtures retain their exact path/content/category approvals. Ordinary
+  recovery-named source/docs need no path approval and can be edited safely;
   adding a real-looking token is still refused. A missing/malformed approval
   manifest refuses inspection rather than silently disabling the gate.
-- Action: For an approved public Git identity, keep the exact name/email pair only
-  in a mode-0600 rules file outside the checkout and configure local
-  `privacyGate.rules`. Run `check --plain` again.
-  Expected: Only the approved metadata identity is permitted. Git user.name/email
-  remain unchanged; the same email in arbitrary file content remains detectable.
-  Never publish the private rules file or approve an identity without the user.
+- Action: In a disposable repo, stage documentation containing a synthetic home
+  path and ordinary recovery-named files, configure a synthetic Git author/committer
+  identity, install the gate and commit. Then add a synthetic token to a recovery
+  file or explicitly forbid the home path in external mode-0600 private rules.
+  Expected: Public metadata/source commit succeeds without identity approvals.
+  Token/private-rule cases refuse the commit without leaking values. Private
+  recovery directories stay blocked; email text in a blob is still detected.
 
 ## Fish login startup
 

@@ -56,8 +56,7 @@ def private_path(path: str) -> bool:
     if path == "second-brain/README.md":
         return False
     return (
-        any(re.search(r"(?:^|[._-])recover(?:y|ies)(?:[._-]|$)", part) for part in lower)
-        or any(part in {"recovery", "recoveries", "backup", "backups", "private", ".aws", "dot_ssh", ".ssh", "private_dot_gnupg", "dot_minikube"} for part in lower)
+        any(part in {"recovery", "recoveries", "backup", "backups", "private", ".aws", "dot_ssh", ".ssh", "private_dot_gnupg", "dot_minikube"} for part in lower)
         or path.startswith(("benchmarks/metaprompt/runs/", "benchmarks/metaprompt-selection/runs/", "second-brain/", "dot_kube/private_config"))
         or name in {"auth.json", "credentials.json", "cookies.txt", "cookies.sqlite", "session.json", "session.jsonl", ".chezmoi.toml", ".chezmoidata.toml", ".chezmoidata.yaml"}
         or (name == ".env" or name.startswith(".env.")) and name != ".env.example"
@@ -160,7 +159,7 @@ def literal_categories(content: bytes, location: str, rules):
 
 def check(repo: Path, *, tree: str | None = None, rules_path: Path | None = None):
     repo = Path(os.fsdecode(git(repo, "rev-parse", "--show-toplevel").rstrip(b"\n")))
-    rules, identities = rules_for(repo, rules_path)
+    rules, _ = rules_for(repo, rules_path)
     findings = []
     approvals = load_approvals()
     for oid, encoded_path in candidate(repo, tree):
@@ -173,14 +172,16 @@ def check(repo: Path, *, tree: str | None = None, rules_path: Path | None = None
         categories.update(scanner.scan_content(content, "blob"))
         approved = approvals.get((reference(encoded_path), hashlib.sha256(content).hexdigest()), ())
         categories.difference_update(approved)
-        # Explicit private prohibitions always override reviewed public heuristics.
+        categories.discard("home_path")
+        # Explicit private prohibitions always override public metadata defaults.
         categories.update(literal_categories(encoded_path, "blob", rules["literals"]))
         categories.update(literal_categories(content, "blob", rules["literals"]))
         if any(fnmatch.fnmatchcase(path, pattern) for pattern in rules["path_globs"]):
             categories.add("sensitive_path")
         payload = lfs_payload(repo, content)
         if payload is not content:
-            categories.update(scanner.scan_content(payload, "blob", rules["literals"]))
+            categories.update(scanner.scan_content(payload, "blob") - {"home_path"})
+            categories.update(literal_categories(payload, "blob", rules["literals"]))
         findings.extend((category, reference(encoded_path)) for category in sorted(categories))
     for kind in ("AUTHOR", "COMMITTER"):
         ident = git(repo, "var", "GIT_" + kind + "_IDENT").strip()
@@ -188,13 +189,8 @@ def check(repo: Path, *, tree: str | None = None, rules_path: Path | None = None
         if not match:
             raise GateError("Git identity is unavailable")
         name, email = match.group(1, 2)
-        approved = any(name == item["name"].encode() and email == item["email"].encode() for item in identities)
         identity = name + b" <" + email + b">"
-        categories = scanner.scan_content(identity, "commit")
-        if approved:
-            categories.discard("email")
-        elif email.rsplit(b"@", 1)[-1].lower() not in scanner.SAFE_EMAIL_DOMAINS:
-            categories.add("email")
+        categories = scanner.scan_content(identity, "commit") - {"email", "home_path"}
         categories.update(literal_categories(identity, "commit", rules["literals"]))
         findings.extend((category, "identity-" + kind.lower()) for category in sorted(categories))
     return findings

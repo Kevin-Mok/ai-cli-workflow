@@ -5611,6 +5611,26 @@
       ],
       "verification": "Isolated actual12/19pt fixtures passed both ratios, repeated returns, restart, zoom, restore and unfocused/cross-instance isolation. Live disposable windows followed real i3 moves; deployed service restart preserved existing metrics. Dedicated XID-targeted whole-workspace fixture passed both sides, main return and visible-workspace/focus restoration.",
       "verification_scope": "runtime"
+    },
+    {
+      "applicability": "Commit gates explicitly configured to permit public metadata while preserving authentication-secret and explicit private-policy checks.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Inspect exact candidate categories and effective Git identities; distinguish recovery source filenames from archive directories; compare source and installed snapshots and run the actual hook without modifying HEAD/index."
+      ],
+      "id": "local-gate-public-metadata-defaults",
+      "limitations": "Standalone history auditor remains stricter; permitted public paths/identities can reveal metadata. Existing dynamic-import type-check error remains; no clean type result claimed.",
+      "reference": "references/state-security.md#local-gate-public-metadata-defaults",
+      "remedy": "Allow only specified built-in metadata heuristics before explicit private literal/path rules at index, LFS and metadata boundaries. Keep actual secrets, blob-email checks and private archives blocked; refresh installed snapshots.",
+      "sources": [
+        "482327c6d64888827a6d6697a46f4ca65fb5a2ddc1ae3376782c111b1ca744ab"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "Safe scoped commits blocked by home-path, ordinary recovery filename and Git identity email heuristics."
+      ],
+      "verification": "Seven worker-observed defining RED failures; 49 gate, 14 history and one checkpoint regression passed. Both source candidate checks and actual installed hook/status passed; refresh-config completed after reviewed identical-byte permission drift reconciliation.",
+      "verification_scope": "runtime"
     }
   ],
   "reports": [
@@ -10459,6 +10479,25 @@
       "findings": [],
       "reviewed_on": "2026-10-22",
       "sha256": "c6156fd799ab7044148acd59cb937286769e6fa3ac1080e589a5ac3313794e99"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/twitter-cap-bot/docs/postmortem/2026-10-22-new-tweet-cap-eviction.md"
+      ],
+      "decision": "No new cross-repository learning: product-specific newest-pair eligibility and retained-cap policy correction; full RED/GREEN evidence and the local lesson are recorded in the report and repository tasks/lessons.md. Code verified; live activation remains pending.",
+      "findings": [],
+      "reviewed_on": "2026-10-22",
+      "sha256": "041ae52be94013a45b0b38bc645273e54ccbd886022f0d155ca1afa203f9000a"
+    },
+    {
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-10-22-privacy-gate-public-metadata.md"
+      ],
+      "findings": [
+        "local-gate-public-metadata-defaults"
+      ],
+      "reviewed_on": "2026-10-22",
+      "sha256": "482327c6d64888827a6d6697a46f4ca65fb5a2ddc1ae3376782c111b1ca744ab"
     }
   ],
   "review": {

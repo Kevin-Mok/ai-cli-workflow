@@ -612,39 +612,42 @@ missing objects, unavailable rules, and scanner failures refuse inspection.
 
 Shared detection covers recognizable OpenAI/Anthropic, GitHub, AWS access-ID,
 Google API and Slack token shapes; credential assignments (including JSON keys),
-PEM/base64 private-key headers and SSH key material; email/home/IP identifiers;
-and known keyed runtime UUIDs, including nested serialized JSON. Nil runtime UUIDs,
-example domains, documentation networks and exact placeholder values remain safe.
-There are no blanket fixture-directory exemptions. Candidate path rules block raw
-benchmark runs, private credentials, private vault data, and recovery locations
-even when force-added. Review false positives locally; use a neutral example
-rather than exempting a directory.
+PEM/base64 private-key headers and SSH key material; email/IP identifiers in
+file content; and known keyed runtime UUIDs, including nested serialized JSON.
+The commit gate permits ordinary home-directory paths, Git author/committer
+name/email metadata, and recovery-named source/docs such as `restart_recovery.py`.
+These defaults apply to local LFS payloads too. They do not permit authentication
+secrets, arbitrary email addresses in file content, or explicit private-policy
+matches. The standalone history auditor retains its broader identifier diagnostics.
+Nil runtime UUIDs, example domains, documentation networks and exact placeholder
+values remain safe. There are no blanket fixture-directory exemptions. Candidate
+path rules still block raw benchmark runs, private credentials/vault data, and
+private `recovery/`, `recoveries/` and backup directories, even when force-added.
 
 Reviewed legacy source expressions, synthetic redaction fixtures and public
 recovery runbooks are listed in `scripts/privacy_gate_approvals.json` using only
 path references, full content SHA-256 hashes, specific categories and public review
-reasons. Each approval applies to those exact bytes at that exact path; any edit
-requires a fresh review. All other categories still run, and explicit private forbidden literals/path globs
-always override public approvals. There is no test-directory
-or general recovery-document exemption. The installer snapshots this manifest;
+reasons. Each approval applies to those exact bytes at that exact path; edits
+require review if the content still triggers another blocked category. Ordinary
+recovery filenames need no approval; their contents remain fully scanned. Explicit
+private forbidden literals/path globs always override public defaults and approvals.
+There is no test-directory content exemption. The installer snapshots this manifest;
 missing or malformed policy blocks inspection. After a scanner/policy update,
 repeat `install` before relying on the installed hook.
 
-If the gate reports an email category only for `identity-author` or
-`identity-committer`, decide whether that Git identity is public. Keep it unchanged
-only after explicitly approving its exact name/email pair in the private rules
-file described below; otherwise configure an appropriate public identity locally.
-Do not add an email-domain exemption or copy real identity rules into this repo.
+Git author/committer identity emails are permitted as metadata without an
+allowlist; Git identity settings remain unchanged. Other secret patterns and
+explicit private prohibitions still apply to identities. The same email in
+arbitrary file content remains checked.
 
 Optional private policy uses `--rules PATH` or local Git config `privacyGate.rules`.
 Keep that mode-`0600` JSON file outside the repository. It accepts the history
 auditor's `forbidden_literals` and `forbidden_path_globs`; the gate deliberately
 ignores `allowed_paths` so private policy cannot weaken built-in restrictions.
-An optional `approved_public_identities` array holds exact `{ "name": "Example
-Maintainer", "email": "maintainer@example.invalid" }` pairs. This approval only
-permits that identity's Git metadata; the same address in file bytes is still
-checked. It does not alter Git identity settings or approve arbitrary addresses.
-Keep real approvals and private literals out of tracked documentation.
+The legacy `approved_public_identities` array remains accepted and validated
+for compatibility, but identity metadata no longer requires it. Explicit forbidden
+literals and path globs still take precedence. Keep private literals and policy
+files out of tracked documentation.
 
 Every candidate blob, including binary raw bytes, is checked. LFS pointers require
 a readable local payload with matching size and SHA-256; nothing is fetched.

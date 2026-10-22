@@ -275,3 +275,5 @@
 - 2026-10-22: Verify the running i3bar after updating status scripts: reload can retain an unchanged command, and transient startup fallback must retry. Standalone renderer output alone does not prove activation. See [4K bar inspection](../docs/postmortem/2026-10-22-4k-bar-inspection.md).
 
 - 2026-10-22: Dunst pause only gates daemon delivery; direct event-hook TTS needs the same pause query in the shared player, including after the playback lock and before later stages. Explicit previews may bypass it. See [DND TTS](../docs/postmortem/2026-10-22-dnd-tts.md).
+
+2026-10-22 - Apply public-metadata heuristic allowances before reapplying explicit private policy at each boundary, including indexed paths/blobs, LFS payloads and effective Git identities. A source-only gate pass does not verify installed hook snapshots; reinstall and exercise the actual hook after policy changes.

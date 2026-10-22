@@ -100,3 +100,13 @@ findings and scanner errors as blocking safety failures; repair and restage the
 candidate before retrying. Preserve the active Git hooks. Plumbing commits must
 pass the exact immutable tree OID with `--tree OID` to the same shared gate.
 See the root README privacy-gate section for activation, private rules and limits.
+
+The gate permits home-directory paths, Git author/committer name/email metadata,
+and ordinary recovery-named source or documentation files. Email addresses in
+file content are still checked. Authentication tokens, passwords, private keys,
+private recovery archives and explicit private-policy matches remain blocking.
+
+If the working repository has no gate entry point, run the canonical
+`~/linux-config/scripts/executable_privacy-gate` with `--repo <repo-root> check`.
+Use the shared implementation rather than omitting the check or copying a scanner
+into the project. Refresh installed hook snapshots after policy changes.
