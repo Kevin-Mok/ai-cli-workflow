@@ -1468,7 +1468,7 @@ play audio, so exercise them deliberately.
   Expected: Scheduled playback clears an already blanked X11 screen and stays visible past that timeout; dismissal releases inhibition and the original timeout/DPMS settings are unchanged. A locked session still skips playback.
 - Action: Run `~/linux-config/scripts/executable_setup-screensaver-timer --test` in the X11 desktop; do not touch input for ten seconds, then dismiss playback. Repeat and press Ctrl+C during the wait.
   Expected: Displays turn off, wake ten seconds later and show manual preview without changing the daily timer. Ctrl+C during the wait wakes displays and exits without preview.
-- Action: Dismiss manual previews, type `sofss` and press Enter in fish before 10 AM; leave the desktop untouched until 10 AM. Repeat after 10 AM when the next-day wait is acceptable.
+- Action: Dismiss manual previews, type `sofss` (or `sofs`) and press Enter in fish before 10 AM; leave the desktop untouched until 10 AM. Repeat after 10 AM when the next-day wait is acceptable.
   Expected: The daily timer is armed before idle/daily playback stops and displays power off. At the next local 10 AM displays wake, idle monitoring resumes and scheduled playback starts when unlocked even without browser coverage. Input can wake displays early; suspend can delay the timer. The command does not power off the computer or enforce a blackout through input.
 
 - Action: Run `~/scripts/media-screensaver orient` (or add `--media DIR`) and choose a video; move the mouse and use the keyboard inside the review window.
