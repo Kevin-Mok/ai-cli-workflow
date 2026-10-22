@@ -970,6 +970,8 @@ this.
   a scrollbar; Kitty's native thumb cannot expose tmux-owned history. See the
   [tmux gesture checks](docs/smoke-tests.md#tmux-pane-history-scrolling) and run
   `~/scripts/tmux-scrollback-smoke` (or `--app-mouse`) in an isolated window.
+  With the separately prepared `~/.local/opt/tmux-3.8/bin/tmux`, add
+  `--scrollbar` to preview native pane scrollbars without restarting existing sessions.
   Use
   [`scripts/executable_install-tmux-tpm.sh`](scripts/executable_install-tmux-tpm.sh)
   to install or update TPM and reload an active tmux server before using

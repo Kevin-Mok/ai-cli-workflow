@@ -266,3 +266,5 @@
 - 2026-10-22: Calibrate mpv speech with rendered output, not a linear percentage assumption: native50 volume measured roughly18dB below100. Distinguish an unsupported/silent per-stream capture from real silence; the sink monitor gave usable live levels. Preserve user-selected persistent volume over calibration guesses.
 
 - 2026-10-22: Successful refresh-config can skip migration-preserved targets such as `.tmux.conf`. Check chezmoi ignore membership and live bindings; merge only authorized changes into preserved files without changing their ownership. See [terminal activation](../docs/postmortem/2026-10-22-terminal-helper-path-probe.md).
+
+- 2026-10-22: Verify terminal launchers under the inherited desktop/system PATH, not only the interactive shell. Prefer the installed modern Kitty when its config requires modern mappings, and keep versioned tmux plugin clients on the same child PATH as their server. A PTY test cannot expose Kitty config dialogs or plugin-launch overlays. See [scrollbar preparation](../docs/postmortem/2026-10-22-school-2-scrollbar-preparation.md).

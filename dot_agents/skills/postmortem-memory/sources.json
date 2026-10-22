@@ -5488,6 +5488,48 @@
       "sources": [
         "14a228dd392acede5d69b5c314504689fd1f6837ec4128904f31d1c48c88cf5f"
       ]
+    },
+    {
+      "id": "local-tmux-38-edge-drag-compatibility",
+      "reference": "references/artifact-verification.md#local-tmux-38-edge-drag-compatibility",
+      "status": "unresolved",
+      "confidence": "supported",
+      "verification_scope": "runtime",
+      "symptoms": [
+        "Existing stationary top-edge and bottom-edge selection checks time out on tmux 3.8 in both emacs and vi modes."
+      ],
+      "applicability": "This repository's tmux selection configuration and PTY regression fixtures when preparing a versioned tmux 3.8 upgrade from 3.4.",
+      "diagnostics": [
+        "Run combined preview and scrolling suite on each version using PATH; use unique disposable sockets.",
+        "Separately exercise native scrollbar SGR drag in shell and mouse-aware application fixtures; compare production session identities."
+      ],
+      "remedy": "Keep the production 3.4 server and clients unchanged; use the versioned 3.8 binary only for isolated scrollbar previews until edge-selection compatibility is investigated.",
+      "verification": "Combined suite passes 24/24 on 3.4 and 20/24 on 3.8. Native scrollbar drag passes independently in both shell and app fixtures; six original session identities/window counts and server PID remain unchanged.",
+      "limitations": "Root cause of edge-selection differences unresolved; no physical desktop acceptance or production migration. Successful scrollbar drag is not full selection-workflow compatibility.",
+      "sources": [
+        "e18f213cfce479da14f556a53d0f1b247ee2da93d89537730264f011b2d20ec1"
+      ]
+    },
+    {
+      "id": "local-kitty-preview-inherited-path",
+      "reference": "references/artifact-verification.md#local-kitty-preview-inherited-path",
+      "status": "verified_fix",
+      "confidence": "confirmed",
+      "verification_scope": "runtime",
+      "symptoms": [
+        "Kitty rejects map --allow-fallback=shifted,ascii and ignores scrollbar config keys; isolated tmux preview shows TPM returned 1."
+      ],
+      "applicability": "Host with modern ~/.local/bin/kitty 0.49.2 plus legacy /usr/bin/kitty 0.32.2; versioned tmux 3.8 preview with inherited system PATH.",
+      "diagnostics": [
+        "Compare exact Kitty binaries and parse the same live config with accumulate_bad_lines.",
+        "Run the real graphical helper under PATH=/usr/bin:/bin; inspect visible history and exact live input, not only PTY tests."
+      ],
+      "remedy": "Prefer the installed user-local Kitty executable and prepend the selected versioned tmux directory to preview child PATH so plugins use matching clients. Preserve required modern mappings.",
+      "verification": "Legacy parser reproduced line-30 error; modern parser reported zero bad lines. Both defining launcher assertions failed before fixes and passed afterward. Actual isolated GUI under system PATH displayed history, scrollbar and INPUT hello; helper exited 0 and installed bytes matched source.",
+      "limitations": "User-local Kitty fallback elsewhere still requires a compatible PATH binary. Isolated GUI checks do not establish physical desktop acceptance or resolve four pre-existing 3.8 edge-selection failures.",
+      "sources": [
+        "e18f213cfce479da14f556a53d0f1b247ee2da93d89537730264f011b2d20ec1"
+      ]
     }
   ],
   "reports": [
@@ -10131,6 +10173,17 @@
       "reviewed_on": "2026-10-22",
       "findings": [
         "local-chezmoi-preserved-target-activation"
+      ]
+    },
+    {
+      "sha256": "e18f213cfce479da14f556a53d0f1b247ee2da93d89537730264f011b2d20ec1",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-22-school-2-scrollbar-preparation.md"
+      ],
+      "reviewed_on": "2026-10-22",
+      "findings": [
+        "local-tmux-38-edge-drag-compatibility",
+        "local-kitty-preview-inherited-path"
       ]
     }
   ],

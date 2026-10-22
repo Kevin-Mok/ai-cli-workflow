@@ -505,3 +505,29 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Verification: Direct screen video was black before the workaround; afterward red video and green neighbors remained visible before/after resizing and movement. All57 screensaver tests passed. Source and installed synthetic checks passed on the actual three-output desktop and released all playback pipelines.
 - Limitations: Deprecated GTK3 API with potential flicker, stacking and performance costs; X11-specific workaround, not an upstream repair. The exact partial mask in the user's photograph and prolonged full-resolution smoothness remain unconfirmed.
 - Source: [screensaver launch investigation](../../../../docs/postmortem/2026-10-20-screensaver-launch-black-box.md).
+
+## local-tmux-38-edge-drag-compatibility
+
+- Status: unresolved
+- Confidence: supported
+- Verification scope: runtime
+- Symptoms: Existing stationary top-edge and bottom-edge selection checks time out on tmux 3.8 in both emacs and vi modes.
+- Applicability: This repository's tmux selection configuration and PTY regression fixtures when preparing a versioned tmux 3.8 upgrade from 3.4.
+- Diagnostics: Run combined preview and scrolling suite on each version using PATH; use unique disposable sockets. Separately exercise native scrollbar SGR drag in shell and mouse-aware application fixtures; compare production session identities.
+- Remedy: Keep the production 3.4 server and clients unchanged; use the versioned 3.8 binary only for isolated scrollbar previews until edge-selection compatibility is investigated.
+- Verification: Combined suite passes 24/24 on 3.4 and 20/24 on 3.8. Native scrollbar drag passes independently in both shell and app fixtures; six original session identities/window counts and server PID remain unchanged.
+- Limitations: Root cause of edge-selection differences unresolved; no physical desktop acceptance or production migration. Successful scrollbar drag is not full selection-workflow compatibility.
+- Source: [school-2 scrollbar preparation](../../../../docs/postmortem/2026-10-22-school-2-scrollbar-preparation.md) (SHA-256 `e18f213cfce479da14f556a53d0f1b247ee2da93d89537730264f011b2d20ec1`).
+
+## local-kitty-preview-inherited-path
+
+- Status: verified_fix
+- Confidence: confirmed
+- Verification scope: runtime
+- Symptoms: Kitty rejects map --allow-fallback=shifted,ascii and ignores scrollbar config keys; isolated tmux preview shows TPM returned 1.
+- Applicability: Host with modern ~/.local/bin/kitty 0.49.2 plus legacy /usr/bin/kitty 0.32.2; versioned tmux 3.8 preview with inherited system PATH.
+- Diagnostics: Compare exact Kitty binaries and parse the same live config with accumulate_bad_lines. Run the real graphical helper under PATH=/usr/bin:/bin; inspect visible history and exact live input, not only PTY tests.
+- Remedy: Prefer the installed user-local Kitty executable and prepend the selected versioned tmux directory to preview child PATH so plugins use matching clients. Preserve required modern mappings.
+- Verification: Legacy parser reproduced line-30 error; modern parser reported zero bad lines. Both defining launcher assertions failed before fixes and passed afterward. Actual isolated GUI under system PATH displayed history, scrollbar and INPUT hello; helper exited 0 and installed bytes matched source.
+- Limitations: User-local Kitty fallback elsewhere still requires a compatible PATH binary. Isolated GUI checks do not establish physical desktop acceptance or resolve four pre-existing 3.8 edge-selection failures.
+- Source: [school-2 scrollbar preparation](../../../../docs/postmortem/2026-10-22-school-2-scrollbar-preparation.md) (SHA-256 `e18f213cfce479da14f556a53d0f1b247ee2da93d89537730264f011b2d20ec1`).

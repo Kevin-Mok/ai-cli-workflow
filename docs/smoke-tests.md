@@ -1149,6 +1149,28 @@ Use a pane at least three text rows tall for the tmux 3.4 edge-release workaroun
 - Action: Separately try dragging the right edge of the tmux fixture.
   Expected: Installed tmux 3.4 has no draggable pane history scrollbar (native support first appears in 3.6); edge dragging selects text rather than giving raw Kitty thumb parity. The scroll/copy flow above uses pane-owned history.
 
+### Prepared tmux scrollbar preview
+
+Preview native pane scrollbars using the separately installed tmux 3.8 binary.
+The default tmux and existing sessions keep running on their original server.
+This requires `~/.local/opt/tmux-3.8/bin/tmux`; it is a local preparation,
+not an automatic bootstrap dependency. No sudo is needed.
+
+- Action: Run ~/scripts/tmux-scrollback-smoke --scrollbar.
+  Expected: A separate Kitty window opens a disposable tmux 3.8 server with a right-edge pane scrollbar and 3,000 numbered history records. The helper prefers ~/.local/bin/kitty when installed, so an older /usr/bin/kitty earlier on PATH cannot reject the modern configuration. No configuration-error dialog appears. Current school-2 windows and all other sessions remain running.
+- Action: Grab the pane scrollbar thumb at the right edge and drag it upward, then back downward. Press Escape, type hello and Enter, then Ctrl+D at empty input.
+  Expected: The pane shows earlier numbered HISTORY records without selecting text. Escape returns to live input, INPUT hello appears, and Ctrl+D closes only the disposable preview.
+- Action: Repeat with ~/scripts/tmux-scrollback-smoke --scrollbar --app-mouse.
+  Expected: The tmux pane scrollbar still browses history while plain wheel/click events over the application produce APP_MOUSE records. Only preview processes are cleaned up on exit.
+
+Preparing this binary does not add a scrollbar to already-running school-2.
+Activating it there requires a separately approved migration to a new server;
+do not kill the shared 3.4 server or replace its client while work is active.
+The current edge-selection regression suite passes 24/24 on 3.4 and 20/24 on
+3.8: stationary top/bottom edge gestures differ in both copy-mode tables.
+The preview checks scrollbar dragging; it does not certify replacement of the
+existing selection workflow. Resolve those differences before migration.
+
 ### Kitty and Codex scrolling
 
 Use a fresh Kitty window after refresh-config: a larger history cannot recover
