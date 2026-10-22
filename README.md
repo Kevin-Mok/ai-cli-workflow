@@ -1,16 +1,20 @@
-# KM's Four-Codex Operating Environment
+# One engineer. Six AI agents. Proof in the commits.
 
-A reproducible Linux workspace for AI-assisted engineering. This repo keeps
-desktop settings, Codex instructions and defaults, reusable skills, public-safe
-workflow code, and work plans under version control. Review the workflow, install the
-prerequisites, preview and apply the configuration with `chezmoi`, then use
-the daily commands and checks to keep the environment consistent.
+I coordinate **six concurrent AI coding agents** across product fixes,
+infrastructure and developer tooling. Shared instructions, reusable automation,
+scoped changes and explicit verification turn those sessions into a repeatable
+engineering workflow. This reproducible Linux workspace versions the tools and
+policies behind it, alongside the desktop configuration that keeps it practical.
 
-For recruiters and AI-native engineers, the point is concrete: this
-repo is a public artifact of how I structure leverage. It shows
-planning before edits, small reversible diffs, reproducible setup,
-durable context across sessions, and verification before claiming work
-is done. Personal values and knowledge-vault contents are intentionally excluded.
+**Approximately 90th-percentile AI-enabled engineering effectiveness among
+developers overall, including nonusers — subjective, unvalidated self-estimate.**
+[Assessment, original range and supporting evidence](docs/ai-engineering-evidence.md).
+
+For recruiters hiring AI-focused software engineers, the proof is inspectable:
+shared Codex/Claude policy, privacy-aware session tooling, an evaluation report
+that publishes negative results, and scoped product fixes with browser regression
+contracts. Start with the receipts below, then explore the implementation and
+setup. Private notes, account data and raw session records stay outside this repo.
 
 ## Tech Stack And Why Chosen
 
@@ -29,6 +33,7 @@ is done. Personal values and knowledge-vault contents are intentionally excluded
 
 ## Table Of Contents
 
+- [Engineering Receipts](#engineering-receipts)
 - [Operating Model At A Glance](#operating-model-at-a-glance)
 - [AI Layer Highlights](#ai-layer-highlights)
 - [Core Components](#core-components)
@@ -41,6 +46,22 @@ is done. Personal values and knowledge-vault contents are intentionally excluded
 - [Reproducibility Through Chezmoi](#reproducibility-through-chezmoi)
 - [Rest Of Repo](#rest-of-repo)
 - [License](#license)
+
+## Engineering Receipts
+
+| Engineering signal | Concrete proof |
+| --- | --- |
+| Reproducible AI setup | [One policy imported by Claude](https://github.com/Kevin-Mok/ai-cli-workflow/blob/d931cc2c8377fe0687eed1bd118d0e941ec28e6a/dot_claude/CLAUDE.md.tmpl) alongside [tracked Codex approval, sandbox and agent settings](https://github.com/Kevin-Mok/ai-cli-workflow/blob/d931cc2c8377fe0687eed1bd118d0e941ec28e6a/dot_codex/config.toml). |
+| Privacy-aware session reuse | [Source filtering](https://github.com/Kevin-Mok/ai-cli-workflow/blob/d931cc2c8377fe0687eed1bd118d0e941ec28e6a/scripts/second_brain/session_digest_input.py) and [regression cases for sources becoming private](https://github.com/Kevin-Mok/ai-cli-workflow/blob/d931cc2c8377fe0687eed1bd118d0e941ec28e6a/tests/test_second_brain_sessions_metadata.py). |
+| Honest evaluation | A [capped prompt benchmark](https://github.com/Kevin-Mok/ai-cli-workflow/blob/d931cc2c8377fe0687eed1bd118d0e941ec28e6a/docs/metaprompt-benchmark.md) reports failures and no supported overall winner; [upstream provenance](https://github.com/Kevin-Mok/ai-cli-workflow/blob/d931cc2c8377fe0687eed1bd118d0e941ec28e6a/dot_agents/skills/metaprompt/SOURCE.md) separates adaptation from original authorship. |
+| Scoped UI delivery | A [public notice change](https://github.com/Kevin-Mok/twitch-grid/blob/29fd768688de19552ba0d6b2b6ab7189bcb43bf8/src/components/PlayerSurface.tsx) with a [browser regression preserving the player iframe](https://github.com/Kevin-Mok/twitch-grid/blob/29fd768688de19552ba0d6b2b6ab7189bcb43bf8/tests/quality-notice.spec.ts). |
+| Concrete acceptance criteria | A [public grid sizing fix](https://github.com/Kevin-Mok/twitch-grid/blob/78e88d0e9cfc7c82643f87f6542ba79d17f2e9d3/src/components/PlayerSurface.tsx) with [2×2 geometry checks at three viewport sizes](https://github.com/Kevin-Mok/twitch-grid/blob/78e88d0e9cfc7c82643f87f6542ba79d17f2e9d3/tests/narrow-panels.spec.ts). |
+
+The [dated evidence review](docs/ai-engineering-evidence.md) covers seven
+selected sessions across three projects. It records delivered changes,
+shared-checkout interference and unfinished work. The receipts establish
+AI-assisted integration and delivery; agent count describes concurrency, with
+no measured productivity multiplier attached.
 
 ## Operating Model At A Glance
 
@@ -439,10 +460,12 @@ That is execution discipline you can inspect.
 The point of keeping plans in the repo is simple: larger tasks should
 not live only in chat scrollback or memory.
 
-### 5. Four Codex Workflow
+<a id="5-four-codex-workflow"></a>
 
-The operating model is four Codex sessions in parallel, each with a
-distinct job:
+### 5. Parallel Codex Workflow
+
+The workflow separates four responsibilities, with the number of parallel
+sessions adapted to the work:
 
 1. Exploration: read the codebase, trace behavior, inspect docs, and
    surface constraints before editing.
@@ -452,9 +475,11 @@ distinct job:
 4. Verification and docs: run tests, validate behavior, and keep
    documentation or plans aligned with the work.
 
-This split only works because every pane inherits the same instruction
-chain, config defaults, trust rules, and reusable skills. The result is
-parallelism with less chaos.
+Shared instructions, config defaults, trust rules and reusable skills keep
+session expectations consistent. Concurrent edits still require bounded
+ownership, scoped diffs and isolated validation; the
+[dated assessment](docs/ai-engineering-evidence.md#five-dimensions) records the
+integration costs observed when several sessions share a checkout.
 
 ## Second Brain Context Layer
 
@@ -1134,7 +1159,7 @@ this.
   template logic across the repo.
 
 That broader dotfiles surface is still substantial, but the README stays
-centered on the four-Codex operating environment because that is the
+centered on the AI-assisted engineering workflow because that is the
 most distinctive and actively evolving part of the repo right now.
 
 ### Desktop notification text

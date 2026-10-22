@@ -300,6 +300,18 @@ listing is cached-only; opening a picker can generate recaps unless disabled.
 
 ## Skills And Docs
 
+- Action: Open the root README's Engineering Receipts and follow its assessment
+  link and immutable source links after refreshing recruiter-facing claims.
+  Expected: Source links are publicly accessible and support the adjacent claim;
+  the assessment records its dated sample and separates observed results from
+  recorded claims and unfinished work. Any public percentile is labeled
+  "subjective, unvalidated estimate" or "subjective, unvalidated self-estimate"
+  beside the number, includes developers who
+  do not use AI, and links its rationale. Adoption rates do not become proficiency
+  rankings; a six-agent concurrency claim does not imply sixfold speed or six
+  projects. Raw sessions and private project details remain excluded. Run the
+  existing README recruiter-sync gate and inspect rendered Markdown as well as
+  the saved prompt and report; a passing structural gate alone is insufficient.
 - Action: Add or change a repo-tracked skill under `dot_agents/skills/`.
   Expected: The skill definition, `dot_agents/skills/README.md`, and the
   root `README.md` stay aligned with the new workflow the skill adds or

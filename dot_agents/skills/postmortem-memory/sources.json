@@ -5615,6 +5615,15 @@
   ],
   "reports": [
     {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-22-proficiency-evidence-discovery.md"
+      ],
+      "decision": "No new durable learning: ext-optional-path-discovery covers observed entrypoint discovery. Approved read-only metadata and anonymous byte checks establish different evidence scopes. The isolated browser bridge remained unresolved; installed headless Chrome with a temporary profile verified static documentation rendering only. Final checker success followed a corrected temporary anchor parser, with no Markdown weakened to fit it. Existing scope and evidence-separation practices apply. local-stale-patch-context already covers regenerating the narrow patch after observed context rejection; no additional durable finding. Configured local fish startup attempted out-of-sandbox writes during command lookup; configuration-free lookup succeeded without diagnostics. This adds no new durable finding or live-shell repair claim. A temporary candidate verifier used malformed shell expansion; the refused object write left index/worktree unchanged, and explicit isolated-index handling passed. This is existing shell-transport practice, not a new durable finding.",
+      "findings": [],
+      "reviewed_on": "2026-10-22",
+      "sha256": "282f81b00747ab9761cf9c7e92a15933ff014675c2079e1066a834ccdda8edf6"
+    },
+    {
       "sha256": "a27fdfaa542914bea4809093711845565d038dfde8b0f7b6d22ec839cc0b48e4",
       "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-10-22-dnd-tts.md"
