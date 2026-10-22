@@ -278,16 +278,10 @@ education work:
 - Keep relevant documentation and ExecPlan updates in the same commit as their
   implementation. Stage only intended files or hunks and inspect the staged diff
   before committing.
-- Open commit delivery replies with the commit hash and actual push status,
-  including the remote and branch. End summaries with skipped checks and material
-  risks, then the bold hash and actual push status, followed by
-  `Full commit message:` and the subject in inline code (include any recorded
-  body in a fenced text block). For example:
-  Skipped subjective animation inspection. Expired notifications may receive a
-  fresh ID. **383e5fd — pushed to `origin/main`.**
-  Full commit message: `feat(i3): update Redshift notifications in place`
-  Confirm success only after verification; state clearly when a push failed or
-  was not performed.
+- For commit delivery, follow [Handoff Format](#handoff-format). Include the
+  verified commit hash and actual push status (remote and branch) in **Verified**.
+  Include `Full commit message:` with the recorded Conventional Commit subject
+  and any body in **Implemented**. State failed or unperformed pushes accurately.
 - After each commit, promptly report the result in Codex output with a high-level
   overview of where the task stands: completed work, verified results, remaining
   work, blockers (or none), and the next step. Maintain the same overview in the
@@ -295,21 +289,9 @@ education work:
   milestones. Update the document before committing and include it with the
   related work; identify the milestone by subject or sequence, then report the
   resulting commit hash in Codex output. Link the status document in the response.
-- Alongside each commit overview, and immediately after reporting a push result,
-  include 5–10 copy-pasteable direct verification commands in the same Codex response,
-  with the required working directory and example expected output immediately
-  after each command, in its own labeled output block. For commands that succeed
-  silently, state "No output; exit status 0." Mark variable values as placeholders
-  and label examples as expected output rather than claiming they were observed.
-  Use commentary for intermediate commits and include the overview and commands
-  in the final
-  handoff. Each command must exercise behavior implemented in that commit through
-  the actual CLI, app, API, or generated artifact and expose an observable result.
-  Do not fill this list with automated test suites, linters, type checks, builds,
-  Git status/diff checks, or source-text searches; run required automated checks
-  before committing and summarize their results separately. Prefer a reusable
-  script only when it directly exercises the implemented behavior; state whether sudo
-  is needed. Do not wait for the user to ask. Preserve the configured push cadence.
+- Use [Handoff Format](#handoff-format) for each commit overview and push result:
+  commentary for intermediate milestones and the final response for delivery.
+  Preserve the configured push cadence.
 - Single-commit workflows push after the commit passes verification; multi-commit workflows push once after the complete verified series, unless the user explicitly requests another cadence.
 - Push the configured upstream only when the target is clear. Do not amend,
   rebase, squash, reset, force-push, or rewrite history unless explicitly asked.
@@ -333,23 +315,38 @@ education work:
 - Before committing, check that another engineer can reproduce the result,
   review the rollback path, and ask whether the solution remains the simplest
   robust option.
-- After every task completion, always provide 5–10 concrete, copy-pasteable
-  direct verification commands in the final handoff, whether or not a commit or
-  push occurred. Apply this to documentation, configuration, analysis, planning,
-  and feature tasks. Commands must directly exercise or verify the completed
-  result through the actual CLI, app, API, or delivered artifact, including
-  relevant edge cases, with observable results. For tasks without new executable
-  behavior, use task-relevant artifact or workflow commands; do not invent
-  behavior or pad the list with unrelated checks. Automated tests, linters, type checks,
-  builds, Git hygiene checks, and source-text searches do not count toward this
-  list; complete required automated checks before completion and, when relevant,
-  before committing, and report their results separately.
-  State the required working directory and whether sudo is needed. Immediately
-  after each command, show its own labeled example expected-output block; do not
-  group expected outputs separately from their commands. For silent success,
-  state "No output; exit status 0." Mark variable values as placeholders and
-  distinguish expected examples from observed verification. Prefer reusable scripts
-  and documented commands that directly exercise the implemented behavior. Do not wait for the user to ask.
+### Handoff Format
+
+For every task-completion handoff, with or without a commit or push, use this
+visible order. Keep the commands together in execution order and outside
+`<details>` or other collapsed sections.
+
+1. **Three direct verification commands:** start with exactly 3 concrete,
+   copy-pasteable commands. State the working directory and whether sudo is
+   needed before them. Immediately after each command, give its own labeled
+   **Expected:** output block; include relevant manual actions before the
+   command that needs them.
+2. **Verified:** report observed checks and results, link evidence or the plan,
+   and state unverified behavior, skipped checks and material risks. Distinguish
+   previous-run results from checks run in this turn.
+3. **Use:** give the user's usage or restore instructions and relevant
+   persistence behavior.
+4. **Implemented:** summarize what changed. State commit/push status when
+   relevant. Keep this summary last.
+
+Commands must exercise the completed behavior through the actual CLI, app, API
+or delivered artifact, including relevant edge cases. For non-executable work,
+use relevant artifact or workflow commands. Automated tests, linters, type
+checks, builds, Git hygiene checks and source-text searches do not count; run
+required checks before completion and summarize their results in **Verified**.
+Use task-relevant commands rather than invented behavior or unrelated padding.
+Follow the runnable-command presentation rules: raw one-line fish commands at
+column zero; expected output uses separate language-tagged fenced blocks.
+For silent success, write "No output; exit status 0." Mark variable values as
+placeholders and label examples as expected rather than observed. Prefer
+existing reusable scripts and documented commands that directly exercise the
+result. Do not wait for the user to ask for the three commands.
+
 - For coding-task handoff, include the atomic plan, a paste-ready Cursor prompt,
   exact automated and manual test plan, docs updates, a Conventional Commit
   suggestion, and any additional validation notes.

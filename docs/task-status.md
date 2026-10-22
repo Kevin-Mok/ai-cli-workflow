@@ -148,3 +148,13 @@ This document records delivery milestones and verification for completed reposit
 - Delivery: one focused commit on main, then push to origin/main after staged review. No remaining shortcut implementation work.
 - Remaining: preserve all unrelated dirty work, including other ledger changes. Unrestricted refresh retains the existing Kitty conflict; interactive keystroke expansion remains manual.
 - Rollback: remove only va from the directory template, deploy the reviewed catalog and regenerate shortcuts.
+
+## Handoff format — docs: standardize command-first task handoffs
+
+- Complete: task handoffs start with three visible direct commands and immediate expected-output blocks, followed by Verified, Use and Implemented. Matching README/smoke checks and both chronological preference entries travel with the policy.
+- Scope: only this session's handoff-format hunks, its refresh incident/ledger record, and this status milestone. Preserve unrelated README/recruiter edits, GitHub remote policy, Kitty changes, incident work and prompts.
+- Verification: canonical/installed Handoff Format blocks match; count/order/visibility assertions and scoped whitespace checks passed. The targeted incident-ledger check exited 0. An initial commit was blocked by a real-home-path alias; the scoped public candidate now uses the existing neutral placeholder and the unchanged privacy gate passes. README gate: handoff coverage updated in this change; staged README retains the existing hook/stack/setup order.
+- Activation: required refresh-config was attempted and stopped on existing Kitty monitor_font.py drift. The installed AGENTS file is ignored/unmanaged, so only its owned handoff section was merged; personalized policy remains intact. Fresh-model behavior was not tested.
+- Delivery milestone: docs: standardize command-first task handoffs; commit on main and push the configured origin/main after staged review. No application deployment is relevant to this configuration/documentation commit.
+- Remaining: unrelated dirty work stays local; broad refresh remains blocked by the existing Kitty conflict. No blocker to publishing the saved, scoped handoff policy.
+- Rollback: revert the handoff policy/docs change and restore only the corresponding installed handoff section; keep feedback history append-only.

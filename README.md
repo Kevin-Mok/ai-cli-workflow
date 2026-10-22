@@ -122,6 +122,8 @@ so the same policy is not loaded and maintained twice.
 
 - [`dot_codex/AGENTS.md`](dot_codex/AGENTS.md) is the only canonical
   working instruction document for this codebase.
+  Task handoffs show three direct commands with expected outputs first, then
+  **Verified**, **Use** and **Implemented** summaries, in that order.
 - [`dot_claude/CLAUDE.md`](dot_claude/CLAUDE.md.tmpl) wires that same
   canonical document into Claude Code globally via an `@path` import.
   No separate Claude-specific copy is maintained.

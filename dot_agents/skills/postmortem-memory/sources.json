@@ -10411,6 +10411,15 @@
       "findings": [],
       "reviewed_on": "2026-10-22",
       "sha256": "ff62d43fce60e9e396fe474e1465fdc9d1a0ee0ae49ca884f7bcf52d0b5bfcd3"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-22-handoff-format-refresh.md"
+      ],
+      "decision": "No new reusable learning: local-refresh-snapshot-ownership and local-chezmoi-preserved-target-activation cover preserving the unrelated Kitty conflict and merging only the authorized Handoff Format into confirmed ignored/unmanaged live AGENTS. Local-privacy-reviewed-content-approvals covers neutral public ledger aliases with separate physical local mappings. The real-home alias candidate was rejected; replacing only its public alias with the existing neutral placeholder passed the unmodified exact staged-candidate privacy gate without exemption or hook bypass. Scoped block equality was verified; broad refresh and fresh-model compliance remain unverified. No commit or push success is claimed.",
+      "findings": [],
+      "reviewed_on": "2026-10-22",
+      "sha256": "c6156fd799ab7044148acd59cb937286769e6fa3ac1080e589a5ac3313794e99"
     }
   ],
   "review": {
