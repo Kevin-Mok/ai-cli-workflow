@@ -10021,6 +10021,15 @@
       ],
       "reviewed_on": "2026-10-21",
       "sha256": "a7bc73007b5411bbf81844f5d0cc130bca4584625d0a24305f712e112657b561"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-22-tcu-inspection-sandbox.md"
+      ],
+      "decision": "No new reusable learning: diagnostic path assumptions, restricted fish startup and host-preserved alias files. Explicit template deployment and regeneration verified tcu; no shortcut logic changed.",
+      "findings": [],
+      "reviewed_on": "2026-10-22",
+      "sha256": "2cea961490861536332807482e86218274179e21cf18d7dc11927cd78d8a152b"
     }
   ],
   "review": {

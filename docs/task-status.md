@@ -112,3 +112,12 @@ This document records delivery milestones and verification for completed reposit
 - Delivery: one focused commit on main, then push to origin/main after staged checks. No remaining shortcut implementation work or blockers.
 - Remaining: preserve all pre-existing and unattributed dirty files. Physical keyboard and subjective listening checks remain manual.
 - Rollback: restore the previous Super+M binding in tracked and preserved live i3 config, then reload i3. Preserve append-only feedback history.
+
+## Tcu directory shortcut — feat(fish): add tcu directory shortcut
+
+- Complete: tcu expands to cd ~/coding/track-codex-sessions in the cdn section; existing tcs remains available and no conflicts were found.
+- Scope: direct-write fallback for session 01a1645a-7540-7161-97de-cd4af4ec8701; helper recognized no writes. Only the shortcut, inspection report, its ledger entry and this milestone are eligible.
+- Verification: refresh-config exited 0; host-preserved alias template was explicitly deployed and regenerated. Generated fish syntax, loaded tcu query and tcu/tcs definitions passed. README gate pass_no_change; targeted incident-memory check passed.
+- Delivery: commit on main and push to origin/main after isolated candidate privacy review. No remaining implementation work.
+- Remaining: unrelated staged and unstaged changes excluded; interactive expansion was not executed. Existing fish sessions may need reloading.
+- Rollback: remove only tcu from the directory template, deploy it and regenerate shortcuts.
