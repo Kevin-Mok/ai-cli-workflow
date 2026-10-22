@@ -121,3 +121,12 @@ This document records delivery milestones and verification for completed reposit
 - Delivery: commit on main and push to origin/main after isolated candidate privacy review. No remaining implementation work.
 - Remaining: unrelated staged and unstaged changes excluded; interactive expansion was not executed. Existing fish sessions may need reloading.
 - Rollback: remove only tcu from the directory template, deploy it and regenerate shortcuts.
+
+## Tw directory shortcut — feat(fish): update tw project shortcut
+
+- Complete: `tw` expands to `cd ~/coding/triway-nextjs` in the sch section; its former mapping is preserved as a comment. Host-preserved alias inputs were explicitly deployed before a scoped refresh completed.
+- Scope: direct-write fallback for session 01a1646d-0e19-7761-8e31-c948597f84d1; the helper detected no writes. Only the shortcut, two incident reports, their reviewed ledger entries and this milestone are eligible. Public ledger aliases use the established placeholder home.
+- Verification: absolute and normalized requests are no-ops; generated fish syntax, installed abbreviation queries and template/live byte comparison passed. README gate returned pass_no_change; both targeted incident-memory checks passed. Exact candidate privacy review is required before commit.
+- Delivery: one focused commit on main, then push to origin/main after isolated candidate review. No remaining shortcut implementation work or blockers.
+- Remaining: preserve unrelated staged and unstaged work. Interactive keystroke expansion remains manual; existing fish sessions may need reloading.
+- Rollback: remove the new tw mapping, restore its commented predecessor, deploy the reviewed directory template and regenerate shortcuts.

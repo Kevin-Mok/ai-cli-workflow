@@ -5535,6 +5535,24 @@
   "reports": [
     {
       "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-22-tw-shortcut-refresh.md"
+      ],
+      "decision": "No new general learning: scoped refresh of host-ignored alias inputs required checking actual managed/ignored destinations and preserving live baseline bytes. Existing path-discovery, local-state preservation, and nested-language literal guidance covers the lookup/editing failures. Explicit rendered deployment plus directory-scoped refresh exited 0; installed fish syntax and abbreviation checks passed. Default refresh and private migration policy were not changed.",
+      "findings": [],
+      "reviewed_on": "2026-10-22",
+      "sha256": "73a0dbf2789c3abfd4b3907ab86f4eda8935335b0ec23868b9581c3045ee7c06"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-22-tw-shortcut-skill-reference.md"
+      ],
+      "decision": "No new reusable learning: a relative skill reference was resolved from the collection root; existing local-discover-paths-before-reads guidance already covers path discovery. Corrected documentation read exited 0; no configuration was affected.",
+      "findings": [],
+      "reviewed_on": "2026-10-22",
+      "sha256": "d2b31507f05f792e9ef0012cbf357791b206e5b7f81f3264d4f2177115c627ec"
+    },
+    {
+      "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-10-20-screensaver-shortcut-desktop-access.md"
       ],
       "decision": "No new reusable learning: scoped X11 access is already documented; the modifier-case assertion and scan-root mistakes were diagnostic invocation errors corrected against actual payloads and the directory-root contract. Live binding/window/dismissal verification passed.",
