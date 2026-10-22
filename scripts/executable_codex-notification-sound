@@ -198,8 +198,21 @@ def playback_signals():
             signal.signal(number, handler)
 
 
-def play(title: str | None = None, *, speech_only: bool = False, source: object = None) -> int:
+def notifications_paused() -> bool:
     try:
+        result = subprocess.run(
+            ['dunstctl', 'is-paused'], capture_output=True, text=True,
+            timeout=1, check=False)
+        return result.returncode == 0 and result.stdout.strip() == 'true'
+    except (OSError, UnicodeError, subprocess.SubprocessError):
+        return False  # Keep audio available on desktops without Dunst.
+
+
+def play(title: str | None = None, *, speech_only: bool = False, source: object = None,
+         respect_dnd: bool = True) -> int:
+    try:
+        if respect_dnd and notifications_paused():
+            return 0
         if speech_only and (title is None or not title.strip()):
             raise ValueError('--speech-only requires a nonblank --title')
         clip = None if speech_only else configured_clip()
@@ -212,7 +225,11 @@ def play(title: str | None = None, *, speech_only: bool = False, source: object 
         lock.parent.mkdir(parents=True, exist_ok=True)
         with playback_signals(), lock.open('a') as owner, ExitStack() as temporary_files:
             fcntl.flock(owner, fcntl.LOCK_EX)
+            if respect_dnd and notifications_paused():
+                return 0
             def playback(path: Path) -> None:
+                if respect_dnd and notifications_paused():
+                    return
                 with outline(source):
                     result = subprocess.run(
                         [player, '--no-config', '--no-video', '--no-terminal',
@@ -368,7 +385,7 @@ def main(argv: list[str] | None = None) -> int:
     if options.command == 'set':
         return save_clip(options.path)
     if options.command == 'preview':
-        return play(options.title, speech_only=options.speech_only, source=capture_source())
+        return play(options.title, speech_only=options.speech_only, source=capture_source(), respect_dnd=False)
     try:
         if options.command == 'speech-volume':
             if options.percent is not None:

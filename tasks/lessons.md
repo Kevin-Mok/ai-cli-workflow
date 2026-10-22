@@ -273,3 +273,5 @@
 
 - 2026-10-22: Verify targeted Kitty font actions with two OS windows in one instance: on0.49.2 the matched action changed the other OS window. A no-UI adapter with explicit OS-window IDs passed isolation and retained baselines across watcher restarts. Discover fixture sockets by unique prefix rather than launcher PID. See [monitor sizing runtime](../docs/postmortem/2026-10-22-kitty-monitor-probe-access.md).
 - 2026-10-22: Verify the running i3bar after updating status scripts: reload can retain an unchanged command, and transient startup fallback must retry. Standalone renderer output alone does not prove activation. See [4K bar inspection](../docs/postmortem/2026-10-22-4k-bar-inspection.md).
+
+- 2026-10-22: Dunst pause only gates daemon delivery; direct event-hook TTS needs the same pause query in the shared player, including after the playback lock and before later stages. Explicit previews may bypass it. See [DND TTS](../docs/postmortem/2026-10-22-dnd-tts.md).

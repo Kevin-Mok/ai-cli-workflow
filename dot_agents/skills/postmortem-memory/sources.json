@@ -35,6 +35,26 @@
   ],
   "findings": [
     {
+      "id": "local-dnd-direct-event-audio",
+      "reference": "references/dnd-audio.md#local-dnd-direct-event-audio",
+      "status": "verified_fix",
+      "confidence": "confirmed",
+      "verification_scope": "runtime",
+      "symptoms": [
+        "i3blocks DND pauses notifications but direct Codex TTS still plays."
+      ],
+      "applicability": "Shared notification players invoked both by Dunst and direct Codex event hooks.",
+      "diagnostics": [
+        "Trace the block to dunstctl set-paused, then trace event-play directly to the shared player without a pause check."
+      ],
+      "remedy": "Query Dunst pause with a bounded timeout before automatic audio, after the playback lock and before each stage. Explicit previews bypass DND; unavailable Dunst retains previous audio behavior.",
+      "verification": "Expected RED3; GREEN DND6, sound89, question12 and private Dunst1; typecheck0. Installed live Dunst pause/resume probe with silent player passed; source/live bytes equal and original pause restored.",
+      "limitations": "Already playing audio may finish; natural incoming event and listening remain manual. Full refresh stopped on unrelated Kitty drift; targeted helper apply succeeded.",
+      "sources": [
+        "a27fdfaa542914bea4809093711845565d038dfde8b0f7b6d22ec839cc0b48e4"
+      ]
+    },
+    {
       "applicability": "Account-wide Codex allowance replay with integer reset deadlines drifting six to ten seconds within a coherent quota progression.",
       "confidence": "confirmed",
       "diagnostics": [
@@ -5594,6 +5614,16 @@
     }
   ],
   "reports": [
+    {
+      "sha256": "a27fdfaa542914bea4809093711845565d038dfde8b0f7b6d22ec839cc0b48e4",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-22-dnd-tts.md"
+      ],
+      "reviewed_on": "2026-10-22",
+      "findings": [
+        "local-dnd-direct-event-audio"
+      ]
+    },
     {
       "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-10-22-tw-shortcut-refresh.md"

@@ -1636,3 +1636,20 @@ and enable `discord-speech`. No sudo. The probes are synthetic and play local au
   then run `~/scripts/kitty-monitor-font restore` while Kitty remains running.
   **Expected:** Service stops and tracked windows regain main baselines; no
   global DPI, remote-control restrictions or launcher settings change.
+
+## DND automatic speech
+
+Verify pause behavior through the notification block and a real Codex event;
+restore the original DND state afterward. No sudo is needed.
+
+- Action: Right-click `Notis` to enable DND, then complete a Codex task or submit
+  a question that normally speaks. Run `~/scripts/codex-notification-sound preview --speech-only --title "DND preview"` deliberately while paused.
+  Expected: Automatic intro/TTS stays silent; the explicit preview speaks.
+  A phrase already playing when paused may finish, but later stages stay silent.
+- Action: Left-click `DND`, then trigger a new normal Codex completion/question.
+  Expected: New automatic audio plays normally. Suppressed hook events do not
+  replay; Dunst's queued popups retain their existing resume behavior.
+
+- Action: With Codex speech enabled, run `~/scripts/codex-notification-sound smoke tagged`.
+  Expected: A synthetic Codex popup without TTS. With DND on it stays queued
+  until resumed; this exercises Dunst delivery without invoking a Codex event hook.

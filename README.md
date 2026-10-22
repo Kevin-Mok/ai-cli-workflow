@@ -1101,6 +1101,8 @@ this.
   indicator immediately left of volume; it refreshes notification pause state every
   two seconds. `Notis` uses the same wallpaper theme color as volume/date;
   paused `DND` stays red. Left-click enables notifications; right-click enables DND.
+  DND also suppresses automatic Codex, Discord and Grok TTS/intro audio; explicit
+  previews remain available and an already playing phrase may finish.
 
 ### Productivity, File Management, And Scripts
 

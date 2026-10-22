@@ -76,6 +76,9 @@ class PlaybackTests(unittest.TestCase):
     def setUp(self):
         self.assertTrue((ROOT / 'scripts/executable_codex-notification-sound').exists(), 'Playback helper not implemented')
         self.helper = load('sound_helper', ROOT / 'scripts/executable_codex-notification-sound')
+        pause = patch.object(self.helper, 'notifications_paused', return_value=False)
+        pause.start()
+        self.addCleanup(pause.stop)
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
         self.root = Path(self.tmp.name)
@@ -92,7 +95,7 @@ class PlaybackTests(unittest.TestCase):
         for title in ('NORMAL', 'LOW', 'CRITICAL'):
             with patch.object(self.helper, 'play', return_value=0) as player, patch.object(self.helper, 'capture_source', return_value=None):
                 self.assertEqual(self.helper.main(['preview', '--plain', '--speech-only', '--title', title]), 0)
-                player.assert_called_once_with(title, speech_only=True, source=None)
+                player.assert_called_once_with(title, speech_only=True, source=None, respect_dnd=False)
 
     def test_discord_format_preserves_sender_and_visible_content(self):
         cases = [

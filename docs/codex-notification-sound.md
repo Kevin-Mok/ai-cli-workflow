@@ -2,6 +2,19 @@
 
 Play your own MP3 for Codex notifications, with optional offline speech of the exact saved conversation title or a short sentence about a queued question afterward. Configure a clip, install the voice, deploy the completion and question callbacks, resume affected conversations, then explicitly enable speech. MP3 sound stays disabled until you configure a path; speech is separately disabled by default. The checkout includes a short "Sire" intro; selected paths remain machine-local. The older question MP3 is not bundled.
 
+## Do Not Disturb
+
+Right-click the i3blocks `Notis`/`DND` indicator to pause notifications and
+suppress automatic Codex, Discord and Grok audio. Left-click restores delivery.
+The shared player checks Dunst pause before starting, after waiting for its
+playback lock, and before each clip or speech stage. Suppressed hook audio is
+discarded; Dunst still displays its queued notifications when resumed. A phrase
+already playing may finish. Explicit `preview` commands remain available during
+DND. If Dunst is unavailable or its one-second query fails, audio retains its
+usual behavior. No settings change or daemon restart is needed for this gate.
+Use `codex-notification-sound smoke tagged` for a synthetic Codex popup without
+TTS when Codex speech is enabled; DND queues that popup until resumed.
+
 ## Choose, preview and disable
 
 These commands require no sudo. After applying the GUI dotfiles, select the bundled `~/scripts/sire.mp3`, which says only "Sire" in Ryan's voice before the notification message is read. It was generated offline with `en_US-ryan-high` at pace 0.95 from the text `Sire.`. On an existing installation, the older question clip may also be available at `~/scripts/can-i-ask-you-a-question.mp3`; selecting Sire leaves it intact. Quote filenames containing spaces:
