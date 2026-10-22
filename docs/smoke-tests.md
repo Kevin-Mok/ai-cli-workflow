@@ -478,13 +478,16 @@ listing is cached-only; opening a picker can generate recaps unless disabled.
   Expected: The tracked helper and daily `Persistent=true` units validate
   without sudo; after `--enable`, `systemctl --user list-timers
   design-skills-sync.timer --no-pager` shows the next refresh.
-- Action: Open the Codex skill picker and select `Commit Plan & Push`.
+- Action: Open the Codex skill picker and select `Commit 2 Plan & Push`.
   Expected: It invokes the stable `$commit-plan-push` skill with its managed
   title and `agents/openai.yaml` metadata. On a mixed dirty tree, it makes a
   best-effort pass over every safe, reviewable change, records validation
   warnings, leaves unsafe files as named residuals, and still attempts the
-  configured push. Picker ordering is controlled by Codex; no unsupported
-  priority field is relied on.
+  configured push. In a fresh Codex session, type `$comm`: the first four
+  matching skill titles are `Commit 1 Session`, `Commit 2 Plan & Push`,
+  `Commit 3 Dirty`, and `Commit 4 Plan`, in that order. Numbers control the
+  alphabetical tie-break; no unsupported priority field is relied on.
+  Type `$commit-session` separately and confirm the original slug still resolves.
 - Action: sync-superpowers-release --dry-run
   Expected: The helper runs `chezmoi apply --refresh-externals` in dry-run
   mode for `~/.codex/superpowers` and

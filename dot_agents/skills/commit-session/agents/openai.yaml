@@ -1,5 +1,5 @@
 interface:
-  display_name: "Commit Session"
+  display_name: "Commit 1 Session"
   short_description: "Commit and push only current-session git work"
   default_prompt: "Use $commit-session to commit only the git changes dirtied during the current Codex session while leaving unrelated baseline-dirty files untouched. Prioritize directly touched files and safe companions; use observed-write fallback if session metadata is missing. Record validation and README warnings and commit the eligible subset. Attempt one upstream push after the local commit or complete commit series and best-effort checks, unless the user explicitly requests another cadence. Report failed checks and push failures accurately."
 

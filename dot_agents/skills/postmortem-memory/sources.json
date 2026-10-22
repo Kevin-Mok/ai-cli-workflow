@@ -10221,6 +10221,15 @@
       "findings": [],
       "reviewed_on": "2026-10-22",
       "sha256": "7087a23975053aa1f714bd8d6ed17c7d6ab80c1582061075d41f8fff7d5ca7d9"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-22-commit-picker-validation.md"
+      ],
+      "decision": "No new learning: existing local-push-policy-baseline-contract guidance covers unrelated policy assertion failures during scoped presentation work; other baseline assertions remain unresolved.",
+      "findings": [],
+      "reviewed_on": "2026-10-22",
+      "sha256": "79b8f337d6d8da16b0926043a66a44cf20bec9d7388f84873e35e7212c15327d"
     }
   ],
   "review": {

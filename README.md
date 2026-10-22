@@ -223,6 +223,10 @@ rendering settings only when observed evidence satisfies both requirements;
 report exact installed-TUI limitations otherwise. Automated checks run before
 completion and any commit, and are reported separately.
 
+The Codex `$comm` picker uses numbered display titles: `Commit 1 Session`,
+`Commit 2 Plan & Push`, `Commit 3 Dirty`, then `Commit 4 Plan`. Skill slugs
+and commands remain unchanged. Restart Codex if cached labels persist.
+
 - [`commit-plan-push`](dot_agents/skills/commit-plan-push/SKILL.md) makes a
   best-effort pass over the entire dirty worktree, separates safe changes into
   chronological commits, pushes once after the series, and reports residuals

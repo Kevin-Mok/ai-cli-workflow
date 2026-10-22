@@ -1,5 +1,5 @@
 interface:
-  display_name: "Commit Dirty"
+  display_name: "Commit 3 Dirty"
   short_description: "Verify, commit, and push the intended dirty git worktree"
   default_prompt: "Use $commit-dirty to make a best-effort commit of all eligible requested changes, prioritize session-touched files and safe companions, and report validation or README warnings without blocking eligible work. Attempt one upstream push after the local commit or complete commit series and best-effort checks, unless the user explicitly requests another cadence. Report failed checks and push failures accurately."
 

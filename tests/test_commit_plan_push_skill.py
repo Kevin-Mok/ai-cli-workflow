@@ -43,7 +43,7 @@ class CommitPlanPushSkillTest(unittest.TestCase):
         metadata = read_required(METADATA_PATH)
         expected = (
             'interface:\n'
-            '  display_name: "Commit Plan & Push"\n'
+            '  display_name: "Commit 2 Plan & Push"\n'
             '  short_description: "Plan, commit, and push dirty Git work"\n'
             '  default_prompt: "Use $commit-plan-push to inspect the current '
             'dirty Git worktree, make a best-effort safe commit series, push it '
@@ -59,7 +59,7 @@ class CommitPlanPushSkillTest(unittest.TestCase):
             "[`commit-plan-push`](commit-plan-push/SKILL.md)", catalog
         )
         smoke_tests = read_required(SMOKE_PATH)
-        self.assertIn("Commit Plan & Push", smoke_tests)
+        self.assertIn("Commit 2 Plan & Push", smoke_tests)
         self.assertIn("agents/openai.yaml", smoke_tests)
 
 
