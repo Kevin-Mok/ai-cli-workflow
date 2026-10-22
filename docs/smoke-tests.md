@@ -1578,3 +1578,12 @@ and enable `discord-speech`. No sudo. The probes are synthetic and play local au
   Expected: Matching popup is silent while disabled; Codex speech and selected clip remain unchanged.
 - Action: Receive a real Discord channel notification without sending a message for this test.
   Expected: If its complete title matches, hear sender says message once, with normal popup behavior. Sender-only Vesktop DMs speak sender says message; unknown-app sender-only notifications remain silent. Client-muted messages never reaching Dunst remain silent. Record subjective listening separately.
+
+## Kitty font shortcuts
+
+- **Action:** Focus a Kitty window and press Ctrl+Shift+Up/Down, Ctrl++/Ctrl+-
+  and Ctrl+= (Ctrl++ is Ctrl+Shift+= on a US keyboard).
+  **Expected:** Each press increases/decreases its font by one point; other OS
+  windows keep their size.
+- **Action:** Press Ctrl+Super++ to enable i3 gaps, then Ctrl+Shift+0 to remove them.
+  **Expected:** Gaps change as before; Ctrl++ remains available to Kitty.

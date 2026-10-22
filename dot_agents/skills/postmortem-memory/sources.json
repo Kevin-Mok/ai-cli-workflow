@@ -10291,6 +10291,15 @@
       ],
       "reviewed_on": "2026-10-22",
       "sha256": "6ee98113af08763342ac6937eef41b0cac5e0b8acaf5fe7155f9f65779ce9207"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-22-kitty-shortcut-inspection.md"
+      ],
+      "decision": "No new learning: existing path/API-discovery, fixture-shape, pipeline and sandbox guidance covers inspection errors; local-i3-probe-ipc-unicode provided the successful acknowledged binding-event probe. Native font keys and scoped live deployment verified; full refresh retains unrelated monitor helper conflict.",
+      "findings": [],
+      "reviewed_on": "2026-10-22",
+      "sha256": "fb292b74505e718a13ece0b631921708e497091d6537ecba31e999b942ea597a"
     }
   ],
   "review": {

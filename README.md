@@ -925,7 +925,10 @@ this.
   with an ellipsis when crowded, reserving volume space before song or calendar.
 - [`dot_config/kitty/kitty.conf`](dot_config/kitty/kitty.conf)
   is the default terminal config, and the i3 bindings now open `kitty`
-  first for normal shells and Codex. Each Kitty window has an i3 titlebar;
+  first for normal shells and Codex. Ctrl+Shift+Up/Down and Ctrl++/Ctrl+-
+  adjust the focused Kitty window's font by one point; Ctrl+= also increases it.
+  The i3 gaps shortcut is Ctrl+Super++ (Ctrl+Shift+0 still removes gaps).
+  Each Kitty window has an i3 titlebar;
   Codex shows its activity indicator and a live “what are we doing?” summary
   (3–5 words, at most 36 characters), such as “Categorize card transactions”.
   Agents check their own native task name at each turn, resume, compaction
