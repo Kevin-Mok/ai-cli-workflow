@@ -1,5 +1,43 @@
-"""Reconcile all native Chrome windows and gate video on mapped windows only."""
+"""X11 browser geometry and scoped display-awake control."""
 from Xlib import X, display, error
+from contextlib import contextmanager
+import ctypes as C
+
+
+@contextmanager
+def keep_awake():
+    """Suspend automatic X11 blanking/DPMS for this connection's lifetime."""
+    x = C.CDLL('libX11.so.6')
+    saver = C.CDLL('libXss.so.1')
+    x.XOpenDisplay.argtypes = [C.c_char_p]
+    x.XOpenDisplay.restype = C.c_void_p
+    x.XCloseDisplay.argtypes = [C.c_void_p]
+    x.XSync.argtypes = [C.c_void_p, C.c_int]
+    x.XForceScreenSaver.argtypes = [C.c_void_p, C.c_int]
+    saver.XScreenSaverQueryExtension.argtypes = [C.c_void_p, C.POINTER(C.c_int), C.POINTER(C.c_int)]
+    saver.XScreenSaverQueryVersion.argtypes = [C.c_void_p, C.POINTER(C.c_int), C.POINTER(C.c_int)]
+    saver.XScreenSaverSuspend.argtypes = [C.c_void_p, C.c_int]
+    saver.XScreenSaverSuspend.restype = None
+    connection = x.XOpenDisplay(None)
+    if not connection:
+        raise ValueError('Cannot keep displays awake; run from the X11 desktop session.')
+    try:
+        event, error, major, minor = (C.c_int() for _ in range(4))
+        if (not saver.XScreenSaverQueryExtension(connection, C.byref(event), C.byref(error))
+                or not saver.XScreenSaverQueryVersion(connection, C.byref(major), C.byref(minor))
+                or (major.value, minor.value) < (1, 1)):
+            raise ValueError('XScreenSaver 1.1 is required to keep scheduled playback visible.')
+        saver.XScreenSaverSuspend(connection, True)
+        # Suspension prevents future blanking but does not clear an existing blank.
+        x.XForceScreenSaver(connection, 0)
+        x.XSync(connection, False)
+        try:
+            yield
+        finally:
+            saver.XScreenSaverSuspend(connection, False)
+            x.XSync(connection, False)
+    finally:
+        x.XCloseDisplay(connection)
 
 
 def match_windows(native, reported):

@@ -1004,6 +1004,10 @@ this.
   and saves a private additional rotation without rewriting the original.
   [`setup-screensaver-timer`](scripts/executable_setup-screensaver-timer) installs a separate
   daily **10:00 AM local-time** user timer after updating the launcher; suspend can delay playback.
+  Fish abbreviation `sofss` pauses idle playback and turns displays off until that
+  next launch; input can wake them early. At 10 AM the timer powers displays on
+  and resumes idle monitoring before playback. Scheduled playback tolerates a missing
+  browser bridge and prevents automatic display blanking while it runs.
   Automatic idle activation waits five idle minutes and
   fails closed when Chrome video coverage is unavailable. See
   [installation, browser enablement and limitations](docs/media-screensaver.md).

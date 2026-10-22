@@ -252,3 +252,14 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - **verification_scope**: runtime
 - **limitations**: Appname is routing metadata, not authentication. Other clients need observed metadata. Non-message Vesktop notifications can also speak. Subjective listening and a new real incoming DM remain manual.
 - **Report**: [2026-10-21-discord-dm-speech.md](../../../../docs/postmortem/2026-10-21-discord-dm-speech.md)
+
+## local-scheduled-screensaver-visibility
+
+- Status: verified_fix; confidence: confirmed; verification scope: runtime (isolated X11).
+- Symptoms: the daily timer wakes displays successfully but playback ends within two seconds when browser coverage is absent; standard inactivity later blanks displays.
+- Applicability: explicit scheduled X11 media playback beside conservative browser-gated idle activation.
+- Diagnostics: inspect timer last-run, service-step status, preview lifetime, bridge availability and blanking/DPMS timeouts. Distinguish physical-input dismissal from successful duration acceptance.
+- Remedy: use manual-preview policy for the explicit schedule, retain locked-session checks and idle safety, and hold connection-scoped XScreenSaverSuspend only during playback. Clear an already active server blank with XForceScreenSaver(ScreenSaverReset) after acquiring inhibition. Close/release in finally; never persistently disable global DPMS to hide the failure.
+- Verification: eight timer and 58 broader tests passed. Isolated Xvfb verifies inhibition beyond the configured timeout, automatic blanking after exception cleanup and unchanged settings. Deployed sources matched; real playback entered three items but physical input ended duration probes.
+- Limitations: real uninterrupted duration and next-morning hardware acceptance remain unobserved. Forced blanking and lockers retain control. Newly detected browser video or user input may dismiss playback.
+- Source: [Morning blackout](../../../../docs/postmortem/2026-10-22-screensaver-morning-blackout.md); exact hash/alias in sources.json.

@@ -5319,6 +5319,28 @@
       "sources": [
         "93c558e10ba3ec99e1738d57218356c69ae34aa2a8ceac9c6af92e46056c595a"
       ]
+    },
+    {
+      "applicability": "Explicitly requested scheduled X11 media playback with conservative browser-gated idle activation.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Inspect timer last-run, each service step, preview lifetime, bridge status and X11 blanking/DPMS timeouts.",
+        "Separate input-dismissed desktop checks from duration-based acceptance."
+      ],
+      "id": "local-scheduled-screensaver-visibility",
+      "limitations": "Uninterrupted real15-second and next-morning hardware acceptance remain unobserved. Explicit forced blanking/lockers remain effective; new detected browser-video playback and user input may dismiss preview.",
+      "reference": "references/operational-drift.md#local-scheduled-screensaver-visibility",
+      "remedy": "Use manual preview policy for the explicit scheduled command while retaining the lock check and idle daemon safety; hold XScreenSaverSuspend only for playback lifetime. Clear any already active server blank with XForceScreenSaver(ScreenSaverReset) after acquiring inhibition.",
+      "sources": [
+        "e600e608b34039d7bc2c65ddf0758b7599a91f37d96faa3764931e5611f8fd9b"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "Daily 10 AM timer wakes monitors but preview closes within two seconds when the browser bridge is unavailable.",
+        "Displays later black out under normal X11/DPMS inactivity timers."
+      ],
+      "verification": "Eight timer and 58 broader tests passed; isolated Xvfb proves automatic blanking suspended past timeout and resumed after exception cleanup without settings changes. Deployed source matched and real playback entered three items, then input dismissed it. Strengthened pre-blanked fixture failed before the reset and passed afterward.",
+      "verification_scope": "runtime"
     }
   ],
   "reports": [
@@ -9748,6 +9770,34 @@
       "findings": [
         "local-vesktop-dm-notification-identity"
       ]
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-21-sofss-shortcut-refresh.md"
+      ],
+      "decision": "No new reusable learning: ignored live alias input requires narrow reconciliation before shortcut generation, already demonstrated by the CTO alias deployment precedent; exact managed/ignored target inspection is established refresh guidance. Focused deployed sofss expansion and fish syntax passed.",
+      "findings": [],
+      "reviewed_on": "2026-10-21",
+      "sha256": "1723b4729461d8dce0c6f9fc6318db8447b69527294afe5ab076bf2bc04739d5"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-22-screensaver-morning-blackout.md"
+      ],
+      "findings": [
+        "local-scheduled-screensaver-visibility"
+      ],
+      "reviewed_on": "2026-10-22",
+      "sha256": "e600e608b34039d7bc2c65ddf0758b7599a91f37d96faa3764931e5611f8fd9b"
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-22-screensaver-commit-privacy.md"
+      ],
+      "decision": "No new reusable learning: existing privacy-reviewed source handling and exact staged-candidate checks cover replacing public machine home aliases with repository placeholders while retaining local metadata. Mandatory gate remains enforced.",
+      "findings": [],
+      "reviewed_on": "2026-10-22",
+      "sha256": "c7ec38a211368c2340882df33113a0399605714e447e90682bc4bd7994c2c025"
     }
   ],
   "review": {

@@ -14,6 +14,74 @@ from media_screensaver import main
 
 
 class TimerTests(unittest.TestCase):
+    def test_ten_second_test_wakes_then_previews_without_changing_timer(self):
+        import runpy
+        module = runpy.run_path(str(INSTALLER))
+        with tempfile.TemporaryDirectory() as directory:
+            home = Path(directory)
+            launcher = home / 'scripts/media-screensaver'
+            launcher.parent.mkdir()
+            launcher.write_text('#!/bin/sh\necho scheduled\n')
+            launcher.chmod(0o755)
+            events = []
+            def execute(command, **kwargs):
+                events.append(command)
+                return subprocess.CompletedProcess(command, 0, 'scheduled', '')
+            def pause(seconds):
+                events.append(['sleep', seconds])
+            with patch.dict(os.environ, dict(HOME=directory, XDG_CONFIG_HOME=directory+'/.config', DISPLAY=':99')), patch.object(subprocess, 'run', side_effect=execute), patch.object(subprocess, 'call', side_effect=lambda command: events.append(command) or 0), patch('time.sleep', side_effect=pause):
+                self.assertEqual(module['main'](['--test', '--plain']), 0)
+            self.assertEqual(events[1:], [
+                ['xset', '+dpms'], ['xset', 'dpms', 'force', 'off'], ['sleep', 10],
+                ['xset', 'dpms', 'force', 'on'], [str(launcher), 'preview', '--plain']])
+            self.assertFalse((home / '.config/systemd/user').exists())
+            events.clear()
+            with patch.dict(os.environ, dict(HOME=directory, XDG_CONFIG_HOME=directory+'/.config', DISPLAY=':99')), patch.object(subprocess, 'run', side_effect=execute), patch.object(subprocess, 'call') as preview, patch('time.sleep', side_effect=KeyboardInterrupt):
+                self.assertEqual(module['main'](['--test', '--plain']), 130)
+                preview.assert_not_called()
+            self.assertEqual(events[-1], ['xset', 'dpms', 'force', 'on'])
+
+    def test_blackout_arms_wake_before_stopping_idle_and_powering_off(self):
+        import runpy
+        module = runpy.run_path(str(INSTALLER))
+        with tempfile.TemporaryDirectory() as directory:
+            home = Path(directory)
+            launcher = home / 'scripts/media-screensaver'
+            launcher.parent.mkdir()
+            launcher.write_text('#!/bin/sh\necho scheduled\n')
+            launcher.chmod(0o755)
+            calls = []
+            def execute(command, **kwargs):
+                calls.append(command)
+                return subprocess.CompletedProcess(command, 0, 'scheduled', '')
+            env = dict(HOME=directory, XDG_CONFIG_HOME=directory+'/.config', DISPLAY=':99')
+            with patch.dict(os.environ, env), patch.object(subprocess, 'run', side_effect=execute):
+                self.assertEqual(module['main'](['--black-until-10', '--plain']), 0)
+            self.assertEqual(calls[-4:], [
+                ['systemctl', '--user', 'enable', '--now', 'media-screensaver-daily.timer'],
+                ['systemctl', '--user', 'stop', 'media-screensaver.service', 'media-screensaver-daily.service'],
+                ['xset', '+dpms'], ['xset', 'dpms', 'force', 'off']])
+            service = (home / '.config/systemd/user/media-screensaver-daily.service').read_text()
+            self.assertIn('ExecStartPre=/usr/bin/xset dpms force on', service)
+            self.assertIn('ExecStartPre=/usr/bin/systemctl --user start media-screensaver.service', service)
+
+    def test_failed_timer_setup_never_powers_off(self):
+        import runpy
+        module = runpy.run_path(str(INSTALLER))
+        with tempfile.TemporaryDirectory() as directory:
+            home = Path(directory)
+            launcher = home / 'scripts/media-screensaver'
+            launcher.parent.mkdir()
+            launcher.write_text('#!/bin/sh\necho scheduled\n')
+            launcher.chmod(0o755)
+            calls = []
+            def execute(command, **kwargs):
+                calls.append(command)
+                return subprocess.CompletedProcess(command, int(command[0] == 'systemctl'), 'scheduled', '')
+            with patch.dict(os.environ, dict(HOME=directory, XDG_CONFIG_HOME=directory+'/.config', DISPLAY=':99')), patch.object(subprocess, 'run', side_effect=execute):
+                self.assertEqual(module['main'](['--black-until-10', '--plain']), 1)
+            self.assertFalse(any(command[0] == 'xset' for command in calls))
+
     def test_install_repeat_and_disable(self):
         self.assertTrue(INSTALLER.exists(), 'daily timer installer is missing')
         with tempfile.TemporaryDirectory() as directory:
@@ -77,13 +145,29 @@ class TimerTests(unittest.TestCase):
                 with patch.object(main.bridge, 'runtime_dir', return_value=Path(directory)), patch.object(main, 'scan', side_effect=AssertionError('duplicate playback started')):
                     self.assertEqual(main.preview(SimpleNamespace(plain=True, details=False)), 0)
 
-    def test_scheduled_skips_locked_session_and_keeps_automatic_gate(self):
+    def test_scheduled_skips_locked_session_and_uses_explicit_preview(self):
         with patch.object(main, 'locked', return_value=True), patch.object(main, 'preview') as preview:
             self.assertEqual(main.main(['scheduled', '--plain']), 0)
             preview.assert_not_called()
         with patch.object(main, 'locked', return_value=False), patch.object(main, 'preview', return_value=0) as preview:
             self.assertEqual(main.main(['scheduled', '--plain']), 0)
-            self.assertTrue(preview.call_args.kwargs['automatic'])
+            self.assertFalse(preview.call_args.kwargs.get('automatic', False))
+
+    def test_scheduled_stays_awake_during_playback_and_releases_on_error(self):
+        from types import SimpleNamespace
+        from unittest.mock import MagicMock
+        from media_screensaver import desktop, renderer
+        args = SimpleNamespace(command='scheduled', report=None, seconds=0, plain=True, details=False)
+        awake = MagicMock()
+        with tempfile.TemporaryDirectory() as directory, patch.object(main, 'scan', return_value=[]), patch.object(main, 'monitors', return_value=[{}, {}]), patch.object(main.bridge, 'runtime_dir', return_value=Path(directory)), patch.object(desktop, 'keep_awake', return_value=awake, create=True), patch.object(renderer, 'run', side_effect=RuntimeError('decoder failed')) as run:
+            def playback(*args, **kwargs):
+                awake.__enter__.assert_called_once()
+                self.assertFalse(kwargs['automatic'])
+                raise RuntimeError('decoder failed')
+            run.side_effect = playback
+            with self.assertRaisesRegex(RuntimeError, 'decoder failed'):
+                main._preview(args)
+        awake.__exit__.assert_called_once()
 
 
 if __name__ == '__main__':

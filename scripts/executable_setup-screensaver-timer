@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 import subprocess
 import sys
+import time
 
 SERVICE = '''[Unit]
 Description=Daily media screensaver
@@ -13,6 +14,8 @@ ConditionEnvironment=DISPLAY
 
 [Service]
 Type=simple
+ExecStartPre=/usr/bin/xset dpms force on
+ExecStartPre=/usr/bin/systemctl --user start media-screensaver.service
 ExecStart=%h/scripts/media-screensaver scheduled
 TimeoutStopSec=10
 KillMode=control-group
@@ -35,19 +38,22 @@ WantedBy=timers.target
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description='Install the daily 10:00 AM screensaver timer; no sudo needed.')
-    parser.add_argument('--disable', action='store_true', help='disable future daily launches')
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument('--disable', action='store_true', help='disable future daily launches')
+    mode.add_argument('--black-until-10', action='store_true', help='pause idle playback and turn displays off until the next daily 10:00 AM launch (input can wake displays)')
+    mode.add_argument('--test', action='store_true', help='turn displays off for 10 seconds, then wake and preview; leave the daily timer unchanged')
     parser.add_argument('--plain', action='store_true', default=os.environ.get('CLI_PLAIN') == '1', help='ASCII output')
     parser.add_argument('--details', action='store_true', help='show raw systemctl errors')
     args = parser.parse_args(argv)
     def run(*arguments):
-        result = subprocess.run(['systemctl', '--user', *arguments], capture_output=True, text=True, timeout=30)
+        result = subprocess.run(list(arguments), capture_output=True, text=True, timeout=30)
         if result.returncode:
             if args.details:
                 print(result.stderr, file=sys.stderr)
-            raise ValueError('systemctl ' + arguments[0] + ' failed; run from your desktop and use --details.')
+            raise ValueError(' '.join(arguments) + ' failed; run from your desktop and use --details.')
     try:
         if args.disable:
-            run('disable', '--now', 'media-screensaver-daily.timer')
+            run('systemctl', '--user', 'disable', '--now', 'media-screensaver-daily.timer')
             message = 'Daily screensaver timer disabled; running playback is unchanged.'
         else:
             launcher = Path.home() / 'scripts/media-screensaver'
@@ -58,6 +64,15 @@ def main(argv=None):
                 raise ValueError('Update the screensaver first: ./scripts/executable_media-screensaver install')
             if not os.environ.get('DISPLAY'):
                 raise ValueError('Run this installer from your X11 desktop terminal (DISPLAY is missing).')
+            if args.test:
+                print(('' if args.plain else '🖥️ ') + 'Displays off for 10 seconds, then wake and open screensaver; input dismisses playback.', flush=True)
+                run('xset', '+dpms')
+                try:
+                    run('xset', 'dpms', 'force', 'off')
+                    time.sleep(10)
+                finally:
+                    run('xset', 'dpms', 'force', 'on')
+                return subprocess.call([str(launcher), 'preview'] + (['--plain'] if args.plain else []) + (['--details'] if args.details else []))
             units = Path(os.environ.get('XDG_CONFIG_HOME', Path.home() / '.config')) / 'systemd/user'
             units.mkdir(parents=True, exist_ok=True)
             for name, content in (('service', SERVICE), ('timer', TIMER)):
@@ -65,12 +80,20 @@ def main(argv=None):
                 if target.is_symlink():
                     raise ValueError('Refusing to replace a symlink: ' + str(target))
                 target.write_text(content)
-            run('daemon-reload')
-            run('import-environment', *[key for key in ('DISPLAY', 'XAUTHORITY', 'XDG_SESSION_ID') if key in os.environ])
-            run('enable', '--now', 'media-screensaver-daily.timer')
+            run('systemctl', '--user', 'daemon-reload')
+            run('systemctl', '--user', 'import-environment', *[key for key in ('DISPLAY', 'XAUTHORITY', 'XDG_SESSION_ID') if key in os.environ])
+            run('systemctl', '--user', 'enable', '--now', 'media-screensaver-daily.timer')
             message = 'Daily screensaver enabled for 10:00 AM local time; suspend may delay playback until resume.'
+            if args.black_until_10:
+                run('systemctl', '--user', 'stop', 'media-screensaver.service', 'media-screensaver-daily.service')
+                run('xset', '+dpms')
+                run('xset', 'dpms', 'force', 'off')
+                message = 'Displays off; screensaver scheduled for the next 10:00 AM local time. Input can wake displays.'
         print(('' if args.plain else '✅ ') + message)
         return 0
+    except KeyboardInterrupt:
+        print(('' if args.plain else 'ℹ️ ') + 'Stopped.', file=sys.stderr)
+        return 130
     except (OSError, ValueError, subprocess.TimeoutExpired) as error:
         print(('' if args.plain else '❌ ') + str(error), file=sys.stderr)
         return 1

@@ -19,6 +19,47 @@ class RuntimeTests(unittest.TestCase):
     def setUp(self):
         self.assertIsNotNone(runtime, 'persistent GTK renderer has not been implemented')
 
+    def test_scheduled_inhibitor_suspends_blanking_and_restores_settings(self):
+        import ctypes as C
+        from media_screensaver.desktop import keep_awake
+        class SaverInfo(C.Structure):
+            _fields_ = [('window', C.c_ulong), ('state', C.c_int), ('kind', C.c_int),
+                        ('til_or_since', C.c_ulong), ('idle', C.c_ulong), ('event_mask', C.c_ulong)]
+        clock = runtime.IdleClock()
+        saver = C.CDLL('libXss.so.1')
+        saver.XScreenSaverQueryInfo.argtypes = [C.c_void_p, C.c_ulong, C.POINTER(SaverInfo)]
+        x = clock.x
+        x.XSetScreenSaver.argtypes = [C.c_void_p, C.c_int, C.c_int, C.c_int, C.c_int]
+        x.XGetScreenSaver.argtypes = [C.c_void_p] + [C.POINTER(C.c_int)] * 4
+        x.XResetScreenSaver.argtypes = [C.c_void_p]
+        x.XSync.argtypes = [C.c_void_p, C.c_int]
+        original = [C.c_int() for _ in range(4)]
+        x.XGetScreenSaver(clock.display, *(C.byref(v) for v in original))
+        info = SaverInfo()
+        def state():
+            saver.XScreenSaverQueryInfo(clock.display, x.XDefaultRootWindow(clock.display), C.byref(info))
+            return info.state
+        try:
+            x.XSetScreenSaver(clock.display, 1, 1, 1, 1)
+            x.XResetScreenSaver(clock.display)
+            x.XSync(clock.display, False)
+            time.sleep(2.2)
+            self.assertEqual(state(), 1, 'fixture must already be blanked before scheduled playback')
+            with self.assertRaisesRegex(RuntimeError, 'release inhibitor'), keep_awake():
+                time.sleep(2.2)
+                self.assertEqual(state(), 0, 'screen blanked while inhibition was held')
+                raise RuntimeError('release inhibitor')
+            time.sleep(2.2)
+            self.assertEqual(state(), 1, 'blanking did not resume after playback failed')
+            current = [C.c_int() for _ in range(4)]
+            x.XGetScreenSaver(clock.display, *(C.byref(v) for v in current))
+            self.assertEqual([v.value for v in current], [1, 1, 1, 1])
+        finally:
+            x.XSetScreenSaver(clock.display, *(v.value for v in original))
+            x.XResetScreenSaver(clock.display)
+            x.XSync(clock.display, False)
+            clock.close()
+
     def test_video_moves_without_restart_and_shutdown_releases_pipeline(self):
         from gi.repository import Gtk, Gst
         from media_screensaver.core import Entry

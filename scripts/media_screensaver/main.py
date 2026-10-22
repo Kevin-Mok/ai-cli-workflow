@@ -1,5 +1,6 @@
 """CLI, installation and idle supervision for the media conveyor."""
 import argparse
+from contextlib import nullcontext
 import fcntl
 import json
 import os
@@ -108,9 +109,11 @@ def _preview(args, automatic=False):
             handle.write(json.dumps(value) + '\n')
             handle.flush()
     try:
-        return run(paths, geometry, seconds=args.seconds,
-                   gate=playback_gate, automatic=automatic,
-                   emit=lambda kind, msg, details=None: output(args, kind, msg, details), report=reporter)
+        from .desktop import keep_awake
+        with keep_awake() if getattr(args, 'command', None) == 'scheduled' else nullcontext():
+            return run(paths, geometry, seconds=args.seconds,
+                       gate=playback_gate, automatic=automatic,
+                       emit=lambda kind, msg, details=None: output(args, kind, msg, details), report=reporter)
     finally:
         if handle:
             handle.close()
@@ -336,7 +339,7 @@ def main(argv=None):
             if locked():
                 output(args, 'info', 'Daily screensaver skipped: session is locked or lock state is unavailable.')
                 return 0
-            return preview(args, automatic=True) or 0
+            return preview(args) or 0
         if args.command == 'install': return install(args)
         if args.command == 'probe': return probe(args)
         if args.command == 'daemon': return daemon(args)
