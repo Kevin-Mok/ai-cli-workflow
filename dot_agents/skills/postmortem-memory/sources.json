@@ -10260,6 +10260,15 @@
       "findings": [
         "local-dunst-fixture-display-capacity"
       ]
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-22-4k-bar-inspection.md"
+      ],
+      "decision": "No new reusable learning: existing desktop permission and refresh ownership guidance covers successful exact-target bar activation; unrelated full-refresh audio-mute conflict remains.",
+      "findings": [],
+      "reviewed_on": "2026-10-22",
+      "sha256": "3b701517954eecbd87d26cfb311c29a5303da13f8c167b5b810891ba9aaca0cd"
     }
   ],
   "review": {

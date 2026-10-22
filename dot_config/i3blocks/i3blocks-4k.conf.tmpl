@@ -15,15 +15,16 @@ color=#cbe4ff
 
 #  volume/spotify [[[ #
 
-[spotify]
-command=~/.config/i3blocks/scripts/now_playing_mpris
-label=
-interval=5
-
 [volume]
 interval=once
 signal=1
 interval=60
+
+[spotify]
+# Let i3bar drop the song before workspace pressure clips the volume.
+command=~/.config/i3blocks/scripts/now_playing_mpris | sed '2c<span></span>'
+label=
+interval=5
 
 #  ]]] volume/spotify #
 

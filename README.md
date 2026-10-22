@@ -921,6 +921,8 @@ this.
 
 ### Editor, Terminal, And Media
 
+- The 4K i3 bar places volume before the song and hides the song when workspace
+  buttons crowd the status area, preserving space for the volume percentage.
 - [`dot_config/kitty/kitty.conf`](dot_config/kitty/kitty.conf)
   is the default terminal config, and the i3 bindings now open `kitty`
   first for normal shells and Codex. Each Kitty window has an i3 titlebar;
