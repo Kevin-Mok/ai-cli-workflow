@@ -339,3 +339,14 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - **verification_scope**: runtime
 - **limitations**: Private daemon fixture repair only; never close user desktop notifications to make a test pass. Full refresh remains blocked on unrelated permission drift.
 - **Report**: [Discord embed verification](../../../../docs/postmortem/2026-10-22-discord-embed-history-access.md)
+
+## local-i3bar-layout-startup-recovery
+
+- Status: **verified_fix**; root-cause confidence: **supported**; verification scope: **runtime**.
+- Symptoms: standalone adaptive status output is correct, but the running i3bar retains unadapted text after reload.
+- Applicability: i3bar status filters initialize font/X resources and query live i3 IPC during configuration reload.
+- Diagnostic checks: Compare actual bar screenshot with standalone output under the running helper's environment; test transient initialization failure and recovery.
+- Remedy: Preserve raw status output during failure and retry initialization on later updates. Restart an unchanged status command when its script changes; confirm the running bar rather than only a separate process.
+- Verification evidence: Executable transient-startup RED/GREEN, ten layout tests, unchanged media regressions, installed-source identity and final screenshot with centered volume and ellipsized title.
+- Limitations: The exact live initialization exception was not captured; the permanent-fallback defect was reproduced. Workspace buttons can exceed physical display capacity.
+- Sources: [4K bar inspection](../../../../docs/postmortem/2026-10-22-4k-bar-inspection.md).

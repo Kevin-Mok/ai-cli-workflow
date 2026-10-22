@@ -1,10 +1,14 @@
 # Keep 4K volume visible
 
-Move volume immediately before the song on DP-2 and let i3bar hide the song
-when workspace buttons crowd the status area. Apply the config and verify the
-real scheduler output without changing playback or audio settings.
+Keep volume near the center of DP-2 and fit song text into the remaining bar
+space with an ellipsis. When workspace buttons extend beyond the center, move
+volume right only as needed. Preserve playback, audio settings and block clicks.
 
 ## Scope and decisions
+
+The initial milestone below records the first shipped implementation. The
+follow-up replaces song disappearance with an adaptive status wrapper; the
+invisible compact form remains only its safe native-i3blocks fallback.
 
 Only the 4K block config changes. Use an empty Pango span as `short_text`
 on the second line of the existing song helper in this config only. Installed
@@ -70,3 +74,48 @@ Exclude all unrelated notification, Kitty, prompt and plan edits. README gate
 returned `pass_no_change`. Verified behavior is active; physical pressure remains
 manual and full refresh remains blocked by unrelated audio-mute drift. Commit
 and upstream push are the remaining delivery steps; no product work remains.
+
+## Follow-up — fit song text and center volume
+
+The user's screenshot shows unused space after the song disappears. Replace
+the blank compact song with adaptive ellipsized text. Keep volume centered on
+DP-2 where workspace buttons allow, then move it right only as those buttons
+require. Preserve all block clicks, polling, colors, and other monitor bars.
+
+Use a small 4K-only status-stream filter around existing i3blocks. Measure text
+with installed system Python GI/Pango at the live bar font and Xft DPI, reserve
+volume/calendar/workspace space, fit the song with a Unicode ellipsis, and use
+song min_width to hold volume's position even for short tracks. Pass click input
+straight to i3blocks. Fall back to a minimal song marker if IPC is unavailable.
+No packages are installed; GTK/Pango bindings are present in /usr/bin/python3.
+
+- [x] Add defining tests for long/short/Unicode titles, crowding, and click stream.
+- [x] Observe RED, implement the filter and wire only the DP-2 bar.
+- [x] Verify tests, live geometry and installed output; update docs and refresh.
+- [ ] Deliver the verified follow-up with the original commit; push once.
+
+Risk: native workspace buttons can exhaust the physical display. Reserve volume
+first and collapse calendar/song as needed; when no text can fit, retain native
+clipping as the physical limit. DPI/font and exact separator calculations need
+live verification. Rollback: restore original 4K status command and block config.
+
+### Delivery milestone — feat(i3blocks): fit song text beside centered volume
+
+Prerequisite commit: `1960ab3` (local, pending series push). The final adaptive
+wrapper reserves volume, centers it where workspaces allow, ellipsizes title
+first, preserves click input and metadata, and retries transient startup failures.
+Defining RED observed for missing filter, title priority, no-song position,
+startup fallback and startup recovery. GREEN: 10 layout tests, 1 scheduler test,
+39 MPRIS tests and both shell regressions; diff whitespace check passed.
+Independent review found empty-song and startup-fallback issues; both corrected
+with regressions. Live source/installed identity and actual bar screenshot
+`/tmp/4k-bar-recovered.png` confirm volume 36% near screen center with
+`Stitches -…`. No audio or playback changes. Extreme workspace pressure and
+click actions are fixture-covered; the user's workspace layout was preserved.
+README and smoke tests describe the final behavior. Repeated required refresh
+attempts preserved unrelated audio/Kitty conflicts; exact owned deployment
+succeeded. Live i3 config is preserved from broad chezmoi management, so only
+the reviewed status_command line was changed there. Runtime requires system
+Python GI/Pango; if unavailable, the original volume-priority stream survives.
+Scope helper remains unavailable; stage only directly observed current-session
+hunks, including the new learning/ledger entry, and exclude Kitty work.

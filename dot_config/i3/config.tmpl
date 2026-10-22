@@ -693,7 +693,7 @@ bar {
     active_workspace $inactive_ws_bg $ui_active_bg $ui_active_text
     inactive_workspace $inactive_ws_bg $ui_inactive_bg $ui_inactive_text
   }
-  status_command i3blocks -c ~/.config/i3blocks/i3blocks-4k.conf
+  status_command /usr/bin/python3 -u ~/.config/i3blocks/scripts/4k_status
   tray_output none
   wheel_up_cmd nop
   wheel_down_cmd nop

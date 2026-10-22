@@ -35,3 +35,28 @@ learning: existing permission/ownership guidance covers this incident.
 The first delivery attempt was blocked by the privacy gate's `home_path`
 category in the new ledger alias. Replace that alias with the repository's
 existing `/home/example` convention before retrying; preserve the report hash.
+
+The follow-up adaptive layout found live i3 config is intentionally not managed
+by chezmoi (`chezmoi diff` reports `not managed`). Deploy the new managed status
+helper normally, and replace only its reviewed status_command line in the live
+i3 config. Preserve other session edits and all other live settings.
+
+Final screenshot initially retained the earlier artist-first output: an i3
+reload does not restart an unchanged status_command. Make the system Python
+interpreter explicit in that command (the helper uses system GI/Pango), then
+reload so i3bar starts the final helper. Standalone final-helper output already
+showed `Stitches -…`; compare the actual running bar after activation.
+
+The restarted bar retained unadapted text even after its first media poll,
+although a standalone process with the running helper's environment adapted
+correctly. Startup fallback was permanent, so a transient initialization failure
+during reload could leave raw i3blocks output forever. Add an executable
+transient-startup regression and retry measurement initialization on subsequent
+status updates while preserving raw output until it succeeds.
+
+Resolution: the defining transient-startup regression now passes and the running
+bar screenshot shows centered volume `36%` with `Stitches -…` beside it. Source
+and installed helper match. A fallback test originally asserted JSON whitespace;
+it now parses the preserved status frame and checks the actual volume value.
+Later full-refresh attempts stopped on unrelated Kitty font-helper drift;
+preserved that work and deployed only this task's helper and live status line.

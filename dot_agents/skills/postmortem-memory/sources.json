@@ -5550,6 +5550,27 @@
       "sources": [
         "0eaa737cd7a67a59ae482d3c668813e4a78366668ee605458ea109d66b780602"
       ]
+    },
+    {
+      "id": "local-i3bar-layout-startup-recovery",
+      "reference": "references/operational-drift.md#local-i3bar-layout-startup-recovery",
+      "status": "verified_fix",
+      "symptoms": [
+        "Standalone adaptive status is correct but the running i3bar retains unadapted text after reload."
+      ],
+      "applicability": "i3bar status filters initializing font/X resources and live i3 IPC during reload.",
+      "diagnostics": [
+        "Compare the actual bar with standalone output under the running helper environment.",
+        "Exercise transient startup initialization failure and later recovery."
+      ],
+      "confidence": "supported",
+      "remedy": "Preserve raw status output and retry initialization on subsequent updates; restart an unchanged status command when its script changes.",
+      "verification": "Executable transient-startup RED/GREEN, ten layout tests, media/display regressions, installed-source identity, and screenshot with centered volume and ellipsized song title.",
+      "verification_scope": "runtime",
+      "limitations": "Exact live initialization exception was not captured; permanent fallback was reproduced. Workspace buttons can exceed physical display capacity.",
+      "sources": [
+        "6ee98113af08763342ac6937eef41b0cac5e0b8acaf5fe7155f9f65779ce9207"
+      ]
     }
   ],
   "reports": [
@@ -10265,10 +10286,11 @@
       "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-10-22-4k-bar-inspection.md"
       ],
-      "decision": "No new reusable learning: existing desktop permission and refresh ownership guidance covers successful exact-target bar activation; unrelated full-refresh audio-mute conflict remains.",
-      "findings": [],
+      "findings": [
+        "local-i3bar-layout-startup-recovery"
+      ],
       "reviewed_on": "2026-10-22",
-      "sha256": "3b701517954eecbd87d26cfb311c29a5303da13f8c167b5b810891ba9aaca0cd"
+      "sha256": "6ee98113af08763342ac6937eef41b0cac5e0b8acaf5fe7155f9f65779ce9207"
     }
   ],
   "review": {

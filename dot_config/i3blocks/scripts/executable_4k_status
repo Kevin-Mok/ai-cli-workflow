@@ -1,0 +1,139 @@
+#!/usr/bin/python3
+"""Fit the 4K song to the live bar while reserving space for volume."""
+import html
+import json
+from pathlib import Path
+import re
+import signal
+import subprocess
+import sys
+
+
+def fit_song(markup, width, measure):
+    if measure(markup) <= width:
+        return markup
+    match = re.match(r"(.*?</span> )(.*)", markup)
+    prefix, track = match.groups() if match else ("", markup)
+    track = html.unescape(track)
+    artist, separator, title = track.partition(" - ")
+    if separator:
+        track = f"{title} - {artist}"
+    if measure(prefix + "…") > width:
+        return "…" if measure("…") <= width else ""
+    low, high = 0, len(track)
+    while low < high:
+        middle = (low + high + 1) // 2
+        if measure(prefix + html.escape(track[:middle].rstrip()) + "…") <= width:
+            low = middle
+        else:
+            high = middle - 1
+    return prefix + html.escape(track[:low].rstrip()) + "…"
+
+
+def layout_blocks(blocks, screen_width, workspace_width, measure):
+    blocks = [dict(block) for block in blocks]
+    song = next((b for b in blocks if b.get("name") == "spotify"), None)
+    volume = next((b for b in blocks if b.get("name") == "volume"), None)
+    if song is None or volume is None:
+        return blocks
+    if not song.get("full_text"):
+        song["full_text"] = "<span></span>"
+    calendar = next((b for b in blocks if b.get("name") == "calendar"), None)
+    visible = [b for b in blocks if b.get("full_text")]
+    separators = sum(b.get("separator_block_width", 9) for b in visible[:-1])
+    volume_width = measure(volume["full_text"])
+    left = max(screen_width / 2 - volume_width / 2, workspace_width + 8)
+    fixed_width = sum(measure(b["full_text"]) for b in visible if b is not song)
+    budget = int(screen_width - left - fixed_width - separators)
+    if budget < 0 and calendar:
+        calendar["full_text"] = calendar.get("short_text", "")
+        fixed_width = volume_width + measure(calendar["full_text"])
+        budget = int(screen_width - left - fixed_width - separators)
+    if budget < 0 and calendar:
+        calendar["full_text"] = ""
+        budget = int(screen_width - left - volume_width - 25 - 4)
+    song["full_text"] = fit_song(song["full_text"], max(0, budget), measure)
+    song["min_width"] = max(0, budget) if song["full_text"] else 0
+    # Native short-form selection must not undo the measured layout.
+    for block in blocks:
+        block.pop("short_text", None)
+    return blocks
+
+
+def transform_line(line, transform):
+    prefix = "," if line.startswith(",") else ""
+    try:
+        blocks = json.loads(line[len(prefix):])
+    except ValueError:
+        return line
+    if not isinstance(blocks, list):
+        return line
+    return prefix + json.dumps(transform(blocks), ensure_ascii=False) + "\n"
+
+
+def ipc(kind, *args):
+    result = subprocess.run(["i3-msg", "-t", kind, *args], capture_output=True,
+                            text=True, check=True, timeout=1)
+    return json.loads(result.stdout)
+
+
+def live_layout():
+    import gi
+    gi.require_version("Pango", "1.0")
+    gi.require_version("PangoCairo", "1.0")
+    from gi.repository import Pango, PangoCairo
+
+    resources = subprocess.run(["xrdb", "-query"], capture_output=True,
+                               text=True, check=True, timeout=1).stdout
+    dpi_match = re.search(r"^Xft.dpi:\s*([\d.]+)", resources, re.MULTILINE)
+    dpi = float(dpi_match[1]) if dpi_match else 96
+    bars = [ipc("get_bar_config", name) for name in ipc("get_bar_config")]
+    bar = next(b for b in bars if "DP-2" in b.get("outputs", []))
+    context = PangoCairo.FontMap.get_default().create_context()
+    PangoCairo.context_set_resolution(context, dpi)
+    layout = Pango.Layout.new(context)
+    layout.set_font_description(Pango.FontDescription.from_string(bar["font"].removeprefix("pango:")))
+
+    def measure(markup):
+        layout.set_markup(markup, -1)
+        return layout.get_pixel_size().width
+
+    def adapt(blocks):
+        output = next(o for o in ipc("get_outputs") if o["name"] == "DP-2")
+        workspaces = [w for w in ipc("get_workspaces") if w["output"] == "DP-2"]
+        button_padding = 2 * round(4 * dpi / 96) + round(dpi / 96)
+        workspace_width = sum(measure(html.escape(w["name"])) + button_padding for w in workspaces)
+        return layout_blocks(blocks, output["rect"]["width"], workspace_width, measure)
+
+    return adapt
+
+
+def main():
+    child = subprocess.Popen(
+        ["i3blocks", "-c", str(Path.home() / ".config/i3blocks/i3blocks-4k.conf")],
+        stdin=sys.stdin, stdout=subprocess.PIPE, text=True, bufsize=1,
+    )
+    signal.signal(signal.SIGTERM, lambda *_: sys.exit(0))
+    warned = False
+    adapt = None
+    try:
+        for line in child.stdout:
+            try:
+                if adapt is None:
+                    adapt = live_layout()
+                rendered = transform_line(line, adapt)
+            except (OSError, subprocess.SubprocessError, ValueError, KeyError, TypeError, StopIteration) as error:
+                if not warned:
+                    print(f"⚠️ 4K bar layout unavailable ({type(error).__name__}); keeping volume priority.", file=sys.stderr)
+                warned = True
+                adapt = None
+                rendered = line
+            sys.stdout.write(rendered)
+            sys.stdout.flush()
+    finally:
+        child.terminate()
+        child.wait(timeout=3)
+
+
+if __name__ == "__main__":
+    main()
