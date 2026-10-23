@@ -1,6 +1,6 @@
 # Trim progress
 
-Current milestone: **passes1–7 committed; pass8 provenance validated for commit**.
+Current milestone: **passes1–8 committed; pass9 duplicate instructions validated for commit**.
 Static loaded context37,619→16,127B (9,404.75→4,031.75 estimated tokens,
 −57.13%). Conditional reference loads remain additional; actual runtime context
 is not measured. Later description/body/output passes and saturation remain open.
@@ -17,6 +17,7 @@ is not measured. Later description/body/output passes and saturation remain open
 | 6 — descriptions | Trigger words retained; procedure stays in bodies | Loaded | 16,127 | 15,116 | 6.27% | 27 |
 | 7 — agent output | Summaries with full explicit diagnostics | CLI output | 16,243 | 124 | 99.24% | 27 |
 | 8 — provenance follow-up | Machine-readable exact source evidence | Source notes | 12,940 | 15,251 | -17.86% | 27 |
+| 9 — instruction deduplication | Canonical controls replace repeated config injection | Loaded | 15,116 | 14,399 | 4.74% | 27 |
 
 Baseline body bytes: 403,458 (100,864.5 approximate tokens). Loaded estimate:
 9,404.75 tokens; UTF-8 bytes/4, not actual model tokenizer usage. See BASELINE.json
@@ -484,3 +485,26 @@ Commit:fix(skills): normalize intake source provenance.
 
 Fresh pass8 selected231tests/385subtests PASS; budgetsPASS,42/46routing
 unchanged, inventory233/0drift, READMEpass_no_change. Staged gates beforecommit.
+
+## Pass 9 — deduplicate injected standing controls
+
+The717Bdeveloper_instructions value repeats3canonical controls: plan updates
+with related work, concise ConventionalCommits and pre-write gitstatus capture.
+Only its5-line TOMLblock is removed. Definingtests prove exacttext deletion,
+everyotherparsedsetting unchanged from4296498e, and originalmodel/effort
+lines/values unchanged from3e898a0f. All3controls remain standing.
+
+Loaded15,116→14,399B saves179.25estimated recurringtokens (4.74% thispass);
+cumulative37,619→14,399B,9,404.75→3,599.75tokens (−61.72%). Descriptions
+4,727B and27skills unchanged. Requiredtechniquerecord adds883bodyB; overall
+182,828→183,711B. Configsource is unapplied; no livepreferences changed.
+
+What worked: exact-block and full parsed-config comparisons constrain a safe
+removal more strongly than model-only spot checks. Next: measure remaining
+description/body candidates against current42/46 and the predeclared1%/100token
+criterion, close all plan dispositions, and regenerate actualcommit comparison.
+Commit:refactor(instructions): remove duplicated developer rules.
+
+Fresh pass9 selected235tests/388subtests PASS; budgetsPASS,42/46routing
+unchanged, inventory233/0drift, READMEpass_no_change. Exactconfigdiff reviewed;
+models/efforts unchanged. Staged size/privacy gates beforecommit.

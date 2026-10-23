@@ -466,3 +466,19 @@ precede commit. Next duplicate developerblock removal preserves model/effort.
 
 Fresh pass8 selected231tests/385subtests PASS; budgetsPASS,42/46routing
 unchanged, inventory233/0drift, READMEpass_no_change. Staged gates beforecommit.
+
+## Pass 8 delivered; pass 9 instruction deduplication
+
+Pass8 committed4296498e after231tests/385subtests and stagedgatesPASS;4new
+provenance findings fixed, doctor35inheritederrors/1warning/0newkeys.
+Pass9 definingRED2→GREEN4tests proves developerblock-only removal, allother
+TOMLsettings and originalmodel/effortlines unchanged,3canonicalcontrols retained.
+Loaded14,399B (−179.25tokens); newtechnique+admissioncost updated.
+- [x] Prove unchanged safety/configuration and remove only duplicated instructions.
+- [x] Ratchet budget; record loaded/body costs separately.
+- [ ] Fullfocusedtests, stagedsize/privacy and dedicatedcommit9.
+- [ ] Remainingcandidate saturationaudit, finalplan reconciliation and evidence review.
+
+Fresh pass9 selected235tests/388subtests PASS; budgetsPASS,42/46routing
+unchanged, inventory233/0drift, READMEpass_no_change. Exactconfigdiff reviewed;
+models/efforts unchanged. Staged size/privacy gates beforecommit.

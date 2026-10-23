@@ -224,3 +224,17 @@ weakened validators or a whole-audit-clean claim from fixing four findings.
 - [ ] Prove full revision/path/hash; label local accepted snapshots honestly.
 - [ ] Preserve source history/notices and validate supported metadata fields.
 - [ ] Recompare exact finding keys; test scoped fixes and report inherited debt.
+
+## Keep one authoritative copy of standing rules — deduplication pass
+
+**Rule:** Remove duplicated injected instructions only after proving each
+control remains in the canonical policy and unrelated configuration is identical.
+**Why:** Repeated policy spends context without adding a decision or safeguard.
+**Repo example:** developer_instructions717→0B saves179.25estimated recurring
+tokens; loaded15,116→14,399B. All3controls remain; model/effort lines unchanged.
+**Mistakes:** Dropping a unique clause, serializing unrelated settings, changing
+model preferences, or treating an unapplied source change as live activation.
+**Checklist**
+- [ ] Map every duplicate clause to retained canonical text before removal.
+- [ ] Prove exact block-only diff and all other setting/model values unchanged.
+- [ ] Ratchet budget; test source invariants, routing and scoped staged privacy.

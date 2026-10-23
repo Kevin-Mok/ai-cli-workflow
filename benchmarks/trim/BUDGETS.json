@@ -6,7 +6,7 @@
     "description_bytes": 400
   },
   "exceptions": {},
-  "loaded_bytes": 15116,
+  "loaded_bytes": 14399,
   "minimum_skills": 27,
   "required_skill_paths": [
     ".agents/skills/brand-system-designer/SKILL.md",
