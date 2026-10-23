@@ -179,3 +179,18 @@ called recurring or billing measurements.
 - [ ] Compare all old technique steps, gate arithmetic and safeguards.
 - [ ] Preserve frontmatter/triggers; measure bytes, five fields and relevant gates.
 - [ ] Commit measured on-demand delta with0recurring savings and pass artifacts.
+
+## Shorten triggers without adding misfires — description pass
+
+**Rule:** Keep user trigger words and invocation metadata; trim procedure from
+descriptions after freezing a current-source routing report.
+**Why:** Descriptions recur every session; bodies retain execution detail.
+**Repo example:** Eight owned descriptions save1,011B/252.75recurring tokens;
+loaded16,127→15,116B. Frozen routing41/46→42/46 and keepers15/17→16/17; no
+previously correct case lost. Unchanged bodies preserve behavior.
+**Mistakes:** Shortening explicit-only skills into generic false positives;
+editing imported sources, changing gold/scorer, or comparing only an old floor.
+**Checklist**
+- [ ] Save current cases/report; retain trigger branches and invocation controls.
+- [ ] Reject losses; review misfires and preserve prior positives.
+- [ ] Refresh admission costs/current calibration; record net bytes and score.

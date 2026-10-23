@@ -2,9 +2,9 @@
   "grandfathered_max_bytes": {
     "README.md": 101164,
     "docs/smoke-tests.md": 159196,
-    "benchmarks/trim/PROGRESS.md": 27679,
-    "plans/skills-efficiency.md": 26161,
-    "dot_agents/skills/lean-instructions/references/vetted-skills.md": 102846
+    "benchmarks/trim/PROGRESS.md": 29676,
+    "plans/skills-efficiency.md": 27115,
+    "dot_agents/skills/lean-instructions/references/vetted-skills.md": 101835
   },
   "skip_globs": [
     "package-lock.json",

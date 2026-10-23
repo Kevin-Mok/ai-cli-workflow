@@ -5,15 +5,8 @@
     "skill_lines": 300,
     "description_bytes": 400
   },
-  "exceptions": {
-    "dot_agents/skills/commit-session/SKILL.md": {
-      "description_bytes": 434
-    },
-    "dot_agents/skills/next-tasks/SKILL.md": {
-      "description_bytes": 423
-    }
-  },
-  "loaded_bytes": 16127,
+  "exceptions": {},
+  "loaded_bytes": 15116,
   "minimum_skills": 27,
   "required_skill_paths": [
     ".agents/skills/brand-system-designer/SKILL.md",

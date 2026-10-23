@@ -159,3 +159,6 @@ Do not weaken the doctor or claim zero-new-findings until that rerun passes.
 A read-only description preflight assumed report key results instead of the
 declared per_case field and raised KeyError. No source changed; inspect the
 returned schema before consuming reports. Same source-inspection lesson.
+
+Description preflight also assumed per-case predicted rather than actual;
+read the evaluator construction before any further schema use. No source changed.

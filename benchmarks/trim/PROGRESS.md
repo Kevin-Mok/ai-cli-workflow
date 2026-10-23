@@ -1,6 +1,6 @@
 # Trim progress
 
-Current milestone: **passes1–4 committed; pass5 body concision validated for commit**.
+Current milestone: **passes1–5 committed; pass6 descriptions validated for commit**.
 Static loaded context37,619→16,127B (9,404.75→4,031.75 estimated tokens,
 −57.13%). Conditional reference loads remain additional; actual runtime context
 is not measured. Later description/body/output passes and saturation remain open.
@@ -14,6 +14,7 @@ is not measured. Later description/body/output passes and saturation remain open
 | 3 — admission gate | Evidence-priced additions and mandatory PASS ledger | Loaded | 30,251 | 30,292 | -0.14% | 27 |
 | 4 — CASD | Log-informed conditional policy routing | Loaded | 30,292 | 16,127 | 46.76% | 27 |
 | 5 — body concision | Repeated technique prose compressed in place | lean body | 15,125 | 10,897 | 27.95% | 27 |
+| 6 — descriptions | Trigger words retained; procedure stays in bodies | Loaded | 16,127 | 15,116 | 6.27% | 27 |
 
 Baseline body bytes: 403,458 (100,864.5 approximate tokens). Loaded estimate:
 9,404.75 tokens; UTF-8 bytes/4, not actual model tokenizer usage. See BASELINE.json
@@ -399,3 +400,39 @@ Commit:refactor(skills): condense the lean technique log.
 
 Fresh pass5 selected200tests/330subtests PASS; budgetsPASS,41/46routing
 unchanged, inventory233/0drift. Exact staged size/privacy gates before commit.
+
+## Pass 6 — owned description trimming
+
+Fresh baseline before any description edit:41/46, saved in description-before.json.
+After8owned edits:42/46 (91.30%), keeper15/17→16/17; every previously correct
+case retained. No cases/scorer/algorithm changed. The formerly missed compound
+feedback+failure case now passes; translation/morning remains a lexical limitation.
+Several draft combinations and shortened morning were rejected for no-skill
+misfires. Descriptions below retain natural trigger branches and explicit-only
+metadata; all8skill bodies are byte-identical to the preceding commit.
+
+| Skill | Old description B | New B | Estimated recurring tokens saved |
+| --- | ---: | ---: | ---: |
+| commit-session | 434 | 245 | 47.25 |
+| next-tasks | 423 | 127 | 74 |
+| night | 288 | 143 | 36.25 |
+| feedback-memory | 338 | 166 | 43 |
+| personal-context | 358 | 261 | 24.25 |
+| fish-alias | 166 | 132 | 8.5 |
+| postmortem-memory | 160 | 124 | 9 |
+| ai-workflow-doctor | 200 | 158 | 10.5 |
+
+Descriptions5,738→4,727B, loaded16,127→15,116B:252.75estimated recurring
+tokens saved,6.27% thispass/59.82% cumulative. Both old description-size
+exceptions retire; all descriptions now≤400B. Calibration descriptions/hashes
+and measured admission costs update together. The required technique record
+adds905bodyB, overall180,084→180,989B; it is separate from recurring savings.
+
+What worked: reject new misfires as well as aggregate declines; global lexical
+weights can affect an unchanged skill. Keep longer wording when it preserves
+correct no-skill routing. Next: terse agent CLI checks, preserving interactive,
+plain, JSON/protocol and explicit diagnostic behavior.
+Commit:refactor(skills): shorten owned routing descriptions.
+
+Fresh pass6 selected200tests/330subtests PASS; budgetsPASS,42/46routing
+vs previous41/46, inventory233/0drift. Staged size/privacy gates before commit.

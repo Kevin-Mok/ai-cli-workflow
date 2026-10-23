@@ -406,3 +406,21 @@ commit. Four intakeprovenance schema findings remain separate follow-up.
 
 Fresh pass5 selected200tests/330subtests PASS; budgetsPASS,41/46routing
 unchanged, inventory233/0drift. Exact staged size/privacy gates before commit.
+
+## Pass 5 delivered; pass 6 descriptions
+
+Pass5 committed60f75a4a after200tests/330subtests and staged gatesPASS; lean
+body−1,057on-demandtokens, no recurringchange. Actualcomparison regenerated.
+Pass6baseline41/46 beforeedits saved description-before.json; selected8owned
+descriptions remove1,011B/252.75recurringtokens. Allpreviouspositives retained;
+42/46 now, keeper16/17. Rejected draft misfires, no gold/scorer edits.
+
+- [x] Preserve invocationmetadata, triggerbranches and identical8skillbodies.
+- [x] Update calibration descriptions/hashes, admissioncosts and technique.
+- [x] Retire both descbudget exceptions; loadedceiling15,116B.
+- [ ] Run focused tests/routing/inventory, stage privacy/size and commit6.
+
+Next: CLIoutput pass, then structured-provenance findings and final saturation.
+
+Fresh pass6 selected200tests/330subtests PASS; budgetsPASS,42/46routing
+vs previous41/46, inventory233/0drift. Staged size/privacy gates before commit.

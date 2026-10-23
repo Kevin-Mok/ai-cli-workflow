@@ -1,6 +1,7 @@
 ---
 name: feedback-memory
-description: Persist durable user corrections and preferences across sessions through a repo-tracked plain-text `feedback.log`. Use when starting a session that should honor prior reusable feedback, or when the user gives durable guidance about workflow, formatting, style, tooling, review expectations, or communication that should apply again later.
+description: >-
+  Use for durable user corrections or preferences about workflow, formatting, style, tooling, review or communication, and sessions needing prior feedback.log guidance.
 ---
 
 # Feedback Memory

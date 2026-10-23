@@ -1,11 +1,7 @@
 ---
 name: personal-context
 description: >-
-  Use automatically when a development or design choice has a plausible
-  personal or cross-project connection: direction, scope, architecture, design,
-  tooling, milestones, or collaboration. Also use when example-user explicitly invokes
-  $personal-context to discuss motivations, tastes, goals, or working experiences.
-  Mechanical work needs no unnecessary lookup.
+  Use automatically for personal or cross-project development/design choices: direction, scope, architecture, tooling, milestones or collaboration; explicit $personal-context discussions of motivations, tastes, goals and working experiences. Skip mechanical work.
 ---
 
 # Personal Context

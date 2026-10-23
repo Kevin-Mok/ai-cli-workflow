@@ -1,9 +1,7 @@
 ---
 name: postmortem-memory
 description: >-
-  Use when a bug is reported, an unexpected command, test or deployment fails,
-  troubleshooting requires a retry, or a postmortem is created or materially
-  updated.
+  Use for reported bugs, unexpected command/test/deployment failures, troubleshooting retries, or postmortem creation/updates.
 ---
 
 # Postmortem Memory

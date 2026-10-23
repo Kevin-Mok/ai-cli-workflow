@@ -1,6 +1,7 @@
 ---
 name: fish-alias
-description: Use when adding or replacing a fish command, directory, or file shortcut from an abbreviation followed by a command or path in example-user's linux-config repository.
+description: >-
+  Use when adding or replacing a fish command, directory or file shortcut from an abbreviation plus a command or path in linux-config.
 ---
 
 # Fish Alias
