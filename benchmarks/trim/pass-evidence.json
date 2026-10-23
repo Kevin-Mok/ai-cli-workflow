@@ -1,11 +1,11 @@
 {
-  "pass": "Pass 6 owned descriptions",
-  "technique": "Trigger words retained; procedure stays in bodies",
-  "commit_subject": "refactor(skills): shorten owned routing descriptions",
+  "pass": "Pass 7 agent tool output",
+  "technique": "Summaries with complete explicit diagnostics",
+  "commit_subject": "perf(cli): summarize agent workflow checks",
   "tests": {
-    "passed": 200,
-    "subtests_passed": 330,
-    "command": "python3 -m pytest -q tests/test_skill_cull_contract.py tests/test_commit_plan_push_skill.py tests/test_metaprompt_integration.py tests/test_cli_emoji_skills.py tests/test_trim_benchmark.py tests/test_trigger_eval.py tests/test_trim_failure_mining.py tests/test_design_skills_sync.py tests/test_superpowers_release_timer.py tests/test_vetted_skills.py tests/test_grok_cli_handoff.py tests/test_file_size_guard.py tests/test_ai_workflow_contract.py tests/test_pre_commit_privacy_gate.py tests/test_checkpoint_privacy_gate.py tests/test_skill_admissions.py tests/test_trim_casd.py"
+    "passed": 230,
+    "subtests_passed": 381,
+    "command": "python3 -m pytest -q tests/test_skill_cull_contract.py tests/test_commit_plan_push_skill.py tests/test_metaprompt_integration.py tests/test_cli_emoji_skills.py tests/test_trim_benchmark.py tests/test_trigger_eval.py tests/test_trim_failure_mining.py tests/test_design_skills_sync.py tests/test_superpowers_release_timer.py tests/test_vetted_skills.py tests/test_grok_cli_handoff.py tests/test_file_size_guard.py tests/test_ai_workflow_contract.py tests/test_pre_commit_privacy_gate.py tests/test_checkpoint_privacy_gate.py tests/test_skill_admissions.py tests/test_trim_casd.py tests/test_ai_workflow_doctor.py"
   },
   "trigger": {
     "exact_matches": 42,
@@ -27,5 +27,14 @@
     "Full repository collection has inherited sanitized Python syntax errors outside selected checks.",
     "Generic skill validator rejects supported explicit-only metadata; repo contracts retain it.",
     "Static-boundary savings exclude triggered reference loads. Postmortem suite has one inherited sanitized-root environment failure; personal-context contract file retains inherited SyntaxError."
-  ]
+  ],
+  "tool_output": {
+    "command": "scripts/sync-vetted-skills --check --plain",
+    "before_bytes": 16243,
+    "after_bytes": 124,
+    "before_lines": 235,
+    "after_lines": 3,
+    "estimated_output_tokens_saved": 4029.75,
+    "recurring_instruction_tokens_saved": 0
+  }
 }

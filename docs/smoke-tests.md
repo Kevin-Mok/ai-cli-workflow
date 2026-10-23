@@ -541,8 +541,9 @@ listing is cached-only; opening a picker can generate recaps unless disabled.
   the specific reason and what would change it. last30days retains its explicit KEEP exception.
 
 - Action: Run `./scripts/sync-vetted-skills --check --plain` from this checkout.
-  Expected: Lists configured and detectable installed/built-in sources with
-  logical identities and verdicts. Final line reports zero missing/stale entries;
+  Expected: Human terminals list configured and detectable sources; pipes/agents
+  show a summary (use --details for the complete listing). Every error remains
+  visible. Final line reports zero missing/stale entries;
   exit 0. Installed-only culls remain visible until explicit host cleanup.
 - Action: Run `./scripts/sync-vetted-skills --json --check` and inspect `skills`,
   `installed_only` and `errors`.
@@ -758,6 +759,11 @@ checks use invented temporary data; real notes are never repository fixtures.
   Expected: It immediately creates one dated postmortem under `docs/postmortem/`, records the initial symptom, impact, evidence, current status, and next steps, then updates that same file with root cause, resolution, verification, and follow-up; deliberate RED tests and intentionally exercised failure paths do not create one.
 - Action: Start non-trivial work from a plan under `plans/`, then inspect the plan before the related commit is prepared.
   Expected: The plan follows `.agent/PLANS.md` with assumptions, checkboxes, verification evidence, review notes, and progress updates intended for the same commit as the work they describe.
+- Action: Compare workflow helper output in a terminal and a pipe, then repeat
+  with CODEX_TEST=1, CLAUDECODE=1, --plain or CLI_PLAIN=1 and NO_COLOR=1.
+  Expected: Terminal output keeps decoration; pipes/agents/plain suppress it.
+  NO_COLOR alone retains terminal emojis. Doctor --details and sync --details
+  retain full diagnostics; JSON/protocol/status and failure exit codes stay intact.
 - Action: Run `./scripts/executable_ai-workflow-doctor --repo . --check` from the repository root.
   Expected: The command exits `0` when the AI workflow surface has no objective structural errors; any semantic-conflict candidate is labeled as a non-blocking human-review warning rather than auto-resolved.
 - Action: With a declared local provenance archive available, run

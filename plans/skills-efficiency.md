@@ -424,3 +424,25 @@ Next: CLIoutput pass, then structured-provenance findings and final saturation.
 
 Fresh pass6 selected200tests/330subtests PASS; budgetsPASS,42/46routing
 vs previous41/46, inventory233/0drift. Staged size/privacy gates before commit.
+
+## Pass 6 delivered; pass 7 terse agent tooling
+
+Pass6 committed5efb06a1 after200tests/330subtests and staged gatesPASS. Eight
+owned descriptions save252.75recurringtokens; all prior positives retained,
+now42/46. Actualcomparison regenerated.
+Pass7 adapts existing README/doctor helpers and sync-vetted: nonTTY/agent
+summary and no decoration, full JSON/explicit details, unchanged humanTTY and
+protocol output. Defining PTY/pipe tests precede changes. Baseline synccheck
+16,243B/235lines (4,060.75estimated outputtokens), not per-session savings.
+- [ ] Exercise agent/human/pipe/plain/NO_COLOR, JSON/protocol and failures.
+- [ ] Measure outputdelta; update docs/technique/costs and focused tests.
+- [ ] Exact staged privacy/size and owncommit; no liveconfiguration activation.
+
+Pass7ready: new4PTY/outputtests observed RED then GREEN; focused43tests/
+243subtests PASS, bashsyntaxPASS. Same inventorycheck output−99.24%,4,029.75
+estimatedtokens/invocation; staticloaded unchanged. FullJSON/details/errors/
+protocol/exitcodes and humanTTY preserved. Roottechniquelog+admissioncost updated;
+full focused suite and staged gates precede owncommit.
+
+Fresh pass7 selected230tests/381subtests PASS; budgetsPASS,42/46routing
+unchanged, inventory233/0drift, READMEpass_no_change. Staged gates beforecommit.

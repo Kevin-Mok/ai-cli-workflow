@@ -194,3 +194,18 @@ editing imported sources, changing gold/scorer, or comparing only an old floor.
 - [ ] Save current cases/report; retain trigger branches and invocation controls.
 - [ ] Reject losses; review misfires and preserve prior positives.
 - [ ] Refresh admission costs/current calibration; record net bytes and score.
+
+## Summarize agent-run checks — CLI output pass
+
+**Rule:** Use undecorated summaries for pipes/agents; retain human TTY output,
+all failure signals, JSON/protocol data and explicit full diagnostics.
+**Why:** Repeated tool responses spend context without improving decisions.
+**Repo example:** sync-vetted check16,243→124B/235→3lines saves4,029.75
+estimated output tokens per invocation; recurring instructions save0tokens.
+Doctor/README suppress decoration for nonTTY or CODEX_*/CLAUDECODE.
+**Mistakes:** Truncated errors/JSON, lost exit status, testing TTY inside a shell
+command substitution, or claiming output savings as per-session instruction savings.
+**Checklist**
+- [ ] Exercise real TTY, agent variables, pipes, plain and NO_COLOR.
+- [ ] Preserve full JSON/protocol/errors; expose --details and document it.
+- [ ] Measure the same invocation; test actual output and record its boundary.

@@ -162,3 +162,7 @@ returned schema before consuming reports. Same source-inspection lesson.
 
 Description preflight also assumed per-case predicted rather than actual;
 read the evaluator construction before any further schema use. No source changed.
+
+The terse-output regression suite exposed a third doctor diagnostic assertion
+using the old implicit full report. Its call now explicitly requests --details;
+the diagnostic assertion stays unchanged, alongside the other updated callers.

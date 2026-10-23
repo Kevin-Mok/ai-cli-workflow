@@ -1,10 +1,12 @@
 {
   "grandfathered_max_bytes": {
-    "README.md": 101164,
-    "docs/smoke-tests.md": 159196,
-    "benchmarks/trim/PROGRESS.md": 29676,
-    "plans/skills-efficiency.md": 27115,
-    "dot_agents/skills/lean-instructions/references/vetted-skills.md": 101835
+    "README.md": 101523,
+    "docs/smoke-tests.md": 159649,
+    "benchmarks/trim/PROGRESS.md": 31097,
+    "plans/skills-efficiency.md": 28416,
+    "dot_agents/skills/lean-instructions/references/vetted-skills.md": 101835,
+    "scripts/executable_ai-workflow-doctor": 32301,
+    "tests/test_ai_workflow_doctor.py": 34976
   },
   "skip_globs": [
     "package-lock.json",

@@ -235,7 +235,7 @@ class AiWorkflowDoctorTests(unittest.TestCase):
         self.assertEqual(comparison["resolved_finding_keys"], [])
 
         text_comparison = self.run_doctor(
-            repo, "--compare", str(snapshot), check=True
+            repo, "--compare", str(snapshot), "--details", check=True
         ).stdout
         self.assertIn("active_totals.bytes: +", text_comparison)
         self.assertIn(
@@ -322,7 +322,7 @@ class AiWorkflowDoctorTests(unittest.TestCase):
         self.assertEqual(self.run_doctor(repo).returncode, 0)
         self.assertEqual(self.run_doctor(repo, "--check").returncode, 1)
 
-        text_report = self.run_doctor(repo).stdout
+        text_report = self.run_doctor(repo, "--details").stdout
         self.assertIn("AGENTS.md:4", text_report)
         self.assertIn("target=docs/missing.md", text_report)
 
@@ -576,7 +576,7 @@ class AiWorkflowDoctorTests(unittest.TestCase):
         self.assertIn(
             "invalid_source_provenance", self.finding_codes(self.json_report(repo))
         )
-        invalid_text = self.run_doctor(repo).stdout
+        invalid_text = self.run_doctor(repo, "--details").stdout
         self.assertIn("invalid_fields=[date, immutable revision]", invalid_text)
 
         source_directory, source_repo, source_commit = self.make_git_source(

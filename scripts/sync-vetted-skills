@@ -200,23 +200,28 @@ def main():
     parser.add_argument('--check', action='store_true', help='Fail on missing or stale calibration entries')
     parser.add_argument('--json', action='store_true', help='Machine-readable inventory with logical source labels')
     parser.add_argument('--plain', action='store_true', help='ASCII human-readable output')
+    parser.add_argument('--details', action='store_true', help='Show the full inventory during noninteractive checks')
     args = parser.parse_args()
+    agent_output = not sys.stdout.isatty() or any(key.startswith('CODEX_') or key == 'CLAUDECODE' for key in os.environ)
+    decorated = not agent_output and not args.plain and os.environ.get('CLI_PLAIN') != '1'
     try:
         report = audit(args.repo.resolve(), Path.home())
     except (OSError, ValueError, KeyError, TypeError) as error:
-        prefix = '' if args.plain or args.json or os.environ.get('CLI_PLAIN') == '1' else '❌ '
+        prefix = '❌ ' if decorated and not args.json else ''
         message = 'could not read a skill source; check source availability and file permissions' if isinstance(error, OSError) else str(error)
         print(prefix + f'Skill inventory: {message}', file=sys.stderr)
         return 2
     if args.json:
         print(json.dumps(report, indent=2))
     else:
-        decorated = not args.plain and os.environ.get('CLI_PLAIN') != '1'
         print(('📚 ' if decorated else '') + 'Vetted skill inventory (read-only; no live cleanup)')
-        for record in report['skills']:
-            state = 'ACTIVE' if record['active'] else 'BUILTIN' if record['kind'] == 'builtin' else 'INSTALLED-ONLY'
-            scopes = ', '.join(record['scopes'] + record['installed_scopes'])
-            print(f'{state:14} {record["id"]} [{record["verdict"]}] {scopes}')
+        if not args.check or args.details or not agent_output:
+            for record in report['skills']:
+                state = 'ACTIVE' if record['active'] else 'BUILTIN' if record['kind'] == 'builtin' else 'INSTALLED-ONLY'
+                scopes = ', '.join(record['scopes'] + record['installed_scopes'])
+                print(f'{state:14} {record["id"]} [{record["verdict"]}] {scopes}')
+        else:
+            print('Full inventory: --details or --json')
         for error in report['errors']:
             print(('⚠️ ' if decorated else '') + error)
         glyph = '⚠️ ' if report['errors'] else '✅ '

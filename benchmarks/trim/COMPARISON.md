@@ -4,10 +4,10 @@ Reproduce instruction costs from committed Git blobs, compare the original with 
 then inspect real pass commits and their recorded verification. An optional working
 draft is reported separately and never counts as a committed pass.
 
-Always-loaded tokens per session: **9,404.75 → 4,031.75**
-(-5,373.00 tokens, -57.13%).
+Always-loaded tokens per session: **9,404.75 → 3,779**
+(-5,625.75 tokens, -59.82%).
 
-Original: `3e898a0f39172d7c30a6b0ae0258209cfe2c7f0c`. HEAD: `60f75a4a3712652a114026be7a424691e831f3df`.
+Original: `3e898a0f39172d7c30a6b0ae0258209cfe2c7f0c`. HEAD: `5efb06a1a2b7b69bef5bcfda7487e8c42e9b3796`.
 
 Estimates use UTF-8 bytes / 4, not model tokenizer usage. The headline includes
 root AGENTS.md + canonical dot_codex/AGENTS.md + config developer_instructions +
@@ -26,11 +26,11 @@ excluded from the headline. External install changes require separate evidence.
 | dot_codex/AGENTS.md bytes | 22,750 | 8,982 | -13,768.00 |
 | dot_codex/AGENTS.md approx_tokens | 5,687.5 | 2,245.5 | -3,442.00 |
 | Developer-instruction tokens | 179.25 | 179.25 | +0.00 |
-| Skill-description tokens | 3,365.5 | 1,434.5 | -1,931.00 |
-| SKILL.md body bytes | 403,458 | 180,084 | -223,374.00 |
+| Skill-description tokens | 3,365.5 | 1,181.75 | -2,183.75 |
+| SKILL.md body bytes | 403,458 | 180,989 | -222,469.00 |
 | Canonical skill count | 59 | 27 | -32.00 |
-| Always-loaded tokens/session | 9,404.75 | 4,031.75 | -5,373.00 |
-| Trigger exact-set accuracy | unavailable | 41/46 (89.13%) | unavailable |
+| Always-loaded tokens/session | 9,404.75 | 3,779 | -5,625.75 |
+| Trigger exact-set accuracy | unavailable | 42/46 (91.30%) | unavailable |
 | Automated tests passed | unavailable | 200 | unavailable |
 
 Trigger and test counts are unavailable without matching committed evidence.
@@ -50,6 +50,7 @@ The two delta columns measure always-loaded tokens.
 | 6e9934c | Pass 3 admission gate | Evidence-priced additions and mandatory PASS ledger | 16/690/172.5 | 357/23,147/5,786.75 | 179.25 | 1,434.5 | 183,100 | 27 | dot_agents/skills/last30days/SKILL.md: 29,889 | 41/46 (89.13%) | 198 | 7,573 | +10.25 | -1,831.75 |
 | f0a1cbb | Pass 4 CASD conditional policy | Log-informed conditional policy routing | 16/690/172.5 | 145/8,982/2,245.5 | 179.25 | 1,434.5 | 184,312 | 27 | dot_agents/skills/last30days/SKILL.md: 29,889 | 41/46 (89.13%) | 200 | 4,031.75 | -3,541.25 | -5,373.00 |
 | 60f75a4 | Pass 5 body concision | Repeated technique prose compressed in place | 16/690/172.5 | 145/8,982/2,245.5 | 179.25 | 1,434.5 | 180,084 | 27 | dot_agents/skills/last30days/SKILL.md: 29,889 | 41/46 (89.13%) | 200 | 4,031.75 | +0.00 | -5,373.00 |
+| 5efb06a | Pass 6 owned descriptions | Trigger words retained; procedure stays in bodies | 16/690/172.5 | 145/8,982/2,245.5 | 179.25 | 1,181.75 | 180,989 | 27 | dot_agents/skills/last30days/SKILL.md: 29,889 | 42/46 (91.30%) | 200 | 3,779 | -252.75 | -5,625.75 |
 
 ## Always-loaded cost by commit
 
@@ -60,6 +61,7 @@ bc0360c    ################################         7,408 tokens
 6e9934c    ################################         7,573 tokens
 f0a1cbb    #################                        4,031.75 tokens
 60f75a4    #################                        4,031.75 tokens
+5efb06a    ################                         3,779 tokens
 ```
 
 ## Largest canonical skill bodies
@@ -68,7 +70,7 @@ f0a1cbb    #################                        4,031.75 tokens
 | ---: | --- | ---: | --- | ---: |
 | 1 | dot_agents/skills/playwright-interactive/SKILL.md | 31,604 | dot_agents/skills/last30days/SKILL.md | 29,889 |
 | 2 | dot_agents/skills/last30days/SKILL.md | 29,889 | dot_agents/skills/impeccable/SKILL.md | 11,985 |
-| 3 | dot_agents/skills/design-taste-frontend/SKILL.md | 21,146 | dot_agents/skills/lean-instructions/SKILL.md | 10,897 |
+| 3 | dot_agents/skills/design-taste-frontend/SKILL.md | 21,146 | dot_agents/skills/lean-instructions/SKILL.md | 11,802 |
 | 4 | dot_agents/skills/redesign-existing-projects/SKILL.md | 15,010 | dot_agents/skills/frontend-design/SKILL.md | 9,634 |
 | 5 | dot_agents/skills/high-end-visual-design/SKILL.md | 10,542 | dot_agents/skills/commit-session/SKILL.md | 9,532 |
 | 6 | dot_agents/skills/delight/SKILL.md | 9,761 | dot_agents/skills/personal-context/SKILL.md | 8,384 |
@@ -83,9 +85,10 @@ f0a1cbb    #################                        4,031.75 tokens
 | ---: | --- | ---: |
 | 1 | Log-informed conditional policy routing | +3,541.25 |
 | 2 | Evidence-ranked cull, overlap merges and calibration maintenance | +1,996.75 |
-| 3 | Repeated technique prose compressed in place | +0.00 |
-| 4 | Evidence-priced additions and mandatory PASS ledger | -10.25 |
-| 5 | Privacy-screened complementary imports and pinned same-slot replacement | -154.75 |
+| 3 | Trigger words retained; procedure stays in bodies | +252.75 |
+| 4 | Repeated technique prose compressed in place | +0.00 |
+| 5 | Evidence-priced additions and mandatory PASS ledger | -10.25 |
+| 6 | Privacy-screened complementary imports and pinned same-slot replacement | -154.75 |
 
 ## Verification provenance
 
@@ -102,6 +105,7 @@ aggregate evidence here, never raw session logs or private data.
 | 6e9934c | deterministic lexical proxy; not model triggering; All27 local names; includes unchanged17keeper/none cases. Original proposal baseline41/46; keepers15/17. | python3 -m pytest -q tests/test_skill_cull_contract.py tests/test_commit_plan_push_skill.py tests/test_metaprompt_integration.py tests/test_cli_emoji_skills.py tests/test_trim_benchmark.py tests/test_trigger_eval.py tests/test_trim_failure_mining.py tests/test_design_skills_sync.py tests/test_superpowers_release_timer.py tests/test_vetted_skills.py tests/test_grok_cli_handoff.py tests/test_file_size_guard.py tests/test_ai_workflow_contract.py tests/test_pre_commit_privacy_gate.py tests/test_checkpoint_privacy_gate.py tests/test_skill_admissions.py |
 | f0a1cbb | deterministic lexical proxy; not model triggering; All27 local names; includes unchanged17keeper/none cases. Original proposal baseline41/46; keepers15/17. | python3 -m pytest -q tests/test_skill_cull_contract.py tests/test_commit_plan_push_skill.py tests/test_metaprompt_integration.py tests/test_cli_emoji_skills.py tests/test_trim_benchmark.py tests/test_trigger_eval.py tests/test_trim_failure_mining.py tests/test_design_skills_sync.py tests/test_superpowers_release_timer.py tests/test_vetted_skills.py tests/test_grok_cli_handoff.py tests/test_file_size_guard.py tests/test_ai_workflow_contract.py tests/test_pre_commit_privacy_gate.py tests/test_checkpoint_privacy_gate.py tests/test_skill_admissions.py tests/test_trim_casd.py |
 | 60f75a4 | deterministic lexical proxy; not model triggering; All27 local names; includes unchanged17keeper/none cases. Original proposal baseline41/46; keepers15/17. | python3 -m pytest -q tests/test_skill_cull_contract.py tests/test_commit_plan_push_skill.py tests/test_metaprompt_integration.py tests/test_cli_emoji_skills.py tests/test_trim_benchmark.py tests/test_trigger_eval.py tests/test_trim_failure_mining.py tests/test_design_skills_sync.py tests/test_superpowers_release_timer.py tests/test_vetted_skills.py tests/test_grok_cli_handoff.py tests/test_file_size_guard.py tests/test_ai_workflow_contract.py tests/test_pre_commit_privacy_gate.py tests/test_checkpoint_privacy_gate.py tests/test_skill_admissions.py tests/test_trim_casd.py |
+| 5efb06a | deterministic lexical proxy; not model triggering; All27locals; frozenintake46 before41 after42, allpreviouspositives retained; keeper15/17 to16/17. | python3 -m pytest -q tests/test_skill_cull_contract.py tests/test_commit_plan_push_skill.py tests/test_metaprompt_integration.py tests/test_cli_emoji_skills.py tests/test_trim_benchmark.py tests/test_trigger_eval.py tests/test_trim_failure_mining.py tests/test_design_skills_sync.py tests/test_superpowers_release_timer.py tests/test_vetted_skills.py tests/test_grok_cli_handoff.py tests/test_file_size_guard.py tests/test_ai_workflow_contract.py tests/test_pre_commit_privacy_gate.py tests/test_checkpoint_privacy_gate.py tests/test_skill_admissions.py tests/test_trim_casd.py |
 
 ## Uncommitted working draft
 
@@ -119,14 +123,14 @@ prove that pass commits, privacy gates or required checks have completed.
 | dot_codex/AGENTS.md approx_tokens | 2,245.5 | -3,442.00 |
 | Developer-instruction tokens | 179.25 | +0.00 |
 | Skill-description tokens | 1,181.75 | -2,183.75 |
-| SKILL.md body bytes | 180,989 | -222,469.00 |
+| SKILL.md body bytes | 181,892 | -221,566.00 |
 | Canonical skill count | 27 | -32.00 |
 | Always-loaded tokens/session | 3,779 | -5,625.75 |
 | Trigger exact-set accuracy | 42/46 (91.30%) | corpus-dependent |
-| Automated tests passed | 200 | unavailable |
+| Automated tests passed | 230 | unavailable |
 
 Trigger scope: deterministic lexical proxy; not model triggering; All27locals; frozenintake46 before41 after42, allpreviouspositives retained; keeper15/17 to16/17..
-Automated command: python3 -m pytest -q tests/test_skill_cull_contract.py tests/test_commit_plan_push_skill.py tests/test_metaprompt_integration.py tests/test_cli_emoji_skills.py tests/test_trim_benchmark.py tests/test_trigger_eval.py tests/test_trim_failure_mining.py tests/test_design_skills_sync.py tests/test_superpowers_release_timer.py tests/test_vetted_skills.py tests/test_grok_cli_handoff.py tests/test_file_size_guard.py tests/test_ai_workflow_contract.py tests/test_pre_commit_privacy_gate.py tests/test_checkpoint_privacy_gate.py tests/test_skill_admissions.py tests/test_trim_casd.py.
+Automated command: python3 -m pytest -q tests/test_skill_cull_contract.py tests/test_commit_plan_push_skill.py tests/test_metaprompt_integration.py tests/test_cli_emoji_skills.py tests/test_trim_benchmark.py tests/test_trigger_eval.py tests/test_trim_failure_mining.py tests/test_design_skills_sync.py tests/test_superpowers_release_timer.py tests/test_vetted_skills.py tests/test_grok_cli_handoff.py tests/test_file_size_guard.py tests/test_ai_workflow_contract.py tests/test_pre_commit_privacy_gate.py tests/test_checkpoint_privacy_gate.py tests/test_skill_admissions.py tests/test_trim_casd.py tests/test_ai_workflow_doctor.py.
 
 ## Regeneration
 

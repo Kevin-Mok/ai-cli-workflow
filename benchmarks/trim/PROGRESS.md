@@ -1,6 +1,6 @@
 # Trim progress
 
-Current milestone: **passes1–5 committed; pass6 descriptions validated for commit**.
+Current milestone: **passes1–6 committed; pass7 tool output validated for commit**.
 Static loaded context37,619→16,127B (9,404.75→4,031.75 estimated tokens,
 −57.13%). Conditional reference loads remain additional; actual runtime context
 is not measured. Later description/body/output passes and saturation remain open.
@@ -15,6 +15,7 @@ is not measured. Later description/body/output passes and saturation remain open
 | 4 — CASD | Log-informed conditional policy routing | Loaded | 30,292 | 16,127 | 46.76% | 27 |
 | 5 — body concision | Repeated technique prose compressed in place | lean body | 15,125 | 10,897 | 27.95% | 27 |
 | 6 — descriptions | Trigger words retained; procedure stays in bodies | Loaded | 16,127 | 15,116 | 6.27% | 27 |
+| 7 — agent output | Summaries with full explicit diagnostics | CLI output | 16,243 | 124 | 99.24% | 27 |
 
 Baseline body bytes: 403,458 (100,864.5 approximate tokens). Loaded estimate:
 9,404.75 tokens; UTF-8 bytes/4, not actual model tokenizer usage. See BASELINE.json
@@ -436,3 +437,27 @@ Commit:refactor(skills): shorten owned routing descriptions.
 
 Fresh pass6 selected200tests/330subtests PASS; budgetsPASS,42/46routing
 vs previous41/46, inventory233/0drift. Staged size/privacy gates before commit.
+
+## Pass 7 — agent CLI output
+
+Same plain vetted check16,243B/235lines→124B/3lines saves16,119B/4,029.75
+estimated OUTPUTtokens per invocation (99.24%). Staticloaded15,116B and27skills
+unchanged; this saves0recurring instructiontokens. Required technique adds903
+bodyB:180,989→181,892B.
+
+Existing README/doctor helpers suppress decoration in pipes or CODEX_*/
+CLAUDECODE environments; real humanTTY remains decorated, including NO_COLOR.
+Explicit --plain/CLI_PLAIN work. Bash captures originalstdout before command
+substitution. Doctor and vetted --check return agent summaries; --details and
+JSON retain complete diagnostics/inventory. Every inventory error, protocol
+status and failure exitcode remains. Existing full-diagnostic test callers now
+request --details, preserving their assertions.
+
+What worked: test realPTY and agentenv, not only mockedisatty. Output savings
+are separate from catalog cost; no new helper framework is needed. Next: fix
+the4intake provenance field-format findings using actual pinned source evidence,
+then remove the already-audited redundant developerinstruction block.
+Commit:perf(cli): summarize agent workflow checks.
+
+Fresh pass7 selected230tests/381subtests PASS; budgetsPASS,42/46routing
+unchanged, inventory233/0drift, READMEpass_no_change. Staged gates beforecommit.
