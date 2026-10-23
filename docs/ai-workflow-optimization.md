@@ -36,6 +36,18 @@ complaint; safety plus observed copy/paste and completion controls remain.
 Active user/developer instructions still govern. No model/effort or live config
 was changed; no push, refresh-config or chezmoi apply is authorized.
 
+## Completed trim series
+
+Twelve pass commits end at79d1a8cb. Original37,619→14,399standing bytes
+(9,404.75→3,599.75estimated tokens,−61.72%); descriptions13,462→4,727B,
+SKILLbodies403,458→179,490B,59→27canonical skills under approved cull/intake.
+The [final comparison](../benchmarks/trim/COMPARISON.md) uses exact committed
+blobs; [saturation review](../benchmarks/trim/saturation.md) records rejected
+candidates, protected sources and earlier-audit dispositions. Triggered references
+remain extra; live config/runtime savings are unverified.239selectedtests/
+391subtests pass; inherited collection/fixture/audit debt is disclosed in PROGRESS.
+Model/effort and Claude permissions remain unchanged; no push/apply occurred.
+
 ## Audited Baseline
 
 Captured on 2026-07-13 before Task 1 edits:

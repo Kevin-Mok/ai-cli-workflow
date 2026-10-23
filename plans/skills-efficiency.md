@@ -38,46 +38,48 @@ Verify findings rather than treating the older audit as current policy.
   each commit. Do not silently weaken contract checks to match moved content.
 
 ## Ordered Implementation Checklist
-- [x] Incorporate the updated `.trim-prompt.md`: trigger-eval baseline and
-  log-mined failure evidence are required before the next trimming pass.
-- [ ] Prepare a separate trigger-eval measurement milestone: 40–60 realistic
-  prompts, expected sets/none, names+descriptions-only deterministic offline
-  scorer, frozen baseline and regression gate. Run before description trimming;
-  rerun every description pass, and revert any accuracy-lowering pass.
-  Capture a current-source JSON report before each description edit; use that
-  report as `--baseline PATH` for the after-edit `--check`, retaining the original
-  baseline separately. This rejects declines after improvements, not just below
-  the original 80% floor. Keep pass scores in PROGRESS.md and the same commit.
-- [ ] Prepare log-mined evidence from ~60 days of native JSONL sessions. Screen
-  private-context/helper sessions, stream read-only, publish only aggregate
-  counts and generic paraphrases in `benchmarks/trim/failure-modes.md`.
-- [ ] Use that evidence in a later distinct CASD-style rule pass: retain safety
-  rules regardless of observed frequency; retain preventive rules for recurring
-  observed failures; move unsupported conditional rules; add only frequent
-  uncovered failure controls. Update lean-instructions in each matching commit.
-- [x] Inspect status, prompts, canonical instructions and existing provenance.
-- [x] Record BASELINE.json before other repository edits; metaprompt pass saved.
-- [x] Add the requested `lean-instructions` skill and one-line AGENTS trigger;
-  document each used technique's rule, rationale, measured before/after example,
-  pitfalls and checklist in that skill in the same commit as every pass.
-- [x] Pass 0: add `scripts/trim-benchmark`, inventory/budget regression tests and
-  explicit exception allowlist; record pre-existing baseline failures and docs.
-- [ ] Pass 1: progressive disclosure of conditional AGENTS procedures into owned
-  skills/references; keep core <=150 lines/9KB, map old sections to new homes;
-  update contract assertions to real new homes. Preserve compact root shims.
-- [ ] Pass 2: scope alignment ceremony; retain assumption/safety rules, use
-  relevant searches, task-sized planning, titles and substantive-failure records.
-- [ ] Pass 3: strict cheap validation; commit skills block on failed checks;
-  remove stale Claude permission entries without widening permissions.
-- [ ] Pass 4: terse agent/non-TTY tooling; preserve interactive decoration,
-  plain overrides and protocol output. Add defining output tests first.
-- [ ] Pass 5: shorten owned skill descriptions while preserving trigger branches;
-  compare each old/new description, keep imported descriptions unchanged.
-- [ ] Pass 6: mechanical on-demand splits of owned long bodies, if eligible;
-  list imported long skills, preserve their bytes and brand duplicate entries.
-- [ ] Pass 7+: evaluate shared references/overlap and further owned opportunities;
-  retain only meaningful safe wins and document rejected hypotheses.
-- [ ] Complete independent audit; final summary/recommendations at PROGRESS top.
+
+This is the current checklist; chronological checkpoints below retain earlier
+states and are superseded by this disposition. Native Plan Mode/title tooling
+was unavailable; the saved ExecPlan/metaprompt preceded implementation.
+
+- [x] Capture initial status, immutable baseline, saved prompt/metaprompt and budgets.
+- [x] Freeze original trigger corpus/baseline before trimming; keep original and
+  expanded corpora immutable, preserve every prior correct case at each pass.
+- [x] Mine eligible recent logs read-only; publish safe counts/uncertainty only.
+- [x] Pass1 `bc0360c9`: approved cull, both merges, repo exposure controls,
+  keeper-routing investigation and calibration/history synchronization.
+- [x] Pass2 `60c6e70f`: privacy-reviewed bounded intake, four complementary
+  skills, pinned Impeccable swap, file guard and feedback consolidation.
+- [x] Pass3 `6e9934c7`: mandatory duplicate-first scored admissions, all local
+  PASS/rejected PR DENY entries, complete calibration precedents and drift check.
+- [x] Pass4 `f0a1cbb0`: conditional AGENTS refs;91exact blocks retained once,
+  mandatory routers,8,982B/145line core and real-home contract tests.
+- [x] Pass5 `60f75a4a`: technique-log concision retaining all five required fields.
+- [x] Pass6 `5efb06a1`: owned trigger descriptions; unchanged bodies/metadata,
+  frozen41/46→42/46, all previous positives retained.
+- [x] Pass7 `c24871f2`: terse agent/pipe output, real PTY tests, full diagnostics.
+- [x] Pass8 `4296498e`: exact source-provenance schema fixes; zero new doctor keys.
+- [x] Pass9 `9e1ce9ff`: duplicated developer block removed; all other TOML,
+  original model/effort lines and three standing controls preserved.
+- [x] Pass10 `d6a75f69`: explicit dialogue reference; shared privacy/auth controls stay.
+- [x] Pass11 `f9930fc8`: conditional planning/consolidation/learning detail only.
+- [x] Pass12 `79d1a8cb`: conditional artifact template; shared handoff controls stay.
+- [x] Update lean/PROGRESS/COMPARISON/plan in every pass commit; ratchet budgets.
+- [x] Review remaining owned descriptions/bodies and protected imports; record
+  no further safe meaningful pass in benchmarks/trim/saturation.md and .json.
+- [x] Regenerate COMPARISON from actual original..pass12 Git blobs; finalreport
+  endpoint explicitly pinned, report-only commit has identical measured surfaces.
+- [x] Complete final independent evidence review (9verified/0incorrect); finalize
+  report/plan closure in the report-only commit after exactstaged gates.
+
+Earlier `.trim-spec.md` proposals F3 reduced planning/title/postmortem/handoff
+ceremony and F4 strict global commit policy/Claude permission cleanup are
+**superseded/deferred**, not implemented: primary prompt treats that file as an
+earlier audit, while active AGENTS requires current safeguards/best-effort policy.
+See saturation.md's finding-by-finding disposition. F1 effort is recommendation
+only; F2/F5 implemented, F6 already shared via Claude's canonical import.
+The approved cull supersedes the proposed playwright-interactive split.
 
 ## Risks, Edge Cases, And Rollback
 Natural-language triggering needs semantic review beyond size tests. Additional
@@ -104,7 +106,11 @@ Manual review: compare description trigger branches, rule mapping and referenced
 skill names; inspect output in PTY and redirected modes using controlled fixtures.
 Review original requirements against HEAD and immutable baseline at completion.
 
-## Progress
+## Historical Progress Checkpoints
+
+These earlier prepared/blocked states are retained as chronology and superseded
+by the current checklist and final closure below.
+
 Pass 0 implementation ready, including the requested lean-instructions skill;
 commit blocked by read-only shared Git metadata.
 Intended commit: `test(trim): baseline instruction costs and budgets`.
@@ -518,3 +524,58 @@ budgets14399loaded/179490body, routing42/46,233sources/0drift, READMEPASS.
 - [x] Technique/admissioncost updates and honest entry/combined accounting.
 - [ ] Stage/review exactcandidate, privacy/size gates and owncommit12.
 - [ ] Final saturation/evidence review and actual-commit report-only closure.
+
+## Pass 12 delivered; final report closure
+
+Pass12 committed79d1a8cb after239tests/391subtests, independent11tests/8subtests,
+budgets,42/46routing,233sources/0drift, README and exactstagedsize/privacyPASS.
+All12optimizationpasses are distinct commits. Finalreport-only commit updates
+PROGRESStop, actualcommitCOMPARISON,12immutableprivacyreceipts and saturation.
+Measuredsurfaces remain14399loaded/4727descriptions/179490body/27skills.
+Earlier F3/F4 proposals explicitly deferred, protectedsources/preferences remain.
+
+Final automated verification: run the exact239test command recorded in
+benchmarks/trim/pass-evidence.json; then scripts/trim-benchmark --plain --check,
+scripts/trigger-eval --plain --baseline benchmarks/trim/description-routing.json
+--check, scripts/sync-vetted-skills --check --plain, README gate and exactstaged
+size/privacy checks. Report-only generator wording receives focused regression.
+Manual/source checks: inspect mapped91blocks and mandatory links, description
+cue preservation, all12commit companions and immutable privacy-tree mappings.
+RealPTY human/agent/pipe/plain/NO_COLOR verified in pass7; live provider/apply,
+actual model routing and GUI wrapped-copy not checked. Rollback by new revert
+commit per pass; no history rewrite. User's three private inputs stay untracked.
+
+Paste-ready Cursor continuation prompt (only for a future authorized review):
+“Read plans/skills-efficiency.md, benchmarks/trim/PROGRESS.md, checks.md and
+saturation.md. Verify the pinned12pass series and current CLI artifacts. Preserve
+model/effort, private inputs and imported sources; do not push or apply config.
+Use lean-instructions before any new skill/rule and compare against42/46 routing.
+Do not add another trim pass without measured safe meaningful savings.”
+
+Suggested report commit: docs(trim): close the measured optimization series.
+Provider usage, user review time and actual session-token savings unknown; the
+static estimates are not billing measurements. Canonical postmortem-learning
+ledger writes outside allowed roots remain explicitly outstanding, not bypassed.
+
+### Intake sources.json disposition
+
+The requested manual merge was reviewed, not replaced wholesale. PR33's pinned
+source-ledger delta adds exactly one private authoring-incident record, with an
+absolute local alias, no finding links and an explicit no-new-learning decision.
+Its underlying private report is outside the approved skill paths and was not
+imported. Privacy/scope disposition: exclude that record; do not create a dangling
+public ledger entry. PR37 changes neither sources.json nor README. The public
+ledger remains its newer489report/236finding snapshot; no reusable skill-runtime
+learning delta is missing. README's relevant intake lines were merged by hand.
+This is separate from outstanding canonical learning registration for incidents
+created during this task. No private report text or local alias is published.
+
+Fresh final workflow doctor:35errors/1warning, no added or removed finding keys
+vs pass8; zero added/three removed vs pass0. JSON audit status remains fail for
+inherited findings; CLI exit0. Report-only checks15tests/9subtests PASS and
+working measurements match pinned pass12 exactly.
+
+Finalreview:9verified/0incorrect/1deliverypending; all primaryrequirements and
+saturation decision accepted. Rootfinalizes exactstagedsize/privacy and report
+commit; no additional optimizationpass. This report commit closes the recorded
+deliveryboundary, while explicitly disclosed host/legacy/learning limits remain.

@@ -1,9 +1,54 @@
 # Trim progress
 
-Current milestone: **passes1–11 committed; pass12 handoff format validated for commit**.
-Static loaded context37,619→14,399B (9,404.75→3,599.75 estimated tokens,
-−61.72%). Conditional reference loads remain additional; actual runtime context
-is not measured. Remaining conditional-body candidates and final saturation closure remain open.
+Final implementation: **12 passes committed**, ending at `79d1a8cb`.
+The final report commit records this endpoint without changing measured surfaces.
+
+| Metric | Original | Final | Change |
+| --- | ---: | ---: | ---: |
+| Always-loaded estimated tokens/session | 9,404.75 | 3,599.75 | −61.72% / −5,805 tokens |
+| Always-loaded bytes | 37,619 | 14,399 | −23,220 bytes |
+| Description bytes | 13,462 | 4,727 | −64.89% |
+| SKILL.md body bytes | 403,458 | 179,490 | −55.51% |
+| Canonical skills | 59 | 27 | Approved cull/merges, then complementary intake |
+| Canonical AGENTS lines / bytes | 353 / 22,750 | 145 / 8,982 | Conditional procedures retained in references |
+
+These are static repository estimates (UTF-8 bytes/4), not measured model
+usage or billing. Triggered references cost additional context. Configuration
+is unapplied; actual host-session savings are unverified. The headline excludes
+external installs, names/paths/wrappers and the duplicate `.agents` brand entry.
+
+Fresh pass12 checks: **239 tests/391 subtests PASS**, budgets PASS, lexical
+routing **42/46 (91.30%)**,233 inventoried sources / 0 drift and README PASS.
+Frozen intake routing improved41→42; keeper routing13→16of17. All previously
+correct cases survive. Original40/50 uses a different corpus, so is not compared
+as an accuracy delta. Both cull misses were investigated before commit: the
+secondary-label miss later passed; the explicit-only morning/translation
+ambiguity remains a proxy limitation. Exact-tree privacy receipts cover all12
+passes; every pass also had root-observed staged privacy/size gates.
+
+Recommendations: retain the admission/calibration/budget gates; review the
+[saturation audit](saturation.md) before further edits. No remaining safe
+candidate meets the existing meaningful threshold. Full-cue description search
+found only22B/5.5tokens; further body moves would hide shared safeguards or
+relocate required content without saving a real invocation. Keep protected
+imports and both brand copies. Try medium default/high planning only in a
+separate representative-task experiment; model/effort preferences here are
+unchanged. Authorize live external cleanup separately:191 detectable installed-only
+entries can still be exposed on this host.
+
+Known limits: full test collection has six inherited SyntaxErrors; broader
+postmortem checks retain one inherited fixture failure; doctor has 35 inherited errors /
+1 warning, with zero new keys in the fresh final run. Native Plan Mode/title tooling unavailable; written ExecPlan
+used. Canonical postmortem-learning registrations outside writable roots remain
+outstanding. History audit1,604candidates are unadjudicated, not confirmed leaks.
+No push, refresh-config, chezmoi apply, live hooks/providers or private-store access.
+Provider usage and user review time were not measured.
+
+[COMPARISON](COMPARISON.md) is regenerated from all12actual pass commits;
+[checks](checks.md), [privacy receipts](commit-gates.json) and
+[the ExecPlan](../../plans/skills-efficiency.md) retain evidence and rollback.
+Older prepared/blocked/unresolved notes below are historical checkpoints,
+superseded by this summary and the final review; they are not current blockers.
 
 | Pass | Technique | Surface | Old bytes | New bytes | Reduction | Skills |
 | --- | --- | --- | ---: | ---: | ---: | ---: |
@@ -569,3 +614,26 @@ Fresh selected239tests/391subtests, routing42/46, budgets, inventory233sources/
 What worked: moving an artifact format preserves shared setup controls.
 Next: close the measured saturation audit and regenerate actual-commit comparison;
 no further optimization candidate meets the existing threshold safely.
+
+### Intake sources.json disposition
+
+The requested manual merge was reviewed, not replaced wholesale. PR33's pinned
+source-ledger delta adds exactly one private authoring-incident record, with an
+absolute local alias, no finding links and an explicit no-new-learning decision.
+Its underlying private report is outside the approved skill paths and was not
+imported. Privacy/scope disposition: exclude that record; do not create a dangling
+public ledger entry. PR37 changes neither sources.json nor README. The public
+ledger remains its newer489report/236finding snapshot; no reusable skill-runtime
+learning delta is missing. README's relevant intake lines were merged by hand.
+This is separate from outstanding canonical learning registration for incidents
+created during this task. No private report text or local alias is published.
+
+## Final report delivery
+
+All12passes committed through79d1a8cb. Independentfinalreview9verified/0incorrect,
+onlyfinalreportdelivery pending; no material primary-goal gap. Finalgenerator
+15tests/9subtestsPASS; actual12commitCOMPARISON and12privacyreceipts regenerated.
+Freshdoctor35inheritederrors/1warning, zero newkeys vs pass0/pass8. Report-only
+subject:`docs(trim): close the measured optimization series`; exactstagedgates
+precede commit, with unchanged measuredsurfaces. No further meaningful safepass
+found. Remaining host/legacy/canonicallearning limits are disclosed above.

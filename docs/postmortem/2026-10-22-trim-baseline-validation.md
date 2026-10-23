@@ -182,3 +182,9 @@ verbatim preservation is intentional; tests/privacy/size passed, and no staged
 whitespace-PASSclaim applies to that reference. Laterrefs use a closingpointer
 after the copiedpayload. A reviewer optionalbrace-glob produced nonexistent
 cross-product paths; no source defect, covered by the discoverylesson.
+
+Final-report source discovery: a broad /tmp rg inventory returned protected
+system-directory diagnostics (pipeline exit0); no source mutation or validation
+was affected. Use known preflight artifact paths, not recursive system-temp
+inventory. Existing source-discovery learning applies; canonical registration
+outside writable roots remains outstanding.

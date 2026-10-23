@@ -123,3 +123,34 @@ reconstruction and11tests/8subtestsPASS; sharedcontrols/frontmatter unchanged,
 artifactrouter mandatory. Entry−219.25tokens, artifactcombined+103.75tokens
 verified. Selected239tests/391subtests, budgets,42/46routing,233sources/0drift
 and READMEPASS. Immutabletree privacy receipts nowcover11completedpasses.
+
+## Final closure review
+
+This review supersedes historical open/read-only/deliverypending checkpoints
+above; they remain as chronology. Independent evidence-reviewer: **9 verified,
+0 incorrect,1 deliverypending**. No material primary-goal implementation gap.
+
+| Claim | Evidence | Verdict |
+| --- | --- | --- |
+| Reproducible baseline/final estimates | Originalref vs BASELINE;14,399B/3,599.75estimatedtokens,−61.72% | Verified |
+| Approved cull/merges/bounded intake |12commits;27locals; last30days and bothbrandcopies preserved | Verified |
+| Routing/corpus preservation |42/46 acceptedfloor, every priorcorrectcase retained; immutablecorpora | Verified |
+| Policy/skill disclosure | Exact91block/paragraph reconstruction and mandatorylinks; sharedguards main | Verified |
+| Admissions/calibration |27localPASS,7DENY,93precedents,61retirementrecords;0drift | Verified |
+| One pass/one commit and companions | All12include lean,PROGRESS,COMPARISON,plan; actualendpoint79d1a8cb | Verified |
+| Privacy/source ledger |12treeIDs match; independent exacttree reruns; PR33 private unlinked record omitted,PR37 no delta | Verified |
+| Stopping criterion | saturation.md/.json negativecandidates, unchangedthreshold, protectedsources and honestconditionalcosts | Verified |
+| Finaldocs/constraints | PROGRESStop/currentplan/earlierauditdispositions; protectedpreferences/copies unchanged | Verified |
+| Finalreportcommit | Exactstagedgates/commit performed by root afterreview | Delivery boundary |
+
+Fresh pass12 suite239tests/391subtestsPASS; finalgenerator15tests/9subtestsPASS.
+FinalbenchmarkbudgetsPASS;42/46routing;233sources/0drift; READMEpass_no_change.
+Working measuredsurfaces exactlymatch pinned79d1a8cb. Freshdoctor35errors/1warning,
+0newkeys versuspass0/pass8 (3removedversuspass0); JSONCLIexit0, auditstatusfail
+forinheriteddebt. Fullcollection/PMfixture limitations and blockedcanonicallearning
+registration remain disclosed, not treated as verifiedhealth. No liveapply/push.
+
+Finalreport subject: `docs(trim): close the measured optimization series`.
+The report-only commit changes no measured instruction/skill surface. Its own
+SHA cannot appear inside itself; COMPARISON pins the lastimplementation endpoint
+and prints the exact --head regeneration command.
