@@ -16,7 +16,7 @@ marker and is excluded. No history rewrite or desktop manipulation is needed.
 - [x] Capture status, branch/upstream and applicable instructions before writes.
 - [x] Inspect dirty docs, prompts, plans, policy, feedback and memory changes.
 - [x] Independently review memory contracts; run README and focused smoke gates.
-- [ ] Commit restored working-directory paths in docs, prompts and their plans.
+- [x] Commit restored working-directory paths in docs, prompts and their plans.
 - [ ] Commit reviewed incident evidence, references and ledger together.
 - [ ] Commit repository-creation remote policy and matching durable preference.
 - [ ] Run required refresh, review residuals and push the complete series once.
@@ -49,7 +49,7 @@ email; replace it with the repository name without changing scanner policy.
 
 ## Milestones
 
-Review complete; no commits or push yet. Four targeted local report checks passed
+Documentation commit `349b65d` is verified; no push yet. Four targeted local report checks passed
 before interruption (exit 0). Required refresh was attempted
 with normal scoped approval and stopped (exit 1) on a pre-existing
 `.config/mimeapps.list` conflict/EOF. No forced overwrite or shortcut regeneration.
@@ -63,3 +63,15 @@ prompts and existing plans plus this delivery plan. These are path-only
 corrections; runtime behavior is unchanged. README gate and focused memory smoke
 passed before interruption. Staging requires scoped approval because `.git` is
 read-only in the sandbox. Commit only after a fresh staged privacy gate passes.
+
+
+### Milestone 1 result and milestone 2 candidate
+
+Milestone 1 completed as `349b65d`: ten intended paths, explicit and hook privacy
+checks passed, no residual staged paths. No runtime changes. Next: memory group.
+
+Prepare `docs(memory): reconcile reviewed incident evidence` with three restored
+local incident reports, browser/grid/tracker findings, reviewed aliases and the
+delivery-environment incident. All 102 same-hash record changes are alias-only;
+the three replaced hashes match their modified report bytes. No finding was
+removed. Run the exact candidate gate; external source corpus remains unverified.

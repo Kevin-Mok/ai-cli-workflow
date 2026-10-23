@@ -531,3 +531,14 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Verification: Legacy parser reproduced line-30 error; modern parser reported zero bad lines. Both defining launcher assertions failed before fixes and passed afterward. Actual isolated GUI under system PATH displayed history, scrollbar and INPUT hello; helper exited 0 and installed bytes matched source.
 - Limitations: User-local Kitty fallback elsewhere still requires a compatible PATH binary. Isolated GUI checks do not establish physical desktop acceptance or resolve four pre-existing 3.8 edge-selection failures.
 - Source: [school-2 scrollbar preparation](../../../../docs/postmortem/2026-10-22-school-2-scrollbar-preparation.md) (SHA-256 `da97cda60650610bed5f0eff10cf92242e2d05ff708d246ad217f2bc1c0f5a23`).
+
+## local-work-scope-reconciliation
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **runtime**.
+- Symptoms: Matched allowance hours differ slightly from model totals; reasoning rows can differ by a displayed second from their model.
+- Applicability: Reports combining observation-matched consumption and full recorded model work.
+- Diagnostic checks: Compare exact integer microseconds in one frozen report. Combine reset cohorts only within one plan/bucket stream; parallel streams can overlap. Inspect per-row whole-second truncation. Sanitize absolute machine-home paths in public evidence documents before staging.
+- Remedy: Quantify matched versus all work and outside-window time for one stream; warn against adding parallel streams. Explain fractional seconds without replacing the consumption denominator or changing exact exports. Repeat the full total in bold cyan beside model rows and bold the combined matched summary.
+- Verification evidence: Five intentional RED assertions; 183 focused tests, mypy and Ruff passed. Actual source and installed normal, 32-column ASCII and details reports exited 0, with installed/source renderer byte equality. Frozen unmatched work: 6.937s. Full run incomplete after 207 passes and an executor warning; bounded FX diagnostic reproduced teardown stall; fresh final overview 26 passed. Follow-up emphasis passed 55 tests, mypy/Ruff and installed ANSI/plain/details checks.
+- Limitations: Live durations grow, displayed sums can differ through truncation, full suite incomplete from async teardown stall; account-wide rates do not establish individual-model quota cost.
+- Source: [2026-10-22-consumption-hours-reconciliation.md](/home/kevin/coding/track-codex-sessions/docs/postmortem/2026-10-22-consumption-hours-reconciliation.md) (SHA-256 `c0279cb6c07d`; registered in sources.json).

@@ -21,7 +21,7 @@ The initial `functions.exec` handoff preparation failed with `ReferenceError: Te
 
 - Cause: assumed the browser/Node `TextEncoder` global existed in the restricted V8 isolate. The exception occurred before any native task creation.
 - Python `len(handoff.encode('utf-8'))` verified the exact handoff as 301 bytes, below the 1,000-byte limit (exit 0).
-- One native creation returned executor `<redacted-executor-id>`.
+- One native creation returned executor `01a15f98-0593-7d02-8c22-bf14d544134b`.
 - The terminal opener, using normal scoped sandbox escalation, verified that executor in focused Kitty window 2 (exit 0). No duplicate executor was created.
 - Native `read_thread` showed an active, in-progress implementation turn without an error. Launch/navigation are verified; completed Discord speech behavior is not established by this compiler check.
 - Status: resolved compiler handoff. Implementation and runtime acceptance belong to the executor.

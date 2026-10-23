@@ -303,3 +303,81 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Verification: Initial list-keys showed only select-pane and current pane entered copy mode at position5. Scoped source-file restored full root and emacs/vi binding bodies; transient mode canceled. Subsequent PTY and isolated Kitty event checks passed.
 - Limitations: Verified for installed tmux3.4 and these mouse bindings; do not infer all quoting or shell transport is fixed. Reload only authorized options.
 - Source: [tmux scrolling diagnosis](../../../../docs/postmortem/2026-10-13-tmux-scrolling.md) (SHA-256 `8a1c8ba042b176a7612ebe0b94a68c6e1c912130bd3a9b11d10b1ae660574484`).
+
+## local-virtualenv-interpreter-path-identity
+
+- Status: verified_workaround
+- Confidence: confirmed
+- Verification scope: runtime
+- Symptoms: Resolving an installed Python virtualenv shebang symlink loses package metadata.
+- Applicability: Read-only installed-package identity checks and isolated Python CLI benchmarks launched from a virtualenv shebang.
+- Diagnostics: Read the installed entrypoint shebang literally.; Verify interpreter imports and distribution metadata before treating a resolved executable as equivalent.
+- Remedy: Invoke the literal virtualenv interpreter path; verify Python, package metadata and source identity in that environment.
+- Verification: The resolved system interpreter lacked package metadata. Literal installed-tool Python 3.12.3 imported the package and resolved Store/layout; all 39 Python modules plus package JSON matched the starting checkout.
+- Limitations: Environment identity does not establish benchmark speed, arbitrary schema compatibility or activation of later source changes. Unknown benchmark SIGTERM sender remains unresolved.
+- Source: [Tracker latency investigation](/home/kevin/coding/track-codex-sessions/docs/postmortem/2026-10-22-latency-discovery-paths.md) (SHA-256 `a72a4025f13a53cb333e80582d0372c3334f059d42d5af72836ddbb86697f0d9`).
+
+## local-cli-benchmark-startup-cache-parity
+
+- Status: verified_fix
+- Confidence: confirmed
+- Verification scope: runtime
+- Symptoms: Source hashes match intended changes but only the baseline has valid project bytecode caches during complete CLI timing.
+- Applicability: Python subprocess latency comparisons that copy source trees or run preparatory imports/selfchecks.
+- Diagnostics: Inventory generated project caches on both sides, separately from deployable source identity.; Verify interpreter magic, cache flags and source timestamp/size; inspect bytecode read traces.; Remember that PYTHONDONTWRITEBYTECODE disables writes while existing valid caches can still be read.
+- Remedy: Prepare isolated comparator copies with the same startup-cache policy; validate both before every report/index subprocess outside the wall timer. Keep preparatory imports from warming only one side. Preserve rejected observations and restart fair timing rather than subtracting a correction factor.
+- Verification: Six valid baseline caches versus zero candidate caches reproduced the failed parity gate. Clean 40-file copies passed zero-versus-zero; runtime preflights enforce disabled writes, optimize0 and no cache prefix. Five-pair controls traced all six reads only on cached side; medians changed direction between two controls. Independent xhigh review approved source/protocol/cache identities and fair initialization.
+- Limitations: This fixes private benchmark startup equivalence, not report performance, ambient variance or live activation. Old timings cannot drive retention/stopping. Prior full JSON parity remains semantic evidence only for identical source/content/options at its original absolute paths after bytecode equivalence is proved. Later same-source stale-index control differed by 4.933s in median; case-specific null controls do not supply a correction factor or a verified ambient-noise remedy.
+- Source: [Tracker latency investigation](/home/kevin/coding/track-codex-sessions/docs/postmortem/2026-10-22-latency-discovery-paths.md) (SHA-256 `a72a4025f13a53cb333e80582d0372c3334f059d42d5af72836ddbb86697f0d9`).
+
+## local-command-completion-launch-namespace
+
+- Status: verified_workaround
+- Confidence: confirmed
+- Verification scope: runtime
+- Symptoms: An outer exec cell completes after nested exec_command yields, while a partial test log and sandbox ps are mistaken for a stopped host check.; Offline profile summary processing can fail after the profiled CLI and primary result have completed.
+- Applicability: Long-running tool orchestration with nested exec sessions and different sandbox versus approved-host PID namespaces.
+- Diagnostics: Retain exec_command session_id and resume it with write_stdin; use functions.wait only for an outer yielded exec cell.; Compare log growth and process visibility in the same approved namespace as command launch before declaring termination or retrying.; Distinguish the CLI return status from offline consumer/wrapper completion; inspect saved primary artifacts before any rerun.
+- Remedy: Keep nested session handles until completion. If a handle was already discarded, await the original wrapper explicit per-command exit statuses and final source-hash manifest; do not start duplicate checks from a partial response or an unrelated PID namespace. If complete raw profile/results survive a secondary summary error, use a separately recorded offline consumer with pinned artifacts rather than repeating the profile. Derive offline postguard inputs from saved manifests and frozen files, not globals initialized in a previous adapter process.
+- Verification: The partial pytest log advanced from51to74to82percent; approved host ps showed the original pytest alive while default ps saw only sandboxPID1. Without rerun, the original wrapper recorded610tests, Ruff, offlinebuild and279smoketests all exit0 with unchanged start/end task hashes. A later single cold-status profile returned0 before pstats(Path) failed; separate pstats(str(path)) processing recovered its summary/postguards with all seven primary hashes unchanged and no new CLI/profile execution.
+- Limitations: This recovers completion evidence for an already instrumented wrapper, not a discarded tool handle or a truly terminated process. It does not diagnose unknown SIGTERM events, grant broader execution scope or prove that arbitrary partial logs represent success.
+- Source: [Tracker latency investigation](/home/kevin/coding/track-codex-sessions/docs/postmortem/2026-10-22-latency-discovery-paths.md) (SHA-256 `a72a4025f13a53cb333e80582d0372c3334f059d42d5af72836ddbb86697f0d9`).
+
+## local-cli-benchmark-disposable-index-space
+
+- Status: verified_workaround
+- Confidence: confirmed
+- Verification scope: runtime
+- Symptoms: Repeated private per-case SQLite index copies exhaust /tmp before the next parity report starts, and even default sandbox setup fails with ENOSPC.
+- Applicability: Private CLI benchmark runs retaining many disposable per-case index states alongside immutable sources, frozen inputs and raw evidence.
+- Diagnostics: Check bytes and inodes in the execution namespace; distinguish setup failure from report mismatch.; Inventory exact completed-case cache files, check task ownership, symlinks and lock state, and record protected evidence hashes before cleanup.; Keep read-only protected evidence roots separate from disposable unlink roots; preserve an inherited external helper only by its exact approved path and SHA, never by broadening deletion scope.
+- Remedy: Under the existing exclusive measurement lock, reclaim only specifically inventoried completed per-case disposable indexes. Preserve source, frozen/native inputs, masters, raw stdout/stderr, manifests, results and active checkpoints; verify hashes and free space before resuming unchanged code/protocol. Budget subsequent copies and clean completed disposable states outside timed intervals.
+- Verification: Case14 parity setup failed before CLI launch with13exactcases preserved. Approved cleanup removed150regular index.sqlite/wal/shm files from completed round1-fair states,20,747,673,600logical bytes; freebytes0to20,697,808,896. Parent independently rehashed714protected files; checkpoint13unchanged, ordinary sandbox restored and all26parity completed. Separately approved156parity-template unlinks reclaimed21,577,367,552bytes; parent verified156pathsabsent/197hashesunchanged. All26human cases then completed260timed subprocesses exit0 with headroom checks. A third approved150-file timing-state cleanup reclaimed20,747,468,800bytes before controls; parent verified exact paths and all43,799protected hashes before/after, free30,184,804,352bytes. First fresh-state projects control completed successfully. Later R6 audit overconstrained protected reads to the runtime root and rejected its own exact pinned external helper. A one-predicate path+SHA exception passed defining V1-RED/V2-GREEN and11fixtures, independent xhigh review, then same-primary real audit69936 with7823protected hashes preserved pre/post and only6templates removed; no report rerun. Later allocation-only +4096 drift on a copied template retained dev/inode/size/mtime and exact master DB bytes. V3 permits only index.sqlite with fresh authoritative-master SHA on that mismatch, keeps WAL/SHM strict and exact prior verifier pins, and passed defining RED/GREEN15fixtures/xhigh plus actual case2audit3881 with7846protected hashes and exact6cleanup; allocation delta recorded, kernel cause unproved.
+- Limitations: Verified scoped environment recovery and bounded parity/human-matrix lifecycle, not a product speedup, global cleanup authorization or guarantee against recurrence. Later fresh-control preflights use a conservative4GB floor; low-space rejection was not deliberately exercised. Completed runtime caches were intentionally removed while reproducible source/input/protocol/raw evidence and masters remain.
+- Source: [Tracker latency investigation](/home/kevin/coding/track-codex-sessions/docs/postmortem/2026-10-22-latency-discovery-paths.md) (SHA-256 `a72a4025f13a53cb333e80582d0372c3334f059d42d5af72836ddbb86697f0d9`).
+
+## local-tracker-validation-runtime
+
+- Status: verified_workaround
+- Confidence: confirmed
+- Verification scope: runtime
+- Symptoms: Tracker integration tests fail creating canonical Path.home .local/state/codex-time/locks in a read-only sandbox, or binding isolated Unix sockets.; An empty task-selected UV_CACHE_DIR makes offline setup/build unable to find cached hatchling; restricted default-cache access can fail opening sdists-v9/.git before collection; secondary async teardown may appear stuck.
+- Applicability: This repository focused/full pytest, setup/build and smoke checks whose isolated fixtures still use canonical home locks, Unix sockets and the documented existing uv cache.
+- Diagnostics: Read actual failure traces and retained source hashes before attributing failures to the candidate.; Distinguish Path.home canonical locks from XDG overrides; match process observations to launch namespace.; Check cache identity and preserve the original log; use per-test faulthandler diagnostics for a recurrent stall.
+- Remedy: Run the existing isolated-fixture checks with explicitly requested approved normal permissions and the documented default uv cache; do not silently fall back to restricted execution; unset only the task-added empty cache override. Keep offline build and existing dependencies. Do not change product locking, weaken assertions, download dependencies or restart live services to satisfy sandbox failures.
+- Verification: Restricted checks showed Errno30 canonical locks, Unix socket EPERM and uncached hatchling; after bounded diagnostic interrupts, the same unchanged candidate passed three exact failing writer/socket/FX representatives, full621tests, repositoryRuff, offline sdist/wheel and279smoketests plus exact1320000tokens/USD2.91/CAD3.9285. Parent checked all six source/test hashes before/after/current and explicit exit0 logs. Later retained-R4 focused restoration hit restricted cache Errno30 before collection; explicit normal permissions passed51tests with exact full source/test paths and matching start/end hashes.
+- Limitations: Verified test/build environment workaround for isolated fixtures, not an optimization gain, general sandbox escape authorization, live deployment, or a diagnosis of every FX timeout. The restricted-run blank TimeoutError origin remains unproved; only its corrected-environment pass is established.
+- Source: [Tracker latency investigation](/home/kevin/coding/track-codex-sessions/docs/postmortem/2026-10-22-latency-discovery-paths.md) (SHA-256 `a72a4025f13a53cb333e80582d0372c3334f059d42d5af72836ddbb86697f0d9`).
+
+## local-collaboration-idle-agent-dispatch
+
+- Status: verified_workaround
+- Confidence: confirmed
+- Verification scope: runtime
+- Symptoms: A revision request delivered with collaboration.send_message to a completed worker produces no new turn or artifact.
+- Applicability: The collaboration namespace when requesting additional work from an idle or completed child agent.
+- Diagnostics: Read the actual tool lifecycle descriptions; inspect live agent state rather than infer execution from successful delivery.; Coordinate a single wake when another agent may already have issued a followup.
+- Remedy: Use collaboration.followup_task to start authorized idle work; use send_message for information delivery. Retain actual completion evidence and do not treat running state as success.
+- Verification: The consumer producer remained completed after parent send_message requests. An auditor followup_task started the bounded revision; parent observed running without duplicate wake. Producer published V2 consumer dbc0946a and readiness343889da with actual inline0e895e terminal0 and26 synthetic checks; parent reviewed the exact diff.
+- Limitations: Verified dispatch recovery in the collaboration namespace only, not a product or benchmark gain, completion inferred from delivery, or a lifecycle contract for differently named native messaging tools.
+- Source: [Tracker latency investigation](/home/kevin/coding/track-codex-sessions/docs/postmortem/2026-10-22-latency-discovery-paths.md) (SHA-256 `a72a4025f13a53cb333e80582d0372c3334f059d42d5af72836ddbb86697f0d9`).
