@@ -535,6 +535,11 @@ listing is cached-only; opening a picker can generate recaps unless disabled.
 
 ## Vetted skill calibration drift
 
+- Action: Review `docs/skill-admissions.md` before proposing a skill or AGENTS rule.
+- Expected: Duplicate jobs are denied or merged; a PASS records current token costs,
+  evidence, closest precedents, frozen cases, size and privacy review. DENY records
+  the specific reason and what would change it. last30days retains its explicit KEEP exception.
+
 - Action: Run `./scripts/sync-vetted-skills --check --plain` from this checkout.
   Expected: Lists configured and detectable installed/built-in sources with
   logical identities and verdicts. Final line reports zero missing/stale entries;

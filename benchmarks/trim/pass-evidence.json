@@ -1,11 +1,11 @@
 {
-  "pass": "Pass 2 approved intake",
-  "technique": "Privacy-screened complementary imports and pinned same-slot replacement",
-  "commit_subject": "feat(skills): intake approved complementary workflows",
+  "pass": "Pass 3 admission gate",
+  "technique": "Evidence-priced additions and mandatory PASS ledger",
+  "commit_subject": "feat(skills): enforce scored admission decisions",
   "tests": {
-    "passed": 192,
-    "subtests_passed": 231,
-    "command": "python3 -m pytest -q tests/test_skill_cull_contract.py tests/test_commit_plan_push_skill.py tests/test_metaprompt_integration.py tests/test_cli_emoji_skills.py tests/test_trim_benchmark.py tests/test_trigger_eval.py tests/test_trim_failure_mining.py tests/test_design_skills_sync.py tests/test_superpowers_release_timer.py tests/test_vetted_skills.py tests/test_grok_cli_handoff.py tests/test_file_size_guard.py tests/test_ai_workflow_contract.py tests/test_pre_commit_privacy_gate.py tests/test_checkpoint_privacy_gate.py"
+    "passed": 198,
+    "subtests_passed": 239,
+    "command": "python3 -m pytest -q tests/test_skill_cull_contract.py tests/test_commit_plan_push_skill.py tests/test_metaprompt_integration.py tests/test_cli_emoji_skills.py tests/test_trim_benchmark.py tests/test_trigger_eval.py tests/test_trim_failure_mining.py tests/test_design_skills_sync.py tests/test_superpowers_release_timer.py tests/test_vetted_skills.py tests/test_grok_cli_handoff.py tests/test_file_size_guard.py tests/test_ai_workflow_contract.py tests/test_pre_commit_privacy_gate.py tests/test_checkpoint_privacy_gate.py tests/test_skill_admissions.py"
   },
   "trigger": {
     "exact_matches": 41,

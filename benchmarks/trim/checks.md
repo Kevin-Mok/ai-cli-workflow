@@ -77,3 +77,13 @@ Staged whitespace: authored paths pass; four pinned upstream reference files
 retain source formatting warnings/Markdown hard breaks. Their byte/hash
 provenance is preserved instead of normalizing vendor text for a diff check.
 Staged file-size guard exits0 with finite reviewed legacy ceilings.
+
+## Pass 3 admission review
+
+Independent bounded reviewer: no material defect. Verified27localPASS+7DENY+
+1rulePASS; measured current costs, case/precedent refs, explicit last30days
+0.989211 exception, estimate-labelled rejects, duplicate-first ordering and
+human semantic/privacy limits. Lean237bodylines; ledger19,754B<20KB.
+Fresh selected198tests/239subtests PASS; benchmark30,292loaded/5,738desc/183,100
+bodyB PASS; routing41/46 unchanged; inventory233sources/0drift. Root performs
+exact staged privacy/size checks and commit after this review.

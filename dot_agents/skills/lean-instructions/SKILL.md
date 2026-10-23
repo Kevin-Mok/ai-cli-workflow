@@ -26,6 +26,63 @@ addresses the original reason. Run `scripts/sync-vetted-skills --check` to repor
 missing or stale entries, including configured sources and detectable built-ins.
 Keep repo configuration and still-installed copies distinct until activation.
 
+## Mandatory admission gate
+
+After the duplicate search above, apply this gate before adding a skill or an
+AGENTS.md rule. Duplicate jobs receive `DENY: duplicate of <skill>` or a merge
+recommendation, before numerical scoring; re-admissions address the cull reason.
+
+1. Score **value 0–5** from relevant repo/session evidence and **uniqueness 0–2**
+   against the surviving jobs (0 = duplicate, 2 = uncovered). Cite the 2–3 closest
+   vetted IDs with sanitized evidence and explain why no survivor substitutes.
+2. Measure UTF-8 description and body bytes separately. Full token estimates are
+   each bytes/4. **Weighted cost = description bytes/4 + body bytes/40** assumes
+   a 10% body-load rate, not measured usage. **Score = (2 × value + uniqueness)
+   / (weighted cost/100)**. Charge a standing rule's whole text as description.
+3. Usually require **value ≥2, uniqueness ≥1, score ≥1**, trigger-first wording,
+   current `BUDGETS.json` size limits, a frozen candidate trigger case, routing
+   nonregression and source privacy/scope clearance. Use `scripts/trigger-eval
+   --check`; the committed intake46 corpus covers every current local skill.
+   This lexical proxy is not real model-trigger accuracy. Freeze new cases
+   before evaluating future candidates and preserve earlier corpora and floors.
+4. Before adding, record dated **PASS/DENY** in `docs/skill-admissions.md`: scores,
+   both full token costs, weighted cost, evidence, closest precedents and why no
+   survivor substitutes. PASS includes case IDs and size/privacy evidence; DENY
+   includes the specific reason and what would change it. Label supplied costs
+   as estimates; an approved proposal alone is not source or privacy clearance.
+5. Add only on PASS; refresh measured costs when editing an admitted skill.
+   Run `python3 -m unittest discover -s tests -p test_skill_admissions.py` and
+   `scripts/sync-vetted-skills --check`. Additions/removals update calibration
+   and preserve history. Commit the ledger, technique, plan and pass docs together.
+
+Keep exceptions honest: `last30days` remains below cutoff under explicit user
+KEEP authority. This gate/log and its standing router are explicitly required;
+record their actual cost rather than inflating evidence or inventing savings.
+
+## Admit evidence before spending context — admission pass
+
+**Rule:** Require a recorded, tested PASS before adding context; reject duplicate
+jobs first and retain rejected candidates as concrete precedents.
+
+**Why:** Repeatedly priced admissions prevent catalog growth from undoing trims.
+
+**Repo example:** The AGENTS pointer grows from 155 to 196 bytes: **10.25 recurring tokens
+added, 0 saved**. This body grows from 10,307 to 13,913 bytes:
+**901.5 on-demand tokens added**. Its 69-byte description remains
+17.25 tokens. The unchanged intake46 lexical corpus scores 41/46 (89.13%) before
+and after the gate; neither added enforcement nor moved references are savings.
+
+**Mistakes:** Scoring renamed duplicates; inflating a borderline keeper's score;
+calling assumed body loads measured usage; approving uninspected private files;
+relabelling cases to hide routing losses; recording stale costs or vague DENYs.
+
+**Checklist**
+- [ ] Search live jobs first; compare and cite 2–3 vetted precedent IDs.
+- [ ] Price both full loads and assumed weighted cost; preserve honest exceptions.
+- [ ] Check frozen cases, nonregression, privacy/scope and current size budgets.
+- [ ] Record dated PASS/DENY before adding; refresh costs and calibration together.
+- [ ] Test every local admission and preserve all earlier pass evidence.
+
 ## Measure the actual loading boundary — pass 0
 
 **Rule:** Record UTF-8 bytes, lines and bytes/4 estimates before editing. Compare

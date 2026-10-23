@@ -188,7 +188,7 @@ education work:
 
 ## Documentation And Repo Surfaces
 
-- Use `lean-instructions` when adding to AGENTS.md or adding/editing/removing a skill; update `vetted-skills.md` in the same commit for additions/removals.
+Before adding a skill or an AGENTS.md rule, run the `lean-instructions` gate. Add it only on PASS, and record the verdict. Adding or removing a skill updates `vetted-skills.md` in the same commit.
 
 - Start every how-to or procedural document with a short, plain-language
   overview directly below the title. Explain what the document helps the

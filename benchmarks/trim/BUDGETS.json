@@ -8,7 +8,7 @@
   "exceptions": {
     "dot_codex/AGENTS.md": {
       "lines": 357,
-      "bytes": 23106
+      "bytes": 23147
     },
     "dot_agents/skills/commit-session/SKILL.md": {
       "description_bytes": 434
@@ -17,7 +17,7 @@
       "description_bytes": 423
     }
   },
-  "loaded_bytes": 30251,
+  "loaded_bytes": 30292,
   "minimum_skills": 27,
   "required_skill_paths": [
     ".agents/skills/brand-system-designer/SKILL.md",

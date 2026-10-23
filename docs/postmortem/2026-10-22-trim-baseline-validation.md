@@ -115,3 +115,12 @@ reference files (including intentional Markdown hard breaks), plus one extra
 EOF blank line in the newly moved shadcn workflow. The authored EOF was removed.
 Preserve pinned upstream bytes/hashes and check authored changes separately;
 upstream formatting warnings do not establish a runtime or privacy defect.
+
+### Admission candidate size check
+
+The first pass3 staged size check rejected the existing long vetted reference:
+resolving its pending intake hash to the real40-character SHA adds20bytes.
+No source/calibration content was lost. The user explicitly allows the on-demand
+reference to be long; freeze its exact reviewed size as an existing-file ceiling
+in file-size-guard.json, then rerun the staged guard and privacy gate. This is
+not a wildcard exemption and does not allow a new oversized authored file.

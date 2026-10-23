@@ -330,3 +330,26 @@ budget assertions pass after the final freeze. Active routing41/46 (same proposa
 floor), keeper15/17 unchanged; inventory233 sources/42ACTIVE/191installed-only/
 0drift; trim budgets PASS. README gate pass_no_change. Legacy size ceilings
 freeze to reviewed actual bytes; staged size/privacy gates precede commit.
+
+Pass2 delivered as60c6e70f after192 tests/231subtests and exact staged
+size/privacy PASS. No push/live apply. COMPARISON now includes actual pass2.
+Pass3 scope: mandatory scored gate+27-skill ledger+7DENY records, duplicate and
+precedent checks, measured-cost test enforcement, concise artifacts within
+20KB authored-file limits. Preserve all current techniques and calibration.
+
+## Pass 3 — admission gate ready
+
+- [x] Require a recorded PASS before skill/rule additions; check duplicates first.
+- [x] Backfill27localPASS,1rulePASS and7DENY with measured costs and2precedents.
+- [x] Enforce missing/stale costs, score bounds, budget/case/precedent integrity.
+- [x] Preserve93ranked calibrations and resolve intake retirement to its real SHA.
+- [x] Document use/smoke review; keep ledger19,754B and lean237bodylines.
+- [ ] Commit pass3 after selected tests and exact staged privacy/size review.
+
+Loaded30,251→30,292B (+10.25tokens); this required quality gate saves0tokens.
+Next pass: log-mined conditional AGENTS routing, with exact-retention map and
+regression checks. Rollback: revert this commit with ledger/rule/docs together.
+
+Fresh pass3 selected evidence:198tests/239subtests PASS, routing41/46 unchanged,
+budgetPASS, inventory233/0drift, READMEpass_no_change. Commit subject identifies
+this milestone; next progress update reports its resulting SHA.

@@ -1,9 +1,8 @@
 # Trim progress
 
-Current milestone: **pass 1 committed as `bc0360c9`; pass 2 approved intake
-assembled and under final staged validation**. The original goal, later
-admission/CASD/efficiency passes and saturation audit remain open. Earlier
-prepared milestones below are historical runs.
+Current milestone: **pass1 cull `bc0360c9` and pass2 intake `60c6e70f`
+committed; pass3 admission enforcement validated for its own commit**. Later CASD/efficiency
+passes and saturation audit remain open. Prior prepared milestones are history.
 
 | Pass | Technique | Surface | Old bytes | New bytes | Reduction | Skills |
 | --- | --- | --- | ---: | ---: | ---: | ---: |
@@ -11,6 +10,7 @@ prepared milestones below are historical runs.
 | Pre-cull prerequisite (included in pass 1) | Measurement + required technique record | Loaded | 37,619 | 37,756 | -0.36% | 60 |
 | 1 — cull | Approved relevance cull, merges and calibration sync | Loaded | 37,756 | 29,632 | 21.52% | 22 |
 | 2 — approved intake | Bounded complementary imports and pinned swap | Loaded | 29,632 | 30,251 | -2.09% | 27 |
+| 3 — admission gate | Evidence-priced additions and mandatory PASS ledger | Loaded | 30,251 | 30,292 | -0.14% | 27 |
 
 Baseline body bytes: 403,458 (100,864.5 approximate tokens). Loaded estimate:
 9,404.75 tokens; UTF-8 bytes/4, not actual model tokenizer usage. See BASELINE.json
@@ -311,3 +311,41 @@ routing, keeper routing, vetted inventory and README gates pass. Actual command:
 pass-evidence.json. Inventory233 sources/42ACTIVE/191installed-only/0drift.
 Reviewed finite legacy-doc growth ceilings are in config/file-size-guard.json;
 they are exact byte ceilings, not wildcard exclusions or live hook installation.
+
+Pass2 committed: `60c6e70f` (`feat(skills): intake approved complementary
+workflows`) after192 tests/231subtests, bothrouting corpora, inventory and budgets
+passed; exact staged size and privacy gates passed.123 reviewed paths, no
+private inputs/model config/live installation/push. COMPARISON regenerated from
+actual pass1+pass2 history. Intake retirement history now cites its real commit.
+
+## Pass 3 — scored admission gate (in progress)
+
+Enforce every local skill's measured PASS, record rejected PR reasons/change
+conditions, compare2–3precedents and duplicate jobs before scores. Preserve the
+explicit last30days exception and unmeasured body-load assumption. This pass
+adds a quality control rather than claiming a token reduction. Source privacy
+and scope checks are not waived by score or user ranking.
+
+## Pass 3 — scored admission enforcement
+
+The mandatory one-line gate costs155→196bytes (+10.25 recurring estimated
+tokens); loaded30,251→30,292B (+0.14%; cumulative original−19.48%). Descriptions
+remain5,738B and27locals; bodies179,494→183,100B (+901.5 on-demand tokens).
+The lean entry remains237body lines, under300. Ledger19,754B fits20KB.
+
+The35 entries record27localPASS,1rulePASS and7rejected-PRDENY, each with2closest
+vetted precedents. Shared checks avoid repeating invariant review references.
+All current measured costs, rubric arithmetic and frozen46case IDs are tested;
+last30days score0.989211 remains an explicit KEEP exception, not inflated.
+Semantic evidence/privacy review remains human judgment; the lexical score is
+not real model routing. Calibration retains the actual intake retirement SHA.
+
+What worked: shared checks fit the complete ledger under20KB without stripping
+reasons or fabricated evidence. This pass buys enforcement, saves0tokens.
+Next: use the already-mined failure evidence to move conditional AGENTS detail
+to mandatory on-demand homes, preserving every observed preventive/safety rule.
+Commit:feat(skills): enforce scored admission decisions. No push/live apply.
+
+Fresh pass3 verification:198 tests/239subtests PASS; loaded budgets PASS; frozen
+intake routing41/46 unchanged; inventory233sources/0drift. README gate
+pass_no_change. Exact staged privacy/size clearance runs immediately before commit.
