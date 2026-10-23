@@ -1,6 +1,6 @@
 # Trim progress
 
-Current milestone: **passes1–6 committed; pass7 tool output validated for commit**.
+Current milestone: **passes1–7 committed; pass8 provenance validated for commit**.
 Static loaded context37,619→16,127B (9,404.75→4,031.75 estimated tokens,
 −57.13%). Conditional reference loads remain additional; actual runtime context
 is not measured. Later description/body/output passes and saturation remain open.
@@ -16,6 +16,7 @@ is not measured. Later description/body/output passes and saturation remain open
 | 5 — body concision | Repeated technique prose compressed in place | lean body | 15,125 | 10,897 | 27.95% | 27 |
 | 6 — descriptions | Trigger words retained; procedure stays in bodies | Loaded | 16,127 | 15,116 | 6.27% | 27 |
 | 7 — agent output | Summaries with full explicit diagnostics | CLI output | 16,243 | 124 | 99.24% | 27 |
+| 8 — provenance follow-up | Machine-readable exact source evidence | Source notes | 12,940 | 15,251 | -17.86% | 27 |
 
 Baseline body bytes: 403,458 (100,864.5 approximate tokens). Loaded estimate:
 9,404.75 tokens; UTF-8 bytes/4, not actual model tokenizer usage. See BASELINE.json
@@ -460,4 +461,26 @@ then remove the already-audited redundant developerinstruction block.
 Commit:perf(cli): summarize agent workflow checks.
 
 Fresh pass7 selected230tests/381subtests PASS; budgetsPASS,42/46routing
+unchanged, inventory233/0drift, READMEpass_no_change. Staged gates beforecommit.
+
+## Pass 8 — close intake provenance findings
+
+The defining test observed4invalid-source findings before supported fields were
+added. Grok/eval now cite the accepted public-intake Git snapshot/path/blobhash
+as a checkpoint, explicitly not a claim of upstream origin; original import
+pins remain without private repo locations. shadcn/Impeccable cite their true
+public pinned upstream paths. Credits/licenses, runtime/privacy limits and
+existing source narratives remain. Dates/fieldlabels now match the doctor.
+
+Source notes12,940→15,251B adds577.75estimated on-demandtokens. Staticloaded
+15,116B unchanged;0recurring saved. Required technique adds936bodyB, overall
+181,892→182,828B. Freshdoctor35errors/1warning,0newkeys vsoriginalsavedbaseline;
+this resolves all4intake findings while retaining inherited failures.
+
+What worked: use exact accepted source evidence, never invented upstream origin
+or weakened validation. Next: remove717B of duplicated developerinstructions
+while proving their canonical rules and model/effort preferences unchanged.
+Commit:fix(skills): normalize intake source provenance.
+
+Fresh pass8 selected231tests/385subtests PASS; budgetsPASS,42/46routing
 unchanged, inventory233/0drift, READMEpass_no_change. Staged gates beforecommit.

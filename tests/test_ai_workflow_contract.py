@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 
 import re
+import runpy
+import hashlib
+import subprocess
 import unittest
 from pathlib import Path
 
@@ -27,6 +30,23 @@ def read_canonical_policy() -> str:
 
 
 class AIWorkflowContractTest(unittest.TestCase):
+    def test_intake_source_records_validate_without_invented_upstream_origins(self):
+        doctor = runpy.run_path(str(REPO_ROOT / 'scripts/executable_ai-workflow-doctor'))
+        checkpoint = '60c6e70f6ba63e6902aa6da76761f0fd550f4e06'
+        for slug in ('grok-cli-handoff', 'skill-eval', 'shadcn', 'impeccable'):
+            with self.subTest(skill=slug):
+                path = REPO_ROOT / 'dot_agents/skills' / slug / 'SOURCE.md'
+                self.assertIsNone(doctor['validate_source'](path, slug, REPO_ROOT, verify_sources=True))
+                if slug in ('grok-cli-handoff', 'skill-eval'):
+                    fields = doctor['source_fields'](path.read_text())
+                    self.assertEqual(fields['source archive'], '.')
+                    self.assertEqual(fields['source commit'], checkpoint)
+                    source = f'dot_agents/skills/{slug}/SKILL.md'
+                    self.assertEqual(fields['original source path'], source)
+                    accepted = subprocess.check_output(['git', 'show', f'{checkpoint}:{source}'], cwd=REPO_ROOT)
+                    self.assertEqual(fields['source sha-256'], hashlib.sha256(accepted).hexdigest())
+                    self.assertIn('not an upstream-origin claim', path.read_text())
+
     def test_execplan_contract_is_decision_complete(self) -> None:
         contract_path = REPO_ROOT / ".agent/PLANS.md"
         self.assertTrue(contract_path.is_file(), ".agent/PLANS.md must exist")

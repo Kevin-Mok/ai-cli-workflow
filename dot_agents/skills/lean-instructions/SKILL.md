@@ -209,3 +209,18 @@ command substitution, or claiming output savings as per-session instruction savi
 - [ ] Exercise real TTY, agent variables, pipes, plain and NO_COLOR.
 - [ ] Preserve full JSON/protocol/errors; expose --details and document it.
 - [ ] Measure the same invocation; test actual output and record its boundary.
+
+## Close provenance audit findings with exact source facts — follow-up
+
+**Rule:** Record machine-readable source fields from pinned evidence; preserve
+credits, licenses and private-source boundaries while fixing audit findings.
+**Why:** A concise entry still needs reproducible lineage when reviewed.
+**Repo example:** Four SOURCE notes12,940→15,251B; audit4newerrors→0.
+This adds 577.75 on-demand estimated tokens, saves0recurring tokens;
+staticloaded15,116B unchanged. Prior35errors/1warning remain outside this pass.
+**Mistakes:** Invented upstream origin, private repo locations, punctuated dates,
+weakened validators or a whole-audit-clean claim from fixing four findings.
+**Checklist**
+- [ ] Prove full revision/path/hash; label local accepted snapshots honestly.
+- [ ] Preserve source history/notices and validate supported metadata fields.
+- [ ] Recompare exact finding keys; test scoped fixes and report inherited debt.

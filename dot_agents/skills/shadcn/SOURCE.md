@@ -8,6 +8,13 @@ shadcn/ui is an MIT component-source ecosystem, registry tooling, npm CLI and do
 
 ## Provenance and local changes
 
+- Upstream repo: https://github.com/shadcn-ui/ui
+- Upstream commit: 4233ed1caded8c38f4bc14b14afe1f93ebcaf966
+- Original source path: skills/shadcn/SKILL.md
+- Adapted on: 2026-10-22
+- Adaptation basis: official component workflow and pinned references; explicit invocation and bounded public intake.
+- Local adaptation: retain the documented CLI pin, entrypoint trimming, on-demand workflows and credential/mutation boundaries.
+
 - Reviewed 2026-10-14: [shadcn-ui/ui](https://github.com/shadcn-ui/ui), commit [`4233ed1caded8c38f4bc14b14afe1f93ebcaf966`](https://github.com/shadcn-ui/ui/tree/4233ed1caded8c38f4bc14b14afe1f93ebcaf966).
 - Read the pinned [README](https://github.com/shadcn-ui/ui/blob/4233ed1caded8c38f4bc14b14afe1f93ebcaf966/README.md), [MIT license](https://github.com/shadcn-ui/ui/blob/4233ed1caded8c38f4bc14b14afe1f93ebcaf966/LICENSE.md) (copyright 2023 shadcn), and [skill subtree](https://github.com/shadcn-ui/ui/tree/4233ed1caded8c38f4bc14b14afe1f93ebcaf966/skills/shadcn). The complete license is retained in [LICENSE](LICENSE).
 - Vendored `SKILL.md`, `cli.md`, `customization.md`, `registry.md`, `mcp.md`, and all six `rules/*.md` from that revision. Supporting documents replace `shadcn@latest` with `shadcn@4.21.5`; `mcp.md` additionally pins its bare setup examples and labels configuration writes as explicitly requested, reviewed actions. `customization.md` drops its link to the omitted showcase workflow while retaining the radius guidance.

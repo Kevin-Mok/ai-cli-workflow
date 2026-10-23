@@ -166,3 +166,9 @@ read the evaluator construction before any further schema use. No source changed
 The terse-output regression suite exposed a third doctor diagnostic assertion
 using the old implicit full report. Its call now explicitly requests --details;
 the diagnostic assertion stays unchanged, alongside the other updated callers.
+
+Provenance resolution: exact supported repository/path/revision/date/basis/local
+fields added to4SOURCEs; defining test4invalid→none. Localpins resolve accepted
+intake commit/path/blobhash; remoteupstream evidence retained without newnetwork
+claims. Freshdoctor35errors/1warning,0newfindingkeys vs savedbaseline. The
+4intake-introduced metadata findings are fixed; original findings remain.

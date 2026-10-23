@@ -446,3 +446,23 @@ full focused suite and staged gates precede owncommit.
 
 Fresh pass7 selected230tests/381subtests PASS; budgetsPASS,42/46routing
 unchanged, inventory233/0drift, READMEpass_no_change. Staged gates beforecommit.
+
+## Pass 7 delivered; pass 8 provenance normalization
+
+Pass7 committedc24871f2 after230tests/381subtests and stagedgatesPASS. Inventory
+check output−99.24%; recurringunchanged. Actualcomparison regenerated.
+Pass8 fixes4new doctorSOURCEfield-format errors (39errors/1warning vs35inherited),
+preserving source facts/credits/pins/licenses and public privacy boundaries.
+Four source notes baseline12940B; source metadata is on demand,0recurring savings.
+- [ ] Defining source-validator test RED, then normalize supported keys.
+- [ ] Resolve accepted local intake Git blobs and retain true public upstream pins.
+- [ ] Doctor0newkeys, scopedtests/routing/inventory; record actualbytes and commit8.
+
+Pass8ready: new sourcevalidator test RED4→GREEN;14contracttests/4subtestsPASS.
+FourSOURCErecords12,940→15,251B,0recurring savings; remote pins retained,local
+accepted-source checkpoints resolve revision/path/blobhash. Doctor35errors/
+1warning,0newkeys; inherited debt remains. Full focused tests and staged gates
+precede commit. Next duplicate developerblock removal preserves model/effort.
+
+Fresh pass8 selected231tests/385subtests PASS; budgetsPASS,42/46routing
+unchanged, inventory233/0drift, READMEpass_no_change. Staged gates beforecommit.

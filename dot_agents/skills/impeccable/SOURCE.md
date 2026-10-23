@@ -2,6 +2,13 @@
 
 This pinned web skill provides the upstream design playbooks to Codex and Claude Code on explicit invocation. Read the retained scope and runtime limits before using its launcher.
 
+- Upstream repo: https://github.com/pbakaus/impeccable
+- Upstream commit: 9d9fcf5cf7a47728959e0c92ae0ab274571b16e3
+- Original source path: .agents/skills/impeccable/SKILL.md
+- Adapted on: 2026-10-22
+- Adaptation basis: pinned web design skill and retained licensed runtime resources; explicit invocation and bounded public intake.
+- Local adaptation: retain the documented web-only scope, launcher/telemetry boundaries, runtime assets and notices.
+
 - Upstream: https://github.com/pbakaus/impeccable
 - Reviewed and downloaded: 2026-10-14; commit `9d9fcf5cf7a47728959e0c92ae0ab274571b16e3`, skill 4.5.2, engine version file 0.1.14.
 - Source subtree: [.agents/skills/impeccable](https://github.com/pbakaus/impeccable/tree/9d9fcf5cf7a47728959e0c92ae0ab274571b16e3/.agents/skills/impeccable).
