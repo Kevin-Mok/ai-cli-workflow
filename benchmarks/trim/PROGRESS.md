@@ -1,9 +1,9 @@
 # Trim progress
 
-Current milestone: **passes1–8 committed; pass9 duplicate instructions validated for commit**.
-Static loaded context37,619→16,127B (9,404.75→4,031.75 estimated tokens,
-−57.13%). Conditional reference loads remain additional; actual runtime context
-is not measured. Later description/body/output passes and saturation remain open.
+Current milestone: **passes1–9 committed; pass10 conditional dialogue validated for commit**.
+Static loaded context37,619→14,399B (9,404.75→3,599.75 estimated tokens,
+−61.72%). Conditional reference loads remain additional; actual runtime context
+is not measured. Remaining conditional-body candidates and final saturation closure remain open.
 
 | Pass | Technique | Surface | Old bytes | New bytes | Reduction | Skills |
 | --- | --- | --- | ---: | ---: | ---: | ---: |
@@ -18,6 +18,7 @@ is not measured. Later description/body/output passes and saturation remain open
 | 7 — agent output | Summaries with full explicit diagnostics | CLI output | 16,243 | 124 | 99.24% | 27 |
 | 8 — provenance follow-up | Machine-readable exact source evidence | Source notes | 12,940 | 15,251 | -17.86% | 27 |
 | 9 — instruction deduplication | Canonical controls replace repeated config injection | Loaded | 15,116 | 14,399 | 4.74% | 27 |
+| 10 — conditional dialogue | Explicit conversation procedure loads only for that branch | Personal entry body | 8,384 | 6,758 | 19.39% | 27 |
 
 Baseline body bytes: 403,458 (100,864.5 approximate tokens). Loaded estimate:
 9,404.75 tokens; UTF-8 bytes/4, not actual model tokenizer usage. See BASELINE.json
@@ -508,3 +509,23 @@ Commit:refactor(instructions): remove duplicated developer rules.
 Fresh pass9 selected235tests/388subtests PASS; budgetsPASS,42/46routing
 unchanged, inventory233/0drift, READMEpass_no_change. Exactconfigdiff reviewed;
 models/efforts unchanged. Staged size/privacy gates beforecommit.
+
+## Pass 10 — conditional dialogue disclosure
+
+Only the complete FollowPerson dialogue procedure moves to a mandatory
+explicit-conversation reference. Begin entrypoint/auth, orientation/private-source
+safeguards, automatic retrieval, storage and projectqualification remain exact
+in the main skill. All original paragraphs survive exactlyonce; description/
+frontmatter unchanged. The old literal-contract test resolves the actual home;
+its inheritedSyntaxError remains, while independent preservationtests pass.
+
+Personalentry8,384→6,758B saves406.5estimated entrytokens for automaticuse.
+Explicit flow loads1,984Breference:combined8,742B adds89.5tokens. Overall
+SKILLbodies183,711→183,011B includes926Btechniquelog growth; recurring14,399B
+and27skills unchanged. No private-store access or live configuration changes.
+
+What worked: retain shared controls in the entry even when a larger apparent
+split would look cheaper. The projectindex section remains because it shares
+privacy/qualification duties. Next: conditional planning-only, consolidation
+and learning-update procedures identified by the remaining-body audit.
+Commit:refactor(skills): defer explicit conversation procedure.

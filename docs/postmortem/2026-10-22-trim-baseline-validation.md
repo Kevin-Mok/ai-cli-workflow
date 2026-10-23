@@ -172,3 +172,7 @@ fields added to4SOURCEs; defining test4invalid→none. Localpins resolve accepte
 intake commit/path/blobhash; remoteupstream evidence retained without newnetwork
 claims. Freshdoctor35errors/1warning,0newfindingkeys vs savedbaseline. The
 4intake-introduced metadata findings are fixed; original findings remain.
+
+A saturation inspection assumed personal-context/SOURCE.md existed; that optional
+file is absent. No source was modified by the probe. The known source-discovery
+lesson applies: inspect observed inventory before optional provenance paths.

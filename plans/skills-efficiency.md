@@ -482,3 +482,15 @@ Loaded14,399B (−179.25tokens); newtechnique+admissioncost updated.
 Fresh pass9 selected235tests/388subtests PASS; budgetsPASS,42/46routing
 unchanged, inventory233/0drift, READMEpass_no_change. Exactconfigdiff reviewed;
 models/efforts unchanged. Staged size/privacy gates beforecommit.
+
+## Pass 9 delivered; pass 10 conditional body disclosure
+
+Pass9 committed9e1ce9ff after235tests/388subtests and stagedgatesPASS;
+717Bduplicate removed, model/effort and allotherTOML unchanged.
+Saturation found furthermeaningful conditionalbodywork, so goalcontinues.
+Pass10movesonly explicitdialogue; allshared/privacy/auth/sourcecontrols main.
+Personalbody8,384→6,758B saves406.5entrytokens forautomaticroute; explicit
+combinedload adds89.5tokens. Two definingtests RED→GREEN plus independent
+review5verified/0incorrect, no materialdefect; fullselected237tests/388subtests
+PASS, budgets/routing42/46/inventory233/0drift/READMEPASS.
+Nextpass11 addresses3otherconditionalprocedures; finalclosure remains open.

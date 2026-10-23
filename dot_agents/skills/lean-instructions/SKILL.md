@@ -238,3 +238,18 @@ model preferences, or treating an unapplied source change as live activation.
 - [ ] Map every duplicate clause to retained canonical text before removal.
 - [ ] Prove exact block-only diff and all other setting/model values unchanged.
 - [ ] Ratchet budget; test source invariants, routing and scoped staged privacy.
+
+## Load conditional skill branches on demand — body disclosure
+
+**Rule:** Move a self-contained optional branch verbatim behind a mandatory
+conditional link; keep shared authorization, privacy and safety in the entry.
+**Why:** One invocation need not load procedures used by another branch.
+**Repo example:** Personal-context8,384→6,758bodyB saves406.5estimated entry
+tokens for automatic lookups. Explicit conversations load the1,984Breference:
+combined8,742B adds89.5tokens. Description unchanged;0recurring savings.
+**Mistakes:** Moving required/common controls, claiming savings for a branch
+that must read both files, lost paragraphs or weakened literal-contract tests.
+**Checklist**
+- [ ] Identify an actual conditional branch; retain all shared safeguards.
+- [ ] Prove exact source preservation/frontmatter and the mandatory trigger.
+- [ ] Measure entry and combined loads; resolve tests to actual retained homes.

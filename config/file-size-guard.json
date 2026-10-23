@@ -2,8 +2,8 @@
   "grandfathered_max_bytes": {
     "README.md": 101523,
     "docs/smoke-tests.md": 159649,
-    "benchmarks/trim/PROGRESS.md": 33962,
-    "plans/skills-efficiency.md": 30605,
+    "benchmarks/trim/PROGRESS.md": 35313,
+    "plans/skills-efficiency.md": 31319,
     "dot_agents/skills/lean-instructions/references/vetted-skills.md": 101835,
     "scripts/executable_ai-workflow-doctor": 32301,
     "tests/test_ai_workflow_doctor.py": 34976

@@ -34,6 +34,7 @@ class PersonalContextSkillTest(unittest.TestCase):
 
     def test_relevance_routing_and_private_learning_are_explicit(self):
         skill = (SKILL_ROOT / "SKILL.md").read_text(encoding="utf-8")
+        skill += "\n" + (SKILL_ROOT / "references/explicit-conversation.md").read_text(encoding="utf-8")
         canonical = (REPO_ROOT / "dot_codex/AGENTS.md").read_text(encoding="utf-8")
         for target in set(re.findall(r"\]\((references/[^)#]+\.md)(?:#[^)]*)?\)", canonical)):
             canonical += "\n" + (REPO_ROOT / "dot_codex" / target).read_text(encoding="utf-8")

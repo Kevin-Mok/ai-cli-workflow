@@ -99,3 +99,11 @@ weakening assertions. Final core8,982B/145lines, staticloaded16,127B. Triggered
 reference loads remain extra; no actualruntime savings claim. Selected suite
 200tests/330subtests PASS, routing41/46, inventory233/0drift. Root staged gates
 and dedicatedcommit remain finaldeliveryboundary.
+
+## Pass 10 and retrospective privacy
+
+Independentreview5verified/0incorrect/1deliverypending; exactpersonalbranch
+preservation, maincontrols, conditionalrouter and honestentry/combinedload
+metrics verified. Selected237tests/388subtests PASS. Nineimmutable pass-tree
+privacy receipts independentlymatchGit; intake/pass9 exact-tree reruns PASS.
+Historicalprecommit/size timing is root-observed, not a retrospectivecertificate.
