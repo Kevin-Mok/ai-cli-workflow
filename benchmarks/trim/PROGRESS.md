@@ -1,8 +1,9 @@
 # Trim progress
 
-Current milestone: **pass1 cull `bc0360c9` and pass2 intake `60c6e70f`
-committed; pass3 admission enforcement validated for its own commit**. Later CASD/efficiency
-passes and saturation audit remain open. Prior prepared milestones are history.
+Current milestone: **passes1–3 committed; pass4 CASD validated for commit**.
+Static loaded context37,619→16,127B (9,404.75→4,031.75 estimated tokens,
+−57.13%). Conditional reference loads remain additional; actual runtime context
+is not measured. Later description/body/output passes and saturation remain open.
 
 | Pass | Technique | Surface | Old bytes | New bytes | Reduction | Skills |
 | --- | --- | --- | ---: | ---: | ---: | ---: |
@@ -11,6 +12,7 @@ passes and saturation audit remain open. Prior prepared milestones are history.
 | 1 — cull | Approved relevance cull, merges and calibration sync | Loaded | 37,756 | 29,632 | 21.52% | 22 |
 | 2 — approved intake | Bounded complementary imports and pinned swap | Loaded | 29,632 | 30,251 | -2.09% | 27 |
 | 3 — admission gate | Evidence-priced additions and mandatory PASS ledger | Loaded | 30,251 | 30,292 | -0.14% | 27 |
+| 4 — CASD | Log-informed conditional policy routing | Loaded | 30,292 | 16,127 | 46.76% | 27 |
 
 Baseline body bytes: 403,458 (100,864.5 approximate tokens). Loaded estimate:
 9,404.75 tokens; UTF-8 bytes/4, not actual model tokenizer usage. See BASELINE.json
@@ -349,3 +351,30 @@ Commit:feat(skills): enforce scored admission decisions. No push/live apply.
 Fresh pass3 verification:198 tests/239subtests PASS; loaded budgets PASS; frozen
 intake routing41/46 unchanged; inventory233sources/0drift. README gate
 pass_no_change. Exact staged privacy/size clearance runs immediately before commit.
+
+## Pass 4 — CASD conditional procedures
+
+Canonical23,147→8,982B;357→145lines. Static loaded30,292→16,127B
+(−14,165B/3,541.25estimatedtokens,46.76%); description5,738B and27skills
+unchanged. Bodies183,100→184,312B charges the required technique record.
+Seven mandatory reference homes preserve42moved blocks; all91original blocks
+retain exact wording/hash and appear exactly once in casd-map.json. Core retains
+safety, authority, defining tests and completion evidence. The title checkpoint
+stays standing; details load for native-tool discovery/change. Other routers
+cover system design, failures, CLI/fish, memory, docs/config and delivery.
+
+The416screened sessions support completion/copy-paste safeguards. No complaint
+met3sessions/2dates; no speculative new rule was added. The gate records a PASS
+for replacement routing:1,250B/312.5static tokens of overhead included in net
+savings, public source only, case instructions-edit,91block preservation.
+Reference text is retained; actual loads/cache/tokenizer use are unmeasured.
+
+What worked: exact block retention proves more than heading searches; required
+routers avoid silently losing policy. Contract tests resolve real moved homes.
+Next: trim owned descriptions against the saved41/46 corpus and preceding
+accepted snapshot, retaining explicit-only invocation and all trigger branches.
+Commit:refactor(instructions): route conditional procedures on demand.
+
+Fresh CASD selected200tests/330subtests PASS; frozen41/46routing unchanged,
+233sources/0inventorydrift, budgetsPASS, READMEpass_no_change. Exact staged
+size/privacy clearance precedes the dedicated pass4commit.

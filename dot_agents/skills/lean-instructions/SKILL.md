@@ -239,3 +239,22 @@ target; including installed external descriptions in repo-only savings.
 - [ ] Keep old cases unchanged; check both keeper and expanded-corpus floors.
 - [ ] Update catalog, calibration/history, budgets and measured net costs.
 - [ ] Run staged privacy/size checks; commit this intake as its own pass.
+
+## Route conditional policy without losing safeguards — CASD pass
+
+**Rule:** Use screened failure evidence to retain preventive/safety controls;
+move conditional procedures verbatim behind mandatory task-specific routers.
+**Why:** Unrelated tasks avoid loading detailed procedures, while triggered work
+still finds the original policy. Sparse matches never justify deleting safety.
+**Repo example:** Canonical AGENTS23,147B becomes 8,982B; static loaded
+context30,292B becomes 16,127B, saving 3,541.25 estimated
+recurring tokens. All91original blocks survive exactly once;42move to7refs.
+Reference loads still cost tokens when triggered; these are static-boundary
+savings, not measured runtime/tokenizer savings. No complaint met the3session/
+2date threshold, so no speculative rule was added.
+**Mistakes:** Calling moved text deleted; making an always-required reference
+look conditional; weakening safety; checking only headings rather than content.
+**Checklist**
+- [ ] Map observed failures to retained controls; keep safety even at zero matches.
+- [ ] Compare original block hashes and one verbatim home; verify all routers.
+- [ ] Price router costs, separate triggered loads, test contracts and budgets.

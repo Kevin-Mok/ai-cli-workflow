@@ -124,3 +124,25 @@ No source/calibration content was lost. The user explicitly allows the on-demand
 reference to be long; freeze its exact reviewed size as an existing-file ceiling
 in file-size-guard.json, then rerun the staged guard and privacy gate. This is
 not a wildcard exemption and does not allow a new oversized authored file.
+
+Admission size resolution: exact existing-reference ceiling102,846B accepted
+the20-byte real-SHA substitution; staged size and privacy gates passed before
+6e9934c7. CASD discovery also passed unmatched test-name globs to rg; no files
+changed, and rg --files supplied the actual names. This repeats the known
+source-discovery lesson, not a new product failure. Canonical learning-ledger
+writes remain outside permitted roots; tracked-source registration outstanding.
+
+CASD source-contract verification: postmortem-memory suite25PASS/1inherited
+environment failure at test_actual_ledger_reference_status_and_coverage because
+public /home/example fixture roots/ledger reports are unavailable. The changed
+relocated-policy assertion passes. Do not repair private fixture availability or
+claim the complete suite green; CASD block retention independently checks policy.
+The PMlookup query staged-file-size-guard/existing-reference-ceiling returned
+no directly applicable remedy; the exact user-authorized long-reference ceiling
+was independently reviewed. Canonical helper check still reports this living
+report new/unregistered; its external tracked ledger is outside writable roots.
+
+CASD final review added28router bytes after a test worker had already started;
+198tests/330subtests passed but2budget assertions saw the old ceiling. Frozen
+source now16,127loadedB; root benchmarkPASS. Rerun after confirming that value,
+not while its owner is updating it. Same preparation-ordering lesson as pass2.

@@ -35,6 +35,8 @@ class PersonalContextSkillTest(unittest.TestCase):
     def test_relevance_routing_and_private_learning_are_explicit(self):
         skill = (SKILL_ROOT / "SKILL.md").read_text(encoding="utf-8")
         canonical = (REPO_ROOT / "dot_codex/AGENTS.md").read_text(encoding="utf-8")
+        for target in set(re.findall(r"\]\((references/[^)#]+\.md)(?:#[^)]*)?\)", canonical)):
+            canonical += "\n" + (REPO_ROOT / "dot_codex" / target).read_text(encoding="utf-8")
         for text in (skill, canonical):
             normalized = " ".join(text.split())
             for trigger in ("direction", "scope", "architecture", "design", "tooling", "milestones", "collaboration"):
@@ -75,7 +77,11 @@ class PersonalContextSkillTest(unittest.TestCase):
         for required in ("repo_relative_path", "provenance_version", "blob_sha256", "historical"):
             self.assertIn(required, reference)
         for relative in ("README.md", "docs/smoke-tests.md", "dot_codex/AGENTS.md"):
-            self.assertIn("example-user Mok", (REPO_ROOT / relative).read_text(encoding="utf-8"))
+            source = (REPO_ROOT / relative).read_text(encoding="utf-8")
+            if relative == "dot_codex/AGENTS.md":
+                for target in set(re.findall(r"\]\((references/[^)#]+\.md)(?:#[^)]*)?\)", source)):
+                    source += "\n" + (REPO_ROOT / "dot_codex" / target).read_text(encoding="utf-8")
+            self.assertIn("example-user Mok", source)
 
     def test_supporting_references_are_inside_the_package(self):
         skill = (SKILL_ROOT / "SKILL.md").read_text(encoding="utf-8")

@@ -10,12 +10,31 @@ The [current trim plan](../plans/skills-efficiency.md) and
 [pass log](../benchmarks/trim/PROGRESS.md) track a new optimization series.
 Its immutable baseline records 353 lines / 22,750 bytes for canonical AGENTS,
 59 canonical skills, 37,619 recurring bytes and 403,458 on-demand body bytes.
-The requested lean-instructions technique skill and its one-line AGENTS route
-add 137 recurring bytes (34.25 estimated tokens), making 60 canonical skills.
-Measurement itself saves zero tokens; no reduction or saturation claim yet.
-The CLI estimates UTF-8 bytes/4, separately from the older doctor's character
-estimate. Pass 0 is prepared but uncommitted because shared Git metadata is
-mounted read-only. Live config/model/effort and imported skills are unchanged.
+The cull, complementary intake and mandatory admission passes are committed as
+`bc0360c9`, `60c6e70f` and `6e9934c7`; the current
+[comparison](../benchmarks/trim/COMPARISON.md) reproduces actual Git blobs.
+The CASD pass moves conditional procedures verbatim and preserves every original
+block. Canonical AGENTS:23,147B/357lines before, 8,982B/145lines
+after. Static recurring context falls30,292→16,127B. Actual task context
+depends on triggered reference loads; the moved text is retained, not deleted.
+
+| Original section/procedure | Mandatory home |
+| --- | --- |
+| Start-of-turn checkpoint and Live Codex Task Titles | [Task titles](../dot_codex/references/task-titles.md) |
+| System Design Routing | [System design](../dot_codex/references/system-design.md) |
+| CLI decoration/progress and fish paste/copy procedure | [CLI and shell](../dot_codex/references/cli-and-shell.md) |
+| Failure lookup, learning and immediate postmortem procedure | [Postmortems](../dot_codex/references/postmortems.md) |
+| Conditional Session Memory | [Session memory](../dot_codex/references/session-memory.md) |
+| README/manual checks, overview and configuration refresh | [Documentation/config](../dot_codex/references/documentation-and-config.md) |
+| Commit workflow, delivery cadence and Handoff Format | [Delivery](../dot_codex/references/delivery.md) |
+| Authority, safety, scope, planning, defining tests, feedback and verification | [Standing core](../dot_codex/AGENTS.md) |
+
+The [block preservation map](../benchmarks/trim/casd-map.json) identifies all91
+original blocks by source line, section, hash and retained home. Trigger routers
+are mandatory. Screened native-session evidence found no frequent uncovered
+complaint; safety plus observed copy/paste and completion controls remain.
+Active user/developer instructions still govern. No model/effort or live config
+was changed; no push, refresh-config or chezmoi apply is authorized.
 
 ## Audited Baseline
 

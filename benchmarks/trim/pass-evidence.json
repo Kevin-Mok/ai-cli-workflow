@@ -1,11 +1,11 @@
 {
-  "pass": "Pass 3 admission gate",
-  "technique": "Evidence-priced additions and mandatory PASS ledger",
-  "commit_subject": "feat(skills): enforce scored admission decisions",
+  "pass": "Pass 4 CASD conditional policy",
+  "technique": "Log-informed conditional policy routing",
+  "commit_subject": "refactor(instructions): route conditional procedures on demand",
   "tests": {
-    "passed": 198,
-    "subtests_passed": 239,
-    "command": "python3 -m pytest -q tests/test_skill_cull_contract.py tests/test_commit_plan_push_skill.py tests/test_metaprompt_integration.py tests/test_cli_emoji_skills.py tests/test_trim_benchmark.py tests/test_trigger_eval.py tests/test_trim_failure_mining.py tests/test_design_skills_sync.py tests/test_superpowers_release_timer.py tests/test_vetted_skills.py tests/test_grok_cli_handoff.py tests/test_file_size_guard.py tests/test_ai_workflow_contract.py tests/test_pre_commit_privacy_gate.py tests/test_checkpoint_privacy_gate.py tests/test_skill_admissions.py"
+    "passed": 200,
+    "subtests_passed": 330,
+    "command": "python3 -m pytest -q tests/test_skill_cull_contract.py tests/test_commit_plan_push_skill.py tests/test_metaprompt_integration.py tests/test_cli_emoji_skills.py tests/test_trim_benchmark.py tests/test_trigger_eval.py tests/test_trim_failure_mining.py tests/test_design_skills_sync.py tests/test_superpowers_release_timer.py tests/test_vetted_skills.py tests/test_grok_cli_handoff.py tests/test_file_size_guard.py tests/test_ai_workflow_contract.py tests/test_pre_commit_privacy_gate.py tests/test_checkpoint_privacy_gate.py tests/test_skill_admissions.py tests/test_trim_casd.py"
   },
   "trigger": {
     "exact_matches": 41,
@@ -24,6 +24,7 @@
   "limitations": [
     "No live installs, hook activation, provider/runtime download, model routing or push.",
     "Full repository collection has inherited sanitized Python syntax errors outside selected checks.",
-    "Generic skill validator rejects supported explicit-only metadata; repo contracts retain it."
+    "Generic skill validator rejects supported explicit-only metadata; repo contracts retain it.",
+    "Static-boundary savings exclude triggered reference loads. Postmortem suite has one inherited sanitized-root environment failure; personal-context contract file retains inherited SyntaxError."
   ]
 }

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import re
 import unittest
 from pathlib import Path
 
@@ -16,6 +17,13 @@ PUSH_POLICY = (
 
 def read_repo_file(relative_path: str) -> str:
     return (REPO_ROOT / relative_path).read_text(encoding="utf-8")
+
+
+def read_canonical_policy() -> str:
+    """Resolve the real mandatory references while keeping core-byte tests literal."""
+    core = read_repo_file("dot_codex/AGENTS.md")
+    targets = sorted(set(re.findall(r"\]\((references/[^)#]+\.md)(?:#[^)]*)?\)", core)))
+    return core + "\n" + "\n".join(read_repo_file("dot_codex/" + target) for target in targets)
 
 
 class AIWorkflowContractTest(unittest.TestCase):
@@ -101,7 +109,7 @@ class AIWorkflowContractTest(unittest.TestCase):
             self.assertIn(required_label, manual_evidence)
 
     def test_canonical_policy_preserves_required_boundaries(self) -> None:
-        canonical = read_repo_file("dot_codex/AGENTS.md").lower()
+        canonical = read_canonical_policy().lower()
         for required_text in (
             "failing test or executable reproducer",
             "fails for the expected reason",
@@ -121,7 +129,7 @@ class AIWorkflowContractTest(unittest.TestCase):
     def test_canonical_policy_requires_living_unexpected_failure_postmortems(
         self,
     ) -> None:
-        canonical = read_repo_file("dot_codex/AGENTS.md").lower()
+        canonical = read_canonical_policy().lower()
         for required_text in (
             "unexpected task failure",
             "immediately create",
@@ -136,7 +144,7 @@ class AIWorkflowContractTest(unittest.TestCase):
             self.assertIn(required_text, canonical)
 
     def test_system_design_routing_is_explicit(self) -> None:
-        canonical = read_repo_file("dot_codex/AGENTS.md").lower()
+        canonical = read_canonical_policy().lower()
         for reference_name in (
             "architecture.md",
             "coding-standards.md",
@@ -210,7 +218,7 @@ class AIWorkflowContractTest(unittest.TestCase):
             "another cadence."
         )
         for relative_path in policy_files:
-            content = " ".join(read_repo_file(relative_path).split())
+            content = " ".join((read_canonical_policy() if relative_path == "dot_codex/AGENTS.md" else read_repo_file(relative_path)).split())
             self.assertTrue(
                 PUSH_POLICY in content or best_effort_cadence in content,
                 relative_path,
@@ -232,7 +240,7 @@ class AIWorkflowContractTest(unittest.TestCase):
             "each successful commit is followed by a push",
         )
         for relative_path in active_workflow_files:
-            content = read_repo_file(relative_path).lower()
+            content = (read_canonical_policy() if relative_path == "dot_codex/AGENTS.md" else read_repo_file(relative_path)).lower()
             for banned_fragment in banned_fragments:
                 self.assertNotIn(banned_fragment, content, relative_path)
 

@@ -795,6 +795,9 @@ detectable installed/built-in skills with the on-demand
 [vetted reference](dot_agents/skills/lean-instructions/references/vetted-skills.md).
 The mandatory [admission gate](docs/skill-admissions.md) records scored PASS/DENY
 verdicts before new skills or standing rules; every local skill needs a PASS.
+The canonical [standing core](dot_codex/AGENTS.md) routes matching tasks to
+mandatory procedure references; the [preservation map](benchmarks/trim/casd-map.json)
+proves original policy text survived the split.
 `--json` lists source identities and verdicts; `--repo PATH` selects the checkout.
 Missing or stale entries fail `--check`; no installer runs and no file is written.
 Configured external packages must be available locally; unavailable sources

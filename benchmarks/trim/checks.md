@@ -87,3 +87,15 @@ human semantic/privacy limits. Lean237bodylines; ledger19,754B<20KB.
 Fresh selected198tests/239subtests PASS; benchmark30,292loaded/5,738desc/183,100
 bodyB PASS; routing41/46 unchanged; inventory233sources/0drift. Root performs
 exact staged privacy/size checks and commit after this review.
+
+## Pass 4 CASD review
+
+Independent preservation2tests/91subtests PASS. All91originalblocks retained
+verbatim exactlyonce;42moved to7mandatoryrefs. Reviewer caught2routing gaps:
+READMEprecommitgate needed commit/push routing, and memory needed explicit
+personal-context/project-session triggers. Both fixed and asserted; reviewer
+confirmed resolution. Three sourcecontractdiffs read actual movedhomes without
+weakening assertions. Final core8,982B/145lines, staticloaded16,127B. Triggered
+reference loads remain extra; no actualruntime savings claim. Selected suite
+200tests/330subtests PASS, routing41/46, inventory233/0drift. Root staged gates
+and dedicatedcommit remain finaldeliveryboundary.

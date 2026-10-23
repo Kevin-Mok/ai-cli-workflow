@@ -353,3 +353,34 @@ regression checks. Rollback: revert this commit with ledger/rule/docs together.
 Fresh pass3 selected evidence:198tests/239subtests PASS, routing41/46 unchanged,
 budgetPASS, inventory233/0drift, READMEpass_no_change. Commit subject identifies
 this milestone; next progress update reports its resulting SHA.
+
+## Pass 3 delivered; pass 4 CASD
+
+Pass3 committed6e9934c7 after198tests/239subtests and exact staged privacy/size
+PASS. Real comparison regenerated immediately. No push or live activation.
+Pass4 moves conditional policy verbatim to mandatory routed homes, with a
+paragraph/hash preservation map and defining RED/GREEN tests; retain safety and
+observed completion/copy-paste controls. Original canonical23,147B/357lines;
+loaded30,292B. No frequent uncovered complaint warrants a new standing rule.
+
+- [ ] Define retention proof and observe expected RED.
+- [ ] Move conditional procedures; keep routers mandatory and standing safety.
+- [ ] Validate contract refs, routing, inventory, budgets and scoped suites.
+- [ ] Update technique/ledger, actual comparison and exact staged gates; commit4.
+
+Rollback is the individual pass commit; no original text deletion is accepted
+without a retained home. Reference files stay below20KB each.
+
+CASD implementation complete: defining2tests observed RED then GREEN;91blocks
+retained exactlyonce,42moved,7refs. Canonical8,982B/145lines, staticloaded16,127B
+(−3,541.25estimatedtokens from pass3). Checkpoint remains standing; details
+conditional. Full active tests/routing/inventory and staged gates precede commit.
+Known external publicfixture failure remains scoped; no safety rule deleted.
+
+Fresh CASD selected200tests/330subtests PASS; frozen41/46routing unchanged,
+233sources/0inventorydrift, budgetsPASS, READMEpass_no_change. Exact staged
+size/privacy clearance precedes the dedicated pass4commit.
+
+Independent review found and resolved2routercoveragegaps: docs/config now
+required before commits/pushes; memory includes explicit personal-context and
+project/session context. Added CASDassertions pass; finalcore8,982B/145lines.

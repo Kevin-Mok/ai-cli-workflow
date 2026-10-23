@@ -1,27 +1,22 @@
 # Skill admissions
 
-Search vetted names, descriptions and jobs first; DENY duplicates or merge them.
-Score, record PASS/DENY, then add only on PASS. Refresh costs on edits; additions
-and removals update calibration/history in the same commit.
+Search vetted names/descriptions/jobs first; DENY duplicates or merge. Record
+PASS before adding; refresh costs on edits and calibration on additions/removals.
 
 Value 0–5 and uniqueness 0–2 use sanitized review evidence and surviving jobs.
 Full tokens=each UTF-8 bytes/4; weighted cost=desc bytes/4+body bytes/40 assumes
 **unmeasured 10% loading**. Score=(2*value+uniqueness)/(cost/100). Usual PASS:
 value>=2,uniqueness>=1,score>=1 plus the cited checks. Rule text pays desc cost.
-L/F/M/X/R=loads/followed/misfires/explicit/lifetime reads; heuristic counts,
-not causal efficacy. PR all-cwd reads differ from filtered keeper counts.
+L/F/M/X/R=loads/followed/misfires/explicit/lifetime reads: heuristics.
 
 `checks` inherits shared basis/size/trigger/privacy references.
 `distinct` explains no substitute; `precedents` cites2–3 closest vetted IDs. Reject costs are
 supplied estimates (desc chars as bytes); sources uninspected. Intake evidence is
 pass2. No raw/private data copied. Frozen intake46 covers27 skills:41/46 (89.13%)
-lexical matches, **not model triggering**. Tests enforce costs, cases, thresholds,
-sizes and routing; evidence/privacy semantics need review.
+lexical matches, **not model triggering**. Tests enforce costs/cases/budgets; semantic evidence/privacy need review.
 
 last30days has explicit user KEEP below cutoff; lean/router are user-required.
-Existing desc exceptions remain in BUDGETS.json. The rule verdict preceded its
-insertion:155→196B adds41B/10.25 recurring estimated tokens, not savings.
-This ledger covers local skills; calibration also covers externals/built-ins.
+Existing desc exceptions remain in BUDGETS.json. The rule adds41B/10.25 recurring tokens. Calibration covers externals too.
 
 ```json
 {"schema_version":1,"checks":{"public":{"cost_basis":"measured UTF-8 bytes/4","trigger_first":true,"size_budget":"PASS","budget_reference":"benchmarks/trim/BUDGETS.json","privacy_scope":"Public sources; sanitized aggregates only; no private import here.","privacy_reference":"dot_codex/AGENTS.md","nonregression":"intake-baseline.json; lexical proxy only"},"intake":{"cost_basis":"measured UTF-8 bytes/4","trigger_first":true,"size_budget":"PASS","budget_reference":"benchmarks/trim/BUDGETS.json","privacy_scope":"Pass2 source/privacy adaptations and staged privacy gate cleared; no re-import here.","privacy_reference":"benchmarks/trim/PROGRESS.md#pass-2--approved-private-source-intake","nonregression":"intake-baseline.json; lexical proxy only"},"uninspected":{"cost_basis":"supplied estimate; source not inspected","privacy_scope":"Uninspected proposal; privacy/size/trigger checks remain unverified."}},"entries":[
@@ -37,7 +32,7 @@ This ledger covers local skills; calibration also covers externals/built-ins.
 {"date":"2026-10-22","name":"grok-cli-handoff","verdict":"PASS","value":2,"uniqueness":1,"description_bytes":123,"body_bytes":4755,"description_tokens":30.75,"body_tokens":1188.75,"weighted_cost":149.625,"score":3.341688,"evidence":"Approved intake; 1 all-cwd read; remote/local transfer.","distinct":"context-handoff resumes tasks; this preserves transfer authority/STOP.","case_ids":["intake-grok"],"precedents":["existing:context-handoff","existing:long-task-harness"],"checks":"intake"},
 {"date":"2026-10-22","name":"impeccable","verdict":"PASS","value":4,"uniqueness":2,"description_bytes":92,"body_bytes":11985,"description_tokens":23.0,"body_tokens":2996.25,"weighted_cost":322.625,"score":3.099574,"evidence":"Approved pinned swap; 22 all-cwd reads; frontend umbrella.","distinct":"Generator builds new UI; explicit design commands refine surfaces.","case_ids":["intake-impeccable"],"precedents":["existing:impeccable","existing:frontend-design"],"checks":"intake"},
 {"date":"2026-10-22","name":"last30days","verdict":"PASS","value":3,"uniqueness":2,"description_bytes":246,"body_bytes":29889,"description_tokens":61.5,"body_tokens":7472.25,"weighted_cost":808.725,"score":0.989211,"evidence":"X9; distinct recent multi-source research; user KEEP.","distinct":"No survivor researches recent community discussion.","case_ids":["research-recent"],"precedents":["existing:next-tasks","existing:metaprompt"],"checks":"public","exception":"explicit user-approved KEEP below cutoff"},
-{"date":"2026-10-22","name":"lean-instructions","verdict":"PASS","value":5,"uniqueness":2,"description_bytes":69,"body_bytes":13913,"description_tokens":17.25,"body_tokens":3478.25,"weighted_cost":365.075,"score":3.286996,"evidence":"User-required technique log and mandatory admission gate.","distinct":"Doctor audits; skill-eval benchmarks; neither enforces admissions.","case_ids":["instructions-edit"],"precedents":["existing:ai-workflow-doctor","pr-33:skill-eval"],"checks":"public","exception":"explicitly user-required gate and technique log"},
+{"date":"2026-10-22","name":"lean-instructions","verdict":"PASS","value":5,"uniqueness":2,"description_bytes":69,"body_bytes":15125,"description_tokens":17.25,"body_tokens":3781.25,"weighted_cost":395.375,"score":3.035093,"evidence":"User-required technique log and mandatory admission gate.","distinct":"Doctor audits; skill-eval benchmarks; neither enforces admissions.","case_ids":["instructions-edit"],"precedents":["existing:ai-workflow-doctor","pr-33:skill-eval"],"checks":"public","exception":"explicitly user-required gate and technique log"},
 {"date":"2026-10-22","name":"metaprompt-run","verdict":"PASS","value":4,"uniqueness":1,"description_bytes":221,"body_bytes":7922,"description_tokens":55.25,"body_tokens":1980.5,"weighted_cost":253.3,"score":3.553099,"evidence":"X81; prompt then fresh-conversation execution.","distinct":"metaprompt authors without requiring execution.","case_ids":["prompt-run"],"precedents":["existing:metaprompt","existing:metaprompt-alxve"],"checks":"public"},
 {"date":"2026-10-22","name":"metaprompt","verdict":"PASS","value":5,"uniqueness":1,"description_bytes":130,"body_bytes":4603,"description_tokens":32.5,"body_tokens":1150.75,"weighted_cost":147.575,"score":7.453837,"evidence":"L37/heavy explicit use; current task invokes it.","distinct":"Prompt-only authoring differs from prompt-and-execute.","case_ids":["prompt-create"],"precedents":["existing:metaprompt-alxve","existing:metaprompt-run"],"checks":"public"},
 {"date":"2026-10-22","name":"morning","verdict":"PASS","value":2,"uniqueness":2,"description_bytes":257,"body_bytes":970,"description_tokens":64.25,"body_tokens":242.5,"weighted_cost":88.5,"score":6.779661,"evidence":"L1; explicit overnight continuation and user choices.","distinct":"Handoff captures facts; morning obtains follow-up decisions.","case_ids":["intake-morning"],"precedents":["existing:night","existing:context-handoff"],"checks":"public"},
@@ -62,3 +57,12 @@ This ledger covers local skills; calibration also covers externals/built-ins.
 {"date":"2026-10-22","name":"lean-admission-rule","kind":"rule","verdict":"PASS","value":5,"uniqueness":2,"description_bytes":196,"body_bytes":0,"description_tokens":49.0,"body_tokens":0,"weighted_cost":49.0,"score":24.489796,"evidence":"User requires PASS-before-add and synchronized calibration.","distinct":"Old pointer did not require recorded PASS.","case_ids":["instructions-edit"],"precedents":["existing:ai-workflow-doctor","pr-33:skill-eval"],"checks":"public","exception":"User-required router; actual cost disclosed."}
 ]}
 ```
+
+## Conditional-policy routing — PASS (2026-10-22)
+
+Value5, uniqueness1; router1250B/312.5tokens, body0,
+weightedcost312.5, score3.520000. Replaces standing procedures without
+new behavior: casd-map.json proves91blocks retained. Closest precedents:
+existing:ai-workflow-doctor, existing:context-handoff; neither routes standing
+policy. Frozen instructions-edit case;41/46 unchanged;9KB/150line budgetPASS;
+public-source-only relocation. Triggered reference loads remain additional.
