@@ -384,3 +384,25 @@ size/privacy clearance precedes the dedicated pass4commit.
 Independent review found and resolved2routercoveragegaps: docs/config now
 required before commits/pushes; memory includes explicit personal-context and
 project/session context. Added CASDassertions pass; finalcore8,982B/145lines.
+
+## Pass 4 delivered; pass 5 body concision
+
+Pass4 committedf0a1cbb0 after200tests/330subtests and staged privacy/sizePASS.
+All91original blocks survive; both review-found router gaps fixed. Staticloaded
+16,127B/4,031.75tokens; no runtime-load claim. COMPARISON regenerated.
+
+Pass5 owns only lean-instructions body and matching costs/evidence/docs. Preserve
+all8existing technique records and mandatory gate; add this technique's measured
+example. Description69B unchanged. Body15,125B/256lines before; target<10KB.
+- [ ] Compress repeated prose while preserving rule/why/example/mistakes/checklist.
+- [ ] Refresh measured admission costs and run relevant checks on frozen source.
+- [ ] Record on-demand-only savings and commit pass5; no recurring savings claim.
+
+Pass5 implementation ready: leanbody15,125→10,897B (−1,057on-demandtokens),
+177lines;9technique records with all5fields and completegate retained.
+Description69B unchanged, recurring0saved. Rootreview confirms required fields
+and decisions; measured admission cost refreshed. Focused tests/gates precede
+commit. Four intakeprovenance schema findings remain separate follow-up.
+
+Fresh pass5 selected200tests/330subtests PASS; budgetsPASS,41/46routing
+unchanged, inventory233/0drift. Exact staged size/privacy gates before commit.

@@ -1,6 +1,6 @@
 # Trim progress
 
-Current milestone: **passes1–3 committed; pass4 CASD validated for commit**.
+Current milestone: **passes1–4 committed; pass5 body concision validated for commit**.
 Static loaded context37,619→16,127B (9,404.75→4,031.75 estimated tokens,
 −57.13%). Conditional reference loads remain additional; actual runtime context
 is not measured. Later description/body/output passes and saturation remain open.
@@ -13,6 +13,7 @@ is not measured. Later description/body/output passes and saturation remain open
 | 2 — approved intake | Bounded complementary imports and pinned swap | Loaded | 29,632 | 30,251 | -2.09% | 27 |
 | 3 — admission gate | Evidence-priced additions and mandatory PASS ledger | Loaded | 30,251 | 30,292 | -0.14% | 27 |
 | 4 — CASD | Log-informed conditional policy routing | Loaded | 30,292 | 16,127 | 46.76% | 27 |
+| 5 — body concision | Repeated technique prose compressed in place | lean body | 15,125 | 10,897 | 27.95% | 27 |
 
 Baseline body bytes: 403,458 (100,864.5 approximate tokens). Loaded estimate:
 9,404.75 tokens; UTF-8 bytes/4, not actual model tokenizer usage. See BASELINE.json
@@ -378,3 +379,23 @@ Commit:refactor(instructions): route conditional procedures on demand.
 Fresh CASD selected200tests/330subtests PASS; frozen41/46routing unchanged,
 233sources/0inventorydrift, budgetsPASS, READMEpass_no_change. Exact staged
 size/privacy clearance precedes the dedicated pass4commit.
+
+## Pass 5 — technique-body concision
+
+All8existing technique records plus the new concision record retain rule, why,
+repo before/after token example, mistakes and checklists. Mandatory duplicate
+search,2–3precedents, rubric, explicit exceptions, privacy/provenance, frozen
+previous-case floors, size checks and cull history remain. No technique moved.
+Lean body15,125→10,897B saves1,057estimated on-demandtokens (27.95%),177lines;
+description69B unchanged. Overall bodies184,312→180,084B; loaded16,127B and
+27skills unchanged. This pass saves0recurring tokens.
+
+What worked: remove repetition within five fixed fields rather than moving
+required technique details out of the skill. The aspirational10KB target was
+not forced at the expense of safeguards; the actual300line budget passes.
+Next: apply description candidates only after replaying the unchanged current
+41/46snapshot, then address agent tool output and four audit-format findings.
+Commit:refactor(skills): condense the lean technique log.
+
+Fresh pass5 selected200tests/330subtests PASS; budgetsPASS,41/46routing
+unchanged, inventory233/0drift. Exact staged size/privacy gates before commit.

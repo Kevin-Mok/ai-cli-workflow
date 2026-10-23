@@ -1,7 +1,7 @@
 {
-  "pass": "Pass 4 CASD conditional policy",
-  "technique": "Log-informed conditional policy routing",
-  "commit_subject": "refactor(instructions): route conditional procedures on demand",
+  "pass": "Pass 5 body concision",
+  "technique": "Repeated technique prose compressed in place",
+  "commit_subject": "refactor(skills): condense the lean technique log",
   "tests": {
     "passed": 200,
     "subtests_passed": 330,

@@ -5,256 +5,177 @@ description: Use when adding to AGENTS.md or adding, editing, or removing a skil
 
 # Lean Instructions
 
-Keep instructions discoverable while reducing recurring context. Before adding
-to AGENTS.md or creating/editing/removing a skill, apply the techniques below and compare
-the affected surface with `scripts/trim-benchmark`. Preserve safety and user
-trigger phrases; inspect provenance before editing imported material.
-
-For each technique used, maintain its rule, rationale, measured repo example,
-mistakes and checklist here in the same commit as the pass. Keep descriptions
-short and this body within the 300-line budget. Do not claim projected savings
-as measured results. The pass log is `benchmarks/trim/PROGRESS.md`.
-
-Before scoring an addition, search names, descriptions and jobs in
-[vetted skills](references/vetted-skills.md) for overlap. If a live skill already
-does the job, DENY with `duplicate of <skill>` or recommend a merge. Compare the
-2–3 closest precedents and cite their IDs in the later admission verdict.
-Additions/removals update that reference in the same commit. Preserve culled and
-merged entries with date, real commit SHA, reason, evidence and survivor; use an
-explicit pending SHA until a commit exists. Re-admission needs new evidence that
-addresses the original reason. Run `scripts/sync-vetted-skills --check` to report
-missing or stale entries, including configured sources and detectable built-ins.
-Keep repo configuration and still-installed copies distinct until activation.
+Before AGENTS or skill edits, apply this gate and the techniques below; compare
+`scripts/trim-benchmark` results. Preserve safety, triggers and provenance.
+Keep each technique's five fields here, descriptions short and body≤300lines.
+Commit ledger, technique, PROGRESS, COMPARISON and plan together; stop if commit
+is blocked. Estimates are not billing; projections are not measured savings.
 
 ## Mandatory admission gate
 
-After the duplicate search above, apply this gate before adding a skill or an
-AGENTS.md rule. Duplicate jobs receive `DENY: duplicate of <skill>` or a merge
-recommendation, before numerical scoring; re-admissions address the cull reason.
+1. **Duplicate search first:** search names/descriptions/jobs in
+   [vetted skills](references/vetted-skills.md). Live overlap gets DENY with
+   `duplicate of <skill>` or a merge recommendation. Compare/cite2–3 closest IDs;
+   re-admission needs new evidence addressing the cull reason.
+2. Score **value0–5** from repo/session evidence, **uniqueness0–2** against
+   survivors (0=duplicate,2=uncovered); sanitize evidence and explain no substitute.
+   Measure UTF-8 description/body bytes: each full token cost=bytes/4.
+   **Weighted cost=description bytes/4+body bytes/40** assumes **unmeasured10% loading**.
+   **Score=(2×value+uniqueness)/(weighted cost/100)**. Rule text pays description cost.
+3. Usually require **value≥2,uniqueness≥1,score≥1**, trigger-first wording, current
+   `BUDGETS.json`, frozen candidate cases, routing nonregression and source
+   privacy/scope clearance. Freeze new cases before scoring; retain original
+   corpora and previous accepted floors. `scripts/trigger-eval --check` uses
+   intake46 covering current locals; lexical routing is not model accuracy.
+4. Record dated PASS/DENY in `docs/skill-admissions.md` **before adding**: scores,
+   both full token costs, weighted cost, evidence, precedents, no-substitute reason.
+   PASS cites cases and size/privacy checks; DENY gives reason/change condition.
+   Label supplied costs estimates; proposal approval does not clear source/privacy.
+5. Add only on PASS; refresh admission costs on edits. Run `python3 -m unittest
+   discover -s tests -p test_skill_admissions.py` and `scripts/sync-vetted-skills --check`.
+   Add/remove updates calibration in the same commit. Preserve cull/merge date,
+   real SHA (explicit pending until committed), reason/evidence/survivor.
+   Distinguish configured sources from still-installed host copies.
 
-1. Score **value 0–5** from relevant repo/session evidence and **uniqueness 0–2**
-   against the surviving jobs (0 = duplicate, 2 = uncovered). Cite the 2–3 closest
-   vetted IDs with sanitized evidence and explain why no survivor substitutes.
-2. Measure UTF-8 description and body bytes separately. Full token estimates are
-   each bytes/4. **Weighted cost = description bytes/4 + body bytes/40** assumes
-   a 10% body-load rate, not measured usage. **Score = (2 × value + uniqueness)
-   / (weighted cost/100)**. Charge a standing rule's whole text as description.
-3. Usually require **value ≥2, uniqueness ≥1, score ≥1**, trigger-first wording,
-   current `BUDGETS.json` size limits, a frozen candidate trigger case, routing
-   nonregression and source privacy/scope clearance. Use `scripts/trigger-eval
-   --check`; the committed intake46 corpus covers every current local skill.
-   This lexical proxy is not real model-trigger accuracy. Freeze new cases
-   before evaluating future candidates and preserve earlier corpora and floors.
-4. Before adding, record dated **PASS/DENY** in `docs/skill-admissions.md`: scores,
-   both full token costs, weighted cost, evidence, closest precedents and why no
-   survivor substitutes. PASS includes case IDs and size/privacy evidence; DENY
-   includes the specific reason and what would change it. Label supplied costs
-   as estimates; an approved proposal alone is not source or privacy clearance.
-5. Add only on PASS; refresh measured costs when editing an admitted skill.
-   Run `python3 -m unittest discover -s tests -p test_skill_admissions.py` and
-   `scripts/sync-vetted-skills --check`. Additions/removals update calibration
-   and preserve history. Commit the ledger, technique, plan and pass docs together.
-
-Keep exceptions honest: `last30days` remains below cutoff under explicit user
-KEEP authority. This gate/log and its standing router are explicitly required;
-record their actual cost rather than inflating evidence or inventing savings.
+`last30days` has explicit user KEEP below cutoff; this gate/log/router are
+user-required. Disclose actual costs; keep scores honest and exceptions named.
 
 ## Admit evidence before spending context — admission pass
 
-**Rule:** Require a recorded, tested PASS before adding context; reject duplicate
-jobs first and retain rejected candidates as concrete precedents.
-
-**Why:** Repeatedly priced admissions prevent catalog growth from undoing trims.
-
-**Repo example:** The AGENTS pointer grows from 155 to 196 bytes: **10.25 recurring tokens
-added, 0 saved**. This body grows from 10,307 to 13,913 bytes:
-**901.5 on-demand tokens added**. Its 69-byte description remains
-17.25 tokens. The unchanged intake46 lexical corpus scores 41/46 (89.13%) before
-and after the gate; neither added enforcement nor moved references are savings.
-
-**Mistakes:** Scoring renamed duplicates; inflating a borderline keeper's score;
-calling assumed body loads measured usage; approving uninspected private files;
-relabelling cases to hide routing losses; recording stale costs or vague DENYs.
-
+**Rule:** Record/test PASS before additions; reject duplicates first.
+**Why:** Priced admissions prevent growth undoing trims.
+**Repo example:** Pointer155→196B adds10.25recurring tokens (saves0); body
+10,307→13,913B adds901.5on-demand tokens. Description69B=17.25tokens and
+intake41/46 (89.13%) unchanged. Enforcement/reference moves are not savings.
+**Mistakes:** Renamed duplicates, inflated scores, assumed loads called measured,
+uninspected sources, relabelled cases, stale costs or vague DENYs.
 **Checklist**
-- [ ] Search live jobs first; compare and cite 2–3 vetted precedent IDs.
-- [ ] Price both full loads and assumed weighted cost; preserve honest exceptions.
-- [ ] Check frozen cases, nonregression, privacy/scope and current size budgets.
-- [ ] Record dated PASS/DENY before adding; refresh costs and calibration together.
-- [ ] Test every local admission and preserve all earlier pass evidence.
+- [ ] Cite2–3 precedents; price full/weighted loads and exceptions.
+- [ ] Check cases/privacy/scope/size/nonregression; record verdict first.
+- [ ] Test all local admissions; update costs/calibration and preserve evidence.
 
-## Measure the actual loading boundary — pass 0
+## Measure the actual loading boundary — pass0
 
-**Rule:** Record UTF-8 bytes, lines and bytes/4 estimates before editing. Compare
-the same files and categories afterward; count descriptions in recurring context
-and bodies only when invoked. Ratchet explicit existing budget exceptions.
-
-**Why:** Separating recurring and on-demand costs prevents misleading savings;
-a reproducible CLI and budgets expose growth without guessing from line counts.
-
-**Repo example:** Baseline manual loaded sum: 37,619 bytes (9,404.75 tokens).
-`scripts/trim-benchmark --plain` reproduces 37,619 bytes before the required lean
-skill addition. Before/after savings from measurement itself: **0 tokens**.
-The separate 403,458 body bytes (100,864.5 tokens) are not recurring savings.
-The required skill description and AGENTS pointer change loaded cost to 37,756
-bytes (9,439 tokens): **34.25 tokens added**, not saved. Record both costs.
-
-**Mistakes:** Treating bytes/4 as tokenizer billing; counting moved bodies as
-deleted capabilities; silently replacing the baseline; claiming whole-suite
-green from focused tests; recording malformed or incomparable snapshots.
-
+**Rule:** Compare identical per-file bytes/lines/bytes÷4 before/after; descriptions
+recur, bodies load on invocation. Separate CLI costs; ratchet explicit budgets.
+**Why:** Correct boundaries prevent misleading savings.
+**Repo example:** Baseline37,619B=9,404.75tokens; measurement saves0.
+`scripts/trim-benchmark --plain` reproduces it. Bodies403,458B=100,864.5tokens
+are separate. Required lean/router adds34.25tokens:37,619→37,756B (9,439tokens).
+**Mistakes:** Billing claims, moved capabilities called deleted, baseline
+replacement, whole-suite claims from focused tests, incomparable snapshots.
 **Checklist**
-- [ ] Save the pre-edit inventory and preserve its original baseline.
-- [ ] Separate loaded, body and CLI-output metrics; include new router costs.
-- [ ] Compare lines, bytes and estimates per item; test snapshot/error paths.
-- [ ] Preserve skill paths and trigger branches, not just the aggregate count.
-- [ ] Run relevant tests and budgets; record gains, costs and next hypothesis.
-- [ ] Update this skill, pass row and plan with the same commit; do not advance
-      to another pass when the current commit is blocked.
+- [ ] Preserve pre-edit inventory/original baseline; include router growth.
+- [ ] Compare each item/category, paths/triggers and snapshot/error cases.
+- [ ] Test/budget; log gains, next hypothesis and same-commit pass artifacts.
 
 ## Guard trigger quality — trigger baseline
 
-**Rule:** Freeze realistic positive, multi-skill and no-skill cases before
-shortening descriptions. Save a before-edit JSON report with `scripts/trigger-eval`;
-after editing, rerun with `--baseline` set to that report and `--check`. Reject
-any decline from the previous accepted score; retain the original baseline too.
-
-**Why:** Shorter descriptions are useful only while user requests still route.
-A fixed corpus and scorer prevent changing the exam to hide a regression.
-
-**Repo example:** The 58-byte lean-instructions description is unchanged before
-and after this guard (14.5 estimated tokens, **0 tokens saved**). The initial
-50-case lexical baseline is 40/50 (80%). This is measurement infrastructure;
-actual description passes must report their own token reduction and score.
-
-**Mistakes:** Comparing only to the original floor after an improvement;
-tuning gold labels after scoring; calling lexical accuracy model-trigger quality;
-assuming the 38 tested skill names prove preservation of all 60 skills.
-
+**Rule:** Freeze positive/multi/no-skill cases before trims. Save current-source
+`scripts/trigger-eval --json`; replay with `--baseline <pre-edit-report> --check`.
+Reject any decline even above the original floor; preserve original cases/baseline.
+**Why:** A fixed corpus/scorer exposes losses without changing the exam.
+**Repo example:** Description58→58B (14.5tokens) saves0; baseline40/50 (80%).
+Only38names tested, not all60; actual trims report their own savings.
+**Mistakes:** Original-floor-only checks, tuned gold labels, lexical results
+called model accuracy or full-catalog preservation.
 **Checklist**
-- [ ] Save the current-source score before editing; preserve original cases.
-- [ ] Rerun the same cases against the before-edit snapshot; reject any decline.
-- [ ] Review uncovered trigger branches semantically; never score skill bodies.
-- [ ] Log token change and exact-set accuracy; update this skill with the pass.
+- [ ] Save before score; replay unchanged cases/scorer against previous acceptance.
+- [ ] Review uncovered branches semantically; score names/descriptions, not bodies.
+- [ ] Log token/exact-set deltas; reject regressions and update technique.
 
 ## Mine failure evidence before changing rules — measurement input
 
-**Rule:** Screen the recent session window read-only, excluding helpers and
-private context before retaining counts. Keep safety rules regardless of matches;
-use recurring observed problems to retain controls and move conditional detail.
-Add a new control only for a frequent uncovered failure.
-
-**Why:** Evidence reduces speculative standing policy without treating absent
-regex matches as proof that a safeguard is useless.
-
-**Repo example:** The 205-byte completion-evidence paragraph remains unchanged
-(51.25 estimated tokens before/after, **0 tokens saved**). In 416 eligible
-sessions, the scan found 2 unsupported-completion complaint candidates; it
-supports retaining the rule. No complaint class met the predeclared frequency
-threshold, so no extra standing rule was added by this measurement step.
-
-**Mistakes:** Publishing raw logs; equating failed tool completions with
-unexpected incidents; treating intentional RED as a defect; deleting safety
-controls because privacy exclusions or regex wording produced zero matches.
-
+**Rule:** Screen recent logs read-only; exclude helpers/private context before
+counts. Keep safety regardless; add only frequent uncovered controls and use
+evidence to retain controls or relocate conditional detail.
+**Why:** Absent regex matches do not invalidate safeguards.
+**Repo example:** Completion rule205→205B (51.25tokens) saves0. In416sessions,
+2unsupported-completion candidates; no class met3sessions/2dates, so no new rule.
+**Mistakes:** Raw exports, tool failures called unexpected incidents, intentional
+RED called defective, safety removed after zero/private-excluded matches.
 **Checklist**
-- [ ] Freeze the window/codebook; stream stable bounded files without exports.
-- [ ] Report exclusions, candidate counts and uncertainty; paraphrase safely.
-- [ ] Map observed failures to retained rules; measure any later move separately.
+- [ ] Freeze window/codebook; stream bounded stable files without exports.
+- [ ] Report exclusions/counts/uncertainty safely; map controls, measure moves separately.
 
 ## Cull by relevance and preserve useful overlap — approved cull
 
-**Rule:** Cull only explicitly approved names after freezing a keep-list routing
-slice. Merge unique behavior into survivors, fix callers, and disable external
-exposures through repo configuration while preserving upstream files.
-
-**Why:** Rare overlapping catalogs cost every session and increase misfires;
-retaining useful contracts avoids losing capabilities with the discarded entry.
-
-**Repo example:** Removing 39 approved local sources eliminates 7,847 description
-bytes (1,961.75 estimated recurring tokens gross) and 280,523 body bytes.
-Retain last30days, add the context-handoff merge survivor, and measure net costs
-with trim-benchmark: before the new calibration-sync requirement, loaded context
-moved from 37,756 to 29,543 bytes (**2,053.25 tokens saved**, 21.75%). Keep-list
-routing moved from 13/17 to 15/17 on unchanged
-cases. External removal estimates are potential configuration savings until
-installation cleanup; no live upstream file was deleted.
-
-**Mistakes:** Treating gross bytes as net savings; scoring removed labels as
-keeper regressions; silently discarding planning-only behavior; deleting global
-installs or private inputs; quoting a private study in public artifacts.
-
+**Rule:** Cull approved names after freezing keeper routing; merge unique
+behavior/planning-only branches, repair callers, disable external exposure in
+repo config and preserve upstream files.
+**Why:** Rare overlaps spend recurring context and cause misfires.
+**Repo example:**39sources remove7,847description B (1,961.75tokens gross) and
+280,523body B. Keep last30days; merge long-task-harness→context-handoff and
+commit-plan→commit-plan-push. Before calibration-sync growth,37,756→29,543B
+saves2,053.25tokens (21.75%); unchanged keep routing13/17→15/17. External savings
+remain potential until activation/cleanup; no live upstream deletion.
+**Mistakes:** Gross called net, removed labels called keeper regressions, lost
+planning behavior, global/private-input deletion, private-study publication.
 **Checklist**
-- [ ] Record explicit authorization, per-name reasons and pre-cull metrics.
-- [ ] Freeze the retained-case slice before edits; preserve original gold data.
-- [ ] Preserve merge behavior, repair active references and run focused tests.
-- [ ] Report per-name bytes, net metrics, routing, manual cleanup and commit state.
+- [ ] Record authority/names/reasons/bytes/pre-metrics; freeze unchanged keeper slice.
+- [ ] Preserve merges/gold; repair references and test survivors.
+- [ ] Log net count/cost/routing, per-name costs, manual cleanup and commit status.
 
 ## Keep calibration aligned with configuration — cull maintenance
 
-**Rule:** Inventory configured and detectable installed skills, retain removal
-history, and fail drift checks when live entries are missing or active entries
-are stale. Search jobs and descriptions for duplicates before scoring additions.
-
-**Why:** A gate trained on stale keepers approves duplicates and forgets why an
-earlier candidate lost. Persistent culled entries make re-admission reviewable.
-
-**Repo example:** The 39 removed source directories retain their measured cull
-reasons in the on-demand reference instead of disappearing. This integrity
-check saves **0 tokens** itself; its description/router growth is charged in the
-cull benchmark, and the long reference is excluded from recurring context.
-
-**Mistakes:** Deleting cull history; inventing a pending commit's SHA; treating a
-disabled repo installer as proof the old host copy is gone; bypassing duplicates
-by changing names; treating unmeasured built-ins as scored study candidates.
-
+**Rule:** Inventory configured/detectable installed skills and built-ins; fail
+missing/stale entries. Search jobs before scoring; retain cull/merge history
+and require new evidence addressing cull reasons for re-admission.
+**Why:** Stale precedents approve duplicates and forget earlier losses.
+**Repo example:**39removed sources retain measured reasons in the on-demand
+reference; integrity checking saves0tokens. Router growth is charged to culling;
+reference bytes are excluded from recurring context.
+**Mistakes:** Deleted history, invented SHAs, disabled installer called host
+cleanup, renamed duplicates, unmeasured built-ins called scored candidates.
 **Checklist**
-- [ ] Inventory local/configured sources and detectable built-ins/installed copies.
-- [ ] Search names, descriptions and jobs; cite the closest precedents.
-- [ ] Keep dated cull/merge history, reasons, evidence and survivor.
-- [ ] Run drift tests and sync check; commit reference and config changes together.
+- [ ] Inventory local/configured/installed sources and detectable built-ins.
+- [ ] Cite precedents; retain date/SHA/reason/evidence/survivor and cull rationale.
+- [ ] Run drift tests/sync; commit reference and config changes together.
 
 ## Admit complementary sources and disclose load costs — intake pass
 
-**Rule:** Import only approved paths after a privacy screen; keep meaningful
-triggers, move detailed workflows to references and retain licenses/provenance.
-Audit private-source text semantically as well as with the exact-candidate gate.
-
-**Why:** A complementary job earns a bounded recurring cost; pinned on-demand
-resources preserve capability without putting all detail in the entry point.
-
-**Repo example:** Four approved skill descriptions total498→406 bytes:23
-estimated recurring tokens of avoided intake growth, not existing-catalog
-savings. shadcn entry20,669→6,727 bytes saves3,485.5 on-demand entry tokens;
-detailed workflows remain linked. Net added descriptions are charged separately
-in PROGRESS. Required web runtime assets remain; unused native files are removed.
-
-**Mistakes:** Importing a whole private branch; copying private evaluation notes;
-claiming a moved reference disappeared; dropping runtime assets to meet a byte
-target; including installed external descriptions in repo-only savings.
-
+**Rule:** Import approved paths after semantic privacy review and exact-candidate
+gate. Retain triggers, pinned provenance/licenses and required runtime assets;
+move detailed workflows to on-demand references.
+**Why:** Complementary jobs earn bounded entry costs without losing capability.
+**Repo example:** Four descriptions498→406B avoid23recurring tokens of intake
+growth. shadcn20,669→6,727B saves3,485.5on-demand entry tokens; workflows stay
+linked. PROGRESS charges net additions; required web assets remain, unused
+native resources removed. These are not existing-catalog/external savings.
+**Mistakes:** Whole-branch/private-note imports, moved text called deleted,
+required assets dropped for size, external costs counted locally.
 **Checklist**
-- [ ] Pin allowed paths, screen content and preserve provenance/licenses.
-- [ ] Freeze cases using original proposal descriptions before evaluating trims.
-- [ ] Keep old cases unchanged; check both keeper and expanded-corpus floors.
-- [ ] Update catalog, calibration/history, budgets and measured net costs.
-- [ ] Run staged privacy/size checks; commit this intake as its own pass.
+- [ ] Pin allowed paths; screen private text semantically/exactly; preserve licenses.
+- [ ] Freeze original-proposal-description cases before scoring; retain old gold.
+- [ ] Check keeper/expanded floors, catalog/history/budgets/net costs and staged gates.
+- [ ] Commit intake separately; approval grants no broader import authority.
 
 ## Route conditional policy without losing safeguards — CASD pass
 
-**Rule:** Use screened failure evidence to retain preventive/safety controls;
-move conditional procedures verbatim behind mandatory task-specific routers.
-**Why:** Unrelated tasks avoid loading detailed procedures, while triggered work
-still finds the original policy. Sparse matches never justify deleting safety.
-**Repo example:** Canonical AGENTS23,147B becomes 8,982B; static loaded
-context30,292B becomes 16,127B, saving 3,541.25 estimated
-recurring tokens. All91original blocks survive exactly once;42move to7refs.
-Reference loads still cost tokens when triggered; these are static-boundary
-savings, not measured runtime/tokenizer savings. No complaint met the3session/
-2date threshold, so no speculative rule was added.
-**Mistakes:** Calling moved text deleted; making an always-required reference
-look conditional; weakening safety; checking only headings rather than content.
+**Rule:** Retain failure-backed/safety controls; relocate procedures verbatim
+behind mandatory conditional routers. Sparse evidence never deletes safety.
+**Why:** Unrelated tasks avoid detail; triggered tasks reach original policy.
+**Repo example:** AGENTS23,147→8,982B; loaded30,292→16,127B saves3,541.25recurring
+estimated tokens. All91blocks survive once;42move to7refs. Triggered loads cost
+separately: static-boundary savings, not measured runtime usage. No complaint
+met3sessions/2dates; no speculative rule added.
+**Mistakes:** Moved called deleted, always-read reference called conditional,
+weakened safety, heading-only preservation checks.
 **Checklist**
-- [ ] Map observed failures to retained controls; keep safety even at zero matches.
-- [ ] Compare original block hashes and one verbatim home; verify all routers.
-- [ ] Price router costs, separate triggered loads, test contracts and budgets.
+- [ ] Map failures to controls; retain safety at zero matches.
+- [ ] Verify original hashes/one home/routers/source contracts; budget router and triggered costs.
+
+## Compress repeated technique prose — body concision pass
+
+**Rule:** Compress repetition; retain every technique's five fields here and all
+gate decisions/safeguards. Required techniques stay in this body.
+**Why:** Less on-demand context preserves actionable decisions.
+**Repo example:** f0a1cbb0 body15,125→10,897 B saves1057.00
+estimated on-demand tokens; description69→69B saves0recurring tokens.
+No required technique moved; frozen routing/cases remain unchanged.
+**Mistakes:** Dropped actions/safeguards, hidden techniques, on-demand savings
+called recurring or billing measurements.
+**Checklist**
+- [ ] Compare all old technique steps, gate arithmetic and safeguards.
+- [ ] Preserve frontmatter/triggers; measure bytes, five fields and relevant gates.
+- [ ] Commit measured on-demand delta with0recurring savings and pass artifacts.

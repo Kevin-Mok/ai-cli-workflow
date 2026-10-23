@@ -146,3 +146,16 @@ CASD final review added28router bytes after a test worker had already started;
 198tests/330subtests passed but2budget assertions saw the old ceiling. Frozen
 source now16,127loadedB; root benchmarkPASS. Rerun after confirming that value,
 not while its owner is updating it. Same preparation-ordering lesson as pass2.
+
+Fresh post-intake/CASD workflow doctor returns39errors/1warning, with4new
+invalid_source_provenance findings: grok-cli-handoff, skill-eval, shadcn and
+impeccable. Source text exists, but imported notes lack the doctor's exact
+repository/path/revision/basis field names and use punctuated dates. This repeats
+the known local-doctor-provenance-baseline issue. Keep body pass focused; correct
+structured provenance as a separate follow-up, using true pinned upstream paths
+or accepted local intake blobs, without publishing private repo locations.
+Do not weaken the doctor or claim zero-new-findings until that rerun passes.
+
+A read-only description preflight assumed report key results instead of the
+declared per_case field and raised KeyError. No source changed; inspect the
+returned schema before consuming reports. Same source-inspection lesson.
