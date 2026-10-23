@@ -247,6 +247,9 @@ conditional link; keep shared authorization, privacy and safety in the entry.
 **Repo example:** Personal-context8,384→6,758bodyB saves406.5estimated entry
 tokens for automatic lookups. Explicit conversations load the1,984Breference:
 combined8,742B adds89.5tokens. Description unchanged;0recurring savings.
+Pass11 planning-only/consolidation/learning entries15,469→12,420B save762.25
+entrytokens when unused. All3references total4,373B; combined16,793B adds331
+tokens when allbranches trigger. Descriptions unchanged; originalcontrols retained.
 **Mistakes:** Moving required/common controls, claiming savings for a branch
 that must read both files, lost paragraphs or weakened literal-contract tests.
 **Checklist**

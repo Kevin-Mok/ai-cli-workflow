@@ -494,3 +494,14 @@ combinedload adds89.5tokens. Two definingtests RED→GREEN plus independent
 review5verified/0incorrect, no materialdefect; fullselected237tests/388subtests
 PASS, budgets/routing42/46/inventory233/0drift/READMEPASS.
 Nextpass11 addresses3otherconditionalprocedures; finalclosure remains open.
+
+## Pass 10 delivered; pass 11 conditional procedures
+
+Pass10 committedd6a75f69 after237tests/388subtests and privacy/sizePASS; its
+verbatim copiedref retains one intentional cosmetic blankEOFwarning.
+Pass11 mainentrycontrols stay exact; only planning-only, consolidation and
+PMlearning detail moves. Entries−762.25tokens; all3combinedpaths+331tokens.
+Fullselected238tests/391subtests and independent35tests/202subtests PASS;
+42/46routing, budgets,233sources/0drift and READMEPASS. Staged gates/commitnext.
+Finalcandidate: actualhandofftemplate only; shared evidence/status/retry policy
+remains main. Keep GrokSTOP guardrail section inentry.

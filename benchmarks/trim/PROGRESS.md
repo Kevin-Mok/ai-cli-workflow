@@ -1,6 +1,6 @@
 # Trim progress
 
-Current milestone: **passes1–9 committed; pass10 conditional dialogue validated for commit**.
+Current milestone: **passes1–10 committed; pass11 conditional procedures validated for commit**.
 Static loaded context37,619→14,399B (9,404.75→3,599.75 estimated tokens,
 −61.72%). Conditional reference loads remain additional; actual runtime context
 is not measured. Remaining conditional-body candidates and final saturation closure remain open.
@@ -19,6 +19,7 @@ is not measured. Remaining conditional-body candidates and final saturation clos
 | 8 — provenance follow-up | Machine-readable exact source evidence | Source notes | 12,940 | 15,251 | -17.86% | 27 |
 | 9 — instruction deduplication | Canonical controls replace repeated config injection | Loaded | 15,116 | 14,399 | 4.74% | 27 |
 | 10 — conditional dialogue | Explicit conversation procedure loads only for that branch | Personal entry body | 8,384 | 6,758 | 19.39% | 27 |
+| 11 — conditional procedures | Planning-only, consolidation and learning branches | Three entry bodies | 15,469 | 12,420 | 19.71% | 27 |
 
 Baseline body bytes: 403,458 (100,864.5 approximate tokens). Loaded estimate:
 9,404.75 tokens; UTF-8 bytes/4, not actual model tokenizer usage. See BASELINE.json
@@ -529,3 +530,25 @@ split would look cheaper. The projectindex section remains because it shares
 privacy/qualification duties. Next: conditional planning-only, consolidation
 and learning-update procedures identified by the remaining-body audit.
 Commit:refactor(skills): defer explicit conversation procedure.
+
+## Pass 11 — conditional planning, consolidation and learning
+
+Three realbranches move verbatim behind MUSTread links; planning'sno-write/mode
+guards, feedbackappend/privacy/ownership and immediatepostmortem/tracked-source
+obligations remain main. Original paragraphs/frontmatter/links are preserved.
+Existingliteralassertions resolve the newhomes without weakening; fullselected
+238tests/391subtests PASS, routing42/46unchanged, budgets/inventory233/0drift/
+READMEPASS. Independentreview4verified/0incorrect, no materialdefect.
+
+Entries:commit-plan-push7,191→6,404B;feedback4,288→3,287B;postmortem3,990→
+2,729B. Combined15,469→12,420B saves762.25estimated entrytokens when branches
+are unused. References total4,373B; combined16,793B adds331tokens if alltrigger.
+Logexample adds240B; overallbodies183,011→180,202B. Recurring14,399B unchanged.
+
+What worked: retain duties/authorization inentry and move executiondetail only.
+Newreferenceclosingpointers preserve payload bytes without trailingblank EOF.
+Pass10's copied reference retains its original trailingblank; that cosmetic
+whitespace warning is intentionally accepted, with tests/privacy/size passing.
+Next: split the actualhandoff artifacttemplate while keeping status/evidence/
+retry safeguards inentry. GrokSTOP remains because dispatchers need its safety
+boundaries before launching work. Commit:refactor(skills): defer conditional procedures.

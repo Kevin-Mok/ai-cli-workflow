@@ -21,19 +21,7 @@ changes into commits, or a safe plan without execution. This mode performs
 change files, index state or history. An explicit execution request selects the
 delivery workflow below instead; uncertainty stays read-only.
 
-Inspect the repository, branch, status, all staged/unstaged/untracked diffs,
-history and related files. Plan every safe, reviewable group oldest-to-newest;
-preserve prerequisite chronology and explain ambiguity. Identify secrets,
-credentials, caches, generated files, risky binaries and ownership questions as
-exclusions. Review README impact without applying repairs. Keep companion
-plans, docs, tests and postmortems with the matching implementation. Treat
-ordinary validation and README findings as warnings for later execution.
-
-Then return: working-tree summary; numbered commit groups with purpose, files,
-rationale, README impact and concise Conventional Commit subjects/minimal
-concrete bodies; risks and exclusions; optional manual commands in chronology;
-and a final subject-only message summary. Recommend the smallest checks for
-later execution and **return before the delivery workflow**.
+In planning-only mode, MUST read [the planning procedure](references/planning-only.md) and return before delivery.
 
 Single-commit workflows push after the commit passes verification; multi-commit workflows push once after the complete verified series, unless the user explicitly requests another cadence.
 

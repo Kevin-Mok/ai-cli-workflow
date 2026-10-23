@@ -65,6 +65,13 @@
       "privacy_exit": 0,
       "output": "Privacy gate PASS: exact candidate checked locally.",
       "historical_precommit_checks": "root-observed PASS; no separate raw log retained"
+    },
+    {
+      "commit": "d6a75f6963eaad822697a00b48075f10ef285d27",
+      "tree": "4d73f36986e07199c2eab5d91ce096c4538cf3a8",
+      "privacy_exit": 0,
+      "output": "Privacy gate PASS: exact candidate checked locally.",
+      "historical_precommit_checks": "root-observed PASS; no separate raw log retained"
     }
   ]
 }

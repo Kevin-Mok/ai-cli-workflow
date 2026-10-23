@@ -285,6 +285,7 @@ class AIWorkflowContractTest(unittest.TestCase):
 
     def test_feedback_memory_consolidation_prefers_merge_and_is_gated(self) -> None:
         text = read_repo_file("dot_agents/skills/feedback-memory/SKILL.md")
+        text += "\n" + read_repo_file("dot_agents/skills/feedback-memory/references/consolidation.md")
         for required in (
             "3+ times in separate sessions",
             "Ask the user before writing any skill",

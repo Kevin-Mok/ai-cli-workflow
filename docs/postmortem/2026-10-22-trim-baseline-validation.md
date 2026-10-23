@@ -176,3 +176,9 @@ claims. Freshdoctor35errors/1warning,0newfindingkeys vs savedbaseline. The
 A saturation inspection assumed personal-context/SOURCE.md existed; that optional
 file is absent. No source was modified by the probe. The known source-discovery
 lesson applies: inspect observed inventory before optional provenance paths.
+
+Pass10 exactcopiednewreference caused a staged blankEOFwarning. Payload
+verbatim preservation is intentional; tests/privacy/size passed, and no staged
+whitespace-PASSclaim applies to that reference. Laterrefs use a closingpointer
+after the copiedpayload. A reviewer optionalbrace-glob produced nonexistent
+cross-product paths; no source defect, covered by the discoverylesson.

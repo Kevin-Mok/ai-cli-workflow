@@ -13,6 +13,7 @@ class SkillCullContractTest(unittest.TestCase):
     def test_commit_planning_only_stops_before_delivery(self):
         skill = (SKILLS / "commit-plan-push/SKILL.md").read_text()
         planning = skill.split("## Planning-only mode", 1)[1].split("## Required Workflow", 1)[0]
+        planning += "\n" + (SKILLS / "commit-plan-push/references/planning-only.md").read_text()
         for requirement in ("commit-plan", "no Git writes", "Do not stage, commit, push",
                             "oldest-to-newest", "README", "warnings", "files",
                             "Conventional Commit", "chronology", "return"):

@@ -107,3 +107,11 @@ preservation, maincontrols, conditionalrouter and honestentry/combinedload
 metrics verified. Selected237tests/388subtests PASS. Nineimmutable pass-tree
 privacy receipts independentlymatchGit; intake/pass9 exact-tree reruns PASS.
 Historicalprecommit/size timing is root-observed, not a retrospectivecertificate.
+
+## Pass 11 review
+
+Independent4verified/0incorrect/1deliverypending. Exactthreebranchpreservation,
+sharedguardrails/frontmatter/links, mandatoryconditions and honestentry/combined
+loads verified. Independent35tests/202subtests PASS; selected238/391PASS.
+GrokSTOP stays inentry. Historicalgate claims remain root-observed; exact
+committed-tree privacy receipts nowcover10completedpasses.
