@@ -49,7 +49,7 @@ DISPLAY/XAUTHORITY/I3SOCK and restarts `kitty-monitor-font.service` on login/rel
 It runs `~/scripts/kitty-monitor-font watch` with minute-by-minute heartbeats.
 No new dependency or Kitty configuration reload is needed.
 
-Working directory: `/home/example/linux-config`; no sudo. Read-only live metrics:
+Working directory: `/home/kevin/linux-config`; no sudo. Read-only live metrics:
 
 python3 scripts/executable_kitty-monitor-font status
 

@@ -1,6 +1,6 @@
 # Redshift temperature notifications in i3
 
-Implement this request in /home/example/linux-config: “when using redshift in i3 i want a noti that shows what temp its at like in dunst”.
+Implement this request in /home/kevin/linux-config: “when using redshift in i3 i want a noti that shows what temp its at like in dunst”.
 
 Make the existing i3 Redshift controls show a Dunst desktop notification with the resulting color temperature in kelvin after a successful operation. Assume notifications are wanted for manual i3 adjustments, presets and reset; do not add a background monitor or periodic notifications.
 

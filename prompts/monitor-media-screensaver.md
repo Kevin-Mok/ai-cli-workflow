@@ -1,4 +1,4 @@
-Implement a Linux X11/i3 screensaver in /home/example/linux-config.
+Implement a Linux X11/i3 screensaver in /home/kevin/linux-config.
 
 Media and movement:
 - Recursively discover photos and videos under /mnt/linux-files-3/hevin, ignoring unrelated files.

@@ -1,4 +1,4 @@
-Fix tmux selection scrolling and clipboard copying in /home/example/linux-config.
+Fix tmux selection scrolling and clipboard copying in /home/kevin/linux-config.
 
 Observed problem:
 The blue-highlighted selection lets me access older tmux output, but
