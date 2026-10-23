@@ -11,9 +11,9 @@ usage() {
   cat <<'USAGE'
 Usage: sync-design-skills [--dry-run|--bootstrap]
 
-Refresh the managed public design skill externals; UI/UX Pro Max stays vendored.
+Refresh the retained Impeccable source and Higgsfield plugin.
 --dry-run previews external refreshes without modifying skill files.
---bootstrap is a compatibility no-op; chezmoi deploys the vendored UI/UX Pro Max skill.
+--bootstrap is a compatibility no-op; no separate bootstrap is needed.
 USAGE
 }
 
@@ -33,15 +33,12 @@ if [[ ! -d "$source_dir" ]]; then
 fi
 
 if [[ "$mode" == bootstrap ]]; then
-  echo "$(cli_emoji '✅')UI/UX Pro Max is vendored; no separate bootstrap is needed."
+  echo "$(cli_emoji '✅')Design sources use chezmoi; no separate bootstrap is needed."
   exit 0
 fi
 
 targets=(
   "$HOME/.codex/skills/upstreams/impeccable"
-  "$HOME/.codex/skills/upstreams/21st"
-  "$HOME/.codex/skills/upstreams/review-animations"
-  "$HOME/.codex/skills/upstreams/scroll-world"
   "$HOME/.codex/plugins/higgsfield"
 )
 apply_args=(-S "$source_dir" apply --refresh-externals -v)
@@ -56,4 +53,4 @@ if [[ "$mode" == dry-run ]]; then
   exit 0
 fi
 
-echo "$(cli_emoji 'ℹ️')Design skills refreshed. UI/UX Pro Max stays pinned. Restart agent sessions to load updates."
+echo "$(cli_emoji 'ℹ️')Design skills refreshed. Restart agent sessions to load updates."

@@ -73,9 +73,10 @@ education work:
   to `.agent/PLANS.md`.
 - Make plans decision-complete: record scope, assumptions, checkboxes, risks,
   verification evidence, and review notes. Keep progress current while working.
-- For work spanning sessions, use the `long-task-harness` skill (brief,
+- For work spanning sessions, use the `context-handoff` skill (brief,
   `/goal`, `evidence-reviewer` pass, `progress.md` handoff).
   Commit matching plan updates in the same change as the work they describe.
+- Before browser automation or Playwright commands, use the `playwright` skill.
 - A small task may use a short inline plan. If evidence invalidates any plan,
   stop and revise it before continuing.
 - Use focused subagents when two or more independent tasks can proceed in
@@ -185,6 +186,8 @@ education work:
   invocation.
 
 ## Documentation And Repo Surfaces
+
+- Use `lean-instructions` when adding to AGENTS.md or adding/editing/removing a skill; update `vetted-skills.md` in the same commit for additions/removals.
 
 - Start every how-to or procedural document with a short, plain-language
   overview directly below the title. Explain what the document helps the

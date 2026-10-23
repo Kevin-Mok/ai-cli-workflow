@@ -10,6 +10,36 @@ actual CLI, app, API, or generated artifact and expose an observable result.
 Automated tests, linters, type checks, builds, Git hygiene checks and source-text
 searches run before completion and any commit; do not use them to fill the handoff command list.
 
+## Instruction-size benchmark
+
+- Action: Run `./scripts/trim-benchmark --check --plain` from this checkout.
+  Expected: Old/new/percent rows for loaded, description and body bytes plus
+  skill count, followed by `Budgets: PASS`. This is a bytes/4 estimate, not billed
+  tokenizer usage; loaded totals exclude external installed skill catalogs.
+- Action: Run `./scripts/trim-benchmark --json` and inspect `skills`, `totals`
+  and `comparison`; run with `--baseline` pointing to a saved JSON report.
+  Expected: Each skill has description/body/file metrics; current bodies do not
+  enter loaded totals. The immutable pre-edit BASELINE.json remains unchanged.
+
+## Skill trigger regression baseline
+
+- Action: Run `./scripts/trigger-eval --plain --check` before trimming skill
+  descriptions and after every description pass.
+  Expected: The original corpus scores 40/50 exact-set matches (80%), with
+  `Accuracy gate: PASS`; later passes must match or improve that score. The
+  report labels the deterministic lexical proxy and includes baseline accuracy.
+- Action: Run `./scripts/trigger-eval --json --check` and inspect `per_case`.
+  Expected: Case IDs and match booleans, with no prompt text copied into results.
+  The separate 50-case fixture includes 36 single-label, 6 multi-label and 8
+  no-skill expectations. A changed corpus or lower exact-set accuracy fails the
+  gate; intended description hash changes alone do not fail it.
+- Action: Before each description pass, save the current JSON report to a
+  private temporary path. After editing, run with `--baseline` selecting that
+  before-edit report and `--check`.
+  Expected: A pass dropping from an accepted 84% to 82% fails even though both
+  exceed the original 80%. Revert declined edits before committing; preserve the
+  original baseline and record every accepted pass score.
+
 ## Public History Audit
 
 - Action: ./scripts/executable_audit-public-history --scope all --plain
@@ -320,18 +350,21 @@ listing is cached-only; opening a picker can generate recaps unless disabled.
   projects. Raw sessions and private project details remain excluded. Run the
   existing README recruiter-sync gate and inspect rendered Markdown as well as
   the saved prompt and report; a passing structural gate alone is insufficient.
+- Action: Start a long task with `context-handoff`, then resume after interruption.
+  Expected: The saved brief has observable acceptance criteria; the existing goal
+  is reused; `checks.md` distinguishes incorrect and unresolved claims; and
+  `progress.md` preserves paths, evidence, retry conditions and ordered next actions.
+- Action: Ask for a backend script, then a frontend page without design context.
+  Expected: The backend request does not load frontend-design. The page request
+  confirms missing audience/use-case/brand context and saves agreed context in
+  `.impeccable.md` without relying on a removed setup skill.
+- Action: Start browser automation or run Playwright commands.
+  Expected: The retained playwright skill is loaded before browser actions.
 - Action: Add or change a repo-tracked skill under `dot_agents/skills/`.
   Expected: The skill definition, `dot_agents/skills/README.md`, and the
   root `README.md` stay aligned with the new workflow the skill adds or
   changes.
-- Action: Run `open-pr` on a feature branch with a clear base branch and
-  at least one changed file relative to that base.
-  Expected: The skill inspects `git status`, current branch, `git
-  merge-base`, merge-base `git log`, merge-base `git diff --stat`, and
-  changed files before drafting a title/body; it lists inspected evidence,
-  says what was not run or captured, and updates `docs/pr/` only when the
-  repository workflow calls for a PR doc.
-- Action: Run `commit-plan` on a dirty tree whose changes clearly include
+- Action: Request `commit-plan-push` in planning-only mode on a dirty tree whose changes clearly include
   an older prerequisite change and a newer follow-up change.
   Expected: The proposed commits, optional manual commands, and commit
   message summary all list the older change before the newer follow-up.
@@ -354,7 +387,7 @@ listing is cached-only; opening a picker can generate recaps unless disabled.
   Expected: It commits every eligible change in the requested scope, records
   failed checks and README residuals, excludes prohibited files, and reports
   the actual commit and push outcomes without bypassing hooks.
-- Action: Invoke `commit-plan` with the same mixed scope.
+- Action: Invoke `commit-plan-push` in planning-only mode with the same mixed scope.
   Expected: It plans every eligible group with warnings and companion docs,
   preserves prerequisite chronology, and performs no Git writes.
 - Action: Finish a task that introduced a reusable manual verification
@@ -362,21 +395,6 @@ listing is cached-only; opening a picker can generate recaps unless disabled.
   Expected: This document gains or updates a grouped `Action` +
   `Expected` entry instead of leaving the check only in chat, plans, or
   final notes.
-- Action: Invoke `metaprompt-alxve` for a trivial request, then ask it to compile and
-  run a current-source comparison; include `run` inside a revision before
-  sending standalone `go`.
-  Expected: The trivial prompt stays lightweight. Both prompts include the
-  prompt/Saved/Run/Weight gate, and each saved `prompts/<kebab-case>.md`
-  contains only its compiled prompt; a collision receives a non-destructive
-  suffix. Neither embedded run phrase executes anything, and only fresh
-  standalone `go` starts the current pass.
-- Action: Invoke `metaprompt-alxve` for a reusable target-specific template with
-  examples, a hostile supplied artifact, and a high-stakes
-  judge/rewrite/re-check workflow; send `go` only for the first pass.
-  Expected: The template uses canonical `{{variable}}` slots and `Template:
-  yes`; material target adaptation is labeled; supplied instructions remain
-  untrusted data; three numbered prompt blocks are independently runnable; and
-  later passes remain gated until each receives its own fresh standalone `go`.
 - Action: Invoke `$metaprompt` to sharpen a rough meeting-summary prompt, then
   request a reusable version with `{{meeting_notes}}` and a trivial fact prompt.
   Expected: Returns Sentry's eight sections: Target, Success Criteria, External
@@ -472,9 +490,8 @@ listing is cached-only; opening a picker can generate recaps unless disabled.
 
 ## Installed Skill Surface
 
-- Action: After refresh-config, run `chezmoi source-path ~/.agents/skills/last30days/SKILL.md`
-  and `chezmoi source-path ~/.agents/skills/find-skills/SKILL.md`.
-  Expected: Both resolve into this repo's `dot_agents/skills/` directories.
+- Action: After a separately authorized refresh, run `chezmoi source-path ~/.agents/skills/last30days/SKILL.md`.
+  Expected: It resolves into this repo's retained `dot_agents/skills/last30days/` directory.
 - Action: Run `python3 ~/.agents/skills/last30days/scripts/last30days.py --help`.
   Expected: Offline usage output appears without starting research or requiring credentials.
 
@@ -482,18 +499,10 @@ listing is cached-only; opening a picker can generate recaps unless disabled.
   install.
   Expected: The installed skill copy matches the repo-tracked source so
   future sessions see the same instructions and metadata.
-- Action: Run `python3 dot_agents/skills/ui-ux-pro-max/scripts/search.py "education dashboard" --design-system -p "LessonOps" -f markdown` from the source checkout.
-  Expected: A candidate design system prints without credentials, network access or persisted files.
-- Action: Run `python3 dot_agents/skills/ui-ux-pro-max/scripts/search.py "keyboard focus" --stack react`.
-  Expected: React stack guidance prints; inspect the version/status applicability before using it.
-- Action: Run `python3 dot_agents/skills/ui-ux-pro-max/scripts/search.py "zxqvnevermatch987654321" --domain ux`.
-  Expected: Zero matches are disclosed explicitly, with no fabricated recommendation.
-- Action: After normal shared-skill deployment, invoke `$ui-ux-pro-max` in Codex and `/ui-ux-pro-max` in Claude Code, then start a generic design request without either invocation.
-  Expected: Explicit requests load the shared skill and supporting files; a generic request does not automatically load this skill. Deployment is required; not performed during evaluation.
 - Action: sync-design-skills --dry-run
-  Expected: Chezmoi previews only the five managed public-source refreshes and
-  does not run the UI/UX Pro Max updater, authenticate any service, generate
-  media, or spend credits.
+  Expected: Chezmoi previews only the retained Impeccable source and Higgsfield
+  plugin targets. No retired source is installed, no UI/UX Pro Max updater runs,
+  and no service authentication, media generation or credit spending occurs.
 - Action: setup-design-skills-timer --check
   Expected: The tracked helper and daily `Persistent=true` units validate
   without sudo; after `--enable`, `systemctl --user list-timers
@@ -503,29 +512,43 @@ listing is cached-only; opening a picker can generate recaps unless disabled.
   title and `agents/openai.yaml` metadata. On a mixed dirty tree, it makes a
   best-effort pass over every safe, reviewable change, records validation
   warnings, leaves unsafe files as named residuals, and still attempts the
-  configured push. In a fresh Codex session, type `$comm`: the first four
+  configured push. In a fresh Codex session, type `$comm`: the first three
   matching skill titles are `Commit 1 Session`, `Commit 2 Plan & Push`,
-  `Commit 3 Dirty`, and `Commit 4 Plan`, in that order. Numbers control the
+  and `Commit 3 Dirty`, in that order. Planning-only requests use the retained
+  plan-and-push skill without staging, committing or pushing. Numbers control the
   alphabetical tie-break; no unsupported priority field is relied on.
   Type `$commit-session` separately and confirm the original slug still resolves.
 - Action: sync-superpowers-release --dry-run
-  Expected: The helper runs `chezmoi apply --refresh-externals` in dry-run
-  mode for `~/.codex/superpowers` and
-  `~/.agents/skills/superpowers`, rendering the latest
-  `obra/superpowers` release archive without writing files.
+  Expected: Reports that installation is disabled, exits 0 and leaves existing
+  upstream files untouched. No chezmoi or network operation runs.
 - Action: setup-superpowers-release-timer --enable
-  Expected: The optional timer installs and enables without sudo, with the daily 05:00 local-time schedule and `Persistent=true` configured.
+  Expected: Refuses the retired integration with exit 2; no timer is installed
+  or enabled. This is an intentional negative check.
 - Action: setup-superpowers-release-timer --check
-  Expected: The installed units validate successfully from the standard `$HOME/linux-config` checkout.
-- Action: systemctl --user list-timers superpowers-release-sync.timer
-  Expected: The timer row shows its next 05:00 local-time trigger.
-- Action: journalctl --user -u superpowers-release-sync.service
-  Expected: This is an inspection step; the journal may be empty until the scheduled 05:00 run or a `Persistent=true` catch-up run occurs.
-  An empty journal does not mean enabling the timer failed or that enabling immediately ran the service.
-- Action: setup-superpowers-release-timer --disable
-  Expected: The timer is stopped and disabled while the managed unit files remain installed.
-- Action: setup-superpowers-release-timer --disable
-  Expected: Cleanup remains idempotent: the timer stays stopped and disabled without sudo.
+  Expected: Reports the disabled repo integration, exits 0 and does not inspect
+  or change live timer state.
+- Action: On a host with the legacy timer, explicitly run
+  `setup-superpowers-release-timer --disable`, then repeat it.
+  Expected: The timer is stopped/disabled without sudo; repeat cleanup succeeds
+  when systemd reports it already unloaded. Existing upstream files remain.
+  A systemd failure is reported with exit 2. Skip live cleanup in trim-only runs.
+
+## Vetted skill calibration drift
+
+- Action: Run `./scripts/sync-vetted-skills --check --plain` from this checkout.
+  Expected: Lists configured and detectable installed/built-in sources with
+  logical identities and verdicts. Final line reports zero missing/stale entries;
+  exit 0. Installed-only culls remain visible until explicit host cleanup.
+- Action: Run `./scripts/sync-vetted-skills --json --check` and inspect `skills`,
+  `installed_only` and `errors`.
+  Expected: JSON distinguishes ACTIVE repo config from lingering installed
+  copies, includes description evidence and reports an empty errors list.
+  Neither command executes installers or modifies the reference or host.
+- Action: For an approved skill addition/removal, update the vetted reference in
+  the same change and rerun the check before committing.
+  Expected: Every live source has a current entry and no ACTIVE entry names a
+  gone configured source. Culled/merged entries retain date, reason, evidence,
+  survivor and actual commit reference once available; pending drafts say pending.
 
 ## Personal context and project knowledge
 

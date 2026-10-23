@@ -4,6 +4,19 @@ This document holds the measurement baseline, policy decisions, and historical
 provenance moved out of always-loaded instructions. The implementation plan is
 [`plans/ai-workflow-optimization.md`](../plans/ai-workflow-optimization.md).
 
+## Skills-efficiency measurement (2026-10-22)
+
+The [current trim plan](../plans/skills-efficiency.md) and
+[pass log](../benchmarks/trim/PROGRESS.md) track a new optimization series.
+Its immutable baseline records 353 lines / 22,750 bytes for canonical AGENTS,
+59 canonical skills, 37,619 recurring bytes and 403,458 on-demand body bytes.
+The requested lean-instructions technique skill and its one-line AGENTS route
+add 137 recurring bytes (34.25 estimated tokens), making 60 canonical skills.
+Measurement itself saves zero tokens; no reduction or saturation claim yet.
+The CLI estimates UTF-8 bytes/4, separately from the older doctor's character
+estimate. Pass 0 is prepared but uncommitted because shared Git metadata is
+mounted read-only. Live config/model/effort and imported skills are unchanged.
+
 ## Audited Baseline
 
 Captured on 2026-07-13 before Task 1 edits:

@@ -1,0 +1,190 @@
+#!/usr/bin/env python3
+"""Measure repository instruction costs without changing the baseline."""
+
+import argparse
+import json
+import math
+import re
+import os
+import subprocess
+import sys
+import tomllib
+from pathlib import Path
+
+
+def metric(text):
+    size = len(text.encode('utf-8'))
+    return {'lines': len(text.splitlines()), 'bytes': size, 'approx_tokens': size / 4}
+
+
+def description_and_body(text):
+    match = re.match(r'\A---\r?\n(.*?)\r?\n---\r?\n?(.*)\Z', text, re.S)
+    if not match:
+        raise ValueError('SKILL.md requires YAML frontmatter')
+    header, body = match.groups()
+    desc = re.search(r'^description:\s*(.*)((?:\n[ \t]+[^\n]*)*)', header, re.M)
+    if not desc:
+        raise ValueError('SKILL.md requires description')
+    first, rest = desc.groups()
+    if first in ('>', '>-', '>+', '|', '|-', '|+'):
+        value = ' '.join(line.strip() for line in rest.splitlines()).strip()
+    else:
+        value = ' '.join([first.strip()] + [line.strip() for line in rest.splitlines() if line.strip()])
+        if value[:1] == value[-1:] and value[:1] in ('"', "'"):
+            value = value[1:-1]
+    return value, body
+
+
+def git(root, *args):
+    result = subprocess.run(['git', '-C', str(root), *args], capture_output=True)
+    if result.returncode:
+        raise ValueError('git snapshot could not be read')
+    return result.stdout.decode('utf-8')
+
+
+def commit_ref(root, ref):
+    try:
+        return git(root, 'rev-parse', '--verify', '--end-of-options', ref + '^{commit}').strip()
+    except ValueError as error:
+        raise ValueError('invalid commit ref') from error
+
+
+def collect(root, ref=None):
+    sha = commit_ref(root, ref) if ref is not None else None
+
+    def read(path):
+        return git(root, 'show', sha + ':' + path) if sha else (root / path).read_text()
+
+    instructions = {p: metric(read(p)) for p in
+                    ('AGENTS.md', 'AGENTS.repo.md', 'AGENTS-BASE.md', 'dot_codex/AGENTS.md')}
+    config = tomllib.loads(read('dot_codex/config.toml'))
+    developer = metric(config.get('developer_instructions', ''))
+    skills = {}
+    for directory in ('dot_agents/skills', '.agents/skills'):
+        if sha:
+            entries = git(root, 'ls-tree', '-rz', '--full-tree', sha, '--', directory).split('\0')
+            paths = [entry.split('\t', 1)[1] for entry in entries
+                     if entry and entry.startswith('100') and entry.split('\t', 1)[1].endswith('/SKILL.md')]
+        else:
+            paths = [p.relative_to(root).as_posix() for p in (root / directory).rglob('SKILL.md')
+                     if not p.is_symlink()]
+        for path in sorted(paths):
+            content = read(path)
+            description, body = description_and_body(content)
+            skills[path] = {
+                'description': metric(description), 'body': metric(body),
+                'file': metric(content)}
+    canonical = {p: s for p, s in skills.items() if p.startswith('dot_agents/')}
+    desc_bytes = sum(s['description']['bytes'] for s in canonical.values())
+    body_bytes = sum(s['body']['bytes'] for s in canonical.values())
+    loaded = instructions['AGENTS.md']['bytes'] + instructions['dot_codex/AGENTS.md']['bytes'] + developer['bytes'] + desc_bytes
+    return {'schema_version': 1, 'method': 'UTF-8 bytes / 4; estimate, not tokenizer usage',
+            'scope': 'repo canonical catalog; root + canonical AGENTS + config developer_instructions + dot_agents descriptions; excludes names, paths, runtime wrappers and external installs; .agents duplicate measured separately',
+            'instructions': instructions, 'developer_instructions': developer, 'skills': skills,
+            'totals': {'skills_count': len(canonical), 'skill_entries_count': len(skills),
+                       'description_bytes': desc_bytes, 'body_bytes': body_bytes,
+                       'loaded_bytes': loaded, 'loaded_approx_tokens': loaded / 4,
+                       'body_approx_tokens': body_bytes / 4},
+            **({'base_commit': sha} if sha else {})}
+
+
+def budget_errors(report, budget):
+    errors = []
+    limits = budget['limits']
+    for path, value in report['instructions'].items():
+        exception = budget['exceptions'].get(path, {})
+        for key, name in [('bytes', 'instruction_bytes'), ('lines', 'instruction_lines')]:
+            if value[key] > exception.get(key, limits[name]):
+                errors.append(f'{path}: {key} exceeds budget')
+    for path, value in report['skills'].items():
+        exception = budget['exceptions'].get(path, {})
+        if value['file']['lines'] > exception.get('lines', limits['skill_lines']):
+            errors.append(f'{path}: lines exceeds budget')
+        if value['description']['bytes'] > exception.get('description_bytes', limits['description_bytes']):
+            errors.append(f'{path}: description_bytes exceeds budget')
+    if report['totals']['loaded_bytes'] > budget['loaded_bytes']:
+        errors.append('loaded_bytes exceeds budget')
+    if report['totals']['skills_count'] < budget['minimum_skills']:
+        errors.append('skills_count dropped; document an authorized merge before adjusting budget')
+    for path in budget.get('required_skill_paths', []):
+        if path not in report['skills']:
+            errors.append(f'{path}: required skill missing')
+    return errors
+
+
+def comparison(old, new):
+    return {'old': old, 'new': new, 'percent_change': (new - old) / old * 100 if old else None}
+
+
+def metric_comparison(old, new):
+    return {key: comparison(old.get(key, 0), value) for key, value in new.items()}
+
+
+def validate_snapshot(snapshot, report):
+    def numbers(value, required):
+        if not isinstance(value, dict) or not required.keys() <= value.keys():
+            raise ValueError('missing measurement fields')
+        if any(isinstance(v, bool) or not isinstance(v, (int, float)) or not math.isfinite(v) or v < 0 for v in value.values()):
+            raise ValueError('measurements must be finite nonnegative numbers')
+
+    if snapshot['schema_version'] != 1:
+        raise ValueError('unsupported snapshot version')
+    numbers(snapshot['totals'], report['totals'])
+    numbers(snapshot['developer_instructions'], metric(''))
+    for path in report['instructions']:
+        numbers(snapshot['instructions'][path], metric(''))
+    for skill in snapshot['skills'].values():
+        for key in ('description', 'body', 'file'):
+            numbers(skill[key], metric(''))
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--repo', type=Path, default=Path(__file__).resolve().parents[1])
+    parser.add_argument('--baseline', type=Path, help='Comparison snapshot; never overwritten')
+    parser.add_argument('--ref', help='Measure committed blobs at this ref; skips working-tree budgets')
+    parser.add_argument('--json', action='store_true', help='Full inventory and per-item comparisons')
+    parser.add_argument('--check', action='store_true', help='Working tree only: fail on size budgets or skill loss')
+    parser.add_argument('--plain', action='store_true', help='ASCII output')
+    args = parser.parse_args()
+    if args.ref is not None and args.check:
+        parser.error('--check requires the working tree; historical refs skip current budgets')
+    try:
+        root = args.repo.resolve()
+        baseline = json.loads((args.baseline or root / 'benchmarks/trim/BASELINE.json').read_text())
+        report = collect(root, args.ref)
+        validate_snapshot(baseline, report)
+        report['comparison'] = {k: comparison(v, report['totals'][k]) for k, v in baseline['totals'].items()}
+        report['instruction_comparison'] = {
+            path: metric_comparison(baseline['instructions'][path], value)
+            for path, value in report['instructions'].items()}
+        report['developer_comparison'] = metric_comparison(baseline['developer_instructions'], report['developer_instructions'])
+        report['item_comparison'] = {}
+        for path, value in report['skills'].items():
+            old = baseline['skills'].get(path, {})
+            report['item_comparison'][path] = {k: metric_comparison(old.get(k, {}), v) for k, v in value.items()}
+        report['budget_errors'] = ([] if args.ref is not None else
+                                   budget_errors(report, json.loads((root / 'benchmarks/trim/BUDGETS.json').read_text())))
+    except (OSError, ValueError, KeyError, TypeError, AttributeError, OverflowError) as error:
+        print(f'trim-benchmark: {error}; check repo, frontmatter and snapshot schema', file=sys.stderr)
+        return 2
+    if args.json:
+        print(json.dumps(report, indent=2))
+    else:
+        decorated = sys.stdout.isatty() and not args.plain and os.environ.get('CLI_PLAIN') != '1'
+        decorated = decorated and not any(k.startswith('CODEX_') or k == 'CLAUDECODE' for k in os.environ)
+        print(('📏 ' if decorated else '') + 'Trim benchmark (UTF-8 bytes / 4; estimated tokens)')
+        print(f'{"Surface":24} {"old":>10} {"new":>10} {"change %":>10}')
+        for key in ('loaded_bytes', 'description_bytes', 'body_bytes', 'skills_count'):
+            row = report['comparison'][key]
+            change = f'{row["percent_change"]:+.2f}%' if row['percent_change'] is not None else 'new'
+            print(f'{key:24} {row["old"]:>10} {row["new"]:>10} {change:>10}')
+        if args.check:
+            print('Budgets: ' + ('FAIL' if report['budget_errors'] else 'PASS'))
+            for error in report['budget_errors']:
+                print(error)
+    return int(args.check and bool(report['budget_errors']))
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())

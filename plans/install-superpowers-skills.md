@@ -1,5 +1,10 @@
 # ExecPlan: Install Superpowers Skills
 
+This historical installation record is superseded by the 2026-10-22 approved
+skill cull. The repo no longer installs Superpowers or its timer; refresh is a
+compatibility no-op and timer enablement is refused. Existing upstream files
+remain untouched. See [current integration and cleanup guidance](../docs/design-skills.md).
+
 ## Checklist
 
 - [x] Add the chezmoi source-state entries that clone `obra/superpowers` into `~/.codex/superpowers` and expose its `skills/` directory at `~/.agents/skills/superpowers`.

@@ -200,7 +200,7 @@ class AIWorkflowContractTest(unittest.TestCase):
             "dot_codex/AGENTS.md",
             "dot_agents/skills/commit-dirty/SKILL.md",
             "dot_agents/skills/commit-dirty/agents/openai.yaml",
-            "dot_agents/skills/commit-plan/SKILL.md",
+            "dot_agents/skills/commit-plan-push/SKILL.md",
             "dot_agents/skills/commit-session/SKILL.md",
             "dot_agents/skills/commit-session/agents/openai.yaml",
         )
@@ -212,7 +212,7 @@ class AIWorkflowContractTest(unittest.TestCase):
             "AGENTS.repo.md",
             "AGENTS-BASE.md",
             "dot_agents/skills/README.md",
-            "dot_agents/skills/commit-plan/agents/openai.yaml",
+            "dot_agents/skills/commit-plan-push/agents/openai.yaml",
             "tasks/lessons.md",
         )
         banned_fragments = (

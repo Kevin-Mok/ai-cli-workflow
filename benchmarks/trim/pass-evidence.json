@@ -1,0 +1,32 @@
+{
+  "pass": "Approved cull",
+  "technique": "Evidence-ranked cull, overlap merges and calibration maintenance",
+  "commit_subject": "refactor(skills): cull approved overlaps",
+  "tests": {
+    "passed": 82,
+    "subtests_passed": 217,
+    "command": "python3 -m pytest -q tests/test_skill_cull_contract.py tests/test_commit_plan_push_skill.py tests/test_metaprompt_integration.py tests/test_cli_emoji_skills.py tests/test_trim_benchmark.py tests/test_trigger_eval.py tests/test_trim_failure_mining.py tests/test_design_skills_sync.py tests/test_superpowers_release_timer.py tests/test_vetted_skills.py"
+  },
+  "trigger": {
+    "exact_matches": 15,
+    "case_count": 17,
+    "method": "deterministic lexical proxy; not model triggering",
+    "scope": "17 unchanged original keeper/none cases; pre-cull 13/17. Not comparable to original 50-case corpus."
+  },
+  "limitations": [
+    "Uncommitted working draft; actual staged-candidate privacy gate pending.",
+    "AI workflow contract suite has three inherited failures; no whole-suite green claim.",
+    "No live apply, refresh-config, timer cleanup, model calls or push."
+  ],
+  "calibration": {
+    "source_entries": 228,
+    "configured_active": 38,
+    "installed_only": 190,
+    "detectable_builtins": 5,
+    "missing_stale": 0,
+    "ranked_candidates": 93,
+    "unscored_origin_ids": 52,
+    "retirement_records": 60,
+    "reference_bytes": 105815
+  }
+}

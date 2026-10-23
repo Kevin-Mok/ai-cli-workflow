@@ -1,84 +1,54 @@
 # Managed Public Design Skills
 
-This repository manages external design skills through chezmoi and vendors
-UI/UX Pro Max at a reviewed immutable revision. Normal deployment clones the
-external sources, exposes their Codex links, and deploys shared tracked skills
-for Codex CLI and Claude Code. See the evaluation below before choosing a skill.
+This repository keeps Impeccable as its external design skill and preserves the
+separate Higgsfield plugin integration. Preview retained-source updates before
+refreshing them, then restart agent sessions. The approved skill cull removes
+unused installers and discovery links without deleting installed upstream files.
 
 ## Included sources
 
 | Capability | Upstream | Installed path |
 | --- | --- | --- |
 | Impeccable | [pbakaus/impeccable](https://github.com/pbakaus/impeccable) | `~/.codex/skills/impeccable` |
-| 21st CLI, AI, design sync, registry | [21st-dev/skill](https://github.com/21st-dev/skill) | `~/.codex/skills/21st-*` |
-| Review Animations | [emilkowalski/skills](https://github.com/emilkowalski/skills) | `~/.codex/skills/review-animations` |
-| Scroll World | [oso95/scroll-world](https://github.com/oso95/scroll-world) | `~/.codex/skills/scroll-world` |
-| UI/UX Pro Max | [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) | `~/.agents/skills/ui-ux-pro-max/` with a Claude directory link |
 | Higgsfield plugin | [higgsfield-ai/skills](https://github.com/higgsfield-ai/skills) | `~/.codex/plugins/higgsfield` |
+
+The shared tracked `frontend-design` and `brand-system-designer` skills remain
+available. Codex and Claude use complete shared skill directories; the generic
+Claude linker preserves supporting files and refuses non-symlink conflicts.
 
 ## Daily refresh
 
-`design-skills-sync.timer` runs at 05:00 local time with
-`Persistent=true`; a missed run is caught up when the user manager starts.
-Its service refreshes only the managed upstream repositories fast-forward and
-leaves the vendored UI/UX Pro Max skill pinned. `--bootstrap` is retained as a
-compatibility no-op for the old one-time hook; no npm installer runs. It does
-not authenticate 21st or Higgsfield, create media, spend credits, or upgrade the Higgsfield CLI.
+`design-skills-sync.timer` runs at 05:00 local time with `Persistent=true`,
+catching up a missed run when the user manager starts. It refreshes only the
+Impeccable source and Higgsfield plugin, with fast-forward-only Git updates.
+`sync-design-skills --dry-run` previews these exact targets. The legacy
+`--bootstrap` option remains a no-op; the obsolete one-time bootstrap hook is
+removed. No npm installer runs.
 
-Use `sync-design-skills --dry-run` to preview the source refresh. Use
-`setup-design-skills-timer --check`, `--enable`, or `--disable` to manage
-the user timer. Both commands require no sudo.
+Use `setup-design-skills-timer --check`, `--enable`, or `--disable` to manage
+this retained timer. These commands require no sudo. Restart agent sessions
+after a refresh to load updated skill definitions. Higgsfield authentication,
+CLI installation and generation remain separate user operations.
 
-After a refresh, restart Codex to load the updated skill definitions. For
-Higgsfield, install its CLI separately if needed, then run
-`higgsfield auth login` yourself before requesting any generation.
+## Retired integrations and existing hosts
 
-## UI/UX Pro Max evaluation (2026-10-14)
+The approved cull removes repo installation and exposure of `21st-ai`,
+`21st-cli-use`, `21st-design-sync`, `21st-registry`, `review-animations`,
+`scroll-world`, and the entire Superpowers bundle. UI/UX Pro Max is no longer
+vendored or bootstrapped. The upstream repositories and existing home-directory
+copies are untouched by this change.
 
-**Recommendation: 8/10 — retain it as an explicit-only, pinned shared skill.**
-The repo previously advertised a global Codex install using an unpinned npm
-CLI. This change replaces that route with reviewed local Python runtime/CSV
-files, [MIT licence and source provenance](../dot_agents/skills/ui-ux-pro-max/SOURCE.md),
-and both agent invocation gates. No MCP entries or accounts are required.
+Superpowers service/timer sources are removed. `sync-superpowers-release`,
+including `--dry-run`, is now a compatibility no-op. Its setup command's
+`--enable` is refused, while `--check` reports only the disabled repo integration
+and does not inspect live timers. `--disable` remains an explicit cleanup action
+for an already-installed `superpowers-release-sync.timer`; it needs no source
+checkout or chezmoi and reports systemd failures without raw private diagnostics.
 
-It is an upstream agent skill with an optional Node installer and Claude plugin
-packaging, not an MCP server or UI component library. Despite the README's
-“AI-powered” language, the bundled generator uses deterministic BM25 retrieval
-and rules; the calling agent supplies interpretation and implementation.
-Invoke `$ui-ux-pro-max` in Codex or `/ui-ux-pro-max` in Claude Code after the
-normal shared-skill deployment and session restart. The skill's `--help`
-documents domains, stacks, JSON output, design-system generation and optional
-persistence. Existing MASTER files are preserved unless explicitly forced.
-
-### Overlap with existing skills
-
-| Existing capability | Overlap and distinct role |
-| --- | --- |
-| `frontend-design`, `design-taste-frontend`, `high-end-visual-design`, `redesign-existing-projects`, `minimalist-ui` | Strong overlap in visual direction; those prompts lack this bundled searchable CSV engine. |
-| 21st CLI/registry skills | Component sourcing; UI/UX Pro Max supplies guidance rather than installed components. |
-| Impeccable, `critique`, `audit`, `polish`, `animate` | Use these for craft and rendered verification; retrieved suggestions are not proof of quality or accessibility. |
-
-### Pros, cons and tradeoffs
-
-Pros: offline Python standard-library runtime, concrete domain/stack search,
-structured output, candidate design-system synthesis and optional persistence;
-shared complete directory works with both CLI agents. Vendoring removes npm
-execution, API credentials and automatic policy drift from this route.
-
-Cons: broad advice duplicates many existing skills, retrieval is heuristic,
-and its approximately 3 MB dataset requires manual reviewed updates. Static
-framework guidance can age. It is not a renderer or accessibility validator.
-Explicit invocation trades automatic discovery for deliberate use and avoids
-another broad default design trigger. Previously generated companion skills on
-an existing host are not removed or retroactively gated by this change.
-
-Security/licence: MIT copyright 2024 Next Level Builder is retained. Search
-runtime has no network, account, paid tier or telemetry requirement. Source
-inspection found no runtime/CLI telemetry client; installer paths use npm and
-GitHub (optional PAT for rate limits), which this integration does not execute.
-Generated Google Fonts imports can cause network requests when adopted in an
-app; individual font/package licences still apply. Only text/catalog metadata,
-not font binaries, is bundled. Agent-provider billing remains separate.
-
-Unverified: live Codex/Claude discovery after deployment, full visual quality,
-and third-party dependency/site privacy policies.
+Deployment is intentionally not performed in the trimming worktree. Existing
+installed helpers, exposure links, timers and plugin-managed copies can therefore
+remain active. Review them manually before future activation: stop a legacy
+Superpowers timer with the retained setup command's `--disable`, review stale
+skill discovery links, and restart agents after approved cleanup. Do not delete
+upstream repositories as part of this cull. Plugin-managed skills without a repo
+installer require a separate manual enablement review.

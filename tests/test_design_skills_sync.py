@@ -18,18 +18,9 @@ SETUP = REPO_ROOT / "scripts" / "executable_setup-design-skills-timer"
 
 UPSTREAMS = {
     "impeccable": "https://github.com/pbakaus/impeccable.git",
-    "21st": "https://github.com/21st-dev/skill.git",
-    "review-animations": "https://github.com/emilkowalski/skills.git",
-    "scroll-world": "https://github.com/oso95/scroll-world.git",
 }
 SYMLINKS = {
     "impeccable": "upstreams/impeccable/.github/skills/impeccable",
-    "21st-cli-use": "upstreams/21st/skills/21st-cli-use",
-    "21st-ai": "upstreams/21st/skills/21st-ai",
-    "21st-design-sync": "upstreams/21st/skills/21st-design-sync",
-    "21st-registry": "upstreams/21st/skills/21st-registry",
-    "review-animations": "upstreams/review-animations/skills/review-animations",
-    "scroll-world": "upstreams/scroll-world/skills/scroll-world",
 }
 
 
@@ -57,6 +48,16 @@ class DesignSkillSourcesTest(unittest.TestCase):
         for slug, target in SYMLINKS.items():
             link = REPO_ROOT / "dot_codex" / "skills" / f"symlink_{slug}.tmpl"
             self.assertEqual(link.read_text(encoding="utf-8").strip(), target)
+
+    def test_culled_externals_and_exposure_templates_are_not_managed(self) -> None:
+        externals = EXTERNALS.read_text(encoding="utf-8")
+        for source in ("21st", "review-animations", "scroll-world"):
+            self.assertNotIn(f'".codex/skills/upstreams/{source}"', externals)
+        for slug in (
+            "21st-ai", "21st-cli-use", "21st-design-sync", "21st-registry",
+            "review-animations", "scroll-world",
+        ):
+            self.assertFalse((REPO_ROOT / "dot_codex" / "skills" / f"symlink_{slug}.tmpl").exists())
 
 
 class DesignSkillRefreshHelperTest(unittest.TestCase):
@@ -105,7 +106,7 @@ class DesignSkillRefreshHelperTest(unittest.TestCase):
     def calls(self) -> list[str]:
         return self.log.read_text(encoding="utf-8").splitlines()
 
-    def test_dry_run_refreshes_externals_without_updating_uiux_pro_max(self) -> None:
+    def test_dry_run_refreshes_only_retained_sources(self) -> None:
         completed = self.run_helper("--dry-run")
 
         self.assertEqual(completed.returncode, 0, completed.stderr)
@@ -113,16 +114,20 @@ class DesignSkillRefreshHelperTest(unittest.TestCase):
         self.assertEqual(len(self.calls()), 1)
         self.assertIn("chezmoi -S", self.calls()[0])
         self.assertIn("apply --refresh-externals -v -n", self.calls()[0])
+        self.assertTrue(self.calls()[0].endswith(
+            f"{self.home}/.codex/skills/upstreams/impeccable {self.home}/.codex/plugins/higgsfield"
+        ))
         self.assertNotIn("npx", self.calls()[0])
 
-    def test_bootstrap_preserves_vendored_uiux_without_network(self) -> None:
+    def test_legacy_bootstrap_is_a_noop_without_network(self) -> None:
         completed = self.run_helper("--bootstrap")
 
         self.assertEqual(completed.returncode, 0, completed.stderr)
-        self.assertIn("UI/UX Pro Max is vendored", completed.stdout)
+        self.assertIn("no separate bootstrap is needed", completed.stdout)
+        self.assertNotIn("UI/UX Pro Max", completed.stdout)
         self.assertEqual(self.calls(), [])
 
-    def test_normal_refresh_preserves_existing_uiux_after_externals(self) -> None:
+    def test_normal_refresh_leaves_unmanaged_installed_copies_untouched(self) -> None:
         skill = self.home / ".agents" / "skills" / "ui-ux-pro-max"
         skill.mkdir(parents=True)
         (skill / "SKILL.md").write_text("explicit-only marker")
