@@ -17,9 +17,9 @@ marker and is excluded. No history rewrite or desktop manipulation is needed.
 - [x] Inspect dirty docs, prompts, plans, policy, feedback and memory changes.
 - [x] Independently review memory contracts; run README and focused smoke gates.
 - [x] Commit restored working-directory paths in docs, prompts and their plans.
-- [ ] Commit reviewed incident evidence, references and ledger together.
-- [ ] Commit repository-creation remote policy and matching durable preference.
-- [ ] Run required refresh, review residuals and push the complete series once.
+- [x] Commit reviewed incident evidence, references and ledger together.
+- [x] Review repository-creation remote policy and matching durable preference for the final commit.
+- [x] Attempt required refresh and review residuals; prepare one final upstream push.
 
 ## Verification and review
 
@@ -75,3 +75,34 @@ local incident reports, browser/grid/tracker findings, reviewed aliases and the
 delivery-environment incident. All 102 same-hash record changes are alias-only;
 the three replaced hashes match their modified report bytes. No finding was
 removed. Run the exact candidate gate; external source corpus remains unverified.
+
+
+### Milestone 2 result and final policy candidate
+
+Milestone 2 completed as `694fc55` with exactly 13 intended paths and no residual
+staging. Fresh memory smoke, 253-finding ledger contract check, four targeted
+report checks and whitespace checks all exit 0. Explicit and hook privacy gates
+passed. Full external corpus was not scanned.
+
+Prepare `docs: preserve checkout when creating GitHub repos` with the existing
+canonical-policy addition, its matching feedback preference, and this plan.
+Review confirms it requires the newly created repository as origin, verified
+fetch/push URLs, and retention of the current checkout. No scripts changed.
+README gate remains pass_no_change; configuration activation was attempted and
+stopped on the preserved pre-existing mimeapps conflict. Do not retry/force it.
+
+After this candidate passes its staged gate and commits, check final commit scope
+and residuals, then push `main` to `origin/main` once. Actual final SHA and push
+result must be verified and reported in the delivery response; at this plan's
+commit boundary that push has not yet run. Expected residuals are
+`:memory:.ses` (machine-local session data) and two concurrently added policy
+lines in `dot_codex/AGENTS.md` (UI copy and UX/DX/AX preferences), which appeared
+after the reviewed baseline and remain outside this delivery candidate. No further source changes
+or runtime tests are needed for the documentation-only policy addition.
+
+
+The final staged diff exposed two concurrent policy additions before the privacy
+check finished. Deliberately interrupted that check before any commit; exclude
+only those two lines from the index while retaining their exact working bytes.
+The final commit must contain only the previously reviewed repository-creation
+hunk, feedback preference and plan. Do not claim a clean worktree.

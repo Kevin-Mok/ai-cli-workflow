@@ -260,6 +260,11 @@ education work:
 
 ## Git And Delivery
 
+- When asked to create a new GitHub repository, also configure it as the current
+  working repository's `origin` unless another remote is specified, and verify
+  its fetch/push URLs. Keep the current checkout; explain any filesystem
+  restriction before substituting a separate checkout.
+
 - Any file larger than 3 MB must be committed using Git LFS. Configure its
   Git LFS tracking in `.gitattributes` before staging it, and commit the
   matching `.gitattributes` change with the file.
