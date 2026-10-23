@@ -23,6 +23,7 @@ class SkillCullContractTest(unittest.TestCase):
 
     def test_context_handoff_retains_long_task_acceptance_and_review(self):
         skill = (SKILLS / "context-handoff/SKILL.md").read_text()
+        skill += "\n" + (SKILLS / "context-handoff/references/handoff-format.md").read_text()
         for requirement in ("task.md", "acceptance criteria", "checks.md", "progress.md",
                             "evidence-reviewer", "incorrect", "unresolved", "goal",
                             "existing goal", "Do not publish, push, send, or deploy",

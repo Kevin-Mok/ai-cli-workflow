@@ -40,7 +40,7 @@ Default workspace: `.harness/<slug>/`, unless the task names another path.
 
 ## Handoff artifact
 
-Return only the handoff, at most 600 words, using the eight headings below in order.
+Before creating or returning a handoff artifact, MUST read [the handoff format](references/handoff-format.md). Long-task setup and resume do not load the template.
 
 Assign `DC#` IDs to every known done criterion and write exactly one evidence
 record for every listed DC. Status meanings are strict: `met = verified pass`;
@@ -58,36 +58,6 @@ what changed between attempts, and an observable retry condition. Do not
 propose the same retry while its condition is unchanged. Link artifacts instead
 of copying logs, transcripts, code, or plans. Preserve literal paths, branches,
 commands, protected-state constraints, and security restrictions.
-
-```markdown
-## Goal and Done Criteria
-Goal: <one sentence>
-- DC1: <observable acceptance criterion>
-
-## Constraints
-- <literal protected state, command, scope, or safety constraint>
-
-## Decisions
-- <settled decision and concise rationale>
-
-## Current State
-- <confirmed branch, work item, owner, and implementation/test state>
-
-## Evidence and Failed Attempts
-- DC1 — <met|open|failed|unknown> — <check> → <observed result> — <evidence link or recovery action>
-- Failure: <stable signature> — Attempts: <count> — Last evidence: <link> — Changed since: <fact> — Retry when: <condition>
-
-## Artifacts
-- [artifact](path): <why the next agent needs it>
-
-## Blockers
-- None — <check that confirmed absence>
-- or Unknown — <authoritative source or action needed>
-- or <blocker and evidence>
-
-## Ordered Next Actions
-1. Owner: <agent or role> — Action: <exact command or edit> — Expected: <observable result> — Stop if: <condition>
-```
 
 Every next action includes `Owner:`, `Action:`, `Expected:`, and `Stop if:`.
 Its Action contains a literal executable command or a precise path-scoped edit.

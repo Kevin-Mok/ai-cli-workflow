@@ -250,6 +250,8 @@ combined8,742B adds89.5tokens. Description unchanged;0recurring savings.
 Pass11 planning-only/consolidation/learning entries15,469→12,420B save762.25
 entrytokens when unused. All3references total4,373B; combined16,793B adds331
 tokens when allbranches trigger. Descriptions unchanged; originalcontrols retained.
+Pass12 handoffentry4,496→3,619B saves219.25setup/resume tokens. Artifactflow
+adds1,292Bref; combined4,911B adds103.75tokens. Status/retry/authorization stay main.
 **Mistakes:** Moving required/common controls, claiming savings for a branch
 that must read both files, lost paragraphs or weakened literal-contract tests.
 **Checklist**

@@ -1,11 +1,11 @@
 {
-  "pass": "Pass 11 conditional procedures",
-  "technique": "Planning-only, consolidation and learning branches",
-  "commit_subject": "refactor(skills): defer conditional procedures",
+  "pass": "Pass 12 handoff format",
+  "technique": "Artifact template on demand; shared workflow retained",
+  "commit_subject": "refactor(skills): defer the handoff artifact template",
   "tests": {
-    "passed": 238,
+    "passed": 239,
     "subtests_passed": 391,
-    "command": "python3 -m pytest -q tests/test_skill_cull_contract.py tests/test_commit_plan_push_skill.py tests/test_metaprompt_integration.py tests/test_cli_emoji_skills.py tests/test_trim_benchmark.py tests/test_trigger_eval.py tests/test_trim_failure_mining.py tests/test_design_skills_sync.py tests/test_superpowers_release_timer.py tests/test_vetted_skills.py tests/test_grok_cli_handoff.py tests/test_file_size_guard.py tests/test_ai_workflow_contract.py tests/test_pre_commit_privacy_gate.py tests/test_checkpoint_privacy_gate.py tests/test_skill_admissions.py tests/test_trim_casd.py tests/test_ai_workflow_doctor.py tests/test_trim_instruction_duplicates.py tests/test_trim_skill_disclosure.py tests/test_trim_conditional_skills.py"
+    "command": "python3 -m pytest -q tests/test_skill_cull_contract.py tests/test_commit_plan_push_skill.py tests/test_metaprompt_integration.py tests/test_cli_emoji_skills.py tests/test_trim_benchmark.py tests/test_trigger_eval.py tests/test_trim_failure_mining.py tests/test_design_skills_sync.py tests/test_superpowers_release_timer.py tests/test_vetted_skills.py tests/test_grok_cli_handoff.py tests/test_file_size_guard.py tests/test_ai_workflow_contract.py tests/test_pre_commit_privacy_gate.py tests/test_checkpoint_privacy_gate.py tests/test_skill_admissions.py tests/test_trim_casd.py tests/test_ai_workflow_doctor.py tests/test_trim_instruction_duplicates.py tests/test_trim_skill_disclosure.py tests/test_trim_conditional_skills.py tests/test_trim_handoff_format.py"
   },
   "trigger": {
     "exact_matches": 42,

@@ -505,3 +505,16 @@ Fullselected238tests/391subtests and independent35tests/202subtests PASS;
 42/46routing, budgets,233sources/0drift and READMEPASS. Staged gates/commitnext.
 Finalcandidate: actualhandofftemplate only; shared evidence/status/retry policy
 remains main. Keep GrokSTOP guardrail section inentry.
+
+## Pass 11 delivered; pass 12 handoff format
+
+Pass11 committedf9930fc8 with238tests/391subtests and stagedgatesPASS. Pass12
+entry4,496→3,619B saves219.25setup/resume tokens; artifact combined4,911B
+adds103.75tokens. Allsharedworkflow/evidence/status/retry/security controls stay
+main; frontmatter unchanged, template mandatory on artifact path. Independent
+review3verified/0incorrect,11tests/8subtestsPASS; selected239tests/391subtests,
+budgets14399loaded/179490body, routing42/46,233sources/0drift, READMEPASS.
+- [x] Exactpinned reconstruction, links, mandatoryrouter and sharedcontrols.
+- [x] Technique/admissioncost updates and honest entry/combined accounting.
+- [ ] Stage/review exactcandidate, privacy/size gates and owncommit12.
+- [ ] Final saturation/evidence review and actual-commit report-only closure.

@@ -1,6 +1,6 @@
 # Trim progress
 
-Current milestone: **passes1–10 committed; pass11 conditional procedures validated for commit**.
+Current milestone: **passes1–11 committed; pass12 handoff format validated for commit**.
 Static loaded context37,619→14,399B (9,404.75→3,599.75 estimated tokens,
 −61.72%). Conditional reference loads remain additional; actual runtime context
 is not measured. Remaining conditional-body candidates and final saturation closure remain open.
@@ -20,6 +20,7 @@ is not measured. Remaining conditional-body candidates and final saturation clos
 | 9 — instruction deduplication | Canonical controls replace repeated config injection | Loaded | 15,116 | 14,399 | 4.74% | 27 |
 | 10 — conditional dialogue | Explicit conversation procedure loads only for that branch | Personal entry body | 8,384 | 6,758 | 19.39% | 27 |
 | 11 — conditional procedures | Planning-only, consolidation and learning branches | Three entry bodies | 15,469 | 12,420 | 19.71% | 27 |
+| 12 — handoff format | Artifact template loads only for artifact creation | Handoff entry body | 4,496 | 3,619 | 19.51% | 27 |
 
 Baseline body bytes: 403,458 (100,864.5 approximate tokens). Loaded estimate:
 9,404.75 tokens; UTF-8 bytes/4, not actual model tokenizer usage. See BASELINE.json
@@ -552,3 +553,19 @@ whitespace warning is intentionally accepted, with tests/privacy/size passing.
 Next: split the actualhandoff artifacttemplate while keeping status/evidence/
 retry safeguards inentry. GrokSTOP remains because dispatchers need its safety
 boundaries before launching work. Commit:refactor(skills): defer conditional procedures.
+
+## Pass 12 — conditional handoff template
+
+Pass11 committedf9930fc8 after238tests/391subtests and exactstagedgatesPASS.
+Pass12 moves only the actual8heading/600word template behind a MUSTread router;
+all6longtasksteps, evidence/status/retry/security/authorization remain main.
+Entry4,496→3,619B saves219.25estimated tokens for setup/resume; reference1,292B
+makes artifact combined4,911B, adding103.75tokens. Recurring savings0. Net catalog
+body180,202→179,490B includes165B technique-log growth. All27descriptions unchanged.
+Fresh selected239tests/391subtests, routing42/46, budgets, inventory233sources/
+0drift and READMEpass_no_change PASS. Independent11tests/8subtests PASS; reviewer
+3verified/0incorrect/1deliverypending, no materialdefect. Exactstagedgates precede
+`refactor(skills): defer the handoff artifact template`.
+What worked: moving an artifact format preserves shared setup controls.
+Next: close the measured saturation audit and regenerate actual-commit comparison;
+no further optimization candidate meets the existing threshold safely.

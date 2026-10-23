@@ -1,6 +1,6 @@
 {
   "scope": "Retrospective immutable pass-tree privacy validation under current local rules; distinct from historical root-observed precommit timing. Historical staged-size passes are root-observed.",
-  "checked_at_utc": "2026-10-23T03:30:25.578255+00:00",
+  "checked_at_utc": "2026-10-23T03:53:44.942675+00:00",
   "scanner_blob": "79278f7300093db756d2448f2fe52af90338e774",
   "results": [
     {
@@ -69,6 +69,13 @@
     {
       "commit": "d6a75f6963eaad822697a00b48075f10ef285d27",
       "tree": "4d73f36986e07199c2eab5d91ce096c4538cf3a8",
+      "privacy_exit": 0,
+      "output": "Privacy gate PASS: exact candidate checked locally.",
+      "historical_precommit_checks": "root-observed PASS; no separate raw log retained"
+    },
+    {
+      "commit": "f9930fc8cff73f852ea56b657b15c54a6b262812",
+      "tree": "78371882ab41bf7d7d684ab09044614a4fed9604",
       "privacy_exit": 0,
       "output": "Privacy gate PASS: exact candidate checked locally.",
       "historical_precommit_checks": "root-observed PASS; no separate raw log retained"
