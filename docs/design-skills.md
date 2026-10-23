@@ -1,27 +1,52 @@
 # Managed Public Design Skills
 
-This repository keeps Impeccable as its external design skill and preserves the
-separate Higgsfield plugin integration. Preview retained-source updates before
-refreshing them, then restart agent sessions. The approved skill cull removes
-unused installers and discovery links without deleting installed upstream files.
+This repository pins Impeccable's web design skill locally and preserves the
+separate Higgsfield plugin integration. Use Impeccable explicitly, preview
+Higgsfield updates before refreshing them, and restart agent sessions after
+activation. Existing upstream copies remain untouched.
 
 ## Included sources
 
 | Capability | Upstream | Installed path |
 | --- | --- | --- |
-| Impeccable | [pbakaus/impeccable](https://github.com/pbakaus/impeccable) | `~/.codex/skills/impeccable` |
+| Impeccable 4.5.2, pinned | [pbakaus/impeccable](https://github.com/pbakaus/impeccable/tree/9d9fcf5cf7a47728959e0c92ae0ab274571b16e3) | `~/.agents/skills/impeccable` |
 | Higgsfield plugin | [higgsfield-ai/skills](https://github.com/higgsfield-ai/skills) | `~/.codex/plugins/higgsfield` |
 
 The shared tracked `frontend-design` and `brand-system-designer` skills remain
 available. Codex and Claude use complete shared skill directories; the generic
 Claude linker preserves supporting files and refuses non-symlink conflicts.
 
+## Pinned Impeccable
+
+Invoke `$impeccable` in Codex or `/impeccable` in Claude Code. The local skill
+disables implicit invocation. It covers web interfaces, including mobile web;
+four unused native platform references and four unregistered custom agent
+profiles are omitted. Web playbooks, runtime assets, inline role contracts,
+upstream hashes and license notices remain. The former external clone and Codex
+exposure template are no longer configured; the tracked shared skill is the
+canonical source.
+
+Read its [source and runtime boundary](../dot_agents/skills/impeccable/SOURCE.md)
+before launching. The launcher can download engine 0.1.14 when none is available,
+or use another installed engine. Set `IMPECCABLE_NO_TELEMETRY=1` for launcher
+calls; this disables optional choice reporting while catalog and update requests
+still use the network. Downloads, hooks, shortcut creation and live mode require
+their own requested operation. Without authorized runtime setup, read project
+context and the requested playbook through the documented fallback. Live mode
+can execute a project validation command and write project files.
+
+`tests/test_design_skills_sync.py` checks the pin and invocation policy, retained
+upstream hashes, internal links, launcher handoff to a disposable engine fixture,
+Higgsfield-only refresh, and preservation of legacy upstream files. It does not
+run a downloaded engine, prove design efficacy, or apply live configuration.
+
 ## Daily refresh
 
 `design-skills-sync.timer` runs at 05:00 local time with `Persistent=true`,
 catching up a missed run when the user manager starts. It refreshes only the
-Impeccable source and Higgsfield plugin, with fast-forward-only Git updates.
-`sync-design-skills --dry-run` previews these exact targets. The legacy
+Higgsfield plugin, with fast-forward-only Git updates. Impeccable changes only
+through reviewed repository updates; the timer does not update its pin.
+`sync-design-skills --dry-run` previews the Higgsfield target. The legacy
 `--bootstrap` option remains a no-op; the obsolete one-time bootstrap hook is
 removed. No npm installer runs.
 

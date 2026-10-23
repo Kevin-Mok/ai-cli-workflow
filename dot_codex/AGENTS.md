@@ -77,6 +77,7 @@ education work:
   `/goal`, `evidence-reviewer` pass, `progress.md` handoff).
   Commit matching plan updates in the same change as the work they describe.
 - Before browser automation or Playwright commands, use the `playwright` skill.
+- Use `grok-cli-handoff` for remote-assistant delegation to local CLI; verify authorization, checkout evidence and STOP.
 - A small task may use a short inline plan. If evidence invalidates any plan,
   stop and revise it before continuing.
 - Use focused subagents when two or more independent tasks can proceed in

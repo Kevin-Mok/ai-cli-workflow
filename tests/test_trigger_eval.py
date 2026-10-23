@@ -42,10 +42,14 @@ class TriggerEvalTest(unittest.TestCase):
         archived = {case['id']: case for case in self.module['load_cases'](ROOT / 'benchmarks/trim/trigger-cases.yaml')}
         catalog = self.module['load_catalog'](ROOT)
         self.assertTrue(all(set(case['expected']) <= catalog.keys() for case in active))
-        self.assertTrue(all(case == archived[case['id']] for case in active))
+        retained = self.module['load_cases'](ROOT / 'benchmarks/trim/cull-keep-cases.yaml')
+        self.assertTrue(all(case == archived[case['id']] for case in retained))
+        self.assertTrue(all(case in active for case in retained))
         frozen = json.loads(baseline_path.read_text())
-        self.assertEqual(frozen['case_count'], 17)
-        self.assertEqual(frozen['exact_matches'], 13)
+        self.assertEqual(frozen['case_count'], 46)
+        self.assertEqual(frozen['exact_matches'], 41)
+        cull = json.loads((ROOT / 'benchmarks/trim/cull-keep-baseline.json').read_text())
+        self.assertEqual((cull['case_count'], cull['exact_matches']), (17, 13))
         self.assertEqual(self.module['digest'](active), frozen['cases_sha256'])
 
     def test_default_selection_uses_pointer_and_falls_back_to_archive(self):

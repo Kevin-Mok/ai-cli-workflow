@@ -11,7 +11,7 @@ usage() {
   cat <<'USAGE'
 Usage: sync-design-skills [--dry-run|--bootstrap]
 
-Refresh the retained Impeccable source and Higgsfield plugin.
+Refresh the Higgsfield plugin. Impeccable is pinned in shared tracked skills.
 --dry-run previews external refreshes without modifying skill files.
 --bootstrap is a compatibility no-op; no separate bootstrap is needed.
 USAGE
@@ -38,7 +38,6 @@ if [[ "$mode" == bootstrap ]]; then
 fi
 
 targets=(
-  "$HOME/.codex/skills/upstreams/impeccable"
   "$HOME/.codex/plugins/higgsfield"
 )
 apply_args=(-S "$source_dir" apply --refresh-externals -v)

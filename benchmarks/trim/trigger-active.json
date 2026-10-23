@@ -1,5 +1,5 @@
 {
-  "cases": "benchmarks/trim/cull-keep-cases.yaml",
-  "baseline": "benchmarks/trim/cull-keep-baseline.json",
-  "scope": "Approved keep-list subset: 17 unchanged archival cases; excludes deliberately removed skills and is not comparable to the original 50-case baseline. Deterministic lexical proxy only."
+  "cases": "benchmarks/trim/intake-cases.yaml",
+  "baseline": "benchmarks/trim/intake-baseline.json",
+  "scope": "Intake:46 frozen cases covering all27 local skills; includes unchanged17-case keep-list. Compare only same cases; deterministic lexical proxy."
 }

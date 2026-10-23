@@ -12,6 +12,8 @@ and handoff workflows instead of removing their safeguards.
   efficiency techniques when adding to AGENTS.md or adding/editing a skill.
 - [`ai-workflow-doctor`](ai-workflow-doctor/SKILL.md): Audit active instruction
   context, references, plan contracts, provenance and skill-catalog drift.
+- [`skill-eval`](skill-eval/SKILL.md): Evaluate a named skill with real tasks,
+  human-calibrated binary grading and blind comparisons.
 - [`feedback-memory`](feedback-memory/SKILL.md): Append durable cross-task user
   preferences to the canonical feedback log.
 - [`postmortem-memory`](postmortem-memory/SKILL.md): Retrieve reviewed incident
@@ -42,6 +44,9 @@ tests and documentation accompany the change they describe.
   during README work, or when a documented public interface changes.
 - [`smoke-test-capture`](smoke-test-capture/SKILL.md): Maintain reusable grouped
   Action/Expected manual checks with the change that creates or alters them.
+
+- [`grok-cli-handoff`](grok-cli-handoff/SKILL.md): Verify remote-assistant
+  authorization, local checkout evidence and cooperative STOP handling.
 
 ## Explicit Task Workflows
 
@@ -75,8 +80,15 @@ tests and documentation accompany the change they describe.
 - [`playwright`](playwright/SKILL.md): Automate real browser navigation,
   screenshots, extraction and UI debugging. Load it before Playwright commands.
 
-The retained external `impeccable` umbrella covers design critique, quality and
-polish; see [the managed design guide](../../docs/design-skills.md). Codex's
+- [`vercel-react-best-practices`](vercel-react-best-practices/SKILL.md): Explicit
+  React/Next.js performance review against pinned Vercel guidance.
+- [`shadcn`](shadcn/SKILL.md): Explicit shadcn/ui component, registry and preset
+  work; load detailed workflows and rules only when needed.
+- [`impeccable`](impeccable/SKILL.md): Pinned explicit web design commands for
+  critique, audit, refinement and implementation.
+
+The pinned local Impeccable replaces its moving external installer; see
+[the managed design guide](../../docs/design-skills.md). Codex's
 `.system` imagegen and openai-docs skills remain runtime-provided rather than
 copied into this catalog. A source cull does not delete installed or upstream
 files. Live installation changes and catalog reloads require their own verified

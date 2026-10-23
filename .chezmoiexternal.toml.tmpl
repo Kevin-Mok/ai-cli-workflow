@@ -1,11 +1,4 @@
 {{ if not (get . "migrationOffline" | default false) }}
-[".codex/skills/upstreams/impeccable"]
-    type = "git-repo"
-    url = "https://github.com/pbakaus/impeccable.git"
-    refreshPeriod = "24h"
-    [".codex/skills/upstreams/impeccable".pull]
-        args = ["--ff-only"]
-
 [".codex/plugins/higgsfield"]
     type = "git-repo"
     url = "https://github.com/higgsfield-ai/skills.git"

@@ -60,3 +60,20 @@ history findings are unadjudicated and predate host-fetched private refs.
 Resume at the cull's stage/review/privacy/commit boundary only when ordinary
 Git metadata writes are available. No next pass, live apply or push is authorized
 at this checkpoint. The complete optimization goal remains open.
+
+## Pass 2 intake review
+
+Independent bounded review:8 verified/0 incorrect/1 unresolved (the final staged
+privacy/size gates and commit). No material implementation defect. Verified
+approved scope,30251 loaded B/5738 desc B/179494 body B/27locals,41/46 and15/17
+routing,233 sources/42ACTIVE/0drift,93ranked/61history, privacy-hook chaining and
+post-hook candidate checking, Grok authorization/STOP and pinned web assets.
+Final full selected log:192 tests/231 subtests; independent security-focused
+run48 tests/8subtests. One minor historical optimize reference was clarified.
+The reviewer did not read minified assets or assert live engine/provider
+efficacy. Staged privacy clearance must be established by the root gate.
+
+Staged whitespace: authored paths pass; four pinned upstream reference files
+retain source formatting warnings/Markdown hard breaks. Their byte/hash
+provenance is preserved instead of normalizing vendor text for a diff check.
+Staged file-size guard exits0 with finite reviewed legacy ceilings.

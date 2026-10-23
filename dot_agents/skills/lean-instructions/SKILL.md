@@ -156,3 +156,29 @@ by changing names; treating unmeasured built-ins as scored study candidates.
 - [ ] Search names, descriptions and jobs; cite the closest precedents.
 - [ ] Keep dated cull/merge history, reasons, evidence and survivor.
 - [ ] Run drift tests and sync check; commit reference and config changes together.
+
+## Admit complementary sources and disclose load costs — intake pass
+
+**Rule:** Import only approved paths after a privacy screen; keep meaningful
+triggers, move detailed workflows to references and retain licenses/provenance.
+Audit private-source text semantically as well as with the exact-candidate gate.
+
+**Why:** A complementary job earns a bounded recurring cost; pinned on-demand
+resources preserve capability without putting all detail in the entry point.
+
+**Repo example:** Four approved skill descriptions total498→406 bytes:23
+estimated recurring tokens of avoided intake growth, not existing-catalog
+savings. shadcn entry20,669→6,727 bytes saves3,485.5 on-demand entry tokens;
+detailed workflows remain linked. Net added descriptions are charged separately
+in PROGRESS. Required web runtime assets remain; unused native files are removed.
+
+**Mistakes:** Importing a whole private branch; copying private evaluation notes;
+claiming a moved reference disappeared; dropping runtime assets to meet a byte
+target; including installed external descriptions in repo-only savings.
+
+**Checklist**
+- [ ] Pin allowed paths, screen content and preserve provenance/licenses.
+- [ ] Freeze cases using original proposal descriptions before evaluating trims.
+- [ ] Keep old cases unchanged; check both keeper and expanded-corpus floors.
+- [ ] Update catalog, calibration/history, budgets and measured net costs.
+- [ ] Run staged privacy/size checks; commit this intake as its own pass.

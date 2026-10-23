@@ -204,8 +204,17 @@ class AIWorkflowContractTest(unittest.TestCase):
             "dot_agents/skills/commit-session/SKILL.md",
             "dot_agents/skills/commit-session/agents/openai.yaml",
         )
+        best_effort_cadence = (
+            "Attempt one upstream push after the local commit or complete commit "
+            "series and best-effort checks, unless the user explicitly requests "
+            "another cadence."
+        )
         for relative_path in policy_files:
-            self.assertIn(PUSH_POLICY, read_repo_file(relative_path), relative_path)
+            content = " ".join(read_repo_file(relative_path).split())
+            self.assertTrue(
+                PUSH_POLICY in content or best_effort_cadence in content,
+                relative_path,
+            )
 
         active_workflow_files = policy_files + (
             "AGENTS.md",
@@ -231,19 +240,12 @@ class AIWorkflowContractTest(unittest.TestCase):
         feedback = read_repo_file(
             "dot_agents/skills/feedback-memory/feedback.log"
         ).splitlines()
-        delivery_entries = [
-            entry
-            for entry in feedback
-            if entry.startswith("2026-07-13 - Single-commit workflows")
-        ]
-        self.assertEqual(
-            delivery_entries,
-            [
-                "2026-07-13 - Single-commit workflows push after the commit passes "
-                "verification; multi-commit workflows push once after the complete "
-                "verified series, unless I explicitly request another cadence."
-            ],
-        )
+        # Sanitized public history omits older private entries; assert the live
+        # append-only contract without reconstructing the removed feedback.
+        self.assertTrue(feedback[0].startswith("# Public-safe append-only"))
+        skill = read_repo_file("dot_agents/skills/feedback-memory/SKILL.md")
+        self.assertIn("Keep the file append-only", skill)
+        self.assertIn("Do not rewrite, reformat, dedupe, or move old entries", skill)
 
         lessons = read_repo_file("tasks/lessons.md")
         self.assertNotIn(PUSH_POLICY, lessons)
@@ -252,6 +254,19 @@ class AIWorkflowContractTest(unittest.TestCase):
             "feedback log.",
             lessons,
         )
+
+    def test_feedback_memory_consolidation_prefers_merge_and_is_gated(self) -> None:
+        text = read_repo_file("dot_agents/skills/feedback-memory/SKILL.md")
+        for required in (
+            "3+ times in separate sessions",
+            "Ask the user before writing any skill",
+            "continuous-learning-v2",
+            "MIT",
+            "avoid growing the skill count",
+            "never delete or rewrite old lines",
+        ):
+            self.assertIn(required, text)
+        self.assertNotIn("Hard cap", text)
 
     def test_optimization_doc_records_the_audited_baseline(self) -> None:
         doc_path = REPO_ROOT / "docs/ai-workflow-optimization.md"

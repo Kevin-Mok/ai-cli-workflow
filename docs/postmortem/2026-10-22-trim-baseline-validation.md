@@ -97,3 +97,21 @@ The first staged whitespace check exposed a trailing blank line in the new
 trim-benchmark file, which earlier unstaged diff checks did not inspect. Removed
 only the extra EOF whitespace; executable logic is unchanged. Recheck the exact
 staged diff before privacy validation and commit.
+
+An intake calibration edit asserted an incorrect heading depth before writing
+any file; the authoritative headings were then inspected. Correct the targeted
+section match rather than guessing. Existing source/context discovery guidance
+applies. The generic skill validator's unsupported disable-model-invocation
+error matches the already-reviewed2026-10-21-sire-session-validation incident;
+retain valid invocation metadata and use repository contract checks.
+
+Two pass2 benchmark tests initially read budgets before their coordinated update
+completed. After the final freeze, the targeted2 and full192-test/231-subtest
+run pass. This is preparation ordering, not a product regression. Run budget
+checks only after the owned budget snapshot is final.
+
+Staged intake whitespace review found inherited formatting in pinned vendor
+reference files (including intentional Markdown hard breaks), plus one extra
+EOF blank line in the newly moved shadcn workflow. The authored EOF was removed.
+Preserve pinned upstream bytes/hashes and check authored changes separately;
+upstream formatting warnings do not establish a runtime or privacy defect.

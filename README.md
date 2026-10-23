@@ -275,12 +275,20 @@ not just aliases or workflow notes.
 - [`brand-system-designer`](dot_agents/skills/brand-system-designer/SKILL.md)
   develops a repo-native visual identity, logo, typography, favicon and social assets.
 
-The retained external Impeccable umbrella covers critique, polish, accessibility,
-responsive design and the narrower design passes. The approved cull removes the
+The pinned local [Impeccable](dot_agents/skills/impeccable/SKILL.md) umbrella
+covers web design critique, polish, accessibility and responsive design.
+[shadcn](dot_agents/skills/shadcn/SKILL.md) supplies explicit component-library
+work, while [Vercel best practices](dot_agents/skills/vercel-react-best-practices/SKILL.md)
+provides pinned React/Next.js performance guidance. The approved cull removes the
 separate local pass skills; see [the design-skill guide](docs/design-skills.md)
 for the managed install and its boundaries.
 
 #### Coding And Long Tasks
+
+- [`grok-cli-handoff`](dot_agents/skills/grok-cli-handoff/SKILL.md) verifies
+  remote-assistant authorization, checkout evidence and cooperative STOP.
+- [`skill-eval`](dot_agents/skills/skill-eval/SKILL.md) benchmarks a named skill
+  with real tasks and human-calibrated blind comparisons.
 
 - [`next-tasks`](dot_agents/skills/next-tasks/SKILL.md) proposes a small set of
   independently verifiable tasks from current repository evidence.
@@ -807,6 +815,13 @@ to that before-edit report for the after-edit `--check`. Comparing only with the
 original 80% floor would miss a decline following an improvement. Revert any
 decline, log the accepted score and refine against the same cases.
 
+The [file-size guard](docs/file-size-guard.md) checks the exact staged authored
+files with `python3 scripts/file_size_guard.py --plain`; `--report` inventories
+HEAD sizes. New files are limited to 5,000 estimated tokens, existing oversized
+files may stay the same size or shrink, and reviewed exact-path legacy ceilings
+are explicit. Tests use disposable repositories. Hook installation is an
+explicit local action; it preserves existing privacy-hook enforcement.
+
 These are the core entrypoints the README depends on. The flags and
 options listed below are verified against local CLI help or script
 source in this repo.
@@ -820,7 +835,7 @@ source in this repo.
 | `refresh-config` | Apply reviewed chezmoi files and reload shortcuts. | No flags; `CLI_PLAIN=1` provides ASCII decoration. Excludes scripts, externals, and removals; reports elapsed progress, stops on conflicts, and never imports live settings. Diagnostics remain in a private temporary log. |
 | [`./scripts/executable_fix-vps-codex.sh`](docs/fix-vps-codex.md) | Run locally to repair Codex npm permissions on a VPS using SSH keys, without sudo. Reuses compatible Node/npm and verifies a normal update through a second SSH session. | Defaults to `example-user@192.0.2.10`; `--host`, `--port`, and `--identity` override the connection. `--dry-run` reads diagnostics without repair writes or npm execution; `--help` shows prerequisites. Requires remote Linux, Python 3.8+, bash or fish, and an already trusted host key. |
 | `sync-superpowers-release` | Report the retired Superpowers integration; existing upstream files stay untouched. | `--dry-run` and normal invocation are compatibility no-ops. `--help` explains the retirement. |
-| `sync-design-skills` | Refresh only the retained Impeccable source and Higgsfield plugin. | `--dry-run` previews these two external targets. `--bootstrap` is a compatibility no-op. `LINUX_CONFIG_SOURCE` selects another checkout. It never authenticates accounts, generates media, spends credits, or upgrades the Higgsfield CLI. |
+| `sync-design-skills` | Refresh only the retained Higgsfield plugin; Impeccable is pinned locally. | `--dry-run` previews the retained external target. `--bootstrap` is a compatibility no-op. `LINUX_CONFIG_SOURCE` selects another checkout. It never authenticates accounts, generates media, spends credits, or upgrades the Higgsfield CLI. |
 | `setup-design-skills-timer` | Validate, enable, or disable the daily 05:00 design-skill refresh timer. | Exactly one of `--check`, `--enable`, or `--disable` is required. `--enable` validates and activates the `Persistent=true` user timer without sudo. |
 | `setup-superpowers-release-timer` | Report the disabled repo integration or explicitly clean up a legacy user timer; no sudo is required. | Exactly one of `--check`, `--enable`, or `--disable` is required. `--check` does not inspect live timers; `--enable` exits 2 without installing; `--disable` stops/disables the old timer without needing chezmoi or a source checkout. |
 | `./scripts/executable_ai-workflow-doctor` | Audit the repo's AI instruction and skill surface, or capture a stable before/after measurement for workflow optimization. | `--repo PATH` selects the repository. `--format text\|json` selects human or machine output. `--snapshot PATH` writes a deterministic JSON baseline; `--compare PATH` compares the current report with one. `--verify-sources` resolves declared local source archives when available. `--check` exits nonzero for objective errors while review findings remain non-blocking warnings. |

@@ -7,8 +7,8 @@
   },
   "exceptions": {
     "dot_codex/AGENTS.md": {
-      "lines": 356,
-      "bytes": 22985
+      "lines": 357,
+      "bytes": 23106
     },
     "dot_agents/skills/commit-session/SKILL.md": {
       "description_bytes": 434
@@ -17,8 +17,8 @@
       "description_bytes": 423
     }
   },
-  "loaded_bytes": 29632,
-  "minimum_skills": 22,
+  "loaded_bytes": 30251,
+  "minimum_skills": 27,
   "required_skill_paths": [
     ".agents/skills/brand-system-designer/SKILL.md",
     "dot_agents/skills/ai-workflow-doctor/SKILL.md",
@@ -30,6 +30,8 @@
     "dot_agents/skills/feedback-memory/SKILL.md",
     "dot_agents/skills/fish-alias/SKILL.md",
     "dot_agents/skills/frontend-design/SKILL.md",
+    "dot_agents/skills/grok-cli-handoff/SKILL.md",
+    "dot_agents/skills/impeccable/SKILL.md",
     "dot_agents/skills/last30days/SKILL.md",
     "dot_agents/skills/lean-instructions/SKILL.md",
     "dot_agents/skills/metaprompt-run/SKILL.md",
@@ -42,9 +44,12 @@
     "dot_agents/skills/postmortem-memory/SKILL.md",
     "dot_agents/skills/readme-recruiter-sync/SKILL.md",
     "dot_agents/skills/second-brain-session/SKILL.md",
-    "dot_agents/skills/smoke-test-capture/SKILL.md"
+    "dot_agents/skills/shadcn/SKILL.md",
+    "dot_agents/skills/skill-eval/SKILL.md",
+    "dot_agents/skills/smoke-test-capture/SKILL.md",
+    "dot_agents/skills/vercel-react-best-practices/SKILL.md"
   ],
-  "addition_note": "Original baseline immutable. Approved cull includes required lean/router and calibration-sync costs; explicit current ceilings ratchet after each accepted pass.",
+  "addition_note": "Original baseline immutable; approved pass2 adds four complementary skills, pins Impeccable locally, and includes measured routing/technique costs. Canonical locals27; required lean is an extra user-requested skill.",
   "approved_cull": {
     "count": 39,
     "names": [

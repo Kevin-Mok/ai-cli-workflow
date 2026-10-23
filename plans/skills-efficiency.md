@@ -294,3 +294,39 @@ tests82/217 and budgets PASS. Both remaining routing misses were reconstructed
 on original HEAD and are unchanged proxy limitations (compound request loses
 second label; translation shares the word morning); rationale is in PROGRESS.
 Commit pass1 now after exact staged privacy check; do not add scope.
+
+## Pass 1 delivered; pass 2 intake
+
+Pass1 `refactor(skills): cull approved overlaps` committed as
+`bc0360c9a59610469526c45d83efefb82f296382` after82 tests/217 subtests,
+unchanged/improved routing, staged scope review and exact privacy PASS.
+Direct Git tool invocations work; do not use Python-spawned Git mutations in
+this execution environment. No push or live config sync performed.
+
+Pass2 imports only approved paths at the seven fetched refs. Source file privacy
+audit104 files found only1home-path candidate; sanitized imports and local
+provenance retain required runtime assets. Four imports and Impeccable pin add
+5canonical dirs, now27 including required lean; no keeper removed locally.
+The new46 frozen cases cover all27 names and score41/46 both before/after
+local transforms; original keeper17 slice remains15/17.
+
+- [x] Import and trim approved skills; shadcn entry6,727 bytes with on-demand refs.
+- [x] Replace moving Impeccable install with pinned local web source.
+- [x] Import size hook with preserved privacy chain, feedback consolidation and
+  truthful public-contract fixes; keep feedback.log unchanged.
+- [x] Merge README/catalog/routing lines and update calibration/history by hand.
+- [ ] Freeze exact legacy size ceilings; run focused suites, budget/inventory,
+  keeper/expanded routing, staged size/privacy gates and inspect staged scope.
+- [ ] Commit `feat(skills): intake approved complementary workflows` as pass2.
+- [ ] Regenerate actual-commit comparison; continue separate admission/CASD passes.
+
+Rollback: revert the individual pass with matching config/calibration/docs; no
+live hook/install state is changed. Current source metrics and exact commands
+are recorded in pass-evidence and PROGRESS; do not claim full-suite collection
+green while inherited sanitized syntax errors remain outside this scope.
+
+Pass2 final focused evidence:192 tests/231 subtests PASS; both previously failing
+budget assertions pass after the final freeze. Active routing41/46 (same proposal
+floor), keeper15/17 unchanged; inventory233 sources/42ACTIVE/191installed-only/
+0drift; trim budgets PASS. README gate pass_no_change. Legacy size ceilings
+freeze to reviewed actual bytes; staged size/privacy gates precede commit.

@@ -500,8 +500,8 @@ listing is cached-only; opening a picker can generate recaps unless disabled.
   Expected: The installed skill copy matches the repo-tracked source so
   future sessions see the same instructions and metadata.
 - Action: sync-design-skills --dry-run
-  Expected: Chezmoi previews only the retained Impeccable source and Higgsfield
-  plugin targets. No retired source is installed, no UI/UX Pro Max updater runs,
+  Expected: Chezmoi previews only the retained Higgsfield plugin target. The local
+  Impeccable source remains pinned and is not refreshed. No retired source is installed, no UI/UX Pro Max updater runs,
   and no service authentication, media generation or credit spending occurs.
 - Action: setup-design-skills-timer --check
   Expected: The tracked helper and daily `Persistent=true` units validate
@@ -1696,3 +1696,20 @@ restore the original DND state afterward. No sudo is needed.
 - Action: With Codex speech enabled, run `~/scripts/codex-notification-sound smoke tagged`.
   Expected: A synthetic Codex popup without TTS. With DND on it stays queued
   until resumed; this exercises Dunst delivery without invoking a Codex event hook.
+
+## Approved skill intake and staged size gate
+
+- Action: Run `python3 -B dot_agents/skills/grok-cli-handoff/scripts/smoke.py --plain`.
+  Expected: Disposable clear/STOP/wrong-branch scenarios report the documented
+  exit statuses; no live job starts and no real checkout changes.
+- Action: Run `python3 -B scripts/smoke_file_size_guard.py --plain`.
+  Expected: All disposable block/allow, partial-stage and preserved privacy-hook
+  scenarios pass without installing a hook in the real repository.
+- Action: Run `python3 scripts/file_size_guard.py --plain` before committing.
+  Expected: The actual staged candidate passes; a growing authored file over its
+  permitted size is refused with an actionable split recommendation.
+- Action: Run the intake trigger corpus and vetted-inventory checks.
+  Expected: All27 local names have frozen routing cases; exact-set accuracy is
+  at least the original intake proposal baseline, and no inventory drift remains.
+  These are lexical proxy checks; live provider, CLI-package and UI execution
+  require their separately documented setup.

@@ -1,15 +1,16 @@
 # Trim progress
 
-Current milestone: **pass 1 cull validated; staging and exact privacy review
-now proceeding after Git metadata access was restored**. The next pass has not started. Final totals and recommendations
-will appear here only after the remaining passes and saturation audit. Earlier
-prepared milestones below are historical runs; current cull evidence is separate.
+Current milestone: **pass 1 committed as `bc0360c9`; pass 2 approved intake
+assembled and under final staged validation**. The original goal, later
+admission/CASD/efficiency passes and saturation audit remain open. Earlier
+prepared milestones below are historical runs.
 
 | Pass | Technique | Surface | Old bytes | New bytes | Reduction | Skills |
 | --- | --- | --- | ---: | ---: | ---: | ---: |
 | Baseline | Pre-edit inventory | Loaded | 37,619 | 37,619 | 0% | 59 |
-| 0 (prepared prerequisite) | Measurement + required technique record | Loaded | 37,619 | 37,756 | -0.36% | 60 |
+| Pre-cull prerequisite (included in pass 1) | Measurement + required technique record | Loaded | 37,619 | 37,756 | -0.36% | 60 |
 | 1 — cull | Approved relevance cull, merges and calibration sync | Loaded | 37,756 | 29,632 | 21.52% | 22 |
+| 2 — approved intake | Bounded complementary imports and pinned swap | Loaded | 29,632 | 30,251 | -2.09% | 27 |
 
 Baseline body bytes: 403,458 (100,864.5 approximate tokens). Loaded estimate:
 9,404.75 tokens; UTF-8 bytes/4, not actual model tokenizer usage. See BASELINE.json
@@ -239,3 +240,74 @@ The cull improves the fixed keeper slice13/17 to15/17 and preserves its score
 after required calibration changes. These are acceptable cull nonregressions,
 not proof of real model routing. A later description pass must still preserve
 the immediately preceding score.
+
+## Pass 2 — approved private-source intake
+
+Pass1 is committed as `bc0360c9a59610469526c45d83efefb82f296382`; its exact
+staged privacy gate passed. COMPARISON has been regenerated from that real
+commit. The two lexical routing misses and their unchanged original predictions
+were reviewed and accepted before commit, without changing the scorer/gold.
+
+This pass imports only the approved four skill dirs, pinned Impeccable swap,
+size-guard sources and feedback consolidation. Source audit screened104 files
+(2,546,797 bytes):one home-path candidate, sanitized before public import; no
+credential or private-policy candidates. Personal/private evaluation examples
+and missing private-only links were removed or replaced with honest local docs.
+No PR was mutated, no branch merged, no network provider called.
+
+Four new complementary skills add406 description bytes (101.5 recurring tokens).
+Their original proposal descriptions were498 bytes;92 bytes/23 tokens are
+avoided intake growth, not savings from an existing catalog. shadcn's entry
+shrinks20,669→6,727 bytes, with workflows/rules preserved on demand. Impeccable
+adds92 local description bytes and replaces its moving external installer;
+54,577 bytes of unused native/TOML inputs are omitted while required web assets,
+fallbacks and licenses remain. Do not count old external description savings in
+the repo-only headline. No installed upstream copy was deleted.
+
+Catalog:27 canonical local skills including the required lean-instructions;
+external CTO/plugin/built-in entries and the readonly brand mirror are separate.
+The apparent one-over-roster difference is the explicitly required lean skill.
+The original23-skill keep/last30days roster includes external keepers; counts
+from different discovery surfaces must not be silently added.
+
+The new46-case corpus covers every27-local name and retains the unchanged17
+keeper/none cases. Its baseline uses immutable pass1 keepers plus original
+approved proposal descriptions, frozen before scoring local transforms:
+41/46 (89.13%). After intake:41/46, and keepers remain15/17. Corpora and scorer
+are unchanged. All prior frozen corpora remain available.
+
+The local file-size gate checks exact staged authored bytes, preserves earlier
+privacy-hook vetoes and defaults new files to20,000 bytes (5,000 estimated
+tokens). Existing oversized files may stay unchanged or shrink. Only reviewed
+exact-path finite ceilings permit this pass's necessary legacy-doc growth.
+Neither hook installer nor real configuration activation is run here.
+Feedback grows3,503→4,670 body bytes with unchanged description; the append-only
+feedback log is untouched. AGENTS.repo shrinks2,036→1,122 bytes while preserving
+stricter repo protections. Stale public contract assertions were repaired from
+current policy rather than fabricating historical feedback entries.
+
+Calibration reflects the pinned local replacement; all60 pass1 retirement
+records now cite its real commit SHA. The new replacement history is pending
+until pass2 exists, and will be resolved in the next pass. Existing93 ranking
+rows retain their numeric evidence; old Impeccable moves to MERGED-INTO.
+Actual source descriptions/jobs and logical install scopes remain searchable.
+
+Validation limitations: generic quick_validate rejects supported explicit-only
+metadata; this matches the existing reviewed validator incident, so invocation
+boundaries stay intact and repository contracts are used. Live Impeccable
+engine/provider execution and real agent-catalog activation remain unverified.
+
+What worked: immutable source baselines prevent tuning the exam after imports;
+separate new capability costs, moved entry text and retired external exposure.
+Next: commit this intake after focused tests, inventory/budget/size/privacy
+checks, then enforce the scored admission gate in its own pass.
+
+Measured pass2 loaded cost: 29,632→30,251 bytes (+619; +154.75 estimated tokens). Against original37,619 bytes: 19.59% lower. SKILL body bytes: 138,102→179,494; on-demand additions are not recurring savings.
+
+Final pass2 focused run:192 tests/231 subtests PASS, including both privacy suites
+and the repaired AI workflow contract. Earlier budget tests raced the in-progress
+budget freeze; the fresh targeted2 and complete rerun both pass. Budget, expanded
+routing, keeper routing, vetted inventory and README gates pass. Actual command:
+pass-evidence.json. Inventory233 sources/42ACTIVE/191installed-only/0drift.
+Reviewed finite legacy-doc growth ceilings are in config/file-size-guard.json;
+they are exact byte ceilings, not wildcard exclusions or live hook installation.

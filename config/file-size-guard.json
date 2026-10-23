@@ -1,0 +1,70 @@
+{
+  "grandfathered_max_bytes": {
+    "README.md": 100794,
+    "docs/smoke-tests.md": 158845,
+    "dot_codex/AGENTS.md": 23106,
+    "benchmarks/trim/PROGRESS.md": 22213,
+    "plans/skills-efficiency.md": 21726
+  },
+  "skip_globs": [
+    "package-lock.json",
+    "npm-shrinkwrap.json",
+    "yarn.lock",
+    "pnpm-lock.yaml",
+    "*.lock",
+    "bun.lockb",
+    "pnpm-lock.yml",
+    "flake.lock",
+    "Pipfile.lock",
+    "Gemfile.lock",
+    "composer.lock",
+    "go.sum",
+    "*.pdf",
+    "*.png",
+    "*.jpg",
+    "*.jpeg",
+    "*.gif",
+    "*.webp",
+    "*.avif",
+    "*.ico",
+    "*.mp3",
+    "*.mp4",
+    "*.wav",
+    "*.zip",
+    "*.gz",
+    "*.woff*",
+    "*.min.*",
+    "*.map",
+    "*.generated.*",
+    "*_generated.*",
+    "*.pb.*",
+    "vendor/*",
+    "vendored/*",
+    "node_modules/*",
+    "data/*",
+    "dist/*",
+    "build/*",
+    "generated/*",
+    "dot_agents/skills/last30days/*",
+    "benchmarks/metaprompt-selection/candidates/*",
+    "benchmarks/*/runs/*",
+    "dot_config/fish/completions/kubectl.fish",
+    "txt/ubuntu/apt-packages.txt"
+  ],
+  "upstream_globs": [
+    "dot_agents/skills/*",
+    "benchmarks/*/candidates/*"
+  ],
+  "upstream_markers": [
+    "SOURCE.md",
+    "LICENSE",
+    "LICENSE.md",
+    "LICENSE.txt",
+    "COPYING"
+  ],
+  "generated_markers": [
+    "@generated",
+    "Code generated",
+    "DO NOT EDIT"
+  ]
+}
