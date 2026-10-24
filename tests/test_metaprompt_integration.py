@@ -12,7 +12,6 @@ from unittest.mock import patch
 ROOT = Path(__file__).resolve().parents[1]
 SKILLS = ROOT / "dot_agents/skills"
 NEW = SKILLS / "metaprompt"
-OLD = SKILLS / "metaprompt-alxve"
 PIN = "d18b7aa8ba878354e5c348310230e652f7690f9c"
 CANDIDATE = ROOT / "benchmarks/metaprompt-selection/candidates/sentry-prompt-optimizer"
 NATIVE_FILES = {
@@ -25,27 +24,13 @@ NATIVE_FILES = {
 
 class MetapromptIntegrationTest(unittest.TestCase):
     def test_independent_names_and_invocations(self):
-        for name in ("metaprompt", "metaprompt-alxve", "metaprompt-run"):
+        for name in ("metaprompt", "metaprompt-run"):
             with self.subTest(name=name):
                 root = SKILLS / name
                 self.assertTrue((root / "SKILL.md").is_file())
                 self.assertIn(f"name: {name}\n", (root / "SKILL.md").read_text())
                 self.assertIn(f"${name} ", (root / "agents/openai.yaml").read_text())
-        if OLD.exists():
-            self.assertNotIn("Use for /metaprompt,", (OLD / "SKILL.md").read_text())
 
-    def test_legacy_references_match_reviewed_public_inventory(self):
-        expected = {
-            "LICENSE.txt": "fb3d1cf94dbd25af40177c401761ddf55c08ea41c91b410e5ab0d1229ede8dea",
-            "references/execution-routing.md": "642ebb47dac969029ae19d038bdcd67981cef91ce0ad84ec92decb71e7f6104c",
-            "references/examples.md": "bc849a6c87cbcd93ca8bb7cc1eb23e1e24b3380dc12db4f70e6eb7229fb18f4c",
-            "references/model-profiles.md": "f8b352ab2ceef18387c4640fde4958a2510e76706c7c816e382a59da9149c9fb",
-            "references/compilation-rules.md": "c02f02105f75ca256cabfb9cc5573f4672bce1e91b612eb6a0122c022b99d2c4",
-        }
-        for name, digest in expected.items():
-            with self.subTest(name=name):
-                self.assertTrue((OLD / name).is_file())
-                self.assertEqual(hashlib.sha256((OLD / name).read_bytes()).hexdigest(), digest)
 
     def test_imported_bytes_match_manifest(self):
         self.assertTrue((NEW / "UPSTREAM.json").is_file())
@@ -90,9 +75,6 @@ class MetapromptIntegrationTest(unittest.TestCase):
         self.assertIn("depth pass", runner)
         self.assertIn("cannot expand authorization", runner)
         self.assertIn("unaccepted", runner)
-        legacy = (OLD / "SKILL.md").read_text()
-        self.assertNotIn("depth pass", legacy)
-        self.assertNotIn("felixrieseberg", legacy)
         for relative in ("docs/metaprompt-skills.md", "docs/smoke-tests.md"):
             with self.subTest(relative=relative):
                 self.assertIn("depth pass", (ROOT / relative).read_text())

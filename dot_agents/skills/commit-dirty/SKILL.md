@@ -44,7 +44,7 @@ Use this skill for explicit write requests to create a real git commit and push 
 ## Guardrails
 
 - Treat `commit all dirty` as authorization to include every safe, reviewable dirty change. For narrower requests, exclude unrelated work.
-- Do not use this skill when the task is only to plan commits or group dirty changes without writing. Use `commit-plan` for that case.
+- Do not use this skill when the task is only to plan commits or group dirty changes without writing. Use `commit-plan-push` in planning-only mode for that case.
 - Do not use this skill when the user explicitly wants to ship only the current Codex session's changes. Use `commit-session` for that case.
 - Never bypass `readme-recruiter-sync` because the code diff looks small.
 - Never invent README claims, flags, install steps, or recruiter copy that the repo does not support.

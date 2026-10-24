@@ -21,42 +21,12 @@
       "classification": "modified help only; trial/result JSON preserved"
     },
     {
-      "path": "dot_agents/skills/gh-fix-ci/scripts/inspect_pr_checks.py",
-      "language": "skill helper",
-      "classification": "modified prose/help; protocols/data preserved"
-    },
-    {
-      "path": "dot_agents/skills/imagegen/scripts/image_gen.py",
-      "language": "skill helper",
-      "classification": "modified prose/help; protocols/data preserved"
-    },
-    {
-      "path": "dot_agents/skills/leetcode-init/scripts/init_leetcode_problem.py",
-      "language": "skill helper",
-      "classification": "modified prose/help; protocols/data preserved"
-    },
-    {
       "path": "dot_agents/skills/metaprompt/scripts/update_upstream.py",
       "language": "skill helper",
       "classification": "modified prose/help; protocols/data preserved"
     },
     {
       "path": "dot_agents/skills/playwright/scripts/playwright_cli.sh",
-      "language": "skill helper",
-      "classification": "modified prose/help; protocols/data preserved"
-    },
-    {
-      "path": "dot_agents/skills/screenshot/scripts/ensure_macos_permissions.sh",
-      "language": "skill helper",
-      "classification": "modified prose/help; protocols/data preserved"
-    },
-    {
-      "path": "dot_agents/skills/screenshot/scripts/take_screenshot.py",
-      "language": "skill helper",
-      "classification": "modified prose/help; protocols/data preserved"
-    },
-    {
-      "path": "dot_agents/skills/transcribe/scripts/transcribe_diarize.py",
       "language": "skill helper",
       "classification": "modified prose/help; protocols/data preserved"
     },

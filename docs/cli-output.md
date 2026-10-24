@@ -10,6 +10,17 @@ Human-facing script output now uses appropriate decorative emojis so headings, p
 - JSON/CSV, status tokens, numeric data, raw filenames, passwords/clipboard data, generated files, diffs and command-substitution results remain undecorated. Silent commands stay silent. External tools and unmodified parser diagnostics keep their own formatting.
 - Scripts remain independently runnable; shell/Python prose helpers are local. Fish functions use the installed autoloadable `cli-message` helper.
 
+## Workflow checks in agents and pipes
+
+The README gate, workflow doctor and vetted-skill checker automatically suppress
+decoration when stdout is not a terminal or CODEX_*/CLAUDECODE variables are set.
+Human terminals keep their existing presentation; NO_COLOR alone keeps emojis.
+Use --plain (first argument for the README helper) or CLI_PLAIN=1 explicitly.
+Doctor text and vetted --check use concise agent summaries; --details restores
+full findings/inventory. Every inventory error and failure status remains.
+Doctor --format json and vetted --json remain complete machine-readable data.
+Other legacy helpers retain their documented presentation controls.
+
 ## Safe direct verification
 
 Working directory: `/home/example/linux-config`. No sudo is needed. All commands below are read-only help/listing or presentation checks. Expected examples are abbreviated and variable paths/data may differ.

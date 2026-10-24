@@ -11213,6 +11213,15 @@
       "findings": [],
       "reviewed_on": "2026-10-23",
       "sha256": "5b10c0bd2cb94044c8e18195341905fbc732437cf952f7a8d416e304966a20cd"
+    },
+    {
+      "aliases": [
+        "/home/kevin/ai-cli-dotfiles-public/.worktrees/skills-efficiency/docs/postmortem/2026-10-23-skills-pr-base-inspection.md"
+      ],
+      "findings": [],
+      "decision": "No new general learning: exact-ref verification and complete historical Git fixtures apply existing environment/ownership guidance. Corrected isolated candidate passed 240 tests and 391 subtests.",
+      "reviewed_on": "2026-10-23",
+      "sha256": "931ab044b61333c735598beef598ab7dbf8d2e3d24ba9106d9b82a8fad4314a8"
     }
   ],
   "review": {

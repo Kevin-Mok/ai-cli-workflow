@@ -1,5 +1,10 @@
 # Daily Superpowers Release Sync Design
 
+This historical installation record is superseded by the 2026-10-22 approved
+skill cull. The repo no longer installs Superpowers or its timer; refresh is a
+compatibility no-op and timer enablement is refused. Existing upstream files
+remain untouched. See [current integration and cleanup guidance](../../design-skills.md).
+
 ## Goal
 
 Run the existing `sync-superpowers-release` helper once per day at 05:00 local

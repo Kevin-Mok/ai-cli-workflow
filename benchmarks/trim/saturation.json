@@ -1,0 +1,18 @@
+{
+  "baseline_exact_matches": 42,
+  "case_count": 46,
+  "description_pass_surface_bytes": 4727,
+  "first_search": {
+    "combinations": 32,
+    "nonregressing": 2,
+    "best_saved_bytes": 49,
+    "semantic_result": "Rejected: omitted the context-window-boundary trigger."
+  },
+  "complete_cue_search": {
+    "combinations": 32,
+    "nonregressing": 2,
+    "best_saved_bytes": 22,
+    "best_saved_estimated_tokens": 5.5,
+    "result": "Below meaningful threshold for the full description pass; no edit applied."
+  }
+}

@@ -1,8 +1,7 @@
 # Metaprompt skills
 
 Use these skills to create, improve, and save a prompt for another task.
-Invoke `$metaprompt` or the original `$metaprompt-alxve` to review a saved
-prompt, or invoke **Metaprompt & Run** (`$metaprompt-run`) to compile, save
+Invoke `$metaprompt` to review a saved prompt, or invoke **Metaprompt & Run** (`$metaprompt-run`) to compile, save
 and immediately start a fresh Codex conversation to execute the task. Follow
 the update and verification steps when changing the installed skill.
 
@@ -16,16 +15,15 @@ the practical choice for already explicit tasks. The report links pinned source
 and maintenance receipts, adapter limitations, costs, and optional installation
 and rollback. The eight native files are preserved behind the existing
 `metaprompt` name; the local adapter adds prompt saving and ordinary execution
-boundaries. Use
-`$metaprompt-alxve` for the original compiler, including its strict standalone
-`go` boundary. Both save compiled prompts under the active repo's `prompts/`
-directory with non-destructive collision suffixes.
+boundaries. The approved cull retires the overlapping original compiler; its
+[pre-cull source](https://github.com/Kevin-Mok/ai-cli-workflow/tree/3e898a0f39172d7c30a6b0ae0258209cfe2c7f0c/dot_agents/skills/metaprompt-alxve) remains historical recovery evidence. The retained authoring and runner
+skills save compiled prompts under the active repo's `prompts/` directory with
+non-destructive collision suffixes.
 
 | Invocation | Behavior |
 | --- | --- |
 | `$metaprompt Make me a prompt to summarize meeting notes.` | Returns Sentry's eight-section package, saves only the Optimized Prompt, and reports its path. Labels prepared versus executed evals. Does not execute the embedded production task. |
 | `$metaprompt-run Summarize the supplied meeting notes into decisions, owners and deadlines; mark missing values unknown.` | Reuses the current metaprompt compiler and saved-prompt contract, then immediately starts a new conversation to execute the saved prompt once with fresh context. Asks for absent notes before producing the summary. |
-| `$metaprompt-alxve Make me a prompt to summarize meeting notes.` | Preserves original weight selection, prompt/Saved/Run/Weight metadata, and fresh standalone `go` gate for every pass. |
 
 Tracked sources install through chezmoi to `~/.agents/skills/<name>`.
 The existing Claude installer links complete directories under
@@ -37,8 +35,8 @@ file verification alone does not prove a running session refreshed its picker.
 The [runner skill](../dot_agents/skills/metaprompt-run/SKILL.md) references its
 sibling compiler directly, including the parent's routed references. Install
 both directories together. Updates to the current compiler therefore apply to
-the runner without a second upstream copy. The original authoring-only
-`$metaprompt` and legacy `$metaprompt-alxve` contracts remain unchanged.
+the runner without a second upstream copy. The authoring-only `$metaprompt`
+contract remains unchanged; the legacy adapter is outside the active roster.
 
 An explicit runner invocation authorizes compilation and execution of the
 supplied task under normal session permissions. The optimized prompt preserves
@@ -176,11 +174,10 @@ update the pin and matching checks together, and run the regression commands
 below before deployment. Review both source content and model behavior;
 passing text checks is not evidence of better prompt results.
 
-For the original compiler, invoke `$metaprompt-alxve`; its four
-references and license are byte-identical to the pre-migration package.
-To roll back a later upstream import, stage the prior full SHA through the
-same helper and restore only its reviewed imported inventory and pin. Leave
-the legacy skill and unrelated working-tree files intact. The Sentry updater
+For explicitly requested recovery of the retired original compiler, inspect
+its [pre-cull source](https://github.com/Kevin-Mok/ai-cli-workflow/tree/3e898a0f39172d7c30a6b0ae0258209cfe2c7f0c/dot_agents/skills/metaprompt-alxve). To roll back a later Sentry import, stage the prior full SHA through the
+same helper and restore only its reviewed imported inventory and pin. Preserve
+unrelated working-tree files. The Sentry updater
 cannot fetch old Majkey revisions: restore the complete outgoing package from
 the backup recorded in [the replacement plan](../plans/replace-metaprompt-with-sentry.md)
 if reversing this replacement. The backup is machine-local and temporary.
@@ -196,16 +193,15 @@ Deployment evidence and any scope restrictions belong in the active plan.
 From the repository root:
 
 ```bash
-python3 tests/test_metaprompt_contract.py
 python3 tests/test_metaprompt_integration.py
 python3 -m unittest discover -s tests -p 'test_metaprompt_selection*.py' -q
 bash tests/test_claude_skill_links.sh
 ```
 
-The legacy suite covers its saved-prompt and standalone-go contract; the new
-suite covers independent identities, preserved legacy bytes, exact Sentry
-content against the frozen candidate, retired-resource removal, and safe
-update staging. The selection tests are offline and do not rerun models.
+The integration suite covers retained identities, exact Sentry content against
+the frozen candidate, retired-resource removal, local adapter and runner
+boundaries, and safe update staging. Tests solely for the culled legacy adapter
+are retired with its source; benchmark snapshot tests remain independent. The selection tests are offline and do not rerun models.
 The retired Majkey linter, eval-manifest generator and helper test suite are
 no longer part of the active package.
 
@@ -288,7 +284,7 @@ prompt for a future update:
 
 > Review the candidate staged by the metaprompt update helper against its
 > current UPSTREAM.json. Preserve the local prompt-authoring adapter and
-> metaprompt-alxve behavior. Apply only reviewed upstream files and matching
+> fresh-conversation runner boundaries. Apply only reviewed upstream files and matching
 > pin/provenance changes. Run the automated commands and four behavioral
 > trials in docs/metaprompt-skills.md, update docs/smoke-tests.md and the active
 > plan, then refresh safely and verify installed files. Preserve unrelated

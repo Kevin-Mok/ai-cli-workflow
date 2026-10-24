@@ -2,8 +2,7 @@
 name: metaprompt
 description: >-
   Use for /metaprompt, "make me a prompt", or requests to create, sharpen,
-  deepen, audit, or template prompts for models and agents. Use metaprompt-alxve
-  instead when the user explicitly requests the original alxve compiler.
+  deepen, audit, or template prompts for models and agents.
 ---
 
 # Metaprompt
@@ -62,7 +61,7 @@ depth pass, and saved prompt artifacts.
    prompt in a `prompt` fence followed by `Saved: <path>` outside the fence.
    Save only that prompt, not the surrounding report. Keep sections concise for
    simple requests. For existing prompts include the native diff-style change
-   note. Use `$metaprompt-alxve` for the original strict standalone-`go` workflow.
+   note.
 
 Verify model-specific claims against current primary documentation when they
 affect the prompt. An upstream source date or attractive rewrite is not proof

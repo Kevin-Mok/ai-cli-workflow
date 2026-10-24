@@ -1,4 +1,4 @@
-# Read-only reviewer used by the long-task-harness skill.
+# Read-only reviewer used by the context-handoff long-task procedure.
 # Schema: https://developers.openai.com/codex/subagents (custom agent files).
 name = "evidence-reviewer"
 description = "Read-only reviewer that checks claims in a deliverable (code changes, docs, reports) against primary evidence and returns a claim -> evidence table. Use after a long task produces deliverables, before reporting completion."

@@ -111,7 +111,7 @@ high-leverage properties:
 - Skill growth in [`dot_agents/skills/`](dot_agents/skills/) turns
   repeated prompting into reusable local tools for shipping, research,
   browser automation, design work, docs lookup, and media tasks.
-- [`commit-plan`](dot_agents/skills/commit-plan/SKILL.md) makes commit
+- [`commit-plan-push` planning-only mode](dot_agents/skills/commit-plan-push/SKILL.md) makes commit
   hygiene inspectable: before anything is staged, it can review a dirty
   worktree the way a senior SWE would review a PR draft, separating
   concerns, flagging risky mixed changes, and turning messy local work
@@ -247,74 +247,54 @@ report exact installed-TUI limitations otherwise. Automated checks run before
 completion and any commit, and are reported separately.
 
 The Codex `$comm` picker uses numbered display titles: `Commit 1 Session`,
-`Commit 2 Plan & Push`, `Commit 3 Dirty`, then `Commit 4 Plan`. Skill slugs
-and commands remain unchanged. Restart Codex if cached labels persist.
+`Commit 2 Plan & Push`, and `Commit 3 Dirty`. The plan-and-push survivor also
+handles planning-only requests without Git writes. Restart Codex after the
+separately authorized install update if cached labels persist.
 
 - [`commit-plan-push`](dot_agents/skills/commit-plan-push/SKILL.md) makes a
   best-effort pass over the entire dirty worktree, separates safe changes into
   chronological commits, pushes once after the series, and reports residuals
-  when a file cannot be safely shipped.
-- [`commit-plan`](dot_agents/skills/commit-plan/SKILL.md) turns a dirty
-  worktree into something closer to a senior engineer's pre-PR pass. It
-  inspects staged, unstaged, and untracked changes, groups them into
-  the smallest coherent commits, calls out risky mixes like README
-  drift or suspicious artifacts, and gives execution-ready commands
-  without staging, committing, or rewriting history.
+  when a file cannot be safely shipped. Its planning-only mode returns safe
+  groups, checks and exclusions without staging, committing or pushing.
 - [`commit-session`](dot_agents/skills/commit-session/SKILL.md) ships
   only the files owned by the current Codex session, with fallback logic
   when a session missed its pre-write baseline; after safe scoping, it
   records validation warnings and repairs truthful README-gate findings
   before committing. Missing session metadata falls back to directly observed
   writes; mixed files contribute their safely separable session hunks.
-- [`open-pr`](dot_agents/skills/open-pr/SKILL.md) turns branch-vs-base
-  evidence into reviewer-ready PR titles and bodies, including
-  `docs/pr/` sync and ExampleProject DD/Reviewer A handoff context when those
-  workflows apply.
-- [`gh-fix-ci`](dot_agents/skills/gh-fix-ci/SKILL.md) investigates
-  failing GitHub Actions checks and plans the fix before touching code.
 
 This category matters because the repo stores reusable guardrails for
-commit hygiene, session scoping, CI repair, and shipping discipline,
+commit hygiene, session scoping, safe exclusions, and shipping discipline,
 not just aliases or workflow notes.
 
 #### Design And Frontend
 
-Representative highlights:
+- [`frontend-design`](dot_agents/skills/frontend-design/SKILL.md) builds frontend
+  web UI from confirmed audience, use cases and brand context. Backend scripts,
+  documents and data-only tasks use their own workflows.
+- [`brand-system-designer`](dot_agents/skills/brand-system-designer/SKILL.md)
+  develops a repo-native visual identity, logo, typography, favicon and social assets.
 
-- [`design-taste-frontend`](dot_agents/skills/design-taste-frontend/SKILL.md)
-  generates React and Next.js interfaces with stronger art direction and
-  motion than default LLM UI output.
-- [`high-end-visual-design`](dot_agents/skills/high-end-visual-design/SKILL.md)
-  pushes interfaces toward agency-grade typography, spacing, card
-  treatment, and animation quality.
-- [`redesign-existing-projects`](dot_agents/skills/redesign-existing-projects/SKILL.md)
-  upgrades existing sites or apps in place without throwing away the
-  current framework or functionality.
+The pinned local [Impeccable](dot_agents/skills/impeccable/SKILL.md) umbrella
+covers web design critique, polish, accessibility and responsive design.
+[shadcn](dot_agents/skills/shadcn/SKILL.md) supplies explicit component-library
+work, while [Vercel best practices](dot_agents/skills/vercel-react-best-practices/SKILL.md)
+provides pinned React/Next.js performance guidance. The approved cull removes the
+separate local pass skills; see [the design-skill guide](docs/design-skills.md)
+for the managed install and its boundaries.
 
-This category matters because it turns design direction into a
-repeatable local capability instead of a one-off prompting exercise.
+#### Coding And Long Tasks
 
-The managed public design stack adds Impeccable, 21st, Review Animations,
-Scroll World, and Higgsfield through chezmoi externals.
-[UI/UX Pro Max](dot_agents/skills/ui-ux-pro-max/SKILL.md) is a pinned,
-MIT-licensed offline Python/CSV design search skill shared by Codex CLI
-(`$ui-ux-pro-max`) and Claude Code (`/ui-ux-pro-max`), explicit-invoke only.
-The stack's daily refresh, bootstrap behavior, upstream links, and explicit authentication
-boundaries are documented in
-[the design-skill guide](docs/design-skills.md).
+- [`grok-cli-handoff`](dot_agents/skills/grok-cli-handoff/SKILL.md) verifies
+  remote-assistant authorization, checkout evidence and cooperative STOP.
+- [`skill-eval`](dot_agents/skills/skill-eval/SKILL.md) benchmarks a named skill
+  with real tasks and human-calibrated blind comparisons.
 
-#### Coding Practice And Scaffolding
-
-Representative highlights:
-
-- [`leetcode-init`](dot_agents/skills/leetcode-init/SKILL.md) turns a
-  copied LeetCode `.txt` prompt dump and matching `.py` stub into a
-  local runner and inline `unittest` scaffold without filling in the
-  actual solution.
-
-This category matters because it preserves the repo's preference for
-practice scaffolding and verification without turning every LeetCode
-request into solution leakage.
+- [`next-tasks`](dot_agents/skills/next-tasks/SKILL.md) proposes a small set of
+  independently verifiable tasks from current repository evidence.
+- [`context-handoff`](dot_agents/skills/context-handoff/SKILL.md) carries a saved
+  brief, observable acceptance criteria, goal, evidence review and progress note
+  across sessions, and preserves strict criterion-by-criterion handoff evidence.
 
 #### Research And Output Control
 
@@ -334,9 +314,8 @@ Representative highlights:
   human review.
 - [`metaprompt`](dot_agents/skills/metaprompt/SKILL.md) creates and sharpens
   prompts using Sentry's pinned `prompt-optimizer` workflow, with an eight-section
-  report and a separately saved optimized prompt. The original compiler remains available
-  as [`metaprompt-alxve`](dot_agents/skills/metaprompt-alxve/SKILL.md), including
-  its strict per-pass `go` gate. Both save prompt artifacts; the
+  report and a separately saved optimized prompt. The authoring-only compiler
+  and fresh-conversation runner both save prompt artifacts; the
   [skill guide](docs/metaprompt-skills.md) records the upstream comparison,
   usage, reviewed updates, and rollback. The
   [benchmark report](docs/metaprompt-benchmark.md) separates maintenance evidence
@@ -389,58 +368,26 @@ Representative highlights:
   checks install, usage, command flags, stack rationale, and recruiter-facing
   value; safe repairs ship with the change and remaining findings are reported
   without blocking eligible commits.
-- [`openai-docs`](dot_agents/skills/openai-docs/SKILL.md) answers
-  OpenAI product and API questions from current official docs first.
 
 This category matters because it makes repository knowledge,
 documentation quality, and output discipline persistent instead of
 fragile session state.
 
-#### Browser And Desktop Automation
+#### Browser And Research
 
-Representative highlights:
+- [`playwright`](dot_agents/skills/playwright/SKILL.md) drives real browser
+  navigation, screenshots, extraction and UI debugging from the terminal.
+  Load the skill before browser automation or Playwright commands.
+- [`last30days`](dot_agents/skills/last30days/SKILL.md) researches recent community
+  discussion and provides a source health check. Its imported package includes
+  local provenance beside the source. Codex built-in imagegen and openai-docs
+  remain available from the runtime; duplicate repo copies are retired.
 
-- [`playwright`](dot_agents/skills/playwright/SKILL.md) drives a real
-  browser from the terminal for navigation, screenshots, extraction, and
-  UI debugging.
-- [`playwright-interactive`](dot_agents/skills/playwright-interactive/SKILL.md)
-  keeps a Playwright browser session alive for faster repeated inspection
-  and debugging passes.
-- [`screenshot`](dot_agents/skills/screenshot/SKILL.md) handles
-  desktop-level capture when a normal browser tool cannot grab the right
-  evidence.
-
-This category matters because terminal-first agent work still needs
-direct access to browser state and desktop evidence when text-only
-inspection is not enough.
-
-#### Documents And Media
-
-Representative highlights:
-
-- [`imagegen`](dot_agents/skills/imagegen/SKILL.md) runs image
-  generation and editing workflows through the OpenAI Image API.
-- [`pdf`](dot_agents/skills/pdf/SKILL.md) handles PDF reading,
-  generation, and review workflows where rendered layout matters as much
-  as extracted text.
-- [`transcribe`](dot_agents/skills/transcribe/SKILL.md) converts speech
-  from audio or video into text with optional diarization and
-  known-speaker hints.
-
-This category matters because the repo packages higher-friction media
-workflows as inspectable local tools instead of leaving them as ad hoc
-prompts.
-
-The managed research and discovery skills include
-[`last30days`](dot_agents/skills/last30days/SKILL.md), which researches recent
-community discussion and provides a source health check, and
-[`find-skills`](dot_agents/skills/find-skills/SKILL.md), which finds and installs
-skills through the Skills CLI. Both are installed under `~/.agents/skills/`
-by the normal chezmoi refresh; provenance is recorded beside each package.
-
-Several skills also include `SOURCE.md`, helper scripts, reference
-material, or agent metadata. That makes them closer to local tools than
-to copied prompt snippets.
+Skill sources can include helper scripts, references, provenance and picker
+metadata. The approved cull changes this repository's managed catalog; it does
+not delete installed or upstream copies. No live refresh occurs during the trim
+benchmark task. Start a fresh agent session after a separately authorized
+installation update to reload skill routing.
 
 ### 4. ExecPlans
 
@@ -702,11 +649,9 @@ chezmoi -S "$PWD" diff
 chezmoi -S "$PWD" apply
 ```
 
-That apply path also follows the native-discovery install flow for
-[`obra/superpowers`](https://github.com/obra/superpowers): `chezmoi`
-installs the latest release archive into `~/.codex/superpowers` and
-writes `~/.agents/skills/superpowers` as a symlink to its `skills/`
-directory.
+The approved skill cull retires the Superpowers installer and discovery link.
+Existing home-directory copies and timers require the explicit cleanup described
+in [managed design skills](docs/design-skills.md#retired-integrations-and-existing-hosts).
 
 The same apply installs the Second Brain command, shared session skill, and
 user-level checkpoint units, but it does not enable the timer. The tracked
@@ -774,16 +719,10 @@ layer. Keep machine and identity values private. `refresh-config` applies review
 6. Use `setup-second-brain-timer --check` to validate an installed setup,
    `--enable` to opt into the persistent 16:20 user timer, and `--disable` to
    stop it.
-7. Run `sync-superpowers-release` when you want chezmoi to refresh the
-   external `obra/superpowers` bundle from the latest GitHub release.
-8. Use `setup-superpowers-release-timer --check` to validate the optional
-   user-scoped daily timer; `--enable` schedules it for 05:00 local time
-   with `Persistent=true`, and `--disable` stops it. No sudo is required.
-   Timer setup is intentionally bound to the standard `$HOME/linux-config`
-   checkout; `sync-superpowers-release` itself still supports an alternate
-   `LINUX_CONFIG_SOURCE` for manual refreshes.
-   Refreshed skills are picked up by newly started Codex sessions; already-
-   running sessions remain unchanged until restarted.
+7. `sync-superpowers-release` is a compatibility no-op after the approved cull.
+8. `setup-superpowers-release-timer --check` reports the disabled repo
+   integration without inspecting live timers. `--enable` is refused;
+   `--disable` explicitly stops an existing legacy timer without sudo.
 9. Run the repo-managed `codex` wrapper from the repo root when you want
    the tracked AGENTS chain, Codex config, local skills, and plans to
    shape the session.
@@ -836,6 +775,61 @@ background indexing progresses.
 
 ## Core Command Reference
 
+For instruction-size work, run `./scripts/trim-benchmark --check --plain` from
+this checkout. It compares the immutable [trim baseline](benchmarks/trim/BASELINE.json)
+with current instructions, skill descriptions and on-demand bodies; `--json`
+includes per-skill metrics, `--baseline PATH` compares another snapshot,
+`--ref REF` measures committed blobs, and `--repo PATH` selects a checkout.
+`--ref` cannot be combined with working-tree budget checks. The reproducible
+[comparison](benchmarks/trim/COMPARISON.md) separates committed results from
+uncommitted drafts. [Pass results](benchmarks/trim/PROGRESS.md)
+separate recurring context estimates from body/output savings. Budgets reject
+loaded-total growth, configured per-file limit breaches and lost skill paths;
+imported skills are measured without being rewritten. Apply
+[`lean-instructions`](dot_agents/skills/lean-instructions/SKILL.md) when adding
+to AGENTS.md or adding/editing a skill; each pass records its techniques there.
+
+Run `./scripts/sync-vetted-skills --check --plain` with Python 3.11+ after adding
+or removing a skill. It compares local sources, configured external/plugin exports and
+detectable installed/built-in skills with the on-demand
+[vetted reference](dot_agents/skills/lean-instructions/references/vetted-skills.md).
+The mandatory [admission gate](docs/skill-admissions.md) records scored PASS/DENY
+verdicts before new skills or standing rules; every local skill needs a PASS.
+The canonical [standing core](dot_codex/AGENTS.md) routes matching tasks to
+mandatory procedure references; the [preservation map](benchmarks/trim/casd-map.json)
+proves original policy text survived the split.
+`--json` lists source identities and verdicts; `--repo PATH` selects the checkout.
+Piped/agent `--check` output is a summary plus every error; `--details` shows the
+full inventory. Human terminal checks retain the listing. These checks and the
+README/doctor helpers suppress decoration in pipes or agent environments.
+Missing or stale entries fail `--check`; no installer runs and no file is written.
+Configured external packages must be available locally; unavailable sources
+produce exit 2 rather than an assumed empty inventory.
+Configured entries and installed-only copies stay separate. Preserve dated cull
+and merge reasons in the reference when updating it in the same pass commit.
+
+Before trimming descriptions, run `./scripts/trigger-eval --plain --check`.
+The archived 50 public synthetic cases include single-skill, multi-skill and
+no-skill requests, with a pre-cull baseline of 40/50 exact-set matches (80%).
+After the approved cull, the active gate uses 17 unchanged keeper/none cases:
+13/17 before and 15/17 after the cull. These scopes cannot be compared directly.
+This names-and-descriptions lexical proxy does not establish real model routing.
+`--cases PATH` selects JSON-compatible YAML, `--baseline PATH` selects the
+frozen accuracy snapshot, `--repo PATH` selects sources and `--json` emits
+aggregate/per-case-ID results. The check rejects a lower score or changed
+corpus/algorithm; description changes are allowed. Before each description pass,
+save its current JSON report outside the repo; use `--baseline PATH` pointing
+to that before-edit report for the after-edit `--check`. Comparing only with the
+original 80% floor would miss a decline following an improvement. Revert any
+decline, log the accepted score and refine against the same cases.
+
+The [file-size guard](docs/file-size-guard.md) checks the exact staged authored
+files with `python3 scripts/file_size_guard.py --plain`; `--report` inventories
+HEAD sizes. New files are limited to 5,000 estimated tokens, existing oversized
+files may stay the same size or shrink, and reviewed exact-path legacy ceilings
+are explicit. Tests use disposable repositories. Hook installation is an
+explicit local action; it preserves existing privacy-hook enforcement.
+
 These are the core entrypoints the README depends on. The flags and
 options listed below are verified against local CLI help or script
 source in this repo.
@@ -848,11 +842,11 @@ source in this repo.
 | [`codex-search`](docs/codex-session-search.md) | Search decoded local Codex conversations across directories, print snippets and resume commands, or select a session to resume. Installed from `scripts/executable_codex-search`; fish abbreviations `csg` (search) and `crg` (recent picker). | `--recent` lists newest 20 sessions without a pattern or model calls; `--recent --pick` opens available metadata before full archive indexing, then adds usable sessions in the background and ranks them by AI priority. Pending dialogue stays unknown/stale and defers recap generation; Ctrl-G remembers a request until ready. Malformed archive records do not flood the picker; `--details` exposes diagnostics. Guardian/session changes refresh automatically. `--sort priority\|recent` selects the order; picking defaults to priority, listing to recent. Priority is urgent/actionable/unknown/waiting/complete with activity ties; the preview explains its reason and freshness. `--summary-count N` sets the automatic newest-session window (default 20, 0 disables it); Ctrl-G requests a selected recap. `--summary-model MODEL` overrides the configured model; `--no-summaries` prohibits all generation. `-i` ignores case; `-F` uses literal text; `--all-text` adds tool calls/output; `--pick` uses optional fzf and browses all matches. Terminal output defaults to 20 compact results; `--details` shows full blocks; `--limit N` caps printing (0 means all). Pipes default to all full blocks without ANSI; `NO_COLOR` disables terminal color; `--plain` also uses ASCII printed decoration and ASCII borders in the recent picker. `--rebuild-index` reparses sources; `--clear-cache` deletes this Codex home's private index. `CODEX_HOME` selects sessions, `XDG_CACHE_HOME` selects cache storage; `--help`, `-h` or no arguments show usage and examples. Requires Python 3.11+ and rg for pattern search, fzf (tested 0.44.1) for recent picking, and compatible Codex with login for recaps; no sudo to run. |
 | `refresh-config` | Apply reviewed chezmoi files and reload shortcuts. | No flags; `CLI_PLAIN=1` provides ASCII decoration. Excludes scripts, externals, and removals; reports elapsed progress, stops on conflicts, and never imports live settings. Diagnostics remain in a private temporary log. |
 | [`./scripts/executable_fix-vps-codex.sh`](docs/fix-vps-codex.md) | Run locally to repair Codex npm permissions on a VPS using SSH keys, without sudo. Reuses compatible Node/npm and verifies a normal update through a second SSH session. | Defaults to `example-user@192.0.2.10`; `--host`, `--port`, and `--identity` override the connection. `--dry-run` reads diagnostics without repair writes or npm execution; `--help` shows prerequisites. Requires remote Linux, Python 3.8+, bash or fish, and an already trusted host key. |
-| `sync-superpowers-release` | Refresh the externally managed `obra/superpowers` skill bundle from the latest GitHub release archive through chezmoi. | `--dry-run` previews the release refresh without writing files. `LINUX_CONFIG_SOURCE` points the helper at this repo when it is not checked out at `$HOME/linux-config`. |
-| `sync-design-skills` | Refresh the managed public design skill externals; preserve vendored UI/UX Pro Max. | `--dry-run` previews the external refresh. `--bootstrap` is a compatibility no-op; normal shared-skill deployment supplies pinned UI/UX Pro Max. It never authenticates accounts, generates media, spends credits, or upgrades the Higgsfield CLI. |
+| `sync-superpowers-release` | Report the retired Superpowers integration; existing upstream files stay untouched. | `--dry-run` and normal invocation are compatibility no-ops. `--help` explains the retirement. |
+| `sync-design-skills` | Refresh only the retained Higgsfield plugin; Impeccable is pinned locally. | `--dry-run` previews the retained external target. `--bootstrap` is a compatibility no-op. `LINUX_CONFIG_SOURCE` selects another checkout. It never authenticates accounts, generates media, spends credits, or upgrades the Higgsfield CLI. |
 | `setup-design-skills-timer` | Validate, enable, or disable the daily 05:00 design-skill refresh timer. | Exactly one of `--check`, `--enable`, or `--disable` is required. `--enable` validates and activates the `Persistent=true` user timer without sudo. |
-| `setup-superpowers-release-timer` | Validate, enable, or disable the optional user-scoped release-sync timer. It runs daily at 05:00 local time and catches up missed runs with `Persistent=true`; no sudo is required. Refreshed skills are picked up by newly started Codex sessions; already-running sessions remain unchanged until restarted. | Timer setup requires the standard `$HOME/linux-config` checkout. Exactly one of `--check`, `--enable`, or `--disable` is required. `--check` validates the managed sources and installed units without changing state; `--enable` applies and activates the timer; recovery-oriented `--disable` stops it without needing chezmoi or a source checkout. |
-| `./scripts/executable_ai-workflow-doctor` | Audit the repo's AI instruction and skill surface, or capture a stable before/after measurement for workflow optimization. | `--repo PATH` selects the repository. `--format text\|json` selects human or machine output. `--snapshot PATH` writes a deterministic JSON baseline; `--compare PATH` compares the current report with one. `--verify-sources` resolves declared local source archives when available. `--check` exits nonzero for objective errors while review findings remain non-blocking warnings. |
+| `setup-superpowers-release-timer` | Report the disabled repo integration or explicitly clean up a legacy user timer; no sudo is required. | Exactly one of `--check`, `--enable`, or `--disable` is required. `--check` does not inspect live timers; `--enable` exits 2 without installing; `--disable` stops/disables the old timer without needing chezmoi or a source checkout. |
+| `./scripts/executable_ai-workflow-doctor` | Audit the repo's AI instruction and skill surface, or capture a stable before/after measurement for workflow optimization. | `--repo PATH` selects the repository. `--format text\|json` selects human or machine output. `--snapshot PATH` writes a deterministic JSON baseline; `--compare PATH` compares the current report with one. `--verify-sources` resolves declared local source archives when available. `--check` exits nonzero for objective errors while review findings remain non-blocking warnings. Piped/agent text is a summary; `--details` includes full diagnostics, `--plain` suppresses decoration. JSON stays complete. |
 | `./scripts/executable_apply-pywal-theme <wallpaper>` | Regenerate the active `pywal` theme through the repo-owned wrapper so wallpaper changes also refresh kitty and the i3 color resources this repo depends on. | Pass an image path directly, or pass raw `wal` flags when you need that lower-level control. The wrapper runs `wal --saturate 0.8 -e`, reloads Xresources, refreshes running kitty windows when the socket is available, and regenerates the derived i3 palette file. |
 | `./scripts/executable_install-chatgpt-linux` | Download and install the official ChatGPT desktop app package for a supported Linux desktop. | No flags. Supports Ubuntu 24.04/26.04, Debian 13, and Fedora 43/44 on x64 or ARM64. It prints the selected official package URL, then prompts for sudo only to run `apt install` or `dnf install`. |
 | `./scripts/executable_install-tmux-tpm.sh` | Install or fast-forward the TPM plugin manager, correct the tracked tmux bootstrap path when needed, and reload an active tmux server. | `--help` prints usage. With no flags, it clones or fast-forwards TPM under `~/.tmux/plugins/tpm`; restart tmux if no server is active, then press `prefix + I` to install plugins. |
