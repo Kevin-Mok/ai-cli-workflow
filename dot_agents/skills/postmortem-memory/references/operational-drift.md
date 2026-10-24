@@ -217,7 +217,7 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Remedy: Select the latest supplied forecast instant at or before now. Refresh periodically and on visible-tab resume, prevent overlap, bound requests, clear expired data and clean up abort controllers/listeners/timers.
 - Verification evidence: Reproductions RED,36 route+4 effect cases GREEN; typecheck/build passed. Deployment metadata and live API/desktop/mobile checked.
 - Limitations: Controlled effect tests do not establish a ninety-minute unattended browser soak.
-- Source: [Weather selection and refresh](/home/example/coding/scrape-weather/.worktrees/weather-app/docs/postmortem/2026-10-20-hour-selection-and-refresh.md) (SHA-256 `a70c4c1ebde8`; reviewed alias in [sources.json](../sources.json)).
+- Source: [Weather selection and refresh](/home/kevin/coding/scrape-weather/.worktrees/weather-app/docs/postmortem/2026-10-20-hour-selection-and-refresh.md) (SHA-256 `a70c4c1ebde8`; reviewed alias in [sources.json](../sources.json)).
 
 ## local-package-candidate-refresh
 

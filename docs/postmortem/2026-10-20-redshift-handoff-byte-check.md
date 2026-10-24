@@ -11,7 +11,7 @@ The fresh-task handoff stopped before creation because the orchestration runtime
 
 ## Resolution and verification
 
-- Used an ASCII-only handoff and checked its 286-byte length with String.length; one create_thread call returned executor <redacted-executor-id>.
+- Used an ASCII-only handoff and checked its 286-byte length with String.length; one create_thread call returned executor 01a15b49-2d9d-7bc1-85b0-4e414270a709.
 - Initial Kitty navigation returned zero matching source windows under the sandbox. A prior-memory search for `source windows Kitty socket` returned unrelated tmux/process findings; no applicable fix was asserted.
 - Repeating only the terminal opener with normal scoped sandbox escalation succeeded: it verified executor foreground navigation in Kitty window 2. No duplicate task was created.
 - Executor read_thread showed an active in-progress turn. This proves launch and navigation, not completed Redshift behavior.

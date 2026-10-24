@@ -13,7 +13,7 @@ On a bug or unexpected task failure, before retrying or changing a postmortem, M
 Runnable commands remain standalone raw fish lines. Before CLI/script output, manual commands or shell-helper changes, MUST read [CLI and shell rules](references/cli-and-shell.md), including wrapped-copy verification.
 For personal-context, project/session context, capture/resume/closeout, or development/design choices with personal or cross-project relevance, MUST read [conditional memory](references/session-memory.md); keep private context external.
 Before docs, README, manual checks, configuration, commits or pushes, MUST read [documentation and configuration](references/documentation-and-config.md).
-Before any commit, push, merge or task handoff, MUST read [delivery and handoff](references/delivery.md); existing authorization and cadence still govern.
+Before any repo creation, commit, push, merge or task handoff, MUST read [delivery and handoff](references/delivery.md); authorization and cadence govern.
 
 ## Authority And Required Context
 

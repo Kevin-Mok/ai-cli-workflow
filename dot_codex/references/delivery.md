@@ -3,6 +3,11 @@
 Read this procedure when its mandatory canonical AGENTS trigger applies. Follow
 the preserved rules below before acting; active user/developer instructions govern.
 
+- When asked to create a new GitHub repository, also configure it as the current
+  working repository's `origin` unless another remote is specified, and verify
+  its fetch/push URLs. Keep the current checkout; explain any filesystem
+  restriction before substituting a separate checkout.
+
 - Authorized commit workflows make best-effort commits of every eligible change.
   Prioritize session-touched files and favor including safe related files over
   omitting them within the requested scope. Ordinary validation, README, or

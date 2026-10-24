@@ -21,16 +21,23 @@ searches run before completion and any commit; do not use them to fill the hando
   Expected: Each skill has description/body/file metrics; current bodies do not
   enter loaded totals. The immutable pre-edit BASELINE.json remains unchanged.
 
+## Isolated skills proposal review
+
+- Action: Open `.lavish/skills-efficiency-review.html` and compare the pinned main and candidate evidence before approving the PR.
+  Expected: Exact baseline 410feaa, static cost and keeper-routing comparisons, isolated test outcomes and limitations are visible. Main and live configuration remain unchanged.
+- Action: Run `./scripts/trim-benchmark --ref 410feaa --plain`, then `./scripts/trim-benchmark --check --plain` on the review branch.
+  Expected: The baseline measures 37,908 loaded bytes; the integrated candidate measures 14,399 with budgets PASS. These are bytes/4 estimates, not model billing or actual invocation evidence.
+
 ## Skill trigger regression baseline
 
 - Action: Run `./scripts/trigger-eval --plain --check` before trimming skill
   descriptions and after every description pass.
-  Expected: The original corpus scores 40/50 exact-set matches (80%), with
-  `Accuracy gate: PASS`; later passes must match or improve that score. The
+  Expected: The active intake corpus scores 42/46 exact-set matches (91.30%), with
+  `Accuracy gate: PASS`; later passes must preserve prior correct cases. The
   report labels the deterministic lexical proxy and includes baseline accuracy.
 - Action: Run `./scripts/trigger-eval --json --check` and inspect `per_case`.
   Expected: Case IDs and match booleans, with no prompt text copied into results.
-  The separate 50-case fixture includes 36 single-label, 6 multi-label and 8
+  The original 50-case fixture includes 36 single-label, 6 multi-label and 8
   no-skill expectations. A changed corpus or lower exact-set accuracy fails the
   gate; intended description hash changes alone do not fail it.
 - Action: Before each description pass, save the current JSON report to a

@@ -327,6 +327,8 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
   bypass limits remain. Neutral aliases require private machine-path mapping.
 - Source: [privacy gate false positives](../../../../docs/postmortem/2026-10-16-privacy-gate-false-positives.md).
 
+- Publication occurrence: a four-part browser version and synthetic URL userinfo triggered IP/email heuristics. Normalize public evidence to the browser major and construct the URL fixture structurally while retaining its original host/validation semantics. Approve only the confirmed public noreply identity in external mode-0600 policy; leave the scanner, built-in path restrictions and content approvals unchanged. Exact staged gate and whitespace checks passed; 128 unit/integration tests and TypeScript passed after the fixture rewrite. Source: [publication privacy review](/home/kevin/coding/twitch-grid/docs/postmortem/2026-10-22-publication-privacy-review.md).
+
 ## ext-content-filter-counter-reconciliation
 
 - Status: **activation_pending**; root-cause confidence: **confirmed**; verification scope: **code**.
@@ -336,7 +338,7 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Remedy: Pass positively identified rejected IDs from complete history into the atomic merge; deactivate active matching events and decrement sent once. Protect reset-inactive, live-protected and deleted IDs. Request Message Content for classification.
 - Verification evidence: Exact four-chat and mixed deleted-tweet RED cases passed after correction; 216 tests passed including repeat recovery, reset, database reopen and rollback. Offline previews returned 4 to 0, 6 to 2, and 0 to 0.
 - Limitations: Missing/deleted message content cannot be classified. No live restart or Discord verification; activation remains pending.
-- Sources: [2026-10-20-pistol-chat-counting.md](/home/example/coding/twitter-cap-bot/docs/postmortem/2026-10-20-pistol-chat-counting.md) (SHA-256 `99cdb6d17d12`; aliases retained in [sources.json](../sources.json)).
+- Sources: [2026-10-20-pistol-chat-counting.md](/home/kevin/coding/twitter-cap-bot/docs/postmortem/2026-10-20-pistol-chat-counting.md) (SHA-256 `99cdb6d17d12`; aliases retained in [sources.json](../sources.json)).
 
 ## local-quota-reset-jitter-anchor
 
@@ -347,7 +349,7 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Remedy: Fixed ten-second tolerance from the original cohort anchor, retaining retirement, conflicts and real gaps. Keep matched work distinct from total model work.
 - Verification evidence: Six regression cases observed RED; 85 focused tests, mypy and Ruff passed. Installed/source replay gives one row, 2 matched plus 1 genuine gap-excluded point, over three matched hours and one stale reading.
 - Limitations: A real reset within ten seconds is indistinguishable; larger drift still splits. Missing observations and individual-model cost uncertainty remain.
-- Source: [2026-10-20-consumption-reset-jitter.md](/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-20-consumption-reset-jitter.md) (SHA-256 `248455f7bbd2`; registered in sources.json).
+- Source: [2026-10-20-consumption-reset-jitter.md](/home/kevin/coding/track-codex-sessions/docs/postmortem/2026-10-20-consumption-reset-jitter.md) (SHA-256 `248455f7bbd2`; registered in sources.json).
 
 
 ## ext-persistent-verification-profile
@@ -360,7 +362,7 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Verification: defining RED/GREEN; safe post-comparison installation; installed suite483 total/two skips/zero failures, helper11/11 and helper mypy pass, independent review clean. Existing controller type warning unchanged; CLI action help passes.
 - Operator evidence: live exact completed legacy promotion/reuse succeeded without reread, preserving original UTC timestamp2026-10-21T17:43:11.946823+00:00; running proof and prerequisites pass.
 - Limits: no cross-reboot/stopped-start reuse or authenticated acceptance yet. Metadata misses silent bitrot; privileged actors can forge the receipt; shared-library-only upgrades are unbound; USB renumbering may miss. Opaque legacy receipts need exact same-boot promotion.
-- Source: [repeated image verification](/home/example/coding/triway-nextjs/docs/postmortem/2026-10-21-repeated-image-verification.md) (SHA-256 `d1bc903e7471`; registered in sources.json).
+- Source: [repeated image verification](/home/kevin/coding/triway-nextjs/docs/postmortem/2026-10-21-repeated-image-verification.md) (SHA-256 `d1bc903e7471`; registered in sources.json).
 
 
 ## local-gate-public-metadata-defaults

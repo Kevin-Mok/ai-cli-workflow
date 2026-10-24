@@ -61,7 +61,7 @@ Final installer exited0; all12deployed package files match source bytes. Install
 
 ## Direct verification commands
 
-Working directory `/home/example/linux-config`, no sudo. Replace the example file path. These are expected UI observations; observed automated/installed evidence is recorded above.
+Working directory `/home/kevin/linux-config`, no sudo. Replace the example file path. These are expected UI observations; observed automated/installed evidence is recorded above.
 
 `~/scripts/media-screensaver orient`: chooser opens in the library; selected video loops with rotation, Save and Cancel controls.
 

@@ -2,7 +2,7 @@
 
 Historical brief for the initial matcher. Later DM, direction-isolate, single-callback and volume behavior is recorded in [the follow-up plan](../plans/discord-isolate-speech.md).
 
-Implement this approved task end to end in `/home/example/linux-config`. The user requested that Discord desktop messages be read aloud as "[name] says [msg]", selected the existing computer TTS voice Ryan and local playback only, and specifically asked to recognize Discord messages by their notification format. Implementation is authorized; this is not a request for another proposal.
+Implement this approved task end to end in `/home/kevin/linux-config`. The user requested that Discord desktop messages be read aloud as "[name] says [msg]", selected the existing computer TTS voice Ryan and local playback only, and specifically asked to recognize Discord messages by their notification format. Implementation is authorized; this is not a request for another proposal.
 
 ## Approved behavior
 

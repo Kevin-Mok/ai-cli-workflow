@@ -1,0 +1,438 @@
+{
+  "baseline": "410feaaabbae9ede75daf3e58b2d05687f168e90",
+  "improvement_head": "d615688f",
+  "branch": "review/skills-efficiency-20261023",
+  "method": "Same UTF-8 bytes / 4 collector; not model tokens, billing or observed model behavior.",
+  "metrics": {
+    "original": {
+      "skills_count": 59,
+      "skill_entries_count": 60,
+      "description_bytes": 13462,
+      "body_bytes": 403458,
+      "loaded_bytes": 37619,
+      "loaded_approx_tokens": 9404.75,
+      "body_approx_tokens": 100864.5
+    },
+    "main": {
+      "skills_count": 59,
+      "skill_entries_count": 60,
+      "description_bytes": 13462,
+      "body_bytes": 403458,
+      "loaded_bytes": 37908,
+      "loaded_approx_tokens": 9477.0,
+      "body_approx_tokens": 100864.5
+    },
+    "candidate": {
+      "skills_count": 27,
+      "skill_entries_count": 28,
+      "description_bytes": 4727,
+      "body_bytes": 179490,
+      "loaded_bytes": 14399,
+      "loaded_approx_tokens": 3599.75,
+      "body_approx_tokens": 44872.5
+    }
+  },
+  "routing": {
+    "method": "same deterministic TF-IDF lexical proxy and frozen common-label keeper slice",
+    "excluded": [
+      "instructions-edit: lean-instructions absent from baseline catalog"
+    ],
+    "main": [
+      {
+        "id": "brand-kit",
+        "expected": [
+          "brand-system-designer"
+        ],
+        "actual": [
+          "brand-system-designer"
+        ],
+        "pass": true
+      },
+      {
+        "id": "prompt-create",
+        "expected": [
+          "metaprompt"
+        ],
+        "actual": [
+          "metaprompt-alxve"
+        ],
+        "pass": false
+      },
+      {
+        "id": "prompt-run",
+        "expected": [
+          "metaprompt-run"
+        ],
+        "actual": [
+          "metaprompt-run"
+        ],
+        "pass": true
+      },
+      {
+        "id": "instructions-audit",
+        "expected": [
+          "ai-workflow-doctor"
+        ],
+        "actual": [
+          "ai-workflow-doctor"
+        ],
+        "pass": true
+      },
+      {
+        "id": "shortcut-fish",
+        "expected": [
+          "fish-alias"
+        ],
+        "actual": [
+          "fish-alias"
+        ],
+        "pass": true
+      },
+      {
+        "id": "research-recent",
+        "expected": [
+          "last30days"
+        ],
+        "actual": [
+          "last30days"
+        ],
+        "pass": true
+      },
+      {
+        "id": "workflow-ship",
+        "expected": [
+          "commit-session"
+        ],
+        "actual": [
+          "commit-session"
+        ],
+        "pass": true
+      },
+      {
+        "id": "multi-feedback-failure",
+        "expected": [
+          "feedback-memory",
+          "postmortem-memory"
+        ],
+        "actual": [
+          "feedback-memory"
+        ],
+        "pass": false
+      },
+      {
+        "id": "none-arithmetic",
+        "expected": [],
+        "actual": [],
+        "pass": true
+      },
+      {
+        "id": "none-language",
+        "expected": [],
+        "actual": [
+          "morning",
+          "polish"
+        ],
+        "pass": false
+      },
+      {
+        "id": "none-python",
+        "expected": [],
+        "actual": [],
+        "pass": true
+      },
+      {
+        "id": "none-date",
+        "expected": [],
+        "actual": [],
+        "pass": true
+      },
+      {
+        "id": "none-json",
+        "expected": [],
+        "actual": [],
+        "pass": true
+      },
+      {
+        "id": "none-git",
+        "expected": [],
+        "actual": [],
+        "pass": true
+      },
+      {
+        "id": "none-file",
+        "expected": [],
+        "actual": [],
+        "pass": true
+      },
+      {
+        "id": "none-riddle",
+        "expected": [],
+        "actual": [
+          "open-pr"
+        ],
+        "pass": false
+      }
+    ],
+    "candidate": [
+      {
+        "id": "brand-kit",
+        "expected": [
+          "brand-system-designer"
+        ],
+        "actual": [
+          "brand-system-designer"
+        ],
+        "pass": true
+      },
+      {
+        "id": "prompt-create",
+        "expected": [
+          "metaprompt"
+        ],
+        "actual": [
+          "metaprompt"
+        ],
+        "pass": true
+      },
+      {
+        "id": "prompt-run",
+        "expected": [
+          "metaprompt-run"
+        ],
+        "actual": [
+          "metaprompt-run"
+        ],
+        "pass": true
+      },
+      {
+        "id": "instructions-audit",
+        "expected": [
+          "ai-workflow-doctor"
+        ],
+        "actual": [
+          "ai-workflow-doctor"
+        ],
+        "pass": true
+      },
+      {
+        "id": "shortcut-fish",
+        "expected": [
+          "fish-alias"
+        ],
+        "actual": [
+          "fish-alias"
+        ],
+        "pass": true
+      },
+      {
+        "id": "research-recent",
+        "expected": [
+          "last30days"
+        ],
+        "actual": [
+          "last30days"
+        ],
+        "pass": true
+      },
+      {
+        "id": "workflow-ship",
+        "expected": [
+          "commit-session"
+        ],
+        "actual": [
+          "commit-session"
+        ],
+        "pass": true
+      },
+      {
+        "id": "multi-feedback-failure",
+        "expected": [
+          "feedback-memory",
+          "postmortem-memory"
+        ],
+        "actual": [
+          "feedback-memory",
+          "postmortem-memory"
+        ],
+        "pass": true
+      },
+      {
+        "id": "none-arithmetic",
+        "expected": [],
+        "actual": [],
+        "pass": true
+      },
+      {
+        "id": "none-language",
+        "expected": [],
+        "actual": [
+          "morning"
+        ],
+        "pass": false
+      },
+      {
+        "id": "none-python",
+        "expected": [],
+        "actual": [],
+        "pass": true
+      },
+      {
+        "id": "none-date",
+        "expected": [],
+        "actual": [],
+        "pass": true
+      },
+      {
+        "id": "none-json",
+        "expected": [],
+        "actual": [],
+        "pass": true
+      },
+      {
+        "id": "none-git",
+        "expected": [],
+        "actual": [],
+        "pass": true
+      },
+      {
+        "id": "none-file",
+        "expected": [],
+        "actual": [],
+        "pass": true
+      },
+      {
+        "id": "none-riddle",
+        "expected": [],
+        "actual": [],
+        "pass": true
+      }
+    ]
+  },
+  "tests": {
+    "candidate": {
+      "passed": 240,
+      "subtests": 391
+    },
+    "shared_main": {
+      "passed": 65,
+      "subtests": 14
+    },
+    "shared_candidate": {
+      "passed": 64,
+      "subtests": 8
+    },
+    "scope": "Shared suite files have evolved; counts are not identical test-case comparisons. No whole-repository green claim."
+  },
+  "isolation": "Disposable content snapshots under /tmp; .git files reference source metadata for read-only historical assertions. Not independent OS, installed-home or model environments.",
+  "limitations": [
+    "Actual model invocation, billing, latency and live activation untested.",
+    "Whole repository suite has previously recorded inherited collection defects; not rerun.",
+    "Removed skills are intentional approved culls; counts include merged overlaps.",
+    "No refresh-config, installs or merge to main."
+  ],
+  "logs": {
+    "benchmark-before.log": {
+      "sha256": "c1204853685a6847d937107e9bcb154d0376d5cd84dc35fdddacf3349ab3084b",
+      "bytes": 171
+    },
+    "shared-after.log": {
+      "sha256": "72a242b0f6cc3b65d05b3d91e9471aab1eb5582be4aa862bd88e4d56055eac77",
+      "bytes": 111
+    },
+    "candidate-benchmark-check.log": {
+      "sha256": "3b1efd618871b4bc7dfa504f43f28b1f3fe5b975f5a125c3689f87e8dcb13f85",
+      "bytes": 355
+    },
+    "shared-before.log": {
+      "sha256": "b462f64dd99c6800a9f34f5d7f666324b559b4d8b01dfda0b109ac5211e1dce1",
+      "bytes": 178
+    },
+    "benchmark-after.log": {
+      "sha256": "14b7c2d897801c62e19ee7ba799411987a844d6916ce0274970fe17c8a054ddf",
+      "bytes": 46744
+    },
+    "trigger-common-before.json": {
+      "sha256": "b9815e403e734cbc689a22abc590e7717f1874ecdc3c27e5e83cc2e0294e9271",
+      "bytes": 1742
+    },
+    "benchmark-original.log": {
+      "sha256": "98cfd6e05acc17c8cdfad7f51887a6b99a6495130da6b3b046182a7482f68b8f",
+      "bytes": 173
+    },
+    "FINAL-shared-after.log": {
+      "sha256": "bc71bd39fb461707344db3823f6295c702e9d3cbdc67f929664b797724ee61ad",
+      "bytes": 111
+    },
+    "candidate-trigger-check.log": {
+      "sha256": "062fd36e2666377f0e519131268b69485341659ae18b7cca082b397408718bf9",
+      "bytes": 285
+    },
+    "FINAL-metrics-original.json": {
+      "sha256": "59a132a6cbb38ef7ffba30390d353f266269ae34b4aa5e61b223ff863f251b62",
+      "bytes": 22860
+    },
+    "candidate-recorded-suite.log": {
+      "sha256": "779094971a77ecf962d61820f12052afca00e83614ace7e9641d310f51413f6b",
+      "bytes": 331
+    },
+    "trigger-after.log": {
+      "sha256": "de0774effb65b326a4b8331ab5dfce03a75d102f7d84cd523f1062e18d4365e4",
+      "bytes": 1824
+    },
+    "trigger-common-after.log": {
+      "sha256": "00f632d2c6b5fbb4e944971afa136ea9764b1ccb1e43b547f255bae338b0dd77",
+      "bytes": 285
+    },
+    "FINAL-metrics-after.json": {
+      "sha256": "297192aefc5f21ac50d34abc118febf6f11a9f312d31982ad36af9e5e8979e23",
+      "bytes": 11295
+    },
+    "FINAL-shared-before.log": {
+      "sha256": "1e8df5706a0d666d6d8def8c31f9d16f9e2d37a0e39d8bd4803bee2576e83e90",
+      "bytes": 178
+    },
+    "trigger-common-before.log": {
+      "sha256": "b9815e403e734cbc689a22abc590e7717f1874ecdc3c27e5e83cc2e0294e9271",
+      "bytes": 1742
+    },
+    "metrics-original.json": {
+      "sha256": "59a132a6cbb38ef7ffba30390d353f266269ae34b4aa5e61b223ff863f251b62",
+      "bytes": 22860
+    },
+    "FINAL-metrics-before.json": {
+      "sha256": "cfeab407f855014a74e834f7faa47e5526c3249e3e63ecdfec662ede197e9ef2",
+      "bytes": 22860
+    },
+    "metrics-after.json": {
+      "sha256": "297192aefc5f21ac50d34abc118febf6f11a9f312d31982ad36af9e5e8979e23",
+      "bytes": 11295
+    },
+    "common-cases.json": {
+      "sha256": "7f289d8c41885249764e22c6c511b40cf545dcad42369d1cf1f47c28f95b7de6",
+      "bytes": 2603
+    },
+    "metrics-before.json": {
+      "sha256": "cfeab407f855014a74e834f7faa47e5526c3249e3e63ecdfec662ede197e9ef2",
+      "bytes": 22860
+    },
+    "FINAL-candidate-recorded-suite.log": {
+      "sha256": "7c6d4d922d7f36eaa1560dc22b61abdb17697ebcdad7c3f380e0d0ca98df54fc",
+      "bytes": 331
+    },
+    "trigger-before.log": {
+      "sha256": "9eb8b512e4190e452becfe60997d0805750fbdacba437c8b5d3fef68d15c126f",
+      "bytes": 130
+    }
+  },
+  "final_test_output": {
+    "FINAL-candidate-recorded-suite.log": ".................................. [ 14%]\n............................................................................... [ 47%]\n.................................................................. [ 74%]\n.............................................................                  [100%]\n240 passed, 391 subtests passed in 27.66s\n",
+    "FINAL-shared-before.log": ".................................................................                                                                  [100%]\n65 passed, 14 subtests passed in 12.24s\n",
+    "FINAL-shared-after.log": "................................................................ [100%]\n64 passed, 8 subtests passed in 13.38s\n"
+  },
+  "test_command": "python3 -m pytest -q tests/test_skill_cull_contract.py tests/test_commit_plan_push_skill.py tests/test_metaprompt_integration.py tests/test_cli_emoji_skills.py tests/test_trim_benchmark.py tests/test_trigger_eval.py tests/test_trim_failure_mining.py tests/test_design_skills_sync.py tests/test_superpowers_release_timer.py tests/test_vetted_skills.py tests/test_grok_cli_handoff.py tests/test_file_size_guard.py tests/test_ai_workflow_contract.py tests/test_pre_commit_privacy_gate.py tests/test_checkpoint_privacy_gate.py tests/test_skill_admissions.py tests/test_trim_casd.py tests/test_ai_workflow_doctor.py tests/test_trim_instruction_duplicates.py tests/test_trim_skill_disclosure.py tests/test_trim_conditional_skills.py tests/test_trim_handoff_format.py tests/test_trim_main_integration.py",
+  "review": {
+    "verified": 8,
+    "incorrect": 0,
+    "pending": "PR publication and committed ancestry"
+  }
+}
