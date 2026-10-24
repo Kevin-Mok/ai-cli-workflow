@@ -433,6 +433,14 @@
   "review": {
     "verified": 8,
     "incorrect": 0,
-    "pending": "PR publication and committed ancestry"
+    "pending": null
+  },
+  "publication": {
+    "pr": "https://github.com/Kevin-Mok/ai-cli-workflow/pull/3",
+    "base": "main",
+    "branch": "review/skills-efficiency-20261023",
+    "integration_commit": "5c4ad2869022d34eb28e248d406e14ca9abdacae",
+    "merged": false,
+    "ci": "No check results reported; isolated local evidence only"
   }
 }

@@ -15,8 +15,8 @@ Protected work: untracked .skills-relevance.md, .trim-prompt.md, .trim-spec.md, 
 - [x] Compare immutable original, main and candidate snapshots in /tmp.
 - [x] Run focused candidate regression tests and shared baseline tests.
 - [x] Record visible evidence, limitations and reproducible commands.
-- [ ] Review README, privacy gate and final diff; commit plan with evidence.
-- [ ] Push new branch and open PR against main; verify PR head/base.
+- [x] Review README, privacy gate and final diff; commit plan with evidence.
+- [x] Push new branch and open PR against main; verify PR head/base.
 
 ## Verification
 Use current trim-benchmark against snapshots to avoid changing measurement methods; report UTF-8 bytes / 4 as estimates only. Use identical frozen keeper routing cases for before/after comparisons. Run recorded pass-evidence suite on isolated candidate; run only tests existing on both trees for regression comparison. Archive full logs locally and publish safe summaries. Deliberately measure inherited baseline failures; never claim whole-repository green.
@@ -34,3 +34,9 @@ Cursor prompt: Continue plans/skills-efficiency-pr.md on review/skills-efficienc
 Commit suggestion: test(skills): record isolated main comparison.
 
 Independent evidence reviewer:8verified/0incorrect/1publication pending. Recomputed metrics and common-case rows; confirmed final tested files match working content. Final log hashes and safe test output are embedded in pr-validation.json.
+
+## Published milestone
+
+Integration commit5c4ad286 (parents d615688f and410feaa) pushed to origin/review/skills-efficiency-20261023. PR https://github.com/Kevin-Mok/ai-cli-workflow/pull/3 is OPEN, base main, head review/skills-efficiency-20261023, unmerged, merge state clean. Remote main and local linux-config HEAD remain exact410feaa. Fresh final CLI checks: main37,908B, candidate14,399B budgetPASS; active routing42/46 PASS. GitHub reports no CI check results; local isolated evidence is the verification source. No product work remains; review/merge and activation are deliberately reserved for the user.
+
+Publication follow-up milestone: `docs(skills): record review PR publication` records external delivery and fixes evidence links. Next step: review PR3 and concrete evidence before any merge. No blockers.
