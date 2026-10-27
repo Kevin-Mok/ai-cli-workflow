@@ -6,6 +6,7 @@ cli_emoji() {
 }
 
 set -euo pipefail
+export TZ=America/Toronto
 
 usage() {
   printf '%sUsage: rsync-media-date YYYY-MM-DD SOURCE DESTINATION\n' "$(cli_emoji '📖')" >&2

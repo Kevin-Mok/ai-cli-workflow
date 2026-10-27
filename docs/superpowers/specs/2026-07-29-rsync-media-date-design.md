@@ -20,7 +20,8 @@ rsync-media-date 2026-07-28 /mnt/ipad /mnt/linux-files-3/concerts/jcole
 ## Behavior
 
 - Search only `SOURCE/DCIM` for `MOV`, `MP4`, and `M4V` files whose filesystem
-  modification time falls on the requested local calendar date.
+  modification time falls on the requested America/Toronto calendar date,
+  including its daylight-saving rules, regardless of the caller's timezone.
 - Create `DESTINATION` when it does not exist.
 - Copy selected files directly into `DESTINATION`, with no source folder
   hierarchy.

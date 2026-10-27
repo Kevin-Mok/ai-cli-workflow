@@ -817,7 +817,7 @@ checks use invented temporary data; real notes are never repository fixtures.
   failing mid-transfer.
 - Action: Mount an iPad at `/mnt/ipad`, then run
   `rsync-media-date 2026-07-28 /mnt/ipad /mnt/linux-files-3/concerts/jcole`.
-  Expected: The July 28 `.MOV`, `.MP4`, and `.M4V` originals beneath
+  Expected: The July 28 Toronto-time `.MOV`, `.MP4`, and `.M4V` originals beneath
   `/mnt/ipad/DCIM` copy directly into the J. Cole folder with rsync progress,
   overwriting same-named files and creating no DCIM subdirectories.
 - Action: ./scripts/executable_largest-day-file-size /mnt/usb-8tb/concerts
