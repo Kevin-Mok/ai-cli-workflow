@@ -6000,6 +6000,15 @@
   "reports": [
     {
       "aliases": [
+        "/home/kevin/linux-config/.worktrees/alpha-digest-intro/docs/postmortem/2026-10-28-alpha-intro-regression-baseline.md"
+      ],
+      "decision": "No new reusable learning: existing local-benchmark-host-context-guard guidance covers installed-root recognition and fail-closed unknown framing. The unrelated fixture failure reproduces on pristine origin/main; no remedy implemented. A formatting guard preserved the ledger during the first registration attempt.",
+      "findings": [],
+      "reviewed_on": "2026-10-28",
+      "sha256": "1ef35bfc59b8d220cceff452e81e39eb3f8d939a2d6c9cc81a65869ab2447dd3"
+    },
+    {
+      "aliases": [
         "/home/kevin/linux-config/docs/postmortem/2026-10-22-dnd-tts.md"
       ],
       "findings": [
