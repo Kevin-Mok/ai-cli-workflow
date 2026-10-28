@@ -36,7 +36,7 @@ change, test evidence, and delivery boundaries.
 - [x] Add the header and exact prompt body; observe GREEN and compare exact text.
 - [x] Run related prompt contract tests and README audit; update smoke checks.
 - [x] Review the final diff and stage only this task's files; pass privacy gate.
-- [ ] Commit with hooks, then publish the feature branch and open the PR to main
+- [x] Commit with hooks, then publish the feature branch and open the PR to main
   as the post-commit delivery step (receipt belongs in the PR and handoff).
 
 ## Verification and review evidence
@@ -67,7 +67,7 @@ base/head, remote commit, and unchanged main-checkout file hashes.
   test_metaprompt_contract.py -v` passed 12 tests; the same command with
   `test_metaprompt_integration.py` passed 9 tests. Both exited 0.
 - Review found no implementation issues; original RED evidence is recorded
-  above. The final review also covers the incident record and ledger insertion.
+  above. The final review also covers the baseline incident and ledger insertion.
 - Postmortem-memory targeted check passed with no errors, new sources,
   changed sources, or unregistered aliases; exit 0. The registration preserves
   existing entries and records an explicit no-new-learning decision.
@@ -85,6 +85,23 @@ will recheck the final candidate including this evidence update.
 After the commit, push only `feat/alpha-digest-intro`, then create the PR to
 `main` with the missing-reference and baseline-test notes. No blocking prompt
 issues remain; the external routine remains untested.
+
+Milestone 1 delivered: `16c01c18f2d26e12d24809f2758d6bc0419e5f59` committed
+and pushed only to `origin/feat/alpha-digest-intro`, with index, commit, and
+outgoing-history privacy PASS and no findings. PR
+[#4](https://github.com/Kevin-Mok/ai-cli-workflow/pull/4) is open against main.
+The initial SSH disconnect and successful gated retry are documented in
+[the transport report](../docs/postmortem/2026-10-28-alpha-intro-push-transport.md).
+
+Milestone 2: `docs: record alpha intro delivery recovery` records the verified
+transport workaround, reviewed memory, and repo-specific lesson. No prompt,
+test, runtime, or gate behavior changes. Finalize its ledger check and commit
+with hooks, then push the documentation follow-up to the same PR. No further
+implementation is needed; main-checkout dirty state remains protected.
+
+Milestone 2 verification: transport-report targeted memory check passes,
+exit 0, with no errors or uncovered/changed aliases. The reviewed source hash
+is `3b23128e231d289bef51d52c2dfd564c9aac31c545a8b41b4bb6e8cad76ca2eb`.
 
 Cursor review prompt: Review this additive prompt PR against the exact supplied
 body and five required markers. Preserve all boundaries and unrelated work;

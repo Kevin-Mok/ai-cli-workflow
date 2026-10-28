@@ -1,5 +1,7 @@
 # Lessons
 
+- 2026-10-28: A new-branch privacy push scans all reachable history and can outlast the SSH connection. After verifying the base is already public, initialize only the authorized feature ref at that base and retry a normal push with hooks enabled; every new feature commit must still pass the outgoing gate. Do not use this to ignore findings or publish unreviewed content. See [delivery recovery](../docs/postmortem/2026-10-28-alpha-intro-push-transport.md).
+
 - In Bash prompt helpers that assign caller variables with `printf -v`, keep the helper's own local input variable under a different name; Bash dynamic scoping can otherwise leave the caller unset under `set -u`. Exercise an interactive dry run, not only syntax and non-interactive help paths.
 
 - When a user widens README scope after an initial pass, update the documented surface to include every newly named repo entrypoint, not just the most obvious directories.

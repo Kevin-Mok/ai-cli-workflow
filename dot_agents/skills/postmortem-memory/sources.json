@@ -35,6 +35,27 @@
   ],
   "findings": [
     {
+      "applicability": "A user-authorized new feature branch from an already-published base, with an all-history pre-push hook and SSH disconnect.",
+      "confidence": "supported",
+      "diagnostics": [
+        "Verify remote base SHA and feature-ref absence using git ls-remote.",
+        "Inspect the enabled hook: zero remote OID scans all history; nonzero base checks every outgoing delta commit."
+      ],
+      "id": "local-new-branch-push-transport",
+      "limitations": "The exact SSH disconnect cause is unproved. This does not repair scanner performance, permit bypassing findings, or authorize publishing unpublished content via ref creation.",
+      "reference": "references/external-access-deployment.md#local-new-branch-push-transport",
+      "remedy": "Initialize only the authorized remote feature ref at its verified already-public base, then retry a normal push with all hooks enabled.",
+      "sources": [
+        "3b23128e231d289bef51d52c2dfd564c9aac31c545a8b41b4bb6e8cad76ca2eb"
+      ],
+      "status": "verified_workaround",
+      "symptoms": [
+        "SSH connection closes while a new-branch pre-push hook rescans already-public history."
+      ],
+      "verification": "After stopping only the disconnected task push, verified public base/ref absence, initialized the feature ref at that base, and normal push passed the outgoing-history gate and exited 0; PR #4 opened.",
+      "verification_scope": "workaround"
+    },
+    {
       "applicability": "Shared notification players invoked both by Dunst and direct Codex event hooks.",
       "confidence": "confirmed",
       "diagnostics": [
@@ -5998,6 +6019,16 @@
     }
   ],
   "reports": [
+    {
+      "aliases": [
+        "/home/kevin/linux-config/.worktrees/alpha-digest-intro/docs/postmortem/2026-10-28-alpha-intro-push-transport.md"
+      ],
+      "findings": [
+        "local-new-branch-push-transport"
+      ],
+      "reviewed_on": "2026-10-28",
+      "sha256": "3b23128e231d289bef51d52c2dfd564c9aac31c545a8b41b4bb6e8cad76ca2eb"
+    },
     {
       "aliases": [
         "/home/kevin/linux-config/.worktrees/alpha-digest-intro/docs/postmortem/2026-10-28-alpha-intro-regression-baseline.md"
