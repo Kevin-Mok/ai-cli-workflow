@@ -1,9 +1,12 @@
 ---
 name: frontend-design
-description: Create distinctive, production-grade frontend interfaces with high design quality. Use this skill when the user asks to build web components, pages, artifacts, posters, or applications. Generates creative, polished code that avoids generic AI aesthetics.
+description: Use when building or redesigning frontend web interfaces such as pages, components, dashboards, or app UI.
 ---
 
 # Frontend Design
+
+Use for user-facing frontend web UI. Backend services, CLI scripts, documents,
+and data-only artifacts do not call for this design workflow.
 
 Build a distinctive, working interface grounded in the project's audience and
 brand. Confirm the design context, choose a clear visual direction, implement
@@ -26,7 +29,13 @@ Individual skills may require additional context — check the skill's preparati
 **Gathering order:**
 1. **Check current instructions (instant)**: If your loaded instructions already contain a **Design Context** section, proceed immediately.
 2. **Check .impeccable.md (fast)**: If not in instructions, read `.impeccable.md` from the project root. If it exists and contains the required context, proceed.
-3. **Run teach-impeccable (REQUIRED)**: If neither source has context, you MUST run the teach-impeccable skill NOW before doing anything else. Do NOT skip this step. Do NOT attempt to infer context from the codebase instead.
+3. **Gather missing context**: Inspect project docs, existing UI, tokens and brand
+   assets for known constraints. Then ask about remaining audience, use cases,
+   brand personality, aesthetic references and accessibility needs; ask only
+   what the supplied context does not settle. Confirm creator intent before
+   implementation. Save agreed users, brand personality, aesthetic direction
+   and 3–5 design principles under `## Design Context` in `.impeccable.md`,
+   updating that section in place and preserving unrelated content.
 
 ---
 

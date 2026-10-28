@@ -1,0 +1,5 @@
+{
+  "cases": "benchmarks/trim/intake-cases.yaml",
+  "baseline": "benchmarks/trim/intake-baseline.json",
+  "scope": "Intake:46 frozen cases covering all27 local skills; includes unchanged17-case keep-list. Compare only same cases; deterministic lexical proxy."
+}

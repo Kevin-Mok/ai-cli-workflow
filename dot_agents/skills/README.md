@@ -1,329 +1,95 @@
 # Local Skills Catalog
 
-This directory packages repo-tracked local skills for recurring Codex
-work. The catalog below documents every directory under
-`dot_agents/skills/` that currently exposes a `SKILL.md`, grouped by
-the kind of job it handles so you can scan by intent first and then jump
-straight to the source file.
+These repo-tracked skills provide reusable Codex workflows. Choose by task below
+and open the linked source. This catalog covers `dot_agents/skills/`; external
+skills and Codex built-ins have separate install and provenance boundaries.
+The approved relevance cull retains `last30days` and merges overlapping planning
+and handoff workflows instead of removing their safeguards.
 
-The live Codex install also mounts the external
-[`obra/superpowers`](https://github.com/obra/superpowers) bundle at
-`~/.agents/skills/superpowers` by installing its latest release archive
-into `~/.codex/superpowers` and symlinking the archive's `skills/`
-directory. This catalog still focuses on repo-tracked skill sources that
-live under `dot_agents/skills/`, but it includes one dedicated section
-for the externally managed superpowers bundle because that workflow
-meaningfully changes how the broader skill surface is supposed to be
-used in this environment. The legacy `push-dirty/` directory is omitted
-because it does not currently define a live skill.
+## Instruction Quality And Memory
 
-Many of the design skills are composable rather than mutually
-exclusive: `teach-impeccable` captures persistent design context,
-generator skills create or redesign a feature, and the narrower pass
-skills tighten one specific aspect of an existing interface.
+- [`lean-instructions`](lean-instructions/SKILL.md): Apply measured instruction
+  efficiency techniques when adding to AGENTS.md or adding/editing a skill.
+- [`ai-workflow-doctor`](ai-workflow-doctor/SKILL.md): Audit active instruction
+  context, references, plan contracts, provenance and skill-catalog drift.
+- [`skill-eval`](skill-eval/SKILL.md): Evaluate a named skill with real tasks,
+  human-calibrated binary grading and blind comparisons.
+- [`feedback-memory`](feedback-memory/SKILL.md): Append durable cross-task user
+  preferences to the canonical feedback log.
+- [`postmortem-memory`](postmortem-memory/SKILL.md): Retrieve reviewed incident
+  remedies before troubleshooting and keep their evidence and learning current.
+- [`personal-context`](personal-context/SKILL.md): Retrieve relevant personal and
+  source-backed project briefs. Private records stay outside tracked artifacts.
+- [`second-brain-session`](second-brain-session/SKILL.md): Retrieve established
+  project/session context and prepare confirmation-gated session closeouts.
+- [`context-handoff`](context-handoff/SKILL.md): Maintain a long-task brief,
+  observable acceptance criteria, goal, evidence review and progress note; hand
+  off strict criterion-by-criterion evidence after interruption or compression.
 
-## Frontend Direction And Generators
+## Git And Delivery
 
-- [`ui-ux-pro-max`](ui-ux-pro-max/SKILL.md): Explicit-only offline Python/CSV
-  search for design systems, palettes, fonts, charts and stack guidance. Pinned
-  vendored runtime shared by Codex (`$ui-ux-pro-max`) and Claude (`/ui-ux-pro-max`).
-- [`teach-impeccable`](teach-impeccable/SKILL.md): Performs one-time
-  design-context capture, writes a `## Design Context` section to
-  `.impeccable.md`, and gives later design work a persistent audience,
-  tone, and aesthetic baseline.
-- [`frontend-design`](frontend-design/SKILL.md): Creates distinctive,
-  production-grade interfaces while insisting on explicit audience, use
-  case, and brand context before any design implementation starts.
-- [`brand-system-designer`](brand-system-designer/SKILL.md): Creates a
-  repo-native brand system with logo, color, typography, favicon, and social
-  asset guidance when visual identity is the actual task.
-- [`design-taste-frontend`](design-taste-frontend/SKILL.md): Acts as a
-  senior UI/UX engineer for high-agency frontend work, with strict rules
-  around component architecture, motion quality, typography, and
-  avoiding generic AI aesthetics.
-- [`high-end-visual-design`](high-end-visual-design/SKILL.md): Pushes an
-  interface toward premium agency-style execution through stronger font,
-  spacing, card, and animation choices.
-- [`minimalist-ui`](minimalist-ui/SKILL.md): Drives a restrained
-  editorial direction with warm monochrome tones, flat bento structure,
-  typographic contrast, and muted accent color.
-- [`redesign-existing-projects`](redesign-existing-projects/SKILL.md):
-  Upgrades an existing site or app to higher visual quality without
-  throwing away its current framework, CSS approach, or functionality.
+Delivery remains best-effort within verified scope. Planning-only requests stay
+read-only; unsafe content and unrelated work remain excluded. Matching plans,
+tests and documentation accompany the change they describe.
 
-## Managed Public Design Stack
+- [`commit-plan-push`](commit-plan-push/SKILL.md): Plan dirty work oldest-to-newest.
+  Planning-only mode inspects and proposes without Git writes; explicit execution
+  requests create safe coherent commits, then push once after the full series.
+- [`commit-dirty`](commit-dirty/SKILL.md): Verify and ship the authorized dirty
+  worktree in a focused commit, reporting failed checks and unsafe residuals.
+- [`commit-session`](commit-session/SKILL.md): Ship only verified changes touched
+  during the current session, preserving unrelated work and staged changes.
+- [`readme-recruiter-sync`](readme-recruiter-sync/SKILL.md): Check README truth,
+  onboarding, usage, stack rationale and recruiter value at the delivery gate,
+  during README work, or when a documented public interface changes.
+- [`smoke-test-capture`](smoke-test-capture/SKILL.md): Maintain reusable grouped
+  Action/Expected manual checks with the change that creates or alters them.
 
-The daily chezmoi-managed sources are documented in
-[the design-skill guide](../../docs/design-skills.md). They install as
-Codex-native symlinks under `~/.codex/skills/`, plus the Higgsfield
-plugin. UI/UX Pro Max is now vendored above and excluded from automatic updates.
+- [`grok-cli-handoff`](grok-cli-handoff/SKILL.md): Verify remote-assistant
+  authorization, local checkout evidence and cooperative STOP handling.
 
-- `impeccable`: Unified design direction, critique, quality, and polish.
-- `21st-cli-use`, `21st-ai`, `21st-design-sync`, and `21st-registry`:
-  terminal component discovery, generation, theme publishing, and registry
-  management.
-- `review-animations` and `scroll-world`: Motion review and cinematic
-  scroll-experience workflows.
-- `higgsfield`: Managed visual-generation plugin; its CLI authentication and
-  credit-bearing jobs remain explicitly user-driven.
+## Explicit Task Workflows
 
-## UX, Quality, And System Alignment
+- [`night`](night/SKILL.md): Run an explicitly requested unattended overnight job
+  on a local branch, commit without pushing, and leave a handoff note.
+- [`morning`](morning/SKILL.md): Read the night handoff and branch, summarize the
+  evidence, and gather choices before taking the next action.
+- [`next-tasks`](next-tasks/SKILL.md): Propose a bounded set of verifiable tasks
+  from current repository evidence, then execute only the selected task.
+- [`fish-alias`](fish-alias/SKILL.md): Add or replace a fish command, directory or
+  file shortcut using the established mappings and conflict handling.
 
-- [`adapt`](adapt/SKILL.md): Adjusts a design for different screen
-  sizes, devices, contexts, or platforms so the experience stays
-  coherent outside its original happy path.
-- [`audit`](audit/SKILL.md): Runs a broad interface audit across
-  accessibility, performance, theming, and responsive behavior, then
-  reports issues with severity and recommendations.
-- [`critique`](critique/SKILL.md): Reviews visual hierarchy, information
-  architecture, emotional resonance, and overall UX quality from a
-  design-review perspective.
-- [`extract`](extract/SKILL.md): Pulls reusable components, design
-  tokens, and repeated patterns into a more systematic design-system
-  surface.
-- [`harden`](harden/SKILL.md): Improves production readiness through
-  better error states, i18n handling, text overflow behavior, and edge
-  case coverage.
-- [`normalize`](normalize/SKILL.md): Realigns a feature with the existing
-  design system, tokens, and component patterns, and explicitly routes
-  through the design-context workflow first.
-- [`onboard`](onboard/SKILL.md): Designs or improves onboarding, empty
-  states, and first-run flows so users understand value and next steps
-  faster.
-- [`optimize`](optimize/SKILL.md): Focuses on frontend performance across
-  loading speed, rendering, animation cost, image handling, and bundle
-  size.
+## Prompts And Research
 
-## Targeted Design Passes
+- [`metaprompt`](metaprompt/SKILL.md): Create, sharpen or template prompts using
+  Sentry's pinned workflow and save the compiled artifact without executing it.
+  See the [source and reviewed update record](metaprompt/SOURCE.md).
+- [`Metaprompt & Run`](metaprompt-run/SKILL.md) (`$metaprompt-run`): Compile and
+  save the request, then start one fresh Codex conversation to execute it within
+  the user's existing authorization.
+- [`last30days`](last30days/SKILL.md): Research recent community and web discussion
+  and check source health. Its imported package has a local [source record](last30days/SOURCE.md).
 
-- [`animate`](animate/SKILL.md): Adds purposeful motion,
-  micro-interactions, and state transitions that improve usability
-  instead of decorating for its own sake.
-- [`arrange`](arrange/SKILL.md): Reworks layout, spacing, and visual
-  rhythm when a feature feels flat, crowded, or compositionally weak.
-- [`bolder`](bolder/SKILL.md): Turns an overly safe design into
-  something more expressive and visually interesting without losing
-  usability.
-- [`clarify`](clarify/SKILL.md): Rewrites fuzzy labels, microcopy, error
-  messages, and instructions so the interface is easier to understand.
-- [`colorize`](colorize/SKILL.md): Introduces strategic color when a
-  feature feels too monochrome or lacks visual energy.
-- [`delight`](delight/SKILL.md): Adds moments of personality,
-  surprise, and joy that make a competent interface feel memorable.
-- [`distill`](distill/SKILL.md): Removes unnecessary complexity so the
-  interface gets cleaner, sharper, and more focused on its core job.
-- [`overdrive`](overdrive/SKILL.md): Pushes a feature into technically
-  ambitious territory with standout interactions or visual effects that
-  make the implementation feel hard to ignore.
-- [`polish`](polish/SKILL.md): Performs a final quality pass on spacing,
-  alignment, consistency, and edge details before shipping.
-- [`quieter`](quieter/SKILL.md): Dials back an interface that feels too
-  loud or visually aggressive while keeping it intentional.
-- [`typeset`](typeset/SKILL.md): Tightens font choice, hierarchy, sizing,
-  weight, and readability so the typography looks deliberate instead of
-  default.
+## Frontend And Browser Work
 
-## Browser And Desktop Automation
+- [`frontend-design`](frontend-design/SKILL.md): Build frontend web interfaces
+  from confirmed audience, use cases and brand context; save agreed missing
+  design context in `.impeccable.md` for later sessions.
+- [`brand-system-designer`](brand-system-designer/SKILL.md): Develop repo-native
+  visual identity, logo, typography, favicon and social asset guidance.
+- [`playwright`](playwright/SKILL.md): Automate real browser navigation,
+  screenshots, extraction and UI debugging. Load it before Playwright commands.
 
-- [`playwright`](playwright/SKILL.md): Uses terminal-driven Playwright
-  automation for navigation, form filling, screenshots, extraction, and
-  other real-browser tasks.
-- [`playwright-interactive`](playwright-interactive/SKILL.md): Keeps a
-  browser or Electron session alive through `js_repl` for fast iterative
-  UI debugging without constant relaunches.
-- [`screenshot`](screenshot/SKILL.md): Captures desktop-level screenshots
-  when the user needs a full-screen, window, or system-level image and a
-  more integrated tool cannot grab it.
+- [`vercel-react-best-practices`](vercel-react-best-practices/SKILL.md): Explicit
+  React/Next.js performance review against pinned Vercel guidance.
+- [`shadcn`](shadcn/SKILL.md): Explicit shadcn/ui component, registry and preset
+  work; load detailed workflows and rules only when needed.
+- [`impeccable`](impeccable/SKILL.md): Pinned explicit web design commands for
+  critique, audit, refinement and implementation.
 
-## External Superpowers Skills
-
-These skills are mounted from the chezmoi-managed
-`~/.codex/superpowers` release archive into
-`~/.agents/skills/superpowers/<skill>/SKILL.md`. They are not
-repo-tracked under `dot_agents/skills/`, but they are part of the
-live external Superpowers skill surface on this machine. Use
-`sync-superpowers-release` for a manual refresh of that external bundle from
-the latest upstream release. The optional `setup-superpowers-release-timer --enable` path instead
-installs a user-scoped recurring sync at 05:00 local time with
-`Persistent=true`; it catches up missed runs, does not require sudo, and does
-not alter already-running Codex sessions until they are restarted. Use
-`--check` to validate the setup or `--disable` to stop the recurring timer.
-Timer setup is bound to the standard `$HOME/linux-config` checkout, while the
-manual helper continues to support an alternate `LINUX_CONFIG_SOURCE`.
-
-- [`brainstorming`](https://github.com/obra/superpowers/blob/main/skills/brainstorming/SKILL.md):
-  Turns a rough idea into an approved design or spec before any
-  implementation work starts.
-- [`dispatching-parallel-agents`](https://github.com/obra/superpowers/blob/main/skills/dispatching-parallel-agents/SKILL.md):
-  Splits independent investigations or tasks across parallel subagents
-  with tightly scoped context.
-- [`executing-plans`](https://github.com/obra/superpowers/blob/main/skills/executing-plans/SKILL.md):
-  Executes an existing implementation plan step by step when you are not
-  using the more review-heavy subagent workflow.
-- [`finishing-a-development-branch`](https://github.com/obra/superpowers/blob/main/skills/finishing-a-development-branch/SKILL.md):
-  Verifies the branch is ready, presents merge or PR options, and helps
-  close out development work cleanly.
-- [`receiving-code-review`](https://github.com/obra/superpowers/blob/main/skills/receiving-code-review/SKILL.md):
-  Forces technical evaluation of review feedback before making changes,
-  instead of blindly accepting comments.
-- [`requesting-code-review`](https://github.com/obra/superpowers/blob/main/skills/requesting-code-review/SKILL.md):
-  Adds an explicit review pass so spec or code-quality problems get
-  caught before work continues or lands.
-- [`subagent-driven-development`](https://github.com/obra/superpowers/blob/main/skills/subagent-driven-development/SKILL.md):
-  Runs a written plan through fresh subagents, with review after each
-  task for spec compliance and code quality.
-- [`systematic-debugging`](https://github.com/obra/superpowers/blob/main/skills/systematic-debugging/SKILL.md):
-  Enforces root-cause investigation before any bug fix or speculative
-  patching.
-- [`test-driven-development`](https://github.com/obra/superpowers/blob/main/skills/test-driven-development/SKILL.md):
-  Requires the red-green-refactor loop so tests fail first, then guide
-  the minimal implementation.
-- [`using-git-worktrees`](https://github.com/obra/superpowers/blob/main/skills/using-git-worktrees/SKILL.md):
-  Sets up an isolated worktree and branch safely before feature work or
-  plan execution.
-- [`using-superpowers`](https://github.com/obra/superpowers/blob/main/skills/using-superpowers/SKILL.md):
-  The gateway skill that makes the agent check for relevant skills
-  before responding or taking action.
-- [`verification-before-completion`](https://github.com/obra/superpowers/blob/main/skills/verification-before-completion/SKILL.md):
-  Requires fresh verification evidence before claiming work is complete,
-  fixed, or passing.
-- [`writing-plans`](https://github.com/obra/superpowers/blob/main/skills/writing-plans/SKILL.md):
-  Converts an approved design into a granular implementation plan with
-  exact files, tests, and verification steps.
-- [`writing-skills`](https://github.com/obra/superpowers/blob/main/skills/writing-skills/SKILL.md):
-  Applies TDD-style discipline to creating or refining skills, including
-  pressure-testing whether the documentation actually changes agent
-  behavior.
-
-## Git Workflow
-
-Delivery skills make best-effort commits within their authorized scope, prioritize
-session-touched files, and favor including safe related files over omitting them.
-Ordinary validation, README, or helper problems become warnings; missing push
-targets leave local commits intact. Planning-only requests remain read-only.
-
-- [`night`](night/SKILL.md): Explicit-only unattended overnight job on a
-  new local branch; commits without pushing and leaves an untracked
-  `NIGHT_NOTE.md` hand-off instead of asking questions.
-- [`morning`](morning/SKILL.md): Explicit-only pickup that reads
-  `NIGHT_NOTE.md` and the night branch, summarizes it, and asks numbered A/B/C
-  questions with recommendations before acting on the replies.
-- [`commit-plan-push`](commit-plan-push/SKILL.md): Makes a best-effort pass over
-  the entire dirty worktree on an explicit request, committing every safe,
-  reviewable group in chronological order and pushing once after the series.
-  It reports validation warnings, unsafe residuals, and push failures without
-  rewriting history or abandoning independent safe changes.
-- [`commit-plan`](commit-plan/SKILL.md): Plans safe commit boundaries for
-  all dirty git changes without staging, committing, or pushing, while
-  documenting one push after a verified single commit or one push after
-  the complete verified multi-commit series.
-- [`commit-dirty`](commit-dirty/SKILL.md): Verifies scope, runs the
-  minimum relevant checks, then stages, commits, and pushes the
-  intended dirty worktree in the current repository, including explicit
-  `commit dirty` and `commit all dirty` requests, reporting failed checks while
-  committing the eligible subset.
-- [`commit-session`](commit-session/SKILL.md): Ships only the files
-  dirtied during the current Codex session by combining a pre-write git
-  baseline with direct session-touch evidence, including an
-  observed-touch-only fallback when the baseline is missing, then pushes
-  the safely scoped commit unless the user requests another cadence. It
-  records validation failures as warnings and repairs truthful
-  README-gate findings before committing, using direct observed writes when
-  thread metadata or the scope helper is unavailable.
-- [`open-pr`](open-pr/SKILL.md): Drafts or publishes pull request
-  titles and bodies from branch-vs-base evidence, keeps `docs/pr/`
-  handoff docs aligned when a repo uses them, and preserves ExampleProject
-  DD/Reviewer A review context without inventing verification results.
-- [`gh-fix-ci`](gh-fix-ci/SKILL.md): Investigates failing GitHub Actions
-  PR checks with `gh`, summarizes the real failure context, and drafts a
-  fix plan before implementation.
-
-## Coding Practice And Scaffolding
-
-- [`leetcode-init`](leetcode-init/SKILL.md): Turns a same-name LeetCode
-  `.txt` prompt dump and `.py` stub into a local Python scaffold with a
-  `__main__` harness, inline `unittest` coverage, runtime diffs, and
-  structure helpers when needed, without generating the algorithmic
-  solution.
-- [`next-tasks`](next-tasks/SKILL.md): Explicit-only quota spender that reads
-  recent git history, repo docs, prompt docs, and agent sessions run in the
-  repo, lists up to 5 tasks it can
-  finish and prove on its own, each with its evidence and how it will be
-  verified, then does only the one I pick and shows the diff and test results.
-
-## Docs, Knowledge, And Output Control
-
-- [`long-task-harness`](long-task-harness/SKILL.md): Runs multi-session
-  work with a saved brief, acceptance criteria, `/goal`, an
-  `evidence-reviewer` claim -> evidence pass, and a `progress.md` handoff.
-- [`postmortem-memory`](postmortem-memory/SKILL.md): Retrieves reviewed incident
-  remedies before troubleshooting and records new learning in tracked shared
-  knowledge. Its read-only helper deduplicates copied reports, searches symptoms
-  and checks source coverage; fixes, workarounds, unresolved diagnoses and pending
-  live activation retain distinct status and evidence scope.
-- [`ai-workflow-doctor`](ai-workflow-doctor/SKILL.md): Measures active
-  instruction context and audits duplicate policy, broken local references,
-  plan contracts, skill-catalog drift, provenance, and semantic-review
-  candidates with deterministic text or JSON evidence.
-- [`second-brain-session`](second-brain-session/SKILL.md): Retrieves targeted
-  project and session context, routes durable memory to its canonical owner,
-  and prepares confirmation-gated ExampleProject session closeouts.
-- [`personal-context`](personal-context/SKILL.md): Automatically retrieves small
-  personal and source-backed project briefs for relevant development choices,
-  indexing only qualifying committed contributions authored by example-user Mok.
-  learns privately, and supports explicit `$personal-context` conversations.
-  Records, project knowledge, and caches stay in an external private directory.
-- [`feedback-memory`](feedback-memory/SKILL.md): Stores durable user
-  corrections and working preferences in a repo-tracked `feedback.log`
-  so later sessions can honor them.
-- [`full-output-enforcement`](full-output-enforcement/SKILL.md): Prevents
-  truncated delivery on tasks where partial code or partially generated
-  structured output would break the result.
-- [`openai-docs`](openai-docs/SKILL.md): Handles OpenAI product and API
-  questions with current, citation-ready answers grounded in official
-  OpenAI documentation.
-- [`readme-recruiter-sync`](readme-recruiter-sync/SKILL.md): Treats the
-  root `README.md` as a required documentation check for repo-surface changes,
-  keeping setup, usage, command flags, stack rationale, and recruiter
-  framing aligned with the repo. Remaining findings do not block eligible commits.
-- [`metaprompt`](metaprompt/SKILL.md): Creates, sharpens, and templates prompts
-  using Sentry's pinned `prompt-optimizer`, with its eight-section package and
-  eval workflow. Saves only the optimized prompt without executing its task; see the
-  [source and update record](metaprompt/SOURCE.md).
-- [`Metaprompt & Run`](metaprompt-run/SKILL.md) (`$metaprompt-run`): Uses the
-  current metaprompt compiler to improve and save the original request, then
-  immediately starts a new Codex conversation with fresh context to execute
-  the saved prompt within the user's authorized scope, without an extra `go`.
-- [`metaprompt-alxve`](metaprompt-alxve/SKILL.md): Preserves the original
-  compiler, target-aware templates, saved prompts, and strict standalone `go`
-  gate for every execution and high-stakes pass. Select it by its exact name.
-- [`smoke-test-capture`](smoke-test-capture/SKILL.md): Keeps the shared
-  `docs/smoke-tests.md` checklist current whenever work reveals a manual
-  verification step, a changed manual expectation, or an obvious smoke
-  coverage gap.
-
-## Research And Skill Discovery
-
-- [`last30days`](last30days/SKILL.md): Researches recent discussion across
-  community and web sources and includes a source health check. Imported
-  installed version 3.28.0 from mvanhorn/last30days-skill; see [source](last30days/SOURCE.md).
-- [`find-skills`](find-skills/SKILL.md): Finds and installs skills through
-  the Skills CLI; see its local [import record](find-skills/SOURCE.md).
-
-## Documents And Media
-
-- [`imagegen`](imagegen/SKILL.md): Generates or edits images through the
-  OpenAI Image API, including concept art, product shots, background
-  replacement, masking, and transparent outputs.
-- [`pdf`](pdf/SKILL.md): Handles PDF reading, generation, and review when
-  rendering fidelity matters as much as extracted text.
-- [`transcribe`](transcribe/SKILL.md): Transcribes audio or video into
-  text, with optional diarization and known-speaker hints when speaker
-  labeling matters.
-
-## Fish Shortcuts
-
-- [`fish-alias`](fish-alias/SKILL.md): Accepts a source abbreviation followed by
-  its command or path, infers the existing section, comments active conflicts
-  across generated fish names, then applies and refreshes changed mappings.
-  File keys receive the existing `n` prefix in fish.
+The pinned local Impeccable replaces its moving external installer; see
+[the managed design guide](../../docs/design-skills.md). Codex's
+`.system` imagegen and openai-docs skills remain runtime-provided rather than
+copied into this catalog. A source cull does not delete installed or upstream
+files. Live installation changes and catalog reloads require their own verified
+workflow; the trim task performs neither refresh-config nor chezmoi apply.

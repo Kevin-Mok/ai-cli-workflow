@@ -1,5 +1,10 @@
 # Superpowers Release Sync Design
 
+This historical installation record is superseded by the 2026-10-22 approved
+skill cull. The repo no longer installs Superpowers or its timer; refresh is a
+compatibility no-op and timer enablement is refused. Existing upstream files
+remain untouched. See [current integration and cleanup guidance](../../design-skills.md).
+
 ## Goal
 
 Keep the externally managed `obra/superpowers` skill bundle updated on a

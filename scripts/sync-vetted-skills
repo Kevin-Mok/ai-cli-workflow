@@ -1,0 +1,233 @@
+#!/usr/bin/env python3
+"""List skill sources and check the on-demand calibration inventory; never install or write."""
+
+import argparse
+import hashlib
+import json
+import os
+import re
+import runpy
+import sys
+import tomllib
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parents[1]
+REFERENCE = 'dot_agents/skills/lean-instructions/references/vetted-skills.md'
+FRONTMATTER = runpy.run_path(str(ROOT / 'scripts/trim-benchmark'))['description_and_body']
+
+
+def skill_files(directory):
+    """Read actual package exports, excluding fixtures and alternate-agent copies."""
+    if (directory / 'SKILL.md').is_file():
+        return [directory / 'SKILL.md']
+    for subdirectory in ('skills', '.github/skills', '.agents/skills', '.'):
+        found = sorted((directory / subdirectory).glob('*/SKILL.md'))
+        if found:
+            return found
+    return []
+
+
+def collect(root, home):
+    records = {}
+
+    def add(path, identity, scope, active=False, kind='installed'):
+        description, _ = FRONTMATTER(path.read_text())
+        record = records.setdefault(identity, {
+            'id': identity, 'name': path.parent.name, 'active': False,
+            'kind': kind, 'scopes': [], 'installed_scopes': [],
+            'description': description,
+            'description_sha256': hashlib.sha256(description.encode()).hexdigest(),
+        })
+        record['active'] |= active
+        record['kind'] = kind if active else record['kind']
+        scopes = record['scopes'] if active else record['installed_scopes']
+        if scope not in scopes:
+            scopes.append(scope)
+
+    installer_files = sorted(root.glob('run_*install*'))
+    installers = {path.name: path.read_text() for path in installer_files if path.is_file()}
+    mirror = [name for name, text in installers.items()
+              if '.agents/skills' in text and '.claude/skills' in text]
+    for name, text in installers.items():
+        if re.search(r'SKILL\.md|/skills|plugin add', text) and name not in mirror and not re.search(r'codex plugin add [\w-]+@[\w-]+', text):
+            raise ValueError(f'{name}: unrecognized skill installer; add explicit inventory support')
+    for directory, scope in (('dot_agents/skills', 'repo-authored'),
+                              ('.agents/skills', 'repo-mirror')):
+        for path in sorted((root / directory).glob('*/SKILL.md')):
+            prefix = 'repo' if directory == 'dot_agents/skills' else 'repo-mirror'
+            identity = f'{prefix}:{path.parent.name}'
+            add(path, identity, scope, True, 'repo')
+            for installer in mirror:
+                add(path, identity, 'installer:' + installer, True, 'repo')
+
+    external_file = root / '.chezmoiexternal.toml.tmpl'
+    if external_file.exists():
+        text = '\n'.join(line for line in external_file.read_text().splitlines()
+                         if not line.strip().startswith('{{'))
+        for target, config in tomllib.loads(text).items():
+            if config.get('type') != 'git-repo' or 'skills' not in target and 'plugins' not in target:
+                continue
+            package = Path(target).name
+            files = skill_files(home / target)
+            if not files:
+                raise ValueError(f'external:{package}: configured source unavailable; inventory cannot be proven')
+            for path in files:
+                add(path, f'external:{package}:{path.parent.name}',
+                    'external:' + package, True, 'external')
+
+    for template in sorted((root / 'dot_codex/skills').glob('symlink_*.tmpl')):
+        target = template.read_text().strip()
+        if '{{' in target:
+            raise ValueError(f'{template.name}: dynamic skill target needs explicit inventory support')
+        path = home / '.codex/skills' / target / 'SKILL.md'
+        if not path.is_file():
+            raise ValueError(f'{template.name}: configured skill target unavailable')
+        package = target.split('/')[1] if target.startswith('upstreams/') else path.parent.name
+        add(path, f'external:{package}:{path.parent.name}',
+            'exposure:' + template.name, True, 'external')
+
+    plugins = set()
+    config = root / 'dot_codex/config.toml'
+    if config.exists():
+        plugins.update(name for name, item in tomllib.loads(config.read_text()).get('plugins', {}).items()
+                       if item.get('enabled') is True)
+    for text in installers.values():
+        plugins.update(re.findall(r'codex plugin add ([\w-]+@[\w-]+)', text))
+    for plugin in sorted(plugins):
+        name, marketplace = plugin.split('@', 1)
+        versions = sorted((home / '.codex/plugins/cache' / marketplace / name).glob('*'),
+                          key=lambda path: tuple(int(part) for part in re.findall(r'\d+', path.name)))
+        files = skill_files(versions[-1]) if versions else []
+        if not files:
+            raise ValueError(f'plugin:{marketplace}:{name}: configured skill exports unavailable')
+        for path in files:
+            add(path, f'plugin:{marketplace}:{name}:{path.parent.name}',
+                'plugin:' + plugin, True, 'plugin')
+
+    for directory, label in (('.agents/skills', 'agents'), ('.claude/skills', 'claude'),
+                              ('.codex/skills', 'codex')):
+        base = home / directory
+        for child in sorted(base.glob('*')):
+            if child.name.startswith('.') or child.name == 'upstreams':
+                continue
+            if (child / 'SKILL.md').is_file():
+                add(child / 'SKILL.md', f'installed:{label}:{child.name}', label)
+            elif child.is_dir():
+                for path in skill_files(child):
+                    add(path, f'external:{child.name}:{path.parent.name}', label)
+    for package in sorted((home / '.codex/skills/upstreams').glob('*')):
+        for path in skill_files(package):
+            add(path, f'external:{package.name}:{path.parent.name}', 'upstream-cache')
+    for path in sorted((home / '.codex/skills/.system').glob('*/SKILL.md')):
+        add(path, 'builtin:' + path.parent.name, 'codex-builtins', kind='builtin')
+    for record in records.values():
+        record['scopes'].sort()
+        record['installed_scopes'].sort()
+    return sorted(records.values(), key=lambda record: record['id'])
+
+
+def load_reference(path):
+    source = path.read_text()
+    verdict = None
+    known = {}
+    for line in source.splitlines():
+        if re.match(r'^#{2,3} (KEEP|CULL|ADD|REJECT|MERGED-INTO)$', line):
+            verdict = line.split()[-1]
+        if re.match(r'\| (?:existing:|pr-\d+:)', line):
+            known[line.split('|')[1].strip()] = verdict
+    blocks = re.findall(r'```json\n(.*?)\n```', source, re.S)
+    if len(blocks) != 1:
+        raise ValueError('calibration requires one current-inventory JSON block')
+    snapshot = json.loads(blocks[0])
+    if snapshot.get('schema_version') != 1:
+        raise ValueError('unsupported calibration inventory version')
+    return known, snapshot
+
+
+def candidate(record, active, unranked, known):
+    if record['id'] in active:
+        return active[record['id']]['candidate']
+    if record['id'] in unranked:
+        return record['id']
+    original = 'existing:' + record['name']
+    # Installed direct copies can retain a culled source; namespaces remain separate.
+    if (record['id'].startswith('installed:') or
+        record['id'] == f'external:{record["name"]}:{record["name"]}' or
+        record['id'].startswith('external:21st:21st-')) and original in known:
+        return original
+    return record['id']
+
+
+def drift_errors(records, active, unranked, known):
+    errors = []
+    actual = {record['id']: record for record in records if record['active']}
+    for identity in sorted(actual.keys() | active.keys()):
+        if identity not in actual:
+            errors.append(f'{identity}: stale ACTIVE entry; configured source gone')
+        elif identity not in active:
+            errors.append(f'{identity}: missing ACTIVE entry')
+        elif any(actual[identity][key] != active[identity][key]
+                 for key in ('scopes', 'description_sha256', 'description')):
+            errors.append(f'{identity}: stale ACTIVE scopes or description')
+    for record in records:
+        identity = candidate(record, active, unranked, known)
+        if identity not in known and identity not in unranked:
+            errors.append(f'{record["id"]}: missing calibration entry')
+        if record['active'] and known.get(identity) in ('CULL', 'REJECT', 'MERGED-INTO'):
+            errors.append(f'{record["id"]}: configured ACTIVE source contradicts {known[identity]} verdict')
+        entry = unranked.get(record['id'], {})
+        if entry.get('description_basis') == 'detected public skill frontmatter' and entry.get('description') != record['description']:
+            errors.append(f'{record["id"]}: stale public precedent description')
+    return errors
+
+
+def audit(root, home):
+    known, snapshot = load_reference(root / REFERENCE)
+    records = collect(root, home)
+    for record in records:
+        identity = candidate(record, snapshot['active'], snapshot['unranked'], known)
+        record['candidate'] = identity
+        record['verdict'] = known.get(identity, snapshot['unranked'].get(identity, {}).get('verdict', 'MISSING'))
+    return {'schema_version': 1, 'skills': records,
+            'installed_only': [record for record in records if not record['active']],
+            'errors': drift_errors(records, snapshot['active'], snapshot['unranked'], known)}
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--repo', type=Path, default=ROOT)
+    parser.add_argument('--check', action='store_true', help='Fail on missing or stale calibration entries')
+    parser.add_argument('--json', action='store_true', help='Machine-readable inventory with logical source labels')
+    parser.add_argument('--plain', action='store_true', help='ASCII human-readable output')
+    parser.add_argument('--details', action='store_true', help='Show the full inventory during noninteractive checks')
+    args = parser.parse_args()
+    agent_output = not sys.stdout.isatty() or any(key.startswith('CODEX_') or key == 'CLAUDECODE' for key in os.environ)
+    decorated = not agent_output and not args.plain and os.environ.get('CLI_PLAIN') != '1'
+    try:
+        report = audit(args.repo.resolve(), Path.home())
+    except (OSError, ValueError, KeyError, TypeError) as error:
+        prefix = '❌ ' if decorated and not args.json else ''
+        message = 'could not read a skill source; check source availability and file permissions' if isinstance(error, OSError) else str(error)
+        print(prefix + f'Skill inventory: {message}', file=sys.stderr)
+        return 2
+    if args.json:
+        print(json.dumps(report, indent=2))
+    else:
+        print(('📚 ' if decorated else '') + 'Vetted skill inventory (read-only; no live cleanup)')
+        if not args.check or args.details or not agent_output:
+            for record in report['skills']:
+                state = 'ACTIVE' if record['active'] else 'BUILTIN' if record['kind'] == 'builtin' else 'INSTALLED-ONLY'
+                scopes = ', '.join(record['scopes'] + record['installed_scopes'])
+                print(f'{state:14} {record["id"]} [{record["verdict"]}] {scopes}')
+        else:
+            print('Full inventory: --details or --json')
+        for error in report['errors']:
+            print(('⚠️ ' if decorated else '') + error)
+        glyph = '⚠️ ' if report['errors'] else '✅ '
+        print((glyph if decorated else '') + f'{len(report["skills"])} source entries; {len(report["errors"])} missing/stale')
+    return 1 if args.check and report['errors'] else 0
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())

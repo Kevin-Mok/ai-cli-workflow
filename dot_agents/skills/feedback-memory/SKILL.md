@@ -1,6 +1,7 @@
 ---
 name: feedback-memory
-description: Persist durable user corrections and preferences across sessions through a repo-tracked plain-text `feedback.log`. Use when starting a session that should honor prior reusable feedback, or when the user gives durable guidance about workflow, formatting, style, tooling, review expectations, or communication that should apply again later.
+description: >-
+  Use for durable user corrections or preferences about workflow, formatting, style, tooling, review or communication, and sessions needing prior feedback.log guidance.
 ---
 
 # Feedback Memory
@@ -48,6 +49,8 @@ Do not log:
 6. Keep the file append-only. Do not rewrite, reformat, dedupe, or move old entries unless the user explicitly asks.
 7. If the feedback is ambiguous, log only the durable part that would still help in a different future task.
 8. After a run where the user corrected a skill-driven workflow, ask: one-time fix, or should this be in the skill forever? Log it here or edit that skill's `SKILL.md` only when it is permanent.
+
+Before consolidating repeated wins into skills, MUST read [the consolidation procedure](references/consolidation.md); promotion requires evidence and user approval.
 
 ## What to log
 

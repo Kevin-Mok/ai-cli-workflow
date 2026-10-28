@@ -1,0 +1,364 @@
+{
+  "source": "User-approved private ranking; neutral aggregate manifest only",
+  "local_removed": [
+    {
+      "name": "adapt",
+      "reason": "Covered by retained frontend-design and external impeccable; approved cull.",
+      "bytes": {
+        "description": 143,
+        "body": 6857,
+        "source": 7107
+      }
+    },
+    {
+      "name": "animate",
+      "reason": "Covered by retained frontend-design and external impeccable; approved cull.",
+      "bytes": {
+        "description": 134,
+        "body": 7414,
+        "source": 7637
+      }
+    },
+    {
+      "name": "arrange",
+      "reason": "Covered by retained frontend-design and external impeccable; approved cull.",
+      "bytes": {
+        "description": 151,
+        "body": 7150,
+        "source": 7390
+      }
+    },
+    {
+      "name": "audit",
+      "reason": "Covered by retained frontend-design and external impeccable; approved cull.",
+      "bytes": {
+        "description": 194,
+        "body": 5937,
+        "source": 6216
+      }
+    },
+    {
+      "name": "bolder",
+      "reason": "Covered by retained frontend-design and external impeccable; approved cull.",
+      "bytes": {
+        "description": 132,
+        "body": 6494,
+        "source": 6714
+      }
+    },
+    {
+      "name": "clarify",
+      "reason": "Covered by retained frontend-design and external impeccable; approved cull.",
+      "bytes": {
+        "description": 124,
+        "body": 6537,
+        "source": 6750
+      }
+    },
+    {
+      "name": "colorize",
+      "reason": "Covered by retained frontend-design and external impeccable; approved cull.",
+      "bytes": {
+        "description": 130,
+        "body": 6650,
+        "source": 6870
+      }
+    },
+    {
+      "name": "commit-plan",
+      "reason": "Planning-only mode merges into commit-plan-push.",
+      "bytes": {
+        "description": 343,
+        "body": 7351,
+        "source": 8259
+      }
+    },
+    {
+      "name": "critique",
+      "reason": "Covered by retained frontend-design and external impeccable; approved cull.",
+      "bytes": {
+        "description": 179,
+        "body": 5393,
+        "source": 5660
+      }
+    },
+    {
+      "name": "delight",
+      "reason": "Covered by retained frontend-design and external impeccable; approved cull.",
+      "bytes": {
+        "description": 143,
+        "body": 9761,
+        "source": 9993
+      }
+    },
+    {
+      "name": "design-taste-frontend",
+      "reason": "Covered by retained frontend-design and external impeccable; approved cull.",
+      "bytes": {
+        "description": 202,
+        "body": 21146,
+        "source": 22385
+      }
+    },
+    {
+      "name": "distill",
+      "reason": "Covered by retained frontend-design and external impeccable; approved cull.",
+      "bytes": {
+        "description": 111,
+        "body": 6050,
+        "source": 6250
+      }
+    },
+    {
+      "name": "extract",
+      "reason": "Covered by retained frontend-design and external impeccable; approved cull.",
+      "bytes": {
+        "description": 180,
+        "body": 3676,
+        "source": 3945
+      }
+    },
+    {
+      "name": "find-skills",
+      "reason": "Unused discovery workflow; approved cull.",
+      "bytes": {
+        "description": 303,
+        "body": 5129,
+        "source": 6221
+      }
+    },
+    {
+      "name": "full-output-enforcement",
+      "reason": "Unused generic output workflow; approved cull.",
+      "bytes": {
+        "description": 203,
+        "body": 2555,
+        "source": 3807
+      }
+    },
+    {
+      "name": "gh-fix-ci",
+      "reason": "Low-use CI workflow; approved cull.",
+      "bytes": {
+        "description": 313,
+        "body": 3286,
+        "source": 33424
+      }
+    },
+    {
+      "name": "harden",
+      "reason": "Covered by retained frontend-design and external impeccable; approved cull.",
+      "bytes": {
+        "description": 169,
+        "body": 8779,
+        "source": 9036
+      }
+    },
+    {
+      "name": "high-end-visual-design",
+      "reason": "Covered by retained frontend-design and external impeccable; approved cull.",
+      "bytes": {
+        "description": 234,
+        "body": 10542,
+        "source": 11821
+      }
+    },
+    {
+      "name": "leetcode-init",
+      "reason": "Unused practice scaffolder; approved cull.",
+      "bytes": {
+        "description": 216,
+        "body": 2159,
+        "source": 51363
+      }
+    },
+    {
+      "name": "long-task-harness",
+      "reason": "Acceptance, evidence review and progress procedure merges into context-handoff.",
+      "bytes": {
+        "description": 365,
+        "body": 3145,
+        "source": 3556
+      }
+    },
+    {
+      "name": "metaprompt-alxve",
+      "reason": "Overlaps retained metaprompt and metaprompt-run.",
+      "bytes": {
+        "description": 488,
+        "body": 2922,
+        "source": 31011
+      }
+    },
+    {
+      "name": "minimalist-ui",
+      "reason": "Covered by retained frontend-design and external impeccable; approved cull.",
+      "bytes": {
+        "description": 145,
+        "body": 7947,
+        "source": 9096
+      }
+    },
+    {
+      "name": "normalize",
+      "reason": "Covered by retained frontend-design and external impeccable; approved cull.",
+      "bytes": {
+        "description": 67,
+        "body": 3966,
+        "source": 4125
+      }
+    },
+    {
+      "name": "onboard",
+      "reason": "Covered by retained frontend-design and external impeccable; approved cull.",
+      "bytes": {
+        "description": 149,
+        "body": 8256,
+        "source": 8494
+      }
+    },
+    {
+      "name": "open-pr",
+      "reason": "Low-use PR authoring workflow; approved cull.",
+      "bytes": {
+        "description": 286,
+        "body": 5741,
+        "source": 12691
+      }
+    },
+    {
+      "name": "optimize",
+      "reason": "Covered by retained frontend-design and external impeccable; approved cull.",
+      "bytes": {
+        "description": 138,
+        "body": 7632,
+        "source": 7860
+      }
+    },
+    {
+      "name": "overdrive",
+      "reason": "Covered by retained frontend-design and external impeccable; approved cull.",
+      "bytes": {
+        "description": 228,
+        "body": 9676,
+        "source": 9995
+      }
+    },
+    {
+      "name": "pdf",
+      "reason": "Unused PDF workflow; approved cull.",
+      "bytes": {
+        "description": 248,
+        "body": 2449,
+        "source": 15040
+      }
+    },
+    {
+      "name": "playwright-interactive",
+      "reason": "Browser coverage retained in playwright.",
+      "bytes": {
+        "description": 94,
+        "body": 31604,
+        "source": 46555
+      }
+    },
+    {
+      "name": "polish",
+      "reason": "Covered by retained frontend-design and external impeccable; approved cull.",
+      "bytes": {
+        "description": 123,
+        "body": 8021,
+        "source": 8232
+      }
+    },
+    {
+      "name": "quieter",
+      "reason": "Covered by retained frontend-design and external impeccable; approved cull.",
+      "bytes": {
+        "description": 116,
+        "body": 4899,
+        "source": 5104
+      }
+    },
+    {
+      "name": "redesign-existing-projects",
+      "reason": "Covered by retained frontend-design and external impeccable; approved cull.",
+      "bytes": {
+        "description": 225,
+        "body": 15010,
+        "source": 16287
+      }
+    },
+    {
+      "name": "screenshot",
+      "reason": "Browser capture coverage retained in playwright.",
+      "bytes": {
+        "description": 220,
+        "body": 7702,
+        "source": 53296
+      }
+    },
+    {
+      "name": "teach-impeccable",
+      "reason": "Design context preparation merges into frontend-design.",
+      "bytes": {
+        "description": 148,
+        "body": 2823,
+        "source": 3037
+      }
+    },
+    {
+      "name": "transcribe",
+      "reason": "Unused transcription workflow; approved cull.",
+      "bytes": {
+        "description": 216,
+        "body": 2624,
+        "source": 25762
+      }
+    },
+    {
+      "name": "typeset",
+      "reason": "Covered by retained frontend-design and external impeccable; approved cull.",
+      "bytes": {
+        "description": 140,
+        "body": 5551,
+        "source": 5780
+      }
+    },
+    {
+      "name": "ui-ux-pro-max",
+      "reason": "Unused explicit design search workflow; approved cull.",
+      "bytes": {
+        "description": 147,
+        "body": 3193,
+        "source": 3228418
+      }
+    },
+    {
+      "name": "imagegen",
+      "reason": "Duplicate of retained Codex .system built-in.",
+      "bytes": {
+        "description": 328,
+        "body": 9577,
+        "source": 85735
+      }
+    },
+    {
+      "name": "openai-docs",
+      "reason": "Duplicate of retained Codex .system built-in.",
+      "bytes": {
+        "description": 372,
+        "body": 4919,
+        "source": 47899
+      }
+    }
+  ],
+  "retained_exceptions": [
+    "last30days",
+    "lean-instructions"
+  ],
+  "merge_survivors": {
+    "long-task-harness": "context-handoff",
+    "commit-plan": "commit-plan-push"
+  }
+}

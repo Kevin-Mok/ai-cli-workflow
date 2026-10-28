@@ -50,8 +50,8 @@ https://felixrieseberg.com/how-to-be-more-ambitious-a-tutorial-for-humans-with-m
 
 This replaces the previous Majkey adaptation. Its references, helper scripts,
 asset and upstream UI metadata are retired from the active package; the local
-update helper is retained and now targets Sentry. `$metaprompt-alxve` remains
-unchanged. The outgoing source and installed packages are backed up at
+update helper is retained and now targets Sentry. The approved cull retired
+`metaprompt-alxve`; its [pre-cull source](https://github.com/Kevin-Mok/ai-cli-workflow/tree/3e898a0f39172d7c30a6b0ae0258209cfe2c7f0c/dot_agents/skills/metaprompt-alxve) remains available for historical recovery. The outgoing source and installed packages are backed up at
 a private recovery archive. Retain that archive separately when long-term
 recovery of the previous adaptation is needed.
 
@@ -93,7 +93,8 @@ does not prove an already-running picker refreshed its description.
 
 ## Rollback
 
-For the original compiler, use the separately preserved `$metaprompt-alxve`.
+For the retired original compiler, recover its [pre-cull source](https://github.com/Kevin-Mok/ai-cli-workflow/tree/3e898a0f39172d7c30a6b0ae0258209cfe2c7f0c/dot_agents/skills/metaprompt-alxve)
+only when explicitly requested; it is outside the active skill catalog.
 For this Sentry replacement, restore the backed-up outgoing source package and
 its matching updater/manifest, then apply that skill through the reviewed
 refresh procedure and verify it against the backup. Preserve unrelated source

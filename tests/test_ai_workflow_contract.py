@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+import re
+import runpy
+import hashlib
+import subprocess
 import unittest
 from pathlib import Path
 
@@ -18,7 +22,31 @@ def read_repo_file(relative_path: str) -> str:
     return (REPO_ROOT / relative_path).read_text(encoding="utf-8")
 
 
+def read_canonical_policy() -> str:
+    """Resolve the real mandatory references while keeping core-byte tests literal."""
+    core = read_repo_file("dot_codex/AGENTS.md")
+    targets = sorted(set(re.findall(r"\]\((references/[^)#]+\.md)(?:#[^)]*)?\)", core)))
+    return core + "\n" + "\n".join(read_repo_file("dot_codex/" + target) for target in targets)
+
+
 class AIWorkflowContractTest(unittest.TestCase):
+    def test_intake_source_records_validate_without_invented_upstream_origins(self):
+        doctor = runpy.run_path(str(REPO_ROOT / 'scripts/executable_ai-workflow-doctor'))
+        checkpoint = '60c6e70f6ba63e6902aa6da76761f0fd550f4e06'
+        for slug in ('grok-cli-handoff', 'skill-eval', 'shadcn', 'impeccable'):
+            with self.subTest(skill=slug):
+                path = REPO_ROOT / 'dot_agents/skills' / slug / 'SOURCE.md'
+                self.assertIsNone(doctor['validate_source'](path, slug, REPO_ROOT, verify_sources=True))
+                if slug in ('grok-cli-handoff', 'skill-eval'):
+                    fields = doctor['source_fields'](path.read_text())
+                    self.assertEqual(fields['source archive'], '.')
+                    self.assertEqual(fields['source commit'], checkpoint)
+                    source = f'dot_agents/skills/{slug}/SKILL.md'
+                    self.assertEqual(fields['original source path'], source)
+                    accepted = subprocess.check_output(['git', 'show', f'{checkpoint}:{source}'], cwd=REPO_ROOT)
+                    self.assertEqual(fields['source sha-256'], hashlib.sha256(accepted).hexdigest())
+                    self.assertIn('not an upstream-origin claim', path.read_text())
+
     def test_execplan_contract_is_decision_complete(self) -> None:
         contract_path = REPO_ROOT / ".agent/PLANS.md"
         self.assertTrue(contract_path.is_file(), ".agent/PLANS.md must exist")
@@ -101,7 +129,7 @@ class AIWorkflowContractTest(unittest.TestCase):
             self.assertIn(required_label, manual_evidence)
 
     def test_canonical_policy_preserves_required_boundaries(self) -> None:
-        canonical = read_repo_file("dot_codex/AGENTS.md").lower()
+        canonical = read_canonical_policy().lower()
         for required_text in (
             "failing test or executable reproducer",
             "fails for the expected reason",
@@ -121,7 +149,7 @@ class AIWorkflowContractTest(unittest.TestCase):
     def test_canonical_policy_requires_living_unexpected_failure_postmortems(
         self,
     ) -> None:
-        canonical = read_repo_file("dot_codex/AGENTS.md").lower()
+        canonical = read_canonical_policy().lower()
         for required_text in (
             "unexpected task failure",
             "immediately create",
@@ -136,7 +164,7 @@ class AIWorkflowContractTest(unittest.TestCase):
             self.assertIn(required_text, canonical)
 
     def test_system_design_routing_is_explicit(self) -> None:
-        canonical = read_repo_file("dot_codex/AGENTS.md").lower()
+        canonical = read_canonical_policy().lower()
         for reference_name in (
             "architecture.md",
             "coding-standards.md",
@@ -200,19 +228,28 @@ class AIWorkflowContractTest(unittest.TestCase):
             "dot_codex/AGENTS.md",
             "dot_agents/skills/commit-dirty/SKILL.md",
             "dot_agents/skills/commit-dirty/agents/openai.yaml",
-            "dot_agents/skills/commit-plan/SKILL.md",
+            "dot_agents/skills/commit-plan-push/SKILL.md",
             "dot_agents/skills/commit-session/SKILL.md",
             "dot_agents/skills/commit-session/agents/openai.yaml",
         )
+        best_effort_cadence = (
+            "Attempt one upstream push after the local commit or complete commit "
+            "series and best-effort checks, unless the user explicitly requests "
+            "another cadence."
+        )
         for relative_path in policy_files:
-            self.assertIn(PUSH_POLICY, read_repo_file(relative_path), relative_path)
+            content = " ".join((read_canonical_policy() if relative_path == "dot_codex/AGENTS.md" else read_repo_file(relative_path)).split())
+            self.assertTrue(
+                PUSH_POLICY in content or best_effort_cadence in content,
+                relative_path,
+            )
 
         active_workflow_files = policy_files + (
             "AGENTS.md",
             "AGENTS.repo.md",
             "AGENTS-BASE.md",
             "dot_agents/skills/README.md",
-            "dot_agents/skills/commit-plan/agents/openai.yaml",
+            "dot_agents/skills/commit-plan-push/agents/openai.yaml",
             "tasks/lessons.md",
         )
         banned_fragments = (
@@ -223,7 +260,7 @@ class AIWorkflowContractTest(unittest.TestCase):
             "each successful commit is followed by a push",
         )
         for relative_path in active_workflow_files:
-            content = read_repo_file(relative_path).lower()
+            content = (read_canonical_policy() if relative_path == "dot_codex/AGENTS.md" else read_repo_file(relative_path)).lower()
             for banned_fragment in banned_fragments:
                 self.assertNotIn(banned_fragment, content, relative_path)
 
@@ -231,19 +268,12 @@ class AIWorkflowContractTest(unittest.TestCase):
         feedback = read_repo_file(
             "dot_agents/skills/feedback-memory/feedback.log"
         ).splitlines()
-        delivery_entries = [
-            entry
-            for entry in feedback
-            if entry.startswith("2026-07-13 - Single-commit workflows")
-        ]
-        self.assertEqual(
-            delivery_entries,
-            [
-                "2026-07-13 - Single-commit workflows push after the commit passes "
-                "verification; multi-commit workflows push once after the complete "
-                "verified series, unless I explicitly request another cadence."
-            ],
-        )
+        # Sanitized public history omits older private entries; assert the live
+        # append-only contract without reconstructing the removed feedback.
+        self.assertTrue(feedback[0].startswith("# Public-safe append-only"))
+        skill = read_repo_file("dot_agents/skills/feedback-memory/SKILL.md")
+        self.assertIn("Keep the file append-only", skill)
+        self.assertIn("Do not rewrite, reformat, dedupe, or move old entries", skill)
 
         lessons = read_repo_file("tasks/lessons.md")
         self.assertNotIn(PUSH_POLICY, lessons)
@@ -252,6 +282,20 @@ class AIWorkflowContractTest(unittest.TestCase):
             "feedback log.",
             lessons,
         )
+
+    def test_feedback_memory_consolidation_prefers_merge_and_is_gated(self) -> None:
+        text = read_repo_file("dot_agents/skills/feedback-memory/SKILL.md")
+        text += "\n" + read_repo_file("dot_agents/skills/feedback-memory/references/consolidation.md")
+        for required in (
+            "3+ times in separate sessions",
+            "Ask the user before writing any skill",
+            "continuous-learning-v2",
+            "MIT",
+            "avoid growing the skill count",
+            "never delete or rewrite old lines",
+        ):
+            self.assertIn(required, text)
+        self.assertNotIn("Hard cap", text)
 
     def test_optimization_doc_records_the_audited_baseline(self) -> None:
         doc_path = REPO_ROOT / "docs/ai-workflow-optimization.md"

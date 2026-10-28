@@ -1,5 +1,10 @@
 # Daily Superpowers Release Sync Implementation Plan
 
+This historical installation record is superseded by the 2026-10-22 approved
+skill cull. The repo no longer installs Superpowers or its timer; refresh is a
+compatibility no-op and timer enablement is refused. Existing upstream files
+remain untouched. See [current integration and cleanup guidance](../docs/design-skills.md).
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Add an opt-in systemd user timer that runs `sync-superpowers-release` every day at 05:00 local time.

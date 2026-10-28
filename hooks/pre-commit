@@ -1,0 +1,9 @@
+#!/bin/sh
+set -eu
+cd "$(git rev-parse --show-toplevel)"
+hookdir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+# Preserve the privacy gate's veto and any changes it makes to the index.
+if [ -x "$hookdir/pre-commit.file-size-previous" ]; then
+    "$hookdir/pre-commit.file-size-previous" "$@"
+fi
+python3 -B scripts/file_size_guard.py

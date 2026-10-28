@@ -1,6 +1,7 @@
 ---
 name: night
-description: Use only when I explicitly invoke `night` before stepping away, optionally with the task to build tonight. Work unattended on one self-verifiable job on a new local branch, never stop to ask questions, commit without pushing, and leave an untracked `NIGHT_NOTE.md` hand-off for `morning`.
+description: >-
+  Use only for explicit `night` before stepping away: build one self-verifiable task unattended, commit without pushing, and leave NIGHT_NOTE.md.
 argument-hint: "[what to build tonight]"
 disable-model-invocation: true
 disallowed-tools: AskUserQuestion

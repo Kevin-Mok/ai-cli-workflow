@@ -1,0 +1,91 @@
+{
+  "scope": "Retrospective immutable pass-tree privacy validation under current local rules; distinct from historical root-observed precommit timing. Historical staged-size passes are root-observed.",
+  "checked_at_utc": "2026-10-23T03:56:10.287571+00:00",
+  "scanner_blob": "79278f7300093db756d2448f2fe52af90338e774",
+  "results": [
+    {
+      "commit": "bc0360c9a59610469526c45d83efefb82f296382",
+      "tree": "1a331839e7c39573b9c2ed191ec5153b1420fe5d",
+      "privacy_exit": 0,
+      "output": "Privacy gate PASS: exact candidate checked locally.",
+      "historical_precommit_checks": "root-observed PASS; no separate raw log retained"
+    },
+    {
+      "commit": "60c6e70f6ba63e6902aa6da76761f0fd550f4e06",
+      "tree": "3012ce9a5246621f1350bd0f03c2dea3ad10483f",
+      "privacy_exit": 0,
+      "output": "Privacy gate PASS: exact candidate checked locally.",
+      "historical_precommit_checks": "root-observed PASS; no separate raw log retained"
+    },
+    {
+      "commit": "6e9934c74c2ef6aff9997bc4e67b4a0d48297b84",
+      "tree": "c89538b0c3b6325d1d38ac7ca5494d557c332bf2",
+      "privacy_exit": 0,
+      "output": "Privacy gate PASS: exact candidate checked locally.",
+      "historical_precommit_checks": "root-observed PASS; no separate raw log retained"
+    },
+    {
+      "commit": "f0a1cbb09c42de52c1fcda8e226550b6f9746768",
+      "tree": "ce17502c1a28dc1eed517487d63cb7cca22bce23",
+      "privacy_exit": 0,
+      "output": "Privacy gate PASS: exact candidate checked locally.",
+      "historical_precommit_checks": "root-observed PASS; no separate raw log retained"
+    },
+    {
+      "commit": "60f75a4a3712652a114026be7a424691e831f3df",
+      "tree": "856ae7193b94ccc14577cc3e4aa17a881aa8de3c",
+      "privacy_exit": 0,
+      "output": "Privacy gate PASS: exact candidate checked locally.",
+      "historical_precommit_checks": "root-observed PASS; no separate raw log retained"
+    },
+    {
+      "commit": "5efb06a1a2b7b69bef5bcfda7487e8c42e9b3796",
+      "tree": "870bb5db62eeb7d8854c92aef5d862e04b987a93",
+      "privacy_exit": 0,
+      "output": "Privacy gate PASS: exact candidate checked locally.",
+      "historical_precommit_checks": "root-observed PASS; no separate raw log retained"
+    },
+    {
+      "commit": "c24871f2f765bb9f5e3517607c513b77ac4e3e9b",
+      "tree": "ce810d6b6e07fac29f1909e90b2460b701edc42e",
+      "privacy_exit": 0,
+      "output": "Privacy gate PASS: exact candidate checked locally.",
+      "historical_precommit_checks": "root-observed PASS; no separate raw log retained"
+    },
+    {
+      "commit": "4296498e9c910b636aaff512486a219a19a91b75",
+      "tree": "318ac2cff44fcb114ca165a334738b642827eb70",
+      "privacy_exit": 0,
+      "output": "Privacy gate PASS: exact candidate checked locally.",
+      "historical_precommit_checks": "root-observed PASS; no separate raw log retained"
+    },
+    {
+      "commit": "9e1ce9ff832addcb6750590b4b6c4166bbc92f73",
+      "tree": "0766863c3220b62a86b52bfdf66b9237fcc67df4",
+      "privacy_exit": 0,
+      "output": "Privacy gate PASS: exact candidate checked locally.",
+      "historical_precommit_checks": "root-observed PASS; no separate raw log retained"
+    },
+    {
+      "commit": "d6a75f6963eaad822697a00b48075f10ef285d27",
+      "tree": "4d73f36986e07199c2eab5d91ce096c4538cf3a8",
+      "privacy_exit": 0,
+      "output": "Privacy gate PASS: exact candidate checked locally.",
+      "historical_precommit_checks": "root-observed PASS; no separate raw log retained"
+    },
+    {
+      "commit": "f9930fc8cff73f852ea56b657b15c54a6b262812",
+      "tree": "78371882ab41bf7d7d684ab09044614a4fed9604",
+      "privacy_exit": 0,
+      "output": "Privacy gate PASS: exact candidate checked locally.",
+      "historical_precommit_checks": "root-observed PASS; no separate raw log retained"
+    },
+    {
+      "commit": "79d1a8cb34a67c60a9b9ac756c95805bf45a7f68",
+      "tree": "6e63ed26a7b8c4dea0e59428bddc88c9ba8d87b9",
+      "privacy_exit": 0,
+      "output": "Privacy gate PASS: exact candidate checked locally.",
+      "historical_precommit_checks": "root-observed PASS; no separate raw log retained"
+    }
+  ]
+}

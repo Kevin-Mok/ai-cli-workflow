@@ -1,0 +1,135 @@
+{
+  "scope": "Frozen original-corpus subset whose expected sets contain only approved keepers or none; no labels changed",
+  "keepers": [
+    "ai-workflow-doctor",
+    "brand-system-designer",
+    "commit-dirty",
+    "commit-plan-push",
+    "commit-session",
+    "context-handoff",
+    "cto-jarvis",
+    "feedback-memory",
+    "fish-alias",
+    "frontend-design",
+    "impeccable",
+    "last30days",
+    "lean-instructions",
+    "metaprompt",
+    "metaprompt-run",
+    "morning",
+    "next-tasks",
+    "night",
+    "personal-context",
+    "playwright",
+    "postmortem-memory",
+    "readme-recruiter-sync",
+    "second-brain-session",
+    "smoke-test-capture"
+  ],
+  "cases": [
+    {
+      "id": "brand-kit",
+      "prompt": "Create a logo and brand identity with a color palette and favicon for my startup.",
+      "expected": [
+        "brand-system-designer"
+      ]
+    },
+    {
+      "id": "prompt-create",
+      "prompt": "Make me a prompt for an agent that reviews database migrations.",
+      "expected": [
+        "metaprompt"
+      ]
+    },
+    {
+      "id": "prompt-run",
+      "prompt": "Optimize this prompt and execute it immediately in a new conversation with fresh context.",
+      "expected": [
+        "metaprompt-run"
+      ]
+    },
+    {
+      "id": "instructions-audit",
+      "prompt": "Audit our repository AI instructions, skill catalog duplication, and context size.",
+      "expected": [
+        "ai-workflow-doctor"
+      ]
+    },
+    {
+      "id": "instructions-edit",
+      "prompt": "Add a new skill and edit AGENTS.md while keeping the instructions lean.",
+      "expected": [
+        "lean-instructions"
+      ]
+    },
+    {
+      "id": "shortcut-fish",
+      "prompt": "Add a fish directory shortcut: wk should jump to my work folder.",
+      "expected": [
+        "fish-alias"
+      ]
+    },
+    {
+      "id": "research-recent",
+      "prompt": "Research what people have said about local coding agents in the last 30 days.",
+      "expected": [
+        "last30days"
+      ]
+    },
+    {
+      "id": "workflow-ship",
+      "prompt": "Commit and push only this Codex session, leaving pre-existing dirty work alone.",
+      "expected": [
+        "commit-session"
+      ]
+    },
+    {
+      "id": "multi-feedback-failure",
+      "prompt": "Record this durable workflow preference in feedback.log and document the unexpected test failure in a postmortem.",
+      "expected": [
+        "feedback-memory",
+        "postmortem-memory"
+      ]
+    },
+    {
+      "id": "none-arithmetic",
+      "prompt": "What is 19 multiplied by 23?",
+      "expected": []
+    },
+    {
+      "id": "none-language",
+      "prompt": "Translate good morning into Spanish.",
+      "expected": []
+    },
+    {
+      "id": "none-python",
+      "prompt": "Explain the difference between a Python tuple and a list.",
+      "expected": []
+    },
+    {
+      "id": "none-date",
+      "prompt": "How many days are there in a leap year?",
+      "expected": []
+    },
+    {
+      "id": "none-json",
+      "prompt": "Sort these numbers from smallest to largest: 8, 3, 11, 2.",
+      "expected": []
+    },
+    {
+      "id": "none-git",
+      "prompt": "Show the current Git branch name.",
+      "expected": []
+    },
+    {
+      "id": "none-file",
+      "prompt": "Read package.json and tell me the package name.",
+      "expected": []
+    },
+    {
+      "id": "none-riddle",
+      "prompt": "What has keys but cannot open locks?",
+      "expected": []
+    }
+  ]
+}
