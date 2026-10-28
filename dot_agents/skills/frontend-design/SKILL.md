@@ -79,6 +79,8 @@ Create visual rhythm through varied spacing—not the same padding everywhere. E
 
 **DO**: Create visual rhythm through varied spacing—tight groupings, generous separations
 **DO**: Use fluid spacing with clamp() that breathes on larger screens
+**DO**: Avoid unnecessary secondary labels and descriptions. Let the layout do the explaining.
+Source: [@luinlee](https://x.com/luinlee/status/2113085361836744764).
 **DO**: Use asymmetry and unexpected compositions; break the grid intentionally for emphasis
 **DON'T**: Wrap everything in cards—not everything needs a container
 **DON'T**: Nest cards inside cards—visual noise, flatten the hierarchy
