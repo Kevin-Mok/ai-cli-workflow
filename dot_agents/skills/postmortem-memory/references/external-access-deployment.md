@@ -12,7 +12,7 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Verification evidence: Normal retry passed the outgoing-history privacy gate and exited 0; PR #4 opened from the feature branch.
 - Limitations: Exact SSH timeout cause is unproved; no scanner or SSH fix. Never bypass findings or publish unpublished content through ref initialization.
 - Sources:
-  - [Alpha intro push transport](../../../../docs/postmortem/2026-10-28-alpha-intro-push-transport.md) (SHA-256 `e3dbae6ac8a7`; reviewed alias in [sources.json](../sources.json)).
+  - [Alpha intro push transport](../../../../docs/postmortem/2026-10-28-alpha-intro-push-transport.md) (current reviewed hash and alias in [sources.json](../sources.json)).
 
 
 ## ext-compose-ansible-local-readiness

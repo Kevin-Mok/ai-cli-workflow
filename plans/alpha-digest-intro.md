@@ -103,6 +103,11 @@ Milestone 2 verification: transport-report targeted memory check passes,
 exit 0, with no errors or uncovered/changed aliases. The reviewed source hash
 is `3b23128e231d289bef51d52c2dfd564c9aac31c545a8b41b4bb6e8cad76ca2eb`.
 
+Milestone 2 committed as `9989b4c` with privacy PASS. A final citation correction
+uses the ledger's current reviewed hash instead of duplicating an outdated
+abbreviation in guidance. This follow-up changes only that citation and this
+record; both documentation commits will be pushed together to the existing PR.
+
 Cursor review prompt: Review this additive prompt PR against the exact supplied
 body and five required markers. Preserve all boundaries and unrelated work;
 report the documented baseline regression without expanding this change.
