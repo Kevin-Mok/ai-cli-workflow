@@ -10,6 +10,19 @@ actual CLI, app, API, or generated artifact and expose an observable result.
 Automated tests, linters, type checks, builds, Git hygiene checks and source-text
 searches run before completion and any commit; do not use them to fill the handoff command list.
 
+## Alpha Digest Intro
+
+- Action: Open `prompts/alpha-digest-6h-intro.md` and read the purpose header
+  and prompt body before copying the body into the Grok Bot routine.
+  Expected: The header identifies the AI Twitter Alpha six-hour scan. The
+  supplied prompt is unchanged and includes Collect, Filter, Admission filter,
+  Report, and the on-request PR step. This file alone schedules no scans.
+- Action: Check the PR note about
+  `dot_agents/skills/lean-instructions/references/vetted-skills.md` and
+  `docs/skill-admissions.md` before relying on those references.
+  Expected: Both paths are absent from the PR's original base; the references
+  remain verbatim and their absence is disclosed in the PR body.
+
 ## Public History Audit
 
 - Action: ./scripts/executable_audit-public-history --scope all --plain

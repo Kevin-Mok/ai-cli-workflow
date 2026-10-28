@@ -2,6 +2,19 @@
 
 Use these reviewed findings to compare a failure with prior evidence. Check applicability and diagnostics before choosing a remedy; keep its verification scope and limits explicit.
 
+## local-new-branch-push-transport
+
+- Status: **verified_workaround**; root-cause confidence: **supported**; verification scope: **workaround**.
+- Symptoms: SSH closes during a new feature branch's all-history pre-push scan.
+- Applicability: Authorized feature delivery from an already-published base with this gate behavior.
+- Diagnostic checks: Verify remote base/ref state and the hook's exact outgoing range; distinguish active scan progress from transport success.
+- Remedy: Initialize only the authorized feature ref at its verified public base, then push normally with all hooks enabled.
+- Verification evidence: Normal retry passed the outgoing-history privacy gate and exited 0; PR #4 opened from the feature branch.
+- Limitations: Exact SSH timeout cause is unproved; no scanner or SSH fix. Never bypass findings or publish unpublished content through ref initialization.
+- Sources:
+  - [Alpha intro push transport](../../../../docs/postmortem/2026-10-28-alpha-intro-push-transport.md) (current reviewed hash and alias in [sources.json](../sources.json)).
+
+
 ## ext-compose-ansible-local-readiness
 
 - Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **runtime**.
