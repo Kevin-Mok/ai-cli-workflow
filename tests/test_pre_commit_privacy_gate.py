@@ -339,6 +339,19 @@ class PrivacyGateTests(unittest.TestCase):
         self.assertEqual(result.returncode, 1, "a repaired tip must not hide an unsafe outgoing ancestor")
         self.no_leak(result, secret)
 
+    def test_new_branch_pre_push_skips_history_already_on_remote(self):
+        secret = "ghp_" + "aB7C9dE2" * 5
+        self.stage("candidate.txt", secret)
+        self.commit()
+        self.git("update-ref", "refs/remotes/origin/main", "HEAD")
+        self.stage("candidate.txt", "safe new branch commit\n")
+        self.commit()
+        self.install()
+        oid = self.git("rev-parse", "HEAD").stdout.strip()
+        result = self.pre_push(self.push_record(oid))
+        self.assertEqual(result.returncode, 0, "a new branch must only scan commits not already on the remote")
+        self.no_leak(result, secret)
+
     def test_pre_push_checks_actual_commit_message_and_identity(self):
         self.baseline()
         secret = "ghp_" + "aB7C9dE2" * 5
