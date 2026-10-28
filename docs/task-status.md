@@ -158,3 +158,12 @@ This document records delivery milestones and verification for completed reposit
 - Delivery milestone: docs: standardize command-first task handoffs; commit on main and push the configured origin/main after staged review. No application deployment is relevant to this configuration/documentation commit.
 - Remaining: unrelated dirty work stays local; broad refresh remains blocked by the existing Kitty conflict. No blocker to publishing the saved, scoped handoff policy.
 - Rollback: revert the handoff policy/docs change and restore only the corresponding installed handoff section; keep feedback history append-only.
+
+## Concerts directory shortcut — feat(fish): add cnc concerts shortcut
+
+- Complete: `cnc` expands to `cd /mnt/usb-8tb/concerts` in the personal section; no conflicting mappings. The live migration-preserved alias file was updated only for this mapping and shortcuts regenerated.
+- Scope: direct-write fallback for session 01a1844a-5079-7113-9579-fe6597e7762a; helper recognized no writes. Only the shortcut, inspection incident, its ledger record and this milestone are eligible. All pre-existing ledger hunks and other dirty work remain excluded.
+- Verification: generated Fish syntax, loaded abbreviation query/definition and repeated-request no-op passed; targeted incident-memory check passed. README gate returned pass_no_change. Staged whitespace/privacy checks must pass immediately before commit.
+- Delivery: one focused commit on main, followed by push to origin/main. No remaining shortcut implementation work.
+- Remaining: unrestricted refresh-config stopped at existing .config/mimeapps.list drift; targeted shortcut regeneration succeeded. Interactive keystroke expansion remains manual.
+- Rollback: remove only cnc from the template and live catalog, then regenerate shortcuts.

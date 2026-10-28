@@ -1673,3 +1673,8 @@ restore the original DND state afterward. No sudo is needed.
 - Action: With Codex speech enabled, run `~/scripts/codex-notification-sound smoke tagged`.
   Expected: A synthetic Codex popup without TTS. With DND on it stays queued
   until resumed; this exercises Dunst delivery without invoking a Codex event hook.
+
+## Concerts directory shortcut
+
+- **Action:** In Fish, load `~/.config/fish/key_abbr.fish`, type `cnc`, and press Space without executing the expansion.
+- **Expected:** The input expands to `cd /mnt/usb-8tb/concerts`; existing mappings remain available. The mount must be available before navigating.

@@ -11213,6 +11213,15 @@
       "findings": [],
       "reviewed_on": "2026-10-23",
       "sha256": "5b10c0bd2cb94044c8e18195341905fbc732437cf952f7a8d416e304966a20cd"
+    },
+    {
+      "sha256": "9b5d08834a6ce4765049bfd2734e0a349fc4e4778803dfb55bb735e08fa9b010",
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-10-28-concerts-shortcut-fish-inspection.md"
+      ],
+      "reviewed_on": "2026-10-28",
+      "findings": [],
+      "decision": "No new learning: configured Fish startup side effects in read-only sandboxes are already covered by environment-isolation guidance and the 2026-10-23 Fish inspection incident."
     }
   ],
   "review": {
