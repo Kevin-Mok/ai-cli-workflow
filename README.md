@@ -1129,7 +1129,7 @@ this.
   The first adjustment defaults to 6500 K if no value has been saved; direct
   external Redshift commands are not tracked.
   The DP-2 4K bar shows **🌡️ 4500 K** between volume and Spotify: scroll up
-  for +250 K (cooler), down for −250 K (warmer). Other clicks do nothing.
+  for +150 K (cooler), down for −150 K (warmer). Other clicks do nothing.
   It refreshes the saved manual target each second, including keyboard presets
   and reset; it is not a hardware-temperature reading. Backend or state errors
   show **🌡️ ERR**. `~/scripts/redshift-control status` reads the target without

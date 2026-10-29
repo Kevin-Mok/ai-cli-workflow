@@ -7,7 +7,7 @@ import subprocess
 
 def main():
     controller = Path.home() / "scripts/redshift-control"
-    step = {"4": "250", "5": "-250"}.get(os.environ.get("BLOCK_BUTTON", ""))
+    step = {"4": "150", "5": "-150"}.get(os.environ.get("BLOCK_BUTTON", ""))
     try:
         if step is not None:
             subprocess.run([str(controller), "adjust", step], check=True,

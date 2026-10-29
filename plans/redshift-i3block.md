@@ -56,3 +56,20 @@ At the commit boundary: implementation and focused verification complete; no pro
 Excluded work: concat scripts/tests and their README/smoke hunks; feedback/canonical policy edits; privacy approvals; unrelated postmortem records/reference edits; `.harness/concat-concert/`, `:memory:.ses`, concat plans, the pre-existing prompt, and concurrent colorful-i3blocks reports/plans. No timestamps were used as ownership evidence.
 
 Concurrent colorful-icon work began changing shared tests during delivery. The staged version was frozen before those edits; a clean `/tmp/redshift-commit-check` export of exact index bytes passed11Redshift and13layout/scheduler tests (exit0). Those concurrent unstaged edits remain outside this commit.
+
+## Follow-up: 150 K wheel steps
+
+The user requested150 K per scroll after the first commit. This supersedes the original250 K wheel specification; keyboard Ctrl+Alt+Up/Down remains250 K and presets/bounds/default stay unchanged.
+
+- [x] Observe RED for4650 K from4500+wheel-up and4200 K after eight ups from3000.
+- [x] Change only block wheel mapping to+150/−150; update README/smoke examples.
+- [x] Verify focused tests, refresh and live scroll.
+- [x] Prepare scoped numeric/doc hunks for commit; commit/push results are reported by milestone subject in the delivery handoff.
+
+First milestone committed as `18c5797`; push deferred to the completed follow-up series. Concurrent colorful-icon edits in the block/tests/docs are protected and will remain outside our staged follow-up.
+
+Follow-up evidence: defining RED2(4750vs4650,5000vs4200), then current-worktree GREEN12Redshift/13layout tests and keyboard smoke exit0 (the extra palette test belongs to concurrent work). Initial refresh completed. Subsequent broad refresh stopped on unrelated calendar-label drift; preserved source/live. The calendar parser error in the user screenshot was reproduced with the installed scheduler, corrected in shared source by concurrent work, and recovered with a DP-2-only restart. Final visible bar and running wrapper/scheduler verified. Pointer-independent live probe exited0:2300→2450→2300, eight rapid ups→3500; original2300 restored, pointer untouched. See `docs/postmortem/2026-10-29-redshift-150-live-probe.md` for failed probes, root cause and verification limits.
+
+Follow-up milestone: `fix(i3blocks): use 150 K scroll steps`. At commit boundary: requested numeric behavior and docs complete; scoped exact-index checks and privacy gate precede commit; push both retained commits together to `origin/main`. Unrelated icon, calendar-label and media edits remain outside scope. Previous milestone `18c5797` remains intact. Physical human-input and full refresh of unrelated drift are not claimed.
+
+Final follow-up exact-index export:11Redshift tests and13layout/scheduler tests passed, exit0. The current shared-source scheduler overflow reproducer also passed after removal of the unsupported calendar property, exit0. README gate passed; targeted incident-memory check passed. The staged follow-up contains only7session-attributed files/hunks, excluding concurrent palette/config work.

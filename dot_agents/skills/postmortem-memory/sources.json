@@ -11372,6 +11372,15 @@
       "findings": [
         "local-i3blocks-busy-wheel-queue"
       ]
+    },
+    {
+      "sha256": "42aec5680379a12d97c74101b8caa2a9b7650e47964bdbc02f966678bcb96f69",
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-10-29-redshift-150-live-probe.md"
+      ],
+      "reviewed_on": "2026-10-29",
+      "findings": [],
+      "decision": "No new general learning: installed-version parser validation, actual live-process readiness and scoped source/live drift preservation already govern this failure; concurrent source removed unsupported SHORTFMT, then live DP-2 150 K steps and recovery passed."
     }
   ],
   "review": {

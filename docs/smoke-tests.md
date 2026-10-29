@@ -759,7 +759,7 @@ checks use invented temporary data; real notes are never repository fixtures.
   the thermometer. Try rapid wheel events and left/middle/right clicks; select
   keyboard presets and reset. Run `~/scripts/redshift-control status` to compare.
   Expected: Only DP-2 has the block, between volume and Spotify. Windows+2
-  displays 2300 K within one second; up shows 2550 K and down returns 2300 K.
+  displays 2300 K within one second; up shows 2450 K and down returns 2300 K.
   Rapid wheel steps accumulate, bounded at 1000–6500 K; other clicks do nothing.
   Reset displays 6500 K. This is the saved manual target, not a hardware reading
   or a tracker of raw external Redshift commands. Volume and Redshift remain

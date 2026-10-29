@@ -54,7 +54,7 @@ class RedshiftBlock(unittest.TestCase):
         self.assertEqual(self.block().stdout, '🌡️ 6500 K\n')
         self.assertFalse(self.state.exists())
         self.controller('set', '4500')
-        self.assertEqual(self.block('4').stdout, '🌡️ 4750 K\n')
+        self.assertEqual(self.block('4').stdout, '🌡️ 4650 K\n')
         self.assertEqual(self.block('5').stdout, '🌡️ 4500 K\n')
         for button in ('1', '2', '3', '6', ''):
             self.assertEqual(self.block(button).stdout, '🌡️ 4500 K\n')
@@ -70,7 +70,7 @@ class RedshiftBlock(unittest.TestCase):
         with concurrent.futures.ThreadPoolExecutor(max_workers=8) as pool:
             results = list(pool.map(self.block, ['4'] * 8))
         self.assertTrue(all(r.returncode == 0 and 'ERR' not in r.stdout for r in results))
-        self.assertEqual(self.controller('status').stdout, '5000\n')
+        self.assertEqual(self.controller('status').stdout, '4200\n')
 
     def test_invalid_state_and_backend_failure_are_compact_errors(self):
         self.controller('set', '4500')
