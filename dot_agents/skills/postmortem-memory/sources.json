@@ -11258,6 +11258,15 @@
       "findings": [],
       "reviewed_on": "2026-10-29",
       "sha256": "4ca73dc0cf52a5a500b1a8832ddaa489dc506fbdfa5b400e4c8c0253e99c282b"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/track-codex-sessions/docs/postmortem/2026-10-29-overview-reset-total.md"
+      ],
+      "decision": "No new general remedy: existing reset-cohort and work-scope findings remain valid; presentation now exposes the combined observed period total, with local regression tests and an engineering lesson. Full suite 627 passed and installed CLI verified.",
+      "findings": [],
+      "reviewed_on": "2026-10-29",
+      "sha256": "ac34cd21bce24540b8b8081fdf6f46abaee3827257f7f4301b5462760ca1f814"
     }
   ],
   "review": {
