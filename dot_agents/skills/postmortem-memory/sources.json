@@ -11222,6 +11222,33 @@
       "reviewed_on": "2026-10-28",
       "findings": [],
       "decision": "No new learning: configured Fish startup side effects in read-only sandboxes are already covered by environment-isolation guidance and the 2026-10-23 Fish inspection incident."
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/portfolio-site/.worktrees/academics/docs/postmortem/2026-10-28-academics-inspection-paths.md"
+      ],
+      "decision": "No new general remedy beyond reviewed existing workflows: source-path inspection, restricted runtime execution, and exact-content privacy approval. The user-authorized public-portfolio occurrence is resolved with 59 privacy tests, one checkpoint integration and the actual staged gate passing; feature tests, types, lint and build pass.",
+      "findings": [],
+      "reviewed_on": "2026-10-29",
+      "sha256": "ae73e9638088a215039a73c5d9152c25ca41df6732ba2414a0230c4e746dcceb"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/portfolio-site/.worktrees/academics/docs/postmortem/2026-10-28-academics-validation.md"
+      ],
+      "decision": "No new general remedy beyond reviewed existing workflows: source-path inspection, restricted runtime execution, and exact-content privacy approval. The user-authorized public-portfolio occurrence is resolved with 59 privacy tests, one checkpoint integration and the actual staged gate passing; feature tests, types, lint and build pass.",
+      "findings": [],
+      "reviewed_on": "2026-10-29",
+      "sha256": "09945f1857f5923e1aa9b06852290f87f481d05f74dbe278ad126bb38515cab8"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/portfolio-site/.worktrees/academics/docs/postmortem/2026-10-28-academics-commit-privacy.md"
+      ],
+      "decision": "No new general remedy beyond reviewed existing workflows: source-path inspection, restricted runtime execution, and exact-content privacy approval. The user-authorized public-portfolio occurrence is resolved with 59 privacy tests, one checkpoint integration and the actual staged gate passing; feature tests, types, lint and build pass.",
+      "findings": [],
+      "reviewed_on": "2026-10-29",
+      "sha256": "c840b15dc7a2820550a89320545a370d2887808876ffc27e3490361aed9354d7"
     }
   ],
   "review": {

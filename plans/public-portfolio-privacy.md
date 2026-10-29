@@ -13,7 +13,9 @@ Intentionally public professional contact details and reviewed portfolio media s
 - [x] (2026-10-29) Passed five focused checks, all 59 privacy tests, one frozen-tree integration and no-write syntax/whitespace checks.
 - [x] (2026-10-29) Added 12 exact-path/full-hash approvals after reviewing intended public contacts, article URLs and incidental SVG/compressed-media matches; actual portfolio candidate passes.
 - [x] (2026-10-29) refresh-config completed and the existing canonical hook snapshot was refreshed; exact isolated candidate privacy check passed.
-- [ ] Commit only the scoped prerequisite and push normally while preserving unrelated dirty work.
+- [x] (2026-10-29) Committed prerequisite 72b1d33 with preserved hooks and isolated scope; portfolio feature committed as c9266ee in its new worktree.
+- [x] (2026-10-29) Moved the three reviewed incident aliases into the committed feature worktree, preserved unrelated learning entries, and prepared scoped verification closeout.
+- [ ] Publish the verified commits normally; resulting remote receipts are reported in Codex output.
 
 ## Surprises & Discoveries
 
@@ -58,3 +60,5 @@ The portfolio incident records before/after evidence. No raw personal values are
 No dependency, schema shape, public API or CLI flag changes. load_approvals accepts two additional category values; path/full-content hash binding and private-policy precedence remain intact.
 
 Revision note: Created with the minimal shared prerequisite and individually reviewed approvals, keeping the delivery and safety evidence in the same change.
+
+Delivery closeout: the public-portfolio gate prerequisite is 72b1d33; the academic feature is c9266ee on feat/academics. Only this plan and the three session-owned reviewed report records enter the verification follow-up. All other dirty canonical files and learning records remain excluded. No code changed after the passing suites.
