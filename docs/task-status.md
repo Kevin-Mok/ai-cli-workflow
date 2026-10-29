@@ -182,3 +182,12 @@ This document records delivery milestones and verification for completed reposit
 - Resolution: fetch and conflict-free normal merge prepared with no history rewrite; remote privacy-gate fixes combine with existing local fixes. All unrelated dirty work remains excluded.
 - Verification: integration privacy-gate suite passed 60 tests; notification suite exited 0 (91 tests confirmed by the earlier fresh run). Exact staged whitespace, sub-3 MB blob sizing, README gate and candidate privacy review passed. Push receipt is the final delivery check. No application behavior changes beyond the pronunciation rule. Subjective listening remains manual.
 - Next: commit the reviewed integration and push origin/main; no deployment service applies to this dotfiles repository.
+
+## cg video shortcut — feat(fish): add cg video shortcut
+
+- Complete: cg expands to the requested looping mpv command with the absolute USB concert-video path; no conflicts.
+- Scope: session 01a189a3-f878-7453-aa21-176919d7c433; direct-write fallback because the scope helper could not detect orchestration writes. Only the alias, inspection incident, its isolated ledger record and this milestone are included.
+- Verification: refresh-config completed; generated Fish syntax and exact loaded expansion passed; repeated request is a no-op. README gate returned pass_no_change; targeted incident ledger check passed. Privacy review and staged diff inspection precede commit.
+- Delivery: one commit on main, then push origin/main. No implementation blockers or remaining work.
+- Remaining: preserve all baseline dirty work, including unrelated ledger hunks. Playback and interactive keystroke expansion were not exercised. USB mount must be available.
+- Rollback: remove cg from the source and live alias catalog, then refresh shortcuts.

@@ -11315,6 +11315,15 @@
       "findings": [
         "local-fish-keyword-abbreviation"
       ]
+    },
+    {
+      "sha256": "e3c2487969c9d8f43e0f93fd3f9500646199fdeb740e4a2d75eff620ac6e2d66",
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-10-29-cg-shortcut-path-inspection.md"
+      ],
+      "reviewed_on": "2026-10-29",
+      "findings": [],
+      "decision": "No new reusable learning: local-discover-paths-before-reads already covers guessed helper suffixes; inventoried external script was read successfully."
     }
   ],
   "review": {
