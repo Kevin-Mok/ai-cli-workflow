@@ -11249,6 +11249,15 @@
       "findings": [],
       "reviewed_on": "2026-10-29",
       "sha256": "c840b15dc7a2820550a89320545a370d2887808876ffc27e3490361aed9354d7"
+    },
+    {
+      "aliases": [
+        "/home/kevin/linux-config/.worktrees/public-portfolio-privacy/docs/postmortem/2026-10-29-public-portfolio-pre-push.md"
+      ],
+      "decision": "No new general remedy: fetch-first object/ancestry inspection and isolated normal integration apply existing reviewed guidance. Inspection recovered after fetch; merged boundary suites pass 60 plus one checkpoint. Actual branch push receipt remains a separate verification.",
+      "findings": [],
+      "reviewed_on": "2026-10-29",
+      "sha256": "20f69410925051df83a3dace2236d3a558a7ff82d726d498af318b402ea6cbc3"
     }
   ],
   "review": {

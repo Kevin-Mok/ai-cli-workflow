@@ -15,7 +15,9 @@ Intentionally public professional contact details and reviewed portfolio media s
 - [x] (2026-10-29) refresh-config completed and the existing canonical hook snapshot was refreshed; exact isolated candidate privacy check passed.
 - [x] (2026-10-29) Committed prerequisite 72b1d33 with preserved hooks and isolated scope; portfolio feature committed as c9266ee in its new worktree.
 - [x] (2026-10-29) Moved the three reviewed incident aliases into the committed feature worktree, preserved unrelated learning entries, and prepared scoped verification closeout.
-- [ ] Publish the verified commits normally; resulting remote receipts are reported in Codex output.
+- [x] (2026-10-29) Published portfolio feature c9266ee; preserved the original portfolio checkout clean.
+- [x] (2026-10-29) Recovered shared pre-push inspection by fetching concurrent remote objects, then prepared isolated normal integration with published new-branch hotfix 98e2aaf; merged tests pass 60 plus one checkpoint.
+- [ ] Publish fix/public-portfolio-privacy normally; resulting branch receipt is reported in Codex output.
 
 ## Surprises & Discoveries
 
@@ -62,3 +64,5 @@ No dependency, schema shape, public API or CLI flag changes. load_approvals acce
 Revision note: Created with the minimal shared prerequisite and individually reviewed approvals, keeping the delivery and safety evidence in the same change.
 
 Delivery closeout: the public-portfolio gate prerequisite is 72b1d33; the academic feature is c9266ee on feat/academics. Only this plan and the three session-owned reviewed report records enter the verification follow-up. All other dirty canonical files and learning records remain excluded. No code changed after the passing suites.
+
+Concurrent-publication update: shared main advanced independently to 911b869; it was fetched without modifying dirty files. The actual pre-push inspection now passes. To preserve that remote history and unrelated local changes, publish the integrated gate work from .worktrees/public-portfolio-privacy on fix/public-portfolio-privacy rather than force-updating main. No skill additions from the concurrent remote changes enter this branch. The pre-push incident contains the exact evidence; 60 merged privacy tests and one checkpoint pass.
