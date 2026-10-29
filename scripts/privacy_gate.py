@@ -283,7 +283,8 @@ def pre_push(repo: Path, records: bytes, rules_path: Path | None = None):
             continue
         revision = local.decode("ascii")
         git(repo, "rev-parse", revision + "^{commit}")
-        revisions = [revision] if remote == b"0" * len(remote) else [revision, "^" + remote.decode("ascii")]
+        # A new remote branch has no remote base; skip history already on any remote-tracking ref.
+        revisions = [revision, "--not", "--remotes"] if remote == b"0" * len(remote) else [revision, "^" + remote.decode("ascii")]
         for oid in git(repo, "rev-list", *revisions).splitlines():
             if oid in checked_commits:
                 continue

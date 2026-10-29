@@ -11254,10 +11254,10 @@
       "aliases": [
         "/home/kevin/linux-config/docs/postmortem/2026-10-29-discord-commit-git-permissions.md"
       ],
-      "decision": "No new reusable learning: the declared read-only Git metadata boundary requires the existing approved escalation mechanism. Identical scoped staging exited 0 with elevated permission; commit and push are separate verification.",
+      "decision": "No new reusable learning: approved Git metadata escalation restored scoped staging, and the reviewed local-git-fetch-before-ancestry normal-merge remedy prepared a conflict-free integration after the push rejection. Final merge checks and push receipt remain separate verification.",
       "findings": [],
       "reviewed_on": "2026-10-29",
-      "sha256": "043923ba434fbdb1da3f9196a6ec0d8b2ccfffc182c122aa01b3cb0b529da919"
+      "sha256": "4ca73dc0cf52a5a500b1a8832ddaa489dc506fbdfa5b400e4c8c0253e99c282b"
     }
   ],
   "review": {

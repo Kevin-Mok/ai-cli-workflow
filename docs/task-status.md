@@ -175,3 +175,10 @@ This document records delivery milestones and verification for completed reposit
 - Verification: defining test failed before implementation; focused suite passed 91 tests and basedpyright reported 0 errors/warnings/notes. Scoped refresh-config exited 0; installed helper matched source and produced the expected channel, DM/link and body phrases. README gate returned pass_no_change. Fresh pre-commit checks passed: 91 focused tests, zero type-check diagnostics, README pass_no_change. Scoped staging required elevated Git metadata writes and then succeeded; the incident and its no-new-learning ledger entry ship with this task. Exact staged privacy/whitespace review is required before committing.
 - Delivery: one focused commit on main, then push origin/main. Implementation and deployment complete; no blockers. Subjective listening and real incoming-message acceptance remain manual.
 - Rollback: remove the exact pronunciation replacement and apply the helper; existing Discord speech activation and volume persist unchanged.
+
+### Discord pronunciation remote-integration follow-up
+
+- Milestone: pronunciation committed as `45777de`; the first push was safely rejected because origin/main had advanced. Both candidate and normal commit-hook privacy checks passed.
+- Resolution: fetch and conflict-free normal merge prepared with no history rewrite; remote privacy-gate fixes combine with existing local fixes. All unrelated dirty work remains excluded.
+- Verification: integration privacy-gate suite passed 60 tests; notification suite exited 0 (91 tests confirmed by the earlier fresh run). Exact staged whitespace, sub-3 MB blob sizing, README gate and candidate privacy review passed. Push receipt is the final delivery check. No application behavior changes beyond the pronunciation rule. Subjective listening remains manual.
+- Next: commit the reviewed integration and push origin/main; no deployment service applies to this dotfiles repository.
