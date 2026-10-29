@@ -11547,6 +11547,15 @@
       "reviewed_on": "2026-10-29",
       "findings": [],
       "decision": "No new learning: existing sandbox permission guidance applies; use host execution and no-config fish for scoped desktop work."
+    },
+    {
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-10-29-4k-font-inspection.md"
+      ],
+      "decision": "No new learning: existing path discovery guidance applies. Font activation and one-line live diff verified; baseline parser warnings are unchanged. An overbroad workspace equality assertion failed afterward; focus/ID preservation remains unverified.",
+      "findings": [],
+      "reviewed_on": "2026-10-29",
+      "sha256": "48c82fbed44d62ef9bd0b64e8f17ede6daaf2b13290fedd21253a2d69cbdc94b"
     }
   ],
   "review": {

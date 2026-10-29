@@ -987,6 +987,8 @@ Preview the existing disk configuration, install the UUID-specific rules once wi
   changes volume by 3%.
 - Action: Inspect the HDMI-0 right-screen bar after reloading i3.
   Expected: Font size is 35.6 points at 135 DPI (27 rendered pixels smaller than the original 50 points); other monitors retain their font sizes.
+- Action: After refreshing and reloading i3, inspect the DP-2 4K bar and run `i3-msg -t get_bar_config bar-2`.
+  Expected: Its font is 46.2667 points at 135 DPI, three rendered pixels smaller than the preceding 47.8667-point setting (seven pixels below the original 50 points). HDMI-0 remains 35.6 points and DVI-D-0 remains 30 points. This host excludes `.config/i3/` from chezmoi; its live font line is updated separately while preserving local additions.
 - Action: After `refresh-config` and reloading the i3 bars, inspect each monitor;
   change wallpaper with the normal pywal shortcut and inspect again.
   Expected: Speaker/headphones/display, music notes, thermometer, calendar

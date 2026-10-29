@@ -976,6 +976,8 @@ this.
 - Workspace buttons use 15px left padding, a 10px number/icon gap, and 30px right padding at the current 135 DPI; changing DPI requires recalibrating the Pango spacers.
 - The 4K i3 bar keeps volume near the monitor center and fits the song beside it
   with an ellipsis when crowded, reserving volume and Redshift space before song or calendar.
+- The DP-2 4K bar uses a 46.2667-point font at 135 DPI, about 7 pixels smaller
+  than its original 50-point setting; other bar font sizes are unchanged.
 - [`dot_config/kitty/kitty.conf`](dot_config/kitty/kitty.conf)
   is the default terminal config, and the i3 bindings now open `kitty`
   first for normal shells and Codex. Ctrl+Shift+Up/Down and Ctrl++/Ctrl+-
