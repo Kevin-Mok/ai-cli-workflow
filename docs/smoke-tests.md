@@ -1308,6 +1308,11 @@ only a disposable temporary fixture and requires no sudo.
 
 ## Fish Alias Skill
 
+- Action: After refresh, source `~/.config/fish/key_abbr.fish` in an existing Fish shell. On an empty command line type `or` then Space; inspect without pressing Enter and cancel with Ctrl+C. Also type `false; or ` and `echo or ` without executing them.
+  Expected: Standalone `or` expands to `cd /mnt/usb-8tb/concerts/olivia-rodrigo`; logical `or` and argument `or` remain unchanged. Fish treats `or` as a keyword, so this abbreviation uses a guarded anywhere rule. Existing shells need the source step; a refresh in another process cannot reload their abbreviations.
+- Action: Run `python3 -B tests/test_reserved_fish_shortcut.py`.
+  Expected: The interactive PTY regression passes for standalone expansion, preserved logical operators and arguments; no mapped command executes.
+
 Check the shortcut skill using disposable fixture sources before making a live
 request. The fixture suite does not execute mapped commands or install the cbn
 example. Live requests preserve active conflicts with exactly `# ` and refresh

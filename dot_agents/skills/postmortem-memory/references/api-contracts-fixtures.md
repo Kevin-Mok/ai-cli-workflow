@@ -678,3 +678,13 @@ security checks with the arguments you passed.
 - Verification: real12/19pt isolated fixtures passed both ratios, repeated returns, restart, zoom, restore and unfocused/cross-instance isolation. Live disposable i3 windows followed both side outputs and repeated main returns; service restart preserved existing metrics.
 - Limitations: internal API version-sensitive; dispatch root cause unproved. Physical calibration remains manual; dedicated XID-targeted whole-workspace moves passed. Scoped deployment bypassed unrelated audio-mute refresh divergence without resolving it.
 - Source: [Kitty monitor runtime](../../../../docs/postmortem/2026-10-22-kitty-monitor-probe-access.md); reviewed hash retained in sources.json.
+
+## local-fish-keyword-abbreviation
+
+- Status: **verified_fix**; confidence: **confirmed**; scope: **runtime**.
+- Symptom/applicability: Fish3.7 lists an or abbreviation but skips its command-position expansion because or is a keyword.
+- Diagnostic: capture the editable buffer in a real interactive PTY; enumeration is insufficient.
+- Remedy: guard an anywhere/function abbreviation to a buffer containing only or and whitespace. Reload generated definitions in each existing shell.
+- Verification: fixture RED/GREEN, installed PTY captures for standalone expansion and unchanged logical/argument or, and full refresh exit0.
+- Limits: fresh command lines only; unguarded anywhere expansion breaks logical operators.
+- Source: [or expansion incident](../../../../docs/postmortem/2026-10-29-or-abbreviation-expansion.md).

@@ -5995,6 +5995,26 @@
       ],
       "verification": "The consumer producer remained completed after parent send_message requests. An auditor followup_task started the bounded revision; parent observed running without duplicate wake. Producer published V2 consumer dbc0946a and readiness343889da with actual inline0e895e terminal0 and26 synthetic checks; parent reviewed the exact diff.",
       "verification_scope": "runtime"
+    },
+    {
+      "id": "local-fish-keyword-abbreviation",
+      "reference": "references/api-contracts-fixtures.md#local-fish-keyword-abbreviation",
+      "status": "verified_fix",
+      "symptoms": [
+        "Fish or abbreviation exists but does not expand on Space."
+      ],
+      "applicability": "Fish3.7 directory abbreviation named or.",
+      "diagnostics": [
+        "Capture the editable command line in an interactive PTY; compare command-position versus anywhere rules."
+      ],
+      "confidence": "confirmed",
+      "remedy": "Use an anywhere/function abbreviation guarded to a buffer containing only or and whitespace; source regenerated definitions in existing shells.",
+      "verification": "RED literal or; GREEN fixture and live PTY expansion with unchanged logical or and argument or; full refresh exit0.",
+      "verification_scope": "runtime",
+      "limitations": "Fresh command lines only. An unguarded anywhere rule would break logical operators. Name enumeration and syntax checks alone do not prove expansion.",
+      "sources": [
+        "e22a20e482b0a9d85ae01a22d8cf905a856f01a70882bab3c3068799af239fb9"
+      ]
     }
   ],
   "reports": [
@@ -11267,6 +11287,34 @@
       "findings": [],
       "reviewed_on": "2026-10-29",
       "sha256": "ac34cd21bce24540b8b8081fdf6f46abaee3827257f7f4301b5462760ca1f814"
+    },
+    {
+      "sha256": "d3a5200b14c4492692878f647a7f247e54ce3e259185426ce83e425b4d4b0e04",
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-10-29-fish-alias-path-inspection.md"
+      ],
+      "reviewed_on": "2026-10-29",
+      "findings": [],
+      "decision": "No new learning: repeats path discovery and existing scoped deployment practice. Read-only inspection errors corrected; sandbox escalation and reviewed direct shortcut installation verified; full refresh blocked by unrelated mimeapps drift."
+    },
+    {
+      "sha256": "3eb0d904ea7f4c1d6a435e872e1d3df6b97c10afea833e043c5b770c6c29d261",
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-10-29-refresh-mimeapps-mode-conflict.md"
+      ],
+      "reviewed_on": "2026-10-29",
+      "findings": [],
+      "decision": "No new learning: known permissions-only chezmoi conflict. Verified exact target repair, full unforced refresh exit0, empty target diff and retained directory abbreviation. Applications may recreate mode drift."
+    },
+    {
+      "sha256": "e22a20e482b0a9d85ae01a22d8cf905a856f01a70882bab3c3068799af239fb9",
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-10-29-or-abbreviation-expansion.md"
+      ],
+      "reviewed_on": "2026-10-29",
+      "findings": [
+        "local-fish-keyword-abbreviation"
+      ]
     }
   ],
   "review": {
