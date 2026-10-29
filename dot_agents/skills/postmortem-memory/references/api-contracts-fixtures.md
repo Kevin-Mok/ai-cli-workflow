@@ -688,3 +688,14 @@ security checks with the arguments you passed.
 - Verification: fixture RED/GREEN, installed PTY captures for standalone expansion and unchanged logical/argument or, and full refresh exit0.
 - Limits: fresh command lines only; unguarded anywhere expansion breaks logical operators.
 - Source: [or expansion incident](../../../../docs/postmortem/2026-10-29-or-abbreviation-expansion.md).
+
+## local-i3-workspace-label-activation
+
+- Status: **verified_workaround**; confidence: **supported**; verification scope: **runtime**.
+- Symptoms: Renaming after reload can reapply output assignments; strict tree snapshots also count restarted i3bar dock windows.
+- Applicability: Live workspace label updates with existing select/move shortcuts and private installed configuration.
+- Diagnostics: Capture exact UTF-8 labels and numbered output/focus state; compare application XIDs separately from docks, then inspect rendered button width.
+- Remedy: Rename labels before reloading their new assignment rules; guard exact installed edits. Use native minimum button widths for compact padding and account for those widths in adaptive status layout.
+- Verification: 27 isolated real select/move keys passed; 32 original application windows retained workspace numbers. Output restoration retained current visibility/focus; final padding update preserved IDs/output/visibility/focus. 16 layout and one scheduler test plus live checkers passed.
+- Limits: Physical firmware untested, padding varies with font/DPI, unrelated stale music-label assertion remains failing, default IPC still needs scoped approved execution.
+- Source: [Workspace icon activation boundaries](../../../../docs/postmortem/2026-10-29-workspace-icons-activation.md).

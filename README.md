@@ -1113,6 +1113,11 @@ this.
 - [`dot_config/i3/config.tmpl`](dot_config/i3/config.tmpl) is the main
   desktop control plane for workspace movement, app assignments,
   launcher bindings, display and audio shortcuts, and layout control.
+  Workspace labels use native color emoji inspired by their terminal, browser,
+  tools, video, chat, upload, journal, editing, music, server and gaming symbols.
+  Compact labels omit separator/trailing spaces (for example, `2💻`); native
+  minimum button widths leave about 15px side padding at the current font/DPI. Workspace
+  numbers and all select, move-window and launch shortcuts are unchanged.
   **Super+M** (left Super is X11 keycode **133**) toggles speaker mute/unmute and refreshes the volume block.
   Both it and the mute media key use `~/scripts/audio-mute` to show **🔇 Audio — Muted**
   or **🔊 Audio — Unmuted** in one two-second Dunst popup that updates in place.

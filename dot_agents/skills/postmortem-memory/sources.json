@@ -6035,6 +6035,27 @@
       "sources": [
         "d5283b8214bf7822aeb26354d50f82b966cfe52ae1c7638cdb60216cb66de640"
       ]
+    },
+    {
+      "applicability": "Changing live i3 workspace labels while preserving bindings, windows, outputs and focus.",
+      "confidence": "supported",
+      "diagnostics": [
+        "Capture exact UTF-8 labels, numbered workspace output/focus state and application XIDs before activation.",
+        "Separate dock-window replacement from application movement; inspect installed/running config and rendered bar width."
+      ],
+      "id": "local-i3-workspace-label-activation",
+      "limitations": "Physical firmware untested. Padding depends on font/DPI; unrelated stale desktop music-label assertion remains failing. Default sandbox IPC remains restricted.",
+      "reference": "references/api-contracts-fixtures.md#local-i3-workspace-label-activation",
+      "remedy": "Rename to new labels before reloading their new output-assignment rules; guard exact installed replacements. Use native minimum widths for compact padding and include those widths in adaptive status calculations.",
+      "sources": [
+        "75cb97af836d9141c33908830fbca2b83f380be56be2ce21467ece0c7926f6da"
+      ],
+      "status": "verified_workaround",
+      "symptoms": [
+        "Renaming workspaces after reload can reapply output assignments; strict tree comparisons also count restarted i3bar dock windows."
+      ],
+      "verification": "27 real isolated select/move combinations passed; all32original application windows retained numbered workspaces. Output restoration preserved visible/focused workspaces. Final padding activation preserved workspace IDs/output/visibility/focus;16layout and1scheduler tests passed, live checkers passed.",
+      "verification_scope": "runtime"
     }
   ],
   "reports": [
@@ -11381,6 +11402,16 @@
       "reviewed_on": "2026-10-29",
       "findings": [],
       "decision": "No new general learning: installed-version parser validation, actual live-process readiness and scoped source/live drift preservation already govern this failure; concurrent source removed unsupported SHORTFMT, then live DP-2 150 K steps and recovery passed."
+    },
+    {
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-10-29-workspace-icons-activation.md"
+      ],
+      "findings": [
+        "local-i3-workspace-label-activation"
+      ],
+      "reviewed_on": "2026-10-29",
+      "sha256": "75cb97af836d9141c33908830fbca2b83f380be56be2ce21467ece0c7926f6da"
     }
   ],
   "review": {

@@ -365,7 +365,7 @@ bindsym Control+$mod+y exec /home/example/scripts/apply-pywal-theme $($scripts_p
 
 #  ws names [[[ # 
 
-set $ws1 "1  "
+set $ws1 "1💻"
 {{ if eq .chezmoi.hostname "x1-carbon" }}
 set $secondary "HDMI2"
 set $main "eDP1"
@@ -384,7 +384,7 @@ bindsym Mod4+$mod+F1 workspace $ws1; exec chatterino
 bindsym Control+Shift+F1 workspace $ws1; exec $term -e fish -c 'tmux-attach school'
 # bindsym Control+Shift+F1 workspace $ws1; exec $term -e fish -c 'tmux-attach nft'
 
-set $ws2 "2  "
+set $ws2 "2💻"
 set $work_laptop_ip "192.0.2.10"
 workspace $ws2 output $secondary
 bindsym $mod+F2 workspace $ws2; exec $term
@@ -397,7 +397,7 @@ bindsym $mod+Shift+F2 workspace $ws2; exec $term -e mosh kmok@$work_laptop_ip --
 #  ws3 [[[ # 
 
 #set $ws3 "3  "
-set $ws3 "3  "
+set $ws3 "3🌐"
  #set $ws3 "3          "
 # workspace $ws3 output $main
 # bindsym $mod+F3 workspace $ws3; exec $browser
@@ -417,7 +417,7 @@ bindsym Mod4+$mod+b layout tabbed; exec $term -e fish -c "buku-fzf fq"
 
 #  ]]] ws3 # 
 
-set $ws4 "4 󱓧 "
+set $ws4 "4🧰"
 workspace $ws4 output $secondary
 # bindsym $mod+F4 workspace $ws4; exec $term
 # bindsym Control+Shift+F4 workspace $ws4; exec $term -e fish -c 'tmux-attach misc'
@@ -429,7 +429,7 @@ bindsym Mod4+g workspace $ws4; layout tabbed; exec gimp
 
 #  ws5 [[[ # 
 
-set $ws5 "5  "
+set $ws5 "5🎥"
 # workspace $ws5 output $secondary
 assign [class="Steam"] $ws5
 bindsym $mod+F5 workspace $ws5; exec $browser
@@ -459,7 +459,7 @@ for_window [class="ada-mario"] move absolute position 640 0
 
 #  ws6 [[[ # 
 
-set $ws6 "6  "
+set $ws6 "6💬"
 workspace $ws6 output $secondary
 assign [class="Slack"] $ws6
 bindsym Mod4+d workspace $ws6; exec vesktop
@@ -473,7 +473,7 @@ bindsym Mod4+k workspace $ws6; exec slack
 
 #  ]]] ws6 # 
 
-set $ws7 "7  "
+set $ws7 "7📤"
 workspace $ws7 output $secondary
 # bindsym $mod+F7 workspace $ws7; exec $term
 # bindsym $mod+F7 workspace $ws7; exec $term -e mosh kmok@$work_laptop_ip -- tmux a -t nzxt
@@ -483,7 +483,7 @@ bindsym $mod+Shift+F7 workspace $ws7; exec chromium https://txstreet.com/v/eth
 bindsym Mod4+a workspace $ws7; exec android-file-transfer
 # bindsym Mod4+v workspace $ws7; exec VBoxManage startvm "369-a1"
 
-set $ws8 "8  "
+set $ws8 "8📚"
 # assign [class="jetbrains-"] $ws8
 workspace $ws8 output $secondary
 # bindsym $mod+F8 workspace $ws8; exec $term
@@ -492,13 +492,13 @@ bindsym $mod+F8 workspace $ws8; exec $term -e fish -c 'tmux-attach journal'
 bindsym Mod4+$mod+F8 workspace $ws8; exec libreoffice ~/Documents/sit-stand/sit-stand.ods
 bindsym $mod+Shift+F8 workspace $ws8; exec libreoffice ~/Documents/red-hat/workday.ods
 
-set $ws9 "9  "
+set $ws9 "9📝"
 workspace $ws9 output $secondary
 # bindsym $mod+F9 workspace $ws9; exec $term
 # bindsym $mod+F9 workspace $ws9; exec $term -e tmux a -t config
 bindsym $mod+F9 workspace $ws9; exec $term -e fish -c 'tmux-attach config'
 
-set $ws10 "10  "
+set $ws10 "10🎵"
 # set $ws10 "10 🎵"
 assign [class="spotify"] $ws10
 workspace $ws10 output $secondary
@@ -510,7 +510,7 @@ bindsym Mod4+v workspace $ws10; exec $term -e alsamixer -c 1
 # bindsym Mod4+s workspace $ws10; exec ~/scripts/spotify-clean
 bindsym Mod4+s workspace $ws10; exec spotify
 
-set $ws11 "11  "
+set $ws11 "11🖥️"
 # set $ws11 "11 📊"
 # assign [class="Summoners War Exporter"] $ws11
 workspace $ws11 output $secondary
@@ -523,10 +523,10 @@ bindsym Control+Shift+F11 workspace $ws11; exec $term -e fish -c 'tmux-attach ba
 # bindsym $mod+F11 workspace $ws11; exec $term -e gotop -m
 # bindsym Mod4+a workspace $ws11; exec antimicro
 
-set $ws12 "12 "
+set $ws12 "12🎮"
 bindsym $mod+F12 workspace $ws12; exec $term
 
-set $ws13 "13 "
+set $ws13 "13💻"
 bindsym Mod4+F3 workspace $ws13; exec $term
 
 set $ws14 "14"
@@ -622,6 +622,7 @@ set $focused_ws_text #ffffff
 set $bar_trans 00
 set $main_ws_trans aa
 bar {
+  workspace_min_width 144
   i3bar_command i3bar -t 
   {{ if eq .chezmoi.hostname "x1-carbon" }}
   font pango:$sb_font 17
@@ -655,6 +656,7 @@ bar {
 #  secondary bar [[[ # 
 
 bar {
+  workspace_min_width 95
   # output $main
   output $secondary
   {{ if eq .chezmoi.hostname "x1-carbon" }}
@@ -686,6 +688,7 @@ bar {
 #  4k middle bar [[[ #
 
 bar {
+  workspace_min_width 144
   output DP-2
   font pango:$sb_font 50
   i3bar_command i3bar -t

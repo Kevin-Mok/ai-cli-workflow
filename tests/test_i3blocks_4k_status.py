@@ -43,6 +43,12 @@ class SongLayout(unittest.TestCase):
         self.assertEqual(blocks[2]["full_text"], "Short song")
         self.assertGreater(blocks[2]["min_width"], measure("Short song"))
 
+    def test_workspace_minimum_width_reserves_padding_without_clipping_wide_names(self):
+        width = self.module["workspace_button_width"]
+        self.assertEqual(width("1💻", measure, 135, 144), 202)
+        self.assertEqual(width("11💻", lambda text: 240, 135, 144), 253)
+        self.assertEqual(width("1💻", measure, 96, 0), 29)
+
     def test_workspace_pressure_shortens_song_before_volume(self):
         blocks = self.module["layout_blocks"](self.blocks(), 2000, 1550, measure)
         self.assertTrue(blocks[2]["full_text"].endswith("…"))
