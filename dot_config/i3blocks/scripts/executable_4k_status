@@ -1,12 +1,15 @@
 #!/usr/bin/python3
-"""Fit the 4K song to the live bar while reserving space for volume."""
+"""Fit the 4K song to the live bar while reserving space for volume and Redshift."""
 import html
 import json
+import os
+from queue import Empty, SimpleQueue
 from pathlib import Path
 import re
 import signal
 import subprocess
 import sys
+import threading
 
 
 def fit_song(markup, width, measure):
@@ -39,19 +42,22 @@ def layout_blocks(blocks, screen_width, workspace_width, measure):
     if not song.get("full_text"):
         song["full_text"] = "<span></span>"
     calendar = next((b for b in blocks if b.get("name") == "calendar"), None)
-    visible = [b for b in blocks if b.get("full_text")]
-    separators = sum(b.get("separator_block_width", 9) for b in visible[:-1])
     volume_width = measure(volume["full_text"])
     left = max(screen_width / 2 - volume_width / 2, workspace_width + 8)
-    fixed_width = sum(measure(b["full_text"]) for b in visible if b is not song)
-    budget = int(screen_width - left - fixed_width - separators)
+
+    def song_budget():
+        visible = [b for b in blocks if b.get("full_text")]
+        separators = sum(b.get("separator_block_width", 9) for b in visible[:-1])
+        fixed_width = sum(measure(b["full_text"]) for b in visible if b is not song)
+        return int(screen_width - left - fixed_width - separators)
+
+    budget = song_budget()
     if budget < 0 and calendar:
         calendar["full_text"] = calendar.get("short_text", "")
-        fixed_width = volume_width + measure(calendar["full_text"])
-        budget = int(screen_width - left - fixed_width - separators)
+        budget = song_budget()
     if budget < 0 and calendar:
         calendar["full_text"] = ""
-        budget = int(screen_width - left - volume_width - 25 - 4)
+        budget = song_budget()
     song["full_text"] = fit_song(song["full_text"], max(0, budget), measure)
     song["min_width"] = max(0, budget) if song["full_text"] else 0
     # Native short-form selection must not undo the measured layout.
@@ -108,23 +114,70 @@ def live_layout():
     return adapt
 
 
+def forward_clicks(source, child, updates):
+    """Keep wheel events queued in the pipe instead of i3blocks' busy block."""
+    for line in source:
+        try:
+            event = json.loads(line.lstrip(","))
+        except ValueError:
+            event = None
+        if isinstance(event, dict) and event.get("name") == "redshift" and event.get("button") in (4, 5):
+            try:
+                result = subprocess.run(
+                    [str(Path.home() / ".config/i3blocks/scripts/redshift")],
+                    env={**os.environ, "BLOCK_BUTTON": str(event["button"])},
+                    capture_output=True, text=True, check=True,
+                )
+                text = result.stdout.strip().splitlines()[0]
+            except (OSError, subprocess.SubprocessError, IndexError):
+                text = "🌡️ ERR"
+            updates.put(text)
+            # Signal 2 is reserved by the Redshift stanza in this bar only.
+            try:
+                child.send_signal(signal.SIGRTMIN + 2)
+            except ProcessLookupError:
+                return
+        else:
+            try:
+                child.stdin.write(line)
+                child.stdin.flush()
+            except (BrokenPipeError, ValueError):
+                return
+    child.stdin.close()
+
+
 def main():
     child = subprocess.Popen(
         ["i3blocks", "-c", str(Path.home() / ".config/i3blocks/i3blocks-4k.conf")],
-        stdin=sys.stdin, stdout=subprocess.PIPE, text=True, bufsize=1,
+        stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True, bufsize=1,
     )
     signal.signal(signal.SIGTERM, lambda *_: sys.exit(0))
+    updates = SimpleQueue()
+    threading.Thread(target=forward_clicks, args=(sys.stdin, child, updates), daemon=True).start()
     warned = False
     adapt = None
     try:
         for line in child.stdout:
+            latest = None
+            try:
+                while True:
+                    latest = updates.get_nowait()
+            except Empty:
+                pass
+            if latest is not None:
+                def overlay(blocks):
+                    for block in blocks:
+                        if block.get("name") == "redshift":
+                            block["full_text"] = latest
+                    return blocks
+                line = transform_line(line, overlay)
             try:
                 if adapt is None:
                     adapt = live_layout()
                 rendered = transform_line(line, adapt)
             except (OSError, subprocess.SubprocessError, ValueError, KeyError, TypeError, StopIteration) as error:
                 if not warned:
-                    print(f"⚠️ 4K bar layout unavailable ({type(error).__name__}); keeping volume priority.", file=sys.stderr)
+                    print(f"⚠️ 4K bar layout unavailable ({type(error).__name__}); keeping volume and Redshift priority.", file=sys.stderr)
                 warned = True
                 adapt = None
                 rendered = line

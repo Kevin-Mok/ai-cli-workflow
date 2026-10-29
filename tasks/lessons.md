@@ -279,3 +279,5 @@
 2026-10-22 - Apply public-metadata heuristic allowances before reapplying explicit private policy at each boundary, including indexed paths/blobs, LFS payloads and effective Git identities. A source-only gate pass does not verify installed hook snapshots; reinstall and exercise the actual hook after policy changes.
 
 2026-10-22 - Before replacing a privacy scanner bundle, inspect every active hook entrypoint. A pre-commit-only installer can overwrite a bundle used by an older pre-push wrapper; retain its CLI protocol and verify exact outgoing committed trees plus preserved-hook stdin/argument ordering.
+
+- 2026-10-29: i3blocks1.4 can drop rapid clicks while a block runs. Controller-only concurrency tests miss this boundary; test through the scheduler and queue wheel handling in the wrapper before dispatch. See [Redshift activation](../docs/postmortem/2026-10-29-redshift-live-activation.md).

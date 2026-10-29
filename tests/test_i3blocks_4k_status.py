@@ -26,33 +26,47 @@ class SongLayout(unittest.TestCase):
     def blocks(self, song="A very long artist - " + "Long song " * 20):
         return [
             {"name": "volume", "full_text": "VOL 33%", "short_text": "VOL 33%", "separator_block_width": 25},
+            {"name": "redshift", "full_text": "🌡️ 4500 K", "separator_block_width": 25},
             {"name": "spotify", "full_text": song, "short_text": "<span></span>", "separator_block_width": 25},
             {"name": "calendar", "full_text": "Thu 10/22 13:35", "short_text": "13:35"},
         ]
 
     def test_long_song_ellipsizes_and_volume_is_centered(self):
         blocks = self.module["layout_blocks"](self.blocks(), 2000, 400, measure)
-        self.assertTrue(blocks[1]["full_text"].endswith("…"))
+        self.assertTrue(blocks[2]["full_text"].endswith("…"))
         self.assertEqual(blocks[0]["full_text"], "VOL 33%")
-        width = sum(max(measure(b["full_text"]), b.get("min_width", 0)) for b in blocks) + 50
+        width = sum(max(measure(b["full_text"]), b.get("min_width", 0)) for b in blocks) + 75
         self.assertLessEqual(abs((2000 - width + 35) - 1000), 2)
 
     def test_short_song_keeps_volume_at_center(self):
         blocks = self.module["layout_blocks"](self.blocks("Short song"), 2000, 400, measure)
-        self.assertEqual(blocks[1]["full_text"], "Short song")
-        self.assertGreater(blocks[1]["min_width"], measure("Short song"))
+        self.assertEqual(blocks[2]["full_text"], "Short song")
+        self.assertGreater(blocks[2]["min_width"], measure("Short song"))
 
     def test_workspace_pressure_shortens_song_before_volume(self):
-        blocks = self.module["layout_blocks"](self.blocks(), 2000, 1650, measure)
-        self.assertTrue(blocks[1]["full_text"].endswith("…"))
-        self.assertLess(measure(blocks[1]["full_text"]), 200)
+        blocks = self.module["layout_blocks"](self.blocks(), 2000, 1550, measure)
+        self.assertTrue(blocks[2]["full_text"].endswith("…"))
+        self.assertLess(measure(blocks[2]["full_text"]), 200)
         self.assertEqual(blocks[0]["full_text"], "VOL 33%")
 
     def test_extreme_pressure_drops_calendar_and_song_first(self):
         blocks = self.module["layout_blocks"](self.blocks(), 2000, 1920, measure)
         self.assertEqual(blocks[0]["full_text"], "VOL 33%")
-        self.assertEqual(blocks[1]["full_text"], "")
+        self.assertEqual(blocks[1]["full_text"], "🌡️ 4500 K")
         self.assertEqual(blocks[2]["full_text"], "")
+        self.assertEqual(blocks[3]["full_text"], "")
+
+    def test_calendar_fallbacks_reserve_redshift_and_all_separators(self):
+        for workspace, calendar in ((1580, "Thu 10/22 13:35"), (1670, "13:35"), (1780, "")):
+            with self.subTest(workspace=workspace):
+                blocks = self.module["layout_blocks"](self.blocks(), 2000, workspace, measure)
+                visible = [b for b in blocks if b.get("full_text")]
+                width = sum(max(measure(b["full_text"]), b.get("min_width", 0)) for b in visible)
+                width += sum(b.get("separator_block_width", 9) for b in visible[:-1])
+                self.assertLessEqual(width, 2000 - workspace - 8)
+                self.assertEqual(blocks[0]["full_text"], "VOL 33%")
+                self.assertEqual(blocks[1]["full_text"], "🌡️ 4500 K")
+                self.assertEqual(blocks[3]["full_text"], calendar)
 
     def test_unicode_markup_is_valid_and_state_prefix_is_preserved(self):
         prefix = ' <span size="x-small" rise="8192">▶</span> '
@@ -68,11 +82,11 @@ class SongLayout(unittest.TestCase):
                          '{"version":1,"click_events":true}\n')
         self.assertEqual(transform('[[]\n', lambda b: b), '[[]\n')
         blocks = self.blocks("")
-        blocks[1]["instance"] = "click-target"
+        blocks[2]["instance"] = "click-target"
         result = self.module["layout_blocks"](blocks, 2000, 400, measure)
-        self.assertEqual(result[1]["full_text"], "<span></span>")
-        self.assertGreater(result[1]["min_width"], 0)
-        self.assertEqual(result[1]["instance"], "click-target")
+        self.assertEqual(result[2]["full_text"], "<span></span>")
+        self.assertGreater(result[2]["min_width"], 0)
+        self.assertEqual(result[2]["instance"], "click-target")
 
     def test_compact_song_prioritizes_title_over_long_artist(self):
         fitted = self.module["fit_song"]("Very long artist name - Stitches", 160, measure)
@@ -82,7 +96,7 @@ class SongLayout(unittest.TestCase):
     def test_no_song_still_reserves_volume_under_pressure(self):
         result = self.module["layout_blocks"](self.blocks(""), 2000, 1920, measure)
         self.assertEqual(result[0]["full_text"], "VOL 33%")
-        self.assertEqual(result[2]["full_text"], "")
+        self.assertEqual(result[3]["full_text"], "")
 
     def test_startup_failure_preserves_stream_and_forwards_clicks(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -107,6 +121,42 @@ class SongLayout(unittest.TestCase):
             self.assertEqual((root / "clicks").read_text(), clicks)
             self.assertIn("layout unavailable", result.stderr)
 
+    def test_rapid_redshift_clicks_survive_busy_scheduler(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            scripts = root / ".config/i3blocks/scripts"
+            scripts.mkdir(parents=True)
+            # A slow block reproduces scheduler drops; each event must run once.
+            block = scripts / "redshift"
+            block.write_text("#!/bin/sh\nif [ \"$BLOCK_BUTTON\" = 4 ]; then sleep .08; echo x >> \"$TEST_EVENTS\"; echo '🌡️ ERR'; else echo '🌡️ 3000 K'; fi\n")
+            block.chmod(0o755)
+            xrdb = root / "xrdb"
+            xrdb.write_text("#!/bin/sh\nexit 1\n")
+            xrdb.chmod(0o755)
+            (root / ".config/i3blocks/i3blocks-4k.conf").write_text(
+                "[redshift]\ncommand=~/.config/i3blocks/scripts/redshift\ninterval=1\nsignal=2\n")
+            clicks = "[\n" + "\n".join(
+                ("," if i else "") + json.dumps({"name": "redshift", "button": 4})
+                for i in range(8)) + "\n"
+            process = subprocess.Popen(["/usr/bin/python3", str(SCRIPT)],
+                stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                env={**os.environ, "HOME": directory, "PATH": directory + ":/usr/bin:/bin",
+                     "TEST_EVENTS": str(root / "events")}, text=True)
+            try:
+                process.stdin.write(clicks)
+                process.stdin.flush()
+                import time
+                time.sleep(1.8)
+                process.terminate()
+                output, errors = process.communicate(timeout=4)
+            finally:
+                if process.poll() is None:
+                    process.kill()
+                    process.communicate()
+            events = (root / "events").read_text().splitlines() if (root / "events").exists() else []
+            self.assertEqual(len(events), 8, errors)
+            self.assertIn("🌡️ ERR", output)
+
     def test_transient_startup_failure_recovers_layout(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -119,7 +169,7 @@ get_outputs:) echo '[{"name":"DP-2","rect":{"width":2000}}]';;
 get_workspaces:) echo '[]';;
 esac
 ''',
-                "i3blocks": 'printf \'%s\\n\' \'{"version":1,"click_events":true}\' \'[[]\' \',[{"name":"volume","full_text":"33%"},{"name":"spotify","full_text":"Song"},{"name":"calendar","full_text":"13:35"}]\'\n',
+                "i3blocks": 'printf \'%s\\n\' \'{"version":1,"click_events":true}\' \'[[]\' \',[{"name":"volume","full_text":"33%"},{"name":"redshift","full_text":"🌡️ 4500 K"},{"name":"spotify","full_text":"Song"},{"name":"calendar","full_text":"13:35"}]\'\n',
             }
             for name, body in commands.items():
                 command = root / name

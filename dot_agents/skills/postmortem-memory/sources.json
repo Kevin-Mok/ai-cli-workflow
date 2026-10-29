@@ -6015,6 +6015,26 @@
       "sources": [
         "e22a20e482b0a9d85ae01a22d8cf905a856f01a70882bab3c3068799af239fb9"
       ]
+    },
+    {
+      "id": "local-i3blocks-busy-wheel-queue",
+      "reference": "references/operational-drift.md#local-i3blocks-busy-wheel-queue",
+      "status": "verified_fix",
+      "confidence": "confirmed",
+      "verification_scope": "runtime",
+      "symptoms": [
+        "i3blocks 1.4 loses rapid wheel events while the block subprocess is running."
+      ],
+      "applicability": "Interactive blocks behind the installed i3blocks 1.4 scheduler.",
+      "diagnostics": [
+        "Compare actual rapid X11 wheel count with saved controller target; controller-only parallel calls can pass while scheduler delivery drops input."
+      ],
+      "remedy": "Queue Redshift wheel handling in the status wrapper before scheduler dispatch, retain result/error output for the next frame, signal a refresh and forward other input unchanged.",
+      "verification": "Executable rapid-click regression RED/GREEN; live eight 25-ms wheel events preserved all eight steps; Windows+2, both wheel directions, ignored clicks and reset passed; target/pointer/focus restored.",
+      "limitations": "Physical input and crowded live workspaces remain manual; queue coverage is specific to the wrapped DP-2 bar.",
+      "sources": [
+        "d5283b8214bf7822aeb26354d50f82b966cfe52ae1c7638cdb60216cb66de640"
+      ]
     }
   ],
   "reports": [
@@ -11333,6 +11353,25 @@
       "reviewed_on": "2026-10-29",
       "findings": [],
       "decision": "No new reusable learning: existing path discovery and sandbox/network permission guidance covers these delivery diagnostics; GitHub ADMIN permission and public destination were verified before retry."
+    },
+    {
+      "sha256": "abcd0e7200605bc562fcc2ddd46e89d19479c5964335ecf3aa92b70d7da6b0ee",
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-10-29-redshift-test-discovery.md"
+      ],
+      "reviewed_on": "2026-10-29",
+      "findings": [],
+      "decision": "No new learning: existing local-discover-paths-before-reads guidance covers guessed read-only test filenames; actual paths were discovered and read."
+    },
+    {
+      "sha256": "d5283b8214bf7822aeb26354d50f82b966cfe52ae1c7638cdb60216cb66de640",
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-10-29-redshift-live-activation.md"
+      ],
+      "reviewed_on": "2026-10-29",
+      "findings": [
+        "local-i3blocks-busy-wheel-queue"
+      ]
     }
   ],
   "review": {

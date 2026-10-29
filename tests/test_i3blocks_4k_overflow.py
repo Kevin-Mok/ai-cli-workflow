@@ -20,6 +20,7 @@ class FourKOverflow(unittest.TestCase):
             for name, output in {
                 "volume": "VOL 75%\nVOL 75%\n#ffffff\n",
                 "now_playing_mpris": "Artist - Long song\nArtist - Long song\n#abcdef\n",
+                "redshift": "🌡️ 4500 K\n🌡️ 4500 K\n#cbe4ff\n",
                 "calendar": "12:34\n12:34\n#ffffff\n",
             }.items():
                 script = scripts / name
@@ -40,12 +41,13 @@ class FourKOverflow(unittest.TestCase):
                        if line.lstrip(",").startswith("[{")]
             blocks = [block for block in updates[-1] if block.get("name")]
             self.assertEqual([block["name"] for block in blocks],
-                             ["volume", "spotify", "calendar"])
+                             ["volume", "redshift", "spotify", "calendar"])
             self.assertEqual(blocks[0]["full_text"], "VOL 75%")
             self.assertEqual(blocks[0]["short_text"], "VOL 75%")
-            self.assertIn("Artist - Long song", blocks[1]["full_text"])
-            self.assertEqual(blocks[1]["short_text"], "<span></span>")
-            self.assertEqual(blocks[1]["color"], "#abcdef")
+            self.assertEqual(blocks[1]["full_text"], "🌡️ 4500 K")
+            self.assertIn("Artist - Long song", blocks[2]["full_text"])
+            self.assertEqual(blocks[2]["short_text"], "<span></span>")
+            self.assertEqual(blocks[2]["color"], "#abcdef")
 
 
 if __name__ == "__main__":

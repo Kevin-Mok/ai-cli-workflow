@@ -974,7 +974,7 @@ this.
   `~/scripts/kitty-monitor-font-smoke --plain` (`--details` for diagnostics),
   which uses isolated Kitty/Xvfb fixtures; physical calibration still needs review.
 - The 4K i3 bar keeps volume near the monitor center and fits the song beside it
-  with an ellipsis when crowded, reserving volume space before song or calendar.
+  with an ellipsis when crowded, reserving volume and Redshift space before song or calendar.
 - [`dot_config/kitty/kitty.conf`](dot_config/kitty/kitty.conf)
   is the default terminal config, and the i3 bindings now open `kitty`
   first for normal shells and Codex. Ctrl+Shift+Up/Down and Ctrl++/Ctrl+-
@@ -1128,6 +1128,12 @@ this.
   bounded at 1000–6500 K. Presets, `rds`, `rx` and login share the saved temperature.
   The first adjustment defaults to 6500 K if no value has been saved; direct
   external Redshift commands are not tracked.
+  The DP-2 4K bar shows **🌡️ 4500 K** between volume and Spotify: scroll up
+  for +250 K (cooler), down for −250 K (warmer). Other clicks do nothing.
+  It refreshes the saved manual target each second, including keyboard presets
+  and reset; it is not a hardware-temperature reading. Backend or state errors
+  show **🌡️ ERR**. `~/scripts/redshift-control status` reads the target without
+  changing state, applying Redshift or notifying.
   Successful helper operations show **🌡️ Redshift — 2100 K** (using the applied
   temperature) in Dunst. Rapid adjustments edit the same two-second popup in place;
   missing or failed notifications never fail the temperature change.

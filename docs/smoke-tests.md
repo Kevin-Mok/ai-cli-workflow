@@ -755,6 +755,18 @@ checks use invented temporary data; real notes are never repository fixtures.
   creates a fresh popup.
   Fish `redshift-set` and login calls to the shared helper also notify.
 
+- Action: On the DP-2 4K bar, press Windows+2, then scroll up and down over
+  the thermometer. Try rapid wheel events and left/middle/right clicks; select
+  keyboard presets and reset. Run `~/scripts/redshift-control status` to compare.
+  Expected: Only DP-2 has the block, between volume and Spotify. Windows+2
+  displays 2300 K within one second; up shows 2550 K and down returns 2300 K.
+  Rapid wheel steps accumulate, bounded at 1000–6500 K; other clicks do nothing.
+  Reset displays 6500 K. This is the saved manual target, not a hardware reading
+  or a tracker of raw external Redshift commands. Volume and Redshift remain
+  before song/calendar under crowded workspace pressure; song is shortened and
+  calendar shortened/hidden. Backend or malformed-state failures show `🌡️ ERR`
+  without falsely displaying an unsuccessful target. Restore the preferred preset.
+
 - Action: In an i3 desktop session, run `~/scripts/redshift-control set 2100`,
   then `~/scripts/redshift-control adjust 250` and `~/scripts/redshift-control reset`.
   Expected: Terminal output stays unchanged; Dunst shows 2100, 2350 and 6500 K.
@@ -965,9 +977,9 @@ Preview the existing disk configuration, install the UUID-specific rules once wi
 - Action: Run `refresh-config`, then `gpgconf --kill gpg-agent`; open a new terminal and run `pass edit <non-sensitive-test-entry>`.
   Expected: When GPG needs the store password, `pinentry-curses` prompts in that initiating terminal and `pass` continues to the configured editor after successful authentication.
 - Action: Run `/home/example/scripts/apply-desktop-display-layout`, reload i3, and inspect `xrandr --query`.
-  Expected: `DVI-D-0` is 2048x1152 at `+0+0`, `DP-2` is 3840x2160 at `+2048+0`, `HDMI-0` is 1920x1080 at `+5888+0`, and i3 shows bars on all three monitors with the middle 4K bar ordered `volume`, `spotify`, `calendar`.
+  Expected: `DVI-D-0` is 2048x1152 at `+0+0`, `DP-2` is 3840x2160 at `+2048+0`, `HDMI-0` is 1920x1080 at `+5888+0`, and i3 shows bars on all three monitors with the middle 4K bar ordered `volume`, `redshift`, `spotify`, `calendar`.
 - Action: Play a long song and add workspace buttons on DP-2 until the status area is crowded, then remove the extra workspace buttons.
-  Expected: Volume sits near the center of DP-2, immediately left of the song. The song fills available space and ends in an ellipsis when too long; compact text puts the title before the artist. More workspace buttons shorten the song and move volume right only as necessary. Calendar shortens, then hides, before volume can be clipped. A short or absent song retains volume's centered position. Volume clicks and song controls still work. Workspace buttons alone consuming the entire display exceed i3bar's physical capacity.
+  Expected: Volume sits near the center of DP-2, with Redshift immediately before the song. The song fills available space and ends in an ellipsis when too long; compact text puts the title before the artist. More workspace buttons shorten the song and move volume right only as necessary. Calendar shortens, then hides, before volume or Redshift can be clipped. A short or absent song retains volume's centered position. Volume clicks and song controls still work. Workspace buttons alone consuming the entire display exceed i3bar's physical capacity.
 - Action: Right-click the volume block twice, then left-click twice on each bar.
   Expected: Right-click keeps audio muted; left-click keeps audio unmuted. Neither
   changes the playback device. Middle-click still sets 15%, and scrolling still

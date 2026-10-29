@@ -8,15 +8,26 @@ import subprocess
 import sys
 
 
+def state_directory():
+    return Path(os.environ.get("XDG_STATE_HOME", str(Path.home() / ".local/state"))) / "redshift"
+
+
+def status():
+    # Writers publish atomically; a reader must not create state or a lock.
+    state = state_directory() / "temperature"
+    current = int(state.read_text()) if state.exists() else 6500
+    if not 1000 <= current <= 6500:
+        raise ValueError("Saved temperature must be between 1000 and 6500 K")
+    return current
+
+
 def apply(action, value):
-    directory = Path(os.environ.get("XDG_STATE_HOME", str(Path.home() / ".local/state"))) / "redshift"
+    directory = state_directory()
     directory.mkdir(parents=True, exist_ok=True, mode=0o700)
     with (directory / "lock").open("a") as lock:
         fcntl.flock(lock, fcntl.LOCK_EX)
         state = directory / "temperature"
-        current = int(state.read_text()) if state.exists() else 6500
-        if not 1000 <= current <= 6500:
-            raise ValueError("Saved temperature must be between 1000 and 6500 K")
+        current = status()
         target = 6500 if action == "reset" else value
         if action == "adjust":
             target = max(1000, min(6500, current + value))
@@ -48,21 +59,21 @@ def apply(action, value):
 
 def main():
     parser = argparse.ArgumentParser(description="🌡️ Set or adjust Redshift (1000–6500 K).")
-    parser.add_argument("action", choices=("set", "adjust", "reset"))
+    parser.add_argument("action", choices=("set", "adjust", "reset", "status"))
     parser.add_argument("value", type=int, nargs="?", help="Temperature or signed step in kelvin")
     parser.add_argument("--plain", action="store_true", help="Use ASCII output")
     parser.add_argument("--details", action="store_true", help="Show backend diagnostics on failure")
     args = parser.parse_args()
-    if (args.action == "reset") != (args.value is None):
-        parser.error("set/adjust need a value; reset takes no value")
+    if (args.action in ("reset", "status")) != (args.value is None):
+        parser.error("set/adjust need a value; reset/status take no value")
     try:
-        target = apply(args.action, args.value)
+        target = status() if args.action == "status" else apply(args.action, args.value)
     except (OSError, ValueError, subprocess.CalledProcessError) as error:
         print(("" if args.plain else "❌ ") + "Redshift failed; check display access and saved temperature.", file=sys.stderr)
         if args.details:
             print(getattr(error, "stderr", b"").decode(errors="replace") or str(error), file=sys.stderr)
         return 1
-    print(("" if args.plain else "🌡️ ") + f"Temperature: {target} K")
+    print(target if args.action == "status" else ("" if args.plain else "🌡️ ") + f"Temperature: {target} K")
     return 0
 
 

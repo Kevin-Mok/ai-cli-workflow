@@ -349,3 +349,14 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Verification evidence: Executable transient-startup RED/GREEN, ten layout tests, unchanged media regressions, installed-source identity and final screenshot with centered volume and ellipsized title.
 - Limitations: The exact live initialization exception was not captured; the permanent-fallback defect was reproduced. Workspace buttons can exceed physical display capacity.
 - Sources: [4K bar inspection](../../../../docs/postmortem/2026-10-22-4k-bar-inspection.md).
+
+## local-i3blocks-busy-wheel-queue
+
+- Status: **verified_fix**; confidence: **confirmed**; verification scope: **runtime**.
+- Symptoms: i3blocks1.4 drops rapid wheel input while the block subprocess runs.
+- Applicability: interactive blocks behind that scheduler; controller locks alone cannot recover missing events.
+- Diagnostics: compare actual X11 wheel count against the persisted target; test scheduler delivery separately from concurrent controller calls.
+- Remedy: serially queue the DP-2 Redshift wheel events in the existing status wrapper before scheduler dispatch; retain result/error output and signal refresh; forward other input unchanged.
+- Verification: executable rapid-click RED/GREEN, then eight25-ms real bar events applied eight steps; preset, reset and ignored clicks passed. Original target, pointer and focus restored.
+- Limitations: physical input and crowded live workspaces remain manual; scope is the wrapped DP-2 bar.
+- Source: [Redshift live activation](../../../../docs/postmortem/2026-10-29-redshift-live-activation.md).
