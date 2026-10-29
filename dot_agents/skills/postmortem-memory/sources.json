@@ -11538,6 +11538,15 @@
       "reviewed_on": "2026-10-29",
       "findings": [],
       "decision": "No new learning: existing scoped sandbox and unmanaged i3 target guidance applies. Refresh, validation, reload and live IPC verified; screenshot pixels unmeasured."
+    },
+    {
+      "sha256": "33cc3b21fc66979a5beb5dbc0ffc44ae213eaa4d74a0a6b3369e380481d9eb79",
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-10-29-workspace-spacing-desktop-access.md"
+      ],
+      "reviewed_on": "2026-10-29",
+      "findings": [],
+      "decision": "No new learning: existing sandbox permission guidance applies; use host execution and no-config fish for scoped desktop work."
     }
   ],
   "review": {

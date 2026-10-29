@@ -18,11 +18,13 @@ labels = dict(re.findall(r'^set \$ws(\d+) "([^"]+)"$', text, re.M))
 icons = ('💻', '💻', '🌐', '🧰', '🎥', '💬', '📤', '📚', '📝', '🎵', '🖥️', '🎮', '💻')
 errors = []
 for number, icon in enumerate(icons, 1):
-    if labels.get(str(number)) != f'{number}{icon}':
-        errors.append(f'workspace {number} must use compact label {number}{icon}')
+    if labels.get(str(number)) != f"{number}:<span size='1' letter_spacing='18432'> </span>{number}<span size='1' letter_spacing='10240'> </span>{icon}<span size='1' letter_spacing='49152'> </span>":
+        errors.append(f'workspace {number} must use padded label {number}{icon}')
 for number in (14, 15):
-    if labels.get(str(number)) != str(number):
+    if labels.get(str(number)) != f"{number}:<span size='1' letter_spacing='18432'> </span>{number}<span size='1' letter_spacing='49152'> </span>":
         errors.append(f'workspace {number} changed')
+if text.count('  workspace_min_width 0') != 3 or text.count('  strip_workspace_numbers yes') != 3:
+    errors.append('all three bars must disable minimum widths and hide numeric prefixes')
 expected = ['bindsym Mod4+1 workspace $ws11', 'bindsym Mod4+F11 workspace $ws11']
 for key, number in zip('1234567890', range(1, 11)):
     expected += [f'bindsym $mod+{key} workspace $ws{number}',
@@ -40,4 +42,4 @@ if args.live:
 plain = args.plain or os.environ.get('CLI_PLAIN') == '1'
 if errors:
     raise SystemExit(('' if plain else '❌ ') + '\n'.join(errors))
-print(('' if plain else '✅ ') + 'PASS: colorful workspace labels; Alt digits, Super+1/F11 and all number move shortcuts preserved' + ('; live names match' if args.live else ''))
+print(('' if plain else '✅ ') + 'PASS: 15/10/30px workspace spacing at 135 DPI; Alt digits, Super+1/F11 and all number move shortcuts preserved' + ('; live names match' if args.live else ''))

@@ -973,6 +973,7 @@ this.
   `--plain` gives ASCII output; `--json` emits one-shot results. Verify with
   `~/scripts/kitty-monitor-font-smoke --plain` (`--details` for diagnostics),
   which uses isolated Kitty/Xvfb fixtures; physical calibration still needs review.
+- Workspace buttons use 15px left padding, a 10px number/icon gap, and 30px right padding at the current 135 DPI; changing DPI requires recalibrating the Pango spacers.
 - The 4K i3 bar keeps volume near the monitor center and fits the song beside it
   with an ellipsis when crowded, reserving volume and Redshift space before song or calendar.
 - [`dot_config/kitty/kitty.conf`](dot_config/kitty/kitty.conf)

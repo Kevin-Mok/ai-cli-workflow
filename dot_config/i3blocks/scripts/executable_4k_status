@@ -90,9 +90,11 @@ def ipc(kind, *args):
     return json.loads(result.stdout)
 
 
-def workspace_button_width(name, measure, dpi, minimum):
+def workspace_button_width(name, measure, dpi, minimum, strip_numbers=False):
+    if strip_numbers:
+        name = re.sub(r"^\d+:?", "", name)
     padding = 2 * round(4 * dpi / 96) + round(dpi / 96)
-    return max(measure(html.escape(name)) + padding, round(minimum * dpi / 96))
+    return max(measure(name) + padding, round(minimum * dpi / 96))
 
 
 def live_layout():
@@ -120,7 +122,8 @@ def live_layout():
         output = next(o for o in ipc("get_outputs") if o["name"] == "DP-2")
         workspaces = [w for w in ipc("get_workspaces") if w["output"] == "DP-2"]
         workspace_width = sum(workspace_button_width(w["name"], measure, dpi,
-                              bar.get("workspace_min_width", 0)) for w in workspaces)
+                              bar.get("workspace_min_width", 0),
+                              bar.get("strip_workspace_numbers", False)) for w in workspaces)
         return layout_blocks(blocks, output["rect"]["width"], workspace_width, measure, dpi / 96)
 
     return adapt

@@ -78,6 +78,16 @@ class SongLayout(unittest.TestCase):
         self.assertEqual(width("11💻", lambda text: 240, 135, 144), 253)
         self.assertEqual(width("1💻", measure, 96, 0), 29)
 
+    def test_workspace_markup_and_hidden_number_match_rendered_width(self):
+        seen = []
+        def measure_markup(text):
+            seen.append(text)
+            return 100
+        name = "6:<span size='1' letter_spacing='18432'> </span>6💬"
+        width = self.module["workspace_button_width"](name, measure_markup, 135, 0, True)
+        self.assertEqual(width, 113)
+        self.assertEqual(seen, [name.split(":", 1)[1]])
+
     def test_workspace_pressure_shortens_song_before_volume(self):
         blocks = self.module["layout_blocks"](self.blocks(), 2000, 1550, measure)
         self.assertTrue(blocks[2]["full_text"].endswith("…"))

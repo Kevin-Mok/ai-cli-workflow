@@ -365,7 +365,7 @@ bindsym Control+$mod+y exec /home/example/scripts/apply-pywal-theme $($scripts_p
 
 #  ws names [[[ # 
 
-set $ws1 "1💻"
+set $ws1 "1:<span size='1' letter_spacing='18432'> </span>1<span size='1' letter_spacing='10240'> </span>💻<span size='1' letter_spacing='49152'> </span>"
 {{ if eq .chezmoi.hostname "x1-carbon" }}
 set $secondary "HDMI2"
 set $main "eDP1"
@@ -377,6 +377,7 @@ set $main "HDMI-0"
 set $secondary "DVI-D-0"
 set $main "HDMI-0"
 
+# Workspace spacers compensate for i3bar’s 6px inset at Xft.dpi=135: 15px left, 10px gap, 30px right.
 # workspace $ws1 output $main
 workspace $ws1 output $secondary
 bindsym $mod+F1 workspace $ws1; exec $term
@@ -384,7 +385,7 @@ bindsym Mod4+$mod+F1 workspace $ws1; exec chatterino
 bindsym Control+Shift+F1 workspace $ws1; exec $term -e fish -c 'tmux-attach school'
 # bindsym Control+Shift+F1 workspace $ws1; exec $term -e fish -c 'tmux-attach nft'
 
-set $ws2 "2💻"
+set $ws2 "2:<span size='1' letter_spacing='18432'> </span>2<span size='1' letter_spacing='10240'> </span>💻<span size='1' letter_spacing='49152'> </span>"
 set $work_laptop_ip "192.0.2.10"
 workspace $ws2 output $secondary
 bindsym $mod+F2 workspace $ws2; exec $term
@@ -397,7 +398,7 @@ bindsym $mod+Shift+F2 workspace $ws2; exec $term -e mosh kmok@$work_laptop_ip --
 #  ws3 [[[ # 
 
 #set $ws3 "3  "
-set $ws3 "3🌐"
+set $ws3 "3:<span size='1' letter_spacing='18432'> </span>3<span size='1' letter_spacing='10240'> </span>🌐<span size='1' letter_spacing='49152'> </span>"
  #set $ws3 "3          "
 # workspace $ws3 output $main
 # bindsym $mod+F3 workspace $ws3; exec $browser
@@ -417,7 +418,7 @@ bindsym Mod4+$mod+b layout tabbed; exec $term -e fish -c "buku-fzf fq"
 
 #  ]]] ws3 # 
 
-set $ws4 "4🧰"
+set $ws4 "4:<span size='1' letter_spacing='18432'> </span>4<span size='1' letter_spacing='10240'> </span>🧰<span size='1' letter_spacing='49152'> </span>"
 workspace $ws4 output $secondary
 # bindsym $mod+F4 workspace $ws4; exec $term
 # bindsym Control+Shift+F4 workspace $ws4; exec $term -e fish -c 'tmux-attach misc'
@@ -429,7 +430,7 @@ bindsym Mod4+g workspace $ws4; layout tabbed; exec gimp
 
 #  ws5 [[[ # 
 
-set $ws5 "5🎥"
+set $ws5 "5:<span size='1' letter_spacing='18432'> </span>5<span size='1' letter_spacing='10240'> </span>🎥<span size='1' letter_spacing='49152'> </span>"
 # workspace $ws5 output $secondary
 assign [class="Steam"] $ws5
 bindsym $mod+F5 workspace $ws5; exec $browser
@@ -459,7 +460,7 @@ for_window [class="ada-mario"] move absolute position 640 0
 
 #  ws6 [[[ # 
 
-set $ws6 "6💬"
+set $ws6 "6:<span size='1' letter_spacing='18432'> </span>6<span size='1' letter_spacing='10240'> </span>💬<span size='1' letter_spacing='49152'> </span>"
 workspace $ws6 output $secondary
 assign [class="Slack"] $ws6
 bindsym Mod4+d workspace $ws6; exec vesktop
@@ -473,7 +474,7 @@ bindsym Mod4+k workspace $ws6; exec slack
 
 #  ]]] ws6 # 
 
-set $ws7 "7📤"
+set $ws7 "7:<span size='1' letter_spacing='18432'> </span>7<span size='1' letter_spacing='10240'> </span>📤<span size='1' letter_spacing='49152'> </span>"
 workspace $ws7 output $secondary
 # bindsym $mod+F7 workspace $ws7; exec $term
 # bindsym $mod+F7 workspace $ws7; exec $term -e mosh kmok@$work_laptop_ip -- tmux a -t nzxt
@@ -483,7 +484,7 @@ bindsym $mod+Shift+F7 workspace $ws7; exec chromium https://txstreet.com/v/eth
 bindsym Mod4+a workspace $ws7; exec android-file-transfer
 # bindsym Mod4+v workspace $ws7; exec VBoxManage startvm "369-a1"
 
-set $ws8 "8📚"
+set $ws8 "8:<span size='1' letter_spacing='18432'> </span>8<span size='1' letter_spacing='10240'> </span>📚<span size='1' letter_spacing='49152'> </span>"
 # assign [class="jetbrains-"] $ws8
 workspace $ws8 output $secondary
 # bindsym $mod+F8 workspace $ws8; exec $term
@@ -492,13 +493,13 @@ bindsym $mod+F8 workspace $ws8; exec $term -e fish -c 'tmux-attach journal'
 bindsym Mod4+$mod+F8 workspace $ws8; exec libreoffice ~/Documents/sit-stand/sit-stand.ods
 bindsym $mod+Shift+F8 workspace $ws8; exec libreoffice ~/Documents/red-hat/workday.ods
 
-set $ws9 "9📝"
+set $ws9 "9:<span size='1' letter_spacing='18432'> </span>9<span size='1' letter_spacing='10240'> </span>📝<span size='1' letter_spacing='49152'> </span>"
 workspace $ws9 output $secondary
 # bindsym $mod+F9 workspace $ws9; exec $term
 # bindsym $mod+F9 workspace $ws9; exec $term -e tmux a -t config
 bindsym $mod+F9 workspace $ws9; exec $term -e fish -c 'tmux-attach config'
 
-set $ws10 "10🎵"
+set $ws10 "10:<span size='1' letter_spacing='18432'> </span>10<span size='1' letter_spacing='10240'> </span>🎵<span size='1' letter_spacing='49152'> </span>"
 # set $ws10 "10 🎵"
 assign [class="spotify"] $ws10
 workspace $ws10 output $secondary
@@ -510,7 +511,7 @@ bindsym Mod4+v workspace $ws10; exec $term -e alsamixer -c 1
 # bindsym Mod4+s workspace $ws10; exec ~/scripts/spotify-clean
 bindsym Mod4+s workspace $ws10; exec spotify
 
-set $ws11 "11🖥️"
+set $ws11 "11:<span size='1' letter_spacing='18432'> </span>11<span size='1' letter_spacing='10240'> </span>🖥️<span size='1' letter_spacing='49152'> </span>"
 # set $ws11 "11 📊"
 # assign [class="Summoners War Exporter"] $ws11
 workspace $ws11 output $secondary
@@ -523,14 +524,14 @@ bindsym Control+Shift+F11 workspace $ws11; exec $term -e fish -c 'tmux-attach ba
 # bindsym $mod+F11 workspace $ws11; exec $term -e gotop -m
 # bindsym Mod4+a workspace $ws11; exec antimicro
 
-set $ws12 "12🎮"
+set $ws12 "12:<span size='1' letter_spacing='18432'> </span>12<span size='1' letter_spacing='10240'> </span>🎮<span size='1' letter_spacing='49152'> </span>"
 bindsym $mod+F12 workspace $ws12; exec $term
 
-set $ws13 "13💻"
+set $ws13 "13:<span size='1' letter_spacing='18432'> </span>13<span size='1' letter_spacing='10240'> </span>💻<span size='1' letter_spacing='49152'> </span>"
 bindsym Mod4+F3 workspace $ws13; exec $term
 
-set $ws14 "14"
-set $ws15 "15"
+set $ws14 "14:<span size='1' letter_spacing='18432'> </span>14<span size='1' letter_spacing='49152'> </span>"
+set $ws15 "15:<span size='1' letter_spacing='18432'> </span>15<span size='1' letter_spacing='49152'> </span>"
 
 #  ]]] ws names # 
 
@@ -622,7 +623,8 @@ set $focused_ws_text #ffffff
 set $bar_trans 00
 set $main_ws_trans aa
 bar {
-  workspace_min_width 204
+  workspace_min_width 0
+  strip_workspace_numbers yes
   i3bar_command i3bar -t 
   {{ if eq .chezmoi.hostname "x1-carbon" }}
   font pango:$sb_font 17
@@ -644,7 +646,7 @@ bar {
   }
   tray_output none
   # status_command i3blocks -c ~/.config/i3blocks/i3blocks.conf
-  status_command /usr/bin/python3 -u ~/.config/i3blocks/scripts/4k_status ~/.config/i3blocks/i3blocks.conf
+  status_command exec /usr/bin/python3 -u ~/.config/i3blocks/scripts/4k_status ~/.config/i3blocks/i3blocks.conf
   output $main
   # output $secondary
   wheel_up_cmd nop
@@ -656,7 +658,8 @@ bar {
 #  secondary bar [[[ # 
 
 bar {
-  workspace_min_width 155
+  workspace_min_width 0
+  strip_workspace_numbers yes
   # output $main
   output $secondary
   {{ if eq .chezmoi.hostname "x1-carbon" }}
@@ -676,7 +679,7 @@ bar {
     active_workspace $inactive_ws_bg $ui_active_bg $ui_active_text
     inactive_workspace $inactive_ws_bg $ui_inactive_bg $ui_inactive_text
   }
-  status_command /usr/bin/python3 -u ~/.config/i3blocks/scripts/4k_status ~/.config/i3blocks/i3blocks-secondary.conf
+  status_command exec /usr/bin/python3 -u ~/.config/i3blocks/scripts/4k_status ~/.config/i3blocks/i3blocks-secondary.conf
   # status_command 2>/tmp/i3blocks-sam.err i3blocks -vvv -c ~/.config/i3blocks/sam-i3blocks.conf | tee /tmp/i3blocks-sam.out
   tray_output none
   wheel_up_cmd nop
@@ -688,7 +691,8 @@ bar {
 #  4k middle bar [[[ #
 
 bar {
-  workspace_min_width 204
+  workspace_min_width 0
+  strip_workspace_numbers yes
   output DP-2
   font pango:$sb_font 50
   i3bar_command i3bar -t
@@ -698,7 +702,7 @@ bar {
     active_workspace $inactive_ws_bg $ui_active_bg $ui_active_text
     inactive_workspace $inactive_ws_bg $ui_inactive_bg $ui_inactive_text
   }
-  status_command /usr/bin/python3 -u ~/.config/i3blocks/scripts/4k_status
+  status_command exec /usr/bin/python3 -u ~/.config/i3blocks/scripts/4k_status
   tray_output none
   wheel_up_cmd nop
   wheel_down_cmd nop
