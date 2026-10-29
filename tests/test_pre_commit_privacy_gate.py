@@ -703,6 +703,68 @@ exec python3 "$hookdir/privacy-gate.d/executable_privacy-gate" pre-push --hook-a
         refused = self.commit(expected=1)
         self.no_leak(refused, str(self.repo), "Traceback")
 
+    def installed_check(self):
+        return self.invoke([sys.executable, str(self.installed_bundle() / "executable_privacy-gate"), "--repo", str(self.repo), "check"])
+
+    def approve_installed_blob(self, name, categories):
+        manifest = self.installed_bundle() / "privacy_gate_approvals.json"
+        payload = json.loads(manifest.read_bytes())
+        payload["entries"].append({
+            "path_ref": hashlib.sha256(os.fsencode(name)).hexdigest()[:12],
+            "content_sha256": hashlib.sha256((self.repo / name).read_bytes()).hexdigest(),
+            "categories": categories,
+            "reason": "Reviewed synthetic public portfolio fixture.",
+        })
+        manifest.write_text(json.dumps(payload))
+
+    def test_reviewed_portfolio_contact_and_ip_require_exact_blob(self):
+        address = "portfolio" + "@public-fixture.test"
+        public_ip = "203." + "1.2.3"
+        name = "profile.txt"
+        target = self.stage(name, "Contact: " + address + "\nHost: " + public_ip + "\n")
+        self.install()
+        self.approve_installed_blob(name, ["email", "ip_address"])
+        self.assertEqual(self.installed_check().returncode, 0, "exact reviewed public contact/IP content must pass")
+        self.commit()
+        target.write_text(target.read_text() + "Updated public profile.\n")
+        self.git("add", "--", name)
+        self.assertEqual(self.installed_check().returncode, 1, "changed public bytes must require a fresh review")
+        self.blocked(address, public_ip)
+
+    def test_reviewed_portfolio_contact_cannot_override_private_literal(self):
+        address = "portfolio" + "@public-fixture.test"
+        name = "profile.txt"
+        self.stage(name, "Contact: " + address + "\n")
+        self.install()
+        self.approve_installed_blob(name, ["email"])
+        rules = self.base / "private-rules.json"
+        rules.write_text(json.dumps({"forbidden_literals": [{"label": "LOCAL_CONTACT", "category": "email", "value": address}], "forbidden_path_globs": []}))
+        rules.chmod(0o600)
+        self.git("config", "privacyGate.rules", str(rules))
+        self.assertEqual(self.installed_check().returncode, 1, "explicit private literal must override reviewed contact approval")
+        self.blocked(address, name)
+
+    def test_reviewed_portfolio_categories_do_not_approve_secrets(self):
+        address = "portfolio" + "@public-fixture.test"
+        public_ip = "203." + "1.2.3"
+        name = "profile.txt"
+        self.install()
+        for secret in ("ghp_" + "aB7C9dE2" * 5, "api_key=" + "sensitive-" + "aB7C9dE2" * 5, "-----BEGIN " + "PRIVATE KEY-----"):
+            with self.subTest(kind=secret.split("_")[0][:3]):
+                self.stage(name, "Contact: " + address + "\nHost: " + public_ip + "\n" + secret + "\n")
+                self.approve_installed_blob(name, ["email", "ip_address"])
+                self.assertEqual(self.installed_check().returncode, 1, "public categories must not approve secrets")
+                self.blocked(address, public_ip, secret)
+
+    def test_reviewed_portfolio_contact_does_not_approve_private_path(self):
+        address = "portfolio" + "@public-fixture.test"
+        name = ".env"
+        self.stage(name, "Contact: " + address + "\n")
+        self.install()
+        self.approve_installed_blob(name, ["email"])
+        self.assertEqual(self.installed_check().returncode, 1, "public contact approval must not approve private paths")
+        self.blocked(address, name)
+
     def test_malformed_installed_approval_snapshot_fails_closed(self):
         self.install()
         bundle = self.installed_bundle()
@@ -710,7 +772,7 @@ exec python3 "$hookdir/privacy-gate.d/executable_privacy-gate" pre-push --hook-a
         self.assertTrue(manifest.is_file(), "installed scanner must include reviewed manifest")
         secret = "ghp_" + "aB7C9dE2" * 5
         self.stage("safe.txt", "public example\n")
-        for content in ("invalid-json:" + secret, json.dumps({"schema_version": 1, "entries": [{"path_ref": secret, "content_sha256": "a" * 64, "categories": ["credential"], "reason": "invalid path reference"}]}), json.dumps({"schema_version": 1, "entries": [{"path_ref": "a" * 12, "content_sha256": "b" * 64, "categories": ["email"], "reason": "unapproved category"}]})):
+        for content in ("invalid-json:" + secret, json.dumps({"schema_version": 1, "entries": [{"path_ref": secret, "content_sha256": "a" * 64, "categories": ["credential"], "reason": "invalid path reference"}]}), json.dumps({"schema_version": 1, "entries": [{"path_ref": "a" * 12, "content_sha256": "b" * 64, "categories": ["private_key"], "reason": "unapproved category"}]})):
             manifest.write_text(content)
             result = self.invoke([sys.executable, str(bundle / "executable_privacy-gate"), "--repo", str(self.repo), "check", "--details"])
             self.assertEqual(result.returncode, 2, "malformed reviewed manifest must fail closed")

@@ -639,6 +639,10 @@ reasons. Each approval applies to those exact bytes at that exact path; edits
 require review if the content still triggers another blocked category. Ordinary
 recovery filenames need no approval; their contents remain fully scanned. Explicit
 private forbidden literals/path globs always override public defaults and approvals.
+Reviewed public portfolio contact details and incidental SVG/media email or IP
+patterns can use the same exact-path/content-hash approval mechanism. This does
+not approve credentials, provider tokens, private keys or explicit private policy.
+
 There is no test-directory content exemption. The installer snapshots this manifest;
 missing or malformed policy blocks inspection. After a scanner/policy update,
 repeat `install` before relying on the installed hook.

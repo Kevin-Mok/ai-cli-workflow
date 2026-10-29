@@ -101,7 +101,7 @@ def load_approvals():
             or not isinstance(entry["content_sha256"], str) or not re.fullmatch(r"[0-9a-f]{64}", entry["content_sha256"])
             or not isinstance(entry["reason"], str) or not entry["reason"].strip()
             or not isinstance(entry["categories"], list) or not entry["categories"]
-            or any(category not in {"credential", "provider_token", "sensitive_path"} for category in entry["categories"])):
+            or any(category not in {"credential", "provider_token", "sensitive_path", "email", "ip_address"} for category in entry["categories"])):
             raise GateError("Invalid reviewed-content policy entry")
         key = (entry["path_ref"], entry["content_sha256"])
         if key in approvals:
