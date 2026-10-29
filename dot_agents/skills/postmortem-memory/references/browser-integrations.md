@@ -119,3 +119,29 @@ Use these reviewed incidents to distinguish application state defects from provi
 - Verification: Four defining manager cases and two browser behaviors observed RED, then 146 unit tests, build/typecheck and both focused quality browser tests passed. Independent runtime assertions cover same available/fallback IDs, unchanged overrides and native choices. Real coachboop SDK recovered from a deliberately dropped first setter and the native menu showed360p. Commit-scoped HEAD plus only quality changes independently passed 140 unit tests, build/typecheck and both quality browser cases.
 - Limitations: The actual original desktop stored overrides were inaccessible. Native changes before acknowledgement cannot be distinguished from ignored setters; retries are bounded. After three unacknowledged attempts an explicit default change or reload retries. Sustained smoothness/audio not verified. Latest full browser suite had29 passes and2 failures in concurrent bitrate text/video geometry; task quality cases passed.
 - Source: [default quality report](/home/kevin/coding/twitch-grid/docs/postmortem/2026-10-22-default-quality.md); reviewed hash retained in sources.json.
+
+## local-weather-cacheable-issuance-redirects
+
+- **Status:** verified_workaround
+- **Symptoms:** Both agent-browser and direct Playwright hit ERR_TOO_MANY_REDIRECTS on the same TWN hourly page.
+- **Applicability:** System Chrome156 fresh-profile TWN issuance redirects with accepted cookies and cacheable302 responses.
+- **Diagnostics:** Attach CDP before navigation; distinguish main-frame cached redirects from rejected cookies; confirm active target and sandbox.
+- **Confidence:** supported
+- **Remedy:** Disable HTTP cache on the active sandboxed Chrome target before navigating the unchanged exact URL; retain agent-browser when both repaired controllers pass.
+- **Verification:** Default native20requests included17cached redirects. Three cache-disabled paired runs/controller passed complete72record structured/DOM agreement; local302fixture fails before and passes after preparation. User-requested repaired publishing service18:25EDT succeeded;72Blob and12deployed API rows match, visible dashboard shows freshTWN.49tests plus separate browser fixture pass; reliability acceptance remains unmet. Automatic18:30calendar publication also succeeded; latest fetchedAt22:30:11Z reached Vercel. Trial3attempts/2successes/1failure remains unaccepted.
+- **Verification scope:** runtime
+- **Limitations:** Client workaround, not an upstream fix. Different load waits confound timing comparisons. Production restored at operator request with validated Blob/API/browser agreement; separate scheduled trial still has unresolved extraction failure and is not accepted.
+- **Sources:** [2026-10-29-browser-comparison.md](/home/kevin/coding/scrape-weather/.worktrees/playwright-diagnostics/docs/postmortem/2026-10-29-browser-comparison.md)
+
+## local-weather-intermittent-extraction
+
+- **Status:** unresolved
+- **Symptoms:** First systemd trial navigates successfully but fails during weather extraction; next calendar attempt succeeds.
+- **Applicability:** Fail-closed weather extraction trials after cached-navigation repair.
+- **Diagnostics:** Preserve every failed cohort/attempt and its immutable sanitized postmortem. Record evaluation/retrieval/validation stage, checked/generated/allowed-first/actual-first-last UTC, advertised/hydration/rendered counts and first differing row/allowlisted field before further retries.
+- **Confidence:** hypothesis
+- **Remedy:** No verified extraction remedy. Continue bounded nonpublishing measurements; compare alternatives only against specific observed failure evidence.
+- **Verification:** Original attempt1 failed after19.036seconds following302/302/200; original body/error missing. Attempt2 passed72records in29.335seconds. A resumed synthetic early-window fixture rejects before the hour and passes after; this does not confirm the original cause.47tests and separate localbrowser fixture pass; independent resumed live diagnostic passed72records20.605seconds with safe coverage evidence, not a cohort run.
+- **Verification scope:** runtime
+- **Limitations:** A subsequent success does not establish reliability or identify the first failure. First error cannot be reconstructed from new instrumentation.48/48 and live DST observation remain unmet.
+- **Sources:** [2026-10-29-trial-attempt-01.md](/home/kevin/coding/scrape-weather/.worktrees/playwright-diagnostics/docs/postmortem/2026-10-29-trial-attempt-01.md)

@@ -197,3 +197,12 @@ This document records delivery milestones and verification for completed reposit
 - Milestone: shortcut committed as 5331db7; automatic review blocked the initial push before execution.
 - Verification: GitHub confirms the configured Kevin-Mok/ai-cli-workflow destination is public and the authenticated viewer has ADMIN permission. Restricted network and guessed executable-path diagnostics were resolved by approved read-only access and executable discovery.
 - Delivery: record the incident in a follow-up commit, then retry the scoped series push to origin/main. Unrelated dirty files remain excluded; playback remains untested.
+
+## Weather scraping recovery — docs: record weather scraping recovery
+
+- Complete: reviewed cacheable issuance-redirect workaround and preserved unresolved extraction evidence; restored live publication remains separate from failed48/48 reliability acceptance.
+- Scope: direct-write fallback for session01a189a0-c670-74f3-b8b8-aed63509182a because the helper cannot recognize nested tool writes. Only two weather finding sections and three reviewed report records enter the candidate; unrelated dirty memory sources and reference sections remain excluded.
+- Verification: targeted canonical report checks pass; companion scraper49tests plus local browser fixture pass, and automatic18:30publication reached the deployed API. README gate pass_no_change for this knowledge-only scope; exact isolated candidate privacy check required before commit.
+- Delivery: one focused documentation commit on main, then push to origin/main. Scraper implementation/plans/tests ship separately on feat/playwright-diagnostics in scrape-weather-network.
+- Remaining: unrelated dirty work and all private runtime artifacts stay outside commits; original extraction cause and24-hour/DST reliability remain unverified.
+- Rollback: remove only these two scoped findings/reports, preserving all other reviewed knowledge.

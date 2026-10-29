@@ -59,8 +59,8 @@
       "confidence": "confirmed",
       "diagnostics": [
         "Inspect exact reset seconds, accepted percentage chronology and stale counts before changing denominator scope.",
-        "Compare reset 0, jitter ±6/±8/±10 and returns to the original anchor; assert one cohort and conserved matched work.",
-        "Test ±11 beyond the original anchor after an intermediate ±5 reading; retain real reset retirement and gap exclusions."
+        "Compare reset 0, jitter \u00b16/\u00b18/\u00b110 and returns to the original anchor; assert one cohort and conserved matched work.",
+        "Test \u00b111 beyond the original anchor after an intermediate \u00b15 reading; retain real reset retirement and gap exclusions."
       ],
       "id": "local-quota-reset-jitter-anchor",
       "limitations": "A real reset within ten seconds is indistinguishable from timestamp drift. Fixed-anchor jitter beyond ten seconds still splits cohorts. Missing readings remain excluded; low-confidence shared quota rates do not identify individual model costs. Live work durations grow.",
@@ -518,7 +518,7 @@
       "symptoms": [
         "intermittent Gitea 502",
         "root route quick but profile hangs",
-        "healthz intermittently 20–50 seconds",
+        "healthz intermittently 20\u201350 seconds",
         "single thread near full CPU"
       ],
       "topic": "operational-drift",
@@ -3534,7 +3534,7 @@
       "symptoms": [
         "Float sums change when a counted interval is partitioned by model."
       ],
-      "verification": "Fractional RED→GREEN regressions, native record-byte invariance, full 86-test suite and strict typing passed.",
+      "verification": "Fractional RED\u2192GREEN regressions, native record-byte invariance, full 86-test suite and strict typing passed.",
       "verification_scope": "code"
     },
     {
@@ -3574,7 +3574,7 @@
       "symptoms": [
         "uv tool install --force reinstalls a cached local wheel after source-only edits under the same package version."
       ],
-      "verification": "Isolated real-uv repeated setup test RED→GREEN; real setup rebuilt package, models help and v2 schema passed, 14 installed source modules matched.",
+      "verification": "Isolated real-uv repeated setup test RED\u2192GREEN; real setup rebuilt package, models help and v2 schema passed, 14 installed source modules matched.",
       "verification_scope": "runtime"
     },
     {
@@ -5440,7 +5440,7 @@
       "id": "local-discord-direction-isolates",
       "limitations": "Subjective listening and a new real incoming notification remain unobserved. Same-format apps can match; broader suite has unrelated socket and path-fixture failures.",
       "reference": "references/operational-drift.md#local-discord-direction-isolates",
-      "remedy": "Remove U+2066–U+2069 before visible-text parsing; keep full suffix validation before speaking sender says message.",
+      "remedy": "Remove U+2066\u2013U+2069 before visible-text parsing; keep full suffix validation before speaking sender says message.",
       "sources": [
         "3e1a73524f1921786d4dffd880d015e08a40f968a71404a1e265a75ead89fab3"
       ],
@@ -5801,7 +5801,7 @@
       ],
       "status": "unresolved",
       "symptoms": [
-        "Four streams look close to 15 FPS despite Twitch playback counters around 42–64; one stream is smooth."
+        "Four streams look close to 15 FPS despite Twitch playback counters around 42\u201364; one stream is smooth."
       ],
       "verification": "Defining diagnostic tests observed RED, then 136 unit tests/typecheck/build and the bitrate browser case passed. Live supported rates 3.11 and 3.14 Mbps summed to 6.25 for two advancing videos; pause cleared reporting. Source review confirmed no quality-policy writes.",
       "verification_scope": "runtime"
@@ -6055,6 +6055,46 @@
         "Renaming workspaces after reload can reapply output assignments; strict tree comparisons also count restarted i3bar dock windows."
       ],
       "verification": "27 real isolated select/move combinations passed; all32original application windows retained numbered workspaces. Output restoration preserved visible/focused workspaces. Final padding activation preserved workspace IDs/output/visibility/focus;16layout and1scheduler tests passed, live checkers passed.",
+      "verification_scope": "runtime"
+    },
+    {
+      "applicability": "System Chrome156 fresh-profile TWN issuance redirects with accepted cookies and cacheable302 responses.",
+      "confidence": "supported",
+      "diagnostics": [
+        "Attach CDP before navigation; distinguish main-frame cached redirects from rejected cookies; confirm active target and sandbox."
+      ],
+      "id": "local-weather-cacheable-issuance-redirects",
+      "limitations": "Client workaround, not an upstream fix. Different load waits confound timing comparisons. Production restored at operator request with validated Blob/API/browser agreement; separate scheduled trial still has unresolved extraction failure and is not accepted.",
+      "reference": "references/browser-integrations.md#local-weather-cacheable-issuance-redirects",
+      "remedy": "Disable HTTP cache on the active sandboxed Chrome target before navigating the unchanged exact URL; retain agent-browser when both repaired controllers pass.",
+      "sources": [
+        "19a93d02958e8edc66c8d3cd5b20af63ce845c9f33ce1cbda1e8af2010174bb9"
+      ],
+      "status": "verified_workaround",
+      "symptoms": [
+        "Both agent-browser and direct Playwright hit ERR_TOO_MANY_REDIRECTS on the same TWN hourly page."
+      ],
+      "verification": "Default native20requests included17cached redirects. Three cache-disabled paired runs/controller passed complete72record structured/DOM agreement; local302fixture fails before and passes after preparation. User-requested repaired publishing service18:25EDT succeeded;72Blob and12deployed API rows match, visible dashboard shows freshTWN.49tests plus separate browser fixture pass; reliability acceptance remains unmet. Automatic18:30calendar publication also succeeded; latest fetchedAt22:30:11Z reached Vercel. Trial3attempts/2successes/1failure remains unaccepted.",
+      "verification_scope": "runtime"
+    },
+    {
+      "applicability": "Fail-closed weather extraction trials after cached-navigation repair.",
+      "confidence": "hypothesis",
+      "diagnostics": [
+        "Preserve every failed cohort/attempt and its immutable sanitized postmortem. Record evaluation/retrieval/validation stage, checked/generated/allowed-first/actual-first-last UTC, advertised/hydration/rendered counts and first differing row/allowlisted field before further retries."
+      ],
+      "id": "local-weather-intermittent-extraction",
+      "limitations": "A subsequent success does not establish reliability or identify the first failure. First error cannot be reconstructed from new instrumentation.48/48 and live DST observation remain unmet.",
+      "reference": "references/browser-integrations.md#local-weather-intermittent-extraction",
+      "remedy": "No verified extraction remedy. Continue bounded nonpublishing measurements; compare alternatives only against specific observed failure evidence.",
+      "sources": [
+        "2f3fee78175c3be3d8c76b1c06eaff490890384e9fbd34ae2a06d7c781ea690d"
+      ],
+      "status": "unresolved",
+      "symptoms": [
+        "First systemd trial navigates successfully but fails during weather extraction; next calendar attempt succeeds."
+      ],
+      "verification": "Original attempt1 failed after19.036seconds following302/302/200; original body/error missing. Attempt2 passed72records in29.335seconds. A resumed synthetic early-window fixture rejects before the hour and passes after; this does not confirm the original cause.47tests and separate localbrowser fixture pass; independent resumed live diagnostic passed72records20.605seconds with safe coverage evidence, not a cohort run.",
       "verification_scope": "runtime"
     }
   ],
@@ -11412,6 +11452,35 @@
       ],
       "reviewed_on": "2026-10-29",
       "sha256": "75cb97af836d9141c33908830fbca2b83f380be56be2ce21467ece0c7926f6da"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/scrape-weather/.worktrees/playwright-diagnostics/docs/postmortem/2026-10-29-browser-comparison.md"
+      ],
+      "findings": [
+        "local-weather-cacheable-issuance-redirects"
+      ],
+      "reviewed_on": "2026-10-29",
+      "sha256": "19a93d02958e8edc66c8d3cd5b20af63ce845c9f33ce1cbda1e8af2010174bb9"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/scrape-weather/.worktrees/playwright-diagnostics/docs/postmortem/2026-10-29-trial-attempt-01.md"
+      ],
+      "findings": [
+        "local-weather-intermittent-extraction"
+      ],
+      "reviewed_on": "2026-10-29",
+      "sha256": "2f3fee78175c3be3d8c76b1c06eaff490890384e9fbd34ae2a06d7c781ea690d"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/scrape-weather/.worktrees/playwright-diagnostics/data/trial/postmortem-01.md"
+      ],
+      "decision": "Same first scheduled extraction failure as the separately reviewed report; sanitized automatic summary adds no original error detail or verified remedy.",
+      "findings": [],
+      "reviewed_on": "2026-10-29",
+      "sha256": "3ad59a679a3ca447ee6953617b0b3a99524d157166ce8e1180bb81d55f52de89"
     }
   ],
   "review": {
