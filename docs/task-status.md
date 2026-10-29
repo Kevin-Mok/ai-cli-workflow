@@ -167,3 +167,11 @@ This document records delivery milestones and verification for completed reposit
 - Delivery: one focused commit on main, followed by push to origin/main. No remaining shortcut implementation work.
 - Remaining: unrestricted refresh-config stopped at existing .config/mimeapps.list drift; targeted shortcut regeneration succeeded. Interactive keystroke expansion remains manual.
 - Rollback: remove only cnc from the template and live catalog, then regenerate shortcuts.
+
+## Discord pronunciation — fix(notifications): pronounce Discord name as bitcoin
+
+- Complete: Discord speech replaces the exact text `ビットコイン・スタッカー` with `bitcoin` in sender names and message bodies, including sender-only link announcements. Popup text stays unchanged.
+- Scope: direct-write fallback for session 01a188c2-0c65-7fc0-9a92-25cfa01ce41b; the scope helper detected no writes through the orchestration tool. Include only the helper, defining test, notification guide, Discord README row, pronunciation smoke check and this milestone. Preserve every baseline-dirty hunk unrelated to this change.
+- Verification: defining test failed before implementation; focused suite passed 91 tests and basedpyright reported 0 errors/warnings/notes. Scoped refresh-config exited 0; installed helper matched source and produced the expected channel, DM/link and body phrases. README gate returned pass_no_change. Fresh pre-commit checks passed: 91 focused tests, zero type-check diagnostics, README pass_no_change. Scoped staging required elevated Git metadata writes and then succeeded; the incident and its no-new-learning ledger entry ship with this task. Exact staged privacy/whitespace review is required before committing.
+- Delivery: one focused commit on main, then push origin/main. Implementation and deployment complete; no blockers. Subjective listening and real incoming-message acceptance remain manual.
+- Rollback: remove the exact pronunciation replacement and apply the helper; existing Discord speech activation and volume persist unchanged.

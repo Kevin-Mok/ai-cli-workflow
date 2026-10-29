@@ -109,6 +109,14 @@ class PlaybackTests(unittest.TestCase):
             with self.subTest(title=title):
                 self.assertEqual(self.helper.discord_message(title, body), expected)
 
+    def test_discord_bitcoin_name_is_spoken_in_english(self):
+        name = 'ビットコイン・スタッカー'
+        for title in (name, f'\u2068{name}\u2069 (\u2068#work\u2069, \u2068Server\u2069)'):
+            with self.subTest(title=title):
+                self.assertEqual(self.helper.discord_message(title, 'hello', 'vesktop'), 'bitcoin says hello')
+                self.assertEqual(self.helper.discord_message(title, 'https://example.org', 'vesktop'), 'bitcoin sends link')
+        self.assertEqual(self.helper.discord_message('Alex (#work, Server)', f'Hello {name}'), 'Alex says Hello bitcoin')
+
     def test_discord_direction_isolates_do_not_turn_channels_into_dms(self):
         title = '\u2068Alex\u2069 (\u2068#「💼」work\u2069, \u2068Server\u2069)'
         for app in ('vesktop', 'Google Chrome', 'FormatProbe'):

@@ -11249,6 +11249,15 @@
       "findings": [],
       "reviewed_on": "2026-10-29",
       "sha256": "c840b15dc7a2820550a89320545a370d2887808876ffc27e3490361aed9354d7"
+    },
+    {
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-10-29-discord-commit-git-permissions.md"
+      ],
+      "decision": "No new reusable learning: the declared read-only Git metadata boundary requires the existing approved escalation mechanism. Identical scoped staging exited 0 with elevated permission; commit and push are separate verification.",
+      "findings": [],
+      "reviewed_on": "2026-10-29",
+      "sha256": "043923ba434fbdb1da3f9196a6ec0d8b2ccfffc182c122aa01b3cb0b529da919"
     }
   ],
   "review": {

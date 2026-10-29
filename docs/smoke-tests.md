@@ -1601,6 +1601,8 @@ and enable `discord-speech`. No sudo. The probes are synthetic and play local au
   Expected: Normal popup `(A) Alex (#normie, Active)` / `hai`; Ryan says `(A) Alex says hai` with no intro clip.
 - Action: Run `~/scripts/codex-notification-sound smoke discord-unicode`.
   Expected: Normal Unicode-channel popup; Ryan says `Alex says hello`, without channel/server text.
+- Action: Run `notify-send --app-name=vesktop 'ビットコイン・スタッカー (#work, Server)' 'hello'`, then repeat with body `https://example.org`.
+  Expected: Popup retains the Japanese sender name; Ryan says `bitcoin says hello` and `bitcoin sends link`, respectively.
 - Action: Run `~/scripts/codex-notification-sound smoke discord-dm`.
   Expected: Synthetic Vesktop popup `Alex` / `hello from a direct message`; Ryan says `Alex says hello from a direct message` with one WAV and no intro clip.
 - Action: Run `~/scripts/codex-notification-sound smoke discord-isolates`.

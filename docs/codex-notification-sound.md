@@ -240,6 +240,8 @@ path; subjective listening and a real incoming Discord message are separate chec
 Matching requires the complete title `SENDER (#CHANNEL, SERVER)` plus a nonblank
 body. Sender parentheses, Unicode and emoji are preserved; actual notification
 markup is removed and whitespace normalized. Escaped literal markup remains text.
+The exact text `ビットコイン・スタッカー` is spoken as `bitcoin` in sender names
+and message bodies; popup text is unchanged.
 Discord's invisible Unicode direction isolates (U+2066–U+2069) are removed before
 matching, so channel/server metadata stays out of speech. The `smoke discord-isolates`
 probe uses Vesktop identity and reproduces this client format; it should speak `Alex says hello` exactly once.
