@@ -206,3 +206,12 @@ This document records delivery milestones and verification for completed reposit
 - Delivery: one focused documentation commit on main, then push to origin/main. Scraper implementation/plans/tests ship separately on feat/playwright-diagnostics in scrape-weather-network.
 - Remaining: unrelated dirty work and all private runtime artifacts stay outside commits; original extraction cause and24-hour/DST reliability remain unverified.
 - Rollback: remove only these two scoped findings/reports, preserving all other reviewed knowledge.
+
+## Workspace padding — fix(i3): increase workspace button padding
+
+- Complete: minimum button widths increased from 144/95/144 to 204/155/204 logical pixels; the live excluded config received only these substitutions.
+- Scope: session 01a189d6-659e-71b1-8f30-e97365a5f8ee direct-write fallback; unrelated baseline hunks remain excluded.
+- Verified: refresh completed, config validation exited 0 with existing wheel-binding deprecations, one reload succeeded, and live IPC returned 204/155/204. Workspace smoke check and 17 status-layout tests passed; README gate pass_no_change. Exact candidate privacy gate runs before commit.
+- Delivery: one focused commit on main, then push origin/main. No implementation work remains.
+- Limits: physical pixel spacing and clicks not inspected; widths are minimums scaled by DPI.
+- Rollback: restore minimum widths to 144/95/144 in source and live config, validate and reload once.

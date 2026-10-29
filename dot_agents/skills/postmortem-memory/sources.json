@@ -11481,6 +11481,15 @@
       "findings": [],
       "reviewed_on": "2026-10-29",
       "sha256": "3ad59a679a3ca447ee6953617b0b3a99524d157166ce8e1180bb81d55f52de89"
+    },
+    {
+      "sha256": "3c57a0e80ebfcc5e7c49ddbf870bb38d0abe316729213c836931c6bd762eb0d8",
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-10-29-workspace-padding-activation.md"
+      ],
+      "reviewed_on": "2026-10-29",
+      "findings": [],
+      "decision": "No new learning: existing scoped sandbox permission and path-discovery guidance covers this activation; live IPC verifies widths, not visual pixels."
     }
   ],
   "review": {
