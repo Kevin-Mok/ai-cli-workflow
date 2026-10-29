@@ -130,30 +130,30 @@ class NowPlayingTest(unittest.TestCase):
                 if len(args) > 6 and args[6] == "org.mpris.MediaPlayer2.Player"]
 
     def test_playing_chrome_wins_over_spotify(self):
-        self.assertEqual(self.run_block(), ["<span size=\"x-small\" rise=\"8192\">▶️</span>Logic - Soul Food", "<span size=\"x-small\" rise=\"8192\">▶️</span>Logic - Soul Food", "#112233"])
+        self.assertEqual(self.run_block(), ["<span size=\"x-small\" rise=\"8192\">▶️</span>Soul Food - Logic", "<span size=\"x-small\" rise=\"8192\">▶️</span>Soul Food - Logic", "#112233"])
 
     def test_spotify_short_text_includes_artist(self):
         self.data["names"] = {SPOTIFY: ":1.649"}
-        self.assertEqual(self.run_block(), ["<span size=\"x-small\" rise=\"8192\">▶️</span>Drake - Janice STFU",
-                                            "<span size=\"x-small\" rise=\"8192\">▶️</span>Drake - Janice STFU", "#112233"])
+        self.assertEqual(self.run_block(), ["<span size=\"x-small\" rise=\"8192\">▶️</span>Janice STFU - Drake",
+                                            "<span size=\"x-small\" rise=\"8192\">▶️</span>Janice STFU - Drake", "#112233"])
 
     def test_playing_state_adds_compact_triangle_to_both_labels(self):
         self.data["names"] = {SPOTIFY: ":1.649"}
-        playing = '<span size="x-small" rise="8192">▶️</span>Drake - Janice STFU'
+        playing = '<span size="x-small" rise="8192">▶️</span>Janice STFU - Drake'
         self.assertEqual(self.run_block(), [playing, playing, "#112233"])
 
     def test_paused_state_adds_pause_mark_to_both_labels(self):
         self.data["names"] = {SPOTIFY: ":1.649"}
         self.data["players"][":1.649"] = player("Janice STFU", "Drake", "Paused")
         self.assertEqual(self.run_block(), [
-            '<span size="x-small" rise="8192">⏸️</span>Drake - Janice STFU',
-            '<span size="x-small" rise="8192">⏸️</span>Drake - Janice STFU',
+            '<span size="x-small" rise="8192">⏸️</span>Janice STFU - Drake',
+            '<span size="x-small" rise="8192">⏸️</span>Janice STFU - Drake',
             "#112233",
         ])
 
     def test_browser_accepts_separate_artist_metadata_without_title_separator(self):
         self.data["players"][":1.50"] = player("I'm Gone", "Logic")
-        self.assertEqual(self.run_block()[0], "<span size=\"x-small\" rise=\"8192\">▶️</span>Logic - I'm Gone")
+        self.assertEqual(self.run_block()[0], "<span size=\"x-small\" rise=\"8192\">▶️</span>I'm Gone - Logic")
 
     def test_browser_accepts_lenient_artist_title_separators(self):
         for title in ("Logic - I'm Gone", "Logic–I'm Gone", "Logic — I'm Gone",
@@ -189,7 +189,7 @@ class NowPlayingTest(unittest.TestCase):
                               ("Artist - Song", "Channel")):
             with self.subTest(title=title):
                 self.data["players"][":1.50"] = player(title, artist)
-                self.assertEqual(self.run_block()[0], "<span size=\"x-small\" rise=\"8192\">▶️</span>Drake - Janice STFU")
+                self.assertEqual(self.run_block()[0], "<span size=\"x-small\" rise=\"8192\">▶️</span>Janice STFU - Drake")
 
     def test_dedicated_browser_accepts_title_only_songs(self):
         self.data["players"][":1.50"] = player("Solo", "")
@@ -197,11 +197,11 @@ class NowPlayingTest(unittest.TestCase):
 
     def test_flavibot_page_title_falls_back_to_spotify(self):
         self.data["players"][":1.50"] = player("FlaviBot - Music Player", "")
-        self.assertEqual(self.run_block()[0], "<span size=\"x-small\" rise=\"8192\">▶️</span>Drake - Janice STFU")
+        self.assertEqual(self.run_block()[0], "<span size=\"x-small\" rise=\"8192\">▶️</span>Janice STFU - Drake")
 
     def test_flavibot_page_metadata_falls_back_to_spotify(self):
         self.data["players"][":1.50"] = player("Music Player", "FlaviBot")
-        self.assertEqual(self.run_block()[0], "<span size=\"x-small\" rise=\"8192\">▶️</span>Drake - Janice STFU")
+        self.assertEqual(self.run_block()[0], "<span size=\"x-small\" rise=\"8192\">▶️</span>Janice STFU - Drake")
 
     def test_flavibot_page_title_without_spotify_clears_block(self):
         self.data["names"] = {CHROME: ":1.50"}
@@ -222,7 +222,7 @@ class NowPlayingTest(unittest.TestCase):
         self.data["players"][":1.50"] = player("Video", "Channel")
         self.data["names"][CHROME + "2"] = ":1.51"
         self.data["players"][":1.51"] = player("I'm Gone", "Logic")
-        self.assertEqual(self.run_block()[0], "<span size=\"x-small\" rise=\"8192\">▶️</span>Logic - I'm Gone")
+        self.assertEqual(self.run_block()[0], "<span size=\"x-small\" rise=\"8192\">▶️</span>I'm Gone - Logic")
 
     def test_playing_youtube_cannot_replace_paused_flavibot(self):
         self.data["pids"] = {":1.50": os.getpid()}
@@ -230,38 +230,38 @@ class NowPlayingTest(unittest.TestCase):
         self.data["names"][CHROME + "2"] = ":1.51"
         self.data["players"][":1.51"] = player("Under Pressure", "Logic", "Paused")
         self.data["players"][":1.649"]["PlaybackStatus"] = variant("s", "Paused")
-        self.assertEqual(self.run_block()[0], '<span size="x-small" rise="8192">⏸️</span>Logic - Under Pressure')
+        self.assertEqual(self.run_block()[0], '<span size="x-small" rise="8192">⏸️</span>Under Pressure - Logic')
 
     def test_missing_process_fails_closed_to_spotify(self):
         self.data["pids"] = {":1.50": 999999999}
-        self.assertEqual(self.run_block()[0], "<span size=\"x-small\" rise=\"8192\">▶️</span>Drake - Janice STFU")
+        self.assertEqual(self.run_block()[0], "<span size=\"x-small\" rise=\"8192\">▶️</span>Janice STFU - Drake")
 
     def test_playing_spotify_wins_over_paused_chrome(self):
         self.data["players"][":1.50"]["PlaybackStatus"] = variant("s", "Paused")
-        self.assertEqual(self.run_block()[0], "<span size=\"x-small\" rise=\"8192\">▶️</span>Drake - Janice STFU")
+        self.assertEqual(self.run_block()[0], "<span size=\"x-small\" rise=\"8192\">▶️</span>Janice STFU - Drake")
 
     def test_both_paused_prefers_chrome(self):
         for props in self.data["players"].values():
             props["PlaybackStatus"] = variant("s", "Paused")
-        self.assertEqual(self.run_block()[0], '<span size="x-small" rise="8192">⏸️</span>Logic - Soul Food')
+        self.assertEqual(self.run_block()[0], '<span size="x-small" rise="8192">⏸️</span>Soul Food - Logic')
 
     def test_track_transition_is_read_fresh(self):
         self.run_block()
         self.data["players"][":1.50"] = player("Soul Food II", "Logic")
-        self.assertEqual(self.run_block()[0], "<span size=\"x-small\" rise=\"8192\">▶️</span>Logic - Soul Food II")
+        self.assertEqual(self.run_block()[0], "<span size=\"x-small\" rise=\"8192\">▶️</span>Soul Food II - Logic")
 
     def test_closed_browser_falls_back_without_cached_track(self):
         self.run_block()
         del self.data["names"][CHROME]
         del self.data["players"][":1.50"]
-        self.assertEqual(self.run_block()[0], "<span size=\"x-small\" rise=\"8192\">▶️</span>Drake - Janice STFU")
+        self.assertEqual(self.run_block()[0], "<span size=\"x-small\" rise=\"8192\">▶️</span>Janice STFU - Drake")
 
     def test_bad_or_stopped_browser_falls_back(self):
         for props in (None, {}, player("", "Logic"), player("x", "Logic", "Stopped"),
                       player(["bad type"], "Logic"), player("x", "Logic", "unknown")):
             with self.subTest(props=props):
                 self.data["players"][":1.50"] = props
-                self.assertEqual(self.run_block()[0], "<span size=\"x-small\" rise=\"8192\">▶️</span>Drake - Janice STFU")
+                self.assertEqual(self.run_block()[0], "<span size=\"x-small\" rise=\"8192\">▶️</span>Janice STFU - Drake")
 
     def test_other_players_are_ignored(self):
         self.data["names"] = {"org.mpris.MediaPlayer2.vlc": ":1.50"}
@@ -288,11 +288,11 @@ class NowPlayingTest(unittest.TestCase):
         props["Metadata"]["data"]["xesam:artist"] = variant("as", ["A&B", "C<D>"])
         self.data["players"][":1.50"] = props
         self.assertEqual(self.run_block()[0],
-                         '<span size="x-small" rise="8192">▶️</span>A&amp;B, C&lt;D&gt; - L’été &lt;II&gt; &amp; "one" next\\end')
+                         '<span size="x-small" rise="8192">▶️</span>L’été &lt;II&gt; &amp; "one" next\\end - A&amp;B, C&lt;D&gt;')
 
     def test_pango_invalid_controls_are_removed(self):
         self.data["players"][":1.50"] = player("Song\x01name", "Logic")
-        self.assertEqual(self.run_block()[0], "<span size=\"x-small\" rise=\"8192\">▶️</span>Logic - Songname")
+        self.assertEqual(self.run_block()[0], "<span size=\"x-small\" rise=\"8192\">▶️</span>Songname - Logic")
 
     def test_hung_browser_does_not_hide_healthy_spotify(self):
         self.data["names"][CHROME + "2"] = ":1.51"
@@ -301,12 +301,12 @@ class NowPlayingTest(unittest.TestCase):
         self.data["names"][SPOTIFY] = ":1.649"
         for owner in (":1.50", ":1.51", ":1.52"):
             self.data["players"][owner] = "timeout"
-        self.assertEqual(self.run_block()[0], "<span size=\"x-small\" rise=\"8192\">▶️</span>Drake - Janice STFU")
+        self.assertEqual(self.run_block()[0], "<span size=\"x-small\" rise=\"8192\">▶️</span>Janice STFU - Drake")
 
     def test_multiple_playing_browsers_have_deterministic_priority(self):
         self.data["names"] = {CHROME + "2": ":1.51", **self.data["names"]}
         self.data["players"][":1.51"] = player("Second browser", "Other")
-        self.assertEqual(self.run_block()[0], "<span size=\"x-small\" rise=\"8192\">▶️</span>Logic - Soul Food")
+        self.assertEqual(self.run_block()[0], "<span size=\"x-small\" rise=\"8192\">▶️</span>Soul Food - Logic")
 
     def test_failed_cache_write_invalidates_old_click_target(self):
         self.run_block()
@@ -333,7 +333,7 @@ class NowPlayingTest(unittest.TestCase):
     def test_click_uses_previously_displayed_owner(self):
         self.run_block()
         self.data["players"][":1.50"]["PlaybackStatus"] = variant("s", "Paused")
-        self.assertEqual(self.run_block("1")[0], "<span size=\"x-small\" rise=\"8192\">▶️</span>Drake - Janice STFU")
+        self.assertEqual(self.run_block("1")[0], "<span size=\"x-small\" rise=\"8192\">▶️</span>Janice STFU - Drake")
         self.assertEqual(self.actions(), [[":1.50", "/org/mpris/MediaPlayer2",
                                          "org.mpris.MediaPlayer2.Player", "PlayPause"]])
 

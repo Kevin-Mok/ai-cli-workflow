@@ -252,7 +252,7 @@ def main():
     remember(path, player)
     title = player.title if player else ""
     if player:
-        track = f"{player.artist} - {title}" if player.artist else title
+        track = f"{title} - {player.artist}" if player.artist else title
         track = html.escape(track, quote=False)
         if player.status == "Playing":
             state_glyph = f'<span size="x-small" rise="8192">{html.escape(PLAYING_GLYPH, quote=False)}</span>'

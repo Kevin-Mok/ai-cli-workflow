@@ -11556,6 +11556,15 @@
       "findings": [],
       "reviewed_on": "2026-10-29",
       "sha256": "48c82fbed44d62ef9bd0b64e8f17ede6daaf2b13290fedd21253a2d69cbdc94b"
+    },
+    {
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-10-29-music-commit-git-write-permission.md"
+      ],
+      "decision": "No new reusable learning: the explicit read-only .git sandbox profile caused the write failure; approved escalation restored scoped staging without changing policy or product code.",
+      "findings": [],
+      "reviewed_on": "2026-10-29",
+      "sha256": "54cecb7c28c0303acd18d239058353229832c07e7c54fba7a62d0526bf15b6d9"
     }
   ],
   "review": {

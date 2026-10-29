@@ -1100,7 +1100,8 @@ this.
   ignored even when playing while FlaviBot is paused. If Spotify is playing and
   FlaviBot is paused, Spotify appears; with both paused, FlaviBot appears.
   No artist/title regex is required, so title-only songs remain eligible.
-  With no eligible player, the block clears. Titles are displayed in full.
+  With no eligible player, the block clears. Songs display as `Title - Artist`,
+  or just the title when no artist is available.
   Playing tracks use a compact, optically raised color `▶️` button; paused tracks use
   the matching `⏸️` button.
   This isolates the browser process, not websites within it: keep YouTube out
