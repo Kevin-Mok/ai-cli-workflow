@@ -11324,6 +11324,15 @@
       "reviewed_on": "2026-10-29",
       "findings": [],
       "decision": "No new reusable learning: local-discover-paths-before-reads already covers guessed helper suffixes; inventoried external script was read successfully."
+    },
+    {
+      "sha256": "cf88c59c436d4cc96893030e2de18d82bd8ea9bdb2ff91c39248897883bc2299",
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-10-29-cg-session-delivery.md"
+      ],
+      "reviewed_on": "2026-10-29",
+      "findings": [],
+      "decision": "No new reusable learning: existing path discovery and sandbox/network permission guidance covers these delivery diagnostics; GitHub ADMIN permission and public destination were verified before retry."
     }
   ],
   "review": {

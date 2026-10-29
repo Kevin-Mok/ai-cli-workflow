@@ -191,3 +191,9 @@ This document records delivery milestones and verification for completed reposit
 - Delivery: one commit on main, then push origin/main. No implementation blockers or remaining work.
 - Remaining: preserve all baseline dirty work, including unrelated ledger hunks. Playback and interactive keystroke expansion were not exercised. USB mount must be available.
 - Rollback: remove cg from the source and live alias catalog, then refresh shortcuts.
+
+### cg delivery follow-up
+
+- Milestone: shortcut committed as 5331db7; automatic review blocked the initial push before execution.
+- Verification: GitHub confirms the configured Kevin-Mok/ai-cli-workflow destination is public and the authenticated viewer has ADMIN permission. Restricted network and guessed executable-path diagnostics were resolved by approved read-only access and executable discovery.
+- Delivery: record the incident in a follow-up commit, then retry the scoped series push to origin/main. Unrelated dirty files remain excluded; playback remains untested.
