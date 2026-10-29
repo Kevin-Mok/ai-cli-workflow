@@ -11529,6 +11529,15 @@
       ],
       "reviewed_on": "2026-10-29",
       "sha256": "6b10b2121459e5fb6efabb549a8e23210570394d45d3df4cc0c0a7ac516fbb61"
+    },
+    {
+      "sha256": "a33c1e9c75f6a903a951978421b331b196ba3761eca0db8d8cf6599396832c8a",
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-10-29-right-bar-font-activation.md"
+      ],
+      "reviewed_on": "2026-10-29",
+      "findings": [],
+      "decision": "No new learning: existing scoped sandbox and unmanaged i3 target guidance applies. Refresh, validation, reload and live IPC verified; screenshot pixels unmeasured."
     }
   ],
   "review": {

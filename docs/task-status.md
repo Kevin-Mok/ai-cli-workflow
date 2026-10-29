@@ -215,3 +215,12 @@ This document records delivery milestones and verification for completed reposit
 - Delivery: one focused commit on main, then push origin/main. No implementation work remains.
 - Limits: physical pixel spacing and clicks not inspected; widths are minimums scaled by DPI.
 - Rollback: restore minimum widths to 144/95/144 in source and live config, validate and reload once.
+
+## Right-screen bar font — fix(i3): reduce right-screen bar font
+
+- Complete: HDMI-0 main-bar font reduced from50pt to35.6pt, equivalent to27px at135DPI; other bars remain30pt and50pt. Source and excluded live config match.
+- Scope: session01a189d8-b778-7141-a732-c6d7a7b4e2df direct-write fallback because the scope helper did not recognize orchestrated writes. Only the font, matching smoke check, activation report, its isolated ledger entry and this milestone ship.
+- Verified: refresh-config completed; deployed config validation and one reload passed; live IPC confirmed all three font sizes. Existing wheel-binding deprecation warnings remain. README gate pass_no_change. Targeted postmortem ledger check and exact staged privacy review precede commit.
+- Delivery: one focused commit on main, then push origin/main. No implementation work remains; preserve unrelated dirty files/hunks.
+- Limits: screenshot pixel measurement was not performed; conversion assumes135DPI. No web deployment applies.
+- Rollback: restore main-bar font50 in source and live config, run refresh-config, validate and reload once.

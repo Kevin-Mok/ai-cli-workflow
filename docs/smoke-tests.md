@@ -985,6 +985,8 @@ Preview the existing disk configuration, install the UUID-specific rules once wi
   Expected: Right-click keeps audio muted; left-click keeps audio unmuted. Neither
   changes the playback device. Middle-click still sets 15%, and scrolling still
   changes volume by 3%.
+- Action: Inspect the HDMI-0 right-screen bar after reloading i3.
+  Expected: Font size is 35.6 points at 135 DPI (27 rendered pixels smaller than the original 50 points); other monitors retain their font sizes.
 - Action: After `refresh-config` and reloading the i3 bars, inspect each monitor;
   change wallpaper with the normal pywal shortcut and inspect again.
   Expected: Speaker/headphones/display, music notes, thermometer, calendar
