@@ -51,7 +51,7 @@ esac
         return subprocess.check_output(["bash", str(SCRIPT)], env=env, text=True).strip()
 
     def test_unpaused_uses_wal_color7(self):
-        self.assertEqual(self.run_block(), '<span color="#d0bce2">Notis</span>')
+        self.assertEqual(self.run_block(), '<span color="#d0bce2">🔔Notis</span>')
 
     def test_unpaused_falls_back_to_plain_text_without_color7(self):
         for setup in ("missing", "without-color7"):
@@ -60,7 +60,7 @@ esac
                     self.colors.unlink()
                 else:
                     self.colors.write_text("color8='#ffffff'\n")
-                self.assertEqual(self.run_block(), "Notis")
+                self.assertEqual(self.run_block(), "🔔Notis")
                 if setup == "missing":
                     self.colors.write_text("color7='#d0bce2'\n")
 
@@ -87,7 +87,7 @@ esac
 
     def test_paused_queue_remains_red(self):
         self.state.write_text("true")
-        self.assertEqual(self.run_block(), "<span color='#ff6b6b'>DND (2)</span>")
+        self.assertEqual(self.run_block(), "<span color='#ff6b6b'>🔕DND (2)</span>")
 
 
 if __name__ == "__main__":

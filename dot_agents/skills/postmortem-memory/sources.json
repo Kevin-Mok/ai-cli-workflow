@@ -6096,6 +6096,26 @@
       ],
       "verification": "Original attempt1 failed after19.036seconds following302/302/200; original body/error missing. Attempt2 passed72records in29.335seconds. A resumed synthetic early-window fixture rejects before the hour and passes after; this does not confirm the original cause.47tests and separate localbrowser fixture pass; independent resumed live diagnostic passed72records20.605seconds with safe coverage evidence, not a cohort run.",
       "verification_scope": "runtime"
+    },
+    {
+      "applicability": "i3blocks 1.4 config and script-output changes.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Run the actual installed i3blocks scheduler against the config before refresh; pure layout tests do not parse config."
+      ],
+      "id": "local-i3blocks-config-properties",
+      "limitations": "Physical laptop rendering was not exercised; future i3blocks versions may support additional keys. Unicode thin spaces still occupy full cells in Hack Mono.",
+      "reference": "references/api-contracts-fixtures.md#local-i3blocks-config-properties",
+      "remedy": "Use supported config properties and keep custom output defaults in the script. Finish scheduler and focused regression checks before applying live configs; remove the rejected key immediately if already deployed.",
+      "sources": [
+        "6b10b2121459e5fb6efabb549a8e23210570394d45d3df4cc0c0a7ac516fbb61"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "i3blocks 1.4 rejects an arbitrary SHORTFMT config property; i3bar reports status command exited unexpectedly."
+      ],
+      "verification": "62 i3blocks and 13 Redshift tests passed; refresh and i3 restart exited0; final screenshots show recovered calendar/full and clock/compact blocks with colored playback icons.",
+      "verification_scope": "runtime"
     }
   ],
   "reports": [
@@ -11490,6 +11510,25 @@
       "reviewed_on": "2026-10-29",
       "findings": [],
       "decision": "No new learning: existing scoped sandbox permission and path-discovery guidance covers this activation; live IPC verifies widths, not visual pixels."
+    },
+    {
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-10-29-i3blocks-search-paths.md"
+      ],
+      "decision": "No new learning: local-discover-paths-before-reads already covers guessed missing rg operands; inventoried reads succeeded without product changes.",
+      "findings": [],
+      "reviewed_on": "2026-10-29",
+      "sha256": "b38505c159bc0f99a864d5cb241ee1ec7a78ffb0a525e26d5c5a6ff4fe87d6ab"
+    },
+    {
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-10-29-i3blocks-calendar-format.md"
+      ],
+      "findings": [
+        "local-i3blocks-config-properties"
+      ],
+      "reviewed_on": "2026-10-29",
+      "sha256": "6b10b2121459e5fb6efabb549a8e23210570394d45d3df4cc0c0a7ac516fbb61"
     }
   ],
   "review": {

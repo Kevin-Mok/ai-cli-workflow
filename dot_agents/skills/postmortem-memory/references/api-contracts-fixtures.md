@@ -689,6 +689,17 @@ security checks with the arguments you passed.
 - Limits: fresh command lines only; unguarded anywhere expansion breaks logical operators.
 - Source: [or expansion incident](../../../../docs/postmortem/2026-10-29-or-abbreviation-expansion.md).
 
+## local-i3blocks-config-properties
+- Status: **verified_fix**; confidence: **confirmed**; scope: **runtime**.
+- Symptoms/applicability: i3blocks1.4 rejects an arbitrary SHORTFMT config key and i3bar reports status-command exit.
+- Diagnostic: run the installed scheduler against the actual config before refresh; pure layout tests do not exercise config parsing.
+- Remedy: use supported config properties; keep custom display defaults inside the script. Finish focused regressions before live application; immediately remove rejected keys to recover an already affected bar.
+- Verification: 62 i3blocks and13 Redshift tests passed, refresh/restart exited0, and live screenshots show recovered full calendar/compact clock and colored playback icons.
+- Limits: physical laptop rendering untested; later i3blocks versions can differ. Hack Mono gives Unicode thin spaces a full character cell, so inspect actual spacing.
+- Source: [Calendar format compatibility incident](../../../../docs/postmortem/2026-10-29-i3blocks-calendar-format.md).
+
+Asymmetric i3block padding must be injected into i3bar JSON, not the i3blocks1.4 config: even border keys are rejected there. Native min_width includes border, border sizes scale with DPI, and a separator is still drawn before a later empty array entry. Verify the actual scheduler and shared wrapper before activation.
+
 ## local-i3-workspace-label-activation
 
 - Status: **verified_workaround**; confidence: **supported**; verification scope: **runtime**.

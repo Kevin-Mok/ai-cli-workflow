@@ -2,6 +2,7 @@
 """Fit the 4K song to the live bar while reserving space for volume and Redshift."""
 import html
 import json
+import math
 import os
 from queue import Empty, SimpleQueue
 from pathlib import Path
@@ -15,7 +16,7 @@ import threading
 def fit_song(markup, width, measure):
     if measure(markup) <= width:
         return markup
-    match = re.match(r"(.*?</span> )(.*)", markup)
+    match = re.match(r"(.*</span>\s?)(.*)", markup)
     prefix, track = match.groups() if match else ("", markup)
     track = html.unescape(track)
     artist, separator, title = track.partition(" - ")
@@ -33,7 +34,7 @@ def fit_song(markup, width, measure):
     return prefix + html.escape(track[:low].rstrip()) + "…"
 
 
-def layout_blocks(blocks, screen_width, workspace_width, measure):
+def layout_blocks(blocks, screen_width, workspace_width, measure, border_scale=1):
     blocks = [dict(block) for block in blocks]
     song = next((b for b in blocks if b.get("name") == "spotify"), None)
     volume = next((b for b in blocks if b.get("name") == "volume"), None)
@@ -45,21 +46,27 @@ def layout_blocks(blocks, screen_width, workspace_width, measure):
     volume_width = measure(volume["full_text"])
     left = max(screen_width / 2 - volume_width / 2, workspace_width + 8)
 
+    def border_width(block):
+        return sum(math.ceil(block.get(key, 0) * border_scale) for key in ("border_left", "border_right"))
+
     def song_budget():
         visible = [b for b in blocks if b.get("full_text")]
-        separators = sum(b.get("separator_block_width", 9) for b in visible[:-1])
+        separators = sum(b.get("separator_block_width", 9) for b in blocks[:-1] if b.get("full_text"))
         fixed_width = sum(measure(b["full_text"]) for b in visible if b is not song)
+        fixed_width += sum(border_width(b) for b in visible)
         return int(screen_width - left - fixed_width - separators)
 
     budget = song_budget()
-    if budget < 0 and calendar:
+    prefix = re.match(r"(.*</span>\s?)", song["full_text"])
+    minimum_song_width = measure(prefix.group(1) + "…") if prefix else 0
+    if budget < minimum_song_width and calendar:
         calendar["full_text"] = calendar.get("short_text", "")
         budget = song_budget()
-    if budget < 0 and calendar:
+    if budget < minimum_song_width and calendar:
         calendar["full_text"] = ""
         budget = song_budget()
     song["full_text"] = fit_song(song["full_text"], max(0, budget), measure)
-    song["min_width"] = max(0, budget) if song["full_text"] else 0
+    song["min_width"] = max(0, budget) + border_width(song) if song["full_text"] else 0
     # Native short-form selection must not undo the measured layout.
     for block in blocks:
         block.pop("short_text", None)
@@ -114,7 +121,7 @@ def live_layout():
         workspaces = [w for w in ipc("get_workspaces") if w["output"] == "DP-2"]
         workspace_width = sum(workspace_button_width(w["name"], measure, dpi,
                               bar.get("workspace_min_width", 0)) for w in workspaces)
-        return layout_blocks(blocks, output["rect"]["width"], workspace_width, measure)
+        return layout_blocks(blocks, output["rect"]["width"], workspace_width, measure, dpi / 96)
 
     return adapt
 
@@ -151,16 +158,41 @@ def forward_clicks(source, child, updates):
     child.stdin.close()
 
 
+ICON_GAP = '<span size="1" letter_spacing="20480"> </span>'
+ICON_PATTERN = re.compile(r"(🔉|🔊|🔈|🔇|🎧|🖥️|🌡️|🎵|🔔|🔕|📅|🕒|▶️|⏸️|🔋|📶|🔆)(</span>)?")
+
+
+def pad_blocks(blocks, right=25):
+    padded = []
+    for block in blocks:
+        block = dict(block, border="#00000000", border_top=0, border_bottom=0,
+                     border_left=0, border_right=right)
+        for key in ("full_text", "short_text"):
+            if block.get(key):
+                block[key] = ICON_PATTERN.sub(lambda match: match[0] + ICON_GAP, block[key],
+                                              count=2 if block.get("name") == "spotify" else 1)
+        padded.append(block)
+    return padded
+
+
 def main():
+    config = Path(sys.argv[1]).expanduser() if len(sys.argv) > 1 else Path.home() / ".config/i3blocks/i3blocks-4k.conf"
+    try:
+        resources = subprocess.check_output(["xrdb", "-query"], text=True, stderr=subprocess.DEVNULL, timeout=1)
+        match = re.search(r"^Xft.dpi:\s*([\d.]+)", resources, re.MULTILINE)
+        dpi = float(match[1]) if match else 96
+    except (OSError, subprocess.SubprocessError):
+        dpi = 96
+    padding = max(0, round(25 * 96 / dpi))
     child = subprocess.Popen(
-        ["i3blocks", "-c", str(Path.home() / ".config/i3blocks/i3blocks-4k.conf")],
+        ["i3blocks", "-c", str(config)],
         stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True, bufsize=1,
     )
     signal.signal(signal.SIGTERM, lambda *_: sys.exit(0))
     updates = SimpleQueue()
     threading.Thread(target=forward_clicks, args=(sys.stdin, child, updates), daemon=True).start()
     warned = False
-    adapt = None
+    adapt = (lambda blocks: blocks) if len(sys.argv) > 1 else None
     try:
         for line in child.stdout:
             latest = None
@@ -176,6 +208,7 @@ def main():
                             block["full_text"] = latest
                     return blocks
                 line = transform_line(line, overlay)
+            line = transform_line(line, lambda blocks: pad_blocks(blocks, padding))
             try:
                 if adapt is None:
                     adapt = live_layout()

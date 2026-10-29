@@ -2,7 +2,19 @@
 """Display the shared manual Redshift target and route wheel adjustments."""
 import os
 from pathlib import Path
+import re
 import subprocess
+
+
+def color():
+    try:
+        palette = (Path.home() / ".cache/wal/colors.sh").read_text()
+        match = re.search(r"^color7=['\"](#[0-9a-fA-F]{6})['\"]\s*$", palette, re.MULTILINE)
+        if match:
+            return match.group(1)
+    except (OSError, UnicodeError):
+        pass
+    return "#cbe4ff"
 
 
 def main():
@@ -10,7 +22,7 @@ def main():
     step = {"4": "150", "5": "-150"}.get(os.environ.get("BLOCK_BUTTON", ""))
     try:
         if step is not None:
-            subprocess.run([str(controller), "adjust", step], check=True,
+            subprocess.run([str(controller), "adjust", step, "--no-notify"], check=True,
                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         result = subprocess.run([str(controller), "status"], check=True,
                                 capture_output=True, text=True)
@@ -18,9 +30,12 @@ def main():
         if not 1000 <= temperature <= 6500:
             raise ValueError("Invalid controller status")
     except (OSError, ValueError, subprocess.SubprocessError):
-        print("🌡️ ERR")
-        return
-    print(f"🌡️ {temperature} K")
+        text = "🌡️ERR"
+    else:
+        text = f"🌡️{temperature} K"
+    print(text)
+    print()
+    print(color())
 
 
 if __name__ == "__main__":

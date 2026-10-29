@@ -21,7 +21,7 @@ def status():
     return current
 
 
-def apply(action, value):
+def apply(action, value, notify=True):
     directory = state_directory()
     directory.mkdir(parents=True, exist_ok=True, mode=0o700)
     with (directory / "lock").open("a") as lock:
@@ -39,6 +39,8 @@ def apply(action, value):
         pending = directory / "temperature.tmp"
         pending.write_text(str(target) + "\n")
         pending.replace(state)
+        if not notify:
+            return target
         try:
             notification = directory / "notification-id"
             previous = notification.read_text().strip() if notification.exists() else "0"
@@ -63,11 +65,12 @@ def main():
     parser.add_argument("value", type=int, nargs="?", help="Temperature or signed step in kelvin")
     parser.add_argument("--plain", action="store_true", help="Use ASCII output")
     parser.add_argument("--details", action="store_true", help="Show backend diagnostics on failure")
+    parser.add_argument("--no-notify", action="store_true", help="Skip the desktop notification")
     args = parser.parse_args()
     if (args.action in ("reset", "status")) != (args.value is None):
         parser.error("set/adjust need a value; reset/status take no value")
     try:
-        target = status() if args.action == "status" else apply(args.action, args.value)
+        target = status() if args.action == "status" else apply(args.action, args.value, notify=not args.no_notify)
     except (OSError, ValueError, subprocess.CalledProcessError) as error:
         print(("" if args.plain else "❌ ") + "Redshift failed; check display access and saved temperature.", file=sys.stderr)
         if args.details:

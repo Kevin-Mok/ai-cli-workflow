@@ -1,5 +1,6 @@
 #! /bin/sh
 
+LABEL=${LABEL:-'📅'}
 WIDTH=${WIDTH:-200}
 HEIGHT=${HEIGHT:-200}
 #DATEFMT=${DATEFMT:-"+%a %d.%m.%Y %H:%M:%S"}
@@ -40,7 +41,7 @@ case "$BLOCK_BUTTON" in
 	    > /dev/null"
     # --close-on-unfocus \
 esac
-. "/home/example/.cache/wal/colors.sh"
+. "$HOME/.cache/wal/colors.sh"
 echo "$LABEL$(date "$DATEFMT")"
-echo "$LABEL$(date "$SHORTFMT")"
+echo "🕒$(date "$SHORTFMT")"
 echo "$color7"

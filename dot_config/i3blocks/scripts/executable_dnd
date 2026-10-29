@@ -6,14 +6,14 @@ case "${BLOCK_BUTTON:-}" in
 esac
 if [[ "$(dunstctl is-paused 2>/dev/null)" == true ]]; then
   waiting=$(dunstctl count waiting 2>/dev/null || echo 0)
-  if (( waiting > 0 )); then echo "<span color='#ff6b6b'>DND ($waiting)</span>"; else echo "<span color='#ff6b6b'>DND</span>"; fi
+  if (( waiting > 0 )); then echo "<span color='#ff6b6b'>🔕DND ($waiting)</span>"; else echo "<span color='#ff6b6b'>🔕DND</span>"; fi
 else
   if [[ -r "$HOME/.cache/wal/colors.sh" ]]; then
     source "$HOME/.cache/wal/colors.sh"
   fi
   if [[ -n "${color7:-}" ]]; then
-    echo "<span color=\"$color7\">Notis</span>"
+    echo "<span color=\"$color7\">🔔Notis</span>"
   else
-    echo "Notis"
+    echo "🔔Notis"
   fi
 fi

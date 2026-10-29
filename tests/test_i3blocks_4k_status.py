@@ -43,6 +43,35 @@ class SongLayout(unittest.TestCase):
         self.assertEqual(blocks[2]["full_text"], "Short song")
         self.assertGreater(blocks[2]["min_width"], measure("Short song"))
 
+    def test_padding_preserves_click_identity_and_text(self):
+        source = [{"name": "volume", "instance": "sink", "full_text": "🔉38%"}]
+        padded = self.module["pad_blocks"](source, 18)
+        self.assertEqual(html.unescape(re.sub(r"<[^>]+>", "", padded[0]["full_text"])), "🔉 38%")
+        self.assertEqual(padded[0]["instance"], "sink")
+        self.assertEqual(padded[0]["border_right"], 18)
+        self.assertEqual(padded[0]["border_left"], 0)
+        self.assertNotIn("border_right", source[0])
+
+    def test_icon_padding_reaches_compact_text_and_playback_buttons(self):
+        gap = '<span size="1" letter_spacing="20480"> </span>'
+        blocks = [{"name": "calendar", "full_text": "📅Thu", "short_text": "🕒18:34"},
+                  {"name": "spotify", "full_text": '🎵<span size="x-small">⏸️</span>Song'}]
+        padded = self.module["pad_blocks"](blocks)
+        self.assertEqual(padded[0]["full_text"], "📅" + gap + "Thu")
+        self.assertEqual(padded[0]["short_text"], "🕒" + gap + "18:34")
+        self.assertEqual(padded[1]["full_text"], '🎵' + gap + '<span size="x-small">⏸️</span>' + gap + 'Song')
+
+    def test_right_padding_counts_toward_available_width(self):
+        blocks = self.blocks()
+        for block in blocks:
+            block.update(border_left=0, border_right=25)
+        result = self.module["layout_blocks"](blocks, 2000, 1580, measure)
+        visible = [b for b in result if b.get("full_text")]
+        width = sum(max(measure(b["full_text"]) + b["border_left"] + b["border_right"],
+                        b.get("min_width", 0)) for b in visible)
+        width += sum(b.get("separator_block_width", 9) for b in result[:-1] if b.get("full_text"))
+        self.assertLessEqual(width, 2000 - 1580 - 8)
+
     def test_workspace_minimum_width_reserves_padding_without_clipping_wide_names(self):
         width = self.module["workspace_button_width"]
         self.assertEqual(width("1💻", measure, 135, 144), 202)
@@ -81,6 +110,15 @@ class SongLayout(unittest.TestCase):
         self.assertTrue(fitted.endswith("…"))
         self.assertLessEqual(measure(fitted), 250)
         self.assertNotIn("&am…", fitted)
+
+    def test_calendar_compacts_before_music_emoji_is_lost(self):
+        prefix = '🎵<span size="x-small" rise="8192">▶️</span>'
+        for workspace, calendar in ((1580, "13:35"), (1670, "")):
+            with self.subTest(workspace=workspace):
+                blocks = self.module["layout_blocks"](self.blocks(prefix + "Artist - " + "Song " * 20),
+                                                       2000, workspace, measure)
+                self.assertTrue(blocks[2]["full_text"].startswith(prefix), blocks[2])
+                self.assertEqual(blocks[3]["full_text"], calendar)
 
     def test_headers_click_identity_and_empty_song_are_preserved(self):
         transform = self.module["transform_line"]
@@ -161,7 +199,8 @@ class SongLayout(unittest.TestCase):
                     process.communicate()
             events = (root / "events").read_text().splitlines() if (root / "events").exists() else []
             self.assertEqual(len(events), 8, errors)
-            self.assertIn("🌡️ ERR", output)
+            self.assertIn(json.dumps('🌡️<span size="1" letter_spacing="20480"> </span> ERR',
+                                     ensure_ascii=False), output)
 
     def test_transient_startup_failure_recovers_layout(self):
         with tempfile.TemporaryDirectory() as directory:

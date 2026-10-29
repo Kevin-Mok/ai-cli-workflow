@@ -644,7 +644,7 @@ bar {
   }
   tray_output none
   # status_command i3blocks -c ~/.config/i3blocks/i3blocks.conf
-  status_command 2>/tmp/i3blocks.err i3blocks -vvv -c ~/.config/i3blocks/i3blocks.conf | tee /tmp/i3blocks.out
+  status_command /usr/bin/python3 -u ~/.config/i3blocks/scripts/4k_status ~/.config/i3blocks/i3blocks.conf
   output $main
   # output $secondary
   wheel_up_cmd nop
@@ -676,7 +676,7 @@ bar {
     active_workspace $inactive_ws_bg $ui_active_bg $ui_active_text
     inactive_workspace $inactive_ws_bg $ui_inactive_bg $ui_inactive_text
   }
-  status_command i3blocks -c ~/.config/i3blocks/i3blocks-secondary.conf
+  status_command /usr/bin/python3 -u ~/.config/i3blocks/scripts/4k_status ~/.config/i3blocks/i3blocks-secondary.conf
   # status_command 2>/tmp/i3blocks-sam.err i3blocks -vvv -c ~/.config/i3blocks/sam-i3blocks.conf | tee /tmp/i3blocks-sam.out
   tray_output none
   wheel_up_cmd nop

@@ -1098,8 +1098,8 @@ this.
   FlaviBot is paused, Spotify appears; with both paused, FlaviBot appears.
   No artist/title regex is required, so title-only songs remain eligible.
   With no eligible player, the block clears. Titles are displayed in full.
-  Playing tracks use a compact, optically raised `▶`; paused tracks use the
-  matching `‖` marker.
+  Playing tracks use a compact, optically raised color `▶️` button; paused tracks use
+  the matching `⏸️` button.
   This isolates the browser process, not websites within it: keep YouTube out
   of the dedicated FlaviBot window. No Discord bot or token is needed.
   Left/middle/right clicks control the displayed player when supported; stale
@@ -1135,6 +1135,9 @@ this.
   external Redshift commands are not tracked.
   The DP-2 4K bar shows **🌡️ 4500 K** between volume and Spotify: scroll up
   for +150 K (cooler), down for −150 K (warmer). Other clicks do nothing.
+  Wheel changes update the bar silently; keyboard and direct helper operations
+  keep their notifications. The controller’s `--no-notify` flag suppresses a popup
+  for an individual helper invocation.
   It refreshes the saved manual target each second, including keyboard presets
   and reset; it is not a hardware-temperature reading. Backend or state errors
   show **🌡️ ERR**. `~/scripts/redshift-control status` reads the target without
@@ -1148,6 +1151,17 @@ this.
   status-bar, notification, and compositing layer.
   The volume block left-click unmutes and right-click mutes; middle-click sets
   15% volume, and scrolling adjusts volume by 3%.
+  Active blocks use native color emoji (speaker/headphones/display, thermometer,
+  music notes, calendar and notification bells), with matching laptop
+  battery, signal and brightness icons. Values retain pywal `color7`; Redshift
+  rereads that palette on each update and falls back to `#cbe4ff` if unavailable.
+  Paused DND remains red. Compact color playback buttons remain beside
+  the music icon; the date shortens when needed to keep that icon visible, and
+  compact time uses a clock icon. Icons have 20 px of space before their values,
+  using Pango spacing rather than a monospace blank; the shared status wrapper adds about 25 physical pixels
+  of transparent right padding beside 25 px separators, shifting room toward the
+  trailing side. It accounts for DPI-scaled borders when fitting the 4K song.
+  No additional assets or fonts are required.
   The secondary (left desktop monitor) bar includes a clickable `Notis`/`DND`
   indicator immediately left of volume; it refreshes notification pause state every
   two seconds. `Notis` uses the same wallpaper theme color as volume/date;

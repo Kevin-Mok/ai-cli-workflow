@@ -281,3 +281,5 @@
 2026-10-22 - Before replacing a privacy scanner bundle, inspect every active hook entrypoint. A pre-commit-only installer can overwrite a bundle used by an older pre-push wrapper; retain its CLI protocol and verify exact outgoing committed trees plus preserved-hook stdin/argument ordering.
 
 - 2026-10-29: i3blocks1.4 can drop rapid clicks while a block runs. Controller-only concurrency tests miss this boundary; test through the scheduler and queue wheel handling in the wrapper before dispatch. See [Redshift activation](../docs/postmortem/2026-10-29-redshift-live-activation.md).
+
+- 2026-10-29: i3blocks 1.4 rejects arbitrary environment keys in its config. Put calendar output defaults in the script, and finish the real scheduler test before live refresh; Unicode thin spaces still occupy full cells in Hack Mono. See [calendar parser incident](../docs/postmortem/2026-10-29-i3blocks-calendar-format.md).

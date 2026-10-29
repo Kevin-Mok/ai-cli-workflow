@@ -760,7 +760,8 @@ checks use invented temporary data; real notes are never repository fixtures.
   keyboard presets and reset. Run `~/scripts/redshift-control status` to compare.
   Expected: Only DP-2 has the block, between volume and Spotify. Windows+2
   displays 2300 K within one second; up shows 2450 K and down returns 2300 K.
-  Rapid wheel steps accumulate, bounded at 1000–6500 K; other clicks do nothing.
+  Rapid wheel steps accumulate silently, bounded at 1000–6500 K; other clicks do nothing.
+  Wheel changes show no Dunst popup; keyboard/direct helper changes still notify.
   Reset displays 6500 K. This is the saved manual target, not a hardware reading
   or a tracker of raw external Redshift commands. Volume and Redshift remain
   before song/calendar under crowded workspace pressure; song is shortened and
@@ -984,10 +985,21 @@ Preview the existing disk configuration, install the UUID-specific rules once wi
   Expected: Right-click keeps audio muted; left-click keeps audio unmuted. Neither
   changes the playback device. Middle-click still sets 15%, and scrolling still
   changes volume by 3%.
+- Action: After `refresh-config` and reloading the i3 bars, inspect each monitor;
+  change wallpaper with the normal pywal shortcut and inspect again.
+  Expected: Speaker/headphones/display, music notes, thermometer, calendar
+  and notification bells render as native color emoji with a 20 px gap after each icon (including compact clock and playback buttons).
+  Dividers reserve 25 px with 25 px of transparent right padding per block: compared
+  with the previous 45 px centered gaps, left spacing shrinks 10 px and right spacing grows 15 px. Volume, Redshift, music
+  and date values follow pywal color7 while emoji retain their own colors; paused
+  DND stays red. Laptop battery, signal, brightness and temperature icons also
+  use emoji. The full date retains its calendar icon and compact time uses a clock; on DP-2 the calendar
+  shortens before the music icon and playback marker are lost. Long tracks still
+  shorten before volume or Redshift is clipped.
 - Action: ~/scripts/flavibot-browser
   Expected: After refresh-config, opens https://flavibot.xyz/music-player in a separate Chrome process using ~/.local/share/flavibot-chrome. Sign in once and start playback. Later launches reuse that directory; existing Chrome profiles are untouched. Follow the [short usage guide](flavibot-browser.md) for daily use. Reserve this window for FlaviBot and use ordinary Chrome for YouTube.
 - Action: ~/.config/i3blocks/scripts/now_playing_mpris
-  Expected: While FlaviBot or Spotify plays, emits `▶ Artist - Title` for both full_text and short_text, with the triangle small and raised via Pango; when paused, emits `‖ Artist - Title` with the pause mark rendered the same way. Both markers sit centered rather than touching the bar's lower edge. The third line is pywal color7. The 4K status wrapper measures the live bar font, DPI and workspace buttons to fit this text with an ellipsis; its raw config retains an invisible compact form as a fallback. The bar follows within five seconds and shows no state glyph when no player is eligible. Title-only songs are also eligible; artist/title regex matching is no longer used.
+  Expected: While FlaviBot or Spotify plays, emits `▶️Artist - Title` for both full_text and short_text, with the color play button small and raised via Pango; when paused, emits `⏸️Artist - Title` with the color pause button rendered the same way. Both markers sit centered rather than touching the bar's lower edge. The third line is pywal color7. The 4K status wrapper measures the live bar font, DPI and workspace buttons to fit this text with an ellipsis; its raw config retains an invisible compact form as a fallback. The bar follows within five seconds and shows no state glyph when no player is eligible. Title-only songs are also eligible; artist/title regex matching is no longer used.
 - Action: Open the dedicated FlaviBot window with no song loaded while Spotify is available, then repeat with Spotify closed.
   Expected: Generic “FlaviBot - Music Player” metadata never appears, whether exposed as a page-title string or artist “FlaviBot” plus title “Music Player”; the block shows Spotify when available and clears its text and click state otherwise. Real FlaviBot song titles, including title-only songs, remain eligible.
 - Action: Play YouTube in ordinary Chrome, pause FlaviBot in its dedicated window, and pause Spotify.

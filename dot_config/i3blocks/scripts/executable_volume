@@ -5,17 +5,17 @@
 
 set -a
 
-SINK_SYMB=""
+SINK_SYMB="🔉"
 
-AUDIO_HIGH_SYMBOL=${AUDIO_HIGH_SYMBOL:-''}
+AUDIO_HIGH_SYMBOL=${AUDIO_HIGH_SYMBOL:-'🔊'}
 
 AUDIO_MED_THRESH=${AUDIO_MED_THRESH:-50}
-AUDIO_MED_SYMBOL=${AUDIO_MED_SYMBOL:-''}
+AUDIO_MED_SYMBOL=${AUDIO_MED_SYMBOL:-'🔉'}
 
 AUDIO_LOW_THRESH=${AUDIO_LOW_THRESH:-0}
-AUDIO_LOW_SYMBOL=${AUDIO_LOW_SYMBOL:-''}
+AUDIO_LOW_SYMBOL=${AUDIO_LOW_SYMBOL:-'🔈'}
 
-AUDIO_MUTED_SYMBOL=${AUDIO_MUTED_SYMBOL:-''}
+AUDIO_MUTED_SYMBOL=${AUDIO_MUTED_SYMBOL:-'🔇'}
 
 . "$HOME/.cache/wal/colors.sh"
 # DEFAULT_COLOR=${DEFAULT_COLOR:-"#ffffff"}
@@ -37,9 +37,9 @@ AUDIO_DELTA=${AUDIO_DELTA:-3}
 # AUDIO_DELTA=${AUDIO_DELTA:-1}
 
 # LONG_FORMAT=${LONG_FORMAT:-'${SYMB} ${VOL}% [${INDEX}:${NAME}]'}
-LONG_FORMAT=${SHORT_FORMAT:-'${SINK_SYMB}  ${VOL}%'}
+LONG_FORMAT=${SHORT_FORMAT:-'${SINK_SYMB}${VOL}%'}
 # SHORT_FORMAT=${SHORT_FORMAT:-'${SYMB} ${VOL}%[${INDEX}]'}
-SHORT_FORMAT=${SHORT_FORMAT:-'${SINK_SYMB}  ${VOL}%'}
+SHORT_FORMAT=${SHORT_FORMAT:-'${SINK_SYMB}${VOL}%'}
 
 # flags {{{ #
 
@@ -143,13 +143,13 @@ esac
 function print_format {
     case $NAME in
         *"Fiio"*)
-            SINK_SYMB=""
+            SINK_SYMB="🎧"
             ;;
         *"hdmi"*)
-            SINK_SYMB=""
+            SINK_SYMB="🖥️"
             ;;
         *"pci"*)
-            SINK_SYMB=" "
+            SINK_SYMB="🔉"
             ;;
     esac
     eval "echo \"$1\""
