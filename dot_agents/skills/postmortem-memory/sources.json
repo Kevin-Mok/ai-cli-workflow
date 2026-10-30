@@ -12928,6 +12928,15 @@
       "reviewed_on": "2026-10-30",
       "findings": [],
       "decision": "No new reusable learning: existing local-git-fetch-before-ancestry guidance covers concurrent upstream objects missing from the privacy-hook revision walk. Fetch and conflict-free merge preparation verified; final push pending."
+    },
+    {
+      "sha256": "cdfbe75bf034c6f860c399c3e6992b4349dd9d1bb741f32cd9bf17fd1df0fdc5",
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-10-30-refresh-config-local-drift.md"
+      ],
+      "reviewed_on": "2026-10-30",
+      "findings": [],
+      "decision": "Task-specific helper correction: use status first column to distinguish local drift from pending source changes; live refresh verified."
     }
   ],
   "review": {

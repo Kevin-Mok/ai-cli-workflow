@@ -1724,3 +1724,10 @@ restore the original DND state afterward. No sudo is needed.
 
 - **Action:** In Fish, load `~/.config/fish/key_abbr.fish`, type `cnc`, and press Space without executing the expansion.
 - **Expected:** The input expands to `cd /mnt/usb-8tb/concerts`; existing mappings remain available. The mount must be available before navigating.
+
+## Refresh local drift
+
+Preserve local managed-file edits before applying repo changes.
+
+- Action: Modify a disposable managed non-template file locally, then run refresh-config.
+  Expected: Local contents are copied to source, apply succeeds and shortcuts reload. Templates and ignored settings remain intact. Repeated identical template conflicts stop with a private log instead of looping forever.
