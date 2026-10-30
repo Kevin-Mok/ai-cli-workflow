@@ -41,10 +41,10 @@ class FourKOverflow(unittest.TestCase):
                        if line.lstrip(",").startswith("[{")]
             blocks = [block for block in updates[-1] if block.get("name")]
             self.assertEqual([block["name"] for block in blocks],
-                             ["volume", "redshift", "spotify", "calendar"])
-            self.assertEqual(blocks[0]["full_text"], "VOL 75%")
-            self.assertEqual(blocks[0]["short_text"], "VOL 75%")
-            self.assertEqual(blocks[1]["full_text"], "🌡️ 4500 K")
+                             ["redshift", "volume", "spotify", "calendar"])
+            self.assertEqual(blocks[1]["full_text"], "VOL 75%")
+            self.assertEqual(blocks[1]["short_text"], "VOL 75%")
+            self.assertEqual(blocks[0]["full_text"], "🌡️ 4500 K")
             self.assertIn("Artist - Long song", blocks[2]["full_text"])
             self.assertEqual(blocks[2]["short_text"], "<span></span>")
             self.assertEqual(blocks[2]["color"], "#abcdef")

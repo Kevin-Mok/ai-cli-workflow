@@ -758,7 +758,7 @@ checks use invented temporary data; real notes are never repository fixtures.
 - Action: On the DP-2 4K bar, press Windows+2, then scroll up and down over
   the thermometer. Try rapid wheel events and left/middle/right clicks; select
   keyboard presets and reset. Run `~/scripts/redshift-control status` to compare.
-  Expected: Only DP-2 has the block, between volume and Spotify. Windows+2
+  Expected: Only DP-2 has the block, leftmost before volume and Spotify. Windows+2
   displays 2300 K within one second; up shows 2450 K and down returns 2300 K.
   Rapid wheel steps accumulate silently, bounded at 1000–6500 K; other clicks do nothing.
   Wheel changes show no Dunst popup; keyboard/direct helper changes still notify.
@@ -982,7 +982,7 @@ Preview the existing disk configuration, install the UUID-specific rules once wi
 - Action: Run `refresh-config`, then `gpgconf --kill gpg-agent`; open a new terminal and run `pass edit <non-sensitive-test-entry>`.
   Expected: When GPG needs the store password, `pinentry-curses` prompts in that initiating terminal and `pass` continues to the configured editor after successful authentication.
 - Action: Run `/home/example/scripts/apply-desktop-display-layout`, reload i3, and inspect `xrandr --query`.
-  Expected: `DVI-D-0` is 2048x1152 at `+0+0`, `DP-2` is 3840x2160 at `+2048+0`, `HDMI-0` is 1920x1080 at `+5888+0`, and i3 shows bars on all three monitors with the middle 4K bar ordered `volume`, `redshift`, `spotify`, `calendar`.
+  Expected: `DVI-D-0` is 2048x1152 at `+0+0`, `DP-2` is 3840x2160 at `+2048+0`, `HDMI-0` is 1920x1080 at `+5888+0`, and i3 shows bars on all three monitors with the middle 4K bar ordered `redshift`, `volume`, `spotify`, `calendar`.
 - Action: Play a long song and add workspace buttons on DP-2 until the status area is crowded, then remove the extra workspace buttons.
   Expected: Status blocks use the available space to the right of DP-2 workspace buttons without centering volume. Music uses 70% of the bar font, keeps title-artist order, and ends in an ellipsis when too long. More workspace buttons shorten music first; calendar then shortens/hides before volume or Redshift can be clipped. A short or absent song leaves no artificial expanding gap. Volume clicks and song controls still work. Workspace buttons plus fixed controls consuming the entire display exceed i3bar's physical capacity.
 - Action: Right-click the volume block twice, then left-click twice on each bar.

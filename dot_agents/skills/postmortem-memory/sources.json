@@ -12937,6 +12937,15 @@
       "reviewed_on": "2026-10-30",
       "findings": [],
       "decision": "Task-specific helper correction: use status first column to distinguish local drift from pending source changes; live refresh verified."
+    },
+    {
+      "sha256": "97259723402792d10110eec6e69f429245f615f520aaedaa33ecb05f963b75d3",
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-10-30-bar-reorder-refresh-sandbox.md"
+      ],
+      "reviewed_on": "2026-10-30",
+      "findings": [],
+      "decision": "No new learning: existing sandbox write-boundary and asynchronous startup guidance applies. Elevated refresh and deployed configuration order verified; visual and click checks remain manual."
     }
   ],
   "review": {

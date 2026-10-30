@@ -233,3 +233,12 @@ This document records delivery milestones and verification for completed reposit
 - Delivery: one focused commit on main, then push origin/main (Kevin-Mok/ai-cli-workflow). No implementation work remains; full refresh is blocked by pre-existing mimeapps drift, while scoped catalog regeneration succeeded.
 - Limits: interactive typing was not exercised. The invalid test identifier remains outside session scope.
 - Rollback: remove wl from directory source/live catalogs, uncomment its Watson mapping, and regenerate shortcuts.
+
+## Bar block order — fix(i3): put redshift before volume and music
+
+- Complete: 4K status order is Redshift, volume, Spotify, calendar; source and installed config match. Existing smoke checks updated.
+- Scope: session 01a18ddf-fce9-70b1-9518-7e2fe3cf457a; direct-write fallback because the scope helper cannot detect nested tool writes. Include only the bar template, two smoke expectations, scheduler regression expectation, activation incident, its ledger record and this milestone.
+- Verification: refresh-config succeeded with approved home-write access; i3 validation exited 0 with existing wheel-command deprecations, one reload succeeded, and populated deployed renderer confirmed the named block order. README gate pass_no_change; targeted incident ledger check passed. Focused layout regressions: 21 unit tests passed; scheduler expectation updated for the requested order after its initial failure, then rerun before commit. Exact staged privacy review precedes commit.
+- Delivery: one focused commit on main, followed by push origin/main (Kevin-Mok/ai-cli-workflow). Preserve unrelated dirty ledger records and reports.
+- Limits: visual placement and clicks remain manual; no application deployment applies.
+- Rollback: restore volume, Redshift, Spotify, calendar order in the template, refresh configuration, validate and reload i3 once.
