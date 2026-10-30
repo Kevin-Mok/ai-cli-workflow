@@ -108,6 +108,27 @@ Rules:
 - `NIGHT_NOTE.md` and similar private helper files never go to a public
   remote.
 
+## Restarting A Stalled Run
+
+If an unattended session dies, idles, or stops on a blocker the ladder should
+have handled, the owner or a reviewer/watcher may restart it, but only after I
+have said restarts are OK for this run. Note that permission in the `/goal`
+text and in `NIGHT_NOTE.md`.
+
+- Never run more than one Codex session per repo. Check `ps` and
+  `systemd-inhibit --list` first.
+- Relaunch with the same `/goal` text plus the anti-blocking rules and the
+  current `NIGHT_NOTE.md` state, so approvals and scope changes carry over.
+- Branch and push rules stay unchanged: never `main`, never force, secret scan
+  before every push, private files stay private.
+- Keep the machine awake with an inhibitor bounded to the deadline.
+- No restarts in the last hour before the deadline, or after a stated cutoff.
+- Log each restart (time, reason, what changed) under "Workarounds" in
+  `NIGHT_NOTE.md`.
+- A restart that fails twice is reported, not looped.
+- Watchers advise first, and restart only after a nudge goes unanswered for
+  about 30 minutes.
+
 ## Push After Every Commit
 
 Always push the night branch right after each commit, so work is safe off the
@@ -133,7 +154,8 @@ file, `review-notes.md`, next to `NIGHT_NOTE.md`. They append dated notes with
 an id, the commit hash, the file, and the change wanted. The working session
 re-reads it before each stage and after each commit, applies each note, and
 records in `NIGHT_NOTE.md` what it applied or skipped and why. A reviewer or
-watcher advises only: it does not edit code or push.
+watcher advises by default: it does not edit code or push, and restarts a
+session only under "Restarting A Stalled Run".
 
 ## Optional: Trading And Backtest Work
 
