@@ -675,13 +675,19 @@ review them and audit history separately. No CI or server gate is installed.
 Concurrent external index mutations outside Git's commit locking remain outside
 the local scanner's control.
 
-#### When blocked: sanitize instead of only stopping
+#### When blocked: sanitize by default
 
-1. Stop. Do not bypass the gate (`--no-verify`) or weaken its rules.
+Sanitize is the default response whenever the gate blocks a commit or a push
+(both `check` and `pre-push` print it as the next step). Agents run it instead
+of stopping, bypassing, or skipping the push.
+
+1. Never bypass the gate (`--no-verify`) or weaken its rules.
 2. Run `python3 scripts/executable_privacy-gate sanitize` (dry-run by default; it
    lists what would change and masks every value).
-3. Review, then run it again with `--apply` (humans only; automated runs never
-   pass `--apply`). Add `--exclude` to write ignores to `.git/info/exclude`
+3. Then run it with `--apply` only when the user, or a standing instruction for
+   that run, allows it. Automated runs never pass `--apply` otherwise; for
+   unattended night runs the `/goal` text must explicitly grant `--apply` for
+   sanitize. Without that grant, report the dry-run plan and wait. Add `--exclude` to write ignores to `.git/info/exclude`
    instead of `.gitignore`.
    - Private-in-nature tracked files (gate-private paths, `NIGHT_NOTE.md`,
      `review-notes.md`, logs, `run-*.sh`, `.harness/` status files, `.env`, keys)
@@ -689,8 +695,11 @@ the local scanner's control.
    - Useful files with sensitive values get a sanitized `<name>.example` copy
      with placeholders (`<REDACTED_TOKEN>`, `<API_KEY>`, `<PRIVATE_KEY>`,
      `<EMAIL>`, `$HOME`, `<IP_ADDRESS>`, nil UUID). The original is ignored and
-     untracked; `SANITIZED.md` maps each placeholder to what to fill in (never
-     the values). Files that still fail the re-scan are listed for manual review.
+     untracked; `SANITIZED.md` has a table of each placeholder, the file and
+     line numbers, the kind of value it replaced, and what you must enter
+     manually, plus restore steps (copy `<name>.example` to `<name>`, fill the
+     placeholders, never commit the filled file). It never holds the values and
+     is updated idempotently on later runs. Files that still fail the re-scan are listed for manual review.
    - The staged result is re-scanned and reported clean only when it passes.
 4. Review `git diff --cached`, commit the sanitized version, rerun `check`.
 5. Push only the feature/night branch. Sanitize never rewrites history: local

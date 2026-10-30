@@ -102,6 +102,57 @@ class SanitizeTests(unittest.TestCase):
         self.assertFalse((self.repo / ".gitignore").exists())
         self.assertIn("/NIGHT_NOTE.md", (self.repo / ".git/info/exclude").read_text())
 
+    def test_gate_block_prints_sanitize_next_step(self):
+        result = self.gate("check")
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("Next step: run `privacy-gate sanitize`", result.stdout)
+        self.assert_no_secrets(result.stdout + result.stderr)
+
+    def test_pre_push_block_prints_sanitize_next_step(self):
+        self.git("commit", "-q", "-m", "fixture")
+        oid = self.git("rev-parse", "HEAD").strip()
+        record = f"refs/heads/fixture {oid} refs/heads/fixture {'0' * 40}\n"
+        result = subprocess.run([sys.executable, str(GATE), "pre-push", "--repo", str(self.repo), "--plain"],
+                                cwd=self.repo, env=self.env, capture_output=True, text=True, input=record)
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("BLOCKED", result.stdout)
+        self.assertIn("Next step: run `privacy-gate sanitize`", result.stdout)
+        self.assert_no_secrets(result.stdout + result.stderr)
+
+    def test_sanitized_doc_table_lists_lines_kinds_and_actions(self):
+        self.assertEqual(self.gate("sanitize", "--apply").returncode, 0)
+        doc = (self.repo / "SANITIZED.md").read_text()
+        self.assert_no_secrets(doc)
+        self.assertIn("| Placeholder | File: lines | Replaces | What you need to enter |", doc)
+        self.assertIn("Copy each `<name>.example` to `<name>`", doc)
+        self.assertIn("Never commit the filled file", doc)
+        rows = {line.split(" | ")[0][2:]: line for line in doc.splitlines() if line.startswith("| `")}
+        expected = {"`<REDACTED_TOKEN>`": ("1", "token"), "`<API_KEY>`": ("2", "credential"),
+                    "`<EMAIL>`": ("3", "email"), "`$HOME`": ("4", "home directory"), "`<IP_ADDRESS>`": ("5", "IP address")}
+        for placeholder, (line, kind) in expected.items():
+            row = rows[placeholder]
+            self.assertIn(f"`config.env.sh.example`: {line} |", row)
+            self.assertIn(kind, row)
+            self.assertIn("`config.env.sh`", row)
+
+    def test_sanitized_doc_update_is_idempotent(self):
+        self.assertEqual(self.gate("sanitize", "--apply").returncode, 0)
+        self.git("commit", "-q", "-m", "sanitized")
+        self.write("other.txt", f"mail {FAKE_EMAIL}\n")
+        self.git("add", "other.txt")
+        self.assertEqual(self.gate("sanitize", "--apply").returncode, 0)
+        # Re-sanitizing the same file again must not duplicate rows.
+        self.git("rm", "-q", "--cached", "--ignore-unmatch", "other.txt.example")
+        self.git("add", "-f", "other.txt")
+        self.assertEqual(self.gate("sanitize", "--apply").returncode, 0)
+        doc = (self.repo / "SANITIZED.md").read_text()
+        self.assert_no_secrets(doc)
+        rows = [line for line in doc.splitlines() if line.startswith("| `")]
+        self.assertEqual(len(rows), len(set(rows)))
+        self.assertEqual(sum("`other.txt.example`" in r for r in rows), 1)
+        self.assertEqual(sum("`config.env.sh.example`" in r for r in rows), 5)
+        self.assertEqual(doc.count("## How to restore"), 1)
+
 
 if __name__ == "__main__":
     unittest.main()
