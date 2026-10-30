@@ -61,6 +61,15 @@ everything it needs, so it does not depend on earlier messages:
 
 The session treats the goal text as authoritative over earlier messages.
 
+Launch unattended sessions with full permissions (Codex:
+`--dangerously-bypass-approvals-and-sandbox`) so no approval prompt can block
+the run. The goal text must say the session has full permissions, approval
+prompts will not appear, and it must never wait for approval. Full permissions
+do not relax the hard safety rules: no secrets, never `main`, no force-push,
+no destructive git or commands outside the work tree, no spending money, no
+live trading, no private files to a public remote, no `chezmoi apply`. Repeat
+them in the goal text; they still bind.
+
 If the goal completes early, set a new one with the same text and the new
 work. Do not start a second session on the same repo: extra sessions edit the
 same files and conflict.
@@ -119,6 +128,8 @@ text and in `NIGHT_NOTE.md`.
   `systemd-inhibit --list` first.
 - Relaunch with the same `/goal` text plus the anti-blocking rules and the
   current `NIGHT_NOTE.md` state, so approvals and scope changes carry over.
+- Relaunch with full permissions and the same safety rules (see "Running It
+  As A Goal").
 - Branch and push rules stay unchanged: never `main`, never force, secret scan
   before every push, private files stay private.
 - Keep the machine awake with an inhibitor bounded to the deadline.
