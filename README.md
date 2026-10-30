@@ -1124,13 +1124,16 @@ this.
   for YouTube and other sites. See the [short usage guide](docs/flavibot-browser.md).
 - The middle 4K music block uses
   [`now_playing_mpris`](dot_config/i3blocks/scripts/executable_now_playing_mpris)
-  to follow only the dedicated FlaviBot browser, with Spotify fallback.
-  Playing tracks take precedence over paused tracks; FlaviBot wins ties. It polls
+  to follow mpv and the dedicated FlaviBot browser, with Spotify fallback.
+  Playing tracks take precedence over paused tracks; ties prefer mpv, then FlaviBot, then Spotify.
+  mpv needs the distro `mpv-mpris` plugin (Ubuntu package of the same name);
+  reopen existing mpv windows after installing it. The plugin can also be loaded
+  from `~/.config/mpv/scripts/mpris.so` for a user-local installation. It polls
   every five seconds using Python 3 and systemd's `busctl` with JSON support.
   The helper resolves each browser's D-Bus owner to its process and checks the
   exact dedicated data directory. Ordinary Chrome media, including YouTube, is
-  ignored even when playing while FlaviBot is paused. If Spotify is playing and
-  FlaviBot is paused, Spotify appears; with both paused, FlaviBot appears.
+  ignored even when playing while FlaviBot is paused. With mpv absent, if Spotify is playing and
+  FlaviBot is paused, Spotify appears; with both paused and mpv absent, FlaviBot appears.
   No artist/title regex is required, so title-only songs remain eligible.
   With no eligible player, the block clears. Songs display as `Title - Artist`,
   or just the title when no artist is available.

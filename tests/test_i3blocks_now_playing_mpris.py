@@ -129,6 +129,34 @@ class NowPlayingTest(unittest.TestCase):
         return [args[4:] for args in map(json.loads, self.calls.read_text().splitlines())
                 if len(args) > 6 and args[6] == "org.mpris.MediaPlayer2.Player"]
 
+    def test_mpv_base_and_instance_names_win_playing_ties(self):
+        for name in ("org.mpris.MediaPlayer2.mpv", "org.mpris.MediaPlayer2.mpv.instance2449138"):
+            with self.subTest(name=name):
+                self.data["names"][name] = ":1.700"
+                self.data["players"][":1.700"] = player("cigarette-smoke.mp4", "")
+                self.assertEqual(self.run_block()[0], '<span size="x-small" rise="8192">▶️</span>cigarette-smoke.mp4')
+                self.run_block("1")
+                self.assertEqual(self.actions()[-1][0], ":1.700")
+                del self.data["names"][name]
+
+    def test_paused_mpv_loses_to_playing_but_wins_paused_ties(self):
+        self.data["names"]["org.mpris.MediaPlayer2.mpv"] = ":1.700"
+        self.data["players"][":1.700"] = player("Video", "Artist", "Paused")
+        self.assertIn("Soul Food", self.run_block()[0])
+        for props in self.data["players"].values():
+            props["PlaybackStatus"] = variant("s", "Paused")
+        self.assertEqual(self.run_block()[0], '<span size="x-small" rise="8192">⏸️</span>Video - Artist')
+
+    def test_stopped_or_empty_mpv_and_similarly_named_players_are_ignored(self):
+        for name, props in (("org.mpris.MediaPlayer2.mpv", player("Video", "", "Stopped")),
+                            ("org.mpris.MediaPlayer2.mpv", player("", "")),
+                            ("org.mpris.MediaPlayer2.mpvOther", player("Video", ""))):
+            with self.subTest(name=name, props=props):
+                self.data["names"][name] = ":1.700"
+                self.data["players"][":1.700"] = props
+                self.assertIn("Soul Food", self.run_block()[0])
+                del self.data["names"][name]
+
     def test_playing_chrome_wins_over_spotify(self):
         self.assertEqual(self.run_block(), ["<span size=\"x-small\" rise=\"8192\">▶️</span>Soul Food - Logic", "<span size=\"x-small\" rise=\"8192\">▶️</span>Soul Food - Logic", "#112233"])
 

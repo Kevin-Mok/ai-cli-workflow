@@ -12910,6 +12910,15 @@
       "findings": [],
       "reviewed_on": "2026-10-30",
       "sha256": "0ccc0b9e187c33be57f8eeb2fbc2bb63559ffa2cacb1272f782457409ace25d3"
+    },
+    {
+      "sha256": "7567147b3f8e5f8bdb7a4538bbd5d59cace68ff2cdfdd1f90277dab0e0d594bf",
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-10-30-mpv-bus-inspection.md"
+      ],
+      "reviewed_on": "2026-10-30",
+      "findings": [],
+      "decision": "No new learning: existing IPC sandbox, interactive sudo boundary and refresh ownership guidance cover these scoped workarounds. Live plugin verified; broad refresh remains blocked by unrelated MIME drift."
     }
   ],
   "review": {
