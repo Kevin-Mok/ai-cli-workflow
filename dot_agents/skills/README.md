@@ -25,6 +25,9 @@ skills tighten one specific aspect of an existing interface.
 ## Frontend Direction And Generators
 
 - [`hallmark`](hallmark/SKILL.md): Explicit-only Hallmark v2 website design, redesign and audit skill; pinned MIT vendor with [source record](hallmark/SOURCE.md).
+- [`ai-ux-deslop`](ai-ux-deslop/SKILL.md): Pre-code design brief, content cuts,
+  secondary-text removal, banned AI-tell list, copy rules and a Playwright
+  screenshot gate at 390px and 1280px so UI does not read as generic AI output.
 - [`ui-ux-pro-max`](ui-ux-pro-max/SKILL.md): Explicit-only offline Python/CSV
   search for design systems, palettes, fonts, charts and stack guidance. Pinned
   vendored runtime shared by Codex (`$ui-ux-pro-max`) and Claude (`/ui-ux-pro-max`).
