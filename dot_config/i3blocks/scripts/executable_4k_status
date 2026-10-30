@@ -19,16 +19,25 @@ def fit_song(markup, width, measure):
     match = re.match(r"(.*</span>\s?)(.*)", markup)
     prefix, track = match.groups() if match else ("", markup)
     track = html.unescape(track)
+    # Media filenames keep their extension and descriptive ending.
+    keep_end = bool(re.search(r"\.(?:mp4|mkv|webm|mov|m4v|avi|mpg|mpeg|ts|mts|m2ts|wmv|flv|3gp|"
+                              r"mp3|m4a|flac|ogg|opus|wav|aac)$", track, re.IGNORECASE))
+
+    def candidate(length):
+        fragment = track[-length:].lstrip() if keep_end and length else track[:length].rstrip()
+        fragment = html.escape(fragment)
+        return prefix + ("…" + fragment if keep_end else fragment + "…")
+
     if measure(prefix + "…") > width:
         return "…" if measure("…") <= width else ""
     low, high = 0, len(track)
     while low < high:
         middle = (low + high + 1) // 2
-        if measure(prefix + html.escape(track[:middle].rstrip()) + "…") <= width:
+        if measure(candidate(middle)) <= width:
             low = middle
         else:
             high = middle - 1
-    return prefix + html.escape(track[:low].rstrip()) + "…"
+    return candidate(low)
 
 
 def layout_blocks(blocks, screen_width, workspace_width, measure, border_scale=1):

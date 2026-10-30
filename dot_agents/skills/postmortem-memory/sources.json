@@ -12912,7 +12912,7 @@
       "sha256": "0ccc0b9e187c33be57f8eeb2fbc2bb63559ffa2cacb1272f782457409ace25d3"
     },
     {
-      "sha256": "7567147b3f8e5f8bdb7a4538bbd5d59cace68ff2cdfdd1f90277dab0e0d594bf",
+      "sha256": "b7f31333e45f604e6af23bad12c1bac1398b094b65a5b9c7b5d0b219d28bc9f6",
       "aliases": [
         "/home/kevin/linux-config/docs/postmortem/2026-10-30-mpv-bus-inspection.md"
       ],

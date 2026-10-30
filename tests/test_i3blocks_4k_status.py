@@ -125,6 +125,25 @@ class SongLayout(unittest.TestCase):
                 self.assertEqual(blocks[1]["full_text"], "🌡️ 4500 K")
                 self.assertEqual(blocks[3]["full_text"], calendar)
 
+    def test_long_filename_keeps_ending_and_playback_prefix(self):
+        prefix = '🎵<span size="x-small" rise="8192">▶️</span>'
+        filename = "PXL_20261028_011135586_cigarette-smoke.mp4"
+        fitted = self.module["fit_song"](prefix + filename, 240, measure)
+        self.assertTrue(fitted.startswith(prefix + "…"), fitted)
+        self.assertTrue(fitted.endswith("cigarette-smoke.mp4"), fitted)
+        self.assertLessEqual(measure(fitted), 240)
+        self.assertEqual(self.module["fit_song"]("short.mp4", 240, measure), "short.mp4")
+
+    def test_filename_suffix_fitting_handles_markup_unicode_and_tiny_budgets(self):
+        prefix = '<span size="x-small">⏸️</span>'
+        title = "前置き" * 30 + "A&amp;B.MKV"
+        fitted = self.module["fit_song"](prefix + title, 140, measure)
+        self.assertTrue(fitted.startswith(prefix + "…"), fitted)
+        self.assertTrue(fitted.endswith("A&amp;B.MKV"), fitted)
+        self.assertLessEqual(measure(fitted), 140)
+        self.assertEqual(self.module["fit_song"](prefix + title, 10, measure), "…")
+        self.assertEqual(self.module["fit_song"](prefix + title, 0, measure), "")
+
     def test_unicode_markup_is_valid_and_state_prefix_is_preserved(self):
         prefix = ' <span size="x-small" rise="8192">▶</span> '
         fitted = self.module["fit_song"](prefix + "A&amp;B - 東京" * 30, 250, measure)
