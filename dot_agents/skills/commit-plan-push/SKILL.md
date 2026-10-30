@@ -99,3 +99,13 @@ findings and scanner errors as blocking safety failures; repair and restage the
 candidate before retrying. Preserve the active Git hooks. Plumbing commits must
 pass the exact immutable tree OID with `--tree OID` to the same shared gate.
 See the root README privacy-gate section for activation, private rules and limits.
+
+When the privacy gate blocks a commit or push, sanitize by default instead of
+stopping, bypassing, or skipping the push: run
+`python3 scripts/executable_privacy-gate sanitize` (dry-run), then `--apply`
+only when the user or a standing instruction for this run allows it (automated
+runs never use `--apply` otherwise; unattended night runs need the `/goal` text
+to grant `--apply` for sanitize explicitly; without it, report the dry-run plan).
+After applying, commit the sanitized version and `SANITIZED.md` (the table of
+placeholders the user must fill in manually), rerun `check`, and push only the
+feature/night branch. Never rewrite pushed history yourself.

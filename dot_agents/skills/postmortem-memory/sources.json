@@ -12892,6 +12892,15 @@
       "findings": [],
       "reviewed_on": "2026-10-30",
       "sha256": "10f84e9afb8481d866cf8d2df59232f6333babbf4befd89cf1a0592de80f99dd"
+    },
+    {
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-10-30-merge-refresh-local-drift.md"
+      ],
+      "decision": "No new learning: preserve local drift and distinguish Git integration from live activation. refresh-config stopped on MIME associations, exit 1; activation_pending.",
+      "findings": [],
+      "reviewed_on": "2026-10-30",
+      "sha256": "c061e7e565ceb6d35762b2ae947e4cecfd9593ebe81a5482e0866045e67f31a5"
     }
   ],
   "review": {

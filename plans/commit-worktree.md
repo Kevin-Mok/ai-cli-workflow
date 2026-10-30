@@ -14,7 +14,7 @@ Initial status captured on main at 2d35cd3, behind origin/main by seven commits.
 - [x] Commit workflow policy and reviewed incident knowledge: c48f1c5, privacy gate passed.
 - [x] Commit media code with matching documentation, plan and incidents: 4748413; gates passed.
 - [x] Commit desktop code with matching documentation, plan and incidents: 401057d; gates passed.
-- [ ] Attempt upstream push and report residuals.
+- [x] Initial push attempted: rejected non-fast-forward; all four local commits retained.
 
 ## Risks and verification
 
@@ -25,3 +25,11 @@ Media milestone: feat(media): add resumable landscape concat checks; 19 focused 
 Desktop milestone: fix(i3): fit smaller music across bar; 19 focused tests passed. No repeated physical desktop acceptance.
 
 Final prompt milestone: docs(prompts): add Redshift i3block specification. Reviewed standalone implementation prompt; no runtime behavior added. Residuals: :memory:.ses (machine-local), .harness/concat-concert/ (approval review rejected local service/media metadata), scripts/privacy_gate_approvals.json (cross-project approval provenance not established). All other reviewed changes delivered. One push to origin/main follows this series; upstream was seven commits ahead, so rejection is possible and no history rewrite is authorized.
+
+## Upstream integration, 2026-10-30
+
+User explicitly requested merge/rebase and push. Chose a merge to preserve the four published local commit identities. Fetched origin; merged origin/main with no conflicts (README auto-merged). Existing privacy approvals, three harness files and :memory:.ses remain byte-identical and excluded. Merge milestone: chore: merge upstream main for delivery. README gate pass_no_change. Focused concat/i3/sanitize checks and privacy gate required before merge commit; push follows verification. No configuration implementation changed locally; upstream adds privacy sanitize and night workflow guidance. Full-render acceptance remains paused.
+
+Required merge refresh attempted, exit 1: local mimeapps.list drift; preserved, activation incomplete. Incident and reviewed ledger ship with merge.
+
+Fresh merged-tree verification: concat 19/19, i3 status 19/19, privacy sanitize 8/8, all exit 0. README gate pass_no_change; staged whitespace check passed. Reviewed incident targeted check exit 0. No production merge conflicts or manual resolutions.

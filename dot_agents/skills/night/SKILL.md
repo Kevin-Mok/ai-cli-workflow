@@ -26,7 +26,8 @@ In Codex, the task is whatever text follows `$night` in my message.
 4. Do not deploy, delete files, touch secrets or CI config, run `chezmoi apply`,
    or call paid APIs.
 5. Never stop to wait for me. When unsure, take the safest option, record the
-   choice in `NIGHT_NOTE.md`, and keep going.
+   choice in `NIGHT_NOTE.md`, and keep going. A blocker never ends the run
+   (see "When Blocked").
 6. When done, run the relevant tests. If you cannot, write down why.
 7. Finish `NIGHT_NOTE.md` with: branch name, what you did, how you tested it,
    what is still untested, and the questions for me in the morning, each with
@@ -52,11 +53,92 @@ everything it needs, so it does not depend on earlier messages:
   anything"
 - the files to read first: the task file, the plan, and `review-notes.md`
 - the commit rule and the push rule
-- the order of work, and the stop-at-first-failing-gate rule
+- the order of work, and the stop-at-first-failing-gate rule (a failing gate
+  stops that stage, not the run: see "When Blocked")
+- every approval or change I gave in chat or relayed messages: remote
+  visibility, whether pushing is approved, scope changes, and the allowed
+  branch. Write them into the goal text itself at launch.
+
+The session treats the goal text as authoritative over earlier messages.
+
+Launch unattended sessions with full permissions (Codex:
+`--dangerously-bypass-approvals-and-sandbox`) so no approval prompt can block
+the run. The goal text must say the session has full permissions, approval
+prompts will not appear, and it must never wait for approval. Full permissions
+do not relax the hard safety rules: no secrets, never `main`, no force-push,
+no destructive git or commands outside the work tree, no spending money, no
+live trading, no private files to a public remote, no `chezmoi apply`. Repeat
+them in the goal text; they still bind.
 
 If the goal completes early, set a new one with the same text and the new
 work. Do not start a second session on the same repo: extra sessions edit the
 same files and conflict.
+
+## When Blocked
+
+Never stop the whole run on a blocker. Stop only for the hard safety rules:
+secrets, `main`, force-push, destructive commands, spending money, live
+trading, or pushing private files to a public remote.
+
+Work down this ladder, logging each step:
+
+1. Retry once with backoff.
+2. Try an alternative source, tool, or approach: a keyless public API,
+   another endpoint, a different library, or a cached/static fixture labelled
+   as such.
+3. Narrow the scope to the part that works.
+4. Stub the rest behind a clearly marked `TODO`, ship the working subset, mark
+   the gap, and move on to the next stage.
+5. Record it under "Workarounds" in `NIGHT_NOTE.md`.
+
+Examples:
+
+- Bot-blocked site (Etherscan etc.): use keyless APIs (Blockscout;
+  Coinbase/Binance for prices).
+- Rate limit: back off, batch, and cache responses to disk.
+- Missing API key: use a keyless alternative. Never ask for or invent keys.
+- Failing test unrelated to the task: record it and continue.
+- Flaky network: cache responses to fixtures for offline tests.
+
+Rules:
+
+- Time-box: no blocker gets more than ~30 minutes or ~3 attempts of one
+  approach before moving down the ladder.
+- Count failures per approach, not per goal. The count resets when I change
+  scope or the approach is swapped. Failures of dropped requirements do not
+  count.
+- Every commit leaves a working deliverable. Keep committing checkpoints
+  locally even when pushing is blocked.
+- Append a short timestamped heartbeat line to `NIGHT_NOTE.md` at each stage
+  so a reviewer or watcher can see progress.
+- Keep a "Workarounds" section in `NIGHT_NOTE.md`: each blocker, what was
+  tried, the alternative used, and what I should revisit. Put it at the top
+  of the morning summary.
+- `NIGHT_NOTE.md` and similar private helper files never go to a public
+  remote.
+
+## Restarting A Stalled Run
+
+If an unattended session dies, idles, or stops on a blocker the ladder should
+have handled, the owner or a reviewer/watcher may restart it, but only after I
+have said restarts are OK for this run. Note that permission in the `/goal`
+text and in `NIGHT_NOTE.md`.
+
+- Never run more than one Codex session per repo. Check `ps` and
+  `systemd-inhibit --list` first.
+- Relaunch with the same `/goal` text plus the anti-blocking rules and the
+  current `NIGHT_NOTE.md` state, so approvals and scope changes carry over.
+- Relaunch with full permissions and the same safety rules (see "Running It
+  As A Goal").
+- Branch and push rules stay unchanged: never `main`, never force, secret scan
+  before every push, private files stay private.
+- Keep the machine awake with an inhibitor bounded to the deadline.
+- No restarts in the last hour before the deadline, or after a stated cutoff.
+- Log each restart (time, reason, what changed) under "Workarounds" in
+  `NIGHT_NOTE.md`.
+- A restart that fails twice is reported, not looped.
+- Watchers advise first, and restart only after a nudge goes unanswered for
+  about 30 minutes.
 
 ## Push After Every Commit
 
@@ -83,7 +165,8 @@ file, `review-notes.md`, next to `NIGHT_NOTE.md`. They append dated notes with
 an id, the commit hash, the file, and the change wanted. The working session
 re-reads it before each stage and after each commit, applies each note, and
 records in `NIGHT_NOTE.md` what it applied or skipped and why. A reviewer or
-watcher advises only: it does not edit code or push.
+watcher advises by default: it does not edit code or push, and restarts a
+session only under "Restarting A Stalled Run".
 
 ## Optional: Trading And Backtest Work
 
