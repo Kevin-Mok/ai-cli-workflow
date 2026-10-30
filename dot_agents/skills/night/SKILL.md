@@ -19,8 +19,9 @@ In Codex, the task is whatever text follows `$night` in my message.
    when it is set up). Skip anything that needs my call.
 2. Before changing anything, write one line in `NIGHT_NOTE.md` at the repo root
    saying what you are doing. Never stage or commit `NIGHT_NOTE.md`.
-3. Create a new branch (for example `night/<yyyy-mm-dd>-<slug>`) and change
-   things only there. Commit in small steps and push the branch after every
+3. Create a new branch named `night/<yyyy-mm-dd>-<slug>`, where the slug is a
+   few words describing tonight's task (for example `night/2026-10-29-pmo-backtest`),
+   and change things only there. Commit in small steps and push the branch after every
    commit (see "Push After Every Commit").
 4. Do not deploy, delete files, touch secrets or CI config, run `chezmoi apply`,
    or call paid APIs.
@@ -61,7 +62,9 @@ work.
 Always push the night branch right after each commit, so work is safe off the
 machine and a reviewer can read it.
 
-- Push only the night branch. Never push `main` or the default branch, never
+- Push the night branch under its own name, with
+  `git push -u origin night/<yyyy-mm-dd>-<slug>`, so it never shares a branch
+  with other work. Push only that branch. Never push `main` or the default branch, never
   force-push, and never push `NIGHT_NOTE.md`.
 - Prefer a private remote. If the repo has no remote, or the only remote is
   public and the work is not meant to be public, keep committing locally and
