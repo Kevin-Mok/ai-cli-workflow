@@ -12901,6 +12901,15 @@
       "findings": [],
       "reviewed_on": "2026-10-30",
       "sha256": "c061e7e565ceb6d35762b2ae947e4cecfd9593ebe81a5482e0866045e67f31a5"
+    },
+    {
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-10-30-wallet-shortcut-inspection.md"
+      ],
+      "decision": "No new reusable learning: repeats reviewed configured Fish startup inspection and source-path guidance. Scoped shortcut activation is verified; full refresh remains blocked by mimeapps drift. Commit validation exposed an unchanged invalid Python test identifier; suite did not run and remains unresolved.",
+      "findings": [],
+      "reviewed_on": "2026-10-30",
+      "sha256": "0ccc0b9e187c33be57f8eeb2fbc2bb63559ffa2cacb1272f782457409ace25d3"
     }
   ],
   "review": {

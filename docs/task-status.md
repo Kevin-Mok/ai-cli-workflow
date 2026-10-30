@@ -224,3 +224,12 @@ This document records delivery milestones and verification for completed reposit
 - Delivery: one focused commit on main, then push origin/main. No implementation work remains; preserve unrelated dirty files/hunks.
 - Limits: screenshot pixel measurement was not performed; conversion assumes135DPI. No web deployment applies.
 - Rollback: restore main-bar font50 in source and live config, run refresh-config, validate and reload once.
+
+## Wallet directory shortcut — chore(fish): add wallet directory shortcut
+
+- Complete: wl expands to `cd ~/coding/wallet-gas-cost` in cdn; previous Watson definition retained as a comment. Matching smoke check and reviewed inspection incident included.
+- Scope: session 01a18d7e-f7a1-7861-8cd3-6aa283efaf9e; direct-write evidence because the helper did not detect nested tool writes. Include only this session's ledger record; preserve unrelated ledger hunks and two other-session reports.
+- Verification: installed abbreviation and Fish syntax pass; repeated request is a no-op; README gate pass_no_change. Focused suite cannot parse unchanged tests/test_fish_alias.py:74 and ran no tests. Targeted incident check and staged privacy review precede commit.
+- Delivery: one focused commit on main, then push origin/main (Kevin-Mok/ai-cli-workflow). No implementation work remains; full refresh is blocked by pre-existing mimeapps drift, while scoped catalog regeneration succeeded.
+- Limits: interactive typing was not exercised. The invalid test identifier remains outside session scope.
+- Rollback: remove wl from directory source/live catalogs, uncomment its Watson mapping, and regenerate shortcuts.

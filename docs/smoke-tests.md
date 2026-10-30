@@ -1342,6 +1342,9 @@ only a disposable temporary fixture and requires no sudo.
 
 ## Fish Alias Skill
 
+- Action: After refreshing, run `fish --no-config -c 'source ~/.config/fish/key_abbr.fish; abbr --show | string match "abbr -a -- wl *"'`; in an existing Fish shell source that file, type `wl` then Space and cancel with Ctrl+C.
+  Expected: `wl` expands to `cd ~/coding/wallet-gas-cost`; the previous Watson mapping is commented in the command template. Repeating the absolute directory request previews a no-op.
+
 - Action: After refresh, source `~/.config/fish/key_abbr.fish` in an existing Fish shell. On an empty command line type `or` then Space; inspect without pressing Enter and cancel with Ctrl+C. Also type `false; or ` and `echo or ` without executing them.
   Expected: Standalone `or` expands to `cd /mnt/usb-8tb/concerts/olivia-rodrigo`; logical `or` and argument `or` remain unchanged. Fish treats `or` as a keyword, so this abbreviation uses a guarded anywhere rule. Existing shells need the source step; a refresh in another process cannot reload their abbreviations.
 - Action: Run `python3 -B tests/test_reserved_fish_shortcut.py`.
