@@ -15,7 +15,8 @@ SCRIPT = Path(__file__).resolve().parents[1] / "dot_config/i3blocks/scripts/exec
 
 
 def measure(markup):
-    return len(html.unescape(re.sub(r"<[^>]+>", "", markup))) * 10
+    scale = 0.7 if markup.startswith('<span size="70%">') else 1
+    return round(len(html.unescape(re.sub(r"<[^>]+>", "", markup))) * 10 * scale)
 
 
 class SongLayout(unittest.TestCase):
@@ -31,17 +32,28 @@ class SongLayout(unittest.TestCase):
             {"name": "calendar", "full_text": "Thu 10/22 13:35", "short_text": "13:35"},
         ]
 
-    def test_long_song_ellipsizes_and_volume_is_centered(self):
+    def test_long_song_uses_space_up_to_workspace_buttons(self):
         blocks = self.module["layout_blocks"](self.blocks(), 2000, 400, measure)
-        self.assertTrue(blocks[2]["full_text"].endswith("…"))
+        self.assertTrue(blocks[2]["full_text"].endswith("…</span>"))
         self.assertEqual(blocks[0]["full_text"], "VOL 33%")
         width = sum(max(measure(b["full_text"]), b.get("min_width", 0)) for b in blocks) + 75
-        self.assertLessEqual(abs((2000 - width + 35) - 1000), 2)
+        self.assertLessEqual(width, 2000 - 400 - 8)
+        self.assertGreaterEqual(width, 2000 - 400 - 8 - 14)
+        self.assertEqual(blocks[3]["full_text"], "Thu 10/22 13:35")
 
-    def test_short_song_keeps_volume_at_center(self):
+    def test_short_song_uses_smaller_font_without_spacer(self):
         blocks = self.module["layout_blocks"](self.blocks("Short song"), 2000, 400, measure)
-        self.assertEqual(blocks[2]["full_text"], "Short song")
-        self.assertGreater(blocks[2]["min_width"], measure("Short song"))
+        self.assertEqual(blocks[2]["full_text"], '<span size="70%">Short song</span>')
+        self.assertLessEqual(blocks[2].get("min_width", 0), measure(blocks[2]["full_text"]))
+        self.assertEqual(blocks[1]["full_text"], "🌡️ 4500 K")
+        self.assertEqual(blocks[3]["full_text"], "Thu 10/22 13:35")
+
+    def test_smaller_song_fits_more_text_without_changing_other_blocks(self):
+        source = self.blocks("Olivia Rodrigo - the cure")
+        blocks = self.module["layout_blocks"](source, 2000, 1420, measure)
+        self.assertEqual(blocks[2]["full_text"], '<span size="70%">Olivia Rodrigo - the cure</span>')
+        for index in (0, 1, 3):
+            self.assertEqual(blocks[index]["full_text"], source[index]["full_text"])
 
     def test_padding_preserves_click_identity_and_text(self):
         source = [{"name": "volume", "instance": "sink", "full_text": "🔉38%"}]
@@ -90,7 +102,7 @@ class SongLayout(unittest.TestCase):
 
     def test_workspace_pressure_shortens_song_before_volume(self):
         blocks = self.module["layout_blocks"](self.blocks(), 2000, 1550, measure)
-        self.assertTrue(blocks[2]["full_text"].endswith("…"))
+        self.assertTrue(blocks[2]["full_text"].endswith("…</span>"))
         self.assertLess(measure(blocks[2]["full_text"]), 200)
         self.assertEqual(blocks[0]["full_text"], "VOL 33%")
 
@@ -123,11 +135,11 @@ class SongLayout(unittest.TestCase):
 
     def test_calendar_compacts_before_music_emoji_is_lost(self):
         prefix = '🎵<span size="x-small" rise="8192">▶️</span>'
-        for workspace, calendar in ((1580, "13:35"), (1670, "")):
+        for workspace, calendar in ((1560, "Thu 10/22 13:35"), (1670, "13:35"), (1720, "")):
             with self.subTest(workspace=workspace):
                 blocks = self.module["layout_blocks"](self.blocks(prefix + "Artist - " + "Song " * 20),
                                                        2000, workspace, measure)
-                self.assertTrue(blocks[2]["full_text"].startswith(prefix), blocks[2])
+                self.assertTrue(blocks[2]["full_text"].startswith('<span size="70%">' + prefix), blocks[2])
                 self.assertEqual(blocks[3]["full_text"], calendar)
 
     def test_headers_click_identity_and_empty_song_are_preserved(self):
@@ -138,13 +150,13 @@ class SongLayout(unittest.TestCase):
         blocks = self.blocks("")
         blocks[2]["instance"] = "click-target"
         result = self.module["layout_blocks"](blocks, 2000, 400, measure)
-        self.assertEqual(result[2]["full_text"], "<span></span>")
-        self.assertGreater(result[2]["min_width"], 0)
+        self.assertEqual(result[2]["full_text"], "")
+        self.assertEqual(result[2].get("min_width", 0), 0)
         self.assertEqual(result[2]["instance"], "click-target")
 
-    def test_compact_song_prioritizes_title_over_long_artist(self):
+    def test_compact_song_keeps_artist_then_title(self):
         fitted = self.module["fit_song"]("Very long artist name - Stitches", 160, measure)
-        self.assertTrue(fitted.startswith("Stitches"))
+        self.assertEqual(fitted, "Very long artis…")
         self.assertTrue(fitted.endswith("…"))
 
     def test_no_song_still_reserves_volume_under_pressure(self):
@@ -237,7 +249,9 @@ esac
                 capture_output=True, text=True, timeout=5,
             )
             self.assertEqual(result.returncode, 0, result.stderr)
-            self.assertIn('"min_width"', result.stdout)
+            status = json.loads(result.stdout.splitlines()[-1].lstrip(","))
+            song = next(block for block in status if block.get("name") == "spotify")
+            self.assertIn('<span size="70%">', song["full_text"])
 
 
 if __name__ == "__main__":

@@ -974,8 +974,9 @@ this.
   `~/scripts/kitty-monitor-font-smoke --plain` (`--details` for diagnostics),
   which uses isolated Kitty/Xvfb fixtures; physical calibration still needs review.
 - Workspace buttons use 15px left padding, a 10px number/icon gap, and 30px right padding at the current 135 DPI; changing DPI requires recalibrating the Pango spacers.
-- The 4K i3 bar keeps volume near the monitor center and fits the song beside it
-  with an ellipsis when crowded, reserving volume and Redshift space before song or calendar.
+- The 4K i3 bar uses available space beside workspace buttons for status blocks.
+  Music uses 70% of the bar font, keeps title-artist order,
+  and ellipsizes first when crowded, before the calendar compacts or hides.
 - The DP-2 4K bar uses a 46.2667-point font at 135 DPI, about 7 pixels smaller
   than its original 50-point setting; other bar font sizes are unchanged.
 - [`dot_config/kitty/kitty.conf`](dot_config/kitty/kitty.conf)
@@ -1160,7 +1161,7 @@ this.
   battery, signal and brightness icons. Values retain pywal `color7`; Redshift
   rereads that palette on each update and falls back to `#cbe4ff` if unavailable.
   Paused DND remains red. Compact color playback buttons remain beside
-  the music icon; the date shortens when needed to keep that icon visible, and
+  the music icon; music shortens first, then the date shortens when needed to keep that icon visible, and
   compact time uses a clock icon. Icons have 20 px of space before their values,
   using Pango spacing rather than a monospace blank; the shared status wrapper adds about 25 physical pixels
   of transparent right padding beside 25 px separators, shifting room toward the
