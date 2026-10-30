@@ -64,7 +64,8 @@ machine and a reviewer can read it.
 
 - Push the night branch under its own name, with
   `git push -u origin night/<yyyy-mm-dd>-<slug>`, so it never shares a branch
-  with other work. Push only that branch. Never push `main` or the default branch, never
+  with other work, and never reuse a branch from an earlier night. Push only
+  that branch. Never push `main` or the default branch, never
   force-push, and never push `NIGHT_NOTE.md`.
 - Prefer a private remote. If the repo has no remote, or the only remote is
   public and the work is not meant to be public, keep committing locally and
