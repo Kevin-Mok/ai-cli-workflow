@@ -679,6 +679,18 @@ security checks with the arguments you passed.
 - Limitations: internal API version-sensitive; dispatch root cause unproved. Physical calibration remains manual; dedicated XID-targeted whole-workspace moves passed. Scoped deployment bypassed unrelated audio-mute refresh divergence without resolving it.
 - Source: [Kitty monitor runtime](../../../../docs/postmortem/2026-10-22-kitty-monitor-probe-access.md); reviewed hash retained in sources.json.
 
+
+## ext-console-readiness-diagnostics
+
+- Status: **verified_fix**; confidence: **confirmed**; verification scope: **runtime** (diagnostic classification only).
+- Symptoms: generic prelogin readiness timeout hides capture-versus-screen outcome; printed resume encourages an unchanged retry instead of inspection.
+- Applicability: offline VM console readiness before any guest input.
+- Diagnostics: retain only successful frame count, fixed last-screen class and stable read/prompt failure code; observe the actual native reader without keys and remove temporary frames.
+- Remedy: keep exact login acceptance unchanged. Password/account-session hints only block input. Print normal-user open-proof as next_command and retain resume_command separately for after inspection.
+- Verification:3 defining RED tests then daily22/full506 with2skips and helper mypy pass. Actual native probe reads1frame/session-like, console-session in0.893s with no keys; sanitized artifact independently reviewed.
+- Limitations: hints never prove authentication; false positives only block. Historical failed frame unavailable. Root daily-run/login/report/server/GNOME remain pending. Native timing and credentials unchanged.
+- Source: [Repeated console readiness timeout](/home/kevin/coding/triway-nextjs/docs/postmortem/2026-10-29-console-ready-timeout.md) (SHA-256 `8c8b179ea0c6b9d53e12664920f114a732b953a8876f413bc661a7b2b1abc383`).
+
 ## local-fish-keyword-abbreviation
 
 - Status: **verified_fix**; confidence: **confirmed**; scope: **runtime**.
@@ -690,6 +702,7 @@ security checks with the arguments you passed.
 - Source: [or expansion incident](../../../../docs/postmortem/2026-10-29-or-abbreviation-expansion.md).
 
 ## local-i3blocks-config-properties
+
 - Status: **verified_fix**; confidence: **confirmed**; scope: **runtime**.
 - Symptoms/applicability: i3blocks1.4 rejects an arbitrary SHORTFMT config key and i3bar reports status-command exit.
 - Diagnostic: run the installed scheduler against the actual config before refresh; pure layout tests do not exercise config parsing.
@@ -710,3 +723,69 @@ Asymmetric i3block padding must be injected into i3bar JSON, not the i3blocks1.4
 - Verification: 27 isolated real select/move keys passed; 32 original application windows retained workspace numbers. Output restoration retained current visibility/focus; final padding update preserved IDs/output/visibility/focus. 16 layout and one scheduler test plus live checkers passed.
 - Limits: Physical firmware untested, padding varies with font/DPI, unrelated stale music-label assertion remains failing, default IPC still needs scoped approved execution.
 - Source: [Workspace icon activation boundaries](../../../../docs/postmortem/2026-10-29-workspace-icons-activation.md).
+
+## local-strategy-finite-detached-snapshots
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **code**.
+- Symptoms: Infinity survives in failed-candidate report parameters and changes to null after JSON serialization.; An unknown nested confluence property retains a caller object reference that can mutate completed report evidence.
+- Applicability: Finite, serializable research-candidate snapshots recorded for both successful and failed trial evaluations.
+- Diagnostic checks: Round-trip failed-candidate reports through JSON and mutate the original caller objects after creating a report.; Test unknown nested keys, nonfinite numbers and omitted optional values independently of finite but invalid candidate settings.
+- Remedy: Snapshot only known scalar fields, reject unknown keys and nonfinite values before trials, omit undefined values, and copy supported nested fields. Keep finite invalid candidate evaluations counted as failed trials rather than silently dropping them.
+- Verification evidence: Independent Infinity/JSON and nested-mutation reproducers exposed the boundary defects. Strict snapshots and detached confluence copies passed final 38 focused/167 full tests, typecheck/build and independent review; original assertions remained intact.
+- Limitations: This is an explicit small schema, not a general object serializer or proof against every JavaScript object behavior. Code/fixture evidence does not establish a trading edge or external data fidelity.
+- Source: [2026-10-29-strategy-input-boundaries.md](/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-29-strategy-input-boundaries.md) (SHA-256 `c886f914372c59dbd743f868e2994ddaa7da51e073093f79d38496e1ff926040`).
+
+## local-json-zero-allocation-return
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **code**.
+- Symptoms: Multiplying a negative baseline return by zero allocation produces JavaScript negative zero, violating exact zero-exposure and JSON-round-trip equality assertions.
+- Applicability: Numeric reports where zero allocation semantically means a cash-only zero return and deterministic JSON equality is required.
+- Diagnostic checks: Use a losing baseline with zero allocation and assert positive zero plus JSON-round-trip equality.; Retain a nonzero-allocation loss case so a serialization repair cannot clamp genuine negative returns.
+- Remedy: Return explicit positive zero only when allocation is zero; otherwise retain the signed baseline-return multiplication.
+- Verification evidence: The first exposure/controller GREEN attempt passed36/38, with exact-zero and report-round-trip failures. The zero-allocation-only normalization then passed38/38 strategy and167/167 full tests, typecheck/build and independent exposure-formula review.
+- Limitations: This normalizes a semantically zero result only; it is not a general numerical rounding policy and must not hide losses or other nonfinite values.
+- Source: [2026-10-29-strategy-input-boundaries.md](/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-29-strategy-input-boundaries.md) (SHA-256 `c886f914372c59dbd743f868e2994ddaa7da51e073093f79d38496e1ff926040`).
+
+## local-typescript-assertion-narrowing-guard
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **code**.
+- Symptoms: TypeScript reports Property error does not exist on type never in a fault branch after a typed Node assert.equal has already narrowed a discriminated union to its healthy case.
+- Applicability: TypeScript smoke scripts combining assertion-function typings and an explicit discriminant guard on the same value.
+- Diagnostic checks: Read the installed assertion signature and adjacent control-flow guard; distinguish a compiler narrowing error from a runtime accounting failure.; Confirm the fault guard remains reachable before narrowing and retain all financial/idempotence assertions.
+- Remedy: Use the explicit fault guard as the status check and remove only the preceding redundant healthy assertion. Do not cast away the union, remove the fault throw or weaken unrelated checks.
+- Verification evidence: The runtime fixture and179/179 full tests passed before typecheck failed at paper-smoke.ts:40 with TS2339. After removing one redundant assertion, fresh typecheck/build and delayed/zero-delay/plain/JSON smoke commands exited0; independent review reran12/12 broker tests and typecheck. Broker/test sources were unchanged; the full179-test pass preceded the CLI-only correction.
+- Limitations: Evidence verifies the compiler/CLI boundary and synthetic accounting checks, not live broker behavior or actual market arrival. The full suite was not repeated after the one-line CLI correction.
+- Source: [2026-10-29-paper-cli-narrowing.md](/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-29-paper-cli-narrowing.md) (SHA-256 `725aabbb802bbc807699aa8565becbe3cf9882881d9abddad84ce00124f32777`).
+
+## local-history-raw-window-provenance
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **code**.
+- Symptoms: Aggregate snapshot rejects newest-page oldestRawTime after older windows are appended; Short normalized candle arrays can falsely imply provider exhaustion after invalid-candle omission
+- Applicability: Paginated historical market-data loaders whose normalization can omit provider observations and whose immutable cache stores aggregate and per-window provenance.
+- Diagnostic checks: Track raw timestamp cursor and explicit provider exhaustion before OHLC omission rather than deriving completion from normalized count.; Check per-window cursor chains, count sums, warnings, request bounds and aggregate metadata against the actual combined bars.; Validate versioned snapshots and fingerprints on offline reuse; preserve earlier schema files.
+- Remedy: Retain raw cursor/exhaustion separately from normalized bars. Bound raw observations before normalization, keep aggregate oldest cursor coherent with all windows, preserve newest observation metadata, and publish only validated complete versioned snapshots without overwriting earlier observations.
+- Verification evidence: Defining omission/cursor/provenance cases preceded the fix. Loader gate reached61 focused tests; shared276-test gate, typecheck and build passed. Ten frozen provider histories validated and reused offline twice with identical bounds/counts.
+- Limitations: The evidence verifies loader and cached-observation contracts, not provider completeness, historical session arrival, executable prices or TradingView numerical parity. No financial experiment or final holdout ran.
+- Source: [2026-10-29-history-window-provenance.md](/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-29-history-window-provenance.md) (SHA-256 `c34e53fdb1fab6df18c9f88d183e1f40e5ce3cd3551ac7a3af87dde661a0e6f8`).
+
+## local-exclusive-provider-window-exhaustion
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **code**.
+- Symptoms: A nonempty Yahoo response exactly equal to exclusive endTime becomes NO_MARKET_DATA; A later boundary-only page can cause false maximum-history completion and publication
+- Applicability: History paginators that treat a provider empty-data classification as exhaustion while applying exclusive end bounds.
+- Diagnostic checks: Test daily and weekly quotes exactly equal to the exclusive end, not only strictly later timestamps.; Exercise a valid5000-candle first page followed by a nonempty boundary-only page and require an error with no published snapshot.; Keep truly empty terminal-page tests unchanged.
+- Remedy: Reject nonempty observations at or after the exclusive end as INVALID_PROVIDER_DATA instead of translating them into empty history; propagate that failure through the existing paginator and preserve the immutable cache.
+- Verification evidence: All three defining regressions failed before the minimal > to >= predicate correction.61 focused tests and the shared276-test gate passed with typecheck/build; the integrated case verifies two provider calls and no cache publication.
+- Limitations: Offline provider fixtures establish the boundary/exhaustion contract only. The separate loopback permission failure needed scoped execution; the fix does not validate actual market performance, feed latency or historical completeness.
+- Source: [2026-10-30-history-exclusive-boundary.md](/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-30-history-exclusive-boundary.md) (SHA-256 `3fa22dea01ffd8bea4be71699bb004b0a07a4afd52bfcd531bc4ea966337a867`).
+
+## local-cli-plain-before-argument-validation
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **runtime**.
+- Symptoms: A CLI correctly rejects unsupported arguments but emits an emoji despite --plain because validation throws before parsed display flags are applied
+- Applicability: Human-facing CLI entrypoints whose argument parser can throw before the normal output-mode assignment.
+- Diagnostic checks: Exercise --plain together with a deliberately invalid argument before any data access.; Read display-mode initialization and catch/error formatting separately from the parser.; Distinguish restricted test-worker subprocess launch errors from the direct executable result.
+- Remedy: Determine plain mode from raw display flags or the established plain environment option before validating arguments, then use the same mode in the error path. Keep invalid arguments rejected.
+- Verification evidence: The direct paper-study command with --plain --open-test rejected final access with ASCII error output after initialization moved before parsing; focused15 tests and fresh typecheck passed. The temporary nested subprocess wrapper failed with EPERM and was not treated as application evidence.
+- Limitations: This verifies error formatting and argument rejection only. It neither grants final access nor proves data loading, paper execution or subprocess permissions.
+- Source: [2026-10-30-paper-source-path-lookup.md](/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-30-paper-source-path-lookup.md) (SHA-256 `f92f8c3559f3fe5c55ec5c8e19b7ac5f5cde3398403d3fb5aaca237c35a0e51a`).

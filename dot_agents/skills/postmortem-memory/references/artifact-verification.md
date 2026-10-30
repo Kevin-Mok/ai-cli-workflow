@@ -119,10 +119,11 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Applicability: Frozen imported evidence with intentional retained upstream bytes.
 - Diagnostic checks: Verify pin inventory/hash before classifying whitespace.; Run the same check excluding only the proven immutable file.
 - Remedy: Preserve exact pinned bytes and document the narrow whitespace exception instead of trimming frozen input.
-- Verification evidence: The report identifies the pinned license residue and corrected snapshot/docs link verification; original frozen evidence remained preserved.
+- Verification evidence: The report identifies the pinned license residue and corrected snapshot/docs link verification; original frozen evidence remained preserved. The immutable Pine incident later passed an attribute-scoped whitespace check with all three staged blobs equal to unchanged working-tree source bytes.
 - Limitations: This exception is not permission to skip general whitespace checks or excuse authored whitespace; pin integrity must be established.
 - Sources:
   - [2026-10-04-metaprompt-session-scope.md](/home/example/linux-config/.worktrees/vps-aws-bootstrap-prompt/docs/postmortem/2026-10-04-metaprompt-session-scope.md) (SHA-256 `ac02deccdb08`; 2 alias(es), all retained in [sources.json](../sources.json)).
+  - [2026-10-29-immutable-pine-git-check.md](/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-29-immutable-pine-git-check.md) (SHA-256 `5798a54c9f06`; registered in [sources.json](../sources.json)).
 
 ## local-known-unrelated-vault-baseline
 
@@ -542,3 +543,47 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Verification evidence: Five intentional RED assertions; 183 focused tests, mypy and Ruff passed. Actual source and installed normal, 32-column ASCII and details reports exited 0, with installed/source renderer byte equality. Frozen unmatched work: 6.937s. Full run incomplete after 207 passes and an executor warning; bounded FX diagnostic reproduced teardown stall; fresh final overview 26 passed. Follow-up emphasis passed 55 tests, mypy/Ruff and installed ANSI/plain/details checks.
 - Limitations: Live durations grow, displayed sums can differ through truncation, full suite incomplete from async teardown stall; account-wide rates do not establish individual-model quota cost.
 - Source: [2026-10-22-consumption-hours-reconciliation.md](/home/kevin/coding/track-codex-sessions/docs/postmortem/2026-10-22-consumption-hours-reconciliation.md) (SHA-256 `c0279cb6c07d`; registered in sources.json).
+
+## local-concat-preview-display-timing
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **runtime**.
+- Symptoms: A 60fps segment preview shows the previous clip because joined video timestamps start after zero; anamorphic footage is squeezed after fitting coded dimensions and discarding SAR.
+- Applicability: FFmpeg normalized-segment joins with output start-frame previews and square-pixel landscape output.
+- Diagnostic checks: Probe output video start_time and frame timestamps. Use distinct colors per segment at 60fps and non-square-SAR source pixel assertions. Dimensions alone do not prove preview identity or correct display aspect.
+- Remedy: Seek at cumulative normalized-segment durations plus actual output video start_time in absolute timestamp mode; normalize source display aspect before final square-pixel fitting.
+- Verification evidence: Both defining cases failed RED, then all 14 focused checks passed; short actual MOV/MP4 output decoded and yielded distinct upright start previews.
+- Limitations: Only segment starts are sampled. Black/blurred frames and later rotations remain inconclusive. Audio/remux changes require rerunning timing regressions.
+- Source: [concat preview timing/aspect report](../../../../docs/postmortem/2026-10-28-concat-preview-timing-aspect.md); exact reviewed hash and alias are in [sources.json](../sources.json).
+
+## local-concat-resume-publication-intent
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **runtime**.
+- Symptoms: A resumable job refuses its own valid cache clip after interruption following rename, or its own review folder after interruption following mkdir.
+- Applicability: Local resumable media jobs with manifest-bound identity and ownership.
+- Diagnostic checks: Inject interruption immediately after each filesystem publication, then rerun the actual CLI and assert reuse, unchanged completed media, and foreign-data refusal.
+- Remedy: Persist validated completed-clip identity and generated-directory ownership intent before publication/mkdir. Hold an exclusive job lock.
+- Verification evidence: Both exact fault cases failed RED before the ordering fixes; all19focusedtests passed afterward and independent review verified the source ordering.
+- Limitations: This does not prove power-loss/fsync durability or fullrender completion. Source/settings/cache mismatches remain refusals.
+- Source: [concat preview/recovery report](../../../../docs/postmortem/2026-10-28-concat-preview-timing-aspect.md); reviewed hash/alias retained in [sources.json](../sources.json).
+
+## local-immutable-input-index-renormalization
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **code**.
+- Symptoms: Staged whitespace checks reject retained source whitespace and Git warns CRLF inputs will be normalized. Ordinary restaging after -text still leaves normalized index bytes different from immutable working files.
+- Applicability: Immutable imported inputs whose Git index was already normalized before path-specific text attributes were disabled.
+- Diagnostic checks: Inspect git check-attr text whitespace and git ls-files --eol for the exact immutable paths. Compare each staged blob byte-for-byte with the established unchanged source baseline; a passing whitespace check alone does not prove byte preservation.
+- Remedy: Set -text and -whitespace only for established immutable input paths; after changing attributes, explicitly git add --renormalize those paths. Verify exact staged/source bytes and rerun the staged whitespace check.
+- Verification evidence: The initial staged check exited 2 on three immutable Pine inputs. Ordinary restaging failed the byte assertion; EOL inspection exposed stale normalized index entries. Explicit renormalization then passed exact staged/source equality for all three files and staged whitespace check exit 0 without editing source bytes.
+- Limitations: Keep whitespace checks on authored code. Renormalization changes index entries, so scope it to intended immutable paths and verify the baseline. Evidence covers Git representation, not application behavior or upstream provenance.
+- Source: [2026-10-29-immutable-pine-git-check.md](/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-29-immutable-pine-git-check.md) (SHA-256 `5798a54c9f06b6f2a3342987fd53cd0897ddf1966eb9fedfa0e7b9185c13b077`; registered in [sources.json](../sources.json)).
+
+## local-market-quote-unit-formatting
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **runtime**.
+- Symptoms: A shared USD currency formatter mislabels USDT-quoted crypto fills, account balances, costs and trade P&L
+- Applicability: Financial research interfaces displaying instruments with different quote units through shared monetary components.
+- Diagnostic checks: Determine the actual supported instrument quote unit from source identity and saved accounting metadata before formatting.; Test crypto and stock cases across fills, costs, equity, open positions and P&L; inspect the active rendered workspace.; Keep saved numerical values and immutable experiment artifacts unchanged while checking label corrections.
+- Remedy: Pass instrument identity or its explicit quote unit through shared monetary views. Use symbol-aware formatting that labels USDT amounts explicitly and retains USD formatting for USD instruments; never imply conversion or a dollar peg.
+- Verification evidence: Five crypto formatter assertions failed while two USD assertions passed before the correction; all7 then passed. The full372-test suite, typecheck and build passed. Active BTCUSDT and SPY research views at390px showed correct USDT/USD prices, costs and equity without horizontal overflow; the244-attempt/training144/final0 audit stayed unchanged.
+- Limitations: Verified for the four declared research symbols only. This is a display-unit repair; it does not change financial math, establish currency conversion or guarantee a stablecoin peg.
+- Source: [2026-10-30-research-quote-units.md](/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-30-research-quote-units.md) (SHA-256 `517003f748db48794ae2f47b5e78a65a1bf7c8deb0ee9657855a1bf0f85852b6`).

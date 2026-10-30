@@ -59,8 +59,8 @@
       "confidence": "confirmed",
       "diagnostics": [
         "Inspect exact reset seconds, accepted percentage chronology and stale counts before changing denominator scope.",
-        "Compare reset 0, jitter \u00b16/\u00b18/\u00b110 and returns to the original anchor; assert one cohort and conserved matched work.",
-        "Test \u00b111 beyond the original anchor after an intermediate \u00b15 reading; retain real reset retirement and gap exclusions."
+        "Compare reset 0, jitter ±6/±8/±10 and returns to the original anchor; assert one cohort and conserved matched work.",
+        "Test ±11 beyond the original anchor after an intermediate ±5 reading; retain real reset retirement and gap exclusions."
       ],
       "id": "local-quota-reset-jitter-anchor",
       "limitations": "A real reset within ten seconds is indistinguishable from timestamp drift. Fixed-anchor jitter beyond ten seconds still splits cohorts. Missing readings remain excluded; low-confidence shared quota rates do not identify individual model costs. Live work durations grow.",
@@ -518,7 +518,7 @@
       "symptoms": [
         "intermittent Gitea 502",
         "root route quick but profile hangs",
-        "healthz intermittently 20\u201350 seconds",
+        "healthz intermittently 20–50 seconds",
         "single thread near full CPU"
       ],
       "topic": "operational-drift",
@@ -1271,15 +1271,16 @@
       "verification_scope": "runtime"
     },
     {
-      "applicability": "Command runners whose restricted network namespace cannot initialize loopback; distinguish runner startup from application or repository failure.",
+      "applicability": "Command runners whose restricted namespace cannot initialize loopback, or required local test listeners denied by the sandbox; distinguish environment permissions from application assertions and provider-classification bugs.",
       "confidence": "confirmed",
       "diagnostics": [
         "Confirm identical pre-execution error across independent harmless commands.",
         "Capture repository status using a scoped command that actually executes.",
-        "Check that the target directory is a Git checkout rather than assuming one."
+        "Check that the target directory is a Git checkout rather than assuming one.",
+        "For listener failures, compare independent pure checks and rerun the same required socket command only under approved scoped loopback permission; do not alter the test or remove unrelated listeners."
       ],
       "id": "ext-sandbox-loopback",
-      "limitations": "Successful escalation does not repair default sandbox startup or authorize unrelated resources. One documentation report only prepared an add-only recovery and contains no completed verification.",
+      "limitations": "Successful escalation does not repair default sandbox startup or authorize unrelated resources. One documentation report only prepared an add-only recovery and contains no completed verification. A passing socket gate does not fix the independently reproduced exclusive-end provider-classification defect or validate financial results.",
       "reference": "references/execution-environments.md#ext-sandbox-loopback",
       "remedy": "Use the approved require_escalated route for the necessary scoped command when policy permits, or an available authorized workspace editor. Keep the host sandbox repair as separate outstanding work.",
       "sources": [
@@ -1297,16 +1298,18 @@
         "dd1bd38a168022fc7870e512e87b4e549986eecb6c77c75c61fe173288cf00e0",
         "e44b692350053932c60e482b50164cddf90cd5a23412f73e33ebfee647f8ac8a",
         "552f9e8c98515e898e2dd75d21b6962362205c30cc93befd1e37571af8ccede4",
-        "e20c6026f8664c033c118df292e2d6064251176700dc233ff05adb458f9d3aa6"
+        "e20c6026f8664c033c118df292e2d6064251176700dc233ff05adb458f9d3aa6",
+        "1317455932decd9baa5ba54f631cb4f51ab349e5baee102001ea418963bf9a35"
       ],
       "status": "verified_workaround",
       "symptoms": [
         "bwrap: loopback: Failed RTM_NEWADDR: Operation not permitted",
         "read-only commands fail before shell execution",
-        "patch helper cannot start"
+        "patch helper cannot start",
+        "A necessary local HTTP test listener fails listen EPERM on127.0.0.1 in the restricted sandbox"
       ],
       "topic": "execution-environments",
-      "verification": "Multiple reports record successful approved source reads, status checks and verification after normal startup failed; application state was unchanged by failed launches.",
+      "verification": "Multiple reports record successful approved source reads, status checks and verification after normal startup failed; application state was unchanged by failed launches. The PMO report separately records57 loader checks passing before a required bind failed,127 pure checks passing, then the approved combined25-file/276-test gate with typecheck/build passing.",
       "verification_scope": "workaround"
     },
     {
@@ -2460,14 +2463,15 @@
       "reference": "references/artifact-verification.md#local-immutable-upstream-whitespace-exception",
       "remedy": "Preserve exact pinned bytes and document the narrow whitespace exception instead of trimming frozen input.",
       "sources": [
-        "ac02deccdb08b0895685f8a0e18a7590a4ea8aad9db5dfd13867211c017d785d"
+        "ac02deccdb08b0895685f8a0e18a7590a4ea8aad9db5dfd13867211c017d785d",
+        "5798a54c9f06b6f2a3342987fd53cd0897ddf1966eb9fedfa0e7b9185c13b077"
       ],
       "status": "verified_workaround",
       "symptoms": [
         "staged whitespace fails on exact pinned upstream LICENSE"
       ],
       "topic": "artifact-verification",
-      "verification": "The report identifies the pinned license residue and corrected snapshot/docs link verification; original frozen evidence remained preserved.",
+      "verification": "The report identifies the pinned license residue and corrected snapshot/docs link verification; original frozen evidence remained preserved. The immutable Pine incident later passed an attribute-scoped whitespace check with all three staged blobs equal to unchanged working-tree source bytes.",
       "verification_scope": "workaround"
     },
     {
@@ -3534,7 +3538,7 @@
       "symptoms": [
         "Float sums change when a counted interval is partitioned by model."
       ],
-      "verification": "Fractional RED\u2192GREEN regressions, native record-byte invariance, full 86-test suite and strict typing passed.",
+      "verification": "Fractional RED→GREEN regressions, native record-byte invariance, full 86-test suite and strict typing passed.",
       "verification_scope": "code"
     },
     {
@@ -3574,7 +3578,7 @@
       "symptoms": [
         "uv tool install --force reinstalls a cached local wheel after source-only edits under the same package version."
       ],
-      "verification": "Isolated real-uv repeated setup test RED\u2192GREEN; real setup rebuilt package, models help and v2 schema passed, 14 installed source modules matched.",
+      "verification": "Isolated real-uv repeated setup test RED→GREEN; real setup rebuilt package, models help and v2 schema passed, 14 installed source modules matched.",
       "verification_scope": "runtime"
     },
     {
@@ -5440,7 +5444,7 @@
       "id": "local-discord-direction-isolates",
       "limitations": "Subjective listening and a new real incoming notification remain unobserved. Same-format apps can match; broader suite has unrelated socket and path-fixture failures.",
       "reference": "references/operational-drift.md#local-discord-direction-isolates",
-      "remedy": "Remove U+2066\u2013U+2069 before visible-text parsing; keep full suffix validation before speaking sender says message.",
+      "remedy": "Remove U+2066–U+2069 before visible-text parsing; keep full suffix validation before speaking sender says message.",
       "sources": [
         "3e1a73524f1921786d4dffd880d015e08a40f968a71404a1e265a75ead89fab3"
       ],
@@ -5734,7 +5738,7 @@
       "reference": "references/execution-environments.md#local-virtualenv-interpreter-path-identity",
       "remedy": "Invoke the literal virtualenv interpreter path; verify Python, package metadata and source identity in that environment.",
       "sources": [
-        "a72a4025f13a53cb333e80582d0372c3334f059d42d5af72836ddbb86697f0d9"
+        "9fa4f1017c4bce1f9b7733a09c97b6e2562178e309755a63e28388e0c71cb52c"
       ],
       "status": "verified_workaround",
       "symptoms": [
@@ -5772,11 +5776,11 @@
         "Remember that PYTHONDONTWRITEBYTECODE disables writes while existing valid caches can still be read."
       ],
       "id": "local-cli-benchmark-startup-cache-parity",
-      "limitations": "This fixes private benchmark startup equivalence, not report performance, ambient variance or live activation. Old timings cannot drive retention/stopping. Prior full JSON parity remains semantic evidence only for identical source/content/options at its original absolute paths after bytecode equivalence is proved. Later same-source stale-index control differed by 4.933s in median; case-specific null controls do not supply a correction factor or a verified ambient-noise remedy.",
+      "limitations": "This fixes private benchmark startup equivalence, not report performance, ambient variance or live activation. Old timings cannot drive retention/stopping. Prior full JSON parity remains semantic evidence only for identical source/content/options at its original absolute paths after bytecode equivalence is proved. Later same-source stale-index control differed by 4.933s in median; case-specific null controls do not supply a correction factor or a verified ambient-noise remedy. R6 fixed-six workflows all closed with source40/cache0 and original measurements preserved: same-code cold-status medians40.405324468 versus38.783259091 (wall1.622065377/CPU1.484028), larger than baseline/candidate repeat0.632088823. Independent attribution review99db6632 leaves R6 inconclusive/unretained/counter0; these controls are variation evidence, never a correction factor, universal noise floor, zero-effect proof or performance fix.",
       "reference": "references/execution-environments.md#local-cli-benchmark-startup-cache-parity",
       "remedy": "Prepare isolated comparator copies with the same startup-cache policy; validate both before every report/index subprocess outside the wall timer. Keep preparatory imports from warming only one side. Preserve rejected observations and restart fair timing rather than subtracting a correction factor.",
       "sources": [
-        "a72a4025f13a53cb333e80582d0372c3334f059d42d5af72836ddbb86697f0d9"
+        "9fa4f1017c4bce1f9b7733a09c97b6e2562178e309755a63e28388e0c71cb52c"
       ],
       "status": "verified_fix",
       "symptoms": [
@@ -5801,7 +5805,7 @@
       ],
       "status": "unresolved",
       "symptoms": [
-        "Four streams look close to 15 FPS despite Twitch playback counters around 42\u201364; one stream is smooth."
+        "Four streams look close to 15 FPS despite Twitch playback counters around 42–64; one stream is smooth."
       ],
       "verification": "Defining diagnostic tests observed RED, then 136 unit tests/typecheck/build and the bitrate browser case passed. Live supported rates 3.11 and 3.14 Mbps summed to 6.25 for two advancing videos; pause cleared reporting. Source review confirmed no quality-policy writes.",
       "verification_scope": "runtime"
@@ -5900,7 +5904,7 @@
       "reference": "references/execution-environments.md#local-command-completion-launch-namespace",
       "remedy": "Keep nested session handles until completion. If a handle was already discarded, await the original wrapper explicit per-command exit statuses and final source-hash manifest; do not start duplicate checks from a partial response or an unrelated PID namespace. If complete raw profile/results survive a secondary summary error, use a separately recorded offline consumer with pinned artifacts rather than repeating the profile. Derive offline postguard inputs from saved manifests and frozen files, not globals initialized in a previous adapter process.",
       "sources": [
-        "a72a4025f13a53cb333e80582d0372c3334f059d42d5af72836ddbb86697f0d9"
+        "9fa4f1017c4bce1f9b7733a09c97b6e2562178e309755a63e28388e0c71cb52c"
       ],
       "status": "verified_workaround",
       "symptoms": [
@@ -5916,20 +5920,21 @@
       "diagnostics": [
         "Check bytes and inodes in the execution namespace; distinguish setup failure from report mismatch.",
         "Inventory exact completed-case cache files, check task ownership, symlinks and lock state, and record protected evidence hashes before cleanup.",
-        "Keep read-only protected evidence roots separate from disposable unlink roots; preserve an inherited external helper only by its exact approved path and SHA, never by broadening deletion scope."
+        "Keep read-only protected evidence roots separate from disposable unlink roots; preserve an inherited external helper only by its exact approved path and SHA, never by broadening deletion scope.",
+        "Historical inventory sizes do not prove current existence or reclaimable capacity; compare fresh paths/stat observations with prior cleanup receipts and do not infer intervening deletion without earlier live evidence."
       ],
       "id": "local-cli-benchmark-disposable-index-space",
       "limitations": "Verified scoped environment recovery and bounded parity/human-matrix lifecycle, not a product speedup, global cleanup authorization or guarantee against recurrence. Later fresh-control preflights use a conservative4GB floor; low-space rejection was not deliberately exercised. Completed runtime caches were intentionally removed while reproducible source/input/protocol/raw evidence and masters remain.",
       "reference": "references/execution-environments.md#local-cli-benchmark-disposable-index-space",
       "remedy": "Under the existing exclusive measurement lock, reclaim only specifically inventoried completed per-case disposable indexes. Preserve source, frozen/native inputs, masters, raw stdout/stderr, manifests, results and active checkpoints; verify hashes and free space before resuming unchanged code/protocol. Budget subsequent copies and clean completed disposable states outside timed intervals.",
       "sources": [
-        "a72a4025f13a53cb333e80582d0372c3334f059d42d5af72836ddbb86697f0d9"
+        "9fa4f1017c4bce1f9b7733a09c97b6e2562178e309755a63e28388e0c71cb52c"
       ],
       "status": "verified_workaround",
       "symptoms": [
         "Repeated private per-case SQLite index copies exhaust /tmp before the next parity report starts, and even default sandbox setup fails with ENOSPC."
       ],
-      "verification": "Case14 parity setup failed before CLI launch with13exactcases preserved. Approved cleanup removed150regular index.sqlite/wal/shm files from completed round1-fair states,20,747,673,600logical bytes; freebytes0to20,697,808,896. Parent independently rehashed714protected files; checkpoint13unchanged, ordinary sandbox restored and all26parity completed. Separately approved156parity-template unlinks reclaimed21,577,367,552bytes; parent verified156pathsabsent/197hashesunchanged. All26human cases then completed260timed subprocesses exit0 with headroom checks. A third approved150-file timing-state cleanup reclaimed20,747,468,800bytes before controls; parent verified exact paths and all43,799protected hashes before/after, free30,184,804,352bytes. First fresh-state projects control completed successfully. Later R6 audit overconstrained protected reads to the runtime root and rejected its own exact pinned external helper. A one-predicate path+SHA exception passed defining V1-RED/V2-GREEN and11fixtures, independent xhigh review, then same-primary real audit69936 with7823protected hashes preserved pre/post and only6templates removed; no report rerun. Later allocation-only +4096 drift on a copied template retained dev/inode/size/mtime and exact master DB bytes. V3 permits only index.sqlite with fresh authoritative-master SHA on that mismatch, keeps WAL/SHM strict and exact prior verifier pins, and passed defining RED/GREEN15fixtures/xhigh plus actual case2audit3881 with7846protected hashes and exact6cleanup; allocation delta recorded, kernel cause unproved.",
+      "verification": "Case14 parity setup failed before CLI launch with13exactcases preserved. Approved cleanup removed150regular index.sqlite/wal/shm files from completed round1-fair states,20,747,673,600logical bytes; freebytes0to20,697,808,896. Parent independently rehashed714protected files; checkpoint13unchanged, ordinary sandbox restored and all26parity completed. Separately approved156parity-template unlinks reclaimed21,577,367,552bytes; parent verified156pathsabsent/197hashesunchanged. All26human cases then completed260timed subprocesses exit0 with headroom checks. A third approved150-file timing-state cleanup reclaimed20,747,468,800bytes before controls; parent verified exact paths and all43,799protected hashes before/after, free30,184,804,352bytes. First fresh-state projects control completed successfully. Later R6 audit overconstrained protected reads to the runtime root and rejected its own exact pinned external helper. A one-predicate path+SHA exception passed defining V1-RED/V2-GREEN and11fixtures, independent xhigh review, then same-primary real audit69936 with7823protected hashes preserved pre/post and only6templates removed; no report rerun. Later allocation-only +4096 drift on a copied template retained dev/inode/size/mtime and exact master DB bytes. V3 permits only index.sqlite with fresh authoritative-master SHA on that mismatch, keeps WAL/SHM strict and exact prior verifier pins, and passed defining RED/GREEN15fixtures/xhigh plus actual case2audit3881 with7846protected hashes and exact6cleanup; allocation delta recorded, kernel cause unproved. R6 human case25 preflight74832 and later case26 preflight10792 each actually exited1 at the unchanged actual/projected4GB floor before setup/report. The original transcript recovered the first exact traceback; the second output is separately saved. Transient free-space recovery allowed case25 with all four reviewed stages terminal0, but did not establish durable headroom. At that stop, prefix25/26 was held; the failure alone did not authorize further cleanup or a capacity remedy. Subsequent reviewed exact24 diagnostic/control cleanup23533 actually completed0 after inventory41889/audit84251 and a qualified fresh host/FD gate. All24absent, 73893protectedhashes matched before/after, 3319595008logicalbytes removed; profiles/raw/source/master/DATA/native/statuscache/catalog preserved. This scoped capacity recovery still requires a fresh case26 preflight; no performance or noise-attribution claim follows.",
       "verification_scope": "runtime"
     },
     {
@@ -5965,14 +5970,14 @@
       "reference": "references/execution-environments.md#local-tracker-validation-runtime",
       "remedy": "Run the existing isolated-fixture checks with explicitly requested approved normal permissions and the documented default uv cache; do not silently fall back to restricted execution; unset only the task-added empty cache override. Keep offline build and existing dependencies. Do not change product locking, weaken assertions, download dependencies or restart live services to satisfy sandbox failures.",
       "sources": [
-        "a72a4025f13a53cb333e80582d0372c3334f059d42d5af72836ddbb86697f0d9"
+        "9fa4f1017c4bce1f9b7733a09c97b6e2562178e309755a63e28388e0c71cb52c"
       ],
       "status": "verified_workaround",
       "symptoms": [
         "Tracker integration tests fail creating canonical Path.home .local/state/codex-time/locks in a read-only sandbox, or binding isolated Unix sockets.",
         "An empty task-selected UV_CACHE_DIR makes offline setup/build unable to find cached hatchling; restricted default-cache access can fail opening sdists-v9/.git before collection; secondary async teardown may appear stuck."
       ],
-      "verification": "Restricted checks showed Errno30 canonical locks, Unix socket EPERM and uncached hatchling; after bounded diagnostic interrupts, the same unchanged candidate passed three exact failing writer/socket/FX representatives, full621tests, repositoryRuff, offline sdist/wheel and279smoketests plus exact1320000tokens/USD2.91/CAD3.9285. Parent checked all six source/test hashes before/after/current and explicit exit0 logs. Later retained-R4 focused restoration hit restricted cache Errno30 before collection; explicit normal permissions passed51tests with exact full source/test paths and matching start/end hashes.",
+      "verification": "Restricted checks showed Errno30 canonical locks, Unix socket EPERM and uncached hatchling; after bounded diagnostic interrupts, the same unchanged candidate passed three exact failing writer/socket/FX representatives, full621tests, repositoryRuff, offline sdist/wheel and279smoketests plus exact1320000tokens/USD2.91/CAD3.9285. Parent checked all six source/test hashes before/after/current and explicit exit0 logs. Later retained-R4 focused restoration hit restricted cache Errno30 before collection; explicit normal permissions passed51tests with exact full source/test paths and matching start/end hashes. Fresh retained-final verification again incorrectly used restricted launch: defaultUVcacheE30 then privateUVoverride allowed621collection but27failed/182passed and FXepollstall; oneidentity-verifiedpytestSIGINT0/originalexit2, availabletraces explicitlypartial2e23ceb449b752e391cd454f0db2338aa432948da626b390556d8f7f2bd1d036. Lookupaf6255/reference0171f6 applied this existing normal-permission/defaultUVcache remedy. Corrected focused6passed5.51s/full621passed86.60s/mypy39/Ruff/offlinebuild/smoke279passed33.06s, exact1320000tokens/USD2.91/CAD3.9285@1.35; fullfilelogs/literalcontext/beforeafter40source-test maps bind final-summaryd3ce9d275ea93a93e50b53a474a9150c67ce38c8c80ef5d35d0c3ef5bcec18aa/rootread36c457/a6696c. No app/test/dependency changes; restrictedFXtimeout origin remainsunproved, correctedcontextpassonly.",
       "verification_scope": "runtime"
     },
     {
@@ -5987,7 +5992,7 @@
       "reference": "references/execution-environments.md#local-collaboration-idle-agent-dispatch",
       "remedy": "Use collaboration.followup_task to start authorized idle work; use send_message for information delivery. Retain actual completion evidence and do not treat running state as success.",
       "sources": [
-        "a72a4025f13a53cb333e80582d0372c3334f059d42d5af72836ddbb86697f0d9"
+        "9fa4f1017c4bce1f9b7733a09c97b6e2562178e309755a63e28388e0c71cb52c"
       ],
       "status": "verified_workaround",
       "symptoms": [
@@ -5997,64 +6002,242 @@
       "verification_scope": "runtime"
     },
     {
+      "applicability": "This tracker private benchmark descriptor comparison when a producer retains filesystem creation order and a verifier sorts rows.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Compare every saved/current descriptor by canonical path, including complete content SHA and every recorded stat field.",
+        "Inspect producer collection order, verifier sorting and positional zip comparisons before assuming a cache metadata change."
+      ],
+      "id": "local-cli-retained-manifest-path-order",
+      "limitations": "The cache-chmod-ctime precedent does not apply: no metadata drift was observed. Verification covers the first real control audit, guarded exact-six cleanup and completion barrier; five further controls remain pending. It is not a performance gain, permission to omit source/cache checks, or authorization for arbitrary verifier overlays. Original R6 remains unretained and stopping counter0.",
+      "reference": "references/execution-environments.md#local-cli-retained-manifest-path-order",
+      "remedy": "Require unique paths and exactly equal path sets, then compare all existing identity, permission and content fields by path; independently bind the current enumerated verifier and recognize only the exact historical producer tuple. Preserve immutable primary evidence and pin the corrected verifier independently; do not rewrite inventories, rerun timings or waive timestamp checks.",
+      "sources": [
+        "9fa4f1017c4bce1f9b7733a09c97b6e2562178e309755a63e28388e0c71cb52c"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "An offline retained-cache audit rejects unchanged session-status.json because saved and current descriptor lists have different traversal order."
+      ],
+      "verification": "First BCstatus adapter25947 and consumer70310 completed0; read-only audit93894 failed at positional retained comparison. Parent diagnosticc9117f31 found all eight retained files identical in every recorded field and SHA. Pure permutation reproducerf94427 failed frozenV2 as expected. Frozen V3 main de898ab9/helper e4a09b4b preserves all stable fields and exact path sets; fresh independent proof0844d88d passes all eight prior guards, four path-keyed groups, exact historical legacy then following-current real writers, omission/wrong-role/map negatives and four optimized refusals, with eleven file hashes unchanged. Current metadata publication95759 freshly verifies all9614 prior pins; static loader1cba74 accepts exact original V2 case01 release/map plus independently bound current verifier. Actual corrected case01 read-only audit24512 exited0 with receipt881ff0ea,9765protectedhashes,ten timed zeros/24captures, allsixruntime targets valid and zero deletions; completion6c20d0e4 binds actualargv/output. Original release, timing, consumer and inventory bytes stayed unchanged. Actual host gate98408 passed with qualified accessible visibility; clean57952/820c0f0d removed exactsix and preserved9768hashes; barrier82002/f198e3ea verified9770hashes, with actual cleanup78ca60d3 and barrierbed3fc57 external receipts. Five further fixed controls remain pending.",
+      "verification_scope": "runtime"
+    },
+    {
+      "applicability": "Chromium Twitch embeds fitted with transform downscaling while Twitch gates API Play on IntersectionObserver trackVisibility.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Compare intersectionRatio with isVisible on actual user iframes; inspect ancestor scale matrices.",
+        "Compare transform scaling and CSS zoom at equal displayed sizes; verify fullscreen and logical embed minimums."
+      ],
+      "id": "ext-twitch-transform-downscale-visibility",
+      "limitations": "Audibility and smoothness not assessed. User confirmation of automatic versus button-triggered post-change start is pending. Twitch network/content restrictions are separate. Current Twitch source has a visibility-triggered autoplay retry before first playback.",
+      "reference": "references/browser-integrations.md#ext-twitch-transform-downscale-visibility",
+      "remedy": "Use CSS zoom for fitting and translation-only positioning (divide translation by zoom); reset zoom for player fullscreen. Do not add blind Play retries for an invisible observer result.",
+      "sources": [
+        "d58673a3e62ced21f2f4698905b6b70cc2bfdd2d76e12c8dae95e8008a2946e0"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "Native Twitch Play works while SDK Play/autoplay fails in a fitted grid; intersecting iframes report isVisible=false."
+      ],
+      "verification": "Actual 1363px Chrome windows at DPR 2.8125 reported ratio approximately 1 but isVisible=false under scales .63 to .95. CSS zoom restored visibility and Playing with advancing clocks for three live streams in both windows. Real Chromium visibility regression went RED then GREEN; 152 unit tests, build and 42 browser tests passed. Additional native iframe fullscreen bounds at 390x700 passed.",
+      "verification_scope": "runtime"
+    },
+    {
+      "applicability": "This tracker private fixed-control resource contract, including collector, prefix, audit, cleanup and remaining-peak guards.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Sum current per-file allocated blocks within the exact retained state scope and verify SQLite exclusions; distinguish logical bytes from allocated bytes.",
+        "Compare cap provenance with actual report-cache sizes and keep original primary, raw captures, state files and identities hash-bound before recovery.",
+        "Inspect every consumer of the cap and historical measurement/master readiness before revising a versioned contract."
+      ],
+      "id": "local-cli-retained-report-budget",
+      "limitations": "Verified private preserved-case and subsequent fixed-six workflow scope at these actual cache sizes. Future rounds still need fresh source/input/provenance/allocation/capacity guards. This does not resolve ambient timing attribution, establish R6 gain or regression, authorize arbitrary cap increases/global cleanup, or prove live activation.",
+      "reference": "references/execution-environments.md#local-cli-retained-report-budget",
+      "remedy": "Versioned bounded revision: add only the observed19365888B overview report-pair reserve to unchanged5000000B overhead, yielding24365888B overview cap; preserve162057024B status caps and4000000000B actual/projected floor. Version all affected guards coherently, separately bind original case02 measurement and current collector/verifier, retain original AP2 master origin, and recover offline collection without timing rerun.",
+      "sources": [
+        "9fa4f1017c4bce1f9b7733a09c97b6e2562178e309755a63e28388e0c71cb52c"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "A completed cold all-time overview control cannot publish offline evidence because retained overview report caches exceed an assumed per-case nonindex allocation cap."
+      ],
+      "verification": "Actual adapter32533 completed0; consumer8278 failed before summary/inventory at5000000B. Source/stat diagnosis finds six retained files19447808B, of which paired overview JSON caches19365888B and checkpoint/FX81920B. Read-only snapshotba7f6777 protects121nonruntime byte hashes and six runtime identities/fullSHAs. AP2 previous/setup/remaining guards and P3 share the cap; versioned correction is preparation only. Fresh independent runner41920 completed0 with12 normal writer flows,24 expected optimized refusals,Ruff0 and22current+10old hashes unchanged. Qualified-clear source/metadata review preceded actual publication29524. Preserved case02 CP3collector60100, P4audit83359, qualified hostgate80863, exact6clean77354 and barrier47031 all actually exited0. Summaryf48aa291/inventorya2bd869e/audit439c2b94/cleanup65ea014d/barrier0379e807 preserve original timing/setup/release,121 snapshot nonruntime hashes and retained19447808B report files. Final barrier verifies9949 protected hashes and exact6 absent. All six fixed workflows subsequently closed with parent evidence indexf60587a4:60timed integerzeros/144captures/36exact runtime files absent, originalprimary63142356 unchanged; final barrier33903/443c59f2 verifies10480protectedhashes. Subsequent current collector/audit/gate/clean/barrier flows passed with status/overview caps and4GB floor unchanged.",
+      "verification_scope": "runtime"
+    },
+    {
+      "applicability": "Python guard/reproducer fragments compiled under a filename whose on-disk text omits an added wrapper/header.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Preserve actual output, input hashes and positive controls; do not accept totals alone.",
+        "Reconstruct the exact compiled text from pinned wrapper and fragment; map traceback code positions to its AST assertions.",
+        "Compare displayed linecache text with the capture and account for each wrapper or dedent explicitly."
+      ],
+      "id": "local-extracted-guard-trace-line-offset",
+      "limitations": "This verifies diagnostic interpretation only, not a runtime behavior change or new harness GREEN. One-line offset applies only to this exact wrapper/capture; other wrappers, compiler transformations and filenames require their own mapping. Future runtime/publication/benchmark eligibility remain independently gated.",
+      "reference": "references/execution-environments.md#local-extracted-guard-trace-line-offset",
+      "remedy": "Interpret the preserved traceback with the exact compiled-to-captured line map; append a qualified clarification while preserving original raw trace and prior incorrect interpretation. Do not rerun the target or change guards solely to clean printed source text.",
+      "sources": [
+        "9fa4f1017c4bce1f9b7733a09c97b6e2562178e309755a63e28388e0c71cb52c"
+      ],
+      "status": "verified_workaround",
+      "symptoms": [
+        "An extracted-guard unittest has the expected failure count, but its displayed traceback appears to fail a different source assertion than the compiled guard."
+      ],
+      "verification": "Actual OLD-RED61c9c9 returned1 with8tests,5intended failures,0errors and3positive controls; all13pins unchanged (output4c655621/pins68639c2f). Pinned test05db3081 prepends one function-header line to capture7fda3b00. Parent9340ed and independent xhigh review confirm compiledline3 is capturedline2 lineageassert, compiledline7 is capturedline6 status-only delta; candidate-map equality is compiledline8 and not reached. Separate clarification preserves the raw output/false observed_note; no test rerun or source modification.",
+      "verification_scope": "code"
+    },
+    {
+      "applicability": "This private R7 parent-owned tool-completion writer and every connected collector, driver, prefix and next-preflight consumer; not application accounting or a general alias policy.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Read all connected consumers and their exact output, scope and hash fields before constructing parent records; current-case acceptance alone does not prove a resumable prefix.",
+        "Bind receipt digest separately from output digest, preserve actual status/argv, and verify typed phase/case/preparation/readiness/role bindings at the next consumer boundary.",
+        "Check whether any successful dependent receipt or immutable prefix seals a malformed derived record; the earlier unsealed-only amendment exception never applies to a sealed completion."
+      ],
+      "id": "local-cli-tool-completion-output-fields",
+      "limitations": "The earlier audit-field amendment remains confined to the original unsealed case. Completion/resume/shared contracts are verified through owned fixtures and real fresh26JSON parity closure, full26audit/exact3shared cleanup/handoff and unchanged canonical phase-binding validation. This never repairs or credits the old sealed pilot. All26human workflow completion proves actual consumer/receipt boundaries, not attributable speed. Global humanaudit is accepted and guarded candidate archive/restoration toretaineda5 completed. Corrected xhigh ruling is inconclusive/unretained/counter0 with no verified gain or regression; R7 is incremental a5-to-ISO only, never task-original-to-final. Task-original package61ed3a55 still has unknown Git40. Separate original-to-retaineda5 direct cumulative comparison is now completed and parent-verified (result0065465fe9f9dc82f1984cf600d9cbf7d18c8fc3ed241ed5f4ea2cf47e07477c/verificationb3e0b0462c82f19e5f67d6582e9fd0e4f74badfd45f3d2f31aed6bb7c943c14b), with both gains and a consistent coldalloverview wall+CPU regression whose cause remains open; completion validity establishes no performance remedy. R7is unretained/restored; direct cumulative evidence is separate and does not erase adverse cases or prove plateau. Final stopping and any new improvement commit still require their own evidence; no additional timing solely to rescue the marginal ISO batch is recommended. Never amend sealed receipts, raw reports, source/input/master snapshots, pre-existing user work or history; no product activation claim follows.",
+      "reference": "references/execution-environments.md#local-cli-tool-completion-output-fields",
+      "remedy": "Use explicit consumer fields for audit, gate, cleanup and barrier. For a barrier completion add literal recording_scope plus phase, strict-integer case_number, case, independent_audit_sha256 and cleanup_sha256 from its hash-bound immutable barrier. Validate the serialized candidate through the actual reader and exercise the actual first-case writer through the next preflight/resume consumer; do not prefill missing fields only in a fixture. Preserve the old sealed receipt and start a fresh namespace requiring all26cases when the closed pilot cannot resume. The earlier exact root-owned unsealed audit-receipt amendment remains a historical narrow exception requiring original-byte backup, unchanged primary evidence, no dependent references and the inherited lock.",
+      "sources": [
+        "9fa4f1017c4bce1f9b7733a09c97b6e2562178e309755a63e28388e0c71cb52c"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "A successful independent audit is followed by a host-gate KeyError because the root-generated completion record used audit_sha256 instead of independent_audit_sha256.",
+        "A sealed current-case completion passes its local reader but the next parity preflight fails on missing recording_scope and five further resume-envelope fields."
+      ],
+      "verification": "Original audit-field RED522d7357 and readerGREENbd104beb led to the separately verified unsealed amendment3e628b96, fresh gate27367, exact6cleanup67773 and barrier43593; original invalid41485e8f and all primary artifacts remain preserved. Later actual next-case preflight failed because sealed9f17ff13 lacked all six resume fields despite local completion acceptance. After the test-only fence was qualified, RED5223b73b exposed7intended missing-envelope failures/0errors. Exact root-v3 constructor31a24333 derives the six fields from the barrier; GREEN51d02ee2 passed4observer controls,3default/3plain actual-constructor-next-preflight checks andF821 with34pins unchanged. Frozen production guards were not relaxed; old sealed9f17ff13 was not amended. Fresh namespace publication10051/d4de77 then actually completed0 (proofd1434b64), preserving10871hashes/93Pfiles/221closed-pilot files. New case01 driver22946,collector33077,audit37169,gate52901,clean91482,barrier80740 all completed0; barrierb2ef5da2/completioned4d1c87 carries all six resume fields, twoJSONpairs/eightcaptures/exact6absent and10988final hashes. Actual case02preflight10615/8bc385 completed0 with preflight87ca20a9/entry64aec199 and10989prior hashes, verifying the real next-consumer boundary. Old sealed9f17ff13 remains unchanged. Full real fresh parity subsequently closed26cases/156actualactions0/47of47wholeJSONpairs/188captures (closurec9d9c588/root8b8385). Actual full26audit34076/def2e1, sharedgate37917/c1a1b2, exact3clean38403/cdad09 and handoff84618/598dbf all completed0; completion814b9708 binds audit+inventory, handoff69cd0391 binds exact shared scope/hash links, all11697protected/masterDBWAL preserved. Bindingd428347d was content-checked as a Notes candidate then exclusively published byte-identically after handoff; unchanged actual human.phase_binding passes11699pins with main-equivalent context and no root/validator patch. Firsthumanpreflight37584/246773 is now actual0: output6e6dd5b242996dcb36e6f0dc29548120be145f51101c4bb9622373fcf29d4b1b,4662B,entrynull; all11699pins/inputs/runtime/both4GBfloors passed and no normalhumanmaster created. Later all26human workflows closed:52warmups/260timed0/624captures. Corrected independent offline aggregatec9e3a8 returned0, closure2d5ca333738459896127c985a6fb25217c9ef59ed8367012731f829baca41b1e validates156primaryactions0+156metadatawriters0,312returnedrows0, canonical/rawlinks and all six-field barrier envelopes; matrixf04934b3e450df0bed344e677b8fe59c7755e17eb2aae50dd45a845cd02b1afc, finalbarrier740e9049/completionb09d6c6c. Initial offline reader42d7ab assumed flat external status fields for nested adapter/postconsumer envelopes; lookupb974c3/reference7ce61f and actualschema7de2df/de13a5 guided reader-only correction without any CLI rerun or receipt/input amendment. Independent global humanaudit40971 subsequently completed0: canonical445ed8184a740f92737febe8984a077ecfa93b3e6c94321b200ec1558ec10b2b/rawd60b456e4b12c6b603fb17b1dffd5cb95a07da0485a779eb08ba9cd2b320a11e verifies12879protected/312returned0/260timed/624captures/150absentruntime; rootfullread518c90/af4ce0. Candidate guardedarchivea66374d4 and restore5ad4d1 (restore4a5dd1d131981b557e2d7ef6c5c8217cd138776f163633a6b1c3b2ae4a21edc0) restored only3ISOmodules+test toretaineda5; private candidate evidence remains historical/unchanged.",
+      "verification_scope": "runtime"
+    },
+    {
+      "applicability": "The hash-reviewed Linux owned-fixture audit observer for descriptor-relative os.open when Python audit event arguments omit dir_fd; test-only scope.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Preserve the initial setup error and distinguish0tests/1error from the intended target RED.",
+        "Inspect the actual syscall arguments and audit tuple; compare descriptor-relative target with the fence CWD interpretation.",
+        "Verify the owned directory FD through /proc/self/fd, canonical nonsymlink components and matching stat/fstat device+inode before admitting one synchronous audit observation."
+      ],
+      "id": "local-linux-owned-audit-dir-fd-context",
+      "limitations": "Verified only in this owned Linux test process and its synchronous one-use observer contract. This is not a production sandbox, a general Python audit security guarantee, portable dir_fd behavior, authority to allow arbitrary relative paths, or evidence of application performance/live activation. The full captured operational writer template was never executed.",
+      "reference": "references/execution-environments.md#local-linux-owned-audit-dir-fd-context",
+      "remedy": "Use a test-only observer that delegates the original os.open arguments unchanged while supplying verified owned dir_fd context to one matching synchronous audit event. Reject unscoped relative paths, outside directory descriptors, escapes, aliases and protected absolute writes; restore the previous thread-local context afterward. Keep production filesystem calls and guards unchanged.",
+      "sources": [
+        "9fa4f1017c4bce1f9b7733a09c97b6e2562178e309755a63e28388e0c71cb52c"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "A Python test audit fence rejects a legitimate owned os.open basename with dir_fd because it resolves that basename against repository CWD; the same mistake can reject owned temporary-directory cleanup."
+      ],
+      "verification": "Initial39c143f6 failed in owned fixture setup before target assertions. Observer8838a60f corrected only the Linux test observation context; four controls passed. Qualified targetRED5223b73b then reached7intended constructor-envelope failures/0errors. GREEN51d02ee2 passed the same4observer controls and3default/3plain actual writer/next-preflight methods plusF821 with34source/proof pins unchanged. Old failed fixture/evidence were preserved; no actual W/home/pilot/repository operation was allowed by this probe.",
+      "verification_scope": "runtime"
+    },
+    {
+      "applicability": "Public-client Twitch device-flow extensions with session-only credentials or concurrent validation/refresh.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Inspect token storage area and whether the returned refresh token is discarded.",
+        "Reproduce restart/expiry and gate hourly validation against an in-flight API 401; count renewal requests and inspect persistent removal after disconnect."
+      ],
+      "id": "ext-twitch-persistent-token-rotation",
+      "limitations": "Local storage is not encrypted. Revoked/expired Public-client refresh tokens can require consent. Logged-out packaged runtime is not real OAuth acceptance; hosted help/privacy have not been republished.",
+      "reference": "references/state-security.md#ext-twitch-persistent-token-rotation",
+      "remedy": "Persist access/refresh pair and account in TRUSTED_CONTEXTS local storage; keep pending approval session-only. Serialize single-use refreshes, save rotated pair before validation, retry API 401 once only after replacing the rejected token, retain state on transient errors, and guard writes by account generation.",
+      "sources": [
+        "a2a61ec22d9320a7d18295813bee5b6e050c688c171c3745aff37ee1b1842063"
+      ],
+      "status": "activation_pending",
+      "symptoms": [
+        "Twitch extension asks for device consent after Chrome restart or access-token expiry.",
+        "API 401 overlapping successful hourly validation clears credentials without issuing refresh."
+      ],
+      "verification": "Defining restart/expiry and validation/API401 overlap fixtures observed RED before correction. Exact session-only commit candidate passes100 tests, syntax, configured ZIP inspection and isolated Chrome logged-out setup/pages/menu checks. User reports reload/reconnection; actual renewal, restart and next-day acceptance remain unverified.",
+      "verification_scope": "code"
+    },
+    {
+      "applicability": "FFmpeg normalized-segment joins with extracted output start previews and square-pixel landscape output.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Probe actual joined video start_time and frame timestamps; distinguish every fixture segment by pixels at 60fps.",
+        "Use a non-square-SAR source and assert fitted picture/side-bar pixels, not only output dimensions."
+      ],
+      "id": "local-concat-preview-display-timing",
+      "limitations": "Only segment starts are sampled; blurred/black frames and later rotation remain inconclusive. Subsequent audio/remux changes require rerunning timestamp regressions.",
+      "reference": "references/artifact-verification.md#local-concat-preview-display-timing",
+      "remedy": "Seek at cumulative normalized-segment durations plus actual joined video start_time in absolute timestamp mode; normalize display aspect before final square-pixel fitting.",
+      "sources": [
+        "d16cc0f8c0e549c005d5e5cd59c537f6f627d7afc51f0138073540cee0411497"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "Joined-segment preview shows previous segment at 60fps after AAC timestamp offset",
+        "Anamorphic input squeezed when coded dimensions are fitted then SAR discarded"
+      ],
+      "verification": "Defining RED cases passed after correction; all14 focused checks passed and short actual MOV/MP4 output decoded with distinct upright start previews.",
+      "verification_scope": "runtime"
+    },
+    {
+      "applicability": "Resumable local media jobs with manifest-bound ownership and atomic generated artifact publication.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Inject interruption immediately after completed clip rename and review mkdir, then rerun the same actual CLI.",
+        "Verify ownership/identity intent is persisted before filesystem publication and foreign data remains refused."
+      ],
+      "id": "local-concat-resume-publication-intent",
+      "limitations": "Does not establish power-loss durability/fsync guarantees or fullrender completion; changed source/settings/cache still require a new job.",
+      "reference": "references/artifact-verification.md#local-concat-resume-publication-intent",
+      "remedy": "Persist validated completed-clip fingerprint and generated-directory ownership intent before atomic publication or mkdir. Keep an exclusive job lock and refuse unrelated existing data.",
+      "sources": [
+        "d16cc0f8c0e549c005d5e5cd59c537f6f627d7afc51f0138073540cee0411497"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "Resume refuses its own completed clip if interrupted immediately after cache publication",
+        "Resume refuses its own review directory if interrupted immediately after mkdir"
+      ],
+      "verification": "Both exact filesystem fault cases failed before reordering; final19focusedtests passed and independent review verified the ordering.",
+      "verification_scope": "runtime"
+    },
+    {
+      "applicability": "Offline VM login readiness before any guest input; distinguish captured session-like screens from failed native reads.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Record successful frame count, a fixed last-screen class and a stable screen-read/prompt failure code only.",
+        "Observe the actual native reader without keys; remove temporary frames and preserve manual sessions."
+      ],
+      "id": "ext-console-readiness-diagnostics",
+      "limitations": "A session hint is not authenticated acceptance and false positives only stop progress. The historical failed frame was not retained. Root daily-run login/report/server/GNOME remain pending; native transport timing and credentials were not changed.",
+      "reference": "references/api-contracts-fixtures.md#ext-console-readiness-diagnostics",
+      "remedy": "Keep exact login acceptance unchanged. Password/account-session hints only block input; print normal-user open-proof as next_command and retain resume_command separately for after inspection.",
+      "sources": [
+        "8c8b179ea0c6b9d53e12664920f114a732b953a8876f413bc661a7b2b1abc383"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "Prelogin readiness ends at a generic timeout with no capture-versus-prompt evidence.",
+        "A failure prints resume when normal-user display inspection is the immediate action."
+      ],
+      "verification": "Three defining tests RED then daily22/full506 with2skips and helper mypy pass. Actual native probe reads1frame,session-like,console-session in0.893s, no keys; sanitized artifact independently reviewed.",
+      "verification_scope": "runtime"
+    },
+    {
+      "applicability": "Fish3.7 directory abbreviation named or.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Capture the editable command line in an interactive PTY; compare command-position versus anywhere rules."
+      ],
       "id": "local-fish-keyword-abbreviation",
+      "limitations": "Fresh command lines only. An unguarded anywhere rule would break logical operators. Name enumeration and syntax checks alone do not prove expansion.",
       "reference": "references/api-contracts-fixtures.md#local-fish-keyword-abbreviation",
+      "remedy": "Use an anywhere/function abbreviation guarded to a buffer containing only or and whitespace; source regenerated definitions in existing shells.",
+      "sources": [
+        "e22a20e482b0a9d85ae01a22d8cf905a856f01a70882bab3c3068799af239fb9"
+      ],
       "status": "verified_fix",
       "symptoms": [
         "Fish or abbreviation exists but does not expand on Space."
       ],
-      "applicability": "Fish3.7 directory abbreviation named or.",
-      "diagnostics": [
-        "Capture the editable command line in an interactive PTY; compare command-position versus anywhere rules."
-      ],
-      "confidence": "confirmed",
-      "remedy": "Use an anywhere/function abbreviation guarded to a buffer containing only or and whitespace; source regenerated definitions in existing shells.",
       "verification": "RED literal or; GREEN fixture and live PTY expansion with unchanged logical or and argument or; full refresh exit0.",
-      "verification_scope": "runtime",
-      "limitations": "Fresh command lines only. An unguarded anywhere rule would break logical operators. Name enumeration and syntax checks alone do not prove expansion.",
-      "sources": [
-        "e22a20e482b0a9d85ae01a22d8cf905a856f01a70882bab3c3068799af239fb9"
-      ]
-    },
-    {
-      "id": "local-i3blocks-busy-wheel-queue",
-      "reference": "references/operational-drift.md#local-i3blocks-busy-wheel-queue",
-      "status": "verified_fix",
-      "confidence": "confirmed",
-      "verification_scope": "runtime",
-      "symptoms": [
-        "i3blocks 1.4 loses rapid wheel events while the block subprocess is running."
-      ],
-      "applicability": "Interactive blocks behind the installed i3blocks 1.4 scheduler.",
-      "diagnostics": [
-        "Compare actual rapid X11 wheel count with saved controller target; controller-only parallel calls can pass while scheduler delivery drops input."
-      ],
-      "remedy": "Queue Redshift wheel handling in the status wrapper before scheduler dispatch, retain result/error output for the next frame, signal a refresh and forward other input unchanged.",
-      "verification": "Executable rapid-click regression RED/GREEN; live eight 25-ms wheel events preserved all eight steps; Windows+2, both wheel directions, ignored clicks and reset passed; target/pointer/focus restored.",
-      "limitations": "Physical input and crowded live workspaces remain manual; queue coverage is specific to the wrapped DP-2 bar.",
-      "sources": [
-        "d5283b8214bf7822aeb26354d50f82b966cfe52ae1c7638cdb60216cb66de640"
-      ]
-    },
-    {
-      "applicability": "Changing live i3 workspace labels while preserving bindings, windows, outputs and focus.",
-      "confidence": "supported",
-      "diagnostics": [
-        "Capture exact UTF-8 labels, numbered workspace output/focus state and application XIDs before activation.",
-        "Separate dock-window replacement from application movement; inspect installed/running config and rendered bar width."
-      ],
-      "id": "local-i3-workspace-label-activation",
-      "limitations": "Physical firmware untested. Padding depends on font/DPI; unrelated stale desktop music-label assertion remains failing. Default sandbox IPC remains restricted.",
-      "reference": "references/api-contracts-fixtures.md#local-i3-workspace-label-activation",
-      "remedy": "Rename to new labels before reloading their new output-assignment rules; guard exact installed replacements. Use native minimum widths for compact padding and include those widths in adaptive status calculations.",
-      "sources": [
-        "75cb97af836d9141c33908830fbca2b83f380be56be2ce21467ece0c7926f6da"
-      ],
-      "status": "verified_workaround",
-      "symptoms": [
-        "Renaming workspaces after reload can reapply output assignments; strict tree comparisons also count restarted i3bar dock windows."
-      ],
-      "verification": "27 real isolated select/move combinations passed; all32original application windows retained numbered workspaces. Output restoration preserved visible/focused workspaces. Final padding activation preserved workspace IDs/output/visibility/focus;16layout and1scheduler tests passed, live checkers passed.",
       "verification_scope": "runtime"
     },
     {
@@ -6098,6 +6281,26 @@
       "verification_scope": "runtime"
     },
     {
+      "applicability": "Interactive blocks behind the installed i3blocks 1.4 scheduler.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Compare actual rapid X11 wheel count with saved controller target; controller-only parallel calls can pass while scheduler delivery drops input."
+      ],
+      "id": "local-i3blocks-busy-wheel-queue",
+      "limitations": "Physical input and crowded live workspaces remain manual; queue coverage is specific to the wrapped DP-2 bar.",
+      "reference": "references/operational-drift.md#local-i3blocks-busy-wheel-queue",
+      "remedy": "Queue Redshift wheel handling in the status wrapper before scheduler dispatch, retain result/error output for the next frame, signal a refresh and forward other input unchanged.",
+      "sources": [
+        "d5283b8214bf7822aeb26354d50f82b966cfe52ae1c7638cdb60216cb66de640"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "i3blocks 1.4 loses rapid wheel events while the block subprocess is running."
+      ],
+      "verification": "Executable rapid-click regression RED/GREEN; live eight 25-ms wheel events preserved all eight steps; Windows+2, both wheel directions, ignored clicks and reset passed; target/pointer/focus restored.",
+      "verification_scope": "runtime"
+    },
+    {
       "applicability": "i3blocks 1.4 config and script-output changes.",
       "confidence": "confirmed",
       "diagnostics": [
@@ -6116,9 +6319,425 @@
       ],
       "verification": "62 i3blocks and 13 Redshift tests passed; refresh and i3 restart exited0; final screenshots show recovered calendar/full and clock/compact blocks with colored playback icons.",
       "verification_scope": "runtime"
+    },
+    {
+      "applicability": "Changing live i3 workspace labels while preserving bindings, windows, outputs and focus.",
+      "confidence": "supported",
+      "diagnostics": [
+        "Capture exact UTF-8 labels, numbered workspace output/focus state and application XIDs before activation.",
+        "Separate dock-window replacement from application movement; inspect installed/running config and rendered bar width."
+      ],
+      "id": "local-i3-workspace-label-activation",
+      "limitations": "Physical firmware untested. Padding depends on font/DPI; unrelated stale desktop music-label assertion remains failing. Default sandbox IPC remains restricted.",
+      "reference": "references/api-contracts-fixtures.md#local-i3-workspace-label-activation",
+      "remedy": "Rename to new labels before reloading their new output-assignment rules; guard exact installed replacements. Use native minimum widths for compact padding and include those widths in adaptive status calculations.",
+      "sources": [
+        "75cb97af836d9141c33908830fbca2b83f380be56be2ce21467ece0c7926f6da"
+      ],
+      "status": "verified_workaround",
+      "symptoms": [
+        "Renaming workspaces after reload can reapply output assignments; strict tree comparisons also count restarted i3bar dock windows."
+      ],
+      "verification": "27 real isolated select/move combinations passed; all32original application windows retained numbered workspaces. Output restoration preserved visible/focused workspaces. Final padding activation preserved workspace IDs/output/visibility/focus;16layout and1scheduler tests passed, live checkers passed.",
+      "verification_scope": "runtime"
+    },
+    {
+      "applicability": "Immutable imported inputs whose Git index was already normalized before path-specific text attributes were disabled.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Inspect git check-attr text whitespace and git ls-files --eol for the exact immutable paths.",
+        "Compare each staged blob byte-for-byte with the established unchanged source baseline; a passing whitespace check alone does not prove byte preservation."
+      ],
+      "id": "local-immutable-input-index-renormalization",
+      "limitations": "Keep whitespace checks on authored code. Renormalization changes index entries, so scope it to intended immutable paths and verify the baseline. Evidence covers Git representation, not application behavior or upstream provenance.",
+      "reference": "references/artifact-verification.md#local-immutable-input-index-renormalization",
+      "remedy": "Set -text and -whitespace only for established immutable input paths; after changing attributes, explicitly git add --renormalize those paths. Verify exact staged/source bytes and rerun the staged whitespace check.",
+      "sources": [
+        "5798a54c9f06b6f2a3342987fd53cd0897ddf1966eb9fedfa0e7b9185c13b077"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "Staged whitespace checks reject retained source whitespace and Git warns CRLF inputs will be normalized.",
+        "Ordinary restaging after -text still leaves normalized index bytes different from immutable working files."
+      ],
+      "topic": "artifact-verification",
+      "verification": "The initial staged check exited 2 on three immutable Pine inputs. Ordinary restaging failed the byte assertion; EOL inspection exposed stale normalized index entries. Explicit renormalization then passed exact staged/source equality for all three files and staged whitespace check exit 0 without editing source bytes.",
+      "verification_scope": "code"
+    },
+    {
+      "applicability": "Headless TypeScript scripts that need the installed tsx loader but do not require the tsx CLI process IPC listener.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Distinguish launcher IPC failure from script calculation failure; inspect the exact denied listener path.",
+        "Run the same script via node --import tsx in the same default sandbox, then exercise the documented npm entrypoint."
+      ],
+      "id": "local-headless-tsx-loader-without-ipc",
+      "limitations": "This avoids unnecessary launcher IPC; it does not repair or relax the sandbox listener restriction and does not prove a server or live trading path works.",
+      "reference": "references/execution-environments.md#local-headless-tsx-loader-without-ipc",
+      "remedy": "For a pure headless script use node --import tsx script.ts rather than the tsx executable. Keep necessary application listeners and permission boundaries unchanged.",
+      "sources": [
+        "765fac437cd606073bcc5c7957f8b18b638bb6df88b672b9dcef070af4946add"
+      ],
+      "status": "verified_workaround",
+      "symptoms": [
+        "A pure TypeScript smoke command launched through the tsx executable fails at listen EPERM on a temporary tsx IPC pipe before calculation."
+      ],
+      "verification": "The original npm smoke failed at listen EPERM /tmp/tsx-1000/15.pipe. The direct Node loader succeeded; changing only the package script made the actual npm plain/JSON smoke exit 0 in the default sandbox with one costed synthetic round trip.",
+      "verification_scope": "workaround"
+    },
+    {
+      "applicability": "Deterministic event simulations where source time, availability time and execution time differ.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Construct decisions whose source-index order differs from availability order, including an exit sourced before entry but available while held and an entry sourced while held but available after exit.",
+        "Check both future truncation and extra 0/1/2-bar delays without replacing source ATR/risk snapshots."
+      ],
+      "id": "local-backtest-decisions-at-availability",
+      "limitations": "Evidence covers a pure bar simulation with supplied closed, revision-stable inputs. Nominal interval availability is not observed provider arrival, and there is no live broker or profitability evidence.",
+      "reference": "references/state-security.md#local-backtest-decisions-at-availability",
+      "remedy": "Queue every source decision without deciding from source-time position state. At its first availability-qualified later open plus explicit delay, inspect current position state, consume once and apply documented exit-before-entry ties. Unknown future exits cannot cancel earlier pending entries.",
+      "sources": [
+        "d7e999a84dccb77f87c23a4dba06bfd6e3f497dcf727385fd45019790cbdc7a7"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "A future-available exit cancels an earlier pending entry before becoming actionable.",
+        "An exit emitted while flat or entry emitted while held is discarded even though the position changes before its availability time."
+      ],
+      "verification": "Defining availability counterexamples observed RED then passed after the queue correction. Final 29 core and 129 full tests, typecheck, build and shift fixture CLIs passed; independent review reran the availability counterexamples and approved the core gate. A controlled reference-policy mutation failed its guard then causal policy was restored GREEN.",
+      "verification_scope": "code"
+    },
+    {
+      "applicability": "OHLC-only long-position simulations with standing stop/target orders, scheduled next-open exits and adverse fees/slippage.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Exercise an entry whose stop distance is smaller than adverse entry slippage, both scheduled-exit/target-gap conflicts, a known opening target followed by a later low through stop, and an ambiguous intrabar both-hit candle.",
+        "Separate known opening facts from unknown intrabar order; assert exact adverse execution price and unchanged source risk snapshots."
+      ],
+      "id": "local-backtest-known-open-before-intrabar",
+      "limitations": "Bar OHLC does not reveal intrabar sequence; stop-first is an explicit conservative assumption only while the position remains active. It is not TradingView Bar Magnifier equivalence. Costs/gaps can exceed ATR target risk, and numerical Pine parity remains unverified.",
+      "reference": "references/state-security.md#local-backtest-known-open-before-intrabar",
+      "remedy": "For carried positions handle adverse opening stop gap, capped opening target gap, then scheduled market exits inside the levels. For remaining intrabar paths choose stop before target when both touch; apply adverse costs and no favorable target-gap improvement. A newly entered stop above raw open exits at the adverse raw open, not its favorable stop.",
+      "sources": [
+        "d7e999a84dccb77f87c23a4dba06bfd6e3f497dcf727385fd45019790cbdc7a7"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "A newly entered tight stop sells at a more favorable stop above the raw open.",
+        "Scheduled opposite/time exits bypass a standing target on a favorable opening gap, overstating fill price; a later low can incorrectly override a known opening target fill."
+      ],
+      "verification": "The tight-stop RED expected 99.95 instead of observed 99.99597699999998. Two scheduled target-gap REDs failed, then both returned capped 103.997975 instead of 119.94; the known-opening/later-low regression also passed. Independent review approved final 29/29 core tests; full suite129, typecheck, build and fixture CLIs passed.",
+      "verification_scope": "code"
+    },
+    {
+      "applicability": "TypeScript execution APIs whose runtime callers may supply extra properties or values outside declared types.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Inject a display-only mode property at the public strategy boundary and inspect the actual downstream engine options.",
+        "Pass numeric versus string timeframe values; do not let a coercing parser substitute for boundary type validation."
+      ],
+      "id": "local-strategy-explicit-causal-context",
+      "limitations": "Types alone do not establish runtime policy. Evidence covers local pure strategy execution and synthetic fixtures; it does not prove provider arrival, numerical Pine parity or a live trading path.",
+      "reference": "references/state-security.md#local-strategy-explicit-causal-context",
+      "remedy": "Construct downstream execution options from explicit permitted fields and force confirmedOnly. Validate the public higher-timeframe value as string or null before invoking the resolution parser.",
+      "sources": [
+        "c886f914372c59dbd743f868e2994ddaa7da51e073093f79d38496e1ff926040"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "An extra runtime mode=pineParity property reaches the PMO execution adapter through typed-context object spreading.",
+        "A numeric higherTimeframe is coerced by a parser intended for resolution strings."
+      ],
+      "verification": "Independent mode and numeric-timeframe counterexamples defined the regressions. Final 38 strategy/167 full tests, typecheck, build and sealed/open/reject synthetic CLI matrix passed; independent review inspected explicit causal fields and found no remaining must-fix.",
+      "verification_scope": "code"
+    },
+    {
+      "applicability": "Finite, serializable research-candidate snapshots recorded for both successful and failed trial evaluations.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Round-trip failed-candidate reports through JSON and mutate the original caller objects after creating a report.",
+        "Test unknown nested keys, nonfinite numbers and omitted optional values independently of finite but invalid candidate settings."
+      ],
+      "id": "local-strategy-finite-detached-snapshots",
+      "limitations": "This is an explicit small schema, not a general object serializer or proof against every JavaScript object behavior. Code/fixture evidence does not establish a trading edge or external data fidelity.",
+      "reference": "references/api-contracts-fixtures.md#local-strategy-finite-detached-snapshots",
+      "remedy": "Snapshot only known scalar fields, reject unknown keys and nonfinite values before trials, omit undefined values, and copy supported nested fields. Keep finite invalid candidate evaluations counted as failed trials rather than silently dropping them.",
+      "sources": [
+        "c886f914372c59dbd743f868e2994ddaa7da51e073093f79d38496e1ff926040"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "Infinity survives in failed-candidate report parameters and changes to null after JSON serialization.",
+        "An unknown nested confluence property retains a caller object reference that can mutate completed report evidence."
+      ],
+      "verification": "Independent Infinity/JSON and nested-mutation reproducers exposed the boundary defects. Strict snapshots and detached confluence copies passed final 38 focused/167 full tests, typecheck/build and independent review; original assertions remained intact.",
+      "verification_scope": "code"
+    },
+    {
+      "applicability": "Numeric reports where zero allocation semantically means a cash-only zero return and deterministic JSON equality is required.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Use a losing baseline with zero allocation and assert positive zero plus JSON-round-trip equality.",
+        "Retain a nonzero-allocation loss case so a serialization repair cannot clamp genuine negative returns."
+      ],
+      "id": "local-json-zero-allocation-return",
+      "limitations": "This normalizes a semantically zero result only; it is not a general numerical rounding policy and must not hide losses or other nonfinite values.",
+      "reference": "references/api-contracts-fixtures.md#local-json-zero-allocation-return",
+      "remedy": "Return explicit positive zero only when allocation is zero; otherwise retain the signed baseline-return multiplication.",
+      "sources": [
+        "c886f914372c59dbd743f868e2994ddaa7da51e073093f79d38496e1ff926040"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "Multiplying a negative baseline return by zero allocation produces JavaScript negative zero, violating exact zero-exposure and JSON-round-trip equality assertions."
+      ],
+      "verification": "The first exposure/controller GREEN attempt passed36/38, with exact-zero and report-round-trip failures. The zero-allocation-only normalization then passed38/38 strategy and167/167 full tests, typecheck/build and independent exposure-formula review.",
+      "verification_scope": "code"
+    },
+    {
+      "applicability": "npm run verification commands mixing npm-level output options with strict application-level flags.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Inspect whether --silent appears before the script name or after npm's -- separator.",
+        "Keep unknown-application-option rejection intact and inspect the corrected sealed/open JSON results separately."
+      ],
+      "id": "local-npm-script-option-ownership",
+      "limitations": "Verification used synthetic fixtures and consumed no actual market final test. This repairs option ownership in the command, not an application calculation defect.",
+      "reference": "references/editing-shell-transport.md#local-npm-script-option-ownership",
+      "remedy": "Use npm run --silent script-name -- application-flags. Keep npm options before the script name and application options after the separator; correct the verification invocation rather than weakening the application allowlist.",
+      "sources": [
+        "c0d198c85fa2f757b684ef4473aceee8f4984dc1e2de7c0581c5c4e7e8b22f5f"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "A strict application script rejects Unknown option: --silent after npm forwards its own silent option through the script argument separator."
+      ],
+      "verification": "The forwarded --silent form exited1 before strategy calculation. Corrected sealed JSON exited0 with0 holdout runs, and explicit-open JSON exited0 with1 synthetic holdout; plain sealed/open/reject commands also passed.",
+      "verification_scope": "runtime"
+    },
+    {
+      "applicability": "TypeScript smoke scripts combining assertion-function typings and an explicit discriminant guard on the same value.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Read the installed assertion signature and adjacent control-flow guard; distinguish a compiler narrowing error from a runtime accounting failure.",
+        "Confirm the fault guard remains reachable before narrowing and retain all financial/idempotence assertions."
+      ],
+      "id": "local-typescript-assertion-narrowing-guard",
+      "limitations": "Evidence verifies the compiler/CLI boundary and synthetic accounting checks, not live broker behavior or actual market arrival. The full suite was not repeated after the one-line CLI correction.",
+      "reference": "references/api-contracts-fixtures.md#local-typescript-assertion-narrowing-guard",
+      "remedy": "Use the explicit fault guard as the status check and remove only the preceding redundant healthy assertion. Do not cast away the union, remove the fault throw or weaken unrelated checks.",
+      "sources": [
+        "725aabbb802bbc807699aa8565becbe3cf9882881d9abddad84ce00124f32777"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "TypeScript reports Property error does not exist on type never in a fault branch after a typed Node assert.equal has already narrowed a discriminated union to its healthy case."
+      ],
+      "verification": "The runtime fixture and179/179 full tests passed before typecheck failed at paper-smoke.ts:40 with TS2339. After removing one redundant assertion, fresh typecheck/build and delayed/zero-delay/plain/JSON smoke commands exited0; independent review reran12/12 broker tests and typecheck. Broker/test sources were unchanged; the full179-test pass preceded the CLI-only correction.",
+      "verification_scope": "code"
+    },
+    {
+      "applicability": "Queued optional agent work in an orchestrator with a known bounded active execution pool; completed agent history does not itself reserve a free active slot.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Compare the configured active-slot cap with current root/child activity rather than counting only completed agent identities.",
+        "Wait for a worker completion notification before retrying the queued follow-up; verify the resumed turn actually starts."
+      ],
+      "id": "local-agent-slot-before-followup",
+      "limitations": "This observes a permitted resumption after capacity frees; it neither raises nor bypasses the configured concurrency limit and does not establish capacity behavior for a different orchestrator.",
+      "reference": "references/execution-environments.md#local-agent-slot-before-followup",
+      "remedy": "Keep optional work queued until an existing active task demonstrably finishes, then resume it without interrupting required workers or repeatedly retrying at the cap.",
+      "sources": [
+        "1e3b9a2b7686d476a701a1dd03adbd93077d85e037e917344bbdb00d384550e7"
+      ],
+      "status": "verified_workaround",
+      "symptoms": [
+        "Following up a completed agent is rejected with agent thread limit reached while the root and three other active children occupy the configured four execution slots."
+      ],
+      "verification": "The rejected request started no child turn or external mutation. After causal_backtest_core returned FINAL_ANSWER, the queued core_incident_learning turn started successfully and resumed three-report registration.",
+      "verification_scope": "workaround"
+    },
+    {
+      "applicability": "Bounded historical bar simulations with source-close signals, delayed next-open execution and higher-timeframe permission available independently between supplied chart bars.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Reproduce a permitted source signal followed by permission revocation at start+1800 and the next supplied open at start+3600; assert no stale-permission entry.",
+        "Exercise held-position revocation, unknown/empty required permission, standing stop/target gaps, detached provenance, legacy no-policy behavior and future-truncation stability.",
+        "Check strategy and historical paper callers propagate the execution timeline and apply assumed feed delay once."
+      ],
+      "id": "local-backtest-opening-permission-timeline",
+      "limitations": "Code and deterministic fixture evidence only. The policy is immutable input for bounded historical replay, not a continuous permission-observation API or retained session journal. The explicitly non-executable signal-shift stress may omit the guard to expose stale-permission risk. No actual market final slice or paper session was used; numerical parity, feed arrival and trading edge remain unverified.",
+      "reference": "references/state-security.md#local-backtest-opening-permission-timeline",
+      "remedy": "Preserve causal source decisions, but pass a validated detached execution-permission timeline to the shared accounting core. At each market open consult only the latest point available by that open. A required false or unavailable state consumes queued entries without revival and exits held positions after standing adverse-stop/capped-target gap priority. Absence of a policy preserves legacy behavior; a supplied empty timeline requires permission and blocks entries.",
+      "sources": [
+        "6b90a04471240ea04c4d08b12d5deac0b0579f13f89d913c3e67f795877f23f6"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "A source-close entry remains queued across a session/data gap and fills after higher-timeframe permission was already revoked before the next supplied market open."
+      ],
+      "verification": "The independent pre-patch gap reproducer entered at start+3600 despite revocation at start+1800. Nine defining RED failures preceded the correction. Final104/104 focused and204/204 full tests, typecheck/build and core/strategy/paper CLI matrices passed. Independent review replayed the original case (now blocked), checked legacy behavior and detached policy provenance, and approved14 verified claims with one external parity/performance gap. Two failure-path fixtures moved900 to1800 bars while retaining original failure/attempt/no-retry assertions and minimum-trade rules.",
+      "verification_scope": "code"
+    },
+    {
+      "applicability": "Paginated historical market-data loaders whose normalization can omit provider observations and whose immutable cache stores aggregate and per-window provenance.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Track raw timestamp cursor and explicit provider exhaustion before OHLC omission rather than deriving completion from normalized count.",
+        "Check per-window cursor chains, count sums, warnings, request bounds and aggregate metadata against the actual combined bars.",
+        "Validate versioned snapshots and fingerprints on offline reuse; preserve earlier schema files."
+      ],
+      "id": "local-history-raw-window-provenance",
+      "limitations": "The evidence verifies loader and cached-observation contracts, not provider completeness, historical session arrival, executable prices or TradingView numerical parity. No financial experiment or final holdout ran.",
+      "reference": "references/api-contracts-fixtures.md#local-history-raw-window-provenance",
+      "remedy": "Retain raw cursor/exhaustion separately from normalized bars. Bound raw observations before normalization, keep aggregate oldest cursor coherent with all windows, preserve newest observation metadata, and publish only validated complete versioned snapshots without overwriting earlier observations.",
+      "sources": [
+        "c34e53fdb1fab6df18c9f88d183e1f40e5ce3cd3551ac7a3af87dde661a0e6f8"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "Aggregate snapshot rejects newest-page oldestRawTime after older windows are appended",
+        "Short normalized candle arrays can falsely imply provider exhaustion after invalid-candle omission"
+      ],
+      "topic": "api-contracts-fixtures",
+      "verification": "Defining omission/cursor/provenance cases preceded the fix. Loader gate reached61 focused tests; shared276-test gate, typecheck and build passed. Ten frozen provider histories validated and reused offline twice with identical bounds/counts.",
+      "verification_scope": "code"
+    },
+    {
+      "applicability": "History paginators that treat a provider empty-data classification as exhaustion while applying exclusive end bounds.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Test daily and weekly quotes exactly equal to the exclusive end, not only strictly later timestamps.",
+        "Exercise a valid5000-candle first page followed by a nonempty boundary-only page and require an error with no published snapshot.",
+        "Keep truly empty terminal-page tests unchanged."
+      ],
+      "id": "local-exclusive-provider-window-exhaustion",
+      "limitations": "Offline provider fixtures establish the boundary/exhaustion contract only. The separate loopback permission failure needed scoped execution; the fix does not validate actual market performance, feed latency or historical completeness.",
+      "reference": "references/api-contracts-fixtures.md#local-exclusive-provider-window-exhaustion",
+      "remedy": "Reject nonempty observations at or after the exclusive end as INVALID_PROVIDER_DATA instead of translating them into empty history; propagate that failure through the existing paginator and preserve the immutable cache.",
+      "sources": [
+        "3fa22dea01ffd8bea4be71699bb004b0a07a4afd52bfcd531bc4ea966337a867"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "A nonempty Yahoo response exactly equal to exclusive endTime becomes NO_MARKET_DATA",
+        "A later boundary-only page can cause false maximum-history completion and publication"
+      ],
+      "topic": "api-contracts-fixtures",
+      "verification": "All three defining regressions failed before the minimal > to >= predicate correction.61 focused tests and the shared276-test gate passed with typecheck/build; the integrated case verifies two provider calls and no cache publication.",
+      "verification_scope": "code"
+    },
+    {
+      "applicability": "Preserved retired experiments stored inside a project tree where the test runner still scans matching test suffixes.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Inspect the discovered failing file path rather than assuming Git ignore excludes it from test collection.",
+        "Distinguish retired archived artifacts from committed active regression tests.",
+        "Preserve archive bytes and verify the full active suite after making the archive inert."
+      ],
+      "id": "local-inert-test-archives",
+      "limitations": "Git and test-runner discovery remain independent. The suffix remedy applies to intentionally retired artifacts, never to an active failing regression; the underlying test-runner configuration was not changed.",
+      "reference": "references/execution-environments.md#local-inert-test-archives",
+      "remedy": "Give the preserved archived test an inert suffix such as .test.ts.txt, or use a location already excluded by the runner. Do not delete or weaken active tests or change production discovery merely to hide a failure.",
+      "sources": [
+        "a9888c3128bdd7ad095eb8e860a03971185d5d9ee63673eadcd4c62dda2af664"
+      ],
+      "status": "verified_workaround",
+      "symptoms": [
+        "Vitest discovers an archived .test.ts under a Git-ignored cache and fails its relocated relative imports"
+      ],
+      "topic": "execution-environments",
+      "verification": "The initial combined gate passed276 active tests but failed on the relocated archived suite. Renaming only the archive suffix preserved its contents; the fresh gate passed25 files/276 tests, typecheck and build.",
+      "verification_scope": "workaround"
+    },
+    {
+      "applicability": "Human-facing CLI entrypoints whose argument parser can throw before the normal output-mode assignment.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Exercise --plain together with a deliberately invalid argument before any data access.",
+        "Read display-mode initialization and catch/error formatting separately from the parser.",
+        "Distinguish restricted test-worker subprocess launch errors from the direct executable result."
+      ],
+      "id": "local-cli-plain-before-argument-validation",
+      "limitations": "This verifies error formatting and argument rejection only. It neither grants final access nor proves data loading, paper execution or subprocess permissions.",
+      "reference": "references/api-contracts-fixtures.md#local-cli-plain-before-argument-validation",
+      "remedy": "Determine plain mode from raw display flags or the established plain environment option before validating arguments, then use the same mode in the error path. Keep invalid arguments rejected.",
+      "sources": [
+        "f92f8c3559f3fe5c55ec5c8e19b7ac5f5cde3398403d3fb5aaca237c35a0e51a"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "A CLI correctly rejects unsupported arguments but emits an emoji despite --plain because validation throws before parsed display flags are applied"
+      ],
+      "topic": "api-contracts-fixtures",
+      "verification": "The direct paper-study command with --plain --open-test rejected final access with ASCII error output after initialization moved before parsing; focused15 tests and fresh typecheck passed. The temporary nested subprocess wrapper failed with EPERM and was not treated as application evidence.",
+      "verification_scope": "runtime"
+    },
+    {
+      "applicability": "Browser automation through generation-tagged references, wrapper CSS select-fill actions or scripted native-select keyboard steps.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Refresh the accessibility snapshot and resolve the intended observed control immediately before a UID action.",
+        "Compare actual option values, visible labels and the emitted request before blaming application validation.",
+        "Read the current wrapper interface; UID and CSS fill modes can have different selection behavior.",
+        "Inspect document.activeElement before keyboard input; a successful CSS click is not proof of native-select focus.",
+        "After reload, verify the intended workspace is actually active and visible; DOM presence alone can describe a preserved hidden component."
+      ],
+      "id": "local-browser-wrapper-input-contracts",
+      "limitations": "These are automation workarounds, not application fixes or broad browser reliability claims. One refreshed click establishes only that action; the matrix and navigation run do not establish all responsive widths, numerical parity, financial validity or every native-browser interaction.",
+      "reference": "references/browser-integrations.md#local-browser-wrapper-input-contracts",
+      "remedy": "Use a fresh reference for the observed control, or use the documented selector action with actual option values; explicitly focus the observed select before keyboard steps when activeElement proves focus is absent. Verify visible labels and matching rendered data afterward. Preserve strict API rejection of invalid query values. After a development reload, re-select the observed visible workspace when active-view inspection proves the intended view is inactive.",
+      "sources": [
+        "6a3715b1a70358b6fe28db4e8502dd47b5498b85b190c1e94702ba6056f18261",
+        "d46dc2bc22b4114b8500b8fcbea46507b9273a1e9a4843bc94fa1e141ed50036",
+        "bc3d30743e196bf003101502dc015271fd29ffb221a13b50ec4745f3c7a3ef4a",
+        "517003f748db48794ae2f47b5e78a65a1bf7c8deb0ee9657855a1bf0f85852b6"
+      ],
+      "status": "verified_workaround",
+      "symptoms": [
+        "Browser wrapper rejects a UID from an expired snapshot generation with STALE_REF",
+        "CSS select fill receives visible label instead of the actual option value and produces an empty role rejected by the API",
+        "Home/ArrowDown/Enter leave the selected dataset unchanged because a preceding programmatic click left activeElement at BODY",
+        "An acceptance script waits for a ledger after changing mounted hidden Research controls while the Chart workspace remains active"
+      ],
+      "topic": "browser-integrations",
+      "verification": "A fresh snapshot/reference made the previously rejected Research click exit0. Correct option values made the complete browser matrix exit0 across six datasets, four roles in fold0 and selector folds1/2; audit244/final0 and no initial desktop overflow were observed. Keyboard inspection found activeElement BODY and unchanged dataset5; explicit select focus followed by the complete navigation rerun changed the dataset to1 and passed synchronized zoom, live canvas/navigation preservation and deliberate-outage Retry recovery. A post-edit timeout had only live market requests and a hidden Research workspace; selecting visible Research made quote-unit checks succeed without changing application polling/loading behavior.",
+      "verification_scope": "workaround"
+    },
+    {
+      "applicability": "Financial research interfaces displaying instruments with different quote units through shared monetary components.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Determine the actual supported instrument quote unit from source identity and saved accounting metadata before formatting.",
+        "Test crypto and stock cases across fills, costs, equity, open positions and P&L; inspect the active rendered workspace.",
+        "Keep saved numerical values and immutable experiment artifacts unchanged while checking label corrections."
+      ],
+      "id": "local-market-quote-unit-formatting",
+      "limitations": "Verified for the four declared research symbols only. This is a display-unit repair; it does not change financial math, establish currency conversion or guarantee a stablecoin peg.",
+      "reference": "references/artifact-verification.md#local-market-quote-unit-formatting",
+      "remedy": "Pass instrument identity or its explicit quote unit through shared monetary views. Use symbol-aware formatting that labels USDT amounts explicitly and retains USD formatting for USD instruments; never imply conversion or a dollar peg.",
+      "sources": [
+        "517003f748db48794ae2f47b5e78a65a1bf7c8deb0ee9657855a1bf0f85852b6"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "A shared USD currency formatter mislabels USDT-quoted crypto fills, account balances, costs and trade P&L"
+      ],
+      "topic": "artifact-verification",
+      "verification": "Five crypto formatter assertions failed while two USD assertions passed before the correction; all7 then passed. The full372-test suite, typecheck and build passed. Active BTCUSDT and SPY research views at390px showed correct USDT/USD prices, costs and equity without horizontal overflow; the244-attempt/training144/final0 audit stayed unchanged.",
+      "verification_scope": "runtime"
     }
   ],
   "reports": [
+    {
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-10-23-remote-archive-dns.md"
+      ],
+      "decision": "No new reusable learning: permitted network execution resolved a restricted GitHub DNS lookup; no provider-specific or DNS configuration fix was needed.",
+      "findings": [],
+      "reviewed_on": "2026-10-23",
+      "sha256": "fe56e54503d61481033fb8adc973fc52596d2b0fe32aa60066e4479261ffbaab"
+    },
     {
       "aliases": [
         "/home/kevin/linux-config/docs/postmortem/2026-10-22-dnd-tts.md"
@@ -11313,21 +11932,6 @@
     },
     {
       "aliases": [
-        "/home/kevin/coding/track-codex-sessions/docs/postmortem/2026-10-22-latency-discovery-paths.md"
-      ],
-      "findings": [
-        "local-virtualenv-interpreter-path-identity",
-        "local-cli-benchmark-startup-cache-parity",
-        "local-command-completion-launch-namespace",
-        "local-cli-benchmark-disposable-index-space",
-        "local-tracker-validation-runtime",
-        "local-collaboration-idle-agent-dispatch"
-      ],
-      "reviewed_on": "2026-10-23",
-      "sha256": "a72a4025f13a53cb333e80582d0372c3334f059d42d5af72836ddbb86697f0d9"
-    },
-    {
-      "aliases": [
         "/home/kevin/linux-config/docs/postmortem/2026-10-23-commit-delivery-path-discovery.md"
       ],
       "decision": "No new learning: existing path-discovery, patch-operation, scoped sandbox access and privacy-candidate guidance cover these delivery failures. Documentation privacy repair passed explicit and hook checks; refresh remains blocked by unrelated mimeapps conflict.",
@@ -11336,13 +11940,136 @@
       "sha256": "5b10c0bd2cb94044c8e18195341905fbc732437cf952f7a8d416e304966a20cd"
     },
     {
-      "sha256": "9b5d08834a6ce4765049bfd2734e0a349fc4e4778803dfb55bb735e08fa9b010",
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-10-23-agent-policy-fish-inspection.md"
+      ],
+      "decision": "No new learning: existing environment isolation and schema-discovery guidance covers configured Fish startup side effects and the diagnostic ledger-key assumption. Source edit verified; activation pending existing live/source drift.",
+      "findings": [],
+      "reviewed_on": "2026-10-23",
+      "sha256": "44a7022cdd1617d644d79ea52694826ea02dba03a9b6b000a37d7a4d2fc15b57"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/twitch-grid/docs/postmortem/2026-10-23-fullscreen-priority.md"
+      ],
+      "decision": "No new general provider remedy: this task-specific focus/fullscreen selection policy reuses the available rendition IDs and bounded acknowledgement path already covered by ext-twitch-quality-acknowledgement and ext-twitch-resolution-quality-ids. The no-Auto video-only fallback lesson stays in the owning repository. Local loopback EPERM, absent optional files, unavailable browser bridge and broad temporary-directory traversal are verification-environment issues; controlled tests do not establish sustained real Twitch smoothness, audibility or bandwidth savings.",
+      "findings": [],
+      "reviewed_on": "2026-10-23",
+      "sha256": "33f5f85271238fe140b50176ff42277227e86ace4ea3c9e560595a3686c39651"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/twitch-grid/docs/postmortem/2026-10-23-fullscreen-session-shipping.md"
+      ],
+      "decision": "No new general learning: wrapped-write scope-helper fallback uses directly observed edits; Vercel update-cache EROFS repeats the reviewed setup incident and existing cache guidance. Candidate-only validation separates 146/34 from mixed-workspace152/40. Git/deployment verification remains a delivery step rather than an upstream playback claim.",
+      "findings": [],
+      "reviewed_on": "2026-10-23",
+      "sha256": "a5b0258ee3189fb2387dfe9f0877d581ab4cf6494a24c0de1485b15064f233b3"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/twitch-grid/docs/postmortem/2026-10-23-play-all-paused.md"
+      ],
+      "findings": [
+        "ext-twitch-transform-downscale-visibility"
+      ],
+      "reviewed_on": "2026-10-23",
+      "sha256": "d58673a3e62ced21f2f4698905b6b70cc2bfdd2d76e12c8dae95e8008a2946e0"
+    },
+    {
+      "aliases": [
+        "/home/kevin/ai-cli-dotfiles-public/.worktrees/skills-efficiency/docs/postmortem/2026-10-23-skills-pr-base-inspection.md"
+      ],
+      "decision": "No new general learning: exact-ref verification and complete historical Git fixtures apply existing environment/ownership guidance. Corrected isolated candidate passed 240 tests and 391 subtests.",
+      "findings": [],
+      "reviewed_on": "2026-10-23",
+      "sha256": "931ab044b61333c735598beef598ab7dbf8d2e3d24ba9106d9b82a8fad4314a8"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/track-codex-sessions/docs/postmortem/2026-10-22-latency-discovery-paths.md"
+      ],
+      "findings": [
+        "local-virtualenv-interpreter-path-identity",
+        "local-cli-benchmark-startup-cache-parity",
+        "local-command-completion-launch-namespace",
+        "local-cli-benchmark-disposable-index-space",
+        "local-tracker-validation-runtime",
+        "local-collaboration-idle-agent-dispatch",
+        "local-cli-retained-manifest-path-order",
+        "local-cli-retained-report-budget",
+        "local-extracted-guard-trace-line-offset",
+        "local-cli-tool-completion-output-fields",
+        "local-linux-owned-audit-dir-fd-context"
+      ],
+      "reviewed_on": "2026-10-24",
+      "sha256": "9fa4f1017c4bce1f9b7733a09c97b6e2562178e309755a63e28388e0c71cb52c"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/twitch-following-extension/docs/postmortem/2026-10-25-daily-twitch-reconnect.md"
+      ],
+      "findings": [
+        "ext-twitch-persistent-token-rotation"
+      ],
+      "reviewed_on": "2026-10-25",
+      "sha256": "a2a61ec22d9320a7d18295813bee5b6e050c688c171c3745aff37ee1b1842063"
+    },
+    {
+      "aliases": [
+        "/mnt/usb-8tb/hevin/docs/postmortem/2026-10-28-pictures-ssus-verification.md"
+      ],
+      "decision": "No new reusable finding: machine-specific Pictures symlink repair. Completed rsync transfer, final file/archive comparison with mutable directory timestamps omitted, and live navigation are verified. Full independent checksums and physical keyboard expansion remain unverified. Harness PTY repair was not established; a fresh lookup found no orphaned checksum processes. Unrelated existing ledger changes are preserved.",
+      "findings": [],
+      "reviewed_on": "2026-10-28",
+      "sha256": "1f9ea7e4f13d9ec9823ee4d0d54de97a6c2995153a940865e1e65a652e0d2e25"
+    },
+    {
       "aliases": [
         "/home/kevin/linux-config/docs/postmortem/2026-10-28-concerts-shortcut-fish-inspection.md"
       ],
-      "reviewed_on": "2026-10-28",
+      "decision": "No new learning: configured Fish startup side effects in read-only sandboxes are already covered by environment-isolation guidance and the 2026-10-23 Fish inspection incident.",
       "findings": [],
-      "decision": "No new learning: configured Fish startup side effects in read-only sandboxes are already covered by environment-isolation guidance and the 2026-10-23 Fish inspection incident."
+      "reviewed_on": "2026-10-28",
+      "sha256": "9b5d08834a6ce4765049bfd2734e0a349fc4e4778803dfb55bb735e08fa9b010"
+    },
+    {
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-10-28-concat-skill-reference-path.md"
+      ],
+      "decision": "No new learning: existing exact-context/relative-path guidance covers lookup/import/patch diagnostics; canonical title fallback covers an unavailable metadata tool. Corrected lookups and inventory succeeded.",
+      "findings": [],
+      "reviewed_on": "2026-10-28",
+      "sha256": "c4cf45b181a1070f3fd52ebad871fa84320d4522dc88e93a08b5af48764d1a3a"
+    },
+    {
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-10-28-concat-fish-inspection.md"
+      ],
+      "decision": "No new learning: explicit dependencies in isolated Fish shells and prior inspection guidance cover this failure; scoped refresh exited 0.",
+      "findings": [],
+      "reviewed_on": "2026-10-28",
+      "sha256": "db34fb01f91e96d7af76fd6778329994805ec70a9a8598c2b80aa1935950c849"
+    },
+    {
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-10-28-concat-broader-regression.md"
+      ],
+      "decision": "No new learning: disclose missing fixtures and runtime dependencies without claiming unrelated broad suites green; no baseline rerun.",
+      "findings": [],
+      "reviewed_on": "2026-10-28",
+      "sha256": "ec9840fef5e3b1fff80a90c287d9b90c910b02b17a8ca080348e8e7b829e12d4"
+    },
+    {
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-10-28-concat-preview-timing-aspect.md"
+      ],
+      "findings": [
+        "local-concat-preview-display-timing",
+        "local-concat-resume-publication-intent"
+      ],
+      "reviewed_on": "2026-10-28",
+      "sha256": "d16cc0f8c0e549c005d5e5cd59c537f6f627d7afc51f0138073540cee0411497"
     },
     {
       "aliases": [
@@ -11373,12 +12100,40 @@
     },
     {
       "aliases": [
+        "/home/kevin/linux-config/.worktrees/public-portfolio-privacy/docs/postmortem/2026-10-29-public-portfolio-pre-push.md"
+      ],
+      "decision": "No new general remedy: fetch-first object/ancestry inspection and isolated normal integration apply existing reviewed guidance. Inspection recovered after fetch; merged boundary suites pass 60 plus one checkpoint. Actual branch push receipt remains a separate verification.",
+      "findings": [],
+      "reviewed_on": "2026-10-29",
+      "sha256": "20f69410925051df83a3dace2236d3a558a7ff82d726d498af318b402ea6cbc3"
+    },
+    {
+      "aliases": [
         "/home/kevin/linux-config/docs/postmortem/2026-10-29-discord-commit-git-permissions.md"
       ],
       "decision": "No new reusable learning: approved Git metadata escalation restored scoped staging, and the reviewed local-git-fetch-before-ancestry normal-merge remedy prepared a conflict-free integration after the push rejection. Final merge checks and push receipt remain separate verification.",
       "findings": [],
       "reviewed_on": "2026-10-29",
       "sha256": "4ca73dc0cf52a5a500b1a8832ddaa489dc506fbdfa5b400e4c8c0253e99c282b"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/triway-nextjs/docs/postmortem/2026-10-28-console-ready-timeout.md"
+      ],
+      "decision": "No new reusable learning: the historical prelogin timeout/screenshot-worker interruption does not establish the displayed screen or its underlying cause. Preserve it as unresolved; October29 diagnostic evidence is reviewed separately.",
+      "findings": [],
+      "reviewed_on": "2026-10-29",
+      "sha256": "719c4e5efcf7fb211ed3bd2245940939f8dc55b1b932488493b8f801769dbdef"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/triway-nextjs/docs/postmortem/2026-10-29-console-ready-timeout.md"
+      ],
+      "findings": [
+        "ext-console-readiness-diagnostics"
+      ],
+      "reviewed_on": "2026-10-29",
+      "sha256": "8c8b179ea0c6b9d53e12664920f114a732b953a8876f413bc661a7b2b1abc383"
     },
     {
       "aliases": [
@@ -11390,88 +12145,131 @@
       "sha256": "ac34cd21bce24540b8b8081fdf6f46abaee3827257f7f4301b5462760ca1f814"
     },
     {
-      "sha256": "d3a5200b14c4492692878f647a7f247e54ce3e259185426ce83e425b4d4b0e04",
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-10-29-kitty-missing-compositor.md"
+      ],
+      "decision": "Runtime evidence: restoring Picom enables new Kitty windows (70 percent opacity, user-confirmed) but existing opaque windows remain at 1.0 after reload and dynamic adjustment. Initialization cause supported; exact internal cause unresolved. No persistent configuration fix claimed.",
+      "findings": [],
+      "reviewed_on": "2026-10-29",
+      "sha256": "b497a986fff7c2eb7b323f9f152f6e2da525c4c4d338b4b5911cd6df5e2519ab"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/triway-nextjs/docs/postmortem/2026-10-29-backup-acceptance-delay.md"
+      ],
+      "decision": "Historical synthesis of existing restore/console/cache incidents and unresolved workflow delay; no new verified technical remedy. Calendar elapsed time is not labor or downtime. Existing ext-console-readiness-diagnostics, ext-delayed-guest-password-readiness and local-restore-proof-current-boot retain their own verification limits.",
+      "findings": [],
+      "reviewed_on": "2026-10-29",
+      "sha256": "73fd04cf9ede9a6476dc92ad380874a246eaeaba552c74ac0e5e7563de71a852"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/triway-nextjs/docs/postmortem/2026-10-29-session-delivery-gates.md"
+      ],
+      "decision": "Owner-authorized exact-content approvals make shared staged gate pass; no scanner/hook bypass. Existing refresh-config drift stops apply, preserved without overwrite. Session work still depends on older uncommitted recovery prerequisites. No new reusable technical finding; original full-tree scan failure was expected policy enforcement.",
+      "findings": [],
+      "reviewed_on": "2026-10-29",
+      "sha256": "e03a8a845d6d630ff991620fa7a2f14542fc840f5d4515026a19ab77a1d535b3"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/triway-nextjs/docs/postmortem/2026-10-19-backup-comparison-progress.md"
+      ],
+      "decision": "Historical native-QEMU progress implementation evidence; existing local plan/lessons preserve progress semantics and fresh tests cover behavior. No additional cross-project remedy claimed by retrospective registration.",
+      "findings": [],
+      "reviewed_on": "2026-10-29",
+      "sha256": "2a788a013d407e6b3205c54ec4e6f30dd060ef2d3720b3a418217de9b6ad0b61"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/triway-nextjs/docs/postmortem/2026-10-19-restored-login-mount-check.md"
+      ],
+      "decision": "Unresolved historical findmnt boundary; existing pinned-filesystem preflight applies, exact cause unconfirmed. No new verified remedy or actual restored-login pass.",
+      "findings": [],
+      "reviewed_on": "2026-10-29",
+      "sha256": "3bdc5a9177794546e3e855025e04f7275600478e38f9b0b85d24387a3891efc7"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/triway-nextjs/docs/postmortem/2026-10-19-backup-status-session-retrieval.md"
+      ],
+      "decision": "Unresolved historical optional context retrieval; no backup engineering learning. Later successful lookup does not diagnose original failure.",
+      "findings": [],
+      "reviewed_on": "2026-10-29",
+      "sha256": "ddc5c14c36dc69b269e84d5792487c44761b2960a5bfbe57020f6e3057241a41"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/triway-nextjs/docs/postmortem/2026-10-29-remaining-recovery-delivery.md"
+      ],
+      "decision": "Known restricted-runner Ansible RPC boundary; normal-host focused13/full514 passes. Broader five type diagnostics reproduce on HEAD; six module mypy passes. No new runtime recovery remedy or guest acceptance asserted.",
+      "findings": [],
+      "reviewed_on": "2026-10-29",
+      "sha256": "26b22729822e97a595591a6790800361df0fd9a99e34eea3a4c6e82244cd1a97"
+    },
+    {
       "aliases": [
         "/home/kevin/linux-config/docs/postmortem/2026-10-29-fish-alias-path-inspection.md"
       ],
-      "reviewed_on": "2026-10-29",
+      "decision": "No new learning: repeats path discovery and existing scoped deployment practice. Read-only inspection errors corrected; sandbox escalation and reviewed direct shortcut installation verified; full refresh blocked by unrelated mimeapps drift.",
       "findings": [],
-      "decision": "No new learning: repeats path discovery and existing scoped deployment practice. Read-only inspection errors corrected; sandbox escalation and reviewed direct shortcut installation verified; full refresh blocked by unrelated mimeapps drift."
+      "reviewed_on": "2026-10-29",
+      "sha256": "d3a5200b14c4492692878f647a7f247e54ce3e259185426ce83e425b4d4b0e04"
     },
     {
-      "sha256": "3eb0d904ea7f4c1d6a435e872e1d3df6b97c10afea833e043c5b770c6c29d261",
       "aliases": [
         "/home/kevin/linux-config/docs/postmortem/2026-10-29-refresh-mimeapps-mode-conflict.md"
       ],
-      "reviewed_on": "2026-10-29",
+      "decision": "No new learning: known permissions-only chezmoi conflict. Verified exact target repair, full unforced refresh exit0, empty target diff and retained directory abbreviation. Applications may recreate mode drift.",
       "findings": [],
-      "decision": "No new learning: known permissions-only chezmoi conflict. Verified exact target repair, full unforced refresh exit0, empty target diff and retained directory abbreviation. Applications may recreate mode drift."
+      "reviewed_on": "2026-10-29",
+      "sha256": "3eb0d904ea7f4c1d6a435e872e1d3df6b97c10afea833e043c5b770c6c29d261"
     },
     {
-      "sha256": "e22a20e482b0a9d85ae01a22d8cf905a856f01a70882bab3c3068799af239fb9",
       "aliases": [
         "/home/kevin/linux-config/docs/postmortem/2026-10-29-or-abbreviation-expansion.md"
       ],
-      "reviewed_on": "2026-10-29",
       "findings": [
         "local-fish-keyword-abbreviation"
-      ]
+      ],
+      "reviewed_on": "2026-10-29",
+      "sha256": "e22a20e482b0a9d85ae01a22d8cf905a856f01a70882bab3c3068799af239fb9"
     },
     {
-      "sha256": "e3c2487969c9d8f43e0f93fd3f9500646199fdeb740e4a2d75eff620ac6e2d66",
+      "aliases": [
+        "/mnt/usb-8tb/concerts/olivia-rodrigo/docs/postmortem/2026-10-29-audio-model-network-access.md"
+      ],
+      "decision": "No new reusable learning: approved network-enabled execution resolved restricted PyPI DNS and allowed public model downloads; the recording stayed local and no system DNS changes were needed.",
+      "findings": [],
+      "reviewed_on": "2026-10-29",
+      "sha256": "352120f3a2ea0d344883a886e1634da8c8d896e9ce36a45097f3211a3c080c53"
+    },
+    {
       "aliases": [
         "/home/kevin/linux-config/docs/postmortem/2026-10-29-cg-shortcut-path-inspection.md"
       ],
-      "reviewed_on": "2026-10-29",
+      "decision": "No new reusable learning: local-discover-paths-before-reads already covers guessed helper suffixes; inventoried external script was read successfully.",
       "findings": [],
-      "decision": "No new reusable learning: local-discover-paths-before-reads already covers guessed helper suffixes; inventoried external script was read successfully."
+      "reviewed_on": "2026-10-29",
+      "sha256": "e3c2487969c9d8f43e0f93fd3f9500646199fdeb740e4a2d75eff620ac6e2d66"
     },
     {
-      "sha256": "cf88c59c436d4cc96893030e2de18d82bd8ea9bdb2ff91c39248897883bc2299",
       "aliases": [
         "/home/kevin/linux-config/docs/postmortem/2026-10-29-cg-session-delivery.md"
       ],
-      "reviewed_on": "2026-10-29",
+      "decision": "No new reusable learning: existing path discovery and sandbox/network permission guidance covers these delivery diagnostics; GitHub ADMIN permission and public destination were verified before retry.",
       "findings": [],
-      "decision": "No new reusable learning: existing path discovery and sandbox/network permission guidance covers these delivery diagnostics; GitHub ADMIN permission and public destination were verified before retry."
+      "reviewed_on": "2026-10-29",
+      "sha256": "cf88c59c436d4cc96893030e2de18d82bd8ea9bdb2ff91c39248897883bc2299"
     },
     {
-      "sha256": "abcd0e7200605bc562fcc2ddd46e89d19479c5964335ecf3aa92b70d7da6b0ee",
       "aliases": [
         "/home/kevin/linux-config/docs/postmortem/2026-10-29-redshift-test-discovery.md"
       ],
-      "reviewed_on": "2026-10-29",
+      "decision": "No new learning: existing local-discover-paths-before-reads guidance covers guessed read-only test filenames; actual paths were discovered and read.",
       "findings": [],
-      "decision": "No new learning: existing local-discover-paths-before-reads guidance covers guessed read-only test filenames; actual paths were discovered and read."
-    },
-    {
-      "sha256": "d5283b8214bf7822aeb26354d50f82b966cfe52ae1c7638cdb60216cb66de640",
-      "aliases": [
-        "/home/kevin/linux-config/docs/postmortem/2026-10-29-redshift-live-activation.md"
-      ],
       "reviewed_on": "2026-10-29",
-      "findings": [
-        "local-i3blocks-busy-wheel-queue"
-      ]
-    },
-    {
-      "sha256": "42aec5680379a12d97c74101b8caa2a9b7650e47964bdbc02f966678bcb96f69",
-      "aliases": [
-        "/home/kevin/linux-config/docs/postmortem/2026-10-29-redshift-150-live-probe.md"
-      ],
-      "reviewed_on": "2026-10-29",
-      "findings": [],
-      "decision": "No new general learning: installed-version parser validation, actual live-process readiness and scoped source/live drift preservation already govern this failure; concurrent source removed unsupported SHORTFMT, then live DP-2 150 K steps and recovery passed."
-    },
-    {
-      "aliases": [
-        "/home/kevin/linux-config/docs/postmortem/2026-10-29-workspace-icons-activation.md"
-      ],
-      "findings": [
-        "local-i3-workspace-label-activation"
-      ],
-      "reviewed_on": "2026-10-29",
-      "sha256": "75cb97af836d9141c33908830fbca2b83f380be56be2ce21467ece0c7926f6da"
+      "sha256": "abcd0e7200605bc562fcc2ddd46e89d19479c5964335ecf3aa92b70d7da6b0ee"
     },
     {
       "aliases": [
@@ -11503,13 +12301,14 @@
       "sha256": "3ad59a679a3ca447ee6953617b0b3a99524d157166ce8e1180bb81d55f52de89"
     },
     {
-      "sha256": "3c57a0e80ebfcc5e7c49ddbf870bb38d0abe316729213c836931c6bd762eb0d8",
       "aliases": [
-        "/home/kevin/linux-config/docs/postmortem/2026-10-29-workspace-padding-activation.md"
+        "/home/kevin/linux-config/docs/postmortem/2026-10-29-redshift-live-activation.md"
+      ],
+      "findings": [
+        "local-i3blocks-busy-wheel-queue"
       ],
       "reviewed_on": "2026-10-29",
-      "findings": [],
-      "decision": "No new learning: existing scoped sandbox permission and path-discovery guidance covers this activation; live IPC verifies widths, not visual pixels."
+      "sha256": "d5283b8214bf7822aeb26354d50f82b966cfe52ae1c7638cdb60216cb66de640"
     },
     {
       "aliases": [
@@ -11522,6 +12321,15 @@
     },
     {
       "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-10-29-redshift-150-live-probe.md"
+      ],
+      "decision": "No new general learning: installed-version parser validation, actual live-process readiness and scoped source/live drift preservation already govern this failure; concurrent source removed unsupported SHORTFMT, then live DP-2 150 K steps and recovery passed.",
+      "findings": [],
+      "reviewed_on": "2026-10-29",
+      "sha256": "42aec5680379a12d97c74101b8caa2a9b7650e47964bdbc02f966678bcb96f69"
+    },
+    {
+      "aliases": [
         "/home/kevin/linux-config/docs/postmortem/2026-10-29-i3blocks-calendar-format.md"
       ],
       "findings": [
@@ -11531,22 +12339,59 @@
       "sha256": "6b10b2121459e5fb6efabb549a8e23210570394d45d3df4cc0c0a7ac516fbb61"
     },
     {
-      "sha256": "a33c1e9c75f6a903a951978421b331b196ba3761eca0db8d8cf6599396832c8a",
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-10-29-workspace-icons-activation.md"
+      ],
+      "findings": [
+        "local-i3-workspace-label-activation"
+      ],
+      "reviewed_on": "2026-10-29",
+      "sha256": "75cb97af836d9141c33908830fbca2b83f380be56be2ce21467ece0c7926f6da"
+    },
+    {
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-10-29-workspace-padding-activation.md"
+      ],
+      "decision": "No new learning: existing scoped sandbox permission and path-discovery guidance covers this activation; live IPC verifies widths, not visual pixels.",
+      "findings": [],
+      "reviewed_on": "2026-10-29",
+      "sha256": "3c57a0e80ebfcc5e7c49ddbf870bb38d0abe316729213c836931c6bd762eb0d8"
+    },
+    {
       "aliases": [
         "/home/kevin/linux-config/docs/postmortem/2026-10-29-right-bar-font-activation.md"
       ],
-      "reviewed_on": "2026-10-29",
+      "decision": "No new learning: existing scoped sandbox and unmanaged i3 target guidance applies. Refresh, validation, reload and live IPC verified; screenshot pixels unmeasured.",
       "findings": [],
-      "decision": "No new learning: existing scoped sandbox and unmanaged i3 target guidance applies. Refresh, validation, reload and live IPC verified; screenshot pixels unmeasured."
+      "reviewed_on": "2026-10-29",
+      "sha256": "a33c1e9c75f6a903a951978421b331b196ba3761eca0db8d8cf6599396832c8a"
     },
     {
-      "sha256": "33cc3b21fc66979a5beb5dbc0ffc44ae213eaa4d74a0a6b3369e380481d9eb79",
+      "aliases": [
+        "/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-29-uninitialized-workspace.md"
+      ],
+      "decision": "No new reusable learning: an empty .git directory is an ordinary uninitialized workspace; prompt authoring can continue without Git remediation or product changes.",
+      "findings": [],
+      "reviewed_on": "2026-10-29",
+      "sha256": "846875d76002afed223531fcf0c594f7619b3586f8ae105f85dde891a0559a94"
+    },
+    {
       "aliases": [
         "/home/kevin/linux-config/docs/postmortem/2026-10-29-workspace-spacing-desktop-access.md"
       ],
-      "reviewed_on": "2026-10-29",
+      "decision": "No new learning: existing sandbox permission guidance applies; use host execution and no-config fish for scoped desktop work.",
       "findings": [],
-      "decision": "No new learning: existing sandbox permission guidance applies; use host execution and no-config fish for scoped desktop work."
+      "reviewed_on": "2026-10-29",
+      "sha256": "33cc3b21fc66979a5beb5dbc0ffc44ae213eaa4d74a0a6b3369e380481d9eb79"
+    },
+    {
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-10-29-i3-music-helper-discovery.md"
+      ],
+      "decision": "No new learning: a nonexistent assumed script path was corrected to the existing fish function; established file mapping guidance suffices.",
+      "findings": [],
+      "reviewed_on": "2026-10-29",
+      "sha256": "b4590679ad86447da7836b1a1859953e373bad70481e6a7697c3790822c66790"
     },
     {
       "aliases": [
@@ -11559,20 +12404,502 @@
     },
     {
       "aliases": [
+        "/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-29-local-spike-environment.md"
+      ],
+      "decision": "No new cross-project learning: ext-explicit-wrapper-shell and existing scoped sandbox execution guidance cover the verified workarounds; the real-tsx-loader and subprocess-close fixture lesson is recorded in this repository tasks/lessons.md. Runtime evidence does not establish sandbox or installed-permission repair.",
+      "findings": [],
+      "reviewed_on": "2026-10-29",
+      "sha256": "7fcd7a8318ecab287852a61f0df8fa66aae5764f28a98c71d6427e808ad3a51b"
+    },
+    {
+      "aliases": [
         "/home/kevin/linux-config/docs/postmortem/2026-10-29-music-commit-git-write-permission.md"
       ],
       "decision": "No new reusable learning: the explicit read-only .git sandbox profile caused the write failure; approved escalation restored scoped staging without changing policy or product code.",
       "findings": [],
       "reviewed_on": "2026-10-29",
       "sha256": "54cecb7c28c0303acd18d239058353229832c07e7c54fba7a62d0526bf15b6d9"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-29-yahoo-session-snapshot.md"
+      ],
+      "decision": "No new cross-project learning: this verified Yahoo session-end snapshot correction fits existing protocol/boundary validation guidance (ext-boundary-error-contracts); the provider-specific exclusive-session-end and supplied early-close lesson is recorded in jay-tradingview/tasks/lessons.md. Runtime evidence covers 14 live local API requests and 34 focused tests; it does not establish a complete exchange calendar or guaranteed Yahoo delay/history availability.",
+      "findings": [],
+      "reviewed_on": "2026-10-29",
+      "sha256": "65ac52ef21add268c6a93da7934ddcb2db7a052f325b37ae1e3c9af1796a0f09"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-29-immutable-pine-git-check.md"
+      ],
+      "findings": [
+        "local-immutable-upstream-whitespace-exception",
+        "local-immutable-input-index-renormalization"
+      ],
+      "reviewed_on": "2026-10-29",
+      "sha256": "5798a54c9f06b6f2a3342987fd53cd0897ddf1966eb9fedfa0e7b9185c13b077"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-29-overnight-source-discovery.md"
+      ],
+      "decision": "No new learning: local-discover-paths-before-reads already covers guessed optional source/configuration, exact catalog skill paths, observed module exports and asynchronous worker artifact readiness. Repeated read-only errors changed no product state. The supported canonical search invocation without --compact exited 0. Preserve the existing verified_workaround scope; do not claim a product fix.",
+      "findings": [],
+      "reviewed_on": "2026-10-30",
+      "sha256": "638377410d96bd14aa2c1832602322f96d6f6687b9062a9e10739853c5f4a651"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-29-backtest-cli-ipc.md"
+      ],
+      "findings": [
+        "local-headless-tsx-loader-without-ipc"
+      ],
+      "reviewed_on": "2026-10-30",
+      "sha256": "765fac437cd606073bcc5c7957f8b18b638bb6df88b672b9dcef070af4946add"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-29-backtest-core-edge-cases.md"
+      ],
+      "findings": [
+        "local-backtest-decisions-at-availability",
+        "local-backtest-known-open-before-intrabar"
+      ],
+      "reviewed_on": "2026-10-30",
+      "sha256": "d7e999a84dccb77f87c23a4dba06bfd6e3f497dcf727385fd45019790cbdc7a7"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-29-strategy-input-boundaries.md"
+      ],
+      "findings": [
+        "local-strategy-explicit-causal-context",
+        "local-strategy-finite-detached-snapshots",
+        "local-json-zero-allocation-return"
+      ],
+      "reviewed_on": "2026-10-30",
+      "sha256": "c886f914372c59dbd743f868e2994ddaa7da51e073093f79d38496e1ff926040"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-29-strategy-smoke-arguments.md"
+      ],
+      "findings": [
+        "local-npm-script-option-ownership"
+      ],
+      "reviewed_on": "2026-10-30",
+      "sha256": "c0d198c85fa2f757b684ef4473aceee8f4984dc1e2de7c0581c5c4e7e8b22f5f"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-29-market-evidence-inspection.md"
+      ],
+      "decision": "No new learning: an optional read-only diagnostic tried sorting heterogeneous dictionaries, stopped without retry, and changed no application state. Generic manifest-order, streaming JSONL and adapter-boundary findings do not verify a remedy for this inspection. Source mapping completed without it. No successful retry, product defect or verified code fix is claimed; any future inspection must first establish the actual JSON container shape.",
+      "findings": [],
+      "reviewed_on": "2026-10-30",
+      "sha256": "bd7d5bab037fcefe989ea6b55e2c6a62ec2ca2db5434ee55ebc07733c83e6ba8"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-29-paper-cli-narrowing.md"
+      ],
+      "findings": [
+        "local-typescript-assertion-narrowing-guard"
+      ],
+      "reviewed_on": "2026-10-30",
+      "sha256": "725aabbb802bbc807699aa8565becbe3cf9882881d9abddad84ce00124f32777"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-29-agent-capacity.md"
+      ],
+      "findings": [
+        "local-agent-slot-before-followup"
+      ],
+      "reviewed_on": "2026-10-30",
+      "sha256": "1e3b9a2b7686d476a701a1dd03adbd93077d85e037e917344bbdb00d384550e7"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/wallet-gas-cost/docs/postmortem/2026-10-30-stage1-environment.md"
+      ],
+      "decision": "No new reusable finding: restricted git metadata and D-Bus/network access were bypassed only by explicitly scoped approved commands, consistent with existing environment-route guidance. Unborn Git history is expected in a new repo. No sandbox repair or general root cause claimed.",
+      "findings": [],
+      "reviewed_on": "2026-10-30",
+      "sha256": "6cc081ddae2b96f4cef5580daf9b5f1a18496854ec1e2d9be597a418ec9bba7f"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/wallet-gas-cost/docs/postmortem/2026-10-30-historical-source-blocker.md"
+      ],
+      "decision": "No new general remedy: dated provider-specific authorization/range rejections and unresolved endpoint TLS are preserved in the project evidence. Do not generalize these probes to all keyless historical price sources; no verified fix or reusable workaround established.",
+      "findings": [],
+      "reviewed_on": "2026-10-30",
+      "sha256": "5b9738293f34aad6fbb6d72ba6fdcf29b98b940b26c6063541ce79d2c5820411"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-29-hierarchy-execution-boundary.md"
+      ],
+      "findings": [
+        "local-backtest-opening-permission-timeline"
+      ],
+      "reviewed_on": "2026-10-30",
+      "sha256": "6b90a04471240ea04c4d08b12d5deac0b0579f13f89d913c3e67f795877f23f6"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-29-capacity-report-patch.md"
+      ],
+      "decision": "No new learning: local-stale-patch-context and ext-stale-patch-context already require reading current text, narrowing patch context and checking each target after rejection. The report records a first-file atomic rejection followed by an observed-context replacement and whitespace check; no product or financial action changed.",
+      "findings": [],
+      "reviewed_on": "2026-10-30",
+      "sha256": "c944d7bfd9bb32add0a0c7d7466b56c7cb159878734060779de738c426f6af02"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-30-memory-helper-options.md"
+      ],
+      "decision": "No new reusable finding: installed skill text and the current canonical helper exposed different optional flags. Current search --help and both supported searches exited 0 after omitting --compact. This verifies the current read-only invocation only, not synchronization of installed skill versions or broader runtime activation. Consult actual checked-out CLI help rather than assuming optional flags.",
+      "findings": [],
+      "reviewed_on": "2026-10-30",
+      "sha256": "bd6c6d00e23792843b09e118ade31144c10d0583b90b56e9c301277147496e74"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-30-broker-archive-export.md"
+      ],
+      "decision": "No new reusable finding: archiving a module before removing its export caused a transient import failure before any intended behavioral RED. Coordinating the observed export surface with the archived module restored test execution; literal-zero broker guards then passed 20 focused cases. The later shared typecheck saw another worker's intentional RED fields and does not establish a green combined tree. No actual-market or holdout execution occurred.",
+      "findings": [],
+      "reviewed_on": "2026-10-30",
+      "sha256": "d0bce68fa7b3fda7c3adbda9f8fe07216790554717b2cce971755002739e6388"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-29-history-window-provenance.md"
+      ],
+      "findings": [
+        "local-history-raw-window-provenance"
+      ],
+      "reviewed_on": "2026-10-30",
+      "sha256": "c34e53fdb1fab6df18c9f88d183e1f40e5ce3cd3551ac7a3af87dde661a0e6f8"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-30-history-exclusive-boundary.md"
+      ],
+      "findings": [
+        "local-exclusive-provider-window-exhaustion"
+      ],
+      "reviewed_on": "2026-10-30",
+      "sha256": "3fa22dea01ffd8bea4be71699bb004b0a07a4afd52bfcd531bc4ea966337a867"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-30-archived-test-discovery.md"
+      ],
+      "findings": [
+        "local-inert-test-archives"
+      ],
+      "reviewed_on": "2026-10-30",
+      "sha256": "a9888c3128bdd7ad095eb8e860a03971185d5d9ee63673eadcd4c62dda2af664"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-30-study-cli-stderr-type.md"
+      ],
+      "decision": "No new reusable finding: Node's public child-process result permits a null stderr stream even with a configured pipe. Optional access respects that type without a cast or weakened compiler setting. Fresh typecheck/build, help and the expected missing-cache child error path passed;276 tests passed. This verifies the bounded CLI/type boundary only, not actual-market study execution or provider latency.",
+      "findings": [],
+      "reviewed_on": "2026-10-30",
+      "sha256": "8b97750bd4a89c1118f0f4b769a3f5ae54d1f86ad7645f85549f3a19d6c048d8"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-30-retired-smoke-command.md"
+      ],
+      "decision": "No new reusable finding: the runner used a stale paper:latency command after R6 explicitly retired the shift-one broker matrix. Current package scripts and review policy were authoritative. Preserve prior successful checks, omit the superseded command and finish the remaining cache/help/error checks; do not restore rejected behavior or rerun unrelated passing tests. No source, financial model or final holdout changed.",
+      "findings": [],
+      "reviewed_on": "2026-10-30",
+      "sha256": "09dc0ebf12bb65eb5e43a08f5a5f0016c115f9a74ce534a3a229439aab1efa05"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-30-review-loopback-permission.md"
+      ],
+      "findings": [
+        "ext-sandbox-loopback"
+      ],
+      "reviewed_on": "2026-10-30",
+      "sha256": "1317455932decd9baa5ba54f631cb4f51ab349e5baee102001ea418963bf9a35"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/wallet-gas-cost/docs/postmortem/2026-10-30-restart-tooling.md"
+      ],
+      "decision": "No new general learning: optional-path reads and task-specific source transport/provider policy observations reuse existing path-discovery and source-boundary guidance. dRPC receipt workaround verified narrowly; full browser/product behavior remains separate. HTTP500 continuation retains checkpoint and needs bounded retry, not a provider-cap verdict.",
+      "findings": [],
+      "reviewed_on": "2026-10-30",
+      "sha256": "0c6e190f1b3508141932d313c956d0ddf3210e0f4d66635ed87ce1db50828d30"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/wallet-gas-cost/docs/postmortem/2026-10-30-restart-source-transport.md"
+      ],
+      "decision": "No new general learning: optional-path reads and task-specific source transport/provider policy observations reuse existing path-discovery and source-boundary guidance. dRPC receipt workaround verified narrowly; full browser/product behavior remains separate. HTTP500 continuation retains checkpoint and needs bounded retry, not a provider-cap verdict.",
+      "findings": [],
+      "reviewed_on": "2026-10-30",
+      "sha256": "58a9b726a8e30b682310b2c94c7983eb02ef97d67835e799c92d93878b23e3e5"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/wallet-gas-cost/docs/postmortem/2026-10-30-receipts-transport.md"
+      ],
+      "decision": "No new general learning: optional-path reads and task-specific source transport/provider policy observations reuse existing path-discovery and source-boundary guidance. dRPC receipt workaround verified narrowly; full browser/product behavior remains separate. HTTP500 continuation retains checkpoint and needs bounded retry, not a provider-cap verdict.",
+      "findings": [],
+      "reviewed_on": "2026-10-30",
+      "sha256": "9db3490662d821e7201ea1e216c56cb26af6e5b06da25d63cf57fc3d840940f1"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/wallet-gas-cost/docs/postmortem/2026-10-30-checkpoint-review.md"
+      ],
+      "decision": "No new general learning: optional-path reads and task-specific source transport/provider policy observations reuse existing path-discovery and source-boundary guidance. dRPC receipt workaround verified narrowly; full browser/product behavior remains separate. HTTP500 continuation retains checkpoint and needs bounded retry, not a provider-cap verdict.",
+      "findings": [],
+      "reviewed_on": "2026-10-30",
+      "sha256": "9a683224cb809c55e27711f4a0ba06804e5705a636502a0e4992453a374aaa27"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/wallet-gas-cost/docs/postmortem/2026-10-30-browser-bridge.md"
+      ],
+      "decision": "No new general learning: optional-path reads and task-specific source transport/provider policy observations reuse existing path-discovery and source-boundary guidance. dRPC receipt workaround verified narrowly; full browser/product behavior remains separate. HTTP500 continuation retains checkpoint and needs bounded retry, not a provider-cap verdict.",
+      "findings": [],
+      "reviewed_on": "2026-10-30",
+      "sha256": "7b6532f9f48b678f1f304e9f319a0d9f3ad700cf9f8758dcea1968b237f8c9aa"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/wallet-gas-cost/docs/postmortem/2026-10-30-ui-snapshot-recovery.md"
+      ],
+      "decision": "No new general learning: optional-path reads and task-specific source transport/provider policy observations reuse existing path-discovery and source-boundary guidance. dRPC receipt workaround verified narrowly; full browser/product behavior remains separate. HTTP500 continuation retains checkpoint and needs bounded retry, not a provider-cap verdict.",
+      "findings": [],
+      "reviewed_on": "2026-10-30",
+      "sha256": "12def3e77ddec6ff5700527767ec41fe391fd535bea94b6e364ad4d9aeea15bf"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/wallet-gas-cost/docs/postmortem/2026-10-30-publication-gate-tooling.md"
+      ],
+      "decision": "No new general learning: optional-path reads and task-specific source transport/provider policy observations reuse existing path-discovery and source-boundary guidance. dRPC receipt workaround verified narrowly; full browser/product behavior remains separate. HTTP500 continuation retains checkpoint and needs bounded retry, not a provider-cap verdict.",
+      "findings": [],
+      "reviewed_on": "2026-10-30",
+      "sha256": "4d9a9c54f091105ae5486e69450e7e54cfdf0b1c38a1f2dbca31aa4208734ed3"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/wallet-gas-cost/docs/postmortem/2026-10-30-csv-verification.md"
+      ],
+      "decision": "No new general learning: optional-path reads and task-specific source transport/provider policy observations reuse existing path-discovery and source-boundary guidance. dRPC receipt workaround verified narrowly; full browser/product behavior remains separate. HTTP500 continuation retains checkpoint and needs bounded retry, not a provider-cap verdict.",
+      "findings": [],
+      "reviewed_on": "2026-10-30",
+      "sha256": "7f9690f3555f552e2d3fad8d2b069f4ac4d726ce1b13c0b97c0b176459a8b9fa"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/wallet-gas-cost/docs/postmortem/2026-10-30-receipt-authority.md"
+      ],
+      "decision": "No new general learning: optional-path reads and task-specific source transport/provider policy observations reuse existing path-discovery and source-boundary guidance. dRPC receipt workaround verified narrowly; full browser/product behavior remains separate. HTTP500 continuation retains checkpoint and needs bounded retry, not a provider-cap verdict.",
+      "findings": [],
+      "reviewed_on": "2026-10-30",
+      "sha256": "10d895e909e5b62f304ef220d26edb4406dd7e3193a3eeb8ee353e7e4365d30e"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/wallet-gas-cost/docs/postmortem/price-probe-fix.md"
+      ],
+      "decision": "No new general learning: optional-path reads and task-specific source transport/provider policy observations reuse existing path-discovery and source-boundary guidance. dRPC receipt workaround verified narrowly; full browser/product behavior remains separate. HTTP500 continuation retains checkpoint and needs bounded retry, not a provider-cap verdict.",
+      "findings": [],
+      "reviewed_on": "2026-10-30",
+      "sha256": "324495c9d06d4193cf3213ce3f9644ede83a3592dd64de34e60ee0f4b8a2fb8a"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/wallet-gas-cost/docs/postmortem/receipt-anomaly.md"
+      ],
+      "decision": "No new general learning: optional-path reads and task-specific source transport/provider policy observations reuse existing path-discovery and source-boundary guidance. dRPC receipt workaround verified narrowly; full browser/product behavior remains separate. HTTP500 continuation retains checkpoint and needs bounded retry, not a provider-cap verdict.",
+      "findings": [],
+      "reviewed_on": "2026-10-30",
+      "sha256": "c251144283134c324b10aa5856bc8a23a1782ce43756bf4a689e7db00ee4b790"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-30-statistics-source-timeout.md"
+      ],
+      "decision": "No new reusable finding: local-current-source-retrieval already covers resolving unavailable public technical sources through accessible current primary evidence. The author's related overfit-tools paper supplied the needed statistical definitions after deflated-sharpe.pdf returned400/timeout; the failed original URL remains unverified. Saved outputs lacked the required trial-variance and independent-trial inputs, so DSR stayed unavailable rather than inventing a number. This is primary-source retrieval evidence only, not a numerical DSR implementation or performance finding.",
+      "findings": [],
+      "reviewed_on": "2026-10-30",
+      "sha256": "4eb20e42179eaf8f4ac4f36736066693afe56f818892aa28a3fc7986274f49b8"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-30-selector-patch-framing.md"
+      ],
+      "decision": "No new general finding: existing patch-delimiter guidance covers the rejected transport boundaries, and local-stale-patch-context covers an unnecessary partial-paragraph context hunk. Rejections applied no changes. Root re-read actual paragraphs, matched four intended prefixes exactly once, preserved the successful local monitor and obtained diff check 0 plus five passing deadline-safety checks. This evidence verifies the bounded setup/prose correction only; application math, financial artifacts and test assertions are unchanged.",
+      "findings": [],
+      "reviewed_on": "2026-10-30",
+      "sha256": "8f15fbaca727207cfe562724133eb34bea5c28242bd17669538c8046052001a7"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-30-ui-source-discovery.md"
+      ],
+      "decision": "No new reusable finding: local-discover-paths-before-reads and ext-optional-path-discovery already cover inventoried source/configuration paths and waiting for shared outputs. Correct observed reads and the adapter24-test/typecheck gate succeeded. Repeated guesses of optional brief, selector and strategy paths changed no product state and do not justify another path-discovery rule. The later readback script assumed datasets instead of the actual studies field; inspecting current keys and using a guarded read verified all six hashes unchanged and exact244/training144/final0 without a financial evaluation. This repeats the observed-contract principle rather than establishing a new product remedy. A later morning-draft read guessed server/index.ts; canonical lookup and rg --files identified server/app.ts, whose read passed0. Further unnecessary exploration stopped. No file, listener or saved result changed; this repeats the same inventoried-path remedy without new learning. At 13:33 UTC a guessed ResearchView.tsx read and unsupported --query helper flag failed without product mutation. Inventoried ResearchWorkspace.tsx/App contracts and the documented positional lookup passed. Existing optional-path discovery and observed-contract guidance cover both; no new general finding.",
+      "findings": [],
+      "reviewed_on": "2026-10-30",
+      "sha256": "db8ce8abb5abdde7aad71908752e3533d5eb3843e68a1678a308bd9697524336"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-30-research-api-path-lookup.md"
+      ],
+      "decision": "No new reusable finding: local-discover-paths-before-reads already covers the guessed selector-script and metrics filenames. Existing-file matches remained available and later reads used actual sources. These diagnostic misses changed neither source nor cache bytes and provide no new runtime remedy.",
+      "findings": [],
+      "reviewed_on": "2026-10-30",
+      "sha256": "2a5029bd062f14307c23fa10e05da4d1491d5aecc36c2393105ec4eba35586e3"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-30-paper-source-path-lookup.md"
+      ],
+      "decision": "Other incidents in this report add no new general finding: source-name guesses repeat local-discover-paths-before-reads; rejected delete/add patch framing changed no files; supported filter(...).at(-1) respects the configured TypeScript library; nested spawnSync EPERM remains an environment limitation. Direct CLI evidence establishes only the linked plain-output fix.",
+      "findings": [
+        "local-cli-plain-before-argument-validation"
+      ],
+      "reviewed_on": "2026-10-30",
+      "sha256": "f92f8c3559f3fe5c55ec5c8e19b7ac5f5cde3398403d3fb5aaca237c35a0e51a"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-30-research-equity-time-typing.md"
+      ],
+      "decision": "No new reusable finding: the compiler directly identified an absent contextual callback parameter type. Importing the public Lightweight Charts Time type and annotating the formatter restored typecheck. This ordinary explicit-type correction adds no distinct general remedy and does not establish browser quality.",
+      "findings": [],
+      "reviewed_on": "2026-10-30",
+      "sha256": "daf082d5be1244ed3cdc5c1e40c6c61a0a4eb456709c44752be2e1cc3b40fbc8"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-30-research-suite-timeout.md"
+      ],
+      "decision": "No new reusable finding: the active4800-bar regression exceeded its unchanged5000ms timeout once, then the exact test, entire19-test file and untouched365-test suite passed, followed by typecheck/build. Concurrent worker contention is plausible but unproven. Preserve the first failure; do not invent a timeout root cause, increase limits, weaken assertions or mistake an active regression for an inert archive. Optional path misses repeat existing discovery guidance.",
+      "findings": [],
+      "reviewed_on": "2026-10-30",
+      "sha256": "8d293841a512d2e45d553d8f9d4f1f6fa2da402afada27617e58ed355fedefab"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-30-browser-stale-reference.md"
+      ],
+      "findings": [
+        "local-browser-wrapper-input-contracts"
+      ],
+      "reviewed_on": "2026-10-30",
+      "sha256": "6a3715b1a70358b6fe28db4e8502dd47b5498b85b190c1e94702ba6056f18261"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-30-browser-select-values.md"
+      ],
+      "findings": [
+        "local-browser-wrapper-input-contracts"
+      ],
+      "reviewed_on": "2026-10-30",
+      "sha256": "d46dc2bc22b4114b8500b8fcbea46507b9273a1e9a4843bc94fa1e141ed50036"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-30-staged-selector-whitespace.md"
+      ],
+      "decision": "No new reusable finding: the authored-whitespace cleanup principle in local-authored-markdown-whitespace applies by analogy to this locally authored TypeScript EOF residue, but its historical Markdown scope is not extended without need. The immutable source bytes were untouched, non-final-newline byte equality held, and the compact-only staged check passed0 after explicit add/check exit inspection. Awaiting a tool response does not itself reject a nonzero command result; the current API contract requires branching before dependent mutations. This report verifies the narrow forward cleanup and successful staged sequence, not a tested general fail-closed commit gate or the pending complete feature stage. Existing history was preserved.",
+      "findings": [],
+      "reviewed_on": "2026-10-30",
+      "sha256": "7917419786073a00b2add41d007653e9b5a6c170fdc646adff10afb22abfdc9b"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-30-browser-keyboard-focus.md"
+      ],
+      "findings": [
+        "local-browser-wrapper-input-contracts"
+      ],
+      "reviewed_on": "2026-10-30",
+      "sha256": "bc3d30743e196bf003101502dc015271fd29ffb221a13b50ec4745f3c7a3ef4a"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-30-research-quote-units.md"
+      ],
+      "findings": [
+        "local-market-quote-unit-formatting",
+        "local-browser-wrapper-input-contracts"
+      ],
+      "reviewed_on": "2026-10-30",
+      "sha256": "517003f748db48794ae2f47b5e78a65a1bf7c8deb0ee9657855a1bf0f85852b6"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-30-research-prose-spacing.md"
+      ],
+      "decision": "No new reusable finding: the reported concatenated word boundary required ordinary exact prose inspection and a literal correction, not another product algorithm. local-authored-markdown-whitespace applies only by analogy; its trailing-space/EOF checks do not detect missing word spacing. The literal assertion failed on The23 supplied and passed after adding one space; diff check passed and claims/runtime sources remained unchanged. This verifies that exact phrase only, not a general grammar detector.",
+      "findings": [],
+      "reviewed_on": "2026-10-30",
+      "sha256": "837db9667e64c4fc838758e338049d7bf3999a09ec9bd56c4ae7d803d20acef7"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-30-soak-probe-context.md"
+      ],
+      "decision": "No new reusable finding: ext-sandbox-loopback already requires comparing the same scoped command under the approved host context without changing application/test behavior. local-command-completion-launch-namespace supports same-launch-context diagnostics by analogy, but its specific evidence is PID visibility rather than this network view. Here the default /proc/net/tcp probe returned no expected ports; the identical approved-host read found UI5177 and API8790 on127.0.0.1 and exited0. This verifies current host binding only; no process/configuration changed, and neither general sandbox repair nor future deployment safety is established.",
+      "findings": [],
+      "reviewed_on": "2026-10-30",
+      "sha256": "03881ad6215dbcbbcc9e30b0ed99b51c46d4b3da6c43e0f2e4e4ca2fefcfae8d"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-30-model-capacity-interruption.md"
+      ],
+      "decision": "No new reusable finding: the user reported an upstream model-capacity interruption, while the resumed task verified the original launcher, local health, exact saved audit, immutable files and unchanged runtime source. The requested retry/model-fallback sequence is an operating policy and was not exercised; it does not establish a capacity fix or uninterrupted monitoring. Preserve the same task/session and distinguish the unobserved gap from the current successful runtime checks.",
+      "findings": [],
+      "reviewed_on": "2026-10-30",
+      "sha256": "6f7c740157fc91f2ce2e5cde79a21dc0e40b5814f6b5d0c8a45aaaa3a4190015"
+    },
+    {
+      "aliases": [
+        "/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-30-approval-review-capacity.md"
+      ],
+      "decision": "No new general finding: automatic approval review returned capacity twice and timed out once before process creation; the identical scoped read succeeded on retry 3 after user-directed 30s/60s/2m backoff. This verifies one recovery through the unchanged gate and the private repository read, not a permanent model-capacity fix, unsafe-action determination, tested five-minute delay or model-fallback mechanism. Preserve the active task and unaffected local work; do not bypass approval. The exact retry schedule is this user-authorized task policy rather than an untested global guarantee.",
+      "findings": [],
+      "reviewed_on": "2026-10-30",
+      "sha256": "4d0bccae14e6edafe474abe26303d9f4681649ed35c0b7049536e8e9b5c88061"
+    },
+    {
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-10-30-commit-delivery-inspection.md"
+      ],
+      "decision": "No new learning: existing helper discovery and sanitized external-source coverage guidance applies. Actual refresh completed; global memory availability remains limited.",
+      "findings": [],
+      "reviewed_on": "2026-10-30",
+      "sha256": "10f84e9afb8481d866cf8d2df59232f6333babbf4befd89cf1a0592de80f99dd"
     }
   ],
   "review": {
     "method": "Full unique-report reads by bounded reviewers; independent hash/alias reconciliation and evidence/status review.",
     "privacy": "Private personal-context directories and filenames excluded before reads; symlinks and dependency/build/git paths pruned.",
     "reviewed_on": "2026-10-05",
-    "source_aliases": 267,
-    "unique_reports": 180
+    "source_aliases": 727,
+    "unique_reports": 624
   },
   "roots": [
     "/home/example/coding",

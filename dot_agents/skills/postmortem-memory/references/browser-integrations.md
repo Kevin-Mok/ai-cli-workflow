@@ -120,6 +120,21 @@ Use these reviewed incidents to distinguish application state defects from provi
 - Limitations: The actual original desktop stored overrides were inaccessible. Native changes before acknowledgement cannot be distinguished from ignored setters; retries are bounded. After three unacknowledged attempts an explicit default change or reload retries. Sustained smoothness/audio not verified. Latest full browser suite had29 passes and2 failures in concurrent bitrate text/video geometry; task quality cases passed.
 - Source: [default quality report](/home/kevin/coding/twitch-grid/docs/postmortem/2026-10-22-default-quality.md); reviewed hash retained in sources.json.
 
+## ext-twitch-transform-downscale-visibility
+
+- Status: verified_fix
+- Confidence: confirmed
+- Verification scope: runtime
+- Symptoms: Native Play works but SDK Play/autoplay fails in fitted Twitch grids; isVisible=false despite intersectionRatio≈1.
+- Applicability: Chromium embeds downscaled through CSS transforms while Twitch enforces trackVisibility.
+- Diagnostics: Compare real iframe intersection ratio and isVisible plus ancestor matrices. Compare equal-size transform and zoom rendering, then fullscreen and internal minimums.
+- Remedy: Fit with CSS zoom and translation-only geometry (divide translations by zoom). Reset zoom for player fullscreen; do not retry blindly through a failed visibility gate.
+- Verification: Actual 1363px Chrome windows at DPR 2.8125 went from invisible scaled frames to visible Playing streams with advancing clocks. Defining Chromium regression RED/GREEN; 152 unit tests, build, 42 browser tests and added native iframe fullscreen bounds check passed.
+- Limitations: Audio/smoothness unassessed; user confirmation of automatic versus button start pending. Separate network/content gates remain possible. Twitch source retries autoplay after allowed visibility before first playback.
+- Evidence: [W3C visibility algorithm](https://w3c.github.io/IntersectionObserver/#compute-visibility); official Twitch player chunks 61456 and 52722 inspected 2026-10-23.
+- Source: [actual-window visibility incident](/home/kevin/coding/twitch-grid/docs/postmortem/2026-10-23-play-all-paused.md); reviewed hash in sources.json.
+
+
 ## local-weather-cacheable-issuance-redirects
 
 - **Status:** verified_workaround
@@ -133,6 +148,7 @@ Use these reviewed incidents to distinguish application state defects from provi
 - **Limitations:** Client workaround, not an upstream fix. Different load waits confound timing comparisons. Production restored at operator request with validated Blob/API/browser agreement; separate scheduled trial still has unresolved extraction failure and is not accepted.
 - **Sources:** [2026-10-29-browser-comparison.md](/home/kevin/coding/scrape-weather/.worktrees/playwright-diagnostics/docs/postmortem/2026-10-29-browser-comparison.md)
 
+
 ## local-weather-intermittent-extraction
 
 - **Status:** unresolved
@@ -145,3 +161,17 @@ Use these reviewed incidents to distinguish application state defects from provi
 - **Verification scope:** runtime
 - **Limitations:** A subsequent success does not establish reliability or identify the first failure. First error cannot be reconstructed from new instrumentation.48/48 and live DST observation remain unmet.
 - **Sources:** [2026-10-29-trial-attempt-01.md](/home/kevin/coding/scrape-weather/.worktrees/playwright-diagnostics/docs/postmortem/2026-10-29-trial-attempt-01.md)
+
+## local-browser-wrapper-input-contracts
+
+- Status: **verified_workaround**; root-cause confidence: **confirmed**; verification scope: **workaround**.
+- Symptoms: Browser wrapper rejects a UID from an expired snapshot generation with STALE_REF; CSS select fill receives visible label instead of the actual option value and produces an empty role rejected by the API; Home/ArrowDown/Enter leave the selected dataset unchanged because a preceding programmatic click left activeElement at BODY; An acceptance script waits for a ledger after changing mounted hidden Research controls while the Chart workspace remains active
+- Applicability: Browser automation through generation-tagged references, wrapper CSS select-fill actions or scripted native-select keyboard steps.
+- Diagnostic checks: Refresh the accessibility snapshot and resolve the intended observed control immediately before a UID action.; Compare actual option values, visible labels and the emitted request before blaming application validation.; Read the current wrapper interface; UID and CSS fill modes can have different selection behavior.; Inspect document.activeElement before keyboard input; a successful CSS click is not proof of native-select focus.; After reload, verify the intended workspace is actually active and visible; DOM presence alone can describe a preserved hidden component.
+- Remedy: Use a fresh reference for the observed control, or use the documented selector action with actual option values; explicitly focus the observed select before keyboard steps when activeElement proves focus is absent. Verify visible labels and matching rendered data afterward. Preserve strict API rejection of invalid query values. After a development reload, re-select the observed visible workspace when active-view inspection proves the intended view is inactive.
+- Verification evidence: A fresh snapshot/reference made the previously rejected Research click exit0. Correct option values made the complete browser matrix exit0 across six datasets, four roles in fold0 and selector folds1/2; audit244/final0 and no initial desktop overflow were observed. Keyboard inspection found activeElement BODY and unchanged dataset5; explicit select focus followed by the complete navigation rerun changed the dataset to1 and passed synchronized zoom, live canvas/navigation preservation and deliberate-outage Retry recovery. A post-edit timeout had only live market requests and a hidden Research workspace; selecting visible Research made quote-unit checks succeed without changing application polling/loading behavior.
+- Limitations: These are automation workarounds, not application fixes or broad browser reliability claims. One refreshed click establishes only that action; the matrix and navigation run do not establish all responsive widths, numerical parity, financial validity or every native-browser interaction.
+- Source: [2026-10-30-browser-stale-reference.md](/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-30-browser-stale-reference.md) (SHA-256 `6a3715b1a70358b6fe28db4e8502dd47b5498b85b190c1e94702ba6056f18261`).
+- Source: [2026-10-30-browser-select-values.md](/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-30-browser-select-values.md) (SHA-256 `d46dc2bc22b4114b8500b8fcbea46507b9273a1e9a4843bc94fa1e141ed50036`).
+- Source: [2026-10-30-browser-keyboard-focus.md](/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-30-browser-keyboard-focus.md) (SHA-256 `bc3d30743e196bf003101502dc015271fd29ffb221a13b50ec4745f3c7a3ef4a`).
+- Source: [2026-10-30-research-quote-units.md](/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-30-research-quote-units.md) (SHA-256 `517003f748db48794ae2f47b5e78a65a1bf7c8deb0ee9657855a1bf0f85852b6`).
