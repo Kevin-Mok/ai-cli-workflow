@@ -26,7 +26,8 @@ In Codex, the task is whatever text follows `$night` in my message.
 4. Do not deploy, delete files, touch secrets or CI config, run `chezmoi apply`,
    or call paid APIs.
 5. Never stop to wait for me. When unsure, take the safest option, record the
-   choice in `NIGHT_NOTE.md`, and keep going.
+   choice in `NIGHT_NOTE.md`, and keep going. A blocker never ends the run
+   (see "When Blocked").
 6. When done, run the relevant tests. If you cannot, write down why.
 7. Finish `NIGHT_NOTE.md` with: branch name, what you did, how you tested it,
    what is still untested, and the questions for me in the morning, each with
@@ -52,11 +53,60 @@ everything it needs, so it does not depend on earlier messages:
   anything"
 - the files to read first: the task file, the plan, and `review-notes.md`
 - the commit rule and the push rule
-- the order of work, and the stop-at-first-failing-gate rule
+- the order of work, and the stop-at-first-failing-gate rule (a failing gate
+  stops that stage, not the run: see "When Blocked")
+- every approval or change I gave in chat or relayed messages: remote
+  visibility, whether pushing is approved, scope changes, and the allowed
+  branch. Write them into the goal text itself at launch.
+
+The session treats the goal text as authoritative over earlier messages.
 
 If the goal completes early, set a new one with the same text and the new
 work. Do not start a second session on the same repo: extra sessions edit the
 same files and conflict.
+
+## When Blocked
+
+Never stop the whole run on a blocker. Stop only for the hard safety rules:
+secrets, `main`, force-push, destructive commands, spending money, live
+trading, or pushing private files to a public remote.
+
+Work down this ladder, logging each step:
+
+1. Retry once with backoff.
+2. Try an alternative source, tool, or approach: a keyless public API,
+   another endpoint, a different library, or a cached/static fixture labelled
+   as such.
+3. Narrow the scope to the part that works.
+4. Stub the rest behind a clearly marked `TODO`, ship the working subset, mark
+   the gap, and move on to the next stage.
+5. Record it under "Workarounds" in `NIGHT_NOTE.md`.
+
+Examples:
+
+- Bot-blocked site (Etherscan etc.): use keyless APIs (Blockscout;
+  Coinbase/Binance for prices).
+- Rate limit: back off, batch, and cache responses to disk.
+- Missing API key: use a keyless alternative. Never ask for or invent keys.
+- Failing test unrelated to the task: record it and continue.
+- Flaky network: cache responses to fixtures for offline tests.
+
+Rules:
+
+- Time-box: no blocker gets more than ~30 minutes or ~3 attempts of one
+  approach before moving down the ladder.
+- Count failures per approach, not per goal. The count resets when I change
+  scope or the approach is swapped. Failures of dropped requirements do not
+  count.
+- Every commit leaves a working deliverable. Keep committing checkpoints
+  locally even when pushing is blocked.
+- Append a short timestamped heartbeat line to `NIGHT_NOTE.md` at each stage
+  so a reviewer or watcher can see progress.
+- Keep a "Workarounds" section in `NIGHT_NOTE.md`: each blocker, what was
+  tried, the alternative used, and what I should revisit. Put it at the top
+  of the morning summary.
+- `NIGHT_NOTE.md` and similar private helper files never go to a public
+  remote.
 
 ## Push After Every Commit
 
