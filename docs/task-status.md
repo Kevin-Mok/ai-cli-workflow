@@ -242,3 +242,12 @@ This document records delivery milestones and verification for completed reposit
 - Delivery: one focused commit on main, followed by push origin/main (Kevin-Mok/ai-cli-workflow). Preserve unrelated dirty ledger records and reports.
 - Limits: visual placement and clicks remain manual; no application deployment applies.
 - Rollback: restore volume, Redshift, Spotify, calendar order in the template, refresh configuration, validate and reload i3 once.
+
+## TradingView shortcut activation — docs(fish): record TradingView shortcut activation repair
+
+- Complete: reconciled the missing tv entry into the unmanaged installed directory catalog, preserved existing mappings, and regenerated shortcuts with refresh-config. Repository template already contained the correct mapping.
+- Scope: session 01a18e24-2f9c-7ae0-8c18-988f03f6804b direct-write fallback; only the incident report, its ledger record, and this milestone ship. Other dirty records and reports remain excluded.
+- Verified: refresh-config succeeded; fresh isolated fish reports tv as cd ~/coding/jay-tradingview; fish -n passed; targeted incident coverage check passed; README gate pass_no_change. Exact candidate privacy gate precedes commit.
+- Delivery: one documentation commit on main, then push origin/main. No shortcut implementation change remains.
+- Limits: existing interactive terminal may require sourcing key_abbr.fish; interactive typing was not exercised.
+- Rollback: remove only the tv line from the installed directory catalog and regenerate shortcuts; retain unrelated mappings.

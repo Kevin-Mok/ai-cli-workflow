@@ -12946,6 +12946,15 @@
       "reviewed_on": "2026-10-30",
       "findings": [],
       "decision": "No new learning: existing sandbox write-boundary and asynchronous startup guidance applies. Elevated refresh and deployed configuration order verified; visual and click checks remain manual."
+    },
+    {
+      "sha256": "67f82dd52757c82803c73cecfd8ce2467cd34570de1e40bf4315cfcfb1bda174",
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-10-30-fish-shortcut-verification-sandbox.md"
+      ],
+      "reviewed_on": "2026-10-30",
+      "findings": [],
+      "decision": "Incident-specific installed drift repaired and verified; existing isolated-fish verification guidance applies. No new general finding: unmanaged deployment policy was not changed."
     }
   ],
   "review": {
