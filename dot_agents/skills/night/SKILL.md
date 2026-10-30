@@ -1,6 +1,6 @@
 ---
 name: night
-description: Use only when I explicitly invoke `night` before stepping away, optionally with the task to build tonight. Work unattended on one self-verifiable job on a new local branch, never stop to ask questions, commit (push only when I allow it), and leave an untracked `NIGHT_NOTE.md` hand-off for `morning`.
+description: Use only when I explicitly invoke `night` before stepping away, optionally with the task to build tonight. Work unattended on one self-verifiable job on a new local branch, never stop to ask questions, commit and push after every commit, and leave an untracked `NIGHT_NOTE.md` hand-off for `morning`.
 argument-hint: "[what to build tonight]"
 disable-model-invocation: true
 disallowed-tools: AskUserQuestion
@@ -20,8 +20,8 @@ In Codex, the task is whatever text follows `$night` in my message.
 2. Before changing anything, write one line in `NIGHT_NOTE.md` at the repo root
    saying what you are doing. Never stage or commit `NIGHT_NOTE.md`.
 3. Create a new branch (for example `night/<yyyy-mm-dd>-<slug>`) and change
-   things only there. Commit to it when done. Do not push, unless I said to
-   (see "Optional: push as you go").
+   things only there. Commit in small steps and push the branch after every
+   commit (see "Push After Every Commit").
 4. Do not deploy, delete files, touch secrets or CI config, run `chezmoi apply`,
    or call paid APIs.
 5. Never stop to wait for me. When unsure, take the safest option, record the
@@ -50,21 +50,26 @@ everything it needs, so it does not depend on earlier messages:
 - the end time (for example "until 10:00 AM tomorrow") and "do not ask me
   anything"
 - the files to read first: the task file, the plan, and `review-notes.md`
-- the commit rule, and the push rule if pushing is allowed
+- the commit rule and the push rule
 - the order of work, and the stop-at-first-failing-gate rule
 
 If the goal completes early, set a new one with the same text and the new
 work.
 
-## Optional: Push As You Go
+## Push After Every Commit
 
-Only when I say so in the task. Otherwise the default stays: commit, no push.
+Always push the night branch right after each commit, so work is safe off the
+machine and a reviewer can read it.
 
-- Push each commit to the night branch of a private repo. Never push `main`
-  or the default branch, never force-push, and never push `NIGHT_NOTE.md`.
+- Push only the night branch. Never push `main` or the default branch, never
+  force-push, and never push `NIGHT_NOTE.md`.
+- Prefer a private remote. If the repo has no remote, or the only remote is
+  public and the work is not meant to be public, keep committing locally and
+  note it in `NIGHT_NOTE.md`.
 - Before every push, scan the staged files for secrets, `.env` files, and
   machine-local logs.
-- Stop pushing and note it in `NIGHT_NOTE.md` if a push is rejected.
+- If a push is rejected, do not retry with force. Note it in `NIGHT_NOTE.md`,
+  keep committing locally, and try the next push normally.
 
 ## Optional: Outside Reviewer
 
