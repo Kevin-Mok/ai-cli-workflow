@@ -55,7 +55,8 @@ everything it needs, so it does not depend on earlier messages:
 - the order of work, and the stop-at-first-failing-gate rule
 
 If the goal completes early, set a new one with the same text and the new
-work.
+work. Do not start a second session on the same repo: extra sessions edit the
+same files and conflict.
 
 ## Push After Every Commit
 
@@ -66,7 +67,7 @@ machine and a reviewer can read it.
   `git push -u origin night/<yyyy-mm-dd>-<slug>`, so it never shares a branch
   with other work, and never reuse a branch from an earlier night. Push only
   that branch. Never push `main` or the default branch, never
-  force-push, and never push `NIGHT_NOTE.md`.
+  force-push, and never push `NIGHT_NOTE.md`, and never open or merge a pull request.
 - Prefer a private remote. If the repo has no remote, or the only remote is
   public and the work is not meant to be public, keep committing locally and
   note it in `NIGHT_NOTE.md`.
@@ -78,10 +79,11 @@ machine and a reviewer can read it.
 ## Optional: Outside Reviewer
 
 When another agent or person reviews commits overnight, give them one shared
-file, `review-notes.md`, next to the task file. They append dated notes with
-an id. The working session re-reads it between steps, applies each note, and
-records in `NIGHT_NOTE.md` what it applied or skipped and why. Reviewers
-advise only; they do not edit code on the night branch.
+file, `review-notes.md`, next to `NIGHT_NOTE.md`. They append dated notes with
+an id, the commit hash, the file, and the change wanted. The working session
+re-reads it before each stage and after each commit, applies each note, and
+records in `NIGHT_NOTE.md` what it applied or skipped and why. A reviewer or
+watcher advises only: it does not edit code or push.
 
 ## Optional: Trading And Backtest Work
 
