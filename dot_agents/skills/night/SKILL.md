@@ -68,7 +68,8 @@ prompts will not appear, and it must never wait for approval. Full permissions
 do not relax the hard safety rules: no secrets, never `main`, no force-push,
 no destructive git or commands outside the work tree, no spending money, no
 live trading, no private files to a public remote, no `chezmoi apply`. Repeat
-them in the goal text; they still bind.
+them in the goal text; they still bind. If pushing to a public repo is approved,
+the goal text should explicitly grant `--apply` for `privacy-gate sanitize`.
 
 If the goal completes early, set a new one with the same text and the new
 work. Do not start a second session on the same repo: extra sessions edit the
@@ -97,6 +98,10 @@ Examples:
   Coinbase/Binance for prices).
 - Rate limit: back off, batch, and cache responses to disk.
 - Missing API key: use a keyless alternative. Never ask for or invent keys.
+- If the privacy gate blocks a commit or push, follow commit-plan-push's
+  "When blocked" steps: run `privacy-gate sanitize` (dry-run) and use
+  `--apply` only if this /goal text explicitly grants `--apply` for sanitize;
+  otherwise report the dry-run plan and leave the branch unpushed.
 - Failing test unrelated to the task: record it and continue.
 - Flaky network: cache responses to fixtures for offline tests.
 
