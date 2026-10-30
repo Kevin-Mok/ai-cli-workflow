@@ -2,14 +2,21 @@
 """Join timestamp-named camera clips with FFmpeg."""
 
 import argparse
+from contextlib import nullcontext
 from datetime import datetime, timezone
+import fcntl
 from fractions import Fraction
+from html import escape
 import json
+import math
+import os
 from pathlib import Path
 import re
 import shutil
 import subprocess
 import sys
+import tempfile
+import time
 
 
 def _cli_message(text, icon):
@@ -63,19 +70,20 @@ def media_info(path):
     try:
         probe = subprocess.run(
             ["ffprobe", "-v", "error", "-show_entries",
-             "stream=codec_type,width,height,avg_frame_rate,color_transfer", "-of", "json",
+             "stream=codec_type,codec_name,profile,pix_fmt,width,height,avg_frame_rate,time_base,color_transfer,sample_aspect_ratio,start_time,duration,sample_rate,channels,channel_layout:stream_side_data=rotation:format=duration", "-of", "json",
              str(path)], check=True, capture_output=True, text=True,
         )
-        streams = json.loads(probe.stdout)["streams"]
+        details = json.loads(probe.stdout)
+        streams = details["streams"]
         video = next(stream for stream in streams if stream.get("codec_type") == "video")
-        if not any(stream.get("codec_type") == "audio" for stream in streams):
-            raise ValueError("no audio stream")
+        video["audio"] = next(stream for stream in streams if stream.get("codec_type") == "audio")
+        video["duration"] = video.get("duration", details.get("format", {}).get("duration"))
         return video
     except (OSError, subprocess.CalledProcessError, ValueError, KeyError, StopIteration) as exc:
         raise ValueError(f"cannot inspect video and audio streams in {path}: {exc}") from exc
 
 
-def reencode_command(clips, output):
+def reencode_command(clips, output, canvas=None, frame_rate=None, rotations=None):
     videos = [media_info(clip) for clip in clips]
     try:
         width, height = int(videos[0]["width"]), int(videos[0]["height"])
@@ -84,6 +92,9 @@ def reencode_command(clips, output):
         raise ValueError(f"invalid first-clip video properties: {exc}") from exc
     if width < 1 or height < 1 or fps < 1:
         raise ValueError("invalid first-clip dimensions or frame rate")
+    if canvas:
+        width, height = canvas
+        fps = frame_rate
     for index, video in enumerate(videos):
         if video.get("color_transfer") not in (None, "bt709", "arib-std-b67"):
             raise ValueError(
@@ -92,27 +103,261 @@ def reencode_command(clips, output):
     filters = []
     for index, video in enumerate(videos):
         prefix = f"[{index}:v:0]"
+        angle = (rotations or {}).get(clips[index].name, 0)
+        prefix += {0: "", 90: "transpose=clock,", 180: "hflip,vflip,",
+                   270: "transpose=cclock,"}[angle]
+        if canvas:
+            prefix += "scale=w='max(2,trunc(iw*sar/2)*2)':h=ih,setsar=1,"
         if video.get("color_transfer") == "arib-std-b67":
             prefix += (
                 "zscale=t=linear:npl=100,format=gbrpf32le,tonemap=mobius:desat=0,"
                 "zscale=p=bt709:t=bt709:m=bt709:r=tv,"
             )
         filters.append(
-            f"{prefix}fps={fps},scale={width}:{height}:force_original_aspect_ratio=decrease,"
+            f"{prefix}fps={fps},scale={width}:{height}:force_original_aspect_ratio=decrease:force_divisible_by=2,"
             f"pad={width}:{height}:(ow-iw)/2:(oh-ih)/2,format=yuv420p,"
             f"setsar=1,setpts=PTS-STARTPTS[v{index}]"
         )
         filters.append(
-            f"[{index}:a:0]aresample=48000,asetpts=PTS-STARTPTS[a{index}]"
+            f"[{index}:a:0]aresample=48000,aformat=channel_layouts=stereo,asetpts=PTS-STARTPTS[a{index}]"
         )
-    filters.append("[v0][a0][v1][a1]concat=n=2:v=1:a=1[v][a]")
+    inputs = "".join(f"[v{i}][a{i}]" for i in range(len(clips)))
+    filters.append(f"{inputs}concat=n={len(clips)}:v=1:a=1[v][a]")
     return [
         "ffmpeg", "-hide_banner", *[arg for clip in clips for arg in ("-i", str(clip))],
         "-filter_complex", ";".join(filters), "-map", "[v]", "-map", "[a]",
-        "-c:v", "libx264", "-crf", "18", "-preset", "medium", "-pix_fmt", "yuv420p",
+        "-c:v", "libx264", "-profile:v", "high", "-crf", "18", "-preset", "medium", "-pix_fmt", "yuv420p",
         "-color_primaries", "bt709", "-color_trc", "bt709", "-colorspace", "bt709",
-        "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart", str(output),
+        "-c:a", "aac", "-b:a", "192k", "-ar", "48000", "-ac", "2",
+        "-video_track_timescale", "90000", "-movflags", "+faststart", str(output),
     ]
+
+
+def run_media(command, label, details=False, reject_dts=False):
+    started = time.monotonic()
+    print(_cli_message(label, '🎞️'), file=sys.stderr, flush=True)
+    with tempfile.TemporaryFile(mode="w+b") as log:
+        process = subprocess.Popen(command, stdin=subprocess.DEVNULL,
+                                   stdout=subprocess.DEVNULL, stderr=log)
+        try:
+            while True:
+                try:
+                    status = process.wait(timeout=10)
+                    break
+                except subprocess.TimeoutExpired:
+                    elapsed = int(time.monotonic() - started)
+                    print(_cli_message(f"{label} - {elapsed}s elapsed", '⏳'),
+                          file=sys.stderr, flush=True)
+        except BaseException:
+            process.terminate()
+            try:
+                process.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                process.kill()
+                process.wait()
+            raise
+        log.seek(0)
+        diagnostics = log.read().decode("utf-8", errors="replace")
+        if details:
+            sys.stderr.write(diagnostics)
+        if status:
+            raise ValueError(f"{label} failed (exit {status}); use --details for diagnostics")
+        if reject_dts and "non-monoton" in diagnostics.lower():
+            raise ValueError(f"{label} reported non-monotonic DTS; output was not published")
+
+
+def rotation_arg(value):
+    try:
+        name, angle = value.rsplit("=", 1)
+        angle = int(angle)
+        if not name or Path(name).name != name or angle not in (0, 90, 180, 270):
+            raise ValueError
+        return name, angle
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError("rotation must be FILENAME=0|90|180|270") from exc
+
+
+def fingerprint(path):
+    stat = path.stat()
+    return {"size": stat.st_size, "mtime_ns": stat.st_mtime_ns}
+
+
+def save_manifest(path, manifest):
+    temporary = path.with_suffix(".tmp")
+    temporary.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    temporary.replace(path)
+
+
+def check_normalized(path, width, height, fps):
+    video = media_info(path)
+    expected = ("h264", "High", "yuv420p", width, height, f"{fps}/1", "1:1", "1/90000", "bt709")
+    actual = tuple(video.get(key) for key in (
+        "codec_name", "profile", "pix_fmt", "width", "height", "avg_frame_rate",
+        "sample_aspect_ratio", "time_base", "color_transfer"))
+    audio = video["audio"]
+    if actual != expected or (audio.get("codec_name"), audio.get("profile"),
+                              audio.get("sample_rate"), audio.get("channels"),
+                              audio.get("channel_layout"), audio.get("time_base")) != \
+            ("aac", "LC", "48000", 2, "stereo", "1/48000"):
+        raise ValueError(f"normalized streams are incompatible: {path}")
+    duration = float(video["duration"])
+    if not math.isfinite(duration) or duration <= 0:
+        raise ValueError(f"invalid normalized duration: {path}")
+    return duration
+
+
+def landscape_join(clips, output, rotations, details, resume=False):
+    first = media_info(clips[0])
+    width = max(int(first["width"]), int(first["height"])) // 2 * 2
+    height = max(2, round(width * 9 / 16 / 2) * 2)
+    fps = round(Fraction(first["avg_frame_rate"]))
+    if width <= height or fps < 1:
+        raise ValueError("cannot derive a landscape canvas or valid frame rate")
+    settings = {"version": 1, "inputs": [dict(path=str(path), **fingerprint(path)) for path in clips],
+                "rotations": rotations, "canvas": [width, height], "fps": fps, "timescale": 90000}
+    cache = output.with_name(output.stem + ".work")
+    review = output.with_name(output.stem + ".review")
+    if resume:
+        if cache.is_symlink():
+            raise ValueError(f"resume work directory must not be a symlink: {cache}")
+        if not cache.exists():
+            if output.exists() or review.exists():
+                raise ValueError("output or review already exists without a matching resume manifest")
+            cache.mkdir()
+        workspace = nullcontext(str(cache))
+    else:
+        workspace = tempfile.TemporaryDirectory(prefix=".concat-", dir=output.parent)
+    # Normalize sequentially: many simultaneous 4K decoders exhaust memory.
+    with workspace as temporary:
+        work = Path(temporary)
+        with (work / "lock").open("a") as lock:
+            try:
+                fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except BlockingIOError as exc:
+                raise ValueError(f"this resume job is already running: {work}") from exc
+            manifest_path = work / "manifest.json"
+            if manifest_path.exists():
+                manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+                if not isinstance(manifest, dict) or manifest.get("settings") != settings:
+                    raise ValueError("resume sources or settings changed; use a new output name")
+                if not isinstance(manifest.get("completed"), dict):
+                    raise ValueError("invalid resume manifest; use a new output name")
+            else:
+                if output.exists() or review.exists() or any(p.name != "lock" for p in work.iterdir()):
+                    raise ValueError("existing work/output has no valid resume manifest; use a new output name")
+                manifest = {"settings": settings, "completed": {}, "final": None, "review_owned": False}
+                save_manifest(manifest_path, manifest)
+            if output.exists() and fingerprint(output) != manifest.get("final"):
+                raise ValueError("existing output does not match this resume job; use a new output name")
+            if review.exists() and not manifest.get("review_owned"):
+                raise ValueError("existing review does not belong to this resume job; use a new output name")
+            starts = []
+            offset = 0.0
+            normalized = []
+            durations = []
+            for index, clip in enumerate(clips, 1):
+                target = work / f"{index:03d}.mp4"
+                saved = manifest["completed"].get(target.name)
+                if target.is_symlink():
+                    raise ValueError(f"normalized cache must not be a symlink: {target}")
+                if target.exists():
+                    if fingerprint(target) != saved:
+                        raise ValueError(f"normalized cache changed: {target}; use a new output name")
+                    duration = check_normalized(target, width, height, fps)
+                    print(_cli_message(f"Reuse {index}/{len(clips)}: {clip.name}", '✅'),
+                          file=sys.stderr, flush=True)
+                else:
+                    if dict(path=str(clip), **fingerprint(clip)) != settings["inputs"][index - 1]:
+                        raise ValueError(f"source changed during render: {clip}")
+                    partial = work / f"{index:03d}.partial.mp4"
+                    if partial.is_symlink():
+                        raise ValueError(f"partial cache must not be a symlink: {partial}")
+                    partial.unlink(missing_ok=True)
+                    command = reencode_command([clip], partial, (width, height), fps, rotations)
+                    run_media(command[:1] + ["-nostdin", "-n", "-v", "error"] + command[1:],
+                              f"Normalize {index}/{len(clips)}: {clip.name}", details)
+                    duration = check_normalized(partial, width, height, fps)
+                    if dict(path=str(clip), **fingerprint(clip)) != settings["inputs"][index - 1]:
+                        raise ValueError(f"source changed during render: {clip}")
+                    manifest["completed"][target.name] = fingerprint(partial)
+                    save_manifest(manifest_path, manifest)
+                    partial.rename(target)
+                starts.append(offset)
+                offset += duration
+                normalized.append(target)
+                durations.append(duration)
+            listing = work / "normalized.ffconcat"
+            listing.write_text("ffconcat version 1.0\n" + "".join(
+                f"file {ffconcat_path(path)}\nduration {duration:.9f}\n"
+                for path, duration in zip(normalized, durations)), encoding="utf-8")
+            if not output.exists():
+                partial = work / "joined.partial.mp4"
+                partial.unlink(missing_ok=True)
+                # Reencode audio once across cuts to remove per-clip AAC priming overlaps.
+                run_media(["ffmpeg", "-nostdin", "-n", "-v", "warning", "-f", "concat", "-safe", "0",
+                           "-i", str(listing), "-c:v", "copy", "-c:a", "aac", "-ar", "48000", "-ac", "2",
+                           "-b:a", "192k", "-af", "aresample=async=1:first_pts=0",
+                           "-video_track_timescale", "90000", "-movflags", "+faststart", str(partial)],
+                          "Join normalized clips", details, reject_dts=True)
+                check_normalized(partial, width, height, fps)
+                manifest["final"] = fingerprint(partial)
+                save_manifest(manifest_path, manifest)
+                os.link(partial, output)
+                partial.unlink()
+            else:
+                print(_cli_message("Reuse completed joined output", '✅'), file=sys.stderr, flush=True)
+            if not review.exists():
+                manifest["review_owned"] = True
+                save_manifest(manifest_path, manifest)
+                review.mkdir()
+            write_review(clips, starts, output, review, width, height, details, resume)
+
+
+def write_review(clips, starts, output, review, width, height, details, resume):
+
+    video = media_info(output)
+    if (int(video["width"]), int(video["height"])) != (width, height) or \
+            video.get("sample_aspect_ratio") != "1:1" or any(
+                side.get("rotation", 0) for side in video.get("side_data_list", [])):
+        raise ValueError("joined output failed landscape geometry/rotation checks")
+    # AAC priming can shift every joined video timestamp past time zero.
+    video_start = float(video["start_time"])
+    if not math.isfinite(video_start):
+        raise ValueError("joined output has no finite video start timestamp")
+    cards = []
+    for index, (clip, start) in enumerate(zip(clips, starts), 1):
+        start += video_start
+        image = f"{index:03d}.png"
+        if not resume or not (review / image).exists():
+            partial = review / f"{index:03d}.partial.png"
+            partial.unlink(missing_ok=True)
+            run_media(["ffmpeg", "-nostdin", "-n", "-v", "error", "-seek_timestamp", "1", "-ss", f"{start:.6f}",
+                       "-i", str(output), "-frames:v", "1", "-vf", "scale=640:-2",
+                       str(partial)], f"Check start {index}/{len(clips)}: {clip.name}", details)
+            if partial.exists():
+                partial.rename(review / image)
+        if not (review / image).is_file():
+            raise ValueError(f"no decoded start frame for {clip.name} at {start:.3f}s")
+        cards.append(f'<figure><img src="{image}" alt="Start of {escape(clip.name, quote=True)}" '
+                     f'width="640" height="360"><figcaption>{index}. {escape(clip.name)} '
+                     f'— {start:.3f}s</figcaption></figure>')
+    (review / "index.html").write_text(
+        '<!doctype html><html lang="en"><meta charset="utf-8">'
+        '<meta name="viewport" content="width=device-width, initial-scale=1">'
+        '<title>Joined clip orientation review</title>'
+        '<style>body{font:18px system-ui;max-width:1400px;margin:24px auto;padding:0 16px;'
+        'background:#171717;color:#eee}main{display:grid;grid-template-columns:repeat('
+        'auto-fit,minmax(min(100%,480px),1fr));gap:24px}figure{margin:0;min-width:0}'
+        'img{width:100%;height:auto}figcaption{overflow-wrap:anywhere}</style>'
+        '<h1>Joined clip orientation review</h1>'
+        f'<p>Landscape geometry verified: {width} × {height}. Visual review required: '
+        'check that each picture is upright. Only the start of each joined clip is sampled; '
+        'black or blurred frames are inconclusive, and later rotation is not checked.</p>'
+        '<p>To correct a clip, rerun with a new output name and '
+        '<code>--rotate &quot;FILENAME=180&quot;</code> (clockwise degrees: 90, 180 or 270).</p>'
+        '<main>' + "".join(cards) + '</main></html>', encoding="utf-8")
+    print(_cli_message(f"Landscape geometry verified: {width}x{height}", '✅'))
+    print(_cli_message(f"Visual review required: {review / 'index.html'}", '👀'))
 
 
 def main():
@@ -132,10 +377,24 @@ def main():
         "--reencode", action="store_true",
         help="normalize a selected pair to SDR H.264/AAC for a decodable join",
     )
+    parser.add_argument("--landscape", action="store_true",
+                        help="normalize all clips to landscape SDR, join, then save start-frame review")
+    parser.add_argument("--resume", action="store_true",
+                        help="keep validated normalized clips in OUTPUT_STEM.work and resume the same job; requires --landscape")
+    parser.add_argument("--sort", choices=("capture", "mtime"), default="capture",
+                        help="clip order (default: capture; mtime: oldest modification first)")
+    parser.add_argument("--rotate", action="append", type=rotation_arg, default=[],
+                        metavar="FILENAME=DEGREES", help="clockwise correction after metadata rotation; requires --landscape")
+    parser.add_argument("--plain", action="store_true", help="ASCII status output")
+    parser.add_argument("--details", action="store_true", help="show raw FFmpeg diagnostics")
     args = parser.parse_args()
 
-    if args.reencode and not args.clips:
+    if args.reencode and not args.clips and not args.landscape:
         return fail("--reencode requires --clips")
+    if args.rotate and not args.landscape:
+        return fail("rotation corrections require --landscape")
+    if args.resume and not args.landscape:
+        return fail("--resume requires --landscape")
 
     directory = args.directory.expanduser().resolve()
     output = args.output.expanduser().resolve()
@@ -143,8 +402,10 @@ def main():
         return fail(f"directory does not exist: {directory}")
     if not output.parent.is_dir():
         return fail(f"output directory does not exist: {output.parent}")
-    if output.exists():
+    if output.exists() and not args.resume:
         return fail(f"output already exists: {output}")
+    if args.landscape and not args.resume and output.with_name(output.stem + ".review").exists():
+        return fail("review directory already exists; choose a new output name")
 
     if args.clips:
         if len(set(args.clips)) != 2:
@@ -167,12 +428,15 @@ def main():
     try:
         clips = sorted(
             candidates,
-            key=lambda path: (capture_time(path), path.name),
+            key=lambda path: (path.stat().st_mtime_ns if args.sort == "mtime" else capture_time(path), path.name),
         )
     except ValueError as exc:
         return fail(str(exc))
     if not clips:
         return fail(f"no video files found in {directory}")
+    rotations = dict(args.rotate)
+    if len(rotations) != len(args.rotate) or not rotations.keys() <= {clip.name for clip in clips}:
+        return fail("rotation corrections must name selected clips exactly once")
 
     list_path = output.with_name(output.stem + ".ffconcat.txt")
     try:
@@ -188,6 +452,16 @@ def main():
         return 0
     if not shutil.which("ffmpeg"):
         return fail("ffmpeg is required but unavailable")
+    if args.landscape:
+        if not shutil.which("ffprobe"):
+            return fail("ffprobe is required but unavailable")
+        try:
+            landscape_join(clips, output, rotations, args.details, args.resume)
+            return 0
+        except (OSError, ValueError, KeyError, TypeError, ZeroDivisionError) as exc:
+            return fail(str(exc))
+        except KeyboardInterrupt:
+            return fail("interrupted; sources are unchanged; a partial output may remain")
     if args.reencode:
         try:
             command = reencode_command(clips, output)
@@ -199,8 +473,9 @@ def main():
             "-c", "copy", str(output),
         ]
     try:
-        return subprocess.run(command, check=False).returncode
-    except OSError as exc:
+        run_media(command, "Join clips", args.details)
+        return 0
+    except (OSError, ValueError) as exc:
         return fail(str(exc))
 
 
