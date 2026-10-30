@@ -99,3 +99,8 @@ findings and scanner errors as blocking safety failures; repair and restage the
 candidate before retrying. Preserve the active Git hooks. Plumbing commits must
 pass the exact immutable tree OID with `--tree OID` to the same shared gate.
 See the root README privacy-gate section for activation, private rules and limits.
+
+When blocked: stop, run `python3 scripts/executable_privacy-gate sanitize`
+(dry-run; never pass `--apply` in automated runs), report the plan for review,
+and after a human applies it commit the sanitized version, rerun `check`, and
+push only the feature/night branch. Never rewrite pushed history yourself.

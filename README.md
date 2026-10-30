@@ -675,6 +675,28 @@ review them and audit history separately. No CI or server gate is installed.
 Concurrent external index mutations outside Git's commit locking remain outside
 the local scanner's control.
 
+#### When blocked: sanitize instead of only stopping
+
+1. Stop. Do not bypass the gate (`--no-verify`) or weaken its rules.
+2. Run `python3 scripts/executable_privacy-gate sanitize` (dry-run by default; it
+   lists what would change and masks every value).
+3. Review, then run it again with `--apply` (humans only; automated runs never
+   pass `--apply`). Add `--exclude` to write ignores to `.git/info/exclude`
+   instead of `.gitignore`.
+   - Private-in-nature tracked files (gate-private paths, `NIGHT_NOTE.md`,
+     `review-notes.md`, logs, `run-*.sh`, `.harness/` status files, `.env`, keys)
+     are ignored and untracked with `git rm --cached`; the working copy stays.
+   - Useful files with sensitive values get a sanitized `<name>.example` copy
+     with placeholders (`<REDACTED_TOKEN>`, `<API_KEY>`, `<PRIVATE_KEY>`,
+     `<EMAIL>`, `$HOME`, `<IP_ADDRESS>`, nil UUID). The original is ignored and
+     untracked; `SANITIZED.md` maps each placeholder to what to fill in (never
+     the values). Files that still fail the re-scan are listed for manual review.
+   - The staged result is re-scanned and reported clean only when it passes.
+4. Review `git diff --cached`, commit the sanitized version, rerun `check`.
+5. Push only the feature/night branch. Sanitize never rewrites history: local
+   never-pushed commits can be rewritten (`git rebase -i`, `git filter-repo`)
+   after you confirm; already-pushed history needs Kevin's explicit decision.
+
 Rollback with `python3 scripts/executable_privacy-gate uninstall`: it restores the
 preserved hook and removes only the gate bundle. If the hook has changed, removal
 refuses to overwrite it; review locally. If the bundle was damaged, reinstall

@@ -302,14 +302,159 @@ def pre_push(repo: Path, records: bytes, rules_path: Path | None = None):
     return findings
 
 
+# --- sanitize: help publish a censored version instead of only blocking ---
+PRIVATE_NAMES = {"night_note.md", "review-notes.md", "helper-notes.md", "notes.local.md"}
+PRIVATE_SUFFIXES = (".log", ".pid", ".sqlite", ".db")
+PLACEHOLDERS = {
+    "provider_token": ("<REDACTED_TOKEN>", "Provider API token (OpenAI, GitHub, AWS, Google, Slack...)"),
+    "credential": ("<API_KEY>", "Credential value for an api_key/password/secret assignment"),
+    "private_key": ("<PRIVATE_KEY>", "Private key material; generate your own key"),
+    "email": ("<EMAIL>", "Email address"),
+    "home_path": ("$HOME", "Absolute home directory path"),
+    "ip_address": ("<IP_ADDRESS>", "Non-documentation IP address"),
+    "runtime_identifier": ("00000000-0000-0000-0000-000000000000", "Session/runtime UUID (nil UUID placeholder)"),
+    "private_literal": ("<PRIVATE_VALUE>", "Value matched by private local rules"),
+}
+PEM_BLOCK_RE = re.compile(rb"-----BEGIN [A-Z0-9 ]*PRIVATE KEY-----.*?(?:-----END [A-Z0-9 ]*PRIVATE KEY-----|\Z)", re.S)
+
+
+def private_in_nature(path: str) -> bool:
+    lower = path.lower()
+    name = PurePosixPath(lower).name
+    return (
+        private_path(path)
+        or name in PRIVATE_NAMES
+        or name.endswith(PRIVATE_SUFFIXES)
+        or lower.startswith(".harness/") and ("status" in name or name.endswith((".json", ".log")))
+        or name.startswith(("run-", "run_")) and name.endswith((".sh", ".fish"))
+    )
+
+
+def redact(content: bytes, literals) -> tuple[bytes, set[str]]:
+    used = set()
+    def sub(pattern, category, text, group=0, keep=None):
+        def replace(match):
+            if keep and keep(match):
+                return match.group(0)
+            used.add(category)
+            value = PLACEHOLDERS[category][0].encode()
+            if group:
+                start, end = match.span(group)
+                base = match.start()
+                whole = match.group(0)
+                return whole[:start - base] + value + whole[end - base:]
+            return value
+        return pattern.sub(replace, text)
+    text = sub(PEM_BLOCK_RE, "private_key", content)
+    text = sub(scanner.SSH_KEY_RE, "private_key", text)
+    text = sub(scanner.PROVIDER_TOKEN_RE, "provider_token", text)
+    text = sub(scanner.CREDENTIAL_RE, "credential", text, 1, lambda m: scanner.is_safe_credential(m.group(1)))
+    text = sub(scanner.RUNTIME_IDENTIFIER_RE, "runtime_identifier", text, 1,
+               lambda m: m.group(1) == b"00000000-0000-0000-0000-000000000000")
+    text = sub(scanner.EMAIL_RE, "email", text, 0,
+               lambda m: m.group(1).rsplit(b"@", 1)[1].lower() in scanner.SAFE_EMAIL_DOMAINS)
+    text = sub(scanner.HOME_RE, "home_path", text, 0, lambda m: m.group(1).lower() in scanner.SAFE_HOME_USERS)
+    def ip_safe(match):
+        import ipaddress
+        try:
+            address = ipaddress.ip_address(match.group(0).decode("ascii"))
+        except ValueError:
+            return True
+        return address.is_loopback or address.is_unspecified or any(address in n for n in scanner.DOCUMENTATION_NETWORKS)
+    text = sub(scanner.IPV4_RE, "ip_address", text, 0, ip_safe)
+    for value, _category, ignore_case, locations in literals:
+        if "blob" in locations:
+            text = sub(re.compile(re.escape(value), re.I if ignore_case else 0), "private_literal", text)
+    return text, used
+
+
+def ignore_entry(repo: Path, path: str, use_exclude: bool):
+    target = Path(os.fsdecode(git(repo, "rev-parse", "--git-path", "info/exclude").strip()))
+    target = target if target.is_absolute() else repo / target
+    if not use_exclude:
+        target = repo / ".gitignore"
+    line = "/" + path
+    existing = target.read_text(encoding="utf-8").splitlines() if target.exists() else []
+    if line not in existing:
+        target.parent.mkdir(parents=True, exist_ok=True)
+        with target.open("a", encoding="utf-8") as handle:
+            handle.write(line + "\n")
+
+
+def sanitize(repo: Path, *, apply: bool, use_exclude: bool, rules_path: Path | None, out):
+    repo = Path(os.fsdecode(git(repo, "rev-parse", "--show-toplevel").rstrip(b"\n")))
+    rules, _ = rules_for(repo, rules_path)
+    literals = rules["literals"]
+    ignored, sanitized, manual = [], [], []
+    for encoded in git(repo, "ls-files", "-z", "--cached").split(b"\0"):
+        if not encoded:
+            continue
+        path = os.fsdecode(encoded)
+        file = repo / path
+        if path.endswith(".example") or path == "SANITIZED.md" or not file.is_file() or file.is_symlink():
+            continue
+        content = file.read_bytes()
+        categories = scanner.scan_content(content, "blob") | literal_categories(content, "blob", literals)
+        if private_in_nature(path) or any(fnmatch.fnmatchcase(path, g) for g in rules["path_globs"]):
+            ignored.append(path)
+            continue
+        if not categories or scanner.is_binary_content(content):
+            if categories:
+                manual.append(path)
+            continue
+        clean, used = redact(content, literals)
+        left = scanner.scan_content(clean, "blob") | literal_categories(clean, "blob", literals)
+        if left:
+            manual.append(path)
+            continue
+        sanitized.append((path, sorted(used), clean))
+    prefix = "" if out.plain else "🧹 "
+    mode = "APPLY" if apply else "DRY-RUN (no changes; rerun with --apply)"
+    print(f"{prefix}Privacy gate sanitize: {mode}")
+    for path in ignored:
+        print(f"{prefix}Ignore + untrack (working copy kept): {path}")
+    for path, used, _ in sanitized:
+        print(f"{prefix}Sanitize: {path} -> {path}.example (original ignored + untracked); placeholders: {', '.join(PLACEHOLDERS[c][0] for c in used)}")
+    for path in manual:
+        print(f"{prefix}Manual review needed (could not auto-censor cleanly): {path}")
+    if apply:
+        for path in ignored:
+            ignore_entry(repo, path, use_exclude)
+            git(repo, "rm", "--cached", "-q", "--", path)
+        for path, used, clean in sanitized:
+            (repo / (path + ".example")).write_bytes(clean)
+            ignore_entry(repo, path, use_exclude)
+            git(repo, "rm", "--cached", "-q", "--", path)
+            git(repo, "add", "--", path + ".example")
+        if sanitized:
+            lines = ["# Sanitized files", "", "Generated by `privacy-gate sanitize`. Copy each `.example` file to its original",
+                     "name and replace the placeholders with your own values. Real values are never stored here.", "",
+                     "| File | Placeholder | Fill in |", "| --- | --- | --- |"]
+            for path, used, _ in sanitized:
+                lines += [f"| `{path}.example` | `{PLACEHOLDERS[c][0]}` | {PLACEHOLDERS[c][1]} |" for c in used]
+            (repo / "SANITIZED.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
+            git(repo, "add", "--", "SANITIZED.md")
+        if not use_exclude and (ignored or sanitized):
+            git(repo, "add", "--", ".gitignore")
+        findings = check(repo, rules_path=rules_path)
+        status = "clean" if not findings and not manual else "NOT clean"
+        print(f"{prefix}Re-scan of staged candidate: {status} ({len(findings)} findings, {len(manual)} manual).")
+    print(f"{prefix}History: sanitize never rewrites commits. For local never-pushed branches, rewrite only after you confirm"
+          " (e.g. `git rebase -i` or `git filter-repo`); already-pushed history needs Kevin's explicit decision.")
+    print(f"{prefix}Next: review `git diff --cached`, commit, run `privacy-gate check`, push only the feature/night branch.")
+    return 0 if not manual and (not apply or status == "clean") else 1
+
+
 def main() -> int:
     parser = SafeParser(description="Local privacy gate: inspect exact staged bytes without printing private values.")
-    parser.add_argument("command", nargs="?", choices=("check", "pre-push", "install", "status", "uninstall"), default="check")
+    parser.add_argument("command", nargs="?", choices=("check", "pre-push", "install", "status", "uninstall", "sanitize"), default="check")
     parser.add_argument("--repo", type=Path, default=Path.cwd())
     parser.add_argument("--tree", help="Exact immutable tree OID for commit-tree callers")
     parser.add_argument("--rules", type=Path, help="Private mode-0600 policy outside repository")
     parser.add_argument("--plain", action="store_true")
     parser.add_argument("--details", action="store_true", help="Show only safe categories and hashed location references")
+    parser.add_argument("--apply", action="store_true", help="sanitize: make changes (default is dry-run)")
+    parser.add_argument("--exclude", action="store_true", help="sanitize: write ignores to .git/info/exclude instead of .gitignore")
     parser.add_argument("--hook-args", nargs=argparse.REMAINDER, help=argparse.SUPPRESS)
     args = parser.parse_args()
     prefix = "" if args.plain else "🔒 "
@@ -321,6 +466,8 @@ def main() -> int:
     worker = threading.Thread(target=progress, daemon=True)
     worker.start()
     try:
+        if args.command == "sanitize":
+            return sanitize(args.repo, apply=args.apply, use_exclude=args.exclude, rules_path=args.rules, out=args)
         if args.command == "install":
             install(args.repo)
             print(prefix + "Privacy gate installed; prior hook preserved.")
@@ -337,7 +484,7 @@ def main() -> int:
             records = sys.stdin.buffer.read() if args.command == "pre-push" else b""
             findings = pre_push(args.repo, records, args.rules) if args.command == "pre-push" else check(args.repo, tree=args.tree, rules_path=args.rules)
             if findings:
-                repair = "Repair pushed history locally and retry." if args.command == "pre-push" else "Repair locally, stage the safe version, and retry."
+                repair = "Repair pushed history locally and retry." if args.command == "pre-push" else "Repair locally, stage the safe version, and retry. Try `privacy-gate sanitize` (dry-run) to censor."
                 print(prefix + f"Privacy gate BLOCKED: {len(findings)} findings. {repair}")
                 for category in sorted({item[0] for item in findings}):
                     # Private policy category names are untrusted; never echo them.
