@@ -12919,6 +12919,15 @@
       "reviewed_on": "2026-10-30",
       "findings": [],
       "decision": "No new learning: existing IPC sandbox, interactive sudo boundary and refresh ownership guidance cover these scoped workarounds. Live plugin verified; broad refresh remains blocked by unrelated MIME drift."
+    },
+    {
+      "sha256": "a39d527a8d23724303b4b6483a0ab8b39a380114474dc585377cd99ffc1608e8",
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-10-30-filename-display-push-gate.md"
+      ],
+      "reviewed_on": "2026-10-30",
+      "findings": [],
+      "decision": "No new reusable learning: existing local-git-fetch-before-ancestry guidance covers concurrent upstream objects missing from the privacy-hook revision walk. Fetch and conflict-free merge preparation verified; final push pending."
     }
   ],
   "review": {
