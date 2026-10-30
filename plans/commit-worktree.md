@@ -13,7 +13,7 @@ Initial status captured on main at 2d35cd3, behind origin/main by seven commits.
 - [x] Fresh concat and i3 focused suites: 19 passed each.
 - [x] Commit workflow policy and reviewed incident knowledge: c48f1c5, privacy gate passed.
 - [x] Commit media code with matching documentation, plan and incidents: 4748413; gates passed.
-- [ ] Commit desktop code with matching documentation, plan and incidents.
+- [x] Commit desktop code with matching documentation, plan and incidents: 401057d; gates passed.
 - [ ] Attempt upstream push and report residuals.
 
 ## Risks and verification
@@ -23,3 +23,5 @@ Required refresh-config completed (exit 0). Global memory check reports missing 
 Media milestone: feat(media): add resumable landscape concat checks; 19 focused tests passed. Harness excluded after automatic approval review rejected its local runtime metadata.
 
 Desktop milestone: fix(i3): fit smaller music across bar; 19 focused tests passed. No repeated physical desktop acceptance.
+
+Final prompt milestone: docs(prompts): add Redshift i3block specification. Reviewed standalone implementation prompt; no runtime behavior added. Residuals: :memory:.ses (machine-local), .harness/concat-concert/ (approval review rejected local service/media metadata), scripts/privacy_gate_approvals.json (cross-project approval provenance not established). All other reviewed changes delivered. One push to origin/main follows this series; upstream was seven commits ahead, so rejection is possible and no history rewrite is authorized.
