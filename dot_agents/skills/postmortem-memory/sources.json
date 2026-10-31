@@ -12955,6 +12955,15 @@
       "reviewed_on": "2026-10-30",
       "findings": [],
       "decision": "Incident-specific installed drift repaired and verified; existing isolated-fish verification guidance applies. No new general finding: unmanaged deployment policy was not changed."
+    },
+    {
+      "sha256": "510d1a341fea97b83b2f15b699a44f35417428ef34a2e169eee53eee47b70b12",
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-10-31-i3bar-activation-sandbox.md"
+      ],
+      "reviewed_on": "2026-10-31",
+      "findings": [],
+      "decision": "No new reusable learning: existing scoped host-access guidance applies. No-config Fish refresh and approved i3 IPC activation succeeded; original sandbox restrictions remain. Missing guessed helper paths and an early-closed search pipe are diagnostic mistakes, not product defects."
     }
   ],
   "review": {

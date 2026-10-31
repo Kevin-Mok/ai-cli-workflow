@@ -1050,7 +1050,8 @@ this.
   boosts saturation, refreshes kitty, regenerates contrast-safe i3 bar
   colors, and keeps the rest of the tracked wallpaper shortcuts on one
   consistent path instead of sprinkling raw `wal -i` calls through the
-  config.
+  config. All i3 bars use an 80% black translucent backdrop so status text
+  stays readable across wallpapers, including Alt+R changes.
 - [`dot_tmux.conf`](dot_tmux.conf) is the multiplexing layer with a
   custom prefix, mouse mode, TPM plugins, a status line, and copy-mode
   mappings that push selections to `xclip`. New panes keep 50,000 history rows;

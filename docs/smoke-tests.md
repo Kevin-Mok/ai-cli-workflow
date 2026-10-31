@@ -1731,3 +1731,8 @@ Preserve local managed-file edits before applying repo changes.
 
 - Action: Modify a disposable managed non-template file locally, then run refresh-config.
   Expected: Local contents are copied to source, apply succeeds and shortcuts reload. Templates and ignored settings remain intact. Repeated identical template conflicts stop with a private log instead of looping forever.
+
+## Wallpaper contrast behind i3bars
+
+- Action: After refresh-config and one i3 reload, press Alt+R twice and inspect each monitor with bright and dim wallpapers.
+  Expected: Each bar darkens the wallpaper directly behind its text with 80% black; the rest of the wallpaper remains unchanged. Workspace accents and status controls retain their colors and behavior. `i3-msg -t get_bar_config bar-0` (also bar-1 and bar-2) reports background `#000000cc`. The migration-preserved live i3 config needs the same narrow `$bar_trans` change.
