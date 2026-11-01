@@ -1410,7 +1410,11 @@ changed mappings; file source keys gain `n` in fish.
 
 Live Codex usage: `$fish-alias cbn codex-time burn day`. To create the mapping,
 invoke this as an actual request, inspect the reported source/section/conflicts,
-then verify the refresh result. Repeating it must produce a no-op. Directory
+then verify the refresh result. A changed mapping must produce a focused commit
+and push to the configured upstream without another confirmation, unless local-only
+delivery was requested. Missing upstream or rejected pushes retain the local commit
+and report the blocker. Repeating it must produce a no-op without an empty commit
+or publishing unrelated commits. Directory
 example: `$fish-alias pj ~/coding/my-project/`. File example:
 `$fish-alias re README.md` produces `nre` under existing generator conventions.
 

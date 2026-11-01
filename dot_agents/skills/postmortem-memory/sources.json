@@ -12973,6 +12973,15 @@
       "reviewed_on": "2026-11-01",
       "findings": [],
       "decision": "No new reusable learning: discover actual helper locations, use no-config fish for read-only inspection, and deploy unmanaged catalogs explicitly with authorized home access; established environment guidance already covers these constraints."
+    },
+    {
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-11-01-gb-shortcut-source-inspection.md"
+      ],
+      "decision": "No new learning: existing path-discovery guidance covers both read-only inspection assumptions; verify file paths and JSON keys before use. No configuration damage occurred.",
+      "findings": [],
+      "reviewed_on": "2026-11-01",
+      "sha256": "97f9f9a38ec67c175a470b797a83628c077143dcd9a3c8aa989489a1f87dcb4f"
     }
   ],
   "review": {

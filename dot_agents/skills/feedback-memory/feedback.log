@@ -16,3 +16,4 @@
 
 2026-10-30 - For refresh-config (rf), first copy local managed-file changes into the repository, preserving templates and secret/machine-local exclusions. When local drift blocks apply, reconcile it and retry until refresh succeeds; do not stop at the first conflict or overwrite local changes.
 2026-11-01 - Always open link previews in Google Chrome, not Firefox; select Chrome explicitly instead of relying on the system default browser.
+2026-11-01 - fish-alias invocations authorize a focused commit and push of the shortcut plus required related documentation without separate confirmation; always push unless local-only delivery is explicitly requested.

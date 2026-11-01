@@ -260,3 +260,19 @@ This document records delivery milestones and verification for completed reposit
 - Delivery: one focused commit on main, then push origin/main. No implementation work remains.
 - Limits: browser launch and already-running session adoption were not tested.
 - Rollback: remove the Chrome rule from canonical and active instructions; preserve the append-only feedback history.
+
+## Grok Bot shortcut — feat(fish): add gb abbreviation for grok-bot
+
+- Complete: gb expands to grok-bot in work; previous git branch mapping preserved as a comment. Installed preserved catalog reconciled and refreshed.
+- Verified: second refresh exited 0; isolated fish registration/readback and fish -n passed; README gate pass_no_change; targeted incident ledger check passed.
+- Delivery: user explicitly requested automatic fish-alias push; include the skill policy and related README/smoke documentation with the pending gb mapping, then commit and push origin/main. Preserve unrelated dirty work.
+- Limits: grok-bot never executed; existing terminals may need to source key_abbr.fish. No new manual check needed: existing shortcut activation smoke check covers preserved catalogs.
+- Rollback: remove the new gb entry, uncomment git branch in source and installed catalog, then refresh.
+
+## Fish-alias automatic push — feat(fish): push shortcut changes automatically
+
+- Scope: strengthen existing commit guidance with explicit invocation authorization and automatic upstream push; preserve no-op and local-only handling, unrelated-work exclusions and normal failure reporting.
+- Baseline: previous gb delivery stopped for separate commit authorization despite the skill requiring a commit.
+- Verified: skill metadata valid; independent delivery scenarios passed; installed delivery section matches canonical source; refresh exited 0; gb registration and fish syntax passed; README gate pass_no_change. Staged review/privacy checks run before commit.
+- Delivery: one focused commit with pending gb mapping, this policy, required incident learning and scoped documentation; push origin/main. No force-push or unrelated commits.
+- Rollback: restore previous delivery paragraph; gb can be reverted independently by restoring git branch in both source and installed catalog.
