@@ -251,3 +251,12 @@ This document records delivery milestones and verification for completed reposit
 - Delivery: one documentation commit on main, then push origin/main. No shortcut implementation change remains.
 - Limits: existing interactive terminal may require sourcing key_abbr.fish; interactive typing was not exercised.
 - Rollback: remove only the tv line from the installed directory catalog and regenerate shortcuts; retain unrelated mappings.
+
+## Chrome link previews — docs(agents): require Chrome for link previews
+
+- Complete: canonical and active AGENTS instructions explicitly select Google Chrome for link previews; durable feedback appended.
+- Scope: session 01a198d2-8b34-7bc0-b1e6-25c90be219f8; direct-write fallback because the helper did not detect orchestrated writes. Only the Chrome additions and this milestone ship; pre-existing PR-review additions and all other dirty work stay excluded.
+- Verified: refresh-config exited 0; active instruction readback passed; README gate pass_no_change; exact candidate assertions, whitespace and privacy checks precede commit.
+- Delivery: one focused commit on main, then push origin/main. No implementation work remains.
+- Limits: browser launch and already-running session adoption were not tested.
+- Rollback: remove the Chrome rule from canonical and active instructions; preserve the append-only feedback history.

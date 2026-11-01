@@ -46,6 +46,7 @@ education work:
 
 ## Scope, Safety, And Clarity
 
+- Always open link previews in Google Chrome, not Firefox. Select Chrome explicitly rather than relying on the system default browser.
 - Cut taglines, helper text and secondary labels. If a screen needs them to make sense, fix the layout.
 - Make the best decision that will elevate all three: the user experience (UX), developer experience (DX), and agent experience (AX) always, without breaking anything.
 - Do not break production behavior unless explicitly asked. Prefer small, safe, reversible changes and minimal diffs.

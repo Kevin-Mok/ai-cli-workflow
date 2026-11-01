@@ -15,3 +15,4 @@
 2026-10-23 - For performance optimization work, commit each verified improvement separately and report both its measured gain versus the preceding retained version and cumulative measured gain versus the original baseline.
 
 2026-10-30 - For refresh-config (rf), first copy local managed-file changes into the repository, preserving templates and secret/machine-local exclusions. When local drift blocks apply, reconcile it and retry until refresh succeeds; do not stop at the first conflict or overwrite local changes.
+2026-11-01 - Always open link previews in Google Chrome, not Firefox; select Chrome explicitly instead of relying on the system default browser.
