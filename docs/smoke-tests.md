@@ -1344,6 +1344,9 @@ only a disposable temporary fixture and requires no sudo.
 
 ## Fish Alias Skill
 
+- Action: After refresh, run `fish --no-config -c 'source ~/.config/fish/key_abbr.fish; abbr --show | string match "abbr -a -- cc *"'`; in an existing Fish shell source that file, type `cc` then Space, inspect and cancel with Ctrl+C.
+  Expected: `cc` expands to `cd ~/coding/chartclutch`; its previous Calcurse command remains commented. A repeated request is a no-op. Future changed fish-alias requests finish with an immediate focused commit after verification, preserve unrelated dirty work, and report actual push status; no-ops create no empty commit.
+
 - Action: After refreshing, run `fish --no-config -c 'source ~/.config/fish/key_abbr.fish; abbr --show | string match "abbr -a -- wl *"'`; in an existing Fish shell source that file, type `wl` then Space and cancel with Ctrl+C.
   Expected: `wl` expands to `cd ~/coding/wallet-gas-cost`; the previous Watson mapping is commented in the command template. Repeating the absolute directory request previews a no-op.
 
