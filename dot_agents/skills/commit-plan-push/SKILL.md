@@ -8,8 +8,9 @@ disable-model-invocation: true
 
 Plan the current dirty worktree into coherent oldest-to-newest commits.
 Choose the mode from the user's request. Planning-only stays read-only;
-execution requires an explicit request to create commits and push. A skill name
-or proposed command alone never expands that authorization.
+Invoking `$commit-plan-push` authorizes planning, committing, and pushing
+the safe, reviewable dirty worktree through the delivery workflow below.
+An explicit planning-only request overrides this default.
 
 Prioritize files touched during the current session and favor including safe related files over omitting them. Cover the full requested worktree, including reviewable companion files; touched-file priority must not invert prerequisite chronology.
 
@@ -18,8 +19,8 @@ Prioritize files touched during the current session and favor including safe rel
 Use for `commit-plan`, `commit plan`, `plan to commit all dirty`, grouping dirty
 changes into commits, or a safe plan without execution. This mode performs
 **no Git writes**. Do not stage, commit, push, restore, reset, stash, clean, or
-change files, index state or history. An explicit execution request selects the
-delivery workflow below instead; uncertainty stays read-only.
+change files, index state or history. Invoking the skill without a planning-only restriction selects the
+delivery workflow below; genuinely unclear requests stay read-only.
 
 In planning-only mode, MUST read [the planning procedure](references/planning-only.md) and return before delivery.
 

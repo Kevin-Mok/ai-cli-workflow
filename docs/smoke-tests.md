@@ -401,6 +401,9 @@ listing is cached-only; opening a picker can generate recaps unless disabled.
   Expected: It commits every eligible change in the requested scope, records
   failed checks and README residuals, excludes prohibited files, and reports
   the actual commit and push outcomes without bypassing hooks.
+- Action: Invoke `$commit-plan-push` alone in a disposable dirty repository with a configured upstream.
+  Expected: It plans coherent commits, runs checks, commits safe changes and pushes
+  once after verification without requesting separate execution authorization.
 - Action: Invoke `commit-plan-push` in planning-only mode with the same mixed scope.
   Expected: It plans every eligible group with warnings and companion docs,
   preserves prerequisite chronology, and performs no Git writes.

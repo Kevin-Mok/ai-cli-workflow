@@ -20,6 +20,13 @@ def read_required(path: Path) -> str:
 
 
 class CommitPlanPushSkillTest(unittest.TestCase):
+    def test_explicit_invocation_authorizes_delivery_and_plan_only_overrides(self) -> None:
+        skill = read_required(SKILL_PATH)
+        self.assertIn("Invoking `$commit-plan-push` authorizes planning, committing, and pushing", skill)
+        self.assertIn("An explicit planning-only request overrides this default", skill)
+        self.assertNotIn("A skill name\nor proposed command alone never expands", skill)
+        self.assertIn("**no Git writes**", skill)
+
     def test_skill_requires_best_effort_delivery_for_safe_dirty_changes(self) -> None:
         skill = read_required(SKILL_PATH)
         self.assertIn("best-effort", skill)

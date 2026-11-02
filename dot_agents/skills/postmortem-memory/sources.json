@@ -13027,6 +13027,15 @@
       "findings": [],
       "reviewed_on": "2026-10-31",
       "sha256": "d88b64c58c480b242f57e55d8658b2063b51ca9a9aed6c59eac0469058371209"
+    },
+    {
+      "sha256": "39ac7179d89388560130b5a9c3b94ba71fa0ce63cc1275ae4aa4b175fef112cb",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-11-01-commit-skill-path-discovery.md"
+      ],
+      "reviewed_on": "2026-11-01",
+      "findings": [],
+      "decision": "No new reusable learning: discover actual source paths; shortened new admission bookkeeping after its size-cap regression. See task plan for fresh checks."
     }
   ],
   "review": {

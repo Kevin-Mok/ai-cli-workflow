@@ -23,3 +23,5 @@ This turn: backup49 tests, commit-skill5 tests, admission7 tests and startup she
 Commit subjects and verification will be recorded here before each related commit. Push remains pending.
 
 Milestone 1 prepared: `fix(backup): exclude disposable Snap caches`. Backup source, both policies, regression, README/smoke docs and historical incident/plan travel together. Fresh49 backup tests passed; direct excludes preview passed. refresh-config completed successfully this turn. Other groups and one final push remain pending.
+
+Milestone1 committed as c8025b0; both explicit privacy gate and active hook passed. Milestone2 prepared: `fix(skills): execute commit-plan-push on invocation`. Matching contract, catalog, README, smoke/admission documentation, plan and incident registration included. Fresh5 contract and7 admission tests passed; explicit planning-only safeguard retained. Next review policy, startup, desktop and learning groups; push pending.

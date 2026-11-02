@@ -33,8 +33,8 @@ read-only; unsafe content and unrelated work remain excluded. Matching plans,
 tests and documentation accompany the change they describe.
 
 - [`commit-plan-push`](commit-plan-push/SKILL.md): Plan dirty work oldest-to-newest.
-  Planning-only mode inspects and proposes without Git writes; explicit execution
-  requests create safe coherent commits, then push once after the full series.
+  Invoking `$commit-plan-push` plans, creates safe coherent commits, then pushes
+  once after the full series. Explicit planning-only requests perform no Git writes.
 - [`commit-dirty`](commit-dirty/SKILL.md): Verify and ship the authorized dirty
   worktree in a focused commit, reporting failed checks and unsafe residuals.
 - [`commit-session`](commit-session/SKILL.md): Ship only verified changes touched

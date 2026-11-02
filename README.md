@@ -254,7 +254,8 @@ separately authorized install update if cached labels persist.
 - [`commit-plan-push`](dot_agents/skills/commit-plan-push/SKILL.md) makes a
   best-effort pass over the entire dirty worktree, separates safe changes into
   chronological commits, pushes once after the series, and reports residuals
-  when a file cannot be safely shipped. Its planning-only mode returns safe
+  when a file cannot be safely shipped. Invoking `$commit-plan-push` authorizes
+  planning, committing, and pushing. Its explicit planning-only mode returns safe
   groups, checks and exclusions without staging, committing or pushing.
 - [`commit-session`](dot_agents/skills/commit-session/SKILL.md) ships
   only the files owned by the current Codex session, with fallback logic
