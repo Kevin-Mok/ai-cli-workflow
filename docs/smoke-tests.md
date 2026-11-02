@@ -755,10 +755,10 @@ checks use invented temporary data; real notes are never repository fixtures.
   creates a fresh popup.
   Fish `redshift-set` and login calls to the shared helper also notify.
 
-- Action: On the DP-2 4K bar, press Windows+2, then scroll up and down over
+- Action: On both the middle DP-2 4K and right HDMI-0 bars, press Windows+2, then scroll up and down over
   the thermometer. Try rapid wheel events and left/middle/right clicks; select
   keyboard presets and reset. Run `~/scripts/redshift-control status` to compare.
-  Expected: Only DP-2 has the block, leftmost before volume and Spotify. Windows+2
+  Expected: Both bars show the same saved target immediately left of volume; the left DVI-D-0 bar stays unchanged. Windows+2
   displays 2300 K within one second; up shows 2450 K and down returns 2300 K.
   Rapid wheel steps accumulate silently, bounded at 1000–6500 K; other clicks do nothing.
   Wheel changes show no Dunst popup; keyboard/direct helper changes still notify.

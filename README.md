@@ -1176,7 +1176,7 @@ this.
   bounded at 1000–6500 K. Presets, `rds`, `rx` and login share the saved temperature.
   The first adjustment defaults to 6500 K if no value has been saved; direct
   external Redshift commands are not tracked.
-  The DP-2 4K bar shows **🌡️ 4500 K** between volume and Spotify: scroll up
+  The middle DP-2 4K and right HDMI-0 bars show **🌡️ 4500 K** immediately left of volume: scroll up
   for +150 K (cooler), down for −150 K (warmer). Other clicks do nothing.
   Wheel changes update the bar silently; keyboard and direct helper operations
   keep their notifications. The controller’s `--no-notify` flag suppresses a popup

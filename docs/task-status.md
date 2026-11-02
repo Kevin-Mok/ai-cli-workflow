@@ -276,3 +276,13 @@ This document records delivery milestones and verification for completed reposit
 - Verified: skill metadata valid; independent delivery scenarios passed; installed delivery section matches canonical source; refresh exited 0; gb registration and fish syntax passed; README gate pass_no_change. Staged review/privacy checks run before commit.
 - Delivery: one focused commit with pending gb mapping, this policy, required incident learning and scoped documentation; push origin/main. No force-push or unrelated commits.
 - Rollback: restore previous delivery paragraph; gb can be reverted independently by restoring git branch in both source and installed catalog.
+
+
+## Right-screen Redshift — feat(i3): duplicate Redshift on right screen
+
+- Complete: HDMI-0 main bar duplicates the middle DP-2 Redshift block immediately left of volume, sharing its manual temperature and controls. README and smoke expectations updated.
+- Scope: session 01a1998d-cea9-7e93-9818-af3a811e143e direct-write fallback; helper did not detect orchestrated edits. Stage only the bar insertion, related README/smoke hunks, incident, its ledger record and this milestone. Preserve all pre-existing dirty work.
+- Verified: placement assertion RED then GREEN; block tests 7 passed and status-wrapper tests 21 passed. refresh-config exited 0; migration exclusion required the same insertion into the preserved live file. i3 validation exited 0 (existing wheel deprecations); restart succeeded and deployed output emitted Redshift, volume, calendar at preserved 1700 K. README gate pass_no_change; targeted ledger/privacy checks precede commit.
+- Delivery: one focused commit on main, then push configured origin/main; no web deployment applies.
+- Limits: physical visual placement and mouse clicks remain manual. Future migrated installs may need direct bar synchronization because chezmoi excludes preserved targets.
+- Rollback: remove only the four-line Redshift addition from source and preserved live main config, refresh, validate and restart i3.

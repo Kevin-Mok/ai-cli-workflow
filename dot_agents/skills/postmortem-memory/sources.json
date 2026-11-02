@@ -12982,6 +12982,15 @@
       "findings": [],
       "reviewed_on": "2026-11-01",
       "sha256": "97f9f9a38ec67c175a470b797a83628c077143dcd9a3c8aa989489a1f87dcb4f"
+    },
+    {
+      "sha256": "a19c5a947026e0fd310e2d2cd1933821cab36bf61249000d256b742bbf123bb8",
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-11-01-redshift-bar-sandbox.md"
+      ],
+      "reviewed_on": "2026-11-01",
+      "findings": [],
+      "decision": "No new reusable learning: existing sandbox access and unchanged i3 status-command restart guidance apply; approved live activation and deployed renderer output verified."
     }
   ],
   "review": {
