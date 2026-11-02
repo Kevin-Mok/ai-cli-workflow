@@ -35,6 +35,46 @@
   ],
   "findings": [
     {
+      "applicability": "Backup helper launches embedded Python via python3 - with a stdin heredoc, then uses input for erase confirmation.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Inspect launcher and input; reproduce EOF using an isolated heredoc without executing a restore."
+      ],
+      "id": "local-backup-restore-stdin-confirmation",
+      "limitations": "No implementation fix; dry-run returns before prompt and cannot establish interactive readiness. Do not edit checksummed bundle helper or bypass consent.",
+      "reference": "references/backup-restore-confirmation.md#local-backup-restore-stdin-confirmation",
+      "remedy": "Pending: separate Python source transport from interactive confirmation, retain explicit erase consent, and test through the actual launcher before disposable-VM restore acceptance.",
+      "sources": [
+        "1d3dd7eb6140d1fbb8c7a583ab7a5e82aacf4fc0a98d75afc95add8fc8720e1f"
+      ],
+      "status": "unresolved",
+      "symptoms": [
+        "Interactive restore cancels at ERASE confirmation because Python input receives EOF."
+      ],
+      "verification": "Independent reviewer and root reproduced EOF in an isolated heredoc; installed and dated-bundle source use this launcher. Backup/restore help and metadata reads pass. No actual restore attempted.",
+      "verification_scope": "code"
+    },
+    {
+      "applicability": "Containing-mount lookups with autofs and real filesystem at the same target.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Inspect all findmnt entries at the destination; equal-length max chooses the first autofs entry. Check host flags outside a read-only sandbox."
+      ],
+      "id": "local-backup-autofs-selection",
+      "limitations": "Full sudo dry-run requires interactive password. No complete backup or boot restore tested. Sandbox ACL fixture error disappears outside sandbox.",
+      "reference": "references/backup-destinations.md#local-backup-autofs-selection",
+      "remedy": "Prefer non-autofs on equal target lengths for destination validation, source-disk checks and disk ancestry. Retain deepest-path precedence and writable Linux filesystem guards.",
+      "sources": [
+        "6f4538f8af807037908aa04771f8fcc471a2cd404b83b16e027c5fc8f46111e2"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "Writable ext4 backup destination rejected as FAT/exFAT/NTFS behind systemd automount."
+      ],
+      "verification": "Two defining RED regressions; full backup suite 71/71 outside sandbox and Bash syntax pass. Installed destination validation passed on actual host rw ext4/autofs; installed bytes match source; refresh-config passed.",
+      "verification_scope": "runtime"
+    },
+    {
       "applicability": "Shared notification players invoked both by Dunst and direct Codex event hooks.",
       "confidence": "confirmed",
       "diagnostics": [
@@ -6977,6 +7017,26 @@
     }
   ],
   "reports": [
+    {
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-11-02-restore-confirmation-stdin.md"
+      ],
+      "findings": [
+        "local-backup-restore-stdin-confirmation"
+      ],
+      "reviewed_on": "2026-11-02",
+      "sha256": "1d3dd7eb6140d1fbb8c7a583ab7a5e82aacf4fc0a98d75afc95add8fc8720e1f"
+    },
+    {
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-11-01-backup-autofs-destination.md"
+      ],
+      "findings": [
+        "local-backup-autofs-selection"
+      ],
+      "reviewed_on": "2026-11-01",
+      "sha256": "6f4538f8af807037908aa04771f8fcc471a2cd404b83b16e027c5fc8f46111e2"
+    },
     {
       "sha256": "13e403e1d87a90f9921d175cb23758e5bcb56db064a1f0585a3b1454f82156c1",
       "aliases": [

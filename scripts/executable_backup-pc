@@ -165,7 +165,7 @@ def path_disks(path, devices=None, table=None):
     containing = [m for m in table if real == m['target'] or real.startswith(m['target'].rstrip('/')+'/')]
     if not containing:
         fail(f'Cannot identify filesystem containing {real}.')
-    return ancestors(max(containing, key=lambda m: len(m['target']))['maj:min'], devices)
+    return ancestors(max(containing, key=lambda m: (len(m['target']), m['fstype'] != 'autofs'))['maj:min'], devices)
 
 
 def swap_devices():
@@ -300,7 +300,7 @@ def source_preflight(root, destination, live=False):
         dynamic.append('./'+str(rel))
     if live:
         containing=[m for m in table if str(destination)==m['target'] or str(destination).startswith(m['target'].rstrip('/')+'/')]
-        if not containing or max(containing,key=lambda m:len(m['target']))['maj:min'] in source_majors:
+        if not containing or max(containing,key=lambda m:(len(m['target']),m['fstype']!='autofs'))['maj:min'] in source_majors:
             fail('Mount the backup drive first; live destination cannot be on source root/home/EFI.')
     swap_bytes = 0
     for e in entries:
@@ -326,9 +326,11 @@ def destination_preflight(destination):
     table=mounts(); path=Path(destination).resolve()
     containing=[m for m in table if str(path)==m['target'] or str(path).startswith(m['target'].rstrip('/')+'/')]
     if not containing: fail('Cannot identify backup destination filesystem.')
-    mount=max(containing,key=lambda m:len(m['target']))
-    if mount['fstype'] not in ('ext4','xfs','btrfs','f2fs') or 'rw' not in mount['options'].split(','):
-        fail('Browsable home backup requires a writable Linux filesystem (ext4 recommended), not FAT/exFAT/NTFS.')
+    mount=max(containing,key=lambda m:(len(m['target']),m['fstype']!='autofs'))
+    if mount['fstype'] not in ('ext4','xfs','btrfs','f2fs'):
+        fail('Browsable home backup requires a Linux filesystem (ext4 recommended); detected '+mount['fstype']+' at '+mount['target']+'. FAT/exFAT/NTFS are unsupported.')
+    if 'rw' not in mount['options'].split(','):
+        fail('Backup destination is read-only: '+mount['fstype']+' at '+mount['target']+'. Inspect mount status and filesystem health before retrying.')
 
 
 def home_excludes(dynamic):

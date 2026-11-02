@@ -428,6 +428,21 @@ class BackupTests(unittest.TestCase):
                 with self.assertRaises(self.b.BackupError):self.b.destination_preflight(dest)
         self.assertFalse(dest.exists())
 
+    def test_destination_automount_uses_real_filesystem_in_either_order(self):
+        dest=Path(self.tmp.name)/'destination'
+        auto={'target':self.tmp.name,'fstype':'autofs','options':'rw','maj:min':'0:99'}
+        real=dict(auto,fstype='ext4',**{'maj:min':'8:49'})
+        for table in ([auto,real],[real,auto]):
+            with self.subTest(table=table), patch.object(self.b,'mounts',return_value=table):
+                self.b.destination_preflight(dest)
+        self.assertFalse(dest.exists())
+
+    def test_readonly_destination_error_identifies_actual_problem(self):
+        mount={'target':self.tmp.name,'fstype':'ext4','options':'ro'}
+        with patch.object(self.b,'mounts',return_value=[mount]):
+            with self.assertRaisesRegex(self.b.BackupError,'read-only.*ext4'):
+                self.b.destination_preflight(Path(self.tmp.name)/'destination')
+
     def test_home_hardlinks_sparse_hash_and_symlinks_verified(self):
         p=self.root/'home/alice/data';p.write_bytes(bytes(8192)+b'bytes')
         linked=self.root/'home/alice/link';os.link(p,linked)

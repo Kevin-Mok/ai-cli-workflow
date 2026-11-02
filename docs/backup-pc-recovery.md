@@ -8,6 +8,16 @@ different times. Preview, create and keep the complete backup bundle, then
 restore from a live USB using its included script. System files are compressed;
 home files remain browsable. Restoration erases the selected whole disk.
 
+For a concrete dated-directory walkthrough, start with the
+[backup and restore quickstart](backup-pc-quickstart.md), using
+`/mnt/usb-8tb/sys-backup/11-01-26` as the example bundle.
+
+**Current restore blocker:** the Python heredoc launcher consumes stdin, so
+interactive erase confirmation receives EOF and cancels. Backup and restore
+dry-run are unaffected, but a completed interactive restore is blocked until
+this is fixed and tested. See the [incident](postmortem/2026-11-02-restore-confirmation-stdin.md)
+and the quickstart before attempting recovery. Do not bypass the erase prompt.
+
 ## Supported System And Prerequisites
 
 The recovery layout supports Ubuntu 24.04 amd64 with UEFI/GRUB, a conventional
@@ -33,6 +43,10 @@ at `/mnt/source/boot/efi`. Mount the backup disk read-write at `/mnt/backup`.
 Use a Linux backup filesystem, preferably ext4, with sufficient space for the
 normal home files plus the compressed system archive. The helper verifies copied
 home data and metadata; FAT, exFAT and NTFS destinations are rejected.
+Systemd automounts are supported: the mounted Linux filesystem takes precedence
+over the autofs entry at the same path. A read-only destination is rejected
+with its actual filesystem and mount point; inspect filesystem health and mount
+status before retrying. Do not reformat an ext4 drive because of this error.
 Do not boot the installation being archived or allow it to write during backup.
 Without `--live`, the helper rejects writable source mounts and missing
 required mounts. This remains the default backup mode.

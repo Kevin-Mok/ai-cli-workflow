@@ -1492,6 +1492,21 @@ separate disposable-VM boot acceptance check.
   do not establish guest bootability or Secure Boot support.
 - Action: `bash -n scripts/executable_backup-pc`
   Expected: Exit 0; the standalone Bash entrypoint parses without execution.
+- Action: On the installed machine with a systemd-automounted ext4 backup drive,
+  run `sudo ~/scripts/backup-pc backup --live --source-root / --destination /mnt/usb-8tb/sys-backup --dry-run`.
+  Expected: Writable ext4 passes destination validation despite the autofs entry.
+  Read-only ext4 reports read-only, ext4 and the mount point; unsupported
+  filesystems remain rejected. No backup is created by dry-run.
+- Action: Follow the [dated-bundle quickstart](backup-pc-quickstart.md) in a
+  disposable live-USB/VM recovery environment: keep the complete bundle, mount
+  its store read-only, choose a replacement whole disk by stable ID, and run
+  restore with `--dry-run`.
+  Expected: Bundle and home verification precede the target/layout preview;
+  `Dry run complete; zero destructive operations` appears, with no disk writes.
+  The original source and backup disks remain protected. A completed restore
+  requires a separate confirmed erase and an isolated boot check. The
+  [current stdin confirmation blocker](postmortem/2026-11-02-restore-confirmation-stdin.md)
+  must be fixed before the erase/boot acceptance steps can succeed.
 - Action: `./scripts/executable_backup-pc backup --help`
   Expected: Explicit `--live`, integer `--resource-percent` (default 75) and
   `--dry-run` are shown; no files change.
