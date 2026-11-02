@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+prefix='🔊 '
+if [[ ${1:-} == --plain ]]; then
+  prefix=''
+  shift
+fi
+if [[ ${1:-} == --help ]]; then
+  printf '%sUsage: set-dual-jack-audio [--plain]\n' "$prefix"
+  printf 'Unmute ALC897 front headphones and rear speakers without changing volume.\n'
+  printf 'Requires alsa-utils and the installed dual-jack HDA retask mapping. No sudo.\n'
+  exit 0
+fi
+if (( $# )); then
+  printf '%sUnknown option; use --help.\n' "$prefix" >&2
+  exit 2
+fi
+if ! command -v aplay >/dev/null || ! command -v amixer >/dev/null; then
+  printf '%sInstall alsa-utils to restore dual-jack audio.\n' "$prefix" >&2
+  exit 1
+fi
+if ! cards=$(LC_ALL=C aplay -l 2>/dev/null); then
+  printf '%sCould not list sound cards; check desktop audio access.\n' "$prefix" >&2
+  exit 1
+fi
+card=$(awk '/^card [0-9]+:.*ALC897 Analog/ {sub(/:/, "", $2); print $2; exit}' <<< "$cards")
+if [[ -z $card ]]; then
+  printf '%sSkipping dual-jack audio: no ALC897 card found.\n' "$prefix"
+  exit 0
+fi
+for control in Master Front Surround; do
+  if ! amixer -q -c "$card" sset "$control" unmute 2>/dev/null; then
+    printf '%sCould not unmute %s on ALC897 card %s; check the dual-jack mapping.\n' "$prefix" "$control" "$card" >&2
+    exit 1
+  fi
+done
+printf '%sFront headphones + rear speakers enabled; volume unchanged.\n' "$prefix"

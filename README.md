@@ -737,6 +737,14 @@ An unavailable disk does not block boot; wallpaper still requires it to be conne
 without needing a Fish shell first. Nonempty `XSET_DELAY` and `XSET_RATE`
 environment values override their respective defaults.
 
+On the ALC897 desktop, `ubs` and i3 startup also run
+`~/scripts/set-dual-jack-audio` to unmute front headphones and rear green-jack
+speakers together without changing volume or restarting audio. Run it directly
+to restore both outputs; `--plain` gives ASCII output and `--help` shows usage.
+It requires `alsa-utils`, safely skips other sound cards, and uses the existing
+HDA retask boot mapping saved in [the audio recovery notes](docs/audio/README.md).
+No sudo is needed for everyday use.
+
 Treat this repository as the source of truth for most of the environment
 layer. Keep machine and identity values private. `refresh-config` preserves modified managed local files with chezmoi re-add before applying source changes; templates and ignored private settings are preserved.
 

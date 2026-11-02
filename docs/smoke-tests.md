@@ -1009,6 +1009,9 @@ Preview the existing disk configuration, install the UUID-specific rules once wi
 
 ## Audio
 
+- Action: With headphones in the front/top jack and powered speakers in the rear green jack, run `~/scripts/set-dual-jack-audio`, then play `/usr/share/sounds/freedesktop/stereo/audio-channel-front-left.oga` and `audio-channel-front-right.oga` using `paplay`. Repeat after `ubs` and after a fresh i3 login.
+  Expected: Both devices play the same left/right samples. The helper reports both outputs enabled, keeps the previous volume, and does not restart audio services. `--plain` produces ASCII output. On machines without ALC897, it skips without changing another card. A new login check is required to verify startup persistence.
+
 - Action: Press left Super (keycode 133)+M twice while audio is playing.
   Expected: Each press toggles speaker mute/unmute, the volume block updates, and a two-second Audio popup shows Muted or Unmuted. Rapid presses update that popup in place without stacking; the second press restores the original mute state, and no text is typed. Repeat with the mute media key; it shares the same popup. Redshift keeps its separate popup.
 

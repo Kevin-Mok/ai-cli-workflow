@@ -100,6 +100,12 @@ fi
 fixture="$(mktemp -d)"
 trap 'rm -rf "$fixture"' EXIT
 mkdir -p "$fixture/bin" "$fixture/home"
+mkdir -p "$fixture/home/scripts"
+cat > "$fixture/home/scripts/set-dual-jack-audio" <<'STUB'
+#!/bin/bash
+printf 'enabled\n' >> "$STARTUP_AUDIO_LOG"
+STUB
+chmod +x "$fixture/home/scripts/set-dual-jack-audio"
 cat > "$fixture/bin/xset" <<'STUB'
 #!/bin/bash
 printf '%s\n' "$*" > "$XSET_LOG"
@@ -110,8 +116,13 @@ check_repeat() {
   local expected="$1"
   shift
   rm -f "$fixture/xset.log"
+  rm -f "$fixture/audio.log"
   env -u XSET_DELAY -u XSET_RATE HOME="$fixture/home" PATH="$fixture/bin" \
-    XSET_LOG="$fixture/xset.log" "$@" /bin/bash "$script_path" 2>"$fixture/stderr"
+    XSET_LOG="$fixture/xset.log" STARTUP_AUDIO_LOG="$fixture/audio.log" "$@" /bin/bash "$script_path" 2>"$fixture/stderr"
+  if [ "$(cat "$fixture/audio.log")" != enabled ]; then
+    printf 'expected startup to restore dual-jack audio once\n' >&2
+    exit 1
+  fi
   local actual=""
   if [ -f "$fixture/xset.log" ]; then
     actual="$(cat "$fixture/xset.log")"

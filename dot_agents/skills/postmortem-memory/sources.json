@@ -7018,6 +7018,15 @@
   ],
   "reports": [
     {
+      "sha256": "3ba8d8b8e522925791004e2b32e7dd6673e335ec32cfac1856aa158ae7b538e6",
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-11-02-dual-jack-diagnostics.md"
+      ],
+      "reviewed_on": "2026-11-02",
+      "findings": [],
+      "decision": "No new reusable learning: ext-sandbox-loopback covers scoped desktop audio access. Exact-path discovery resolves guessed startup/refresh paths. Live playback user-confirmed; reboot persistence remains unverified."
+    },
+    {
       "aliases": [
         "/home/kevin/linux-config/docs/postmortem/2026-11-02-restore-confirmation-stdin.md"
       ],
