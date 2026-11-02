@@ -1801,3 +1801,14 @@ Preserve local managed-file edits before applying repo changes.
 
 - Action: After refresh-config and one i3 reload, press Alt+R twice and inspect each monitor with bright and dim wallpapers.
   Expected: Each bar darkens the wallpaper directly behind its text with 80% black; the rest of the wallpaper remains unchanged. Workspace accents and status controls retain their colors and behavior. `i3-msg -t get_bar_config bar-0` (also bar-1 and bar-2) reports background `#000000cc`. The migration-preserved live i3 config needs the same narrow `$bar_trans` change.
+
+## Session context comparison artifact
+
+- Action: Read benchmarks/trim/CONTEXT-DIFF.md alongside its JSON twin.
+  Expected: AGENTS+description context is separate from on-demand body inventory;
+  all68canonical skill identities have before/after catalog flags and byte/token
+  counts, with39before-only and7after-only. Real counts name o200k_base and
+  explicitly exclude observed session/provider usage.
+- Action: Compare the two context tables in COMPARISON.md and OVERNIGHT-REPORT.md.
+  Expected: Both are verbatim copies of CONTEXT-DIFF.md; the report and PR3 link
+  the complete artifact and its measurement limits.

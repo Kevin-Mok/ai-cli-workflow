@@ -28,3 +28,10 @@ report-publication checkpoint; the external marker follows the final push.
 ## Next action
 Publish final report commit, verify remote head/body and unchanged measured
 surfaces, write the external DONE receipt, then complete the active goal.
+
+## Criterion 6 continuation
+
+Addenda read in full;68rows and both token methods generated. Requested boundary
+is AGENTS+descriptions9523.25→3599.75estimate; developer instructions separate.
+Copied tables into both reports; independent review/publication pending. Prior
+DONE receipt temporarily marks criterion6 in progress; final action restores it.

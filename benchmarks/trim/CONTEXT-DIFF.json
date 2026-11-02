@@ -1,0 +1,1626 @@
+{
+  "schema_version": 1,
+  "baseline_commit": "8662fa3c30da549fbdb20b8477c80e015e7d5236",
+  "candidate_surfaces_commit": "92a516ab704a086d3d2eb7c9cc5e31c7f6e038c6",
+  "method": "UTF-8 bytes/4 estimate; real tiktoken o200k_base counts, per-fragment sums",
+  "loaded_definition": "static canonical description catalog, not observed runtime loading",
+  "metrics": {
+    "before": {
+      "agents": {
+        "bytes": 24202,
+        "estimated_tokens": 6050.5,
+        "tokenizer_tokens": 4990
+      },
+      "descriptions": {
+        "bytes": 13891,
+        "estimated_tokens": 3472.75,
+        "tokenizer_tokens": 2724
+      },
+      "bodies_on_demand": {
+        "bytes": 436570,
+        "estimated_tokens": 109142.5,
+        "tokenizer_tokens": 97588
+      },
+      "developer_instructions": {
+        "bytes": 717,
+        "estimated_tokens": 179.25,
+        "tokenizer_tokens": 135
+      },
+      "always_loaded_agents_plus_descriptions": {
+        "bytes": 38093,
+        "estimated_tokens": 9523.25,
+        "tokenizer_tokens": 7714
+      },
+      "collector_loaded_including_developer": {
+        "bytes": 38810,
+        "estimated_tokens": 9702.5,
+        "tokenizer_tokens": 7849
+      }
+    },
+    "after": {
+      "agents": {
+        "bytes": 9679,
+        "estimated_tokens": 2419.75,
+        "tokenizer_tokens": 2027
+      },
+      "descriptions": {
+        "bytes": 4720,
+        "estimated_tokens": 1180.0,
+        "tokenizer_tokens": 941
+      },
+      "bodies_on_demand": {
+        "bytes": 213743,
+        "estimated_tokens": 53435.75,
+        "tokenizer_tokens": 47085
+      },
+      "developer_instructions": {
+        "bytes": 0,
+        "estimated_tokens": 0.0,
+        "tokenizer_tokens": 0
+      },
+      "always_loaded_agents_plus_descriptions": {
+        "bytes": 14399,
+        "estimated_tokens": 3599.75,
+        "tokenizer_tokens": 2968
+      },
+      "collector_loaded_including_developer": {
+        "bytes": 14399,
+        "estimated_tokens": 3599.75,
+        "tokenizer_tokens": 2968
+      }
+    }
+  },
+  "deltas": {
+    "agents": {
+      "estimated_tokens": -3630.75,
+      "percent": -60.00743740186761,
+      "tokenizer_tokens": -2963
+    },
+    "descriptions": {
+      "estimated_tokens": -2292.75,
+      "percent": -66.021164782953,
+      "tokenizer_tokens": -1783
+    },
+    "always_loaded_agents_plus_descriptions": {
+      "estimated_tokens": -5923.5,
+      "percent": -62.20040427375109,
+      "tokenizer_tokens": -4746
+    },
+    "bodies_on_demand": {
+      "estimated_tokens": -55706.75,
+      "percent": -51.040382985546415,
+      "tokenizer_tokens": -50503
+    },
+    "developer_instructions": {
+      "estimated_tokens": -179.25,
+      "percent": -100.0,
+      "tokenizer_tokens": -135
+    },
+    "collector_loaded_including_developer": {
+      "estimated_tokens": -6102.75,
+      "percent": -62.89873743880443,
+      "tokenizer_tokens": -4881
+    }
+  },
+  "skills": [
+    {
+      "skill": "adapt",
+      "loaded_before": true,
+      "loaded_after": false,
+      "status": "removed by cull",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 143,
+        "estimated_tokens": 35.75,
+        "tokenizer_tokens": 24
+      },
+      "description_after": {
+        "bytes": 0,
+        "estimated_tokens": 0,
+        "tokenizer_tokens": 0
+      }
+    },
+    {
+      "skill": "ai-ux-deslop",
+      "loaded_before": true,
+      "loaded_after": true,
+      "status": "added-then-denied; retained, new on main",
+      "merged_into": null,
+      "new_on_main": true,
+      "gate_verdict": "DENY",
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 165,
+        "estimated_tokens": 41.25,
+        "tokenizer_tokens": 37
+      },
+      "description_after": {
+        "bytes": 86,
+        "estimated_tokens": 21.5,
+        "tokenizer_tokens": 19
+      }
+    },
+    {
+      "skill": "ai-workflow-doctor",
+      "loaded_before": true,
+      "loaded_after": true,
+      "status": "kept",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 200,
+        "estimated_tokens": 50.0,
+        "tokenizer_tokens": 36
+      },
+      "description_after": {
+        "bytes": 158,
+        "estimated_tokens": 39.5,
+        "tokenizer_tokens": 28
+      }
+    },
+    {
+      "skill": "animate",
+      "loaded_before": true,
+      "loaded_after": false,
+      "status": "removed by cull",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 134,
+        "estimated_tokens": 33.5,
+        "tokenizer_tokens": 23
+      },
+      "description_after": {
+        "bytes": 0,
+        "estimated_tokens": 0,
+        "tokenizer_tokens": 0
+      }
+    },
+    {
+      "skill": "arrange",
+      "loaded_before": true,
+      "loaded_after": false,
+      "status": "removed by cull",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 151,
+        "estimated_tokens": 37.75,
+        "tokenizer_tokens": 27
+      },
+      "description_after": {
+        "bytes": 0,
+        "estimated_tokens": 0,
+        "tokenizer_tokens": 0
+      }
+    },
+    {
+      "skill": "audit",
+      "loaded_before": true,
+      "loaded_after": false,
+      "status": "removed by cull",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 194,
+        "estimated_tokens": 48.5,
+        "tokenizer_tokens": 29
+      },
+      "description_after": {
+        "bytes": 0,
+        "estimated_tokens": 0,
+        "tokenizer_tokens": 0
+      }
+    },
+    {
+      "skill": "bolder",
+      "loaded_before": true,
+      "loaded_after": false,
+      "status": "removed by cull",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 132,
+        "estimated_tokens": 33.0,
+        "tokenizer_tokens": 22
+      },
+      "description_after": {
+        "bytes": 0,
+        "estimated_tokens": 0,
+        "tokenizer_tokens": 0
+      }
+    },
+    {
+      "skill": "brand-system-designer",
+      "loaded_before": true,
+      "loaded_after": true,
+      "status": "kept",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 383,
+        "estimated_tokens": 95.75,
+        "tokenizer_tokens": 73
+      },
+      "description_after": {
+        "bytes": 383,
+        "estimated_tokens": 95.75,
+        "tokenizer_tokens": 73
+      }
+    },
+    {
+      "skill": "clarify",
+      "loaded_before": true,
+      "loaded_after": false,
+      "status": "removed by cull",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 124,
+        "estimated_tokens": 31.0,
+        "tokenizer_tokens": 24
+      },
+      "description_after": {
+        "bytes": 0,
+        "estimated_tokens": 0,
+        "tokenizer_tokens": 0
+      }
+    },
+    {
+      "skill": "colorize",
+      "loaded_before": true,
+      "loaded_after": false,
+      "status": "removed by cull",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 130,
+        "estimated_tokens": 32.5,
+        "tokenizer_tokens": 22
+      },
+      "description_after": {
+        "bytes": 0,
+        "estimated_tokens": 0,
+        "tokenizer_tokens": 0
+      }
+    },
+    {
+      "skill": "commit-dirty",
+      "loaded_before": true,
+      "loaded_after": true,
+      "status": "kept",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 354,
+        "estimated_tokens": 88.5,
+        "tokenizer_tokens": 73
+      },
+      "description_after": {
+        "bytes": 159,
+        "estimated_tokens": 39.75,
+        "tokenizer_tokens": 35
+      }
+    },
+    {
+      "skill": "commit-plan",
+      "loaded_before": true,
+      "loaded_after": false,
+      "status": "merged into commit-plan-push",
+      "merged_into": "commit-plan-push",
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 343,
+        "estimated_tokens": 85.75,
+        "tokenizer_tokens": 72
+      },
+      "description_after": {
+        "bytes": 0,
+        "estimated_tokens": 0,
+        "tokenizer_tokens": 0
+      }
+    },
+    {
+      "skill": "commit-plan-push",
+      "loaded_before": true,
+      "loaded_after": true,
+      "status": "kept",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 394,
+        "estimated_tokens": 98.5,
+        "tokenizer_tokens": 83
+      },
+      "description_after": {
+        "bytes": 155,
+        "estimated_tokens": 38.75,
+        "tokenizer_tokens": 32
+      }
+    },
+    {
+      "skill": "commit-session",
+      "loaded_before": true,
+      "loaded_after": true,
+      "status": "kept",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 434,
+        "estimated_tokens": 108.5,
+        "tokenizer_tokens": 90
+      },
+      "description_after": {
+        "bytes": 245,
+        "estimated_tokens": 61.25,
+        "tokenizer_tokens": 49
+      }
+    },
+    {
+      "skill": "context-handoff",
+      "loaded_before": false,
+      "loaded_after": true,
+      "status": "added on trim branch",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 0,
+        "estimated_tokens": 0,
+        "tokenizer_tokens": 0
+      },
+      "description_after": {
+        "bytes": 173,
+        "estimated_tokens": 43.25,
+        "tokenizer_tokens": 33
+      }
+    },
+    {
+      "skill": "critique",
+      "loaded_before": true,
+      "loaded_after": false,
+      "status": "removed by cull",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 179,
+        "estimated_tokens": 44.75,
+        "tokenizer_tokens": 27
+      },
+      "description_after": {
+        "bytes": 0,
+        "estimated_tokens": 0,
+        "tokenizer_tokens": 0
+      }
+    },
+    {
+      "skill": "delight",
+      "loaded_before": true,
+      "loaded_after": false,
+      "status": "removed by cull",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 143,
+        "estimated_tokens": 35.75,
+        "tokenizer_tokens": 25
+      },
+      "description_after": {
+        "bytes": 0,
+        "estimated_tokens": 0,
+        "tokenizer_tokens": 0
+      }
+    },
+    {
+      "skill": "design-taste-frontend",
+      "loaded_before": true,
+      "loaded_after": false,
+      "status": "removed by cull",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 202,
+        "estimated_tokens": 50.5,
+        "tokenizer_tokens": 34
+      },
+      "description_after": {
+        "bytes": 0,
+        "estimated_tokens": 0,
+        "tokenizer_tokens": 0
+      }
+    },
+    {
+      "skill": "distill",
+      "loaded_before": true,
+      "loaded_after": false,
+      "status": "removed by cull",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 111,
+        "estimated_tokens": 27.75,
+        "tokenizer_tokens": 20
+      },
+      "description_after": {
+        "bytes": 0,
+        "estimated_tokens": 0,
+        "tokenizer_tokens": 0
+      }
+    },
+    {
+      "skill": "extract",
+      "loaded_before": true,
+      "loaded_after": false,
+      "status": "removed by cull",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 180,
+        "estimated_tokens": 45.0,
+        "tokenizer_tokens": 29
+      },
+      "description_after": {
+        "bytes": 0,
+        "estimated_tokens": 0,
+        "tokenizer_tokens": 0
+      }
+    },
+    {
+      "skill": "feedback-memory",
+      "loaded_before": true,
+      "loaded_after": true,
+      "status": "kept",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 338,
+        "estimated_tokens": 84.5,
+        "tokenizer_tokens": 58
+      },
+      "description_after": {
+        "bytes": 166,
+        "estimated_tokens": 41.5,
+        "tokenizer_tokens": 28
+      }
+    },
+    {
+      "skill": "find-skills",
+      "loaded_before": true,
+      "loaded_after": false,
+      "status": "removed by cull",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 303,
+        "estimated_tokens": 75.75,
+        "tokenizer_tokens": 63
+      },
+      "description_after": {
+        "bytes": 0,
+        "estimated_tokens": 0,
+        "tokenizer_tokens": 0
+      }
+    },
+    {
+      "skill": "fish-alias",
+      "loaded_before": true,
+      "loaded_after": true,
+      "status": "kept",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 166,
+        "estimated_tokens": 41.5,
+        "tokenizer_tokens": 31
+      },
+      "description_after": {
+        "bytes": 132,
+        "estimated_tokens": 33.0,
+        "tokenizer_tokens": 25
+      }
+    },
+    {
+      "skill": "frontend-design",
+      "loaded_before": true,
+      "loaded_after": true,
+      "status": "kept",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 254,
+        "estimated_tokens": 63.5,
+        "tokenizer_tokens": 44
+      },
+      "description_after": {
+        "bytes": 106,
+        "estimated_tokens": 26.5,
+        "tokenizer_tokens": 21
+      }
+    },
+    {
+      "skill": "full-output-enforcement",
+      "loaded_before": true,
+      "loaded_after": false,
+      "status": "removed by cull",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 203,
+        "estimated_tokens": 50.75,
+        "tokenizer_tokens": 39
+      },
+      "description_after": {
+        "bytes": 0,
+        "estimated_tokens": 0,
+        "tokenizer_tokens": 0
+      }
+    },
+    {
+      "skill": "gh-fix-ci",
+      "loaded_before": true,
+      "loaded_after": false,
+      "status": "removed by cull",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 313,
+        "estimated_tokens": 78.25,
+        "tokenizer_tokens": 67
+      },
+      "description_after": {
+        "bytes": 0,
+        "estimated_tokens": 0,
+        "tokenizer_tokens": 0
+      }
+    },
+    {
+      "skill": "grok-cli-handoff",
+      "loaded_before": false,
+      "loaded_after": true,
+      "status": "added on trim branch",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 0,
+        "estimated_tokens": 0,
+        "tokenizer_tokens": 0
+      },
+      "description_after": {
+        "bytes": 123,
+        "estimated_tokens": 30.75,
+        "tokenizer_tokens": 26
+      }
+    },
+    {
+      "skill": "hallmark",
+      "loaded_before": true,
+      "loaded_after": true,
+      "status": "added (new on main, kept); PASS",
+      "merged_into": null,
+      "new_on_main": true,
+      "gate_verdict": "PASS",
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 252,
+        "estimated_tokens": 63.0,
+        "tokenizer_tokens": 55
+      },
+      "description_after": {
+        "bytes": 97,
+        "estimated_tokens": 24.25,
+        "tokenizer_tokens": 19
+      }
+    },
+    {
+      "skill": "harden",
+      "loaded_before": true,
+      "loaded_after": false,
+      "status": "removed by cull",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 169,
+        "estimated_tokens": 42.25,
+        "tokenizer_tokens": 29
+      },
+      "description_after": {
+        "bytes": 0,
+        "estimated_tokens": 0,
+        "tokenizer_tokens": 0
+      }
+    },
+    {
+      "skill": "high-end-visual-design",
+      "loaded_before": true,
+      "loaded_after": false,
+      "status": "removed by cull",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 234,
+        "estimated_tokens": 58.5,
+        "tokenizer_tokens": 47
+      },
+      "description_after": {
+        "bytes": 0,
+        "estimated_tokens": 0,
+        "tokenizer_tokens": 0
+      }
+    },
+    {
+      "skill": "imagegen",
+      "loaded_before": true,
+      "loaded_after": false,
+      "status": "removed by cull",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 328,
+        "estimated_tokens": 82.0,
+        "tokenizer_tokens": 71
+      },
+      "description_after": {
+        "bytes": 0,
+        "estimated_tokens": 0,
+        "tokenizer_tokens": 0
+      }
+    },
+    {
+      "skill": "impeccable",
+      "loaded_before": false,
+      "loaded_after": true,
+      "status": "added on trim branch",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 0,
+        "estimated_tokens": 0,
+        "tokenizer_tokens": 0
+      },
+      "description_after": {
+        "bytes": 92,
+        "estimated_tokens": 23.0,
+        "tokenizer_tokens": 19
+      }
+    },
+    {
+      "skill": "last30days",
+      "loaded_before": true,
+      "loaded_after": true,
+      "status": "kept",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 246,
+        "estimated_tokens": 61.5,
+        "tokenizer_tokens": 57
+      },
+      "description_after": {
+        "bytes": 246,
+        "estimated_tokens": 61.5,
+        "tokenizer_tokens": 57
+      }
+    },
+    {
+      "skill": "lean-instructions",
+      "loaded_before": false,
+      "loaded_after": true,
+      "status": "added on trim branch",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 0,
+        "estimated_tokens": 0,
+        "tokenizer_tokens": 0
+      },
+      "description_after": {
+        "bytes": 69,
+        "estimated_tokens": 17.25,
+        "tokenizer_tokens": 17
+      }
+    },
+    {
+      "skill": "leetcode-init",
+      "loaded_before": true,
+      "loaded_after": false,
+      "status": "removed by cull",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 216,
+        "estimated_tokens": 54.0,
+        "tokenizer_tokens": 43
+      },
+      "description_after": {
+        "bytes": 0,
+        "estimated_tokens": 0,
+        "tokenizer_tokens": 0
+      }
+    },
+    {
+      "skill": "long-task-harness",
+      "loaded_before": true,
+      "loaded_after": false,
+      "status": "merged into context-handoff",
+      "merged_into": "context-handoff",
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 365,
+        "estimated_tokens": 91.25,
+        "tokenizer_tokens": 86
+      },
+      "description_after": {
+        "bytes": 0,
+        "estimated_tokens": 0,
+        "tokenizer_tokens": 0
+      }
+    },
+    {
+      "skill": "metaprompt",
+      "loaded_before": true,
+      "loaded_after": true,
+      "status": "kept",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 222,
+        "estimated_tokens": 55.5,
+        "tokenizer_tokens": 52
+      },
+      "description_after": {
+        "bytes": 130,
+        "estimated_tokens": 32.5,
+        "tokenizer_tokens": 32
+      }
+    },
+    {
+      "skill": "metaprompt-alxve",
+      "loaded_before": true,
+      "loaded_after": false,
+      "status": "removed by cull",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 488,
+        "estimated_tokens": 122.0,
+        "tokenizer_tokens": 108
+      },
+      "description_after": {
+        "bytes": 0,
+        "estimated_tokens": 0,
+        "tokenizer_tokens": 0
+      }
+    },
+    {
+      "skill": "metaprompt-run",
+      "loaded_before": true,
+      "loaded_after": true,
+      "status": "kept",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 221,
+        "estimated_tokens": 55.25,
+        "tokenizer_tokens": 45
+      },
+      "description_after": {
+        "bytes": 221,
+        "estimated_tokens": 55.25,
+        "tokenizer_tokens": 45
+      }
+    },
+    {
+      "skill": "minimalist-ui",
+      "loaded_before": true,
+      "loaded_after": false,
+      "status": "removed by cull",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 145,
+        "estimated_tokens": 36.25,
+        "tokenizer_tokens": 30
+      },
+      "description_after": {
+        "bytes": 0,
+        "estimated_tokens": 0,
+        "tokenizer_tokens": 0
+      }
+    },
+    {
+      "skill": "morning",
+      "loaded_before": true,
+      "loaded_after": true,
+      "status": "kept",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 257,
+        "estimated_tokens": 64.25,
+        "tokenizer_tokens": 60
+      },
+      "description_after": {
+        "bytes": 257,
+        "estimated_tokens": 64.25,
+        "tokenizer_tokens": 60
+      }
+    },
+    {
+      "skill": "next-tasks",
+      "loaded_before": true,
+      "loaded_after": true,
+      "status": "kept",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 423,
+        "estimated_tokens": 105.75,
+        "tokenizer_tokens": 94
+      },
+      "description_after": {
+        "bytes": 127,
+        "estimated_tokens": 31.75,
+        "tokenizer_tokens": 28
+      }
+    },
+    {
+      "skill": "night",
+      "loaded_before": true,
+      "loaded_after": true,
+      "status": "kept",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 300,
+        "estimated_tokens": 75.0,
+        "tokenizer_tokens": 66
+      },
+      "description_after": {
+        "bytes": 148,
+        "estimated_tokens": 37.0,
+        "tokenizer_tokens": 30
+      }
+    },
+    {
+      "skill": "normalize",
+      "loaded_before": true,
+      "loaded_after": false,
+      "status": "removed by cull",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 67,
+        "estimated_tokens": 16.75,
+        "tokenizer_tokens": 10
+      },
+      "description_after": {
+        "bytes": 0,
+        "estimated_tokens": 0,
+        "tokenizer_tokens": 0
+      }
+    },
+    {
+      "skill": "onboard",
+      "loaded_before": true,
+      "loaded_after": false,
+      "status": "removed by cull",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 149,
+        "estimated_tokens": 37.25,
+        "tokenizer_tokens": 25
+      },
+      "description_after": {
+        "bytes": 0,
+        "estimated_tokens": 0,
+        "tokenizer_tokens": 0
+      }
+    },
+    {
+      "skill": "open-pr",
+      "loaded_before": true,
+      "loaded_after": false,
+      "status": "removed by cull",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 286,
+        "estimated_tokens": 71.5,
+        "tokenizer_tokens": 64
+      },
+      "description_after": {
+        "bytes": 0,
+        "estimated_tokens": 0,
+        "tokenizer_tokens": 0
+      }
+    },
+    {
+      "skill": "openai-docs",
+      "loaded_before": true,
+      "loaded_after": false,
+      "status": "removed by cull",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 372,
+        "estimated_tokens": 93.0,
+        "tokenizer_tokens": 74
+      },
+      "description_after": {
+        "bytes": 0,
+        "estimated_tokens": 0,
+        "tokenizer_tokens": 0
+      }
+    },
+    {
+      "skill": "optimize",
+      "loaded_before": true,
+      "loaded_after": false,
+      "status": "removed by cull",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 138,
+        "estimated_tokens": 34.5,
+        "tokenizer_tokens": 23
+      },
+      "description_after": {
+        "bytes": 0,
+        "estimated_tokens": 0,
+        "tokenizer_tokens": 0
+      }
+    },
+    {
+      "skill": "overdrive",
+      "loaded_before": true,
+      "loaded_after": false,
+      "status": "removed by cull",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 228,
+        "estimated_tokens": 57.0,
+        "tokenizer_tokens": 43
+      },
+      "description_after": {
+        "bytes": 0,
+        "estimated_tokens": 0,
+        "tokenizer_tokens": 0
+      }
+    },
+    {
+      "skill": "pdf",
+      "loaded_before": true,
+      "loaded_after": false,
+      "status": "removed by cull",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 248,
+        "estimated_tokens": 62.0,
+        "tokenizer_tokens": 54
+      },
+      "description_after": {
+        "bytes": 0,
+        "estimated_tokens": 0,
+        "tokenizer_tokens": 0
+      }
+    },
+    {
+      "skill": "personal-context",
+      "loaded_before": true,
+      "loaded_after": true,
+      "status": "kept",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 358,
+        "estimated_tokens": 89.5,
+        "tokenizer_tokens": 61
+      },
+      "description_after": {
+        "bytes": 261,
+        "estimated_tokens": 65.25,
+        "tokenizer_tokens": 42
+      }
+    },
+    {
+      "skill": "playwright",
+      "loaded_before": true,
+      "loaded_after": true,
+      "status": "kept",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 209,
+        "estimated_tokens": 52.25,
+        "tokenizer_tokens": 42
+      },
+      "description_after": {
+        "bytes": 209,
+        "estimated_tokens": 52.25,
+        "tokenizer_tokens": 42
+      }
+    },
+    {
+      "skill": "playwright-interactive",
+      "loaded_before": true,
+      "loaded_after": false,
+      "status": "removed by cull",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 94,
+        "estimated_tokens": 23.5,
+        "tokenizer_tokens": 17
+      },
+      "description_after": {
+        "bytes": 0,
+        "estimated_tokens": 0,
+        "tokenizer_tokens": 0
+      }
+    },
+    {
+      "skill": "polish",
+      "loaded_before": true,
+      "loaded_after": false,
+      "status": "removed by cull",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 123,
+        "estimated_tokens": 30.75,
+        "tokenizer_tokens": 23
+      },
+      "description_after": {
+        "bytes": 0,
+        "estimated_tokens": 0,
+        "tokenizer_tokens": 0
+      }
+    },
+    {
+      "skill": "postmortem-memory",
+      "loaded_before": true,
+      "loaded_after": true,
+      "status": "kept",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 160,
+        "estimated_tokens": 40.0,
+        "tokenizer_tokens": 32
+      },
+      "description_after": {
+        "bytes": 124,
+        "estimated_tokens": 31.0,
+        "tokenizer_tokens": 23
+      }
+    },
+    {
+      "skill": "quieter",
+      "loaded_before": true,
+      "loaded_after": false,
+      "status": "removed by cull",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 116,
+        "estimated_tokens": 29.0,
+        "tokenizer_tokens": 19
+      },
+      "description_after": {
+        "bytes": 0,
+        "estimated_tokens": 0,
+        "tokenizer_tokens": 0
+      }
+    },
+    {
+      "skill": "readme-recruiter-sync",
+      "loaded_before": true,
+      "loaded_after": true,
+      "status": "kept",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 236,
+        "estimated_tokens": 59.0,
+        "tokenizer_tokens": 42
+      },
+      "description_after": {
+        "bytes": 98,
+        "estimated_tokens": 24.5,
+        "tokenizer_tokens": 22
+      }
+    },
+    {
+      "skill": "redesign-existing-projects",
+      "loaded_before": true,
+      "loaded_after": false,
+      "status": "removed by cull",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 225,
+        "estimated_tokens": 56.25,
+        "tokenizer_tokens": 39
+      },
+      "description_after": {
+        "bytes": 0,
+        "estimated_tokens": 0,
+        "tokenizer_tokens": 0
+      }
+    },
+    {
+      "skill": "screenshot",
+      "loaded_before": true,
+      "loaded_after": false,
+      "status": "removed by cull",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 220,
+        "estimated_tokens": 55.0,
+        "tokenizer_tokens": 42
+      },
+      "description_after": {
+        "bytes": 0,
+        "estimated_tokens": 0,
+        "tokenizer_tokens": 0
+      }
+    },
+    {
+      "skill": "second-brain-session",
+      "loaded_before": true,
+      "loaded_after": true,
+      "status": "kept",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 278,
+        "estimated_tokens": 69.5,
+        "tokenizer_tokens": 45
+      },
+      "description_after": {
+        "bytes": 278,
+        "estimated_tokens": 69.5,
+        "tokenizer_tokens": 45
+      }
+    },
+    {
+      "skill": "shadcn",
+      "loaded_before": false,
+      "loaded_after": true,
+      "status": "added on trim branch",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 0,
+        "estimated_tokens": 0,
+        "tokenizer_tokens": 0
+      },
+      "description_after": {
+        "bytes": 98,
+        "estimated_tokens": 24.5,
+        "tokenizer_tokens": 21
+      }
+    },
+    {
+      "skill": "skill-eval",
+      "loaded_before": false,
+      "loaded_after": true,
+      "status": "added on trim branch",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 0,
+        "estimated_tokens": 0,
+        "tokenizer_tokens": 0
+      },
+      "description_after": {
+        "bytes": 107,
+        "estimated_tokens": 26.75,
+        "tokenizer_tokens": 21
+      }
+    },
+    {
+      "skill": "smoke-test-capture",
+      "loaded_before": true,
+      "loaded_after": true,
+      "status": "kept",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 194,
+        "estimated_tokens": 48.5,
+        "tokenizer_tokens": 35
+      },
+      "description_after": {
+        "bytes": 194,
+        "estimated_tokens": 48.5,
+        "tokenizer_tokens": 35
+      }
+    },
+    {
+      "skill": "teach-impeccable",
+      "loaded_before": true,
+      "loaded_after": false,
+      "status": "merged into frontend-design",
+      "merged_into": "frontend-design",
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 148,
+        "estimated_tokens": 37.0,
+        "tokenizer_tokens": 27
+      },
+      "description_after": {
+        "bytes": 0,
+        "estimated_tokens": 0,
+        "tokenizer_tokens": 0
+      }
+    },
+    {
+      "skill": "transcribe",
+      "loaded_before": true,
+      "loaded_after": false,
+      "status": "removed by cull",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 216,
+        "estimated_tokens": 54.0,
+        "tokenizer_tokens": 42
+      },
+      "description_after": {
+        "bytes": 0,
+        "estimated_tokens": 0,
+        "tokenizer_tokens": 0
+      }
+    },
+    {
+      "skill": "typeset",
+      "loaded_before": true,
+      "loaded_after": false,
+      "status": "removed by cull",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 140,
+        "estimated_tokens": 35.0,
+        "tokenizer_tokens": 24
+      },
+      "description_after": {
+        "bytes": 0,
+        "estimated_tokens": 0,
+        "tokenizer_tokens": 0
+      }
+    },
+    {
+      "skill": "ui-ux-pro-max",
+      "loaded_before": true,
+      "loaded_after": false,
+      "status": "removed by cull",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 147,
+        "estimated_tokens": 36.75,
+        "tokenizer_tokens": 26
+      },
+      "description_after": {
+        "bytes": 0,
+        "estimated_tokens": 0,
+        "tokenizer_tokens": 0
+      }
+    },
+    {
+      "skill": "vercel-react-best-practices",
+      "loaded_before": false,
+      "loaded_after": true,
+      "status": "added on trim branch",
+      "merged_into": null,
+      "new_on_main": false,
+      "gate_verdict": null,
+      "body_loaded_before": null,
+      "body_loaded_after": null,
+      "description_before": {
+        "bytes": 0,
+        "estimated_tokens": 0,
+        "tokenizer_tokens": 0
+      },
+      "description_after": {
+        "bytes": 78,
+        "estimated_tokens": 19.5,
+        "tokenizer_tokens": 14
+      }
+    }
+  ],
+  "loaded_only_before": [
+    "adapt",
+    "animate",
+    "arrange",
+    "audit",
+    "bolder",
+    "clarify",
+    "colorize",
+    "commit-plan",
+    "critique",
+    "delight",
+    "design-taste-frontend",
+    "distill",
+    "extract",
+    "find-skills",
+    "full-output-enforcement",
+    "gh-fix-ci",
+    "harden",
+    "high-end-visual-design",
+    "imagegen",
+    "leetcode-init",
+    "long-task-harness",
+    "metaprompt-alxve",
+    "minimalist-ui",
+    "normalize",
+    "onboard",
+    "open-pr",
+    "openai-docs",
+    "optimize",
+    "overdrive",
+    "pdf",
+    "playwright-interactive",
+    "polish",
+    "quieter",
+    "redesign-existing-projects",
+    "screenshot",
+    "teach-impeccable",
+    "transcribe",
+    "typeset",
+    "ui-ux-pro-max"
+  ],
+  "loaded_only_after": [
+    "context-handoff",
+    "grok-cli-handoff",
+    "impeccable",
+    "lean-instructions",
+    "shadcn",
+    "skill-eval",
+    "vercel-react-best-practices"
+  ],
+  "separately_measured_mirrors": {
+    "before": {
+      ".agents/skills/brand-system-designer/SKILL.md": {
+        "description": {
+          "lines": 1,
+          "bytes": 383,
+          "approx_tokens": 95.75
+        },
+        "body": {
+          "lines": 187,
+          "bytes": 5351,
+          "approx_tokens": 1337.75
+        },
+        "file": {
+          "lines": 191,
+          "bytes": 5784,
+          "approx_tokens": 1446.0
+        }
+      }
+    },
+    "after": {
+      ".agents/skills/brand-system-designer/SKILL.md": {
+        "description": {
+          "lines": 1,
+          "bytes": 383,
+          "approx_tokens": 95.75
+        },
+        "body": {
+          "lines": 187,
+          "bytes": 5351,
+          "approx_tokens": 1337.75
+        },
+        "file": {
+          "lines": 191,
+          "bytes": 5784,
+          "approx_tokens": 1446.0
+        }
+      }
+    }
+  },
+  "limits": "\u201cLoaded\u201d in the skill table means its description is included in the static canonical repository catalog. It does not prove that a host exposed it or that a model invoked its body. Body-loaded flags are unknown (JSON null); the body row prices the complete on-demand inventory, not a typical session or an instruction to load every body. Explicit-only descriptions are conservatively counted, even if a runtime hides them.\n\nThe main baseline already contains ai-ux-deslop and hallmark, so both are loaded-before and loaded-after; \u201cadded\u201d refers to their arrival since410feaa, not an extra after-only entry. AI UX remains denied and retained. Always-loaded here follows the requested AGENTS+descriptions boundary; the existing collector additionally counts config developer instructions, shown separately to reconcile its9,702.5\u21923,599.75 estimate.\n\nReal tokenizer counts use tiktoken o200k_base on the actual public text, summed independently per file/description/body. They are real counts for that encoding, not verified tokenizer counts for the configured model, provider billing, cache behavior, system/developer prompts, history or tool output. No live session trace was sampled. External/built-in/plugin catalogs, names, paths, wrappers and triggered references are excluded; their before-host state is unavailable. The duplicate tracked .agents brand mirror is measured separately in JSON and excluded from canonical totals, as in the existing collector. No installed catalog or configuration was activated."
+}

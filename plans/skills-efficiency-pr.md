@@ -136,3 +136,32 @@ errors. Manual artifact plan: inspect report/PR table for current main, both
 skill verdicts,5conflicts and all limits; confirm no real catalog activation.
 Cursor prompt: Read benchmarks/trim/overnight/progress.md and live DONE receipt;
 verify completed criteria before any further work. Do not activate or merge main.
+
+## Criterion 6 addendum pass
+
+User extended the goal with both addenda. Produce CONTEXT-DIFF.md/JSON with
+AGENTS+description recurring context and separate on-demand body inventory,
+estimated and actual o200k_base text counts; per-skill static catalog flags,
+bytes/tokens and gate/cull/merge status. Copy both tables into COMPARISON and
+OVERNIGHT-REPORT; link the artifact from report and PR3. Runtime body loading
+is unknown, not inferred. Config developer717B is separate to reconcile the
+older collector total. Preserve measured surfaces and every earlier criterion.
+
+- [x] Re-read full goal; capture clean tracked status and preserve4untracked inputs.
+- [x] Generate68skill rows (39before-only,7after-only), totals and real tokenizer counts.
+- [x] Copy identical tables and document scope/limits; JSON mirrors measured separately.
+- [x] Independent evidence recomputation; final staged gates follow.
+- [x] PR3 context links/body read back exact; commit/push and external DONE follow.
+
+Expected: requested AGENTS+description estimate9523.25→3599.75tokens; actual
+o200k_base text counts7714→2968. On-demand inventory109142.5→53435.75estimated
+tokens; actual97588→47085. None is observed provider session usage.
+Next commit:docs(trim): compare session context and every skill. Rollback with
+a new revert; no configuration activation/model/effort changes. Automated check:
+recompute each component and all per-skill descriptions against pinned main
+and current collector, compare copied tables and read back PR body. Manual:
+inspect loaded-definition caveat, before/after-only lists and new-main verdicts.
+
+Independent review verified all counts and copied tables; corrected the third
+merge mapping teach-impeccable→frontend-design from CULL reason. No measured
+source changed. README/privacy/size gates repeat before addendum commit.

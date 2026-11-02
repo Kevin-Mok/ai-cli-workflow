@@ -817,7 +817,8 @@ with current instructions, skill descriptions and on-demand bodies; `--json`
 includes per-skill metrics, `--baseline PATH` compares another snapshot,
 `--ref REF` measures committed blobs, and `--repo PATH` selects a checkout.
 `--ref` cannot be combined with working-tree budget checks. The reproducible
-[comparison](benchmarks/trim/COMPARISON.md) separates committed results from
+[comparison](benchmarks/trim/COMPARISON.md) and
+[session context diff](benchmarks/trim/CONTEXT-DIFF.md) separates committed results from
 uncommitted drafts. [Pass results](benchmarks/trim/PROGRESS.md)
 separate recurring context estimates from body/output savings. Budgets reject
 loaded-total growth, configured per-file limit breaches and lost skill paths;

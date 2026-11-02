@@ -1325,7 +1325,7 @@
     "remote_main": "8662fa3c30da549fbdb20b8477c80e015e7d5236",
     "push_destination": "origin/review/skills-efficiency-20261023",
     "pr": 3,
-    "pr_body_sha256": "23519a834b74b903b48096560dcaff39fb31de803b61193773e8b4661c555ffa",
+    "pr_body_sha256": "605849e6c78b050210263980569e64b5c902dc19c725c6102de1cd471dc85e44",
     "pr_body_exact_match": true,
     "pr_state": "OPEN",
     "merged": false,
@@ -1339,5 +1339,24 @@
     "initial_publication_pending": 3,
     "final_data_check": "26tests/17subtests PASS",
     "closure": "root staged/remote/PR checks; external marker last"
+  },
+  "context_diff": {
+    "markdown": "CONTEXT-DIFF.md",
+    "json": "CONTEXT-DIFF.json",
+    "canonical_rows": 68,
+    "before_only": 39,
+    "after_only": 7,
+    "requested_always_loaded_estimates": [
+      9523.25,
+      3599.75
+    ],
+    "tokenizer": "tiktoken o200k_base; per-fragment sums; not observed provider sessions",
+    "real_always_loaded_tokens": [
+      7714,
+      2968
+    ],
+    "independent_review": "recomputed all counts, statuses and copied tables; teach-impeccable merge mapping corrected",
+    "pr_body_exact_match": true,
+    "pr_body_sha256": "605849e6c78b050210263980569e64b5c902dc19c725c6102de1cd471dc85e44"
   }
 }

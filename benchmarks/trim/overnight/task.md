@@ -22,3 +22,7 @@ Read current PROGRESS, plan and pr-validation JSON. Existing keep/drop decisions
 and immutable CULL.json govern; ai-ux-deslop denied but retained per no-delete.
 Protected untracked files: .skills-relevance.md, .trim-prompt.md, .trim-spec.md,
 pre-existing publication-inspection postmortem. Do not stage them.
+
+- DC6: CONTEXT-DIFF.md/JSON session context totals and per-skill diff, real
+  tokenizer counts if available; identical tables copied into comparison/report,
+  only-before/after lists, measurement limits, report/PR links.

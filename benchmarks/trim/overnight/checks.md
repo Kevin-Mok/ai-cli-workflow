@@ -44,3 +44,11 @@ recorded in the final delivery appendix only after their observed results.
 The original review's unresolved rows are publication receipts, not unresolved
 product behavior. External DONE is checked after the final report push; never
 interpret this committed checkpoint as evidence of a marker that was not read.
+
+## Criterion 6 review
+
+Independent recomputation verified every byte/4 and o200k_base total,68unique
+rows,61before/29after,39before-only/7after-only and identical copied tables.
+Reviewer identified teach-impeccable merge status; corrected all3Markdown
+tables and JSON using CULL reason. PR3 body/context links read back exact.
+No observed runtime or provider usage claim. Final staged gates precede commit.

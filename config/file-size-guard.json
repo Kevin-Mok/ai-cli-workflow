@@ -1,7 +1,7 @@
 {
   "grandfathered_max_bytes": {
-    "README.md": 108728,
-    "docs/smoke-tests.md": 170040,
+    "README.md": 108788,
+    "docs/smoke-tests.md": 170662,
     "benchmarks/trim/PROGRESS.md": 43586,
     "plans/skills-efficiency.md": 36417,
     "dot_agents/skills/lean-instructions/references/vetted-skills.md": 113744,
@@ -74,7 +74,8 @@
     "txt/ubuntu/apt-packages.txt",
     "benchmarks/trim/BASELINE-original.json",
     "benchmarks/trim/BASELINE.json",
-    "benchmarks/trim/pr-validation.json"
+    "benchmarks/trim/pr-validation.json",
+    "benchmarks/trim/CONTEXT-DIFF.json"
   ],
   "upstream_globs": [
     "dot_agents/skills/*",
