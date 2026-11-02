@@ -1,10 +1,10 @@
 {
   "grandfathered_max_bytes": {
-    "README.md": 108434,
-    "docs/smoke-tests.md": 169950,
+    "README.md": 108728,
+    "docs/smoke-tests.md": 170040,
     "benchmarks/trim/PROGRESS.md": 43586,
     "plans/skills-efficiency.md": 36417,
-    "dot_agents/skills/lean-instructions/references/vetted-skills.md": 101835,
+    "dot_agents/skills/lean-instructions/references/vetted-skills.md": 113744,
     "scripts/executable_ai-workflow-doctor": 32301,
     "tests/test_ai_workflow_doctor.py": 34976,
     "dot_agents/skills/postmortem-memory/references/api-contracts-fixtures.md": 90347,
@@ -26,7 +26,7 @@
     "scripts/executable_codex-notification-sound": 23468,
     "dot_agents/skills/postmortem-memory/references/browser-integrations.md": 22397,
     "tests/test_i3blocks_now_playing_mpris.py": 20942,
-    "dot_agents/skills/postmortem-memory/sources.json": 782851
+    "dot_agents/skills/postmortem-memory/sources.json": 782950
   },
   "skip_globs": [
     "package-lock.json",
@@ -71,7 +71,10 @@
     "benchmarks/metaprompt-selection/candidates/*",
     "benchmarks/*/runs/*",
     "dot_config/fish/completions/kubectl.fish",
-    "txt/ubuntu/apt-packages.txt"
+    "txt/ubuntu/apt-packages.txt",
+    "benchmarks/trim/BASELINE-original.json",
+    "benchmarks/trim/BASELINE.json",
+    "benchmarks/trim/pr-validation.json"
   ],
   "upstream_globs": [
     "dot_agents/skills/*",

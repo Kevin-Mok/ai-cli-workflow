@@ -7,7 +7,7 @@
   },
   "exceptions": {},
   "loaded_bytes": 14399,
-  "minimum_skills": 27,
+  "minimum_skills": 29,
   "required_skill_paths": [
     ".agents/skills/brand-system-designer/SKILL.md",
     "dot_agents/skills/ai-workflow-doctor/SKILL.md",
@@ -36,9 +36,11 @@
     "dot_agents/skills/shadcn/SKILL.md",
     "dot_agents/skills/skill-eval/SKILL.md",
     "dot_agents/skills/smoke-test-capture/SKILL.md",
-    "dot_agents/skills/vercel-react-best-practices/SKILL.md"
+    "dot_agents/skills/vercel-react-best-practices/SKILL.md",
+    "dot_agents/skills/ai-ux-deslop/SKILL.md",
+    "dot_agents/skills/hallmark/SKILL.md"
   ],
-  "addition_note": "Original baseline immutable; approved pass2 adds four complementary skills, pins Impeccable locally, and includes measured routing/technique costs. Canonical locals27; required lean is an extra user-requested skill.",
+  "addition_note": "Current-main refresh: all29locals retained including denied ai-ux under explicit no-delete. Original14399B loaded cap and strict9KB/150/300/400 limits retained; trimmed trigger descriptions offset new skill growth.",
   "approved_cull": {
     "count": 39,
     "names": [

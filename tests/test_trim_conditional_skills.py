@@ -8,6 +8,8 @@ from urllib.parse import urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
 BASE = 'd6a75f69'
+MAIN_BASE = '410feaa'
+MAIN = '8662fa3c30da549fbdb20b8477c80e015e7d5236'
 CASES = (
     ('commit-plan-push', 'Inspect the repository, branch, status, all staged/unstaged/untracked diffs,\n', 'Single-commit workflows push', 'planning-only.md',
      'In planning-only mode, MUST read [the planning procedure](references/planning-only.md) and return before delivery.\n\n',
@@ -31,7 +33,20 @@ class ConditionalSkillsTest(unittest.TestCase):
                 ref = folder / 'references' / filename
                 self.assertTrue(ref.is_file(), f'{slug}: conditional reference missing')
                 main, detail = (folder / 'SKILL.md').read_text(), ref.read_text()
-                self.assertEqual(main, original.replace(moved, router, 1))
+                expected = original.replace(moved, router, 1)
+                if slug == 'commit-plan-push':
+                    old_main = subprocess.check_output(
+                        ['git', 'show', f'{MAIN_BASE}:dot_agents/skills/{slug}/SKILL.md'],
+                        cwd=ROOT, text=True)
+                    current_main = subprocess.check_output(
+                        ['git', 'show', f'{MAIN}:dot_agents/skills/{slug}/SKILL.md'],
+                        cwd=ROOT, text=True)
+                    self.assertTrue(current_main.startswith(old_main))
+                    upstream_addition = current_main[len(old_main):]
+                    self.assertIn('When the privacy gate blocks a commit or push, sanitize by default',
+                                  upstream_addition)
+                    expected += upstream_addition
+                self.assertEqual(main, expected)
                 self.assertIn(moved, detail)
                 self.assertEqual(main.split('---', 2)[:2], original.split('---', 2)[:2])
                 for block in original.strip().split('\n\n'):

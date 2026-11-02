@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "date": "2026-11-01",
+      "name": "ai-ux-deslop",
+      "verdict": "DENY",
+      "value": 2,
+      "uniqueness": 0,
+      "description_bytes": 86,
+      "body_bytes": 6257,
+      "description_tokens": 21.5,
+      "body_tokens": 1564.25,
+      "weighted_cost": 177.925,
+      "score": 2.248138,
+      "evidence": "Main adds a checklist synthesizing the retained design generator and audit skills; no distinct measured task demand.",
+      "distinct": "duplicate of frontend-design and impeccable; the secondary-text check already carried in frontend-design.",
+      "case_ids": [
+        "overnight-ai-ux-named",
+        "overnight-ai-ux-natural",
+        "overnight-ai-ux-secondary"
+      ],
+      "precedents": [
+        "existing:frontend-design",
+        "pr-38:impeccable",
+        "pr-34:anthropic-frontend-design"
+      ],
+      "checks": "public",
+      "nonregression": "overnight-before.json + overnight-previous46.json; lexical proxy only",
+      "source_ref": "8662fa3c30da549fbdb20b8477c80e015e7d5236",
+      "retained": "explicit overnight no-delete rule",
+      "cost_basis": "measured UTF-8 bytes/4",
+      "reason": "Uniqueness0; duplicate of retained UI generation/review coverage.",
+      "would_change": "Kevin approves consolidation/removal or new evidence demonstrates a distinct uncovered job."
+    },
+    {
+      "date": "2026-11-01",
+      "name": "hallmark",
+      "verdict": "PASS",
+      "value": 2,
+      "uniqueness": 2,
+      "description_bytes": 97,
+      "body_bytes": 17907,
+      "description_tokens": 24.25,
+      "body_tokens": 4476.75,
+      "weighted_cost": 471.925,
+      "score": 1.271388,
+      "evidence": "Current main supplies pinned deterministic theme draw/scaffold/sloplint tools; frontend category demand only, no skill-specific usage claimed.",
+      "distinct": "Explicit-only local theme and shape dealing with deterministic scaffold/lint workflow is absent from the other survivors.",
+      "case_ids": [
+        "overnight-hallmark-new",
+        "overnight-hallmark-audit",
+        "overnight-hallmark-redesign"
+      ],
+      "precedents": [
+        "existing:frontend-design",
+        "pr-38:impeccable",
+        "existing:brand-system-designer"
+      ],
+      "checks": "public",
+      "nonregression": "overnight-before.json + overnight-previous46.json; lexical proxy only",
+      "source_ref": "8662fa3c30da549fbdb20b8477c80e015e7d5236"
+    }
+  ]
+}

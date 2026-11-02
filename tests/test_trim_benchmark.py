@@ -10,6 +10,7 @@ from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 START = '3e898a0f39172d7c30a6b0ae0258209cfe2c7f0c'
+CURRENT_MAIN = '8662fa3c30da549fbdb20b8477c80e015e7d5236'
 
 
 class TrimBenchmarkTest(unittest.TestCase):
@@ -40,18 +41,26 @@ class TrimBenchmarkTest(unittest.TestCase):
         self.assertGreater(report['totals']['body_bytes'], expected)
 
     def test_committed_inventory_reproduces_original_baseline(self):
-        baseline = json.loads((ROOT / 'benchmarks/trim/BASELINE.json').read_text())
+        baseline = json.loads((ROOT / 'benchmarks/trim/BASELINE-original.json').read_text())
         report = self.module['collect'](ROOT, START)
         self.assertEqual(report, baseline)
         self.assertIn('dot_agents/skills/adapt/SKILL.md', report['skills'])
         self.assertNotIn('dot_agents/skills/lean-instructions/SKILL.md', report['skills'])
 
+    def test_current_main_inventory_is_an_immutable_exact_baseline(self):
+        baseline = json.loads((ROOT / 'benchmarks/trim/BASELINE.json').read_text())
+        report = self.module['collect'](ROOT, CURRENT_MAIN)
+        self.assertEqual(report, baseline)
+        self.assertEqual(baseline['base_commit'], CURRENT_MAIN)
+
     def test_ref_cli_reports_blobs_without_current_budget_gate(self):
         result = subprocess.run([sys.executable, str(ROOT / 'scripts/trim-benchmark'),
-                                 '--ref', START, '--json'], capture_output=True, text=True)
+                                 '--ref', START, '--baseline',
+                                 str(ROOT / 'benchmarks/trim/BASELINE-original.json'),
+                                 '--json'], capture_output=True, text=True)
         self.assertEqual(result.returncode, 0, result.stderr)
         report = json.loads(result.stdout)
-        self.assertEqual(report['totals'], json.loads((ROOT / 'benchmarks/trim/BASELINE.json').read_text())['totals'])
+        self.assertEqual(report['totals'], json.loads((ROOT / 'benchmarks/trim/BASELINE-original.json').read_text())['totals'])
         self.assertEqual(report['comparison']['loaded_bytes']['percent_change'], 0)
         self.assertEqual(report['budget_errors'], [])
         rejected = subprocess.run([sys.executable, str(ROOT / 'scripts/trim-benchmark'),
@@ -122,6 +131,9 @@ class TrimBenchmarkTest(unittest.TestCase):
         report = self.module['collect'](ROOT)
         budget = json.loads((ROOT / 'benchmarks/trim/BUDGETS.json').read_text())
         self.assertEqual(self.module['budget_errors'](report, budget), [])
+        prior = json.loads(subprocess.check_output(
+            ['git', 'show', 'd448de05:benchmarks/trim/BUDGETS.json'], cwd=ROOT, text=True))
+        self.assertLessEqual(budget['loaded_bytes'], prior['loaded_bytes'])
 
     def test_lean_skill_is_discoverable_and_bounded(self):
         path = ROOT / 'dot_agents/skills/lean-instructions/SKILL.md'
@@ -169,7 +181,7 @@ class ComparisonDocumentTest(unittest.TestCase):
     def test_commit_loop_uses_each_snapshot_and_matching_evidence(self):
         first, last = 'a' * 40, 'b' * 40
         subjects = {START: 'original', first: 'perf(trim): descriptions', last: 'docs(trim): follow-up'}
-        original = json.loads((ROOT / 'benchmarks/trim/BASELINE.json').read_text())
+        original = json.loads((ROOT / 'benchmarks/trim/BASELINE-original.json').read_text())
         reduced = json.loads(json.dumps(original))
         reduced['totals']['description_bytes'] -= 400
         reduced['totals']['loaded_bytes'] -= 400

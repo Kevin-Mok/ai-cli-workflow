@@ -19,20 +19,20 @@ searches run before completion and any commit; do not use them to fill the hando
 - Action: Run `./scripts/trim-benchmark --json` and inspect `skills`, `totals`
   and `comparison`; run with `--baseline` pointing to a saved JSON report.
   Expected: Each skill has description/body/file metrics; current bodies do not
-  enter loaded totals. The immutable pre-edit BASELINE.json remains unchanged.
+  enter loaded totals. BASELINE.json pins current main; BASELINE-original.json retains the immutable original experiment.
 
 ## Isolated skills proposal review
 
-- Action: Open `.lavish/skills-efficiency-review.html` and compare the pinned main and candidate evidence before approving the PR.
-  Expected: Exact baseline 410feaa, static cost and keeper-routing comparisons, isolated test outcomes and limitations are visible. Main and live configuration remain unchanged.
-- Action: Run `./scripts/trim-benchmark --ref 410feaa --plain`, then `./scripts/trim-benchmark --check --plain` on the review branch.
-  Expected: The baseline measures 37,908 loaded bytes; the integrated candidate measures 14,399 with budgets PASS. These are bytes/4 estimates, not model billing or actual invocation evidence.
+- Action: Read benchmarks/trim/PR-VALIDATION.md and OVERNIGHT-REPORT.md before approving PR3.
+  Expected: Current main8662fa3c, current static costs, routing, tests and limits are explicit; the historical visual review is marked superseded. Main and live configuration remain unchanged.
+- Action: Run `./scripts/trim-benchmark --ref origin/main --plain`, then `./scripts/trim-benchmark --check --plain` on the review branch.
+  Expected: The baseline measures38,810 loaded bytes; candidate14,399 with budgets PASS. These are bytes/4 estimates, not model billing or actual invocation evidence.
 
 ## Skill trigger regression baseline
 
 - Action: Run `./scripts/trigger-eval --plain --check` before trimming skill
   descriptions and after every description pass.
-  Expected: The active intake corpus scores 42/46 exact-set matches (91.30%), with
+  Expected: The active current-main corpus scores49/54 exact-set matches (90.74%), with
   `Accuracy gate: PASS`; later passes must preserve prior correct cases. The
   report labels the deterministic lexical proxy and includes baseline accuracy.
 - Action: Run `./scripts/trigger-eval --json --check` and inspect `per_case`.
@@ -1780,7 +1780,7 @@ restore the original DND state afterward. No sudo is needed.
   Expected: The actual staged candidate passes; a growing authored file over its
   permitted size is refused with an actionable split recommendation.
 - Action: Run the intake trigger corpus and vetted-inventory checks.
-  Expected: All27 local names have frozen routing cases; exact-set accuracy is
+  Expected: All29 retained local names have frozen routing cases; ai-ux-deslop remains DENY pending Kevin's decision under the no-delete rule; exact-set accuracy is
   at least the original intake proposal baseline, and no inventory drift remains.
   These are lexical proxy checks; live provider, CLI-package and UI execution
   require their separately documented setup.

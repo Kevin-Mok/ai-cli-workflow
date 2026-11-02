@@ -72,8 +72,8 @@ tests and documentation accompany the change they describe.
 
 ## Frontend And Browser Work
 
-- [`ai-ux-deslop`](ai-ux-deslop/SKILL.md): Review UI against the concrete AI-tell and secondary-text checks; overnight admission pending.
-- [`hallmark`](hallmark/SKILL.md): Explicit-only themed page design with pinned assets and runtime checks; overnight admission pending.
+- [`ai-ux-deslop`](ai-ux-deslop/SKILL.md): Review UI against the concrete AI-tell and secondary-text checks; DENY retained for Kevin; no-delete rule.
+- [`hallmark`](hallmark/SKILL.md): Explicit-only themed page design with pinned assets and runtime checks; admission PASS.
 
 - [`frontend-design`](frontend-design/SKILL.md): Build frontend web interfaces
   from confirmed audience, use cases and brand context; save agreed missing

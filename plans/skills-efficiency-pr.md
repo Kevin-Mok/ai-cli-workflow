@@ -53,9 +53,9 @@ unavailable; this ExecPlan is the execution record.
 
 - [x] Capture initial status and fetch origin/main (8662fa3c).
 - [x] Resolve five merge conflicts retaining trimmed policies and relevant upstream changes.
-- [ ] Commit/push the merge checkpoint with privacy and README receipts.
-- [ ] Gate ai-ux-deslop and hallmark; freeze additional routing cases before descriptions.
-- [ ] Refresh current-main baseline, budgets, routing, tests and reports.
+- [x] Commit/push the merge checkpoint with privacy and README receipts.
+- [x] Gate ai-ux-deslop and hallmark; freeze additional routing cases before descriptions.
+- [x] Refresh current-main baseline, budgets, routing, tests and reports.
 - [ ] Evidence-reviewer audit; push final evidence and update PR3.
 - [ ] Verify all five criteria and write the external DONE marker.
 
@@ -78,3 +78,38 @@ Fresh merge checkpoint evidence:93tests/5subtests PASS (20.04s); exact staged
 privacy PASS; README pass_no_change; size guard PASS; core8,989B. Ledger targeted
 coverage PASS with286findings. Prepared commit is the plain merge; next action
 is normal push of the named review branch, then skill admission.
+
+## Admission checkpoint
+
+Hallmark PASS, ai-ux-deslop DENY retained (no-delete). New descriptions are
+trigger-first with bodies intact. Expanded54 frozen before edits49/54→49/54;
+prior46 remains42/46 with no lost positives. Commit-dirty procedure stays in
+body; description354→159B offsets intake so original14,399B ceiling holds.
+Current main38,810B/61skills/core23,512B versus candidate14,399B/29/core8,989B.
+Original baseline/corpora archived unchanged; current baseline is pinned main.
+New contract RED→GREEN43tests/28subtests; broad regression exposed3stale
+assertions, being repaired to preserve historical invariants plus exact additions.
+
+Atomic continuation: gate each new source, freeze cases, run tests, record
+measurements, review evidence, stage/privacy/size/README, commit/push review
+branch, update PR3 and final report, then external DONE only after audit.
+Cursor prompt: Continue this plan; use benchmarks/trim/overnight/task.md and
+progress.md; preserve protected untracked inputs, no activation/main push/rewrite.
+Commit suggestion: feat(skills): gate current-main additions within trim budget.
+
+Admission milestone prepared:259tests/400subtests PASS; targeted historical
+contract repairs15tests/199subtests PASS. Staged gates precede the next commit.
+Generated baseline/JSON outputs use exact-path size exemptions; authored legacy
+doc growth uses finite reviewed ceilings. No generic size/budget exemption.
+
+Final admission checks:26tests/17subtests PASS after review corrected inherited
+per-skill description417→183B (58.5estimated tokens); candidate body213,743B.
+Broad259/400PASS is the immediately prior source-behavior run. Privacy/README/
+size/index diff/incident targeted gates pass; final repeat precedes commit.
+Subject:feat(skills): gate current-main additions within trim budget. Next:
+normal named-branch push, PR body update, final report and external DONE audit.
+
+Independent evidence review:16verified/0incorrect/3deliverypending. Metric
+correction resolved and fresh26/17data contracts pass. Review saved in
+benchmarks/trim/overnight/checks.md. Remaining publication/marker steps are
+explicit; no full completion claimed by the admission commit.

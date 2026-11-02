@@ -1,9 +1,6 @@
 ---
 name: ai-ux-deslop
-description: >-
-  Use when an AI agent is designing, building, or reviewing any web or desktop
-  UI (landing pages, tools, dashboards) and the result must not look like
-  generic AI slop.
+description: Use when designing, building, or reviewing web or desktop UI to avoid generic AI slop.
 ---
 # AI UX de-slop
 

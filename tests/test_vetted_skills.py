@@ -251,7 +251,19 @@ class VettedSkillsTest(unittest.TestCase):
             '21st-ai', '21st-cli-use', '21st-design-sync', '21st-registry',
             'review-animations', 'scroll-world')} <= retired)
         self.assertTrue(any(name.startswith('external:superpowers:') for name in retired))
-        for row in data['unranked'].values():
+        retained_records = {
+            identity: row['verdict'] for identity, row in data['unranked'].items()
+            if identity in ('repo:ai-ux-deslop', 'repo:hallmark')
+        }
+        self.assertEqual(retained_records, {
+            'repo:ai-ux-deslop': 'DENY-RETAINED',
+            'repo:hallmark': 'PASS',
+        })
+        self.assertEqual(sum(row['verdict'] in ('PASS', 'DENY-RETAINED')
+                             for row in data['unranked'].values()), 2)
+        for identity, row in data['unranked'].items():
+            if identity in retained_records:
+                continue
             self.assertIn(row['verdict'], ('UNSCORED', 'CULL'))
             self.assertTrue(row['job'])
 

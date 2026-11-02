@@ -1,24 +1,22 @@
-# Current overnight refresh (2026-11-01)
+# Current-main overnight refresh (2026-11-01)
 
-Main fetched at 8662fa3c; the historical report below remains evidence for the
-previous endpoint, not current measurements. See plans/skills-efficiency-pr.md.
-Merge first; admission then final remeasurement.
+Main8662fa3c merged as a88eea7e and pushed to the named review branch. Current
+measurements:38,810→14,399loadedB (−62.90%);61→29skills; core23,512→8,989B.
+Original14,399B cap retained. Expanded54routing49/54; previous46 remains42/46
+without lost positives. Hallmark PASS; ai-ux-deslop DENY retained for Kevin.
 
-Merge conflicts: docs/smoke-tests.md (combine independent sections), skill README
-(keep concise catalog, add new entries), night description (keep trimmed trigger,
-carry push checkpoints), postmortem sources ledger (union new upstream records),
-AGENTS core (keep trimmed, retain relevant changes in mandatory homes).
-Carry-overs: Chrome previews in core; secondary labels and UX/DX/AX in mandatory
-system-design routing; stronger report-with-encountering-change delivery in
-postmortem reference; sanitize guidance in commit-plan-push; immediate shortcut
-delivery in fish-alias; night goal/blocker/push guidance. The upstream repository
-creation rule remains verbatim in delivery.md. Model/effort lines unchanged.
+Five conflicts: smoke tests combined; concise skill catalog retained; night
+trigger trimmed with push checkpoints; ledger resolved to newer main already
+containing the branch addition; core kept trimmed. Carry-overs: Chrome previews,
+UI secondary-text/UX-DX-AX guidance, stronger postmortem delivery, commit
+sanitization, immediate fish shortcut delivery and night goal/blocker/push
+behavior. Repository-creation rule verbatim; model/effort and CULL unchanged.
 
-Merge checkpoint verification:93tests/5subtests PASS; core8,989B; staged privacy,
-README and size gates PASS; ledger targeted coverage PASS.
-
-Admission pending: ai-ux-deslop and hallmark. No new deletion; approved CULL.json
-remains unchanged. Configuration remains unapplied.
+Merge93tests/5subtests and new contracts43/28PASS. Sharedmain70/17candidate69/11
+PASS; same7inherited collectionSyntaxErrors. Doctor35errors/1warning, no new
+keys vs main39/1. Final focused259tests/400subtests PASS; admission staged checks/publication pending.
+See PR-VALIDATION.md, pr-validation.json and plans/skills-efficiency-pr.md.
+Historical records below describe older endpoints, not current claims.
 
 ---
 

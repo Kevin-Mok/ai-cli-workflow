@@ -258,3 +258,20 @@ that must read both files, lost paragraphs or weakened literal-contract tests.
 - [ ] Identify an actual conditional branch; retain all shared safeguards.
 - [ ] Prove exact source preservation/frontmatter and the mandatory trigger.
 - [ ] Measure entry and combined loads; resolve tests to actual retained homes.
+
+## Refresh a moving main without re-admitting duplicates — overnight pass
+
+**Rule:** Merge first; preserve trimmed homes and approved culls. Freeze expanded
+cases before edits; retain failed new skills when deletion is not authorized.
+**Why:** Old-main comparisons hide subsequent catalog and policy growth.
+**Repo example:** Main38,810B/61locals versus candidate14,399B/29locals;
+9,702.5→3,599.75estimated recurring tokens (−62.90%). New descriptions417→183B
+avoid58.5tokens of inherited growth; commit-dirty354→159B offsets195B intake; unchanged bodies24,164B stay on demand.
+Hallmark PASS; ai-ux-deslop DENY retained for Kevin under the no-delete rule.
+Frozen54 remains49correct; original46 remains42correct with no lost positives.
+**Mistakes:** Treating denied retention as PASS, resetting old corpora, claiming
+live catalog cleanup, or using a stale main baseline after a merge.
+**Checklist**
+- [ ] Pin main; keep repository-creation rule/model lines and cull history.
+- [ ] Price every new skill; freeze cases/catalog, preserve prior positives.
+- [ ] Record conflicts/carry-overs, exact gates and limits; publish each pass.

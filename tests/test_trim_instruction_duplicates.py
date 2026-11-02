@@ -1,5 +1,6 @@
 """Remove only the repeated developer block while retaining canonical controls."""
 
+import json
 import re
 import runpy
 import subprocess
@@ -10,6 +11,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 CONFIG = 'dot_codex/config.toml'
 BEFORE = '4296498e'
+AFTER = '9e1ce9f'
 ORIGINAL = '3e898a0f39172d7c30a6b0ae0258209cfe2c7f0c'
 
 
@@ -49,12 +51,17 @@ class InstructionDuplicateTest(unittest.TestCase):
 
     def test_benchmark_no_longer_charges_the_repeated_block(self):
         collect = runpy.run_path(str(ROOT / 'scripts/trim-benchmark'))['collect']
-        before, current = collect(ROOT, BEFORE), collect(ROOT)
+        before, after, current = collect(ROOT, BEFORE), collect(ROOT, AFTER), collect(ROOT)
         self.assertEqual(before['developer_instructions']['bytes'], 717)
-        self.assertEqual(current['developer_instructions']['bytes'], 0)
-        self.assertEqual(before['totals']['loaded_bytes'] - current['totals']['loaded_bytes'], 717)
+        self.assertEqual(after['developer_instructions']['bytes'], 0)
+        self.assertEqual(before['totals']['loaded_bytes'] - after['totals']['loaded_bytes'], 717)
         for key in ('skills_count', 'description_bytes'):
-            self.assertEqual(current['totals'][key], before['totals'][key])
+            self.assertEqual(after['totals'][key], before['totals'][key])
+        self.assertEqual(current['developer_instructions']['bytes'], 0)
+        self.assertEqual(current['totals']['skills_count'], 29)
+        budget = json.loads((ROOT / 'benchmarks/trim/BUDGETS.json').read_text())
+        self.assertEqual(budget['loaded_bytes'], 14399)
+        self.assertLessEqual(current['totals']['loaded_bytes'], budget['loaded_bytes'])
 
 
 if __name__ == '__main__':

@@ -1,34 +1,63 @@
-# Isolated skills review against exact main
+# Refreshed skills review against current main
 
-Compare exact main 410feaa with the integrated skills proposal before activation. Read the measured costs, inspect the common routing cases, then review the isolated test results and limitations.
+Review current-main costs, frozen routing and isolated tests before considering
+PR3. The previous `410feaa` comparison and visual artifact are historical.
 
-## Fresh comparison
-
-| Measure | Main 410feaa | Integrated candidate |
+| Measure | Current main `8662fa3c` | Trimmed candidate |
 | --- | ---: | ---: |
-| Loaded bytes | 37,908 | 14,399 |
-| Estimated tokens (bytes / 4) | 9,477 | 3,599.75 |
-| Core AGENTS bytes | 23,039 | 8,982 |
-| Skill body bytes (on demand) | 403,458 | 179,490 |
-| Canonical skills | 59 | 27 |
-| Common keeper proxy matches | 12/16 | 15/16 |
+| Recurring loaded bytes | 38,810 | 14,399 (−62.90%) |
+| Estimated tokens (bytes/4) | 9,702.5 | 3,599.75 |
+| Core AGENTS lines / bytes | 361 / 23,512 | 147 / 8,989 |
+| Description bytes | 13,891 | 4,720 |
+| On-demand skill body bytes | 436,570 | 213,743 |
+| Canonical skills | 61 | 29 |
+| Same-label keeper proxy matches | 12/16 | 15/16 |
+| Shared test files | 70 tests / 17 subtests | 69 tests / 11 subtests |
 
-Loaded estimate falls 62.02% against exact main. Original pre-improvement 3e898a0f measured 37,619 bytes; main adds a 289-byte rule. The integrated version retains that rule verbatim in mandatory delivery guidance and explicitly routes repository creation there. No original budget was relaxed.
+## Executed scope
 
-## Isolated execution evidence
+Plain merge `a88eea7e` incorporates main `8662fa3c`,58 commits/294changed files after
+410feaa. Five conflicts were resolved explicitly; trimmed core/catalog survive,
+relevant upstream changes are carried, repository-creation rule stays verbatim
+in mandatory delivery, model/effort settings and CULL.json remain unchanged.
 
-- Candidate focused suite: 240 tests and 391 subtests passed, exit 0. Exact command: the command in benchmarks/trim/pass-evidence.json plus tests/test_trim_main_integration.py.
-- Shared suite files: main 65 tests/14 subtests; candidate 64 tests/8 subtests, both exit 0. Files: tests/test_pre_commit_privacy_gate.py, tests/test_checkpoint_privacy_gate.py, tests/test_metaprompt_integration.py. Counts differ because the files evolved with approved culls; this is not a claim of identical cases.
-- Core-budget integration reproducer: expected RED at 9,271 bytes; retained rule relocated to mandatory delivery, then GREEN at 8,982 bytes. Repository-creation route assertion also observed RED then GREEN.
-- Original frozen keeper cases are filtered mechanically only where expected skill labels exist in both catalogs. Excluded instructions-edit (new lean-instructions skill absent on main); all other 16 prompts and expectations unchanged. Before 12/16, after 15/16; no previously correct case lost. Remaining false positive: none-language selects morning. Full candidate keeper corpus: 16/17. Active intake corpus: 42/46. All are lexical proxies, not real model routing.
-- Fresh benchmark budgets PASS; targeted rule-retention checks PASS; README gate pass_no_change.
+- Merge checkpoint:93 tests/5 subtests PASS.
+- New contracts:43 tests/28 subtests PASS, after defining RED. Final focused suite259 tests/400 subtests PASS
+  is recorded in pr-validation.json; no whole-suite green claim.
+- Shared main 70 tests/17 subtests and candidate 69/11 PASS. Test files evolved;
+  counts do not imply identical cases. Main content snapshot uses read-only
+  source Git metadata, not OS/home/model isolation.
+- Full collection: main 1,464 and candidate 1,546collected, same7 SyntaxErrors,
+  exit2. Error paths and log hashes are in JSON; unrelated failures not repaired.
+- Doctor: main 39 errors / 1 warning, candidate 35/1, zero new keys; diagnostics are
+  not a passing audit. Source notes for both new skills use pinned actual facts.
+- Original budget14,399B retained. Strict core 9 KB/150 lines, descriptions400B,
+  skills300 lines all pass. Hallmark body17,907B/148 lines; ai-ux6,257B/59 lines.
 
-## Reproduce
+## Newly gated skills
 
-Use scripts/trim-benchmark --ref 410feaa --json for exact-main metrics and scripts/trim-benchmark --check --plain for the current candidate. scripts/trigger-eval --check --plain exercises active routing. For historical snapshots, use git archive of each pinned commit into disposable directories; expose source Git history read-only for tests that call git show. Overlay the integration's reviewed delta into the candidate snapshot. The same current collector (runpy.run_path('scripts/trim-benchmark')['collect']) measures all three trees, avoiding missing baseline budget-file assumptions.
+Hallmark PASS: explicit deterministic theme/scaffold/lint workflow; value 2 and
+uniqueness 2 with category-level demand only. No measured usage invented.
+AI UX de-slop DENY: duplicate of frontend-design/Impeccable (uniqueness 0).
+Retained under the overnight no-delete rule for Kevin's decision; remains in
+the catalog and routing cases. No uninstall, disable or re-admission claimed.
+[Measured decisions](../../docs/skill-admissions-current-main.json) cite
+2–3precedents, costs and change conditions.
 
-The disposable content trees are under /tmp/skills-pr-validation-20261023. Their .git files reference source history for read-only assertions; this is content isolation, not a separate OS or installed environment. Raw local logs are not committed. Machine-readable metrics, per-case outcomes and log hashes are in pr-validation.json. Initial setup failures are documented separately and do not count as final product failures.
+## Routing and reproduction
 
-## Merge boundary and limitations
+Expanded 54 remains49/54 (90.74%); original 46 remains 42/46 (91.30%), with no
+previous correct case lost. Common16keepers12/16→15/16. Prompt labels, original
+corpora and scorer are preserved. These lexical results do not prove semantic
+routing or real model behavior.
 
-Main is not merged or activated. No refresh-config, home configuration changes, installs, real model trials, latency or billing measurement. Full repository suite is not claimed green; inherited collection defects were previously recorded. Review skill removals and conditional guidance before merging. Revert the proposal with a new commit if needed.
+Use scripts/trim-benchmark --ref origin/main --plain and
+scripts/trim-benchmark --check --plain from the review branch. Use
+scripts/trigger-eval --check --plain for expanded 54; the separate previous46
+report enforces the immediately preceding accepted floor. Read
+[COMPARISON](COMPARISON.md), [overnight report](OVERNIGHT-REPORT.md) and
+[plan](../../plans/skills-efficiency-pr.md) for conflict/rollback/delivery details.
+
+No live configuration or installed catalog activation, provider trials, tokenizer
+usage, latency or billing evidence. Revert with a new commit if needed; no rebase,
+force-push, main push or other-PR/repo change.

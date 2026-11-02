@@ -1,6 +1,6 @@
 ---
 name: commit-dirty
-description: Use when I explicitly want the current intended dirty git worktree committed and pushed now, including requests like `commit dirty`, `commit all dirty`, `commit and push this`, or `ship these changes`, after verifying scope and running the minimum relevant checks. Do not use for commit planning only, history rewrites, force-pushes, or work outside Git.
+description: Use only for current dirty Git commits/pushes: commit dirty, commit all dirty, commit and push this, or ship these changes. Excludes planning/history rewrites.
 disable-model-invocation: true
 ---
 

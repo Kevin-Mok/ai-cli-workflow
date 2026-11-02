@@ -39,15 +39,18 @@ class TriggerEvalTest(unittest.TestCase):
     def test_active_keep_list_labels_are_valid_and_cases_unchanged(self):
         cases_path, baseline_path = self.active_paths()
         active = self.module['load_cases'](cases_path)
-        archived = {case['id']: case for case in self.module['load_cases'](ROOT / 'benchmarks/trim/trigger-cases.yaml')}
+        original = self.module['load_cases'](ROOT / 'benchmarks/trim/intake-cases.yaml')
         catalog = self.module['load_catalog'](ROOT)
         self.assertTrue(all(set(case['expected']) <= catalog.keys() for case in active))
-        retained = self.module['load_cases'](ROOT / 'benchmarks/trim/cull-keep-cases.yaml')
-        self.assertTrue(all(case == archived[case['id']] for case in retained))
-        self.assertTrue(all(case in active for case in retained))
         frozen = json.loads(baseline_path.read_text())
-        self.assertEqual(frozen['case_count'], 46)
-        self.assertEqual(frozen['exact_matches'], 41)
+        self.assertEqual(frozen['case_count'], 54)
+        self.assertEqual(frozen['exact_matches'], 49)
+        self.assertIn('ai-ux-deslop', {name for case in active for name in case['expected']})
+        self.assertIn('hallmark', {name for case in active for name in case['expected']})
+        self.assertEqual(len(original), 46)
+        original_frozen = json.loads((ROOT / 'benchmarks/trim/intake-baseline.json').read_text())
+        self.assertEqual(self.module['digest'](original), original_frozen['cases_sha256'])
+        self.assertEqual(original_frozen['exact_matches'], 41)
         cull = json.loads((ROOT / 'benchmarks/trim/cull-keep-baseline.json').read_text())
         self.assertEqual((cull['case_count'], cull['exact_matches']), (17, 13))
         self.assertEqual(self.module['digest'](active), frozen['cases_sha256'])
@@ -105,7 +108,7 @@ class TriggerEvalTest(unittest.TestCase):
         report = json.loads(result.stdout)
         cases_path, baseline_path = self.active_paths()
         frozen = json.loads(baseline_path.read_text())
-        self.assertIn('keep-list', report['scope'])
+        self.assertIn('Current-main intake', report['scope'])
         self.assertGreaterEqual(report['exact_match_accuracy'], frozen['exact_match_accuracy'])
         self.assertEqual(report['cases_sha256'], frozen['cases_sha256'])
         self.assertIn('proxy', report['method'])
@@ -114,6 +117,15 @@ class TriggerEvalTest(unittest.TestCase):
         for case in self.module['load_cases'](cases_path):
             self.assertNotIn(case['prompt'], result.stdout)
         self.assertEqual(report['gate_errors'], [])
+
+    def test_no_previously_correct_case_is_lost(self):
+        cases_path, _ = self.active_paths()
+        report = self.module['evaluate'](self.module['load_catalog'](ROOT), self.module['load_cases'](cases_path))
+        previous = json.loads((ROOT / 'benchmarks/trim/overnight-previous46.json').read_text())
+        outcomes = {row['id']: row['exact_match'] for row in report['per_case']}
+        prior = {row['id']: row['exact_match'] for row in previous['per_case']}
+        self.assertEqual(sum(prior.values()), 42)
+        self.assertTrue(all(outcomes[case_id] for case_id, matched in prior.items() if matched))
 
     def test_gate_rejects_lower_accuracy(self):
         _, baseline_path = self.active_paths()

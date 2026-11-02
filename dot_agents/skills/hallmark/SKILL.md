@@ -1,7 +1,7 @@
 ---
 name: hallmark
 disable-model-invocation: true
-description: "Design skill for websites and new pages that look designed, not generated. Use when the user asks to build or design something new, or names Hallmark. Never use it on an existing design unless the user names Hallmark, as in `/hallmark redesign <path>`."
+description: Use only when asked for Hallmark to design new websites/pages or audit/redesign existing designs.
 argument-hint: "<prompt> | redesign <path> | audit <path>"
 version: 2.0.0
 metadata:

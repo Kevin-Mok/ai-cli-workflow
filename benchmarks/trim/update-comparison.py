@@ -183,7 +183,7 @@ def render(root, start=START, head='HEAD', include_working=False, progress=None)
               'Omit `--head` to measure the then-current HEAD. Add `--include-working` only to show a',
               'separately labeled draft. `scripts/trim-benchmark --ref REF --json` exposes',
               'the full inventory for any commit; `--ref` skips current working-tree budgets',
-              'and cannot be combined with `--check`. The original immutable BASELINE.json',
+              'and cannot be combined with `--check`. The original immutable BASELINE-original.json',
               'supplies comparisons and is never rewritten.', '']
     return '\n'.join(lines)
 
@@ -202,7 +202,7 @@ def main():
         def progress(index, sha):
             print(('' if args.plain else '📊 ') + f'Measuring committed snapshot {index}: {sha[:7]}', file=sys.stderr, flush=True)
         document = render(root, args.start, args.head, args.include_working, progress)
-        target = args.output or root / 'benchmarks/trim/COMPARISON.md'
+        target = args.output or root / 'benchmarks/trim/COMPARISON-original.md'
         target.write_text(document)
         print(('' if args.plain else '✅ ') + f'Updated {target}')
     except (OSError, ValueError, KeyError, TypeError) as error:

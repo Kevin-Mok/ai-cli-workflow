@@ -811,7 +811,8 @@ background indexing progresses.
 ## Core Command Reference
 
 For instruction-size work, run `./scripts/trim-benchmark --check --plain` from
-this checkout. It compares the immutable [trim baseline](benchmarks/trim/BASELINE.json)
+this checkout. It compares the pinned [current-main baseline](benchmarks/trim/BASELINE.json)
+(the [original experiment](benchmarks/trim/BASELINE-original.json) is preserved)
 with current instructions, skill descriptions and on-demand bodies; `--json`
 includes per-skill metrics, `--baseline PATH` compares another snapshot,
 `--ref REF` measures committed blobs, and `--repo PATH` selects a checkout.
@@ -820,7 +821,8 @@ includes per-skill metrics, `--baseline PATH` compares another snapshot,
 uncommitted drafts. [Pass results](benchmarks/trim/PROGRESS.md)
 separate recurring context estimates from body/output savings. Budgets reject
 loaded-total growth, configured per-file limit breaches and lost skill paths;
-imported skills are measured without being rewritten. Apply
+pinned imported bodies are preserved; trigger descriptions may be trimmed
+with frozen routing evidence. Apply
 [`lean-instructions`](dot_agents/skills/lean-instructions/SKILL.md) when adding
 to AGENTS.md or adding/editing a skill; each pass records its techniques there.
 
@@ -829,7 +831,9 @@ or removing a skill. It compares local sources, configured external/plugin expor
 detectable installed/built-in skills with the on-demand
 [vetted reference](dot_agents/skills/lean-instructions/references/vetted-skills.md).
 The mandatory [admission gate](docs/skill-admissions.md) records scored PASS/DENY
-verdicts before new skills or standing rules; every local skill needs a PASS.
+verdicts before new skills or standing rules. Each local skill needs PASS;
+the explicitly retained, denied AI UX checklist is the documented overnight
+no-delete exception pending review.
 The canonical [standing core](dot_codex/AGENTS.md) routes matching tasks to
 mandatory procedure references; the [preservation map](benchmarks/trim/casd-map.json)
 proves original policy text survived the split.
@@ -846,8 +850,9 @@ and merge reasons in the reference when updating it in the same pass commit.
 Before trimming descriptions, run `./scripts/trigger-eval --plain --check`.
 The archived 50 public synthetic cases include single-skill, multi-skill and
 no-skill requests, with a pre-cull baseline of 40/50 exact-set matches (80%).
-After the approved cull, the active gate uses 17 unchanged keeper/none cases:
-13/17 before and 15/17 after the cull. These scopes cannot be compared directly.
+The active current-main gate has54 cases covering29 retained skills:49/54.
+It preserves the original46 intake cases (42/46) and unchanged17 keeper cases.
+Historical corpus scores cannot be compared directly.
 This names-and-descriptions lexical proxy does not establish real model routing.
 `--cases PATH` selects JSON-compatible YAML, `--baseline PATH` selects the
 frozen accuracy snapshot, `--repo PATH` selects sources and `--json` emits
