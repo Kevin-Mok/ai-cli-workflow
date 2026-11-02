@@ -1,0 +1,106 @@
+{
+  "complaints": {
+    "copy_paste": {
+      "dates": 2,
+      "frequent": false,
+      "messages": 3,
+      "sessions": 2
+    },
+    "excessive_verbosity_or_cost": {
+      "dates": 1,
+      "frequent": false,
+      "messages": 1,
+      "sessions": 1
+    },
+    "incomplete_scope": {
+      "dates": 0,
+      "frequent": false,
+      "messages": 0,
+      "sessions": 0
+    },
+    "overwritten_work": {
+      "dates": 0,
+      "frequent": false,
+      "messages": 0,
+      "sessions": 0
+    },
+    "repeated_approval": {
+      "dates": 0,
+      "frequent": false,
+      "messages": 0,
+      "sessions": 0
+    },
+    "stale_context": {
+      "dates": 0,
+      "frequent": false,
+      "messages": 0,
+      "sessions": 0
+    },
+    "unsupported_completion": {
+      "dates": 2,
+      "frequent": false,
+      "messages": 2,
+      "sessions": 2
+    }
+  },
+  "coverage": {
+    "candidate_files": 2639,
+    "eligible_sessions": 416,
+    "eligible_user_messages": 1413,
+    "filtered_user_messages": 884,
+    "inventory_files": 6796,
+    "mirrored_user_messages_removed": 0,
+    "outside_window_files": 4157,
+    "outside_window_user_messages": 1,
+    "records": 193797,
+    "screened_files": 2639
+  },
+  "exclusions": {
+    "duplicate_session": 2,
+    "helper_session": 2184,
+    "oversized_record": 22,
+    "private_context": 15
+  },
+  "schema_version": 1,
+  "tool_failures": {
+    "candidates": 1767,
+    "sessions": 328,
+    "taxonomy": {
+      "missing_resource": {
+        "candidates": 353,
+        "dates": 25,
+        "sessions": 169
+      },
+      "network": {
+        "candidates": 6,
+        "dates": 3,
+        "sessions": 3
+      },
+      "other_or_unclassified": {
+        "candidates": 585,
+        "dates": 29,
+        "sessions": 217
+      },
+      "permission_or_read_only": {
+        "candidates": 262,
+        "dates": 28,
+        "sessions": 218
+      },
+      "timeout": {
+        "candidates": 134,
+        "dates": 17,
+        "sessions": 70
+      },
+      "validation_or_assertion": {
+        "candidates": 427,
+        "dates": 24,
+        "sessions": 134
+      }
+    }
+  },
+  "window": {
+    "days": 60,
+    "end_utc": "2026-10-23T01:00:00+00:00",
+    "start_utc": "2026-08-24T01:00:00+00:00"
+  }
+}

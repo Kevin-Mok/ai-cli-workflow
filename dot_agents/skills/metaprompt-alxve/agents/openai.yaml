@@ -1,4 +1,0 @@
-interface:
-  display_name: "Metaprompt Alxve"
-  short_description: "Compile, sharpen, and template prompts"
-  default_prompt: "Use $metaprompt-alxve to compile, sharpen, or template my request, then wait for my standalone go before running any pass."

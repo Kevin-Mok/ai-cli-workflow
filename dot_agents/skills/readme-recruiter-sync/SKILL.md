@@ -1,6 +1,6 @@
 ---
 name: readme-recruiter-sync
-description: Use when handling commit or push requests, refreshing the root README, or changing repo behavior that can make the root README stale, especially when the README needs to sell the repo clearly to recruiters before setup details take over
+description: Use for README work, the pre-commit/push README gate, or changes to a documented public interface.
 ---
 
 # Readme Recruiter Sync
@@ -30,7 +30,7 @@ with the actual files and commands, and repair or report each gap.
 1. Determine whether the gate applies.
    - Always apply before commit or push workflows finalize work.
    - Apply when the user asks for README work directly.
-   - Assume it applies when changes touch `AGENTS.md`, `AGENTS.repo.md`, `dot_codex/`, `dot_agents/`, `plans/`, setup flows, documented commands, or repo positioning.
+   - Outside delivery, apply only when the change makes a README claim stale: public setup, usage, command options, supported workflows, or repo positioning. A backend fix, internal plan, or docs edit alone is insufficient.
    - Resolve skill metadata from repo-local `dot_agents/skills/readme-recruiter-sync`, then repo-local `.agents/skills/readme-recruiter-sync`, then `$HOME/.agents/skills/readme-recruiter-sync` (or `READMERECRUITERSYNC_SKILL_DIR` when explicitly set).
 2. Ground every README claim in repo evidence.
    - Read the relevant config, skills, scripts, docs, and existing README sections.

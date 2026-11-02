@@ -12991,6 +12991,15 @@
       "reviewed_on": "2026-11-01",
       "findings": [],
       "decision": "No new reusable learning: existing sandbox access and unchanged i3 status-command restart guidance apply; approved live activation and deployed renderer output verified."
+    },
+    {
+      "sha256": "bad0fda393058fc4240467ffa22e65e2a318fd0553ce9ca6f354308a8bbf0684",
+      "aliases": [
+        "/home/kevin/ai-cli-dotfiles-public/.worktrees/skills-efficiency/docs/postmortem/2026-11-01-overnight-main-integration.md"
+      ],
+      "reviewed_on": "2026-11-01",
+      "findings": [],
+      "decision": "No new general remedy: finite legacy size ceilings and exact pinned contract checks already govern. Stable entity merge retained current main; fixture metadata and wrapper help corrected. Broad259/400PASS, no new doctor keys; inherited collection and external canonical learning sync remain disclosed."
     }
   ],
   "review": {

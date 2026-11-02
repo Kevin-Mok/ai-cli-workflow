@@ -1,0 +1,306 @@
+{
+  "cases": [
+    {
+      "id": "brand-kit",
+      "prompt": "Create a logo and brand identity with a color palette and favicon for my startup.",
+      "expected": [
+        "brand-system-designer"
+      ]
+    },
+    {
+      "id": "prompt-create",
+      "prompt": "Make me a prompt for an agent that reviews database migrations.",
+      "expected": [
+        "metaprompt"
+      ]
+    },
+    {
+      "id": "prompt-run",
+      "prompt": "Optimize this prompt and execute it immediately in a new conversation with fresh context.",
+      "expected": [
+        "metaprompt-run"
+      ]
+    },
+    {
+      "id": "instructions-audit",
+      "prompt": "Audit our repository AI instructions, skill catalog duplication, and context size.",
+      "expected": [
+        "ai-workflow-doctor"
+      ]
+    },
+    {
+      "id": "instructions-edit",
+      "prompt": "Add a new skill and edit AGENTS.md while keeping the instructions lean.",
+      "expected": [
+        "lean-instructions"
+      ]
+    },
+    {
+      "id": "shortcut-fish",
+      "prompt": "Add a fish directory shortcut: wk should jump to my work folder.",
+      "expected": [
+        "fish-alias"
+      ]
+    },
+    {
+      "id": "research-recent",
+      "prompt": "Research what people have said about local coding agents in the last 30 days.",
+      "expected": [
+        "last30days"
+      ]
+    },
+    {
+      "id": "workflow-ship",
+      "prompt": "Commit and push only this Codex session, leaving pre-existing dirty work alone.",
+      "expected": [
+        "commit-session"
+      ]
+    },
+    {
+      "id": "multi-feedback-failure",
+      "prompt": "Record this durable workflow preference in feedback.log and document the unexpected test failure in a postmortem.",
+      "expected": [
+        "feedback-memory",
+        "postmortem-memory"
+      ]
+    },
+    {
+      "id": "none-arithmetic",
+      "prompt": "What is 19 multiplied by 23?",
+      "expected": []
+    },
+    {
+      "id": "none-language",
+      "prompt": "Translate good morning into Spanish.",
+      "expected": []
+    },
+    {
+      "id": "none-python",
+      "prompt": "Explain the difference between a Python tuple and a list.",
+      "expected": []
+    },
+    {
+      "id": "none-date",
+      "prompt": "How many days are there in a leap year?",
+      "expected": []
+    },
+    {
+      "id": "none-json",
+      "prompt": "Sort these numbers from smallest to largest: 8, 3, 11, 2.",
+      "expected": []
+    },
+    {
+      "id": "none-git",
+      "prompt": "Show the current Git branch name.",
+      "expected": []
+    },
+    {
+      "id": "none-file",
+      "prompt": "Read package.json and tell me the package name.",
+      "expected": []
+    },
+    {
+      "id": "none-riddle",
+      "prompt": "What has keys but cannot open locks?",
+      "expected": []
+    },
+    {
+      "id": "intake-commit-dirty",
+      "prompt": "Use commit-dirty to commit all safe dirty work in this repository.",
+      "expected": [
+        "commit-dirty"
+      ]
+    },
+    {
+      "id": "intake-commit-plan",
+      "prompt": "Use commit-plan-push in planning-only mode to group the dirty files into commits.",
+      "expected": [
+        "commit-plan-push"
+      ]
+    },
+    {
+      "id": "intake-context-resume",
+      "prompt": "Use context-handoff to resume the long task from progress.md after this interruption.",
+      "expected": [
+        "context-handoff"
+      ]
+    },
+    {
+      "id": "intake-frontend",
+      "prompt": "Implement a responsive frontend landing page with distinctive production styling.",
+      "expected": [
+        "frontend-design"
+      ]
+    },
+    {
+      "id": "intake-morning",
+      "prompt": "morning: pick up after the night run and show me the decisions you need.",
+      "expected": [
+        "morning"
+      ]
+    },
+    {
+      "id": "intake-next",
+      "prompt": "Use next-tasks to choose the next few tasks from the repository plan.",
+      "expected": [
+        "next-tasks"
+      ]
+    },
+    {
+      "id": "intake-night",
+      "prompt": "night: work through the approved tasks overnight and leave a NIGHT_NOTE.md.",
+      "expected": [
+        "night"
+      ]
+    },
+    {
+      "id": "intake-personal",
+      "prompt": "Use personal-context to inform this cross-project tooling choice.",
+      "expected": [
+        "personal-context"
+      ]
+    },
+    {
+      "id": "intake-browser",
+      "prompt": "Use Playwright browser automation to verify this form and capture its state.",
+      "expected": [
+        "playwright"
+      ]
+    },
+    {
+      "id": "intake-readme",
+      "prompt": "Run readme-recruiter-sync before committing this documented public command change.",
+      "expected": [
+        "readme-recruiter-sync"
+      ]
+    },
+    {
+      "id": "intake-session",
+      "prompt": "Use second-brain-session to retrieve this established project session context.",
+      "expected": [
+        "second-brain-session"
+      ]
+    },
+    {
+      "id": "intake-smoke",
+      "prompt": "Use smoke-test-capture to record this new manual verification step.",
+      "expected": [
+        "smoke-test-capture"
+      ]
+    },
+    {
+      "id": "intake-react",
+      "prompt": "Review React and Next.js performance against Vercel best practices.",
+      "expected": [
+        "vercel-react-best-practices"
+      ]
+    },
+    {
+      "id": "intake-react-review",
+      "prompt": "Use vercel-react-best-practices to check this Next.js rendering waterfall.",
+      "expected": [
+        "vercel-react-best-practices"
+      ]
+    },
+    {
+      "id": "intake-eval",
+      "prompt": "Evaluate and improve the named skill with real tasks and human-calibrated binary grading.",
+      "expected": [
+        "skill-eval"
+      ]
+    },
+    {
+      "id": "intake-eval-blind",
+      "prompt": "Use skill-eval for a blind comparison of these two skill versions.",
+      "expected": [
+        "skill-eval"
+      ]
+    },
+    {
+      "id": "intake-grok",
+      "prompt": "Grok Bot is delegating work to local Codex; verify the handoff and authorization.",
+      "expected": [
+        "grok-cli-handoff"
+      ]
+    },
+    {
+      "id": "intake-grok-stop",
+      "prompt": "Use grok-cli-handoff to handle STOP during delegated work transferred between hosts.",
+      "expected": [
+        "grok-cli-handoff"
+      ]
+    },
+    {
+      "id": "intake-shadcn",
+      "prompt": "Use shadcn to manage shadcn/ui components, registries and presets.",
+      "expected": [
+        "shadcn"
+      ]
+    },
+    {
+      "id": "intake-shadcn-update",
+      "prompt": "Update the shadcn/ui components with the pinned official CLI guidance.",
+      "expected": [
+        "shadcn"
+      ]
+    },
+    {
+      "id": "intake-impeccable",
+      "prompt": "Use Impeccable to critique and refine this frontend interface.",
+      "expected": [
+        "impeccable"
+      ]
+    },
+    {
+      "id": "intake-impeccable-audit",
+      "prompt": "Run the explicit Impeccable audit design command on this interface.",
+      "expected": [
+        "impeccable"
+      ]
+    },
+    {
+      "id": "intake-none-math",
+      "prompt": "Multiply 19 by 7.",
+      "expected": []
+    },
+    {
+      "id": "intake-none-science",
+      "prompt": "Explain photosynthesis.",
+      "expected": []
+    },
+    {
+      "id": "intake-none-translate",
+      "prompt": "Translate hello into French.",
+      "expected": []
+    },
+    {
+      "id": "intake-none-literature",
+      "prompt": "Who wrote Pride and Prejudice?",
+      "expected": []
+    },
+    {
+      "id": "intake-multi-browser-smoke",
+      "prompt": "Use playwright and smoke-test-capture to verify the browser interaction and record the manual check.",
+      "expected": [
+        "playwright",
+        "smoke-test-capture"
+      ]
+    },
+    {
+      "id": "intake-multi-components",
+      "prompt": "Use vercel-react-best-practices and shadcn to review this Next.js component performance and component updates.",
+      "expected": [
+        "vercel-react-best-practices",
+        "shadcn"
+      ]
+    },
+    {
+      "id": "intake-multi-evaluation",
+      "prompt": "Use skill-eval and ai-workflow-doctor to benchmark this skill and audit the repository catalog.",
+      "expected": [
+        "skill-eval",
+        "ai-workflow-doctor"
+      ]
+    }
+  ]
+}

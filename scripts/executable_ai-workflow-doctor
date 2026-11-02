@@ -7,6 +7,7 @@ import argparse
 import hashlib
 import json
 import math
+import os
 import re
 import shutil
 import subprocess
@@ -24,11 +25,10 @@ from ai_workflow_markdown import link_targets, unfenced_lines
 from ai_workflow_second_brain import second_brain_findings
 
 
-def _cli_message(text, icon):
+def _cli_message(text, icon, plain=False):
     """Decorate human output; CLI_PLAIN=1 keeps legacy scripts undecorated."""
-    import os
-    import sys
-    plain = os.environ.get('CLI_PLAIN') == '1' or '--plain' in sys.argv
+    plain = plain or not sys.stdout.isatty() or os.environ.get('CLI_PLAIN') == '1' or '--plain' in sys.argv
+    plain = plain or any(key.startswith('CODEX_') or key == 'CLAUDECODE' for key in os.environ)
     return ('' if plain else icon + ' ') + text
 
 
@@ -758,7 +758,7 @@ def canonical_json(report: dict[str, Any]) -> str:
     return json.dumps(report, indent=2, sort_keys=True) + "\n"
 
 
-def text_report(report: dict[str, Any]) -> str:
+def text_report(report: dict[str, Any], *, details: bool = False, plain: bool = False) -> str:
     summary = report["summary"]
     totals = report["metrics"]["active_totals"]
     lines = [
@@ -772,7 +772,7 @@ def text_report(report: dict[str, Any]) -> str:
             f"~{totals['estimated_tokens']} tokens"
         ),
     ]
-    if report["findings"]:
+    if report["findings"] and details:
         lines.append("Findings:")
         for finding in report["findings"]:
             locations = ", ".join(
@@ -798,9 +798,9 @@ def text_report(report: dict[str, Any]) -> str:
                 f"- {finding['severity'].upper()} {finding['code']}: "
                 f"{finding['message']}{suffix}"
             )
-    else:
+    elif not report["findings"]:
         lines.append("Findings: none")
-    if "comparison" in report:
+    if "comparison" in report and details:
         comparison = report["comparison"]
         lines.append("Comparison:")
         for key, value in sorted(comparison["metric_deltas"].items()):
@@ -809,10 +809,9 @@ def text_report(report: dict[str, Any]) -> str:
         resolved = ", ".join(comparison["resolved_finding_keys"]) or "none"
         lines.append(f"- Added finding keys: {added}")
         lines.append(f"- Resolved finding keys: {resolved}")
-    import os
-    import sys
-    if os.environ.get('CLI_PLAIN') != '1' and '--plain' not in sys.argv:
-        lines = [('❌ ' if '- ERROR' in line else '⚠️ ' if '- WARNING' in line else '🩺 ' if 'AI workflow doctor' in line else '📋 ') + line for line in lines]
+    if not details:
+        lines.append('Full diagnostics: --details or --format json')
+    lines = [_cli_message(line, '❌' if '- ERROR' in line else '⚠️' if '- WARNING' in line else '🩺' if 'AI workflow doctor' in line else '📋', plain) for line in lines]
     return "\n".join(lines) + "\n"
 
 
@@ -824,6 +823,8 @@ def parser() -> argparse.ArgumentParser:
     argument_parser.add_argument("--compare")
     argument_parser.add_argument("--verify-sources", action="store_true")
     argument_parser.add_argument("--check", action="store_true")
+    argument_parser.add_argument("--plain", action="store_true", help="ASCII output without decoration")
+    argument_parser.add_argument("--details", action="store_true", help="Show full findings and comparison diagnostics")
     return argument_parser
 
 
@@ -846,7 +847,8 @@ def run(arguments: list[str] | None = None) -> int:
             snapshot_path = Path(args.snapshot).expanduser()
             snapshot_path.parent.mkdir(parents=True, exist_ok=True)
             snapshot_path.write_text(snapshot_json, encoding="utf-8")
-        output = rendered_json if args.format == "json" else text_report(report)
+        interactive = sys.stdout.isatty() and not any(key.startswith('CODEX_') or key == 'CLAUDECODE' for key in os.environ)
+        output = rendered_json if args.format == "json" else text_report(report, details=args.details or interactive, plain=args.plain)
         sys.stdout.write(output)
         if args.check and report["summary"]["errors"]:
             return 1

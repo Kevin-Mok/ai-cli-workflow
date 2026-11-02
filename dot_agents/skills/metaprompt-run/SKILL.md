@@ -113,7 +113,6 @@ substitute current-session execution or weaken tool approval requirements.
 | --- | --- |
 | Create or improve a prompt for review | `$metaprompt` |
 | Optimize, save and immediately start a fresh execution conversation | `$metaprompt-run` |
-| Use the original compiler and its standalone `go` gate | `$metaprompt-alxve` |
 
 ## Example
 

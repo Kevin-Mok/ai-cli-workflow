@@ -1,8 +1,16 @@
 #!/usr/bin/env bash
 
 # Human-facing decoration; keep protocol/data output unchanged.
+cli_decorated=0
+if [[ -t 1 && "${CLI_PLAIN:-0}" != 1 && ! ${CLAUDECODE+x} ]] && ! compgen -v CODEX_ >/dev/null; then
+  cli_decorated=1
+fi
+if [[ "${1:-}" == --plain ]]; then
+  cli_decorated=0
+  shift
+fi
 cli_emoji() {
-  [ "${CLI_PLAIN:-0}" = 1 ] || printf '%s ' "$1"
+  [ "$cli_decorated" = 0 ] || printf '%s ' "$1"
 }
 
 set -euo pipefail
@@ -10,7 +18,7 @@ set -euo pipefail
 if [[ "${1:-}" == "--help" || "${1:-}" == "-h" ]]; then
   printf '%s' "$(cli_emoji '📖')"
   cat <<'USAGE'
-Usage: executable_readme-recruiter-sync [REPO_ROOT]
+Usage: executable_readme-recruiter-sync [--plain] [REPO_ROOT]
 
 Runs the repo-local README recruiter-sync gate contract checks and reports one of:
 - pass_no_change

@@ -1,280 +1,36 @@
 #!/usr/bin/env python3
-"""Validate, enable, or disable the Superpowers release-sync user timer."""
+"""Report the retired Superpowers integration or explicitly disable its old timer."""
 
 from __future__ import annotations
 
 import argparse
-import fcntl
 import os
-import stat
 import subprocess
 import sys
-from contextlib import contextmanager
-from pathlib import Path
-from typing import Iterator, Sequence
+from typing import Sequence
 
 
-def _cli_message(text, icon):
-    """Decorate human output; CLI_PLAIN=1 keeps legacy scripts undecorated."""
-    import os
-    import sys
-    plain = os.environ.get('CLI_PLAIN') == '1' or '--plain' in sys.argv
-    return ('' if plain else icon + ' ') + text
-
-HELPER_NAME = "sync-superpowers-release"
-SERVICE_NAME = "superpowers-release-sync.service"
 TIMER_NAME = "superpowers-release-sync.timer"
-SOURCE_RELATIVE_PATHS = {
-    HELPER_NAME: Path("scripts") / "executable_sync-superpowers-release",
-    SERVICE_NAME: Path("dot_config") / "systemd" / "user" / SERVICE_NAME,
-    TIMER_NAME: Path("dot_config") / "systemd" / "user" / TIMER_NAME,
-}
+
+
+def _cli_message(text: str, icon: str) -> str:
+    return ("" if os.environ.get("CLI_PLAIN") == "1" else icon + " ") + text
 
 
 class TimerSetupError(RuntimeError):
-    """Timer setup cannot proceed safely."""
+    """An explicit legacy timer cleanup could not complete."""
 
 
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="setup-superpowers-release-timer",
-        description=_cli_message("Manage the Superpowers release-sync systemd user timer.", '🧰'),
+        description=_cli_message("Superpowers installation is disabled; clean up its legacy timer.", "🧰"),
     )
     action = parser.add_mutually_exclusive_group(required=True)
-    action.add_argument("--check", action="store_true", help="Validate the timer units.")
-    action.add_argument("--enable", action="store_true", help="Install and enable the timer.")
-    action.add_argument("--disable", action="store_true", help="Disable the timer.")
+    action.add_argument("--check", action="store_true", help="Report the disabled repo integration; does not inspect live timers.")
+    action.add_argument("--enable", action="store_true", help="Retired; enabling is refused.")
+    action.add_argument("--disable", action="store_true", help="Disable an existing legacy timer.")
     return parser
-
-
-def _run(arguments: Sequence[str], failure: str) -> subprocess.CompletedProcess[str]:
-    try:
-        completed = subprocess.run(
-            list(arguments), check=False, capture_output=True, text=True
-        )
-    except OSError as error:
-        raise TimerSetupError(failure) from error
-    if completed.returncode != 0:
-        raise TimerSetupError(failure)
-    return completed
-
-
-def _source_root() -> Path:
-    standard = Path.home() / "linux-config"
-    configured = os.environ.get("LINUX_CONFIG_SOURCE")
-    candidate = Path(configured).expanduser() if configured else standard
-    try:
-        metadata = candidate.lstat()
-        standard_resolved = standard.resolve(strict=True)
-        candidate_resolved = candidate.resolve(strict=True)
-    except OSError as error:
-        raise TimerSetupError("Linux config source directory is missing") from error
-    if candidate.is_symlink() or not stat.S_ISDIR(metadata.st_mode):
-        raise TimerSetupError("Linux config source directory is missing")
-    if candidate_resolved != standard_resolved:
-        raise TimerSetupError(
-            "timer setup requires the standard checkout at $HOME/linux-config"
-        )
-    return standard_resolved
-
-
-def _private_lock_path() -> Path:
-    base = Path(
-        os.environ.get("XDG_STATE_HOME", str(Path.home() / ".local" / "state"))
-    ).expanduser()
-    if not base.is_absolute() or base.is_symlink():
-        raise TimerSetupError("timer setup state path is unsafe")
-    try:
-        base.mkdir(parents=True, exist_ok=True, mode=0o700)
-        base_metadata = base.stat()
-    except OSError as error:
-        raise TimerSetupError("timer setup state path is unsafe") from error
-    if not stat.S_ISDIR(base_metadata.st_mode) or base_metadata.st_uid != os.geteuid():
-        raise TimerSetupError("timer setup state path is unsafe")
-    lock_dir = base / "superpowers-release-sync" / "locks"
-    for directory in (lock_dir.parent, lock_dir):
-        try:
-            metadata = directory.lstat()
-        except FileNotFoundError:
-            try:
-                directory.mkdir(mode=0o700)
-                metadata = directory.lstat()
-            except OSError as error:
-                raise TimerSetupError("timer setup state path is unsafe") from error
-        except OSError as error:
-            raise TimerSetupError("timer setup state path is unsafe") from error
-        if (
-            directory.is_symlink()
-            or not stat.S_ISDIR(metadata.st_mode)
-            or metadata.st_uid != os.geteuid()
-        ):
-            raise TimerSetupError("timer setup state path is unsafe")
-        try:
-            directory.chmod(0o700)
-        except OSError as error:
-            raise TimerSetupError("timer setup state path is unsafe") from error
-    return lock_dir / "timer-setup.lock"
-
-
-@contextmanager
-def _setup_lock() -> Iterator[None]:
-    lock_path = _private_lock_path()
-    flags = os.O_RDWR | os.O_CREAT
-    if hasattr(os, "O_NOFOLLOW"):
-        flags |= os.O_NOFOLLOW
-    try:
-        descriptor = os.open(lock_path, flags, 0o600)
-    except OSError as error:
-        raise TimerSetupError("timer setup lock could not be opened") from error
-    try:
-        metadata = os.fstat(descriptor)
-        if (
-            not stat.S_ISREG(metadata.st_mode)
-            or metadata.st_nlink != 1
-            or metadata.st_uid != os.geteuid()
-        ):
-            raise TimerSetupError("timer setup lock is unsafe")
-        os.fchmod(descriptor, 0o600)
-        try:
-            fcntl.flock(descriptor, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        except BlockingIOError as error:
-            raise TimerSetupError(
-                "another timer setup operation is already running"
-            ) from error
-        try:
-            yield
-        finally:
-            fcntl.flock(descriptor, fcntl.LOCK_UN)
-    finally:
-        os.close(descriptor)
-
-
-def _managed_targets() -> tuple[Path, Path, Path]:
-    helper = Path.home() / "scripts" / HELPER_NAME
-    units = Path.home() / ".config" / "systemd" / "user"
-    return helper, units / SERVICE_NAME, units / TIMER_NAME
-
-
-def _validate_source_path(source_root: Path, source: Path, expected: Path) -> None:
-    if source != expected:
-        raise TimerSetupError("chezmoi managed source does not match expected source")
-    try:
-        relative = expected.relative_to(source_root)
-    except ValueError as error:
-        raise TimerSetupError(
-            "chezmoi managed source does not match expected source"
-        ) from error
-    current = source_root
-    for component in relative.parts[:-1]:
-        current /= component
-        try:
-            metadata = current.lstat()
-        except OSError as error:
-            raise TimerSetupError("chezmoi managed source is unsafe") from error
-        if current.is_symlink() or not stat.S_ISDIR(metadata.st_mode):
-            raise TimerSetupError("chezmoi managed source is unsafe")
-
-
-def _source_for(source_root: Path, target: Path) -> Path:
-    completed = _run(
-        ("chezmoi", "-S", str(source_root), "source-path", str(target)),
-        "chezmoi managed source resolution failed",
-    )
-    source = Path(completed.stdout.strip()).expanduser()
-    expected = source_root / SOURCE_RELATIVE_PATHS[target.name]
-    try:
-        metadata = source.lstat()
-    except OSError as error:
-        raise TimerSetupError("chezmoi managed source is missing") from error
-    if (
-        not source.is_absolute()
-        or source.is_symlink()
-        or not stat.S_ISREG(metadata.st_mode)
-        or metadata.st_nlink != 1
-        or metadata.st_uid != os.geteuid()
-    ):
-        raise TimerSetupError("chezmoi managed source is unsafe")
-    _validate_source_path(source_root, source, expected)
-    if target.name == HELPER_NAME and not metadata.st_mode & 0o111:
-        raise TimerSetupError("chezmoi helper source is not executable")
-    return source
-
-
-def _validate_sources() -> tuple[
-    Path, tuple[Path, Path, Path], tuple[Path, Path, Path]
-]:
-    source = _source_root()
-    targets = _managed_targets()
-    sources = tuple(_source_for(source, target) for target in targets)
-    return source, targets, sources
-
-
-def _validate_installed_targets(
-    targets: tuple[Path, Path, Path],
-    sources: tuple[Path, Path, Path],
-) -> None:
-    for target, source in zip(targets, sources, strict=True):
-        try:
-            metadata = target.lstat()
-            installed = target.read_bytes()
-            expected = source.read_bytes()
-        except OSError as error:
-            raise TimerSetupError(
-                "installed Superpowers release timer files do not match managed sources"
-            ) from error
-        if (
-            target.is_symlink()
-            or not stat.S_ISREG(metadata.st_mode)
-            or metadata.st_nlink != 1
-            or installed != expected
-            or (target.name == HELPER_NAME and not metadata.st_mode & 0o111)
-        ):
-            raise TimerSetupError(
-                "installed Superpowers release timer files do not match managed sources"
-            )
-
-
-def _verify_installed_units(targets: tuple[Path, Path, Path]) -> None:
-    _run(
-        ("systemd-analyze", "--user", "verify", *(str(path) for path in targets[1:])),
-        "systemd unit validation failed",
-    )
-
-
-def _check() -> None:
-    _source, targets, _sources = _validate_sources()
-    _verify_installed_units(targets)
-    print(_cli_message("Superpowers release timer units are valid.", '⏱️'))
-
-
-def _best_effort_disable() -> None:
-    try:
-        subprocess.run(
-            ("systemctl", "--user", "disable", "--now", TIMER_NAME),
-            check=False,
-            capture_output=True,
-            text=True,
-        )
-    except OSError:
-        pass
-
-
-def _enable() -> None:
-    source, targets, sources = _validate_sources()
-    _run(
-        ("chezmoi", "-S", str(source), "apply", "--parent-dirs", *(str(path) for path in targets)),
-        "chezmoi managed target apply failed",
-    )
-    _validate_installed_targets(targets, sources)
-    _verify_installed_units(targets)
-    _run(("systemctl", "--user", "daemon-reload"), "systemd user daemon reload failed")
-    try:
-        _run(("systemctl", "--user", "enable", "--now", TIMER_NAME), "timer enable failed")
-        _verify_installed_units(targets)
-    except TimerSetupError:
-        _best_effort_disable()
-        raise
-    print(_cli_message("Superpowers release timer enabled.", '⏱️'))
 
 
 def _disable() -> None:
@@ -290,22 +46,20 @@ def _disable() -> None:
     output = f"{completed.stdout}\n{completed.stderr}".casefold()
     if completed.returncode != 0 and "is not loaded" not in output:
         raise TimerSetupError("timer disable failed")
-    print(_cli_message("Superpowers release timer disabled.", '⏱️'))
+    print(_cli_message("Superpowers release timer disabled.", "⏱️"))
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     try:
-        if args.check:
-            _check()
+        if args.enable:
+            raise TimerSetupError("Superpowers installation is disabled; use --disable to stop its legacy timer")
+        if args.disable:
+            _disable()
         else:
-            with _setup_lock():
-                if args.enable:
-                    _enable()
-                else:
-                    _disable()
+            print(_cli_message("Superpowers repo integration is disabled; existing timers are not inspected.", "ℹ️"))
     except TimerSetupError as error:
-        print(_cli_message(f"setup-superpowers-release-timer: {error}", '❌'), file=sys.stderr)
+        print(_cli_message(f"setup-superpowers-release-timer: {error}", "❌"), file=sys.stderr)
         return 2
     return 0
 

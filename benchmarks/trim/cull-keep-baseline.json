@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "method": "deterministic lexical proxy; not model triggering",
+  "algorithm": "tfidf-cosine-v1-min0.20-relative0.90",
+  "cases_sha256": "101d4633a5b9d4a8fa8375fdcee526793a5ff8a5d3e783470d4ee825f1193efb",
+  "catalog_sha256": "5b38dcf64ac6546725568e5ea97c7500b5c1ae16692bea308a28eaf3574c2b93",
+  "case_count": 17,
+  "exact_matches": 13,
+  "exact_match_accuracy": 0.7647058823529411,
+  "micro_precision": 0.6666666666666666,
+  "micro_recall": 0.8,
+  "micro_f1": 0.7272727272727272,
+  "per_case": [
+    {
+      "id": "brand-kit",
+      "exact_match": true
+    },
+    {
+      "id": "prompt-create",
+      "exact_match": false
+    },
+    {
+      "id": "prompt-run",
+      "exact_match": true
+    },
+    {
+      "id": "instructions-audit",
+      "exact_match": true
+    },
+    {
+      "id": "instructions-edit",
+      "exact_match": true
+    },
+    {
+      "id": "shortcut-fish",
+      "exact_match": true
+    },
+    {
+      "id": "research-recent",
+      "exact_match": true
+    },
+    {
+      "id": "workflow-ship",
+      "exact_match": true
+    },
+    {
+      "id": "multi-feedback-failure",
+      "exact_match": false
+    },
+    {
+      "id": "none-arithmetic",
+      "exact_match": true
+    },
+    {
+      "id": "none-language",
+      "exact_match": false
+    },
+    {
+      "id": "none-python",
+      "exact_match": true
+    },
+    {
+      "id": "none-date",
+      "exact_match": true
+    },
+    {
+      "id": "none-json",
+      "exact_match": true
+    },
+    {
+      "id": "none-git",
+      "exact_match": true
+    },
+    {
+      "id": "none-file",
+      "exact_match": true
+    },
+    {
+      "id": "none-riddle",
+      "exact_match": false
+    }
+  ]
+}

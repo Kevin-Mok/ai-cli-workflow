@@ -1,0 +1,215 @@
+{
+  "schema_version": 1,
+  "method": "deterministic lexical proxy; not model triggering",
+  "algorithm": "tfidf-cosine-v1-min0.20-relative0.90",
+  "cases_sha256": "6e8a6705dfae281a653ea54c5af64f5cdbb801957526a67574bd8a8b0ec50c86",
+  "catalog_sha256": "5b38dcf64ac6546725568e5ea97c7500b5c1ae16692bea308a28eaf3574c2b93",
+  "case_count": 50,
+  "exact_matches": 40,
+  "exact_match_accuracy": 0.8,
+  "micro_precision": 0.8723404255319149,
+  "micro_recall": 0.8541666666666666,
+  "micro_f1": 0.8631578947368421,
+  "per_case": [
+    {
+      "id": "ui-accessibility",
+      "exact_match": true
+    },
+    {
+      "id": "ui-mobile",
+      "exact_match": true
+    },
+    {
+      "id": "ui-motion",
+      "exact_match": true
+    },
+    {
+      "id": "ui-layout",
+      "exact_match": true
+    },
+    {
+      "id": "ui-copy",
+      "exact_match": true
+    },
+    {
+      "id": "ui-color",
+      "exact_match": true
+    },
+    {
+      "id": "ui-critique",
+      "exact_match": true
+    },
+    {
+      "id": "ui-delight",
+      "exact_match": true
+    },
+    {
+      "id": "ui-simple",
+      "exact_match": false
+    },
+    {
+      "id": "ui-reuse",
+      "exact_match": true
+    },
+    {
+      "id": "ui-resilience",
+      "exact_match": true
+    },
+    {
+      "id": "ui-normalize",
+      "exact_match": true
+    },
+    {
+      "id": "ui-onboarding",
+      "exact_match": true
+    },
+    {
+      "id": "ui-performance",
+      "exact_match": true
+    },
+    {
+      "id": "ui-polish",
+      "exact_match": true
+    },
+    {
+      "id": "ui-quieter",
+      "exact_match": true
+    },
+    {
+      "id": "ui-type",
+      "exact_match": true
+    },
+    {
+      "id": "brand-kit",
+      "exact_match": true
+    },
+    {
+      "id": "prompt-create",
+      "exact_match": false
+    },
+    {
+      "id": "prompt-original",
+      "exact_match": false
+    },
+    {
+      "id": "prompt-run",
+      "exact_match": true
+    },
+    {
+      "id": "instructions-audit",
+      "exact_match": true
+    },
+    {
+      "id": "instructions-edit",
+      "exact_match": true
+    },
+    {
+      "id": "skills-find",
+      "exact_match": true
+    },
+    {
+      "id": "shortcut-fish",
+      "exact_match": true
+    },
+    {
+      "id": "coding-scaffold",
+      "exact_match": true
+    },
+    {
+      "id": "research-recent",
+      "exact_match": true
+    },
+    {
+      "id": "workflow-harness",
+      "exact_match": true
+    },
+    {
+      "id": "workflow-ci",
+      "exact_match": true
+    },
+    {
+      "id": "workflow-review",
+      "exact_match": true
+    },
+    {
+      "id": "workflow-plan",
+      "exact_match": true
+    },
+    {
+      "id": "workflow-ship",
+      "exact_match": true
+    },
+    {
+      "id": "media-image",
+      "exact_match": true
+    },
+    {
+      "id": "media-pdf",
+      "exact_match": true
+    },
+    {
+      "id": "media-transcribe",
+      "exact_match": true
+    },
+    {
+      "id": "media-screenshot",
+      "exact_match": true
+    },
+    {
+      "id": "multi-mobile-copy",
+      "exact_match": false
+    },
+    {
+      "id": "multi-color-type",
+      "exact_match": false
+    },
+    {
+      "id": "multi-audit-performance",
+      "exact_match": true
+    },
+    {
+      "id": "multi-brand-image",
+      "exact_match": false
+    },
+    {
+      "id": "multi-pdf-transcript",
+      "exact_match": false
+    },
+    {
+      "id": "multi-feedback-failure",
+      "exact_match": false
+    },
+    {
+      "id": "none-arithmetic",
+      "exact_match": true
+    },
+    {
+      "id": "none-language",
+      "exact_match": false
+    },
+    {
+      "id": "none-python",
+      "exact_match": true
+    },
+    {
+      "id": "none-date",
+      "exact_match": true
+    },
+    {
+      "id": "none-json",
+      "exact_match": true
+    },
+    {
+      "id": "none-git",
+      "exact_match": true
+    },
+    {
+      "id": "none-file",
+      "exact_match": true
+    },
+    {
+      "id": "none-riddle",
+      "exact_match": false
+    }
+  ]
+}

@@ -11,22 +11,18 @@ usage() {
   cat <<'USAGE'
 Usage: sync-superpowers-release [--dry-run]
 
-Refresh the chezmoi-managed obra/superpowers install from the latest GitHub
-release archive and keep ~/.agents/skills/superpowers wired to its skills/
-directory.
+Superpowers installation is disabled by the approved skill cull.
+This compatibility command leaves existing upstream files untouched.
 
 Options:
-  --dry-run, -n   Preview the refresh without writing files.
+  --dry-run, -n   Report the disabled integration without writing files.
   --help, -h      Show this help.
 USAGE
 }
 
-dry_run=0
-
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --dry-run|-n)
-      dry_run=1
       shift
       ;;
     --help|-h)
@@ -41,33 +37,4 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-source_dir="${LINUX_CONFIG_SOURCE:-$HOME/linux-config}"
-
-if [[ ! -d "$source_dir" ]]; then
-  echo "$(cli_emoji '❌')sync-superpowers-release: source directory not found: $source_dir" >&2
-  echo "$(cli_emoji 'ℹ️')Set LINUX_CONFIG_SOURCE to this repo checkout if it lives elsewhere." >&2
-  exit 1
-fi
-
-apply_args=(
-  -S "$source_dir"
-  apply
-  --refresh-externals
-  -v
-)
-
-if [[ "$dry_run" -eq 1 ]]; then
-  apply_args+=(-n)
-fi
-
-apply_args+=(
-  "$HOME/.codex/superpowers"
-  "$HOME/.agents/skills/superpowers"
-)
-
-chezmoi "${apply_args[@]}"
-
-if [[ "$dry_run" -eq 0 ]]; then
-  echo
-  echo "$(cli_emoji '✅')Superpowers release refreshed. Restart Codex sessions to load updated skills."
-fi
+echo "$(cli_emoji 'ℹ️')Superpowers installation is disabled; existing upstream files are unchanged."

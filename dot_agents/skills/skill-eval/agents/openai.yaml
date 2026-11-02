@@ -1,0 +1,6 @@
+interface:
+  display_name: "Skill Eval"
+  short_description: "Calibrated blind evaluations for a named skill"
+  default_prompt: "Use $skill-eval to evaluate a named skill with real session inputs, my edited binary rubric, calibrated blind judging, and matched with/without and candidate comparisons."
+policy:
+  allow_implicit_invocation: false

@@ -1,5 +1,10 @@
 # Superpowers Release Sync Implementation Plan
 
+This historical installation record is superseded by the 2026-10-22 approved
+skill cull. The repo no longer installs Superpowers or its timer; refresh is a
+compatibility no-op and timer enablement is refused. Existing upstream files
+remain untouched. See [current integration and cleanup guidance](../../design-skills.md).
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Manage the external Superpowers bundle with chezmoi from the latest upstream release archive and expose a manual refresh command.

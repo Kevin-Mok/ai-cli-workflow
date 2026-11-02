@@ -1,6 +1,7 @@
 ---
 name: commit-session
-description: Commit and push only the git changes dirtied during the current Codex session, while leaving pre-existing dirty work from other sessions uncommitted. Use when I say `commit-session`, `commit session`, `ship this session`, `commit only this Codex session`, or explicitly ask to avoid committing pre-existing or other-session dirty changes. Do not use for commit planning only, all-dirty shipping, history rewrites, or work outside Git.
+description: >-
+  Use for `commit-session`, `ship this session`, or committing only this Codex session: commit and push session-owned Git changes, preserving pre-existing or other-session dirty work. Excludes planning-only all-dirty shipping and history rewrites.
 disable-model-invocation: true
 ---
 

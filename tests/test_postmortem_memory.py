@@ -4,6 +4,7 @@ import hashlib
 import importlib.util
 import json
 import os
+import re
 from pathlib import Path
 import subprocess
 import tempfile
@@ -254,6 +255,8 @@ class WorkflowTest(unittest.TestCase):
         self.assertIn('before', text.lower())
         self.assertIn('read-only', text)
         policy = (REPO / 'dot_codex/AGENTS.md').read_text()
+        for target in set(re.findall(r'\]\((references/[^)#]+\.md)(?:#[^)]*)?\)', policy)):
+            policy += '\n' + (REPO / 'dot_codex' / target).read_text()
         self.assertIn('postmortem-memory', policy)
         self.assertIn('--postmortem', policy)
         self.assertTrue((SKILL / 'agents/openai.yaml').is_file())

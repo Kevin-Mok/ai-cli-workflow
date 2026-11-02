@@ -4,6 +4,50 @@ This document holds the measurement baseline, policy decisions, and historical
 provenance moved out of always-loaded instructions. The implementation plan is
 [`plans/ai-workflow-optimization.md`](../plans/ai-workflow-optimization.md).
 
+## Skills-efficiency measurement (2026-10-22)
+
+The [current trim plan](../plans/skills-efficiency.md) and
+[pass log](../benchmarks/trim/PROGRESS.md) track a new optimization series.
+Its immutable baseline records 353 lines / 22,750 bytes for canonical AGENTS,
+59 canonical skills, 37,619 recurring bytes and 403,458 on-demand body bytes.
+The cull, complementary intake and mandatory admission passes are committed as
+`bc0360c9`, `60c6e70f` and `6e9934c7`; the current
+[comparison](../benchmarks/trim/COMPARISON.md) reproduces actual Git blobs.
+The CASD pass moves conditional procedures verbatim and preserves every original
+block. Canonical AGENTS:23,147B/357lines before, 8,982B/145lines
+after. Static recurring context falls30,292→16,127B. Actual task context
+depends on triggered reference loads; the moved text is retained, not deleted.
+
+| Original section/procedure | Mandatory home |
+| --- | --- |
+| Start-of-turn checkpoint and Live Codex Task Titles | [Task titles](../dot_codex/references/task-titles.md) |
+| System Design Routing | [System design](../dot_codex/references/system-design.md) |
+| CLI decoration/progress and fish paste/copy procedure | [CLI and shell](../dot_codex/references/cli-and-shell.md) |
+| Failure lookup, learning and immediate postmortem procedure | [Postmortems](../dot_codex/references/postmortems.md) |
+| Conditional Session Memory | [Session memory](../dot_codex/references/session-memory.md) |
+| README/manual checks, overview and configuration refresh | [Documentation/config](../dot_codex/references/documentation-and-config.md) |
+| Commit workflow, delivery cadence and Handoff Format | [Delivery](../dot_codex/references/delivery.md) |
+| Authority, safety, scope, planning, defining tests, feedback and verification | [Standing core](../dot_codex/AGENTS.md) |
+
+The [block preservation map](../benchmarks/trim/casd-map.json) identifies all91
+original blocks by source line, section, hash and retained home. Trigger routers
+are mandatory. Screened native-session evidence found no frequent uncovered
+complaint; safety plus observed copy/paste and completion controls remain.
+Active user/developer instructions still govern. No model/effort or live config
+was changed; no push, refresh-config or chezmoi apply is authorized.
+
+## Completed trim series
+
+Twelve pass commits end at79d1a8cb. Original37,619→14,399standing bytes
+(9,404.75→3,599.75estimated tokens,−61.72%); descriptions13,462→4,727B,
+SKILLbodies403,458→179,490B,59→27canonical skills under approved cull/intake.
+The [final comparison](../benchmarks/trim/COMPARISON.md) uses exact committed
+blobs; [saturation review](../benchmarks/trim/saturation.md) records rejected
+candidates, protected sources and earlier-audit dispositions. Triggered references
+remain extra; live config/runtime savings are unverified.239selectedtests/
+391subtests pass; inherited collection/fixture/audit debt is disclosed in PROGRESS.
+Model/effort and Claude permissions remain unchanged; no push/apply occurred.
+
 ## Audited Baseline
 
 Captured on 2026-07-13 before Task 1 edits:

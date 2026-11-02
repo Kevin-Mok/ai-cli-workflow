@@ -1,7 +1,0 @@
-interface:
-  display_name: "Commit 4 Plan"
-  short_description: "Plan safe git commits without writing changes"
-  default_prompt: "Use $commit-plan to inspect the current repo, group dirty changes into coherent commits, and return a safe commit plan without staging, committing, or pushing. State that a verified single-commit workflow pushes once, while a multi-commit workflow pushes once after the complete verified series, unless the user explicitly requests another cadence."
-
-policy:
-  allow_implicit_invocation: false

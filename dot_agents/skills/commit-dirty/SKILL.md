@@ -1,6 +1,6 @@
 ---
 name: commit-dirty
-description: Use when I explicitly want the current intended dirty git worktree committed and pushed now, including requests like `commit dirty`, `commit all dirty`, `commit and push this`, or `ship these changes`, after verifying scope and running the minimum relevant checks. Do not use for commit planning only, history rewrites, force-pushes, or work outside Git.
+description: Use only for current dirty Git commits/pushes: commit dirty, commit all dirty, commit and push this, or ship these changes. Excludes planning/history rewrites.
 disable-model-invocation: true
 ---
 
@@ -44,7 +44,7 @@ Use this skill for explicit write requests to create a real git commit and push 
 ## Guardrails
 
 - Treat `commit all dirty` as authorization to include every safe, reviewable dirty change. For narrower requests, exclude unrelated work.
-- Do not use this skill when the task is only to plan commits or group dirty changes without writing. Use `commit-plan` for that case.
+- Do not use this skill when the task is only to plan commits or group dirty changes without writing. Use `commit-plan-push` in planning-only mode for that case.
 - Do not use this skill when the user explicitly wants to ship only the current Codex session's changes. Use `commit-session` for that case.
 - Never bypass `readme-recruiter-sync` because the code diff looks small.
 - Never invent README claims, flags, install steps, or recruiter copy that the repo does not support.

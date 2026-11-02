@@ -1,6 +1,7 @@
 ---
 name: ai-workflow-doctor
-description: Use when auditing a repository's AI instructions, skill catalog, local references, provenance, duplication, context size, or workflow drift; also use before and after instruction-surface optimization.
+description: >-
+  Use to audit repo AI instructions, skill catalogs, references, provenance, duplication, context size or workflow drift; before/after instruction optimization.
 ---
 
 # AI Workflow Doctor

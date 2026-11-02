@@ -1,0 +1,202 @@
+{
+  "schema_version": 1,
+  "method": "deterministic lexical proxy; not model triggering",
+  "algorithm": "tfidf-cosine-v1-min0.20-relative0.90",
+  "cases_sha256": "96f0e7e655dc84ab2937735fb8f32c82651c1956bf9602b2032af939ff3e4276",
+  "catalog_sha256": "dae99000fc565430e93c4756169f290b9eb8e6fda7f6e90ea5df0876e8aa1525",
+  "case_count": 46,
+  "exact_matches": 42,
+  "exact_match_accuracy": 0.9130434782608695,
+  "micro_precision": 0.9722222222222222,
+  "micro_recall": 0.9210526315789473,
+  "micro_f1": 0.9459459459459458,
+  "per_case": [
+    {
+      "id": "brand-kit",
+      "exact_match": true
+    },
+    {
+      "id": "prompt-create",
+      "exact_match": true
+    },
+    {
+      "id": "prompt-run",
+      "exact_match": true
+    },
+    {
+      "id": "instructions-audit",
+      "exact_match": true
+    },
+    {
+      "id": "instructions-edit",
+      "exact_match": true
+    },
+    {
+      "id": "shortcut-fish",
+      "exact_match": true
+    },
+    {
+      "id": "research-recent",
+      "exact_match": true
+    },
+    {
+      "id": "workflow-ship",
+      "exact_match": true
+    },
+    {
+      "id": "multi-feedback-failure",
+      "exact_match": true
+    },
+    {
+      "id": "none-arithmetic",
+      "exact_match": true
+    },
+    {
+      "id": "none-language",
+      "exact_match": false
+    },
+    {
+      "id": "none-python",
+      "exact_match": true
+    },
+    {
+      "id": "none-date",
+      "exact_match": true
+    },
+    {
+      "id": "none-json",
+      "exact_match": true
+    },
+    {
+      "id": "none-git",
+      "exact_match": true
+    },
+    {
+      "id": "none-file",
+      "exact_match": true
+    },
+    {
+      "id": "none-riddle",
+      "exact_match": true
+    },
+    {
+      "id": "intake-commit-dirty",
+      "exact_match": true
+    },
+    {
+      "id": "intake-commit-plan",
+      "exact_match": true
+    },
+    {
+      "id": "intake-context-resume",
+      "exact_match": true
+    },
+    {
+      "id": "intake-frontend",
+      "exact_match": true
+    },
+    {
+      "id": "intake-morning",
+      "exact_match": true
+    },
+    {
+      "id": "intake-next",
+      "exact_match": true
+    },
+    {
+      "id": "intake-night",
+      "exact_match": true
+    },
+    {
+      "id": "intake-personal",
+      "exact_match": true
+    },
+    {
+      "id": "intake-browser",
+      "exact_match": true
+    },
+    {
+      "id": "intake-readme",
+      "exact_match": true
+    },
+    {
+      "id": "intake-session",
+      "exact_match": true
+    },
+    {
+      "id": "intake-smoke",
+      "exact_match": true
+    },
+    {
+      "id": "intake-react",
+      "exact_match": true
+    },
+    {
+      "id": "intake-react-review",
+      "exact_match": true
+    },
+    {
+      "id": "intake-eval",
+      "exact_match": true
+    },
+    {
+      "id": "intake-eval-blind",
+      "exact_match": true
+    },
+    {
+      "id": "intake-grok",
+      "exact_match": true
+    },
+    {
+      "id": "intake-grok-stop",
+      "exact_match": true
+    },
+    {
+      "id": "intake-shadcn",
+      "exact_match": true
+    },
+    {
+      "id": "intake-shadcn-update",
+      "exact_match": true
+    },
+    {
+      "id": "intake-impeccable",
+      "exact_match": true
+    },
+    {
+      "id": "intake-impeccable-audit",
+      "exact_match": true
+    },
+    {
+      "id": "intake-none-math",
+      "exact_match": true
+    },
+    {
+      "id": "intake-none-science",
+      "exact_match": true
+    },
+    {
+      "id": "intake-none-translate",
+      "exact_match": true
+    },
+    {
+      "id": "intake-none-literature",
+      "exact_match": true
+    },
+    {
+      "id": "intake-multi-browser-smoke",
+      "exact_match": false
+    },
+    {
+      "id": "intake-multi-components",
+      "exact_match": false
+    },
+    {
+      "id": "intake-multi-evaluation",
+      "exact_match": false
+    }
+  ],
+  "scope": "Intake:46 frozen cases covering all27 local skills; includes unchanged17-case keep-list. Compare only same cases; deterministic lexical proxy.",
+  "gate_errors": [],
+  "baseline_accuracy": 0.8913043478260869
+}

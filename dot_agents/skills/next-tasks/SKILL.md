@@ -1,6 +1,7 @@
 ---
 name: next-tasks
-description: Use only when I explicitly invoke `next-tasks`, typically to spend leftover weekly quota before it resets. Don't start yet; infer work from recent git history (messages and diffs), repo docs, prompt docs, and recent Codex/Claude sessions run in this repo, list up to 5 things you can finish and prove on your own, each citing its evidence, wait for me to pick one, do only that, then show the diff and verification results.
+description: >-
+  Use only for explicit `next-tasks` or leftover weekly quota: propose evidence-backed tasks, wait for a choice, then execute it.
 argument-hint: "[optional focus area]"
 disable-model-invocation: true
 ---

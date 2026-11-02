@@ -1,18 +1,29 @@
 ---
 name: commit-plan-push
-description: Use when I explicitly want the current dirty Git worktree planned into coherent commits, committed, and pushed now, including requests like `commit-plan-push`, “plan, commit, and push all dirty work,” or “split and ship these changes.” Make a best-effort delivery pass across all safe, reviewable changes; do not use for planning only, a single forced dirty commit, or history rewrites.
+description: Use when planning dirty Git commits (`commit-plan`) or explicitly asked to plan, commit, and push or split and ship changes. Planning-only stays read-only.
 disable-model-invocation: true
 ---
 
 # Commit Plan Push
 
-Use this skill for an explicit request to plan the current dirty worktree,
-create the safe commit series immediately, and push it. Treat the inferred
-commit plan as a delivery contract: execute it oldest-to-newest, make a
-best-effort attempt for every safe, reviewable change, and report residuals
-when a file cannot safely be shipped.
+Plan the current dirty worktree into coherent oldest-to-newest commits.
+Choose the mode from the user's request. Planning-only stays read-only;
+execution requires an explicit request to create commits and push. A skill name
+or proposed command alone never expands that authorization.
 
 Prioritize files touched during the current session and favor including safe related files over omitting them. Cover the full requested worktree, including reviewable companion files; touched-file priority must not invert prerequisite chronology.
+
+## Planning-only mode
+
+Use for `commit-plan`, `commit plan`, `plan to commit all dirty`, grouping dirty
+changes into commits, or a safe plan without execution. This mode performs
+**no Git writes**. Do not stage, commit, push, restore, reset, stash, clean, or
+change files, index state or history. An explicit execution request selects the
+delivery workflow below instead; uncertainty stays read-only.
+
+In planning-only mode, MUST read [the planning procedure](references/planning-only.md) and return before delivery.
+
+Single-commit workflows push after the commit passes verification; multi-commit workflows push once after the complete verified series, unless the user explicitly requests another cadence.
 
 ## Required Workflow
 
@@ -61,13 +72,13 @@ Prioritize files touched during the current session and favor including safe rel
 
 ## Guardrails
 
-- Treat this as permission to execute a safe inferred commit plan across the
+- In execution mode, treat this as permission to execute a safe inferred commit plan across the
   whole dirty worktree, not as permission to bundle unrelated work into one
   commit for speed.
 - Respect pre-existing user changes. Never discard, overwrite, stage, or bundle
   work outside the requested and verified scope. Best effort means shipping
   safe, reviewable groups—not guessing about ownership or intent.
-- Do not use this skill for planning only; use `commit-plan` instead.
+- For planning only, use the read-only mode above and stop before delivery.
 - Do not use it when the user explicitly wants one current dirty-worktree
   commit; use `commit-dirty` instead.
 - Do not use it for current-session-only work; use `commit-session` instead.

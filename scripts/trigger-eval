@@ -1,0 +1,195 @@
+#!/usr/bin/env python3
+"""Check synthetic skill-routing cases with a deterministic offline lexical proxy.
+
+This is not a model-trigger evaluation. The frozen v1 algorithm uses only names
+and descriptions: lowercase alphanumeric tokens, fixed English stopwords,
+TF-IDF cosine similarity, minimum score 0.20, and all candidates within 90% of
+the best score. It has no gold-label features, synonyms, stemming or tuning.
+Cases use JSON-compatible YAML to avoid an additional parser dependency.
+"""
+
+import argparse
+from collections import Counter
+import hashlib
+import json
+import math
+import os
+from pathlib import Path
+import re
+import runpy
+import sys
+
+ROOT = Path(__file__).resolve().parents[1]
+ALGORITHM = 'tfidf-cosine-v1-min0.20-relative0.90'
+STOPWORDS = frozenset('a an and are as at be been being by can could did do does for from had has have how i if in into is it its may me my of on or our please should so than that the their them then there these they this those to use was we were what when where which who will with would you your'.split())
+description_and_body = runpy.run_path(str(ROOT / 'scripts/trim-benchmark'))['description_and_body']
+
+
+def digest(value):
+    return hashlib.sha256(json.dumps(value, sort_keys=True, separators=(',', ':'), ensure_ascii=False).encode()).hexdigest()
+
+
+def tokens(text):
+    return [word for word in re.findall(r'[a-z0-9]+', text.lower()) if word not in STOPWORDS]
+
+
+def load_catalog(root):
+    catalog = {}
+    for path in sorted((root / 'dot_agents/skills').rglob('SKILL.md')):
+        if path.is_symlink():
+            continue
+        text = path.read_text()
+        header = text.split('---', 2)[1] if text.startswith('---\n') else ''
+        match = re.search(r'^name:\s*([^\n]+)', header, re.M)
+        if not match:
+            raise ValueError(f'{path}: missing skill name')
+        name = match.group(1).strip().strip('\"\'')
+        if not name or name in catalog:
+            raise ValueError(f'{path}: empty or duplicate skill name')
+        catalog[name] = description_and_body(text)[0]
+    if not catalog:
+        raise ValueError('no canonical skills found')
+    return catalog
+
+
+def load_cases(path):
+    cases = json.loads(path.read_text())['cases']
+    if not isinstance(cases, list) or not cases:
+        raise ValueError('cases must be a nonempty list')
+    seen = set()
+    for case in cases:
+        if not isinstance(case, dict) or not isinstance(case.get('id'), str) or not case['id'] or case['id'] in seen:
+            raise ValueError('each case requires a unique nonempty id')
+        seen.add(case['id'])
+        expected = case.get('expected')
+        if not isinstance(case.get('prompt'), str) or not case['prompt'].strip():
+            raise ValueError(f'{case["id"]}: prompt must be nonempty text')
+        if not isinstance(expected, list) or any(not isinstance(name, str) or not name for name in expected) or len(set(expected)) != len(expected):
+            raise ValueError(f'{case["id"]}: expected must contain unique skill names')
+    return cases
+
+
+def router(catalog):
+    documents = {name: Counter(tokens(name + ' ' + description)) for name, description in catalog.items()}
+    frequency = Counter(word for document in documents.values() for word in document)
+    idf = {word: math.log((1 + len(documents)) / (1 + count)) + 1 for word, count in frequency.items()}
+
+    def vector(words):
+        weighted = {word: count * idf[word] for word, count in words.items() if word in idf}
+        norm = math.sqrt(sum(value * value for value in weighted.values()))
+        return {word: value / norm for word, value in weighted.items()} if norm else {}
+
+    vectors = {name: vector(words) for name, words in documents.items()}
+
+    def route(prompt):
+        query = vector(Counter(tokens(prompt)))
+        scores = {name: sum(value * query.get(word, 0) for word, value in document.items()) for name, document in vectors.items()}
+        best = max(scores.values(), default=0)
+        return sorted(name for name, score in scores.items() if score >= max(0.20, best * 0.90))
+
+    return route
+
+
+def evaluate(catalog, cases):
+    route = router(catalog)
+    correct = true_positive = false_positive = false_negative = 0
+    results = []
+    for case in cases:
+        expected = set(case['expected'])
+        if not expected <= catalog.keys():
+            raise ValueError(f'{case["id"]}: expected skill absent from catalog')
+        predicted = set(route(case['prompt']))
+        match = expected == predicted
+        correct += match
+        true_positive += len(expected & predicted)
+        false_positive += len(predicted - expected)
+        false_negative += len(expected - predicted)
+        results.append({'id': case['id'], 'exact_match': match})
+    precision = true_positive / (true_positive + false_positive) if true_positive + false_positive else 0
+    recall = true_positive / (true_positive + false_negative) if true_positive + false_negative else 0
+    return {'schema_version': 1, 'method': 'deterministic lexical proxy; not model triggering',
+            'algorithm': ALGORITHM, 'cases_sha256': digest(cases), 'catalog_sha256': digest(catalog),
+            'case_count': len(cases), 'exact_matches': correct, 'exact_match_accuracy': correct / len(cases),
+            'micro_precision': precision, 'micro_recall': recall,
+            'micro_f1': 2 * precision * recall / (precision + recall) if precision + recall else 0,
+            'per_case': results}
+
+
+def gate_errors(report, baseline):
+    if baseline['schema_version'] != 1:
+        raise ValueError('unsupported baseline schema')
+    accuracy = baseline['exact_match_accuracy']
+    if isinstance(accuracy, bool) or not isinstance(accuracy, (int, float)) or not 0 <= accuracy <= 1 or not math.isfinite(accuracy):
+        raise ValueError('baseline accuracy must be finite and between 0 and 1')
+    errors = []
+    if baseline['algorithm'] != report['algorithm']:
+        errors.append('algorithm differs from frozen baseline')
+    if baseline['cases_sha256'] != report['cases_sha256'] or baseline['case_count'] != report['case_count']:
+        errors.append('case set differs from frozen baseline')
+    if report['exact_match_accuracy'] < accuracy:
+        errors.append('accuracy below baseline')
+    return errors
+
+
+def default_selection(root):
+    selection = {'cases': 'benchmarks/trim/trigger-cases.yaml',
+                 'baseline': 'benchmarks/trim/trigger-baseline.json',
+                 'scope': 'Original synthetic 50-case corpus; requires the original skill catalog.'}
+    pointer = root / 'benchmarks/trim/trigger-active.json'
+    if pointer.exists():
+        selection = json.loads(pointer.read_text())
+    if not isinstance(selection, dict) or any(not isinstance(selection.get(key), str) or not selection[key].strip() for key in ('cases', 'baseline', 'scope')):
+        raise ValueError('active selection requires nonempty cases, baseline and scope strings')
+    for key in ('cases', 'baseline'):
+        relative = Path(selection[key])
+        path = (root / relative).resolve()
+        if relative.is_absolute() or not path.is_relative_to(root):
+            raise ValueError(f'active {key} path must be relative and remain within repo')
+        selection[key] = path
+    return selection
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--repo', type=Path, default=ROOT)
+    parser.add_argument('--cases', type=Path, help='JSON-compatible YAML case set (default: active phase pointer or original corpus)')
+    parser.add_argument('--baseline', type=Path, help='Accuracy comparison snapshot; use a pre-pass --json report to reject pass-to-pass declines (default: active phase pointer or original baseline); never overwritten')
+    parser.add_argument('--check', action='store_true', help='Reject lower exact-set accuracy or a changed corpus/algorithm')
+    parser.add_argument('--json', action='store_true', help='Machine-readable aggregates and case IDs; no prompt text')
+    parser.add_argument('--plain', action='store_true', help='ASCII output')
+    args = parser.parse_args()
+    try:
+        root = args.repo.resolve()
+        selection = default_selection(root)
+        cases = load_cases(args.cases or selection['cases'])
+        report = evaluate(load_catalog(root), cases)
+        report['scope'] = selection['scope'] if args.cases is None else 'Explicit case set; compare only with a snapshot of the same corpus.'
+        baseline_path = args.baseline or selection['baseline']
+        baseline = json.loads(baseline_path.read_text()) if baseline_path.exists() else None
+        if baseline is None and args.check:
+            raise ValueError('frozen baseline missing; record it before using --check')
+        report['gate_errors'] = gate_errors(report, baseline) if baseline is not None else []
+        report['baseline_accuracy'] = baseline['exact_match_accuracy'] if baseline is not None else None
+    except (OSError, ValueError, KeyError, TypeError, AttributeError, IndexError) as error:
+        print(f'trigger-eval: {error}; check case JSON-compatible YAML, catalog and baseline schema', file=sys.stderr)
+        return 2
+    if args.json:
+        print(json.dumps(report, indent=2))
+    else:
+        decorated = sys.stdout.isatty() and not args.plain and os.environ.get('CLI_PLAIN') != '1'
+        decorated = decorated and not any(key.startswith('CODEX_') or key == 'CLAUDECODE' for key in os.environ)
+        print(('🎯 ' if decorated else '') + 'Trigger eval (deterministic lexical proxy; not model triggering)')
+        print(f'Scope: {report["scope"]}')
+        print(f'Exact-set accuracy: {report["exact_matches"]}/{report["case_count"]} ({report["exact_match_accuracy"]:.2%})')
+        print(f'Micro precision/recall/F1: {report["micro_precision"]:.2%} / {report["micro_recall"]:.2%} / {report["micro_f1"]:.2%}')
+        baseline_text = f'{report["baseline_accuracy"]:.2%}' if report['baseline_accuracy'] is not None else 'not recorded'
+        print(f'Comparison snapshot accuracy: {baseline_text}')
+        if args.check:
+            print('Accuracy gate: ' + ('FAIL' if report['gate_errors'] else 'PASS'))
+            for error in report['gate_errors']:
+                print(error)
+    return int(args.check and bool(report['gate_errors']))
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())
