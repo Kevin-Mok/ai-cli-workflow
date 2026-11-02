@@ -380,11 +380,30 @@ class BackupTests(unittest.TestCase):
         self.assertIn('resume=UUID=NEW',p.read_text()); self.assertNotIn('resume_offset=',p.read_text())
         self.assertEqual((self.root/'etc/initramfs-tools/conf.d/resume').read_text(),'RESUME=UUID=NEW\n')
 
+    def test_home_backup_skips_snap_caches_but_preserves_settings_and_project_data(self):
+        for name in ['alice/snap/spotify/common/.cache/data',
+                     'alice/snap/spotify/123/.cache/data',
+                     'alice/snap/spotify/common/.config/settings',
+                     'alice/project/.cache/keep']:
+            p=self.root/'home'/name
+            p.parent.mkdir(parents=True,exist_ok=True)
+            p.write_text(name)
+        dest=Path(self.tmp.name)/'snap-home-copy'
+        self.b.copy_home(self.root/'home',dest,[])
+        for name in ['alice/snap/spotify/common/.cache/data',
+                     'alice/snap/spotify/123/.cache/data']:
+            self.assertFalse((dest/name).exists(),name)
+        for name in ['alice/snap/spotify/common/.config/settings',
+                     'alice/project/.cache/keep']:
+            self.assertTrue((dest/name).is_file(),name)
+        self.assertEqual(self.b.inspect_home(self.root/'home',[])['entries'],
+                         self.b.inspect_home(dest,[])['entries'])
+
     def test_home_copy_inventory_exclusion_parity_and_literal_mount_names(self):
         for name in ['alice/project/.cache/keep','alice/mounted [disk]/skip']:
             p=self.root/'home'/name;p.parent.mkdir(parents=True,exist_ok=True);p.write_text(name)
         dest=Path(self.tmp.name)/'home-copy'
-        dynamic=['./home/example/mounted [disk]']
+        dynamic=['./home/alice/mounted [disk]']
         self.b.copy_home(self.root/'home',dest,dynamic)
         self.assertTrue((dest/'alice/project/.cache/keep').is_file())
         self.assertFalse((dest/'alice/mounted [disk]/skip').exists())

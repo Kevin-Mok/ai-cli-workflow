@@ -12,6 +12,8 @@
 # User caches are disposable. Keep .config, .local/share and .local/state.
 # Nonstandard XDG_CACHE_HOME paths remain included unless reviewed separately.
 ./home/*/.cache/*
+# Snap application revision/common caches are disposable; preserve other app data.
+./home/*/snap/*/*/.cache/*
 ./root/.cache/*
 
 # Downloaded packages/indexes can be fetched again; retain package databases.

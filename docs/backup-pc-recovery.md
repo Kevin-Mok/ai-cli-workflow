@@ -245,7 +245,7 @@ explain intent and must be stripped when using a list directly with tar.
 | Category | Treatment |
 | --- | --- |
 | `/dev`, `/proc`, `/sys`, `/run`, `/tmp` | Omit runtime contents; preserve or recreate directories and permissions. |
-| Users' default `.cache` directories | Omit contents; include configuration, data and persistent state. Nonstandard cache locations remain included. |
+| Users' default `.cache` and Snap app revision/common `.cache` directories | Omit contents; include configuration, data and persistent state. Other nonstandard cache locations remain included. |
 | APT archives/indexes, pacman package downloads, Snap cache | Omit these known caches; retain package databases and installed state. |
 | `/opt`, Snap/Docker state, browser profiles, Android files, projects and games | Include. |
 | Logs, crash dumps, `/var/tmp`, recovered files in `lost+found` | Include. |

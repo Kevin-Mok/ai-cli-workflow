@@ -1500,7 +1500,8 @@ separate disposable-VM boot acceptance check.
   optional `--user`; copied home ownership remains untouched.
 - Action: `./scripts/executable_backup-pc excludes`
   Expected: Built-in exclusions print without sudo. Cache/runtime data are
-  omitted while persistent application state remains eligible for backup.
+  omitted, including Snap application revision/common .cache contents, while
+  persistent application state remains eligible for backup.
 - Action: `./scripts/backup-pc-vm-check --help`
   Expected: Init, backup, restore and boot phases are listed. For runtime
   acceptance, execute the guide’s workflow using only disposable virtual images,

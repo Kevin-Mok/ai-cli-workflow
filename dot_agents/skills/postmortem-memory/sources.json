@@ -13018,6 +13018,15 @@
       "reviewed_on": "2026-11-01",
       "findings": [],
       "decision": "Known source-discovery and restricted-Fish-startup pitfalls; fixed validation bookkeeping and an inherited first-parent-only test assumption. All40 focused tests/210 subtests pass; refresh completed with approved scoped access. No new general rule or host sandbox fix."
+    },
+    {
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-10-31-backup-cache-suite.md"
+      ],
+      "decision": "No new reusable finding: the existing fixture used example as input and asserted alice, corrected to match; sandbox ACL/PTY failures did not recur in the successful 69-test host suite. No full real backup or restore boot performed.",
+      "findings": [],
+      "reviewed_on": "2026-10-31",
+      "sha256": "d88b64c58c480b242f57e55d8658b2063b51ca9a9aed6c59eac0469058371209"
     }
   ],
   "review": {

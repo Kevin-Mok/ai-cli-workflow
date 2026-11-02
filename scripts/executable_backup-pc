@@ -28,7 +28,7 @@ GIB = 2**30
 MIB = 2**20
 # Match GNU tar names relative to -C SOURCE; omit contents, keep directory metadata.
 EXCLUDES = [f'./{p}/*' for p in ('dev', 'proc', 'sys', 'run', 'tmp',
-            'home/*/.cache', 'root/.cache', 'var/cache/apt/archives',
+            'home/*/.cache', 'home/*/snap/*/*/.cache', 'root/.cache', 'var/cache/apt/archives',
             'var/lib/apt/lists', 'var/cache/pacman/pkg', 'var/lib/snapd/cache')]
 ACTIVE_PROGRESS = None
 BUNDLE_FILES = ('system.tar.xz', 'home-index.json', 'warnings.json', 'manifest.json', 'backup-pc', 'RECOVERY.md')
@@ -332,12 +332,13 @@ def destination_preflight(destination):
 
 
 def home_excludes(dynamic):
-    return ['/*/.cache/*']+['/'+re.sub(r'([*?\[\]\\])',r'\\\1',p[len('./home/'):]) for p in dynamic if p.startswith('./home/')]
+    return ['/*/.cache/*','/*/snap/*/*/.cache/*']+['/'+re.sub(r'([*?\[\]\\])',r'\\\1',p[len('./home/'):]) for p in dynamic if p.startswith('./home/')]
 
 
 def home_skip(relative,dynamic,exclude_caches=True):
     parts=PurePosixPath(relative).parts
     if exclude_caches and len(parts)>=3 and parts[1]=='.cache': return True
+    if exclude_caches and len(parts)>=6 and parts[1]=='snap' and parts[4]=='.cache': return True
     for pattern in dynamic:
         if pattern.startswith('./home/'):
             literal=pattern[len('./home/'):].rstrip('/')
