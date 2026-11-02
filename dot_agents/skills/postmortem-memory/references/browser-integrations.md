@@ -13,7 +13,7 @@ Use these reviewed incidents to distinguish application state defects from provi
 - Remedy: Keep desired state separate from observed state; retain pending audio targets until acknowledged; record applied quality only after sending it through a ready handle; never let late PLAYING erase explicit paused intent.
 - Verification: Defining regressions failed before correction; final 128 unit/integration and 18 static-browser tests passed with typecheck/build. Real initial volume drift was observed independently.
 - Limitations: Native event causes remain ambiguous. Deterministic tests do not establish real Twitch moving video or audible output; pending settings may require an explicit user retry.
-- Source: [2026-10-22-interface-validation.md](/home/kevin/coding/viewington-alt/docs/postmortem/2026-10-22-interface-validation.md); reviewed hash retained in sources.json.
+- Source: [2026-10-22-interface-validation.md](/home/example/coding/viewington-alt/docs/postmortem/2026-10-22-interface-validation.md); reviewed hash retained in sources.json.
 
 ## ext-browser-transfer-privacy-gates
 
@@ -26,7 +26,7 @@ Use these reviewed incidents to distinguish application state defects from provi
 - Remedy: Keep the persistence gate until a separate explicit recovery action, even after successful imports. Construct shared URLs only from origin/path and the bounded public payload; omit unrelated query data.
 - Verification: Both regressions reproduced before correction; the final 128 unit/integration and 18 browser checks passed. Synthetic values only; no private token was used.
 - Limitations: A validated payload does not imply consent to overwrite old data. This verifies the tested app boundary, not arbitrary third-party sharing or browser extensions.
-- Source: [2026-10-22-interface-validation.md](/home/kevin/coding/viewington-alt/docs/postmortem/2026-10-22-interface-validation.md); reviewed hash retained in sources.json.
+- Source: [2026-10-22-interface-validation.md](/home/example/coding/viewington-alt/docs/postmortem/2026-10-22-interface-validation.md); reviewed hash retained in sources.json.
 
 ## ext-rea-bounded-bundle-analysis
 
@@ -39,7 +39,7 @@ Use these reviewed incidents to distinguish application state defects from provi
 - Remedy: Use documented bounded app-specific chunk analysis after whole-site exhaustion. Extract required unpacked resources from the same verified installer alongside app.asar before retrying extraction.
 - Verification: Bounded web analysis, complete ASAR extraction and selected desktop main/preload analysis returned exit 0 with retained REA evidence IDs.
 - Limitations: Full-site/source-map analysis remained incomplete. Selected static resources do not establish Windows runtime behavior. Do not raise resource limits blindly or execute unknown installers for inspection.
-- Source: [2026-10-22-reference-tool-contracts.md](/home/kevin/coding/viewington-alt/docs/postmortem/2026-10-22-reference-tool-contracts.md); reviewed hash retained in sources.json.
+- Source: [2026-10-22-reference-tool-contracts.md](/home/example/coding/viewington-alt/docs/postmortem/2026-10-22-reference-tool-contracts.md); reviewed hash retained in sources.json.
 
 ## ext-twitch-playback-evidence
 
@@ -52,9 +52,9 @@ Use these reviewed incidents to distinguish application state defects from provi
 - Remedy: No verified remedy. Repeat in a normal visible desktop browser and record advancing frames and human audibility separately before changing application policy or declaring success.
 - Verification: Both app and bare SDK attempts had incomplete startup. Bare currentTime stayed at 1.512999 over five seconds with fps 0, bufferSize 0 and no PLAYING; parent geometry was above minimum and visible. Chat loaded public controls.
 - Limitations: Exact upstream/browser/application cause unresolved. A bare failure does not establish the app integration correct, and ONLINE, paused=false or a live thumbnail do not prove sustained playback.
-- Source: [2026-10-22-interface-validation.md](/home/kevin/coding/viewington-alt/docs/postmortem/2026-10-22-interface-validation.md); reviewed hash retained in sources.json.
+- Source: [2026-10-22-interface-validation.md](/home/example/coding/viewington-alt/docs/postmortem/2026-10-22-interface-validation.md); reviewed hash retained in sources.json.
 
-- Subsequent desktop occurrence: the user reports that starting a second live stream immediately stops it while the other keeps playing. Read-only app review found no explicit cross-channel pause command; root cause and two-stream playback remain unresolved. Source: [simultaneous playback report](/home/kevin/coding/twitch-grid/docs/postmortem/2026-10-22-simultaneous-playback.md).
+- Subsequent desktop occurrence: the user reports that starting a second live stream immediately stops it while the other keeps playing. Read-only app review found no explicit cross-channel pause command; root cause and two-stream playback remain unresolved. Source: [simultaneous playback report](/home/example/coding/twitch-grid/docs/postmortem/2026-10-22-simultaneous-playback.md).
 
 ## ext-twitch-native-resume-intent
 
@@ -67,7 +67,7 @@ Use these reviewed incidents to distinguish application state defects from provi
 - Remedy: Adopt playing intent on PLAY (unpaused, possibly buffering) before PLAYING. Do not issue another Play command; keep PLAYING alone subordinate to explicit pause.
 - Verification: Defining manager regression failed paused/paused before correction. Afterwards 129 unit tests, 20 browser tests, typecheck/build and static inspection passed. Browser regression verifies persistence, no corrective commands, other-player isolation and subsequent explicit pause.
 - Limitations: Fixture evidence does not establish live two-stream video or audible output. The original desktop symptom still requires retest. SDK events do not distinguish queued programmatic PLAY from a newer native resume; Chrome bridge startup failed and CUA had no browsers.
-- Source: [native playback resume incident](/home/kevin/coding/twitch-grid/docs/postmortem/2026-10-22-simultaneous-playback.md); reviewed hash retained in sources.json.
+- Source: [native playback resume incident](/home/example/coding/twitch-grid/docs/postmortem/2026-10-22-simultaneous-playback.md); reviewed hash retained in sources.json.
 
 ## ext-twitch-fps-presentation-gap
 
@@ -79,7 +79,7 @@ Use these reviewed incidents to distinguish application state defects from provi
 - Remedy: No verified lag remedy. Show displayed FPS as unavailable when unsupported. Name playbackRate as playback bitrate and label combined partial coverage; never call it actual network download speed.
 - Verification: RED→GREEN adapter/manager/browser checks, 136 unit tests/typecheck/build; live 3.11 +3.14 =6.25 Mbps for two advancing videos.
 - Limitations: Does not establish user-desktop smoothness, GPU/CPU/network bottleneck or successful real resume.
-- Source: [reported FPS and visible stutter](/home/kevin/coding/twitch-grid/docs/postmortem/2026-10-22-reported-fps-visible-stutter.md); reviewed hash retained in sources.json.
+- Source: [reported FPS and visible stutter](/home/example/coding/twitch-grid/docs/postmortem/2026-10-22-reported-fps-visible-stutter.md); reviewed hash retained in sources.json.
 
 ## ext-twitch-resolution-quality-ids
 
@@ -92,7 +92,7 @@ Use these reviewed incidents to distinguish application state defects from provi
 - Remedy: Prefer exact available IDs, then the corresponding 30fps ID for a bare resolution, before existing fallback. Do not rewrite explicit 60fps choices or per-stream overrides.
 - Verification: Six defining manager regressions and the browser default-quality assertion failed before correction. Afterwards 142 unit tests, 29 browser tests and TypeScript/Vite build passed. Official live SDK selected 360p30 at 640x360 and 480p30 at 852x480; Auto selected auto.
 - Limitations: The ID mapping was verified independently, but a later desktop report showed mapping alone was insufficient. See ext-twitch-quality-acknowledgement for ignored requests and older overrides. SDK selection does not establish audibility or sustained visible smoothness.
-- Source: [default quality report](/home/kevin/coding/twitch-grid/docs/postmortem/2026-10-22-default-quality.md); reviewed hash retained in sources.json.
+- Source: [default quality report](/home/example/coding/twitch-grid/docs/postmortem/2026-10-22-default-quality.md); reviewed hash retained in sources.json.
 
 ## ext-twitch-audience-warning-recovery
 
@@ -105,7 +105,7 @@ Use these reviewed incidents to distinguish application state defects from provi
 - Remedy: With explicit viewer approval, use native Start Watching, then native Play if a preview remains. Enlarge the tile to inspect controls. Do not auto-accept warnings or invent force-play loops.
 - Verification: Approved acknowledgement removed the warning. Two screenshots show the original app's unblurred advancing video after native Play/startup. A bare official SDK comparison advanced 10.319188 to 16.723766 seconds; its temporary player was removed. No app code changed.
 - Limitations: Diagnostic HeadlessChrome only; original desktop lineup and audibility unchecked. Initial post-consent startup delay was not isolated. Repeated cached state messages do not prove motion, and cross-profile acknowledgement persistence is not established.
-- Source: [MrSavage blurred playback investigation](/home/kevin/coding/twitch-grid/docs/postmortem/2026-10-22-mrsavage-blurred-playback.md); reviewed hash retained in sources.json.
+- Source: [MrSavage blurred playback investigation](/home/example/coding/twitch-grid/docs/postmortem/2026-10-22-mrsavage-blurred-playback.md); reviewed hash retained in sources.json.
 
 ## ext-twitch-quality-acknowledgement
 
@@ -118,7 +118,7 @@ Use these reviewed incidents to distinguish application state defects from provi
 - Remedy: Send every changed request before accepting an acknowledgement, acknowledge only a later sample, retry pending requests from samples with a three-send budget, and rearm on genuine offline/online recovery. Rearm explicit default changes for default-following channels and changed overrides, even if the rendition ID is unchanged. When the user authorizes all-stream defaults, clear current-lineup overrides at the UI action; retain separately saved profiles.
 - Verification: Four defining manager cases and two browser behaviors observed RED, then 146 unit tests, build/typecheck and both focused quality browser tests passed. Independent runtime assertions cover same available/fallback IDs, unchanged overrides and native choices. Real coachboop SDK recovered from a deliberately dropped first setter and the native menu showed360p. Commit-scoped HEAD plus only quality changes independently passed 140 unit tests, build/typecheck and both quality browser cases.
 - Limitations: The actual original desktop stored overrides were inaccessible. Native changes before acknowledgement cannot be distinguished from ignored setters; retries are bounded. After three unacknowledged attempts an explicit default change or reload retries. Sustained smoothness/audio not verified. Latest full browser suite had29 passes and2 failures in concurrent bitrate text/video geometry; task quality cases passed.
-- Source: [default quality report](/home/kevin/coding/twitch-grid/docs/postmortem/2026-10-22-default-quality.md); reviewed hash retained in sources.json.
+- Source: [default quality report](/home/example/coding/twitch-grid/docs/postmortem/2026-10-22-default-quality.md); reviewed hash retained in sources.json.
 
 ## ext-twitch-transform-downscale-visibility
 
@@ -132,7 +132,7 @@ Use these reviewed incidents to distinguish application state defects from provi
 - Verification: Actual 1363px Chrome windows at DPR 2.8125 went from invisible scaled frames to visible Playing streams with advancing clocks. Defining Chromium regression RED/GREEN; 152 unit tests, build, 42 browser tests and added native iframe fullscreen bounds check passed.
 - Limitations: Audio/smoothness unassessed; user confirmation of automatic versus button start pending. Separate network/content gates remain possible. Twitch source retries autoplay after allowed visibility before first playback.
 - Evidence: [W3C visibility algorithm](https://w3c.github.io/IntersectionObserver/#compute-visibility); official Twitch player chunks 61456 and 52722 inspected 2026-10-23.
-- Source: [actual-window visibility incident](/home/kevin/coding/twitch-grid/docs/postmortem/2026-10-23-play-all-paused.md); reviewed hash in sources.json.
+- Source: [actual-window visibility incident](/home/example/coding/twitch-grid/docs/postmortem/2026-10-23-play-all-paused.md); reviewed hash in sources.json.
 
 
 ## local-weather-cacheable-issuance-redirects
@@ -146,7 +146,7 @@ Use these reviewed incidents to distinguish application state defects from provi
 - **Verification:** Default native20requests included17cached redirects. Three cache-disabled paired runs/controller passed complete72record structured/DOM agreement; local302fixture fails before and passes after preparation. User-requested repaired publishing service18:25EDT succeeded;72Blob and12deployed API rows match, visible dashboard shows freshTWN.49tests plus separate browser fixture pass; reliability acceptance remains unmet. Automatic18:30calendar publication also succeeded; latest fetchedAt22:30:11Z reached Vercel. Trial3attempts/2successes/1failure remains unaccepted.
 - **Verification scope:** runtime
 - **Limitations:** Client workaround, not an upstream fix. Different load waits confound timing comparisons. Production restored at operator request with validated Blob/API/browser agreement; separate scheduled trial still has unresolved extraction failure and is not accepted.
-- **Sources:** [2026-10-29-browser-comparison.md](/home/kevin/coding/scrape-weather/.worktrees/playwright-diagnostics/docs/postmortem/2026-10-29-browser-comparison.md)
+- **Sources:** [2026-10-29-browser-comparison.md](/home/example/coding/scrape-weather/.worktrees/playwright-diagnostics/docs/postmortem/2026-10-29-browser-comparison.md)
 
 
 ## local-weather-intermittent-extraction
@@ -160,7 +160,7 @@ Use these reviewed incidents to distinguish application state defects from provi
 - **Verification:** Original attempt1 failed after19.036seconds following302/302/200; original body/error missing. Attempt2 passed72records in29.335seconds. A resumed synthetic early-window fixture rejects before the hour and passes after; this does not confirm the original cause.47tests and separate localbrowser fixture pass; independent resumed live diagnostic passed72records20.605seconds with safe coverage evidence, not a cohort run.
 - **Verification scope:** runtime
 - **Limitations:** A subsequent success does not establish reliability or identify the first failure. First error cannot be reconstructed from new instrumentation.48/48 and live DST observation remain unmet.
-- **Sources:** [2026-10-29-trial-attempt-01.md](/home/kevin/coding/scrape-weather/.worktrees/playwright-diagnostics/docs/postmortem/2026-10-29-trial-attempt-01.md)
+- **Sources:** [2026-10-29-trial-attempt-01.md](/home/example/coding/scrape-weather/.worktrees/playwright-diagnostics/docs/postmortem/2026-10-29-trial-attempt-01.md)
 
 ## local-browser-wrapper-input-contracts
 
@@ -171,7 +171,31 @@ Use these reviewed incidents to distinguish application state defects from provi
 - Remedy: Use a fresh reference for the observed control, or use the documented selector action with actual option values; explicitly focus the observed select before keyboard steps when activeElement proves focus is absent. Verify visible labels and matching rendered data afterward. Preserve strict API rejection of invalid query values. After a development reload, re-select the observed visible workspace when active-view inspection proves the intended view is inactive.
 - Verification evidence: A fresh snapshot/reference made the previously rejected Research click exit0. Correct option values made the complete browser matrix exit0 across six datasets, four roles in fold0 and selector folds1/2; audit244/final0 and no initial desktop overflow were observed. Keyboard inspection found activeElement BODY and unchanged dataset5; explicit select focus followed by the complete navigation rerun changed the dataset to1 and passed synchronized zoom, live canvas/navigation preservation and deliberate-outage Retry recovery. A post-edit timeout had only live market requests and a hidden Research workspace; selecting visible Research made quote-unit checks succeed without changing application polling/loading behavior.
 - Limitations: These are automation workarounds, not application fixes or broad browser reliability claims. One refreshed click establishes only that action; the matrix and navigation run do not establish all responsive widths, numerical parity, financial validity or every native-browser interaction.
-- Source: [2026-10-30-browser-stale-reference.md](/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-30-browser-stale-reference.md) (SHA-256 `6a3715b1a70358b6fe28db4e8502dd47b5498b85b190c1e94702ba6056f18261`).
-- Source: [2026-10-30-browser-select-values.md](/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-30-browser-select-values.md) (SHA-256 `d46dc2bc22b4114b8500b8fcbea46507b9273a1e9a4843bc94fa1e141ed50036`).
-- Source: [2026-10-30-browser-keyboard-focus.md](/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-30-browser-keyboard-focus.md) (SHA-256 `bc3d30743e196bf003101502dc015271fd29ffb221a13b50ec4745f3c7a3ef4a`).
-- Source: [2026-10-30-research-quote-units.md](/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-30-research-quote-units.md) (SHA-256 `517003f748db48794ae2f47b5e78a65a1bf7c8deb0ee9657855a1bf0f85852b6`).
+- Source: [2026-10-30-browser-stale-reference.md](/home/example/coding/jay-tradingview/docs/postmortem/2026-10-30-browser-stale-reference.md) (SHA-256 `6a3715b1a70358b6fe28db4e8502dd47b5498b85b190c1e94702ba6056f18261`).
+- Source: [2026-10-30-browser-select-values.md](/home/example/coding/jay-tradingview/docs/postmortem/2026-10-30-browser-select-values.md) (SHA-256 `d46dc2bc22b4114b8500b8fcbea46507b9273a1e9a4843bc94fa1e141ed50036`).
+- Source: [2026-10-30-browser-keyboard-focus.md](/home/example/coding/jay-tradingview/docs/postmortem/2026-10-30-browser-keyboard-focus.md) (SHA-256 `bc3d30743e196bf003101502dc015271fd29ffb221a13b50ec4745f3c7a3ef4a`).
+- Source: [2026-10-30-research-quote-units.md](/home/example/coding/jay-tradingview/docs/postmortem/2026-10-30-research-quote-units.md) (SHA-256 `517003f748db48794ae2f47b5e78a65a1bf7c8deb0ee9657855a1bf0f85852b6`).
+
+## local-browser-reload-request-containment
+
+- Status: verified_workaround
+- Confidence: confirmed
+- Verification scope: workaround
+- Symptoms: An active daily App polls intraday contexts despite a no-new-data restriction.; A window fetch patch disappears on full App reload, permitting background requests again.
+- Applicability: Task-owned browser verification of a local app with background polling under a prohibited-download constraint.
+- Diagnostics: Inspect timers and all native-context requests, not only the selected display timeframe.; Read retained response fetchedAt/cacheAge provenance without refetching.; Before app navigation, test target-level interception on inert local probes across reload; verify changed timeOrigin and guard presence after an actual app reload.
+- Remedy: Quiesce or retire only the owned old app tab. Install target-level request interception before navigation plus a new-document guard, preserve only project settings, and keep the controller alive while polling is possible. Stop polling or close the owned target before releasing protection.
+- Verification: Retained Binance1h response proves a fresh08:45UTC download after the restriction. Initial window patch was lost at full reload. Isolated installed-Chrome/CDP target passed two inert probes across reload and actual App timeOrigin changes with guard intact; default5m/context requests blocked. All14eyes,144offline cleanup cases and empty console verified; frozen471artifacts/138rows unchanged.
+- Limitations: Task-target containment only; not a production polling fix or audit of all clients. Earlier forbidden downloads and the initial reload window remain disclosed; historical total is unaudited. No data or financial validation claim follows.
+- Source: [night-browser-context-refresh.md](/home/example/coding/jay-tradingview/docs/postmortem/2026-10-31-night-browser-context-refresh.md); reviewed hash retained in sources.json.
+
+## local-browser-capture-acknowledgement
+
+- Status: **verified_workaround**; confidence: **confirmed**; verification scope: **runtime**.
+- Symptoms: batched dependent viewport/render/screenshot commands return out of order, leaving image-to-scene association unproved.
+- Applicability: concurrent browser capture controllers.
+- Diagnostic checks: match exact command and scene IDs; inspect completion timestamps, dimensions and media hashes rather than success alone.
+- Remedy: await each correlated successful completion before sending its dependent command; preserve the initial pass and bind final media to registered sample IDs.
+- Verification:144 awaited commands/48 PNGs/354 illustrations/4empty scopes and independent7claim audit pass; Research/guard restored and console empty.
+- Limitations: controller concurrency remains; no initial PNG error is asserted (46identical/2different); representative sheets only were visually checked. No financial evaluation or edge claim.
+- Source: [2026-10-31-case-capture-command-order.md](/home/example/coding/jay-tradingview/docs/postmortem/2026-10-31-case-capture-command-order.md) (SHA-256 b869493de710833256b050eb760ecbb18042cd25e8e1ce2f73209cbcb239a2c1).

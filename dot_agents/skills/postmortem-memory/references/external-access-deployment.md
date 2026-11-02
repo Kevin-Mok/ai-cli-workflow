@@ -159,3 +159,7 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Limitations: The exact upstream extraction difference was not isolated; installed user dependency remained old after this workaround. Missing JavaScript runtime can still hide formats.
 - Sources:
   - [2026-09-18-yt-dl-live-download.md](/home/example/linux-config/.worktrees/vps-aws-bootstrap-prompt/docs/postmortem/2026-09-18-yt-dl-live-download.md) (SHA-256 `7992a59ace1f`; 2 alias(es), all retained in [sources.json](../sources.json)).
+
+## ext-vercel-generated-backend-packaging
+
+A READY frontend build can conceal a broken API. Inspect runtime logs and the actual packaged function. Extensionless TypeScript imports accepted by local loaders may fail in plain Node; bundle internal modules with the existing toolchain. Put generated backend output in a normal non-public directory, explicitly include it, and verify package contents: reserved `.vercel` metadata paths may be omitted. Test health/catalog in plain Node without local research caches, then verify real public API data. Prove Git automation with a native Git deployment whose SHA matches the pushed commit; manual CLI deployment is separate evidence.

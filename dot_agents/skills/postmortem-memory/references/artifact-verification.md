@@ -123,7 +123,7 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Limitations: This exception is not permission to skip general whitespace checks or excuse authored whitespace; pin integrity must be established.
 - Sources:
   - [2026-10-04-metaprompt-session-scope.md](/home/example/linux-config/.worktrees/vps-aws-bootstrap-prompt/docs/postmortem/2026-10-04-metaprompt-session-scope.md) (SHA-256 `ac02deccdb08`; 2 alias(es), all retained in [sources.json](../sources.json)).
-  - [2026-10-29-immutable-pine-git-check.md](/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-29-immutable-pine-git-check.md) (SHA-256 `5798a54c9f06`; registered in [sources.json](../sources.json)).
+  - [2026-10-29-immutable-pine-git-check.md](/home/example/coding/jay-tradingview/docs/postmortem/2026-10-29-immutable-pine-git-check.md) (SHA-256 `5798a54c9f06`; registered in [sources.json](../sources.json)).
 
 ## local-known-unrelated-vault-baseline
 
@@ -542,7 +542,7 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Remedy: Quantify matched versus all work and outside-window time for one stream; warn against adding parallel streams. Explain fractional seconds without replacing the consumption denominator or changing exact exports. Repeat the full total in bold cyan beside model rows and bold the combined matched summary.
 - Verification evidence: Five intentional RED assertions; 183 focused tests, mypy and Ruff passed. Actual source and installed normal, 32-column ASCII and details reports exited 0, with installed/source renderer byte equality. Frozen unmatched work: 6.937s. Full run incomplete after 207 passes and an executor warning; bounded FX diagnostic reproduced teardown stall; fresh final overview 26 passed. Follow-up emphasis passed 55 tests, mypy/Ruff and installed ANSI/plain/details checks.
 - Limitations: Live durations grow, displayed sums can differ through truncation, full suite incomplete from async teardown stall; account-wide rates do not establish individual-model quota cost.
-- Source: [2026-10-22-consumption-hours-reconciliation.md](/home/kevin/coding/track-codex-sessions/docs/postmortem/2026-10-22-consumption-hours-reconciliation.md) (SHA-256 `c0279cb6c07d`; registered in sources.json).
+- Source: [2026-10-22-consumption-hours-reconciliation.md](/home/example/coding/track-codex-sessions/docs/postmortem/2026-10-22-consumption-hours-reconciliation.md) (SHA-256 `c0279cb6c07d`; registered in sources.json).
 
 ## local-concat-preview-display-timing
 
@@ -575,7 +575,7 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Remedy: Set -text and -whitespace only for established immutable input paths; after changing attributes, explicitly git add --renormalize those paths. Verify exact staged/source bytes and rerun the staged whitespace check.
 - Verification evidence: The initial staged check exited 2 on three immutable Pine inputs. Ordinary restaging failed the byte assertion; EOL inspection exposed stale normalized index entries. Explicit renormalization then passed exact staged/source equality for all three files and staged whitespace check exit 0 without editing source bytes.
 - Limitations: Keep whitespace checks on authored code. Renormalization changes index entries, so scope it to intended immutable paths and verify the baseline. Evidence covers Git representation, not application behavior or upstream provenance.
-- Source: [2026-10-29-immutable-pine-git-check.md](/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-29-immutable-pine-git-check.md) (SHA-256 `5798a54c9f06b6f2a3342987fd53cd0897ddf1966eb9fedfa0e7b9185c13b077`; registered in [sources.json](../sources.json)).
+- Source: [2026-10-29-immutable-pine-git-check.md](/home/example/coding/jay-tradingview/docs/postmortem/2026-10-29-immutable-pine-git-check.md) (SHA-256 `5798a54c9f06b6f2a3342987fd53cd0897ddf1966eb9fedfa0e7b9185c13b077`; registered in [sources.json](../sources.json)).
 
 ## local-market-quote-unit-formatting
 
@@ -586,4 +586,26 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Remedy: Pass instrument identity or its explicit quote unit through shared monetary views. Use symbol-aware formatting that labels USDT amounts explicitly and retains USD formatting for USD instruments; never imply conversion or a dollar peg.
 - Verification evidence: Five crypto formatter assertions failed while two USD assertions passed before the correction; all7 then passed. The full372-test suite, typecheck and build passed. Active BTCUSDT and SPY research views at390px showed correct USDT/USD prices, costs and equity without horizontal overflow; the244-attempt/training144/final0 audit stayed unchanged.
 - Limitations: Verified for the four declared research symbols only. This is a display-unit repair; it does not change financial math, establish currency conversion or guarantee a stablecoin peg.
-- Source: [2026-10-30-research-quote-units.md](/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-30-research-quote-units.md) (SHA-256 `517003f748db48794ae2f47b5e78a65a1bf7c8deb0ee9657855a1bf0f85852b6`).
+- Source: [2026-10-30-research-quote-units.md](/home/example/coding/jay-tradingview/docs/postmortem/2026-10-30-research-quote-units.md) (SHA-256 `517003f748db48794ae2f47b5e78a65a1bf7c8deb0ee9657855a1bf0f85852b6`).
+
+## local-pmo-utc-calendar-labels
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **code**.
+- Symptoms: UTC-selected chart day ticks show the preceding calendar date when formatted in Toronto browser time.
+- Applicability: Price/PMO Lightweight Charts using UTC time weighting with browser-local tick formatters.
+- Diagnostic checks: Exercise actual chart option formatters and caption with a non-UTC Intl default at UTC midnight, month/year boundaries and DST dates. Verify candle and annotation epochs remain unchanged.
+- Remedy: Use UTC consistently for price/PMO tick, crosshair and selected-bar caption formatting and label UTC explicitly; do not shift input epochs to repair a display mismatch.
+- Verification evidence: Actual formatter regression first received Oct 28 instead of Oct 29, then passed after UTC formatting. Full 44-file/441-test suite and typecheck/build passed; independent reviewer reran defining tests and typecheck/compilation.
+- Limitations: Browser pixels, reference chart timezone, sparse Pine connectors and numerical TradingView parity remain unverified. Separate equity chart formatting is outside scope.
+- Source: [PMO display parity](/home/example/coding/jay-tradingview/docs/postmortem/2026-10-30-pmo-display-parity.md) (SHA-256 `8d8cf4b411fbe4c1040c148ef6cbbd30126c2240fabb59edb61d54b9fbf7a0cd`; registered in [sources.json](../sources.json)).
+
+## local-pine-color-alpha-precedence
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **code**.
+- Symptoms: A Pine secondary divergence color at 40% opacity is dimmed to 34% by an additional canvas alpha multiplier.
+- Applicability: Pine v4-derived marker rendering with explicit eight-digit RGBA colors and an additional default plot opacity.
+- Diagnostic checks: Check official Pine color transparency precedence instead of assuming transp multiplies explicit alpha. Generate actual engine markers and inspect canvas fill color plus globalAlpha in the real primitive draw path.
+- Remedy: Let explicit marker color alpha override the canvas default alpha; preserve 85% primary-dot and 50% buy/sell opacity.
+- Verification evidence: Real calculatePmo-to-PmoOverlay regression observed alpha 0.85 instead of 1 on #3fff0066 before the change, then passed. Full 441 tests and typecheck/build passed; independent evidence review confirmed official Pine v4 color semantics.
+- Limitations: This fixes opacity only, not marker size, saved colors, missing events or Pine sparse-line geometry; no numerical/export or browser-pixel parity is established.
+- Source: [PMO display parity](/home/example/coding/jay-tradingview/docs/postmortem/2026-10-30-pmo-display-parity.md) (SHA-256 `8d8cf4b411fbe4c1040c148ef6cbbd30126c2240fabb59edb61d54b9fbf7a0cd`; registered in [sources.json](../sources.json)).

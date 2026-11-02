@@ -598,7 +598,7 @@ security checks with the arguments you passed.
 - Remedy: Pass len(keycodes) as the fourth argument and flags as the fifth; retain key encoding, hold time, input validation, worker deadlines and credential redaction.
 - Verification evidence: Strict key-count RED/GREEN passes for ordinary keys, Shift chords and newline with no partial invalid input. Operator subsequently reached the secure password prompt; read-only screenshot shows the complete readiness command and output. This verifies the rejected-key-count path advanced; no complete login receipt or service acceptance is claimed.
 - Limitations: Native key delivery is supported by runtime evidence, but post-password OCR failed. Full authenticated acceptance and the new calibrated-frame transport still need a live verified receipt.
-- Source: [Restored console acceptance](/home/kevin/coding/triway-nextjs/docs/postmortem/2026-10-19-headless-console-acceptance.md).
+- Source: [Restored console acceptance](/home/example/coding/triway-nextjs/docs/postmortem/2026-10-19-headless-console-acceptance.md).
 
 ## ext-calibrated-console-evidence
 
@@ -609,7 +609,7 @@ security checks with the arguments you passed.
 - Remedy: Print clear/home and a fixed calibration alphabet in normal monochrome output. Read same-frame glyph masks exactly; keep ordinary prompts on OCR and preserve downstream nonce, checksum, identity and checklist validation. Cap dimensions before full-frame allocation and name only trusted failure stages.
 - Verification evidence: Actual saved frame contains complete command and standalone marker while PSM6/11/3, DPI and integer scaling misread characters. Synthetic calibrated frames roundtrip through the actual report decoder and reject wrong nonce, payload and checksum. Focused107 tests/one skip, full infra434/two skips and app48 pass; scoped system-Python mypy passes3 files.
 - Limitations: New calibrated output has not been exercised by a live authenticated run. Requires uniform bright-on-dark glyph cells at clear/home, at most4096x2160 and4,194,304pixels; unsupported/incomplete frames block. Startup warnings and full server/GNOME recovery remain separate. Calibration alone is not authentication.
-- Source: [Restored console acceptance](/home/kevin/coding/triway-nextjs/docs/postmortem/2026-10-19-headless-console-acceptance.md).
+- Source: [Restored console acceptance](/home/example/coding/triway-nextjs/docs/postmortem/2026-10-19-headless-console-acceptance.md).
 
 ## ext-console-prompt-cursor
 
@@ -620,7 +620,7 @@ security checks with the arguments you passed.
 - Remedy: Accept the exact ordinary prompt label/colon with at most one trailing horizontal cursor (em dash, underscore, hyphen) and horizontal whitespace. Keep username/shell text and multiple marks blocked; preserve exact machine nonce/checksum gates.
 - Verification evidence: Two720x400 native frames differ only in9x2 cursor pixels. Same cursor-on frame: old predicate false, new true. Three defining RED/GREEN parser/integration/actual-Tesseract raster tests pass;87 focused and471 infra/two skips pass, mypy and independent review pass.
 - Limitations: Ordinary prompt code fix only. Unknown OCR suffixes block. No real guest input or authenticated login/server/GNOME acceptance was performed; native private captures removed.
-- Source: [Restored startup and prompt incident](/home/kevin/coding/triway-nextjs/docs/postmortem/2026-10-20-restored-login-startup-prerequisite.md) (SHA-256 f2df6f5e846e43055f3d9bbbfb2c6c3c48725101540f58b08a9227b4d707c8e4).
+- Source: [Restored startup and prompt incident](/home/example/coding/triway-nextjs/docs/postmortem/2026-10-20-restored-login-startup-prerequisite.md) (SHA-256 f2df6f5e846e43055f3d9bbbfb2c6c3c48725101540f58b08a9227b4d707c8e4).
 
 ## local-dunst-replace-notification-id
 
@@ -654,7 +654,7 @@ security checks with the arguments you passed.
 - Remedy: fixture remux uses input `-noautorotate -display_rotation`, then verifies metadata. Initialize GTK with a usable X11 display before creating gtksink.
 - Verification: matrix90 produced rotate-270; baseline renderer failed six metadata cases and current focused seven-test suite passed.
 - Limitations: synthetic pixels do not establish every personal clip; two local samples were verified separately. Xvfb needs scoped X11 access here and lacks DRI2.
-- Source: [orientation fixture incident](/home/kevin/linux-config/docs/postmortem/2026-10-20-orientation-test-gtk-init.md) (SHA-256 `b5450bc880ee68896d17866fb8ff89eb462e5a2c6d6f903129d420b0cffcf93e`).
+- Source: [orientation fixture incident](/home/example/linux-config/docs/postmortem/2026-10-20-orientation-test-gtk-init.md) (SHA-256 `b5450bc880ee68896d17866fb8ff89eb462e5a2c6d6f903129d420b0cffcf93e`).
 
 
 ## ext-delayed-guest-password-readiness
@@ -666,7 +666,7 @@ security checks with the arguments you passed.
 - Remedy: preserve completed image cache/manual session; do not repeat hashes, modify credentials, weaken exact gates or change timing without a reproducer. No verified remedy.
 - Verification: failed frame shows login prompt/no readiness; operator manual login/use succeeds and later frame shows account shell prompt/startx-related output. Independent producer/decoder static review finds no confirmed mismatch. No guest keys or VM/account/cache changes by agent.
 - Limits: shell-mode/printf results unavailable; key timing/chord or function-shadowing hypotheses unproven. Manual access is not automated acceptance.
-- Source: [login-shell readiness](/home/kevin/coding/triway-nextjs/docs/postmortem/2026-10-21-login-shell-readiness.md) (SHA-256 `7c422ae8a36b`).
+- Source: [login-shell readiness](/home/example/coding/triway-nextjs/docs/postmortem/2026-10-21-login-shell-readiness.md) (SHA-256 `7c422ae8a36b`).
 
 ## local-kitty-explicit-os-window-font-sizing
 
@@ -689,7 +689,7 @@ security checks with the arguments you passed.
 - Remedy: keep exact login acceptance unchanged. Password/account-session hints only block input. Print normal-user open-proof as next_command and retain resume_command separately for after inspection.
 - Verification:3 defining RED tests then daily22/full506 with2skips and helper mypy pass. Actual native probe reads1frame/session-like, console-session in0.893s with no keys; sanitized artifact independently reviewed.
 - Limitations: hints never prove authentication; false positives only block. Historical failed frame unavailable. Root daily-run/login/report/server/GNOME remain pending. Native timing and credentials unchanged.
-- Source: [Repeated console readiness timeout](/home/kevin/coding/triway-nextjs/docs/postmortem/2026-10-29-console-ready-timeout.md) (SHA-256 `8c8b179ea0c6b9d53e12664920f114a732b953a8876f413bc661a7b2b1abc383`).
+- Source: [Repeated console readiness timeout](/home/example/coding/triway-nextjs/docs/postmortem/2026-10-29-console-ready-timeout.md) (SHA-256 `8c8b179ea0c6b9d53e12664920f114a732b953a8876f413bc661a7b2b1abc383`).
 
 ## local-fish-keyword-abbreviation
 
@@ -733,7 +733,7 @@ Asymmetric i3block padding must be injected into i3bar JSON, not the i3blocks1.4
 - Remedy: Snapshot only known scalar fields, reject unknown keys and nonfinite values before trials, omit undefined values, and copy supported nested fields. Keep finite invalid candidate evaluations counted as failed trials rather than silently dropping them.
 - Verification evidence: Independent Infinity/JSON and nested-mutation reproducers exposed the boundary defects. Strict snapshots and detached confluence copies passed final 38 focused/167 full tests, typecheck/build and independent review; original assertions remained intact.
 - Limitations: This is an explicit small schema, not a general object serializer or proof against every JavaScript object behavior. Code/fixture evidence does not establish a trading edge or external data fidelity.
-- Source: [2026-10-29-strategy-input-boundaries.md](/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-29-strategy-input-boundaries.md) (SHA-256 `c886f914372c59dbd743f868e2994ddaa7da51e073093f79d38496e1ff926040`).
+- Source: [2026-10-29-strategy-input-boundaries.md](/home/example/coding/jay-tradingview/docs/postmortem/2026-10-29-strategy-input-boundaries.md) (SHA-256 `c886f914372c59dbd743f868e2994ddaa7da51e073093f79d38496e1ff926040`).
 
 ## local-json-zero-allocation-return
 
@@ -744,7 +744,7 @@ Asymmetric i3block padding must be injected into i3bar JSON, not the i3blocks1.4
 - Remedy: Return explicit positive zero only when allocation is zero; otherwise retain the signed baseline-return multiplication.
 - Verification evidence: The first exposure/controller GREEN attempt passed36/38, with exact-zero and report-round-trip failures. The zero-allocation-only normalization then passed38/38 strategy and167/167 full tests, typecheck/build and independent exposure-formula review.
 - Limitations: This normalizes a semantically zero result only; it is not a general numerical rounding policy and must not hide losses or other nonfinite values.
-- Source: [2026-10-29-strategy-input-boundaries.md](/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-29-strategy-input-boundaries.md) (SHA-256 `c886f914372c59dbd743f868e2994ddaa7da51e073093f79d38496e1ff926040`).
+- Source: [2026-10-29-strategy-input-boundaries.md](/home/example/coding/jay-tradingview/docs/postmortem/2026-10-29-strategy-input-boundaries.md) (SHA-256 `c886f914372c59dbd743f868e2994ddaa7da51e073093f79d38496e1ff926040`).
 
 ## local-typescript-assertion-narrowing-guard
 
@@ -755,7 +755,7 @@ Asymmetric i3block padding must be injected into i3bar JSON, not the i3blocks1.4
 - Remedy: Use the explicit fault guard as the status check and remove only the preceding redundant healthy assertion. Do not cast away the union, remove the fault throw or weaken unrelated checks.
 - Verification evidence: The runtime fixture and179/179 full tests passed before typecheck failed at paper-smoke.ts:40 with TS2339. After removing one redundant assertion, fresh typecheck/build and delayed/zero-delay/plain/JSON smoke commands exited0; independent review reran12/12 broker tests and typecheck. Broker/test sources were unchanged; the full179-test pass preceded the CLI-only correction.
 - Limitations: Evidence verifies the compiler/CLI boundary and synthetic accounting checks, not live broker behavior or actual market arrival. The full suite was not repeated after the one-line CLI correction.
-- Source: [2026-10-29-paper-cli-narrowing.md](/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-29-paper-cli-narrowing.md) (SHA-256 `725aabbb802bbc807699aa8565becbe3cf9882881d9abddad84ce00124f32777`).
+- Source: [2026-10-29-paper-cli-narrowing.md](/home/example/coding/jay-tradingview/docs/postmortem/2026-10-29-paper-cli-narrowing.md) (SHA-256 `725aabbb802bbc807699aa8565becbe3cf9882881d9abddad84ce00124f32777`).
 
 ## local-history-raw-window-provenance
 
@@ -766,7 +766,7 @@ Asymmetric i3block padding must be injected into i3bar JSON, not the i3blocks1.4
 - Remedy: Retain raw cursor/exhaustion separately from normalized bars. Bound raw observations before normalization, keep aggregate oldest cursor coherent with all windows, preserve newest observation metadata, and publish only validated complete versioned snapshots without overwriting earlier observations.
 - Verification evidence: Defining omission/cursor/provenance cases preceded the fix. Loader gate reached61 focused tests; shared276-test gate, typecheck and build passed. Ten frozen provider histories validated and reused offline twice with identical bounds/counts.
 - Limitations: The evidence verifies loader and cached-observation contracts, not provider completeness, historical session arrival, executable prices or TradingView numerical parity. No financial experiment or final holdout ran.
-- Source: [2026-10-29-history-window-provenance.md](/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-29-history-window-provenance.md) (SHA-256 `c34e53fdb1fab6df18c9f88d183e1f40e5ce3cd3551ac7a3af87dde661a0e6f8`).
+- Source: [2026-10-29-history-window-provenance.md](/home/example/coding/jay-tradingview/docs/postmortem/2026-10-29-history-window-provenance.md) (SHA-256 `c34e53fdb1fab6df18c9f88d183e1f40e5ce3cd3551ac7a3af87dde661a0e6f8`).
 
 ## local-exclusive-provider-window-exhaustion
 
@@ -777,7 +777,7 @@ Asymmetric i3block padding must be injected into i3bar JSON, not the i3blocks1.4
 - Remedy: Reject nonempty observations at or after the exclusive end as INVALID_PROVIDER_DATA instead of translating them into empty history; propagate that failure through the existing paginator and preserve the immutable cache.
 - Verification evidence: All three defining regressions failed before the minimal > to >= predicate correction.61 focused tests and the shared276-test gate passed with typecheck/build; the integrated case verifies two provider calls and no cache publication.
 - Limitations: Offline provider fixtures establish the boundary/exhaustion contract only. The separate loopback permission failure needed scoped execution; the fix does not validate actual market performance, feed latency or historical completeness.
-- Source: [2026-10-30-history-exclusive-boundary.md](/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-30-history-exclusive-boundary.md) (SHA-256 `3fa22dea01ffd8bea4be71699bb004b0a07a4afd52bfcd531bc4ea966337a867`).
+- Source: [2026-10-30-history-exclusive-boundary.md](/home/example/coding/jay-tradingview/docs/postmortem/2026-10-30-history-exclusive-boundary.md) (SHA-256 `3fa22dea01ffd8bea4be71699bb004b0a07a4afd52bfcd531bc4ea966337a867`).
 
 ## local-cli-plain-before-argument-validation
 
@@ -788,4 +788,60 @@ Asymmetric i3block padding must be injected into i3bar JSON, not the i3blocks1.4
 - Remedy: Determine plain mode from raw display flags or the established plain environment option before validating arguments, then use the same mode in the error path. Keep invalid arguments rejected.
 - Verification evidence: The direct paper-study command with --plain --open-test rejected final access with ASCII error output after initialization moved before parsing; focused15 tests and fresh typecheck passed. The temporary nested subprocess wrapper failed with EPERM and was not treated as application evidence.
 - Limitations: This verifies error formatting and argument rejection only. It neither grants final access nor proves data loading, paper execution or subprocess permissions.
-- Source: [2026-10-30-paper-source-path-lookup.md](/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-30-paper-source-path-lookup.md) (SHA-256 `f92f8c3559f3fe5c55ec5c8e19b7ac5f5cde3398403d3fb5aaca237c35a0e51a`).
+- Source: [2026-10-30-paper-source-path-lookup.md](/home/example/coding/jay-tradingview/docs/postmortem/2026-10-30-paper-source-path-lookup.md) (SHA-256 `f92f8c3559f3fe5c55ec5c8e19b7ac5f5cde3398403d3fb5aaca237c35a0e51a`).
+
+## local-frozen-research-result-specification
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **code**.
+- Symptoms: Checksum-valid saved run drifts MA/config while its ID matches the frozen version; empty-message exception loses error classification; reuse ignores corrupted attempt journals.
+- Applicability: Immutable experiment reports with frozen candidate/configuration and reserved attempts.
+- Diagnostic checks: Change MA period, risk, initial cash, timeframe or seed and recompute checksum; load must reject. Throw an empty error and corrupt one journal envelope.
+- Remedy: Compare complete resolved candidate/config to the frozen specification; classify errors by nullness; validate every journal checksum and claim/version/phase sequence before reuse.
+- Verification evidence: Defining RED observed all three gaps; fixes passed33 focused and484 full tests, typecheck/build.
+- Limitations: Checksums are not authentication against a malicious local writer; fixture evidence does not establish edge or provider parity.
+- Source: [Confluence discovery and evidence validation](/home/example/coding/jay-tradingview/docs/postmortem/2026-10-30-confluence-source-discovery.md) (SHA-256 `ae885475754c0e771c643bf5a31c4dbfc1877acaa7bc7b8e67c1b28b82b22233`).
+
+
+Indicator-loop extension: strict complete claim/result/metric fields and canonical folds, identical read/reuse journal/outcome/Markdown checks, resolved currency/default labels, frozen-end checks and safe newline append passed14 focused/528 full plus11/11 review. Source: [2026-10-30-indicator-loop-review.md](/home/example/coding/jay-tradingview/docs/postmortem/2026-10-30-indicator-loop-review.md) (SHA-256 `e66d83273eeb9bb787d25b7fabbd6559979f65c051baea1339cd67424c96200f`).
+
+Per-batch Markdown placement extension: an identical later financial header exposed first-table insertion. Select the explicitly intended latest table in this sole-writer workflow; test pending append and fill-once finalization with earlier completed rows and later notes preserved. Defining RED→GREEN22focused/576full/typecheck/build and actual-ledger-copy probe verified placement;381priorartifacts/96financialrowstrings unchanged. This is not concurrent-writer safety, a general Markdown parser or financial evidence. Source: [Indicator audit table placement](/home/example/coding/jay-tradingview/docs/postmortem/2026-10-31-indicator-audit-table-placement.md) (SHA-256 `6829574beaecf592a249c1cea66df5586ea0402a135790a4580e62bb7a40f8e1`).
+
+
+Optional-rebalance journal extension: enforce cash/units after each chronological fill, not only at bar end. Separate closed-trade versus open-pointer identities; require positive holding until the true final exit, and derive trade/exit counts, drawdown and profit factor before eligibility gates. Test checksum-valid counter/accounting tampering and decimal threshold equality; a representational tolerance must not become a tuned market parameter. Defining RED→GREEN14boundary/611full/typecheck/build and independent pure fixtures verify this bounded code repair. Five prior claims/420hashes/114rows remain unchanged; no financial edge or authentication claim. Source: [V90 fill invariants](/home/example/coding/jay-tradingview/docs/postmortem/2026-10-31-volatility-fill-cash-order.md) (SHA-256 `fcc67bdac4d3d2cdcb2925861b213d6398bf2c47f2df2889b1e54a922e48a7c0`).
+
+Cumulative-ledger extension: freeze/check prior asset attempts before reservation; count pending/errors/repeats once above the audited legacy baseline. Reject unknown fourteen-column financial families and header-name impostors; share the exact full header and accept only complete dividers. Include imported validators/accounting inputs in source scope. Version future inconclusive/selection-bias labels without rewriting old rows. RED→GREEN21focused/615full/typecheck/build, independent pure probes and five old report reads preserved420hashes/114rows before any new financial call. Source: [Cumulative counter boundaries](/home/example/coding/jay-tradingview/docs/postmortem/2026-10-31-cumulative-count-fixture-type.md) (SHA-256 1aa54f5735c86baa1de7f497b3fa8a441b48e3668601ba7ef97826ba538c051f).
+
+- Supplemental admission evidence: shared core must enforce version/raw declaration/profile/data/prior gates before reservation; CLI-only enforcement left a direct-call bypass. Preserve synthetic read-validation fixtures by testing the exact reader parameter guard, not weakening financial data admission. Role38focused/636full/typecheck/build and independent12claims/sixoldreads/471hashes/138rows pass;0marketcalls. Source: /home/example/coding/jay-tradingview/docs/postmortem/2026-10-31-role-execution-admission.md.
+
+## local-closed-native-prefix-spacing
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **code**.
+- Symptoms: Provisional Yahoo quote overlaps its forming native week; strict interval validation runs before availability clipping.
+- Applicability: Causal native-timeframe indicator and backtest inputs.
+- Diagnostic checks: Inspect raw timestamps/closure; compare full vs clipped replay; retain malformed CLOSED overlap rejection and valid New York DST exception.
+- Remedy: Validate raw finite OHLCV/order, filter by nominal availability, then validate spacing of the used closed prefix. Preserve raw snapshots unchanged.
+- Verification evidence: Engine/strategy RED→GREEN,1000→998 raw SPY replay, actual SPY values,498 tests/typecheck/build.
+- Limitations: Nominal closure is not actual session/arrival proof; no performance/parity claim.
+- Source: [W1 rejects SPY weekly context](/home/example/coding/jay-tradingview/docs/postmortem/2026-10-30-weekly-trend-spy-context.md) (SHA-256 `eef2ae064c8b3231eb73cd775ec00477b447f9332eeaab7ed45389be338f952a`).
+
+## local-joint-validation-stress-screen
+
+- Status: **verified_fix**; confidence: **confirmed**; scope: **code**.
+- Require normal-validation sample, positive net and matched excess before stress-retention comparison; stress also needs its own sample/net/excess. Never rescue one phase with another or retune training choices from them.
+- Verification: insufficient-sample and negative-net validation surrogate fixtures observed RED→GREEN;14 focused/528 full/type/build and11/11 review. No financial-edge evidence.
+- Source: [2026-10-30-indicator-loop-review.md](/home/example/coding/jay-tradingview/docs/postmortem/2026-10-30-indicator-loop-review.md) (SHA-256 `e66d83273eeb9bb787d25b7fabbd6559979f65c051baea1339cd67424c96200f`).
+
+CF supplemental evidence for local-frozen-research-result-specification: /home/example/coding/jay-tradingview/docs/postmortem/2026-10-31-role-confluence-integration.md; profile/candidate identity must remain bound to the exact protocol asset through reservation and read-only reuse. Defining asset-mismatch and checksum-valid profile-mutation checks passed42focused/629full/typecheck/build; this is code evidence, not a financial result.
+
+Case-statistics fixture review: valid chronology must reach the intended boundary; fixed retained-index order and finite computed outputs are part of the reporting contract. Sparse calibration requires both buckets eligible, and source-defined intrabar fill timestamps must survive normalization. Defining regressions and focused14/full650/type/build checks cover code only; no new financial call or live claim. Source: /home/example/coding/jay-tradingview/docs/postmortem/2026-10-31-case-statistics-fixtures.md (SHA-256 22aa1dd8dbbb696d4409bcf157722589961d114cee9f7f16f685bbc31098fdae).
+
+## local-multitimeframe-fixture-time-coverage
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **runtime**.
+- Symptoms: A synthetic browser API returns an empty oldest history window and the client correctly rejects the empty response, although candles exist in other timeframes.
+- Applicability: Synthetic browser or integration fixtures combining chart candles with independently paged higher-timeframe history.
+- Diagnostic checks: Compare timestamp bounds and every exclusive page window across timeframes; equal candle counts do not imply equal time coverage.
+- Remedy: Generate each timeframe from a shared intended time domain, calculate warm-up independently, and cover the requested oldest page. Preserve production empty-window behavior.
+- Verification evidence: The corrected offline Chrome run passed six ordered batches, increasing colored bars from 166 to 399; failure retention, Refresh recovery, cancellation and polling passed.
+- Limitations: This verifies synthetic responses through the real App, validated client boundary, loader, engine and chart. It does not establish live provider completeness, feed behavior or TradingView parity.
+- Source: [Progressive PMO browser fixture bounds](/home/example/coding/chartclutch/docs/postmortem/2026-11-01-progressive-pmo-fixture.md) (SHA-256 `d723a0d976c0218298c5a1cec482c03630a4c68089f921ae7f03341751add0a8`).
