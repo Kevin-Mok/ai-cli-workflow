@@ -155,6 +155,10 @@ Review the DON'T guidelines above—they are the fingerprints of AI-generated wo
 
 ## Implementation Principles
 
+Before calling UI work done, inspect the real flow on mobile and desktop in one batched review:
+- Inventory secondary text. Replace unnecessary explanations with clearer layout, defaults, validation or progressive disclosure; preserve persistent labels, required explanations, errors and data-quality flags.
+- Ask a fresh reviewer, without explanation, what action to take and what the result means. Fix unclear design while preserving required context and the agreed brief. Batch fixes and confirm once; report unresolved issues.
+
 Match implementation complexity to the aesthetic vision. Maximalist designs need elaborate code with extensive animations and effects. Minimalist or refined designs need restraint, precision, and careful attention to spacing, typography, and subtle details.
 
 Interpret creatively and make unexpected choices that feel genuinely designed for the context. No design should be the same. Vary between light and dark themes, different fonts, different aesthetics. NEVER converge on common choices across generations.

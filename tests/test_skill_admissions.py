@@ -70,40 +70,6 @@ def admission_errors(entries, root=ROOT):
         if entry.get('verdict') == 'DENY':
             if not entry.get('reason') or not entry.get('would_change'):
                 errors.append(f'{name}: DENY requires reason and change condition')
-            if name == 'ai-ux-deslop':
-                path = f'dot_agents/skills/{name}/SKILL.md'
-                if (entry.get('cost_basis') != 'measured UTF-8 bytes/4'
-                        or entry.get('retained') != 'explicit overnight no-delete rule'
-                        or entry.get('source_ref') != MAIN_BASE):
-                    errors.append(f'{name}: retained DENY needs measured source evidence')
-                if entry.get('trigger_first') is not True or entry.get('size_budget') != 'PASS':
-                    errors.append(f'{name}: retained DENY needs trigger and size checks')
-                if entry.get('nonregression') != 'overnight-before.json + overnight-previous46.json; lexical proxy only':
-                    errors.append(f'{name}: retained DENY needs both frozen routing floors')
-                if not entry.get('case_ids') or any(
-                        case_id not in cases or name not in cases[case_id]['expected']
-                        for case_id in entry.get('case_ids', [])):
-                    errors.append(f'{name}: retained DENY needs positive trigger cases')
-                if path not in catalog:
-                    errors.append(f'{name}: retained source absent')
-                else:
-                    measured = catalog[path]
-                    if (entry['description_bytes'] != measured['description']['bytes']
-                            or entry['body_bytes'] != measured['body']['bytes']):
-                        errors.append(f'{name}: retained DENY costs stale against source')
-                    exceptions = budgets['exceptions'].get(path, {})
-                    if (measured['file']['lines'] > exceptions.get('lines', budgets['limits']['skill_lines'])
-                            or measured['description']['bytes'] > exceptions.get('description_bytes', budgets['limits']['description_bytes'])):
-                        errors.append(f'{name}: retained DENY exceeds size budget')
-                    source = subprocess.run(
-                        ['git', 'show', f"{MAIN_BASE}:{path}"], cwd=root,
-                        capture_output=True, text=True)
-                    if source.returncode:
-                        errors.append(f'{name}: source_ref lacks retained source')
-                    elif BENCHMARK['description_and_body'](source.stdout)[1] != BENCHMARK['description_and_body']((root / path).read_text())[1]:
-                        errors.append(f'{name}: retained DENY body differs from reviewed main')
-                reviewed.add(name)
-                continue
             if entry.get('cost_basis') != 'supplied estimate; source not inspected':
                 errors.append(f'{name}: uninspected cost must be labelled')
             continue
@@ -119,7 +85,7 @@ def admission_errors(entries, root=ROOT):
         if entry.get('trigger_first') is not True or entry.get('size_budget') != 'PASS':
             errors.append(f'{name}: missing trigger or size approval')
         expected_nonregression = ('overnight-before.json + overnight-previous46.json; lexical proxy only'
-                                  if name in ('ai-ux-deslop', 'hallmark')
+                                  if name == 'hallmark'
                                   else 'intake-baseline.json; lexical proxy only')
         if entry.get('nonregression') != expected_nonregression:
             errors.append(f'{name}: missing nonregression evidence')
@@ -221,8 +187,8 @@ class SkillAdmissionsTest(unittest.TestCase):
         cases_path, baseline_path = self.active_paths()
         cases = TRIGGER['load_cases'](cases_path)
         baseline = json.loads(baseline_path.read_text())
-        self.assertEqual(len(cases), 54)
-        self.assertEqual(baseline['exact_matches'], 49)
+        self.assertEqual(len(cases), 51)
+        self.assertEqual(baseline['exact_matches'], 46)
         self.assertTrue(any(not case['expected'] for case in cases))
         self.assertTrue(any(len(case['expected']) > 1 for case in cases))
         catalog = TRIGGER['load_catalog'](ROOT)
@@ -230,22 +196,34 @@ class SkillAdmissionsTest(unittest.TestCase):
         self.assertEqual(TRIGGER['gate_errors'](TRIGGER['evaluate'](catalog, cases), baseline), [])
         self.assertIn('not model triggering', baseline['method'])
 
-    def test_new_skill_admissions_match_reviewed_outcomes(self):
+    def test_new_skill_admissions_preserve_history_and_approved_consolidation(self):
         entries = {entry['name']: entry for entry in self.ledger()}
-        ai_ux = entries['ai-ux-deslop']
-        hallmark = entries['hallmark']
+        current_main = json.loads((ROOT / 'docs/skill-admissions-current-main.json').read_text())
+        ai_ux = next(entry for entry in current_main['retired'] if entry['name'] == 'ai-ux-deslop')
+        self.assertNotIn('ai-ux-deslop', entries)
         self.assertEqual(ai_ux['verdict'], 'DENY')
         self.assertEqual(ai_ux['retained'], 'explicit overnight no-delete rule')
         self.assertEqual(ai_ux['source_ref'], MAIN_BASE)
         self.assertEqual(ai_ux['cost_basis'], 'measured UTF-8 bytes/4')
-        self.assertTrue(ai_ux['case_ids'])
+        self.assertEqual(ai_ux['status'], 'MERGED')
+        self.assertEqual(ai_ux['survivor'], 'frontend-design')
+        self.assertEqual(ai_ux['consolidation_date'], '2026-11-01')
+        self.assertTrue(ai_ux['authorization'])
+        archived = json.loads(subprocess.check_output(
+            ['git', 'show', '978696a:docs/skill-admissions-current-main.json'], cwd=ROOT, text=True))
+        prior = next(entry for entry in archived['entries'] if entry['name'] == 'ai-ux-deslop')
+        for key, value in prior.items():
+            self.assertEqual(ai_ux[key], value)
+        original_cases = TRIGGER['load_cases'](ROOT / 'benchmarks/trim/overnight-cases.yaml')
+        cases = {case['id']: case for case in original_cases}
+        self.assertTrue(all('ai-ux-deslop' in cases[case_id]['expected'] for case_id in ai_ux['case_ids']))
+        hallmark = entries['hallmark']
         self.assertEqual(hallmark['verdict'], 'PASS')
         self.assertEqual(hallmark['cost_basis'], 'measured UTF-8 bytes/4')
         self.assertTrue(hallmark['case_ids'])
         cases_path, _ = self.active_paths()
-        cases = {case['id']: case for case in TRIGGER['load_cases'](cases_path)}
-        self.assertTrue(all('ai-ux-deslop' in cases[case_id]['expected'] for case_id in ai_ux['case_ids']))
-        self.assertTrue(all('hallmark' in cases[case_id]['expected'] for case_id in hallmark['case_ids']))
+        active_cases = {case['id']: case for case in TRIGGER['load_cases'](cases_path)}
+        self.assertTrue(all('hallmark' in active_cases[case_id]['expected'] for case_id in hallmark['case_ids']))
 
     def active_paths(self):
         selection = json.loads((ROOT / 'benchmarks/trim/trigger-active.json').read_text())

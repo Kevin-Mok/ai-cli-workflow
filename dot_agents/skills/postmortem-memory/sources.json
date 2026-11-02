@@ -13000,6 +13000,24 @@
       "reviewed_on": "2026-11-01",
       "findings": [],
       "decision": "No new general remedy: finite legacy size ceilings and exact pinned contract checks already govern. Stable entity merge retained current main; fixture metadata and wrapper help corrected. Broad259/400PASS, no new doctor keys; inherited collection and external canonical learning sync remain disclosed."
+    },
+    {
+      "sha256": "cef28e3591f88a2d4c8f6ab6ab824c4292802364477e9eda43d70cd3d5d6c96d",
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-11-01-rebase-git-metadata-permission.md"
+      ],
+      "reviewed_on": "2026-11-01",
+      "findings": [],
+      "decision": "Known Git metadata mount restriction; scoped approved fetch/rebase succeeded. No new reusable finding. Autostash restoration was separately resolved and verified; original sandbox remains restricted."
+    },
+    {
+      "sha256": "b865e579551d553c5b5d89e095a6c41342bdd04e9a6381e9e0ab8b31b1debf89",
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-11-01-skill-consolidation-discovery.md"
+      ],
+      "reviewed_on": "2026-11-01",
+      "findings": [],
+      "decision": "Known source-discovery and restricted-Fish-startup pitfalls; fixed validation bookkeeping and an inherited first-parent-only test assumption. All40 focused tests/210 subtests pass; refresh completed with approved scoped access. No new general rule or host sandbox fix."
     }
   ],
   "review": {

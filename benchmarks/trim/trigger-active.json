@@ -1,5 +1,5 @@
 {
-  "cases": "benchmarks/trim/overnight-cases.yaml",
-  "baseline": "benchmarks/trim/overnight-before.json",
-  "scope": "Current-main intake:54 frozen cases covering all29 retained local skills; includes unchanged17-case keep-list and original46 intake. Compare only identical corpora; deterministic lexical proxy, not model triggering."
+  "cases": "benchmarks/trim/deslop-survivor-cases.yaml",
+  "baseline": "benchmarks/trim/deslop-survivor-before.json",
+  "scope": "Approved ai-ux-deslop consolidation: unchanged51 survivor cases from frozen overnight54; three retired-skill cases excluded, not relabelled. Baseline46/51 frozen before removal; deterministic lexical proxy, not model triggering."
 }

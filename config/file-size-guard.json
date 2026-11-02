@@ -1,10 +1,10 @@
 {
   "grandfathered_max_bytes": {
-    "README.md": 108788,
-    "docs/smoke-tests.md": 170662,
-    "benchmarks/trim/PROGRESS.md": 43586,
+    "README.md": 108973,
+    "docs/smoke-tests.md": 171179,
+    "benchmarks/trim/PROGRESS.md": 44840,
     "plans/skills-efficiency.md": 36417,
-    "dot_agents/skills/lean-instructions/references/vetted-skills.md": 113744,
+    "dot_agents/skills/lean-instructions/references/vetted-skills.md": 114123,
     "scripts/executable_ai-workflow-doctor": 32301,
     "tests/test_ai_workflow_doctor.py": 34976,
     "dot_agents/skills/postmortem-memory/references/api-contracts-fixtures.md": 90347,
@@ -26,7 +26,7 @@
     "scripts/executable_codex-notification-sound": 23468,
     "dot_agents/skills/postmortem-memory/references/browser-integrations.md": 22397,
     "tests/test_i3blocks_now_playing_mpris.py": 20942,
-    "dot_agents/skills/postmortem-memory/sources.json": 782950
+    "dot_agents/skills/postmortem-memory/sources.json": 784014
   },
   "skip_globs": [
     "package-lock.json",

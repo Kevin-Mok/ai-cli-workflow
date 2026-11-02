@@ -29,7 +29,8 @@ def model_effort_lines(text):
 def test_main_merge_is_plain_and_preserves_protected_policy_and_culls():
     assert git('merge-base', 'HEAD', MAIN).strip() == MAIN
     assert git('merge-base', 'HEAD', PRE_MERGE_HEAD).strip().startswith(PRE_MERGE_HEAD)
-    commits = git('rev-list', '--first-parent', '--parents', 'HEAD').splitlines()
+    # The PR's original integration remains reachable through main's second parent.
+    commits = git('rev-list', '--parents', 'HEAD').splitlines()
     pre_merge = git('rev-parse', PRE_MERGE_HEAD).strip()
     assert any(row.split()[1:] == [pre_merge, MAIN] for row in commits)
     current_agents = (ROOT / 'dot_codex/AGENTS.md').read_text()
@@ -57,9 +58,9 @@ def test_original_baseline_is_kept_alongside_current_main_baseline():
     assert current['base_commit'] == MAIN
 
 
-def test_denied_ai_ux_source_keeps_its_main_body_while_trimming_description():
+def test_historical_denied_ai_ux_body_was_preserved_before_approved_consolidation():
     path = 'dot_agents/skills/ai-ux-deslop/SKILL.md'
     upstream = git('show', f'{MAIN}:{path}')
-    current = (ROOT / path).read_text()
+    current = git('show', f'978696a:{path}')
     split = runpy.run_path(str(ROOT / 'scripts/trim-benchmark'))['description_and_body']
     assert split(upstream)[1] == split(current)[1]

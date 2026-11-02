@@ -72,12 +72,12 @@ tests and documentation accompany the change they describe.
 
 ## Frontend And Browser Work
 
-- [`ai-ux-deslop`](ai-ux-deslop/SKILL.md): Review UI against the concrete AI-tell and secondary-text checks; DENY retained for Kevin; no-delete rule.
 - [`hallmark`](hallmark/SKILL.md): Explicit-only themed page design with pinned assets and runtime checks; admission PASS.
 
 - [`frontend-design`](frontend-design/SKILL.md): Build frontend web interfaces
   from confirmed audience, use cases and brand context; save agreed missing
-  design context in `.impeccable.md` for later sessions.
+  design context in `.impeccable.md` for later sessions. Includes the secondary-text
+  inventory and unbriefed comprehension review consolidated from `ai-ux-deslop`.
 - [`brand-system-designer`](brand-system-designer/SKILL.md): Develop repo-native
   visual identity, logo, typography, favicon and social asset guidance.
 - [`playwright`](playwright/SKILL.md): Automate real browser navigation,

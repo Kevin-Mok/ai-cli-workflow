@@ -384,10 +384,12 @@ fragile session state.
   remain available from the runtime; duplicate repo copies are retired.
 
 Skill sources can include helper scripts, references, provenance and picker
-metadata. The approved cull changes this repository's managed catalog; it does
-not delete installed or upstream copies. No live refresh occurs during the trim
-benchmark task. Start a fresh agent session after a separately authorized
-installation update to reload skill routing.
+metadata. The 28-skill managed catalog consolidates `ai-ux-deslop` into
+`frontend-design`, including secondary-text inventory and an unbriefed
+comprehension review. The approved cull changes this repository's managed catalog; it does
+not delete installed or upstream copies. This follow-up also removed the
+unchanged installed `ai-ux-deslop` copy after verifying its committed hash.
+Start a fresh agent session after installation updates to reload skill routing.
 
 ### 4. ExecPlans
 

@@ -6,8 +6,8 @@
     "description_bytes": 400
   },
   "exceptions": {},
-  "loaded_bytes": 14399,
-  "minimum_skills": 29,
+  "loaded_bytes": 14313,
+  "minimum_skills": 28,
   "required_skill_paths": [
     ".agents/skills/brand-system-designer/SKILL.md",
     "dot_agents/skills/ai-workflow-doctor/SKILL.md",
@@ -37,10 +37,9 @@
     "dot_agents/skills/skill-eval/SKILL.md",
     "dot_agents/skills/smoke-test-capture/SKILL.md",
     "dot_agents/skills/vercel-react-best-practices/SKILL.md",
-    "dot_agents/skills/ai-ux-deslop/SKILL.md",
     "dot_agents/skills/hallmark/SKILL.md"
   ],
-  "addition_note": "Current-main refresh: all29locals retained including denied ai-ux under explicit no-delete. Original14399B loaded cap and strict9KB/150/300/400 limits retained; trimmed trigger descriptions offset new skill growth.",
+  "addition_note": "2026-11-01 user-approved ai-ux-deslop consolidation into frontend-design:28 locals; description removes86B. Original PR snapshots and 39-name cull remain unchanged; follow-up source ceilings ratchet by86B. Strict9KB/150/300/400 limits retained.",
   "approved_cull": {
     "count": 39,
     "names": [

@@ -32,9 +32,16 @@ searches run before completion and any commit; do not use them to fill the hando
 
 - Action: Run `./scripts/trigger-eval --plain --check` before trimming skill
   descriptions and after every description pass.
-  Expected: The active current-main corpus scores49/54 exact-set matches (90.74%), with
+  Expected: The active survivor corpus scores46/51 exact-set matches (90.20%), with
   `Accuracy gate: PASS`; later passes must preserve prior correct cases. The
   report labels the deterministic lexical proxy and includes baseline accuracy.
+- Action: Build or review a frontend interface with `frontend-design`; inspect
+  mobile and desktop together and ask a fresh reviewer what to do and what the
+  result means without explaining the screen.
+  Expected: Secondary text is inventoried and simplified through design where
+  appropriate; persistent labels, required explanations, errors and data-quality
+  flags remain. Fixes are batched and confirmed once. No separate `ai-ux-deslop`
+  invocation, universal one-line limit or unlimited review loop is required.
 - Action: Run `./scripts/trigger-eval --json --check` and inspect `per_case`.
   Expected: Case IDs and match booleans, with no prompt text copied into results.
   The original 50-case fixture includes 36 single-label, 6 multi-label and 8

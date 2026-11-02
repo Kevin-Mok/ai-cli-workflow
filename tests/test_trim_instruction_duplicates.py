@@ -58,9 +58,9 @@ class InstructionDuplicateTest(unittest.TestCase):
         for key in ('skills_count', 'description_bytes'):
             self.assertEqual(after['totals'][key], before['totals'][key])
         self.assertEqual(current['developer_instructions']['bytes'], 0)
-        self.assertEqual(current['totals']['skills_count'], 29)
+        self.assertEqual(current['totals']['skills_count'], 28)
         budget = json.loads((ROOT / 'benchmarks/trim/BUDGETS.json').read_text())
-        self.assertEqual(budget['loaded_bytes'], 14399)
+        self.assertEqual(budget['loaded_bytes'], 14313)
         self.assertLessEqual(current['totals']['loaded_bytes'], budget['loaded_bytes'])
 
 

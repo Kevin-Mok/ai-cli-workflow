@@ -267,7 +267,9 @@ cases before edits; retain failed new skills when deletion is not authorized.
 **Repo example:** Main38,810B/61locals versus candidate14,399B/29locals;
 9,702.5→3,599.75estimated recurring tokens (−62.90%). New descriptions417→183B
 avoid58.5tokens of inherited growth; commit-dirty354→159B offsets195B intake; unchanged bodies24,164B stay on demand.
-Hallmark PASS; ai-ux-deslop DENY retained for Kevin under the no-delete rule.
+Hallmark PASS; ai-ux-deslop was DENY retained under the original no-delete rule.
+On2026-11-01Kevin approved consolidation into frontend-design and removal;
+preserve its historical decision and measure the follow-up separately.
 Frozen54 remains49correct; original46 remains42correct with no lost positives.
 **Mistakes:** Treating denied retention as PASS, resetting old corpora, claiming
 live catalog cleanup, or using a stale main baseline after a merge.

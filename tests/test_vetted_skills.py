@@ -241,7 +241,8 @@ class VettedSkillsTest(unittest.TestCase):
         self.assertEqual(local, expected)
         self.assertIn('## Culled', self.source())
         for row in data['history']:
-            self.assertEqual(row['date'], '2026-10-22')
+            if row['scope'] != 'repo source consolidated':
+                self.assertEqual(row['date'], '2026-10-22')
             self.assertTrue(row['reason'])
             self.assertTrue(row['evidence'])
             self.assertTrue(row['survivor'])
@@ -256,11 +257,17 @@ class VettedSkillsTest(unittest.TestCase):
             if identity in ('repo:ai-ux-deslop', 'repo:hallmark')
         }
         self.assertEqual(retained_records, {
-            'repo:ai-ux-deslop': 'DENY-RETAINED',
             'repo:hallmark': 'PASS',
         })
         self.assertEqual(sum(row['verdict'] in ('PASS', 'DENY-RETAINED')
-                             for row in data['unranked'].values()), 2)
+                             for row in data['unranked'].values()), 1)
+        self.assertNotIn('repo:ai-ux-deslop', data['active'])
+        self.assertNotIn('repo:ai-ux-deslop', data['unranked'])
+        consolidated = [row for row in data['history'] if row['scope'] == 'repo source consolidated']
+        self.assertEqual(len(consolidated), 1)
+        self.assertEqual(consolidated[0]['candidate'], 'repo:ai-ux-deslop')
+        self.assertEqual(consolidated[0]['survivor'], 'frontend-design')
+        self.assertEqual(consolidated[0]['date'], '2026-11-01')
         for identity, row in data['unranked'].items():
             if identity in retained_records:
                 continue

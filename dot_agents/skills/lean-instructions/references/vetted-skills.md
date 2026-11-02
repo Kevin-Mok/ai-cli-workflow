@@ -607,16 +607,6 @@ A commit cannot embed its own SHA; keep pending evidence honest.
         "repo-authored"
       ]
     },
-    "repo:ai-ux-deslop": {
-      "candidate": "repo:ai-ux-deslop",
-      "description": "Use when designing, building, or reviewing web or desktop UI to avoid generic AI slop.",
-      "description_sha256": "4478d0d23352a9f2d2b635940b4f02c9b6475d7539ea3677e2926483b16e7a0e",
-      "job": "Retained denied overlap; Kevin decision pending.",
-      "scopes": [
-        "installer:run_after_install-claude-skills.sh.tmpl",
-        "repo-authored"
-      ]
-    },
     "repo:hallmark": {
       "candidate": "repo:hallmark",
       "description": "Use only when asked for Hallmark to design new websites/pages or audit/redesign existing designs.",
@@ -1177,6 +1167,16 @@ A commit cannot embed its own SHA; keep pending evidence honest.
       "reason": "Replace moving external source with approved pinned web skill; preserve upstream installed copies.",
       "scope": "config retired; pinned local replacement",
       "survivor": "pr-38:impeccable"
+    },
+    {
+      "candidate": "repo:ai-ux-deslop",
+      "date": "2026-11-01",
+      "scope": "repo source consolidated",
+      "commit": "pending: refactor(skills): consolidate AI UX review checks",
+      "reason": "User approved merging secondary-text and comprehension checks into frontend-design.",
+      "evidence": "plans/consolidate-ai-ux-deslop.md; original source at978696a",
+      "survivor": "frontend-design",
+      "installed_cleanup": "Verified unchanged installed copy removed; hash and recovery evidence in plan."
     }
   ],
   "schema_version": 1,
@@ -1493,30 +1493,23 @@ A commit cannot embed its own SHA; keep pending evidence honest.
       "job": "Measure, admit, trim and remove instructions and skills.",
       "verdict": "UNSCORED"
     },
-    "repo:ai-ux-deslop": {
-      "verdict": "DENY-RETAINED",
-      "description": "Use when designing, building, or reviewing web or desktop UI to avoid generic AI slop.",
-      "description_basis": "detected public skill frontmatter",
-      "job": "Retained denied overlap; Kevin decision pending."
-    },
     "repo:hallmark": {
       "verdict": "PASS",
       "description": "Use only when asked for Hallmark to design new websites/pages or audit/redesign existing designs.",
       "description_basis": "detected public skill frontmatter",
       "job": "Explicit deterministic Hallmark theme/scaffold/lint workflow."
     },
-    "installed:agents:ai-ux-deslop": {
-      "description": "Use when an AI agent is designing, building, or reviewing any web or desktop UI (landing pages, tools, dashboards) and the result must not look like generic AI slop.",
-      "description_basis": "detected public skill frontmatter",
-      "job": "Use when an AI agent is designing, building, or reviewing any web or desktop UI (landing pages, tools, dashboards) and the result must not look like generic AI slop.",
-      "verdict": "UNSCORED"
-    },
     "installed:agents:hallmark": {
-      "description": "Design skill for websites and new pages that look designed, not generated. Use when the user asks to build or design something new, or names Hallmark. Never use it on an existing design unless the user names Hallmark, as in `/hallmark redesign <path>`.",
+      "description": "Use only when asked for Hallmark to design new websites/pages or audit/redesign existing designs.",
       "description_basis": "detected public skill frontmatter",
       "job": "Design skill for websites and new pages that look designed, not generated. Use when the user asks to build or design something new, or names Hallmark. Never use it on an existing design unless the user names Hallmark, as in `/hallmark redesign <path>`.",
       "verdict": "UNSCORED"
-    }
+    },
+    "installed:agents:grok-cli-handoff": {"verdict":"UNSCORED","job":"Source mirror.","description":"Use for Grok Bot or remote assistant delegation to local Codex or Claude Code, cross-host CLI transfers, or delegated STOP.","description_basis":"detected public skill frontmatter"},
+    "installed:agents:lean-instructions": {"verdict":"UNSCORED","job":"Source mirror.","description":"Use when adding to AGENTS.md or adding, editing, or removing a skill.","description_basis":"detected public skill frontmatter"},
+    "installed:agents:shadcn": {"verdict":"UNSCORED","job":"Source mirror.","description":"Manage shadcn/ui components, project context, registries, presets and updates with the pinned CLI.","description_basis":"detected public skill frontmatter"},
+    "installed:agents:skill-eval": {"verdict":"UNSCORED","job":"Source mirror.","description":"Evaluate and improve a named skill with real tasks, human-calibrated binary grading, and blind comparisons.","description_basis":"detected public skill frontmatter"},
+    "installed:agents:vercel-react-best-practices": {"verdict":"UNSCORED","job":"Source mirror.","description":"Review React and Next.js performance using pinned Vercel Engineering guidance.","description_basis":"detected public skill frontmatter"}
   }
 }
 ```

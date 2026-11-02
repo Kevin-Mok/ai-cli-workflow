@@ -659,3 +659,11 @@ Freshdoctor35inheritederrors/1warning, zero newkeys vs pass0/pass8. Report-only
 subject:`docs(trim): close the measured optimization series`; exactstagedgates
 precede commit, with unchanged measuredsurfaces. No further meaningful safepass
 found. Remaining host/legacy/canonicallearning limits are disclosed above.
+
+## 2026-11-01 follow-up: approved AI UX consolidation
+
+After PR3 merged at978696a, Kevin approved consolidating ai-ux-deslop into frontend-design. The secondary-text inventory and unbriefed comprehension review survive with required labels/context and bounded review; the duplicate package is retired. Historical PR numbers and the original54-case corpus above remain snapshots.
+
+Canonical skills29→28; description bytes4720→4634 (−86B,21.5 estimated recurring tokens). On-demand entry body inventory213743→208167B (net−5576B,1394 estimated tokens), including the added survivor checks and updated lean procedure. The eligible commit surface loads14399→14313B; the working tree carries an unrelated487B dirty AGENTS addition, giving14886→14800B. UTF-8bytes/4 estimates exclude external catalogs, billing and actual body invocation.
+
+Freeze the unchanged51 survivor cases at46/51 before source edits; remove only the three retired-skill cases from active selection, never relabel historical cases. After consolidation46/51 and every prior correct survivor remain intact.40 focused tests/210 subtests pass. Read [the follow-up plan](../../plans/consolidate-ai-ux-deslop.md) for exact scope, live activation, protected work and delivery evidence.
