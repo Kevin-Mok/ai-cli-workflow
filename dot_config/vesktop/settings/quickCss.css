@@ -1,4 +1,4 @@
-/* Force font for the actual message bodies (rendered chat text) */
+/* Message font */
 #app-mount [class*="messageContent"],
 #app-mount [class*="markup"] {
   font-family: "Hack", monospace !important;
@@ -10,66 +10,69 @@
   --font-headline: "Hack", monospace;
   --font-code: "Hack", monospace;
 
-  /* Keep wallpaper sharp */
+  /* Wallpaper: brighter, sharp, original colours */
+  --background-image: url("https://i.imgur.com/Y1qFeat.jpeg");
+  --background-position: center;
+  --background-size: cover;
+  --background-attachment: fixed;
   --background-image-blur: 0px !important;
+  --background-filter: brightness(0.90) contrast(1.05)
+    saturate(calc(var(--saturation-factor, 1) * 1.05));
 
-  /* Darken the actual image */
-  --background-filter: brightness(0.42) contrast(1.08)
-    saturate(calc(var(--saturation-factor, 1) * 0.80));
+  /* Frosted Glass compatibility */
+  --serverlist-brightness: 0.65 !important;
+  --left-brightness: 0.65 !important;
+  --middle-brightness: 0.75 !important;
+  --right-brightness: 0.65 !important;
+  --overlay-brightness: 0.65 !important;
 
-  /* Frosted Glass - darker UI */
-  --serverlist-brightness: 0.35 !important;
-  --left-brightness: 0.35 !important;
-  --middle-brightness: 0.28 !important;
-  --right-brightness: 0.25 !important;
-  --overlay-brightness: 0.40 !important;
-
-  /* ClearVision shading */
+  /* Lighter black overlays */
   --background-shading-percent: 100%;
-  --background-shading: rgba(0, 0, 0, 0.68);
+  --background-shading: rgba(0, 0, 0, 0.30);
+  --card-shading: rgba(0, 0, 0, 0.25);
+  --popout-shading: rgba(0, 0, 0, 0.75);
+  --modal-shading: rgba(0, 0, 0, 0.78);
+  --input-shading: rgba(0, 0, 0, 0.35);
 
-  --card-shading: rgba(0, 0, 0, 0.68);
-  --popout-shading: rgba(0, 0, 0, 0.88);
-  --modal-shading: rgba(0, 0, 0, 0.88);
-  --input-shading: rgba(0, 0, 0, 0.76);
-
-  /* === BLAZE / ORANGE ACCENTS === */
+  /* Orange accents */
   --main-color: #ef4d0a;
   --hover-color: #9d1d0d;
   --success-color: #fbca10;
   --danger-color: #9d1d0d;
   --url-color: #fbca10;
 
-  /* === BACKGROUND IMAGE === */
-  --background-image: url("https://i.imgur.com/8vGfgam.jpeg");
-  --background-position: center;
-  --background-size: cover;
-  --background-attachment: fixed;
-
-  /* Darken the image itself */
-  --background-filter: brightness(0.55) contrast(1.15)
-    saturate(calc(var(--saturation-factor, 1) * 1.05));
-
-  /* === MAKE EVERYTHING DARKER (ClearVision shading layers) === */
-  --background-shading-percent: 100%;
-  --background-shading: rgba(0, 0, 0, 0.82);
-  --card-shading: rgba(0, 0, 0, 0.60);
-  --popout-shading: rgba(0, 0, 0, 0.88);
-  --modal-shading: rgba(0, 0, 0, 0.84);
-  --input-shading: rgba(0, 0, 0, 0.70);
+  /* Translucent foreground panels */
+  --background-primary: rgba(12, 12, 16, 0.18);
+  --background-secondary: rgba(12, 12, 16, 0.25);
+  --background-secondary-alt: rgba(12, 12, 16, 0.30);
+  --background-tertiary: rgba(8, 8, 12, 0.30);
+  --background-floating: rgba(18, 18, 22, 0.90);
+  --channeltextarea-background: rgba(12, 12, 16, 0.35);
 
   /* Text */
   --normal-text: #f2f2f2;
-  --muted-text: #b8b8b8;
-
-  /* === FORCE DARK BASE SURFACES (catches leftover grey panels) === */
-  --background-primary: #0b0b0b;
-  --background-secondary: #090909;
-  --background-secondary-alt: #0d0d0d;
-  --background-tertiary: #060606;
-  --background-floating: #0d0d0d;
-  --channeltextarea-background: #0c0c0c;
-
+  --muted-text: #c2c2c2;
   --text-normal: #f2f2f2;
-  --text-muted: #b8b8b8;
+  --text-muted: #c2c2c2;
+}
+
+/* Override the remaining darkness */
+:root,
+.theme-dark,
+.theme-darker,
+.theme-midnight {
+  --background-shading-percent: 45% !important;
+  --background-shading: transparent !important;
+
+  --background-filter: brightness(0.70) contrast(1.02)
+  saturate(calc(var(--saturation-factor, 1) * 1.05)) !important;
+
+  --card-shading: rgba(0, 0, 0, 0.12) !important;
+  --input-shading: rgba(0, 0, 0, 0.20) !important;
+
+  --background-primary: transparent !important;
+  --background-secondary: transparent !important;
+  --background-secondary-alt: transparent !important;
+  --background-tertiary: transparent !important;
+  --channeltextarea-background: rgba(0, 0, 0, 0.20) !important;
 }

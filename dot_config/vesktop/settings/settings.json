@@ -175,9 +175,6 @@
         "Experiments": {
             "enabled": false
         },
-        "ExpressionCloner": {
-            "enabled": true
-        },
         "F8Break": {
             "enabled": false
         },
@@ -683,6 +680,9 @@
         },
         "GifProviderSwitcher": {
             "enabled": false
+        },
+        "ExpressionManager": {
+            "enabled": true
         }
     },
     "notifications": {

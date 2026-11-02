@@ -1824,3 +1824,10 @@ Preserve local managed-file edits before applying repo changes.
 - Action: Compare the two context tables in COMPARISON.md and OVERNIGHT-REPORT.md.
   Expected: Both are verbatim copies of CONTEXT-DIFF.md; the report and PR3 link
   the complete artifact and its measurement limits.
+
+## Desktop application settings
+
+- Action: After refreshing configuration, open Vesktop settings and a normal chat.
+  Expected: The brighter wallpaper, translucent panels and Hack message font are visible; ExpressionManager is enabled. Confirm message text remains readable. This is a manual desktop check.
+- Action: Inspect the installed MIME associations and open an HTTPS link in the desktop.
+  Expected: HTML, HTTP and HTTPS defaults resolve to Google Chrome. The permission-marked chezmoi source `dot_config/private_mimeapps.list` installs the existing associations with private file permissions.
