@@ -952,8 +952,9 @@ checks use invented temporary data; real notes are never repository fixtures.
   once from the repo root. The UUID-based systemd automount makes the wallpaper
   available without a sudo prompt in i3. Confirm the wallpaper is visible before
   opening a terminal or running `ubs` manually. It mounts the disk before
-  applying the `autorandr 4k-3-monitor` profile and the Sukana wallpaper
-  through `/home/example/scripts/apply-pywal-theme`, starts at most one
+  applying the `autorandr 4k-3-monitor` profile and the Ultron Infinity Gauntlet wallpaper
+  (`~/Pictures/Backgrounds/ultron-infinity-gauntlet.png`) through
+  `~/scripts/apply-pywal-theme`, starts at most one
   `picom` compositor, starts `dunst` for notifications
   when available, applies the full 20-button X pointer map without the
   partial-button warning, skips missing optional helpers such as `numlockx`

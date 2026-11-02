@@ -13036,6 +13036,15 @@
       "reviewed_on": "2026-11-01",
       "findings": [],
       "decision": "No new reusable learning: discover actual source paths; shortened new admission bookkeeping after its size-cap regression. See task plan for fresh checks."
+    },
+    {
+      "sha256": "85e3aa567ebf23c133dc894c90f9dbd9dea43224396533a28dd42cfe91a833a7",
+      "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-11-01-startup-theme-helper-discovery.md"
+      ],
+      "reviewed_on": "2026-11-01",
+      "findings": [],
+      "decision": "Read-only helper lookup corrected through tracked path discovery; no reusable new learning or helper defect."
     }
   ],
   "review": {

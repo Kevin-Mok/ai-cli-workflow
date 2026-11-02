@@ -49,7 +49,7 @@ assert_not_matches() {
 
 mount_line="$(line_number 'GRAPHITI_VOLUME_DEVICE="/dev/sdc1"' "$script_path")"
 autorandr_line="$(line_number 'start_command autorandr autorandr 4k-3-monitor' "$script_path")"
-wal_line="$(line_number '/home/example/scripts/apply-pywal-theme "${HOME}/Pictures/Backgrounds/4k/sukana.jpg" &' "$script_path")"
+wal_line="$(line_number '"${HOME}/scripts/apply-pywal-theme" "${HOME}/Pictures/Backgrounds/ultron-infinity-gauntlet.png" &' "$script_path")"
 compose_line="$(line_number 'docker compose -f docker/docker-compose-neo4j.yml up -d neo4j' "$script_path")"
 
 if [ "$mount_line" -ge "$wal_line" ]; then
@@ -72,7 +72,7 @@ assert_contains 'start_command notification-daemon notification-daemon &' "$scri
 assert_contains 'start_command numlockx numlockx on &' "$script_path"
 assert_contains 'start_command redshift "${HOME}/scripts/redshift-control" set 3000' "$script_path"
 assert_contains 'start_command autorandr autorandr 4k-3-monitor' "$script_path"
-assert_contains '/home/example/scripts/apply-pywal-theme "${HOME}/Pictures/Backgrounds/4k/sukana.jpg" &' "$script_path"
+assert_contains '"${HOME}/scripts/apply-pywal-theme" "${HOME}/Pictures/Backgrounds/ultron-infinity-gauntlet.png" &' "$script_path"
 assert_not_contains 'wallpaper="$(/home/example/scripts/shuffler "$HOME/Pictures/Backgrounds/dim/editing" 2>/dev/null)"' "$script_path"
 assert_not_contains '/home/example/scripts/apply-pywal-theme "${wallpaper}" &' "$script_path"
 assert_not_contains '/usr/lib/notification-daemon-1.0/notification-daemon &' "$script_path"
