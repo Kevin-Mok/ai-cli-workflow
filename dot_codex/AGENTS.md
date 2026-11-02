@@ -118,6 +118,8 @@ Before adding a skill or an AGENTS.md rule, run the `lean-instructions` gate. Ad
 
 ## Git And Delivery
 
+- When reviewing a pull request, always fetch the latest remote `main` and merge it into the review branch or rebase the review branch onto it before testing. Resolve conflicts while preserving current-main features, then run automated checks and relevant manual checks on the integrated result. Record the tested PR and main commit IDs; repeat integration and affected checks if either changes before merge. Keep review integration local unless publishing it is explicitly authorized.
+
 - Any file larger than 3 MB must be committed using Git LFS. Configure its
   Git LFS tracking in `.gitattributes` before staging it, and commit the
   matching `.gitattributes` change with the file.
