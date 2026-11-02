@@ -1318,5 +1318,26 @@
     "removed_finding_count": 4,
     "exit_code": 0,
     "limit": "Diagnostic invocation without --check exits0; both audit statuses remain fail."
+  },
+  "publication": {
+    "implementation_commit": "f8e55fbf153cad7aa2b8fc388a577b286b759a97",
+    "merge_commit": "a88eea7e",
+    "remote_main": "8662fa3c30da549fbdb20b8477c80e015e7d5236",
+    "push_destination": "origin/review/skills-efficiency-20261023",
+    "pr": 3,
+    "pr_body_sha256": "23519a834b74b903b48096560dcaff39fb31de803b61193773e8b4661c555ffa",
+    "pr_body_exact_match": true,
+    "pr_state": "OPEN",
+    "merged": false,
+    "ci_results": "none reported",
+    "final_report_commit": "subsequent report-only commit; measured sources identical to implementation_commit",
+    "completion_marker": "external; written only after final push and audit"
+  },
+  "review": {
+    "independent_verified": 16,
+    "independent_incorrect": 0,
+    "initial_publication_pending": 3,
+    "final_data_check": "26tests/17subtests PASS",
+    "closure": "root staged/remote/PR checks; external marker last"
   }
 }

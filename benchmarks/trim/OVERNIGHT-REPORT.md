@@ -7,8 +7,9 @@ manual decisions. Read the evidence before considering merge or live activation.
 
 Current main `8662fa3c30da549fbdb20b8477c80e015e7d5236` (58 commits/294 files after
 410feaa) is merged with plain merge `a88eea7e` and pushed only to
-review/skills-efficiency-20261023. Admission/evidence publication and PR3 body
-refresh are the remaining delivery steps at this checkpoint. No main push,
+review/skills-efficiency-20261023. Admission/evidence commit `f8e55fbf` is pushed and PR3 body is updated with the
+current numbers; exact remote body comparison passed. The final documentation
+receipt follows in this report-only pass. No main push,
 force-push, rebase, other-PR/repo write, refresh-config or chezmoi apply.
 
 | Measure | Current main | Candidate |
@@ -67,7 +68,7 @@ deleted or silently disabled. Existing CULL.json remains unchanged.
 
 - 259 focused tests/400 subtests PASS, exit0. New defining contracts observed
   RED then 43 tests/28 subtests GREEN; historical contract repairs 15/199 PASS.
-  After the final metric correction,26data tests/17subtests PASS.
+  After the final metric correction, 26 data tests/17 subtests PASS.
 - Expanded frozen 54:49/54 before and after; previous 46 remains 42/46, zero
   prior correct cases lost. Prompts/scorer/thresholds unchanged. Five misses:
   morning translation, three multi-label cases and a no-skill Python bug case.
@@ -77,8 +78,8 @@ deleted or silently disabled. Existing CULL.json remains unchanged.
   provenance remain; brand duplicate warning is inherited.
 - Full collection: same7 inherited SyntaxErrors on both main and candidate,
   exit2;1,464 main and1,546 candidate collected. Whole-suite green is not claimed.
-- Merge staged privacy and README passed; admission/final exact staged gates
-  are recorded in pr-validation.json before their commits.
+- Merge staged privacy and README passed; admission exact staged gates
+  PASS; final documentation gates repeat before the report commit.
 - Disposable main content uses source Git metadata read-only; not isolation
   from the host environment or installed models. Native title/Plan Mode tools
   unavailable; written ExecPlan used.
@@ -113,3 +114,17 @@ SANITIZED.md is needed.
   measured uncovered tasks; preserve provenance, licenses and cull history.
 - Fix inherited test collection and doctor findings first so later comparisons
   can broaden their automated scope.
+
+## Completion audit and marker
+
+Independent review verified 16 claims with 0 incorrect; its three publication-only
+items have separate root receipts. Final staged gates pass, admission commit
+f8e55fbf is pushed, and PR3 body matches the prepared current-main table exactly
+(SHA-256 23519a834b74b903b48096560dcaff39fb31de803b61193773e8b4661c555ffa).
+Remote main remains `8662fa3c`; PR stays open/unmerged with no CI results reported.
+
+All substantive done criteria are verified. After this report-only commit is
+pushed, the final local audit writes the external completion marker at
+~/.local/share/culling-night/DONE. That marker is deliberately outside the
+public repository. It records final branch/head, baseline and verification;
+its absence means completion has not yet been signaled.

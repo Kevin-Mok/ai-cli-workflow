@@ -32,3 +32,15 @@ not187+376. All current claims corrected; candidate loaded cost was unchanged.
 Root follow-up: final-data contracts after the2B lean correction26tests/17subtests
 PASS, exit0; exact output/hash in pr-validation.json. Remaining receipts are
 recorded in the final delivery appendix only after their observed results.
+
+## Root publication closure
+
+- Final focused data checks26tests/17subtests PASS after the lean correction.
+- Exact staged privacy, finite size, README and diff checks PASS beforef8e55fbf.
+- f8e55fbf pushed normally to the named review branch; main8662fa3c unchanged.
+- PR3 body exact-match PASS; branch/base filtered query returns only OPENPR3.
+- Final report gates and remote-head check repeat before external marker.
+
+The original review's unresolved rows are publication receipts, not unresolved
+product behavior. External DONE is checked after the final report push; never
+interpret this committed checkpoint as evidence of a marker that was not read.

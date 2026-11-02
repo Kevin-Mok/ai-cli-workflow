@@ -56,8 +56,8 @@ unavailable; this ExecPlan is the execution record.
 - [x] Commit/push the merge checkpoint with privacy and README receipts.
 - [x] Gate ai-ux-deslop and hallmark; freeze additional routing cases before descriptions.
 - [x] Refresh current-main baseline, budgets, routing, tests and reports.
-- [ ] Evidence-reviewer audit; push final evidence and update PR3.
-- [ ] Verify all five criteria and write the external DONE marker.
+- [x] Evidence-reviewer audit; push final evidence and update PR3.
+- [x] Prepare full five-criterion audit and report; external DONE follows final report push.
 
 Merge checkpoint subject: merge(skills): refresh trimmed branch from current main.
 Conflict policy: keep trimmed core/catalog/night description; combine independent
@@ -113,3 +113,26 @@ Independent evidence review:16verified/0incorrect/3deliverypending. Metric
 correction resolved and fresh26/17data contracts pass. Review saved in
 benchmarks/trim/overnight/checks.md. Remaining publication/marker steps are
 explicit; no full completion claimed by the admission commit.
+
+## Published admission and final report checkpoint
+
+Admission commitf8e55fbf pushed toorigin/review/skills-efficiency-20261023; PR3
+body updated and read back exact (SHA-25623519a834b74b903b48096560dcaff39fb31de803b61193773e8b4661c555ffa).
+Remote main8662fa3c unchanged; filtered head/base query returns only openPR3.
+No CI check results reported. Independent16verified/0incorrect; three pending
+delivery receipts now have observed root evidence, except the final external
+marker which is deliberately written only after this report-only push.
+
+Final report subject:docs(trim): publish overnight completion evidence. Measured
+sources equal f8e55fbf; report-only edits do not change metrics or routing.
+No blocker. Remaining manual decisions/limits are in OVERNIGHT-REPORT. Next:
+commit/push this report, verify current remote head/main/body and exact measured
+surfaces, write external DONE, then mark the goal complete. No further product
+work is required; no activation or main merge is authorized.
+
+Automated test plan: exact259test command in pr-validation.json; final-data
+26test command separately recorded; compare shared suites and full-collection
+errors. Manual artifact plan: inspect report/PR table for current main, both
+skill verdicts,5conflicts and all limits; confirm no real catalog activation.
+Cursor prompt: Read benchmarks/trim/overnight/progress.md and live DONE receipt;
+verify completed criteria before any further work. Do not activate or merge main.

@@ -88,3 +88,7 @@ collector: ai-ux165B and Hallmark252B, not the earlier subagent estimates187/376
 Corrected417→183B/58.5estimated tokens in every current report and technique log;
 refreshed lean admission costs and body total213,743B. Overall loaded14,399B
 and62.90% reduction were unchanged. No incorrect per-skill figures were pushed.
+
+Final wrapper field-selection probe rejected native field names; supported
+head/base filters without extra fields verified PR3. Exact body comparison
+passed after edit. No further wrapper retries or external mutations needed.

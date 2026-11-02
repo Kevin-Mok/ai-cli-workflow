@@ -1,27 +1,30 @@
 # Progress: current-main overnight refresh
 
-Updated:2026-11-01. Goal remains active until publication/report/audit is complete.
+Updated:2026-11-02 00:44UTC (2026-11-01 America/Toronto). This is the final
+report-publication checkpoint; the external marker follows the final push.
 
 ## Files
-- ../pr-validation.json, PR-VALIDATION.md, COMPARISON.md: refreshed measurements.
-- ../../../plans/skills-efficiency-pr.md: authoritative plan and milestones.
-- task.md: five criteria and hard boundaries; checks.md: reviewer pending.
+- ../OVERNIGHT-REPORT.md: results, conflicts, new skills, follow-ups and proposals.
+- ../pr-validation.json: current metrics, tests, gates and PR body receipt.
+- ../../../plans/skills-efficiency-pr.md: full implementation/test/rollback record.
+- task.md and checks.md: five criteria, independent review and closure evidence.
 
 ## Done / checks run
-- DC1 met: plain merge `a88eea7e` pushed to named review branch.
-- DC2 implementation prepared: both skills gated; denied source retained.
-- DC3 in progress: measurements/routing/budgets pass; regression final rerun pending.
-- DC4 open: admission/report commits and PR body update pending.
-- DC5 open: final report/audit/marker pending.
+- DC1 met: plain mergea88eea7e pushed, baseline8662fa3c; protected rules/config.
+- DC2 met: exactly2newskills gated; Hallmark PASS, AI UX DENY retained.
+- DC3 met: loaded14399/core8989, strict budgets PASS, active49/54 and prior42/46;
+  broad259/400 and finaldata26/17PASS; privacy/README/size/inventory PASS.
+- DC4 met: admissionf8e55fbf pushed; PR3 body exact-match checked, branch/base
+  filters return only PR3, OPEN/unmerged; remote main unchanged.
+- DC5 report met: OVERNIGHT-REPORT complete. External DONE is final action after
+  this report-only push; check its live state rather than inferring from this file.
 
-## Decisions
-- Original14,399B cap retained; old baseline/corpora preserved separately.
-- Hallmark PASS; ai-ux-deslop DENY retained without disabling installed copies.
-- No other repo writes: external canonical incident-learning sync is manual.
-
-## Open questions
-- Kevin decides later whether to consolidate/remove denied AI UX checklist.
+## Decisions / remaining limits
+- Original loaded ceiling, original corpora/baseline and approved CULL preserved.
+- No activation, other repo writes, new deletion, history rewrite or main push.
+- Same7inherited collection SyntaxErrors; doctor35errors/1warning,0newkeys.
+- Canonical external incident sync and denied-overlap decision are manual.
 
 ## Next action
-Read current test-agent results, complete bounded regression repairs, then run
-staged privacy/size/README gates and commit/push the admission checkpoint.
+Publish final report commit, verify remote head/body and unchanged measured
+surfaces, write the external DONE receipt, then complete the active goal.
