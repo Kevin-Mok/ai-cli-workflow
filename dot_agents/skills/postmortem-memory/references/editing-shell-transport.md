@@ -256,3 +256,14 @@ Chrome updater follow-up: a large Bash policy producer returned status 1 on the 
 - Limitations: Code editing correctness only; live activation and protocol safety require separate checks.
 - Sources:
   - [CLI emoji edit offset incident](/home/example/linux-config/docs/postmortem/2026-10-09-cli-emoji-edit-offsets.md).
+
+## local-npm-script-option-ownership
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **runtime**.
+- Symptoms: A strict application script rejects Unknown option: --silent after npm forwards its own silent option through the script argument separator.
+- Applicability: npm run verification commands mixing npm-level output options with strict application-level flags.
+- Diagnostic checks: Inspect whether --silent appears before the script name or after npm's -- separator.; Keep unknown-application-option rejection intact and inspect the corrected sealed/open JSON results separately.
+- Remedy: Use npm run --silent script-name -- application-flags. Keep npm options before the script name and application options after the separator; correct the verification invocation rather than weakening the application allowlist.
+- Verification evidence: The forwarded --silent form exited1 before strategy calculation. Corrected sealed JSON exited0 with0 holdout runs, and explicit-open JSON exited0 with1 synthetic holdout; plain sealed/open/reject commands also passed.
+- Limitations: Verification used synthetic fixtures and consumed no actual market final test. This repairs option ownership in the command, not an application calculation defect.
+- Source: [2026-10-29-strategy-smoke-arguments.md](/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-29-strategy-smoke-arguments.md) (SHA-256 `c0d198c85fa2f757b684ef4473aceee8f4984dc1e2de7c0581c5c4e7e8b22f5f`).

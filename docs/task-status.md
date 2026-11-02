@@ -158,3 +158,131 @@ This document records delivery milestones and verification for completed reposit
 - Delivery milestone: docs: standardize command-first task handoffs; commit on main and push the configured origin/main after staged review. No application deployment is relevant to this configuration/documentation commit.
 - Remaining: unrelated dirty work stays local; broad refresh remains blocked by the existing Kitty conflict. No blocker to publishing the saved, scoped handoff policy.
 - Rollback: revert the handoff policy/docs change and restore only the corresponding installed handoff section; keep feedback history append-only.
+
+## Concerts directory shortcut — feat(fish): add cnc concerts shortcut
+
+- Complete: `cnc` expands to `cd /mnt/usb-8tb/concerts` in the personal section; no conflicting mappings. The live migration-preserved alias file was updated only for this mapping and shortcuts regenerated.
+- Scope: direct-write fallback for session 01a1844a-5079-7113-9579-fe6597e7762a; helper recognized no writes. Only the shortcut, inspection incident, its ledger record and this milestone are eligible. All pre-existing ledger hunks and other dirty work remain excluded.
+- Verification: generated Fish syntax, loaded abbreviation query/definition and repeated-request no-op passed; targeted incident-memory check passed. README gate returned pass_no_change. Staged whitespace/privacy checks must pass immediately before commit.
+- Delivery: one focused commit on main, followed by push to origin/main. No remaining shortcut implementation work.
+- Remaining: unrestricted refresh-config stopped at existing .config/mimeapps.list drift; targeted shortcut regeneration succeeded. Interactive keystroke expansion remains manual.
+- Rollback: remove only cnc from the template and live catalog, then regenerate shortcuts.
+
+## Discord pronunciation — fix(notifications): pronounce Discord name as bitcoin
+
+- Complete: Discord speech replaces the exact text `ビットコイン・スタッカー` with `bitcoin` in sender names and message bodies, including sender-only link announcements. Popup text stays unchanged.
+- Scope: direct-write fallback for session 01a188c2-0c65-7fc0-9a92-25cfa01ce41b; the scope helper detected no writes through the orchestration tool. Include only the helper, defining test, notification guide, Discord README row, pronunciation smoke check and this milestone. Preserve every baseline-dirty hunk unrelated to this change.
+- Verification: defining test failed before implementation; focused suite passed 91 tests and basedpyright reported 0 errors/warnings/notes. Scoped refresh-config exited 0; installed helper matched source and produced the expected channel, DM/link and body phrases. README gate returned pass_no_change. Fresh pre-commit checks passed: 91 focused tests, zero type-check diagnostics, README pass_no_change. Scoped staging required elevated Git metadata writes and then succeeded; the incident and its no-new-learning ledger entry ship with this task. Exact staged privacy/whitespace review is required before committing.
+- Delivery: one focused commit on main, then push origin/main. Implementation and deployment complete; no blockers. Subjective listening and real incoming-message acceptance remain manual.
+- Rollback: remove the exact pronunciation replacement and apply the helper; existing Discord speech activation and volume persist unchanged.
+
+### Discord pronunciation remote-integration follow-up
+
+- Milestone: pronunciation committed as `45777de`; the first push was safely rejected because origin/main had advanced. Both candidate and normal commit-hook privacy checks passed.
+- Resolution: fetch and conflict-free normal merge prepared with no history rewrite; remote privacy-gate fixes combine with existing local fixes. All unrelated dirty work remains excluded.
+- Verification: integration privacy-gate suite passed 60 tests; notification suite exited 0 (91 tests confirmed by the earlier fresh run). Exact staged whitespace, sub-3 MB blob sizing, README gate and candidate privacy review passed. Push receipt is the final delivery check. No application behavior changes beyond the pronunciation rule. Subjective listening remains manual.
+- Next: commit the reviewed integration and push origin/main; no deployment service applies to this dotfiles repository.
+
+## cg video shortcut — feat(fish): add cg video shortcut
+
+- Complete: cg expands to the requested looping mpv command with the absolute USB concert-video path; no conflicts.
+- Scope: session 01a189a3-f878-7453-aa21-176919d7c433; direct-write fallback because the scope helper could not detect orchestration writes. Only the alias, inspection incident, its isolated ledger record and this milestone are included.
+- Verification: refresh-config completed; generated Fish syntax and exact loaded expansion passed; repeated request is a no-op. README gate returned pass_no_change; targeted incident ledger check passed. Privacy review and staged diff inspection precede commit.
+- Delivery: one commit on main, then push origin/main. No implementation blockers or remaining work.
+- Remaining: preserve all baseline dirty work, including unrelated ledger hunks. Playback and interactive keystroke expansion were not exercised. USB mount must be available.
+- Rollback: remove cg from the source and live alias catalog, then refresh shortcuts.
+
+### cg delivery follow-up
+
+- Milestone: shortcut committed as 5331db7; automatic review blocked the initial push before execution.
+- Verification: GitHub confirms the configured Kevin-Mok/ai-cli-workflow destination is public and the authenticated viewer has ADMIN permission. Restricted network and guessed executable-path diagnostics were resolved by approved read-only access and executable discovery.
+- Delivery: record the incident in a follow-up commit, then retry the scoped series push to origin/main. Unrelated dirty files remain excluded; playback remains untested.
+
+## Weather scraping recovery — docs: record weather scraping recovery
+
+- Complete: reviewed cacheable issuance-redirect workaround and preserved unresolved extraction evidence; restored live publication remains separate from failed48/48 reliability acceptance.
+- Scope: direct-write fallback for session01a189a0-c670-74f3-b8b8-aed63509182a because the helper cannot recognize nested tool writes. Only two weather finding sections and three reviewed report records enter the candidate; unrelated dirty memory sources and reference sections remain excluded.
+- Verification: targeted canonical report checks pass; companion scraper49tests plus local browser fixture pass, and automatic18:30publication reached the deployed API. README gate pass_no_change for this knowledge-only scope; exact isolated candidate privacy check required before commit.
+- Delivery: one focused documentation commit on main, then push to origin/main. Scraper implementation/plans/tests ship separately on feat/playwright-diagnostics in scrape-weather-network.
+- Remaining: unrelated dirty work and all private runtime artifacts stay outside commits; original extraction cause and24-hour/DST reliability remain unverified.
+- Rollback: remove only these two scoped findings/reports, preserving all other reviewed knowledge.
+
+## Workspace padding — fix(i3): increase workspace button padding
+
+- Complete: minimum button widths increased from 144/95/144 to 204/155/204 logical pixels; the live excluded config received only these substitutions.
+- Scope: session 01a189d6-659e-71b1-8f30-e97365a5f8ee direct-write fallback; unrelated baseline hunks remain excluded.
+- Verified: refresh completed, config validation exited 0 with existing wheel-binding deprecations, one reload succeeded, and live IPC returned 204/155/204. Workspace smoke check and 17 status-layout tests passed; README gate pass_no_change. Exact candidate privacy gate runs before commit.
+- Delivery: one focused commit on main, then push origin/main. No implementation work remains.
+- Limits: physical pixel spacing and clicks not inspected; widths are minimums scaled by DPI.
+- Rollback: restore minimum widths to 144/95/144 in source and live config, validate and reload once.
+
+## Right-screen bar font — fix(i3): reduce right-screen bar font
+
+- Complete: HDMI-0 main-bar font reduced from50pt to35.6pt, equivalent to27px at135DPI; other bars remain30pt and50pt. Source and excluded live config match.
+- Scope: session01a189d8-b778-7141-a732-c6d7a7b4e2df direct-write fallback because the scope helper did not recognize orchestrated writes. Only the font, matching smoke check, activation report, its isolated ledger entry and this milestone ship.
+- Verified: refresh-config completed; deployed config validation and one reload passed; live IPC confirmed all three font sizes. Existing wheel-binding deprecation warnings remain. README gate pass_no_change. Targeted postmortem ledger check and exact staged privacy review precede commit.
+- Delivery: one focused commit on main, then push origin/main. No implementation work remains; preserve unrelated dirty files/hunks.
+- Limits: screenshot pixel measurement was not performed; conversion assumes135DPI. No web deployment applies.
+- Rollback: restore main-bar font50 in source and live config, run refresh-config, validate and reload once.
+
+## Wallet directory shortcut — chore(fish): add wallet directory shortcut
+
+- Complete: wl expands to `cd ~/coding/wallet-gas-cost` in cdn; previous Watson definition retained as a comment. Matching smoke check and reviewed inspection incident included.
+- Scope: session 01a18d7e-f7a1-7861-8cd3-6aa283efaf9e; direct-write evidence because the helper did not detect nested tool writes. Include only this session's ledger record; preserve unrelated ledger hunks and two other-session reports.
+- Verification: installed abbreviation and Fish syntax pass; repeated request is a no-op; README gate pass_no_change. Focused suite cannot parse unchanged tests/test_fish_alias.py:74 and ran no tests. Targeted incident check and staged privacy review precede commit.
+- Delivery: one focused commit on main, then push origin/main (Kevin-Mok/ai-cli-workflow). No implementation work remains; full refresh is blocked by pre-existing mimeapps drift, while scoped catalog regeneration succeeded.
+- Limits: interactive typing was not exercised. The invalid test identifier remains outside session scope.
+- Rollback: remove wl from directory source/live catalogs, uncomment its Watson mapping, and regenerate shortcuts.
+
+## Bar block order — fix(i3): put redshift before volume and music
+
+- Complete: 4K status order is Redshift, volume, Spotify, calendar; source and installed config match. Existing smoke checks updated.
+- Scope: session 01a18ddf-fce9-70b1-9518-7e2fe3cf457a; direct-write fallback because the scope helper cannot detect nested tool writes. Include only the bar template, two smoke expectations, scheduler regression expectation, activation incident, its ledger record and this milestone.
+- Verification: refresh-config succeeded with approved home-write access; i3 validation exited 0 with existing wheel-command deprecations, one reload succeeded, and populated deployed renderer confirmed the named block order. README gate pass_no_change; targeted incident ledger check passed. Focused layout regressions: 21 unit tests passed; scheduler expectation updated for the requested order after its initial failure, then rerun before commit. Exact staged privacy review precedes commit.
+- Delivery: one focused commit on main, followed by push origin/main (Kevin-Mok/ai-cli-workflow). Preserve unrelated dirty ledger records and reports.
+- Limits: visual placement and clicks remain manual; no application deployment applies.
+- Rollback: restore volume, Redshift, Spotify, calendar order in the template, refresh configuration, validate and reload i3 once.
+
+## TradingView shortcut activation — docs(fish): record TradingView shortcut activation repair
+
+- Complete: reconciled the missing tv entry into the unmanaged installed directory catalog, preserved existing mappings, and regenerated shortcuts with refresh-config. Repository template already contained the correct mapping.
+- Scope: session 01a18e24-2f9c-7ae0-8c18-988f03f6804b direct-write fallback; only the incident report, its ledger record, and this milestone ship. Other dirty records and reports remain excluded.
+- Verified: refresh-config succeeded; fresh isolated fish reports tv as cd ~/coding/jay-tradingview; fish -n passed; targeted incident coverage check passed; README gate pass_no_change. Exact candidate privacy gate precedes commit.
+- Delivery: one documentation commit on main, then push origin/main. No shortcut implementation change remains.
+- Limits: existing interactive terminal may require sourcing key_abbr.fish; interactive typing was not exercised.
+- Rollback: remove only the tv line from the installed directory catalog and regenerate shortcuts; retain unrelated mappings.
+
+## Chrome link previews — docs(agents): require Chrome for link previews
+
+- Complete: canonical and active AGENTS instructions explicitly select Google Chrome for link previews; durable feedback appended.
+- Scope: session 01a198d2-8b34-7bc0-b1e6-25c90be219f8; direct-write fallback because the helper did not detect orchestrated writes. Only the Chrome additions and this milestone ship; pre-existing PR-review additions and all other dirty work stay excluded.
+- Verified: refresh-config exited 0; active instruction readback passed; README gate pass_no_change; exact candidate assertions, whitespace and privacy checks precede commit.
+- Delivery: one focused commit on main, then push origin/main. No implementation work remains.
+- Limits: browser launch and already-running session adoption were not tested.
+- Rollback: remove the Chrome rule from canonical and active instructions; preserve the append-only feedback history.
+
+## Grok Bot shortcut — feat(fish): add gb abbreviation for grok-bot
+
+- Complete: gb expands to grok-bot in work; previous git branch mapping preserved as a comment. Installed preserved catalog reconciled and refreshed.
+- Verified: second refresh exited 0; isolated fish registration/readback and fish -n passed; README gate pass_no_change; targeted incident ledger check passed.
+- Delivery: user explicitly requested automatic fish-alias push; include the skill policy and related README/smoke documentation with the pending gb mapping, then commit and push origin/main. Preserve unrelated dirty work.
+- Limits: grok-bot never executed; existing terminals may need to source key_abbr.fish. No new manual check needed: existing shortcut activation smoke check covers preserved catalogs.
+- Rollback: remove the new gb entry, uncomment git branch in source and installed catalog, then refresh.
+
+## Fish-alias automatic push — feat(fish): push shortcut changes automatically
+
+- Scope: strengthen existing commit guidance with explicit invocation authorization and automatic upstream push; preserve no-op and local-only handling, unrelated-work exclusions and normal failure reporting.
+- Baseline: previous gb delivery stopped for separate commit authorization despite the skill requiring a commit.
+- Verified: skill metadata valid; independent delivery scenarios passed; installed delivery section matches canonical source; refresh exited 0; gb registration and fish syntax passed; README gate pass_no_change. Staged review/privacy checks run before commit.
+- Delivery: one focused commit with pending gb mapping, this policy, required incident learning and scoped documentation; push origin/main. No force-push or unrelated commits.
+- Rollback: restore previous delivery paragraph; gb can be reverted independently by restoring git branch in both source and installed catalog.
+
+
+## Right-screen Redshift — feat(i3): duplicate Redshift on right screen
+
+- Complete: HDMI-0 main bar duplicates the middle DP-2 Redshift block immediately left of volume, sharing its manual temperature and controls. README and smoke expectations updated.
+- Scope: session 01a1998d-cea9-7e93-9818-af3a811e143e direct-write fallback; helper did not detect orchestrated edits. Stage only the bar insertion, related README/smoke hunks, incident, its ledger record and this milestone. Preserve all pre-existing dirty work.
+- Verified: placement assertion RED then GREEN; block tests 7 passed and status-wrapper tests 21 passed. refresh-config exited 0; migration exclusion required the same insertion into the preserved live file. i3 validation exited 0 (existing wheel deprecations); restart succeeded and deployed output emitted Redshift, volume, calendar at preserved 1700 K. README gate pass_no_change; targeted ledger/privacy checks precede commit.
+- Delivery: one focused commit on main, then push configured origin/main; no web deployment applies.
+- Limits: physical visual placement and mouse clicks remain manual. Future migrated installs may need direct bar synchronization because chezmoi excludes preserved targets.
+- Rollback: remove only the four-line Redshift addition from source and preserved live main config, refresh, validate and restart i3.

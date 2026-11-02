@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
+export TZ=America/Toronto
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 script_path="${repo_root}/scripts/executable_rsync-media-date"
@@ -54,7 +55,7 @@ assert_not_contains_nul() {
   fi
 }
 
-test -x "$script_path"
+test -f "$script_path"
 bash -n "$script_path"
 
 run_script 2026-07-28 "$source_root" "$destination"

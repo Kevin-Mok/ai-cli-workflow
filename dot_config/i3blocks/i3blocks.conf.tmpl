@@ -126,6 +126,10 @@ color=#cbe4ff
 
 #  volume/spotify [[[ # 
 
+[redshift]
+interval=1
+signal=2
+
 [volume]
 interval=once
 signal=1
@@ -154,16 +158,16 @@ interval=60
 
 {{ if eq .chezmoi.hostname "x1-carbon" }}
 [battery]
-label=⚡
+label=🔋
 interval=30
 
 [wifi]
-label= 
+label=📶
 instance=wlp3s0
 interval=10
 
 [backlight]
-label= 
+label=🔆
 interval=5
 {{ end }}
 

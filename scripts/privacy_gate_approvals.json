@@ -144,6 +144,102 @@
         "sensitive_path"
       ],
       "reason": "Public recovery tests use temporary synthetic stores and contain no private recovery data."
+    },
+    {
+      "path_ref": "b8d2dc3f404d",
+      "content_sha256": "9aa941d12d2ffdb5ef7731e7f592b6cd944dd3fe2ea333846bb968e895135b2d",
+      "categories": [
+        "ip_address"
+      ],
+      "reason": "Reviewed public portfolio icon path: decimal SVG coordinates, not a network address. Exact bytes only; any edit requires fresh review."
+    },
+    {
+      "path_ref": "2aac5ec7ec82",
+      "content_sha256": "6d8146eb824080f89beb1d30641995e619621856043abbd08ff1205598f55172",
+      "categories": [
+        "ip_address"
+      ],
+      "reason": "Reviewed public portfolio icon path: decimal SVG coordinates, not a network address. Exact bytes only; any edit requires fresh review."
+    },
+    {
+      "path_ref": "36e1e249bb34",
+      "content_sha256": "f4309ca1c8ddd878f29e7d2386613bfd5165efa0f491d378db6b376eb5bd6daf",
+      "categories": [
+        "email"
+      ],
+      "reason": "User-approved public portfolio contact link and displayed professional email. Exact bytes only; any edit requires fresh review."
+    },
+    {
+      "path_ref": "fc92a7cbce08",
+      "content_sha256": "2f8437846941e52b5d9931a999d58a5486618d6b860176f2526312fafcc5fc50",
+      "categories": [
+        "email"
+      ],
+      "reason": "Reviewed public article link: publishing-platform author URL, not private email. Exact bytes only; any edit requires fresh review."
+    },
+    {
+      "path_ref": "fbfc400e8013",
+      "content_sha256": "0029a0f2dd7527a3d2017fdccbe06fbddff92415c8419cfb704ca74d60c2af71",
+      "categories": [
+        "email"
+      ],
+      "reason": "User-approved public resume contact information in maintenance documentation. Exact bytes only; any edit requires fresh review."
+    },
+    {
+      "path_ref": "118329f0176b",
+      "content_sha256": "b04a586e08745e617df20dbed5c7d5bee4b398a7d0f4b00e582b1fc91824b745",
+      "categories": [
+        "email"
+      ],
+      "reason": "User-approved public resume contact information in reference documentation. Exact bytes only; any edit requires fresh review."
+    },
+    {
+      "path_ref": "ddaf4e28cc31",
+      "content_sha256": "3c01f59079bb6e89d505f89d9c69935198823249bc8294311663fc59cdd704f7",
+      "categories": [
+        "email"
+      ],
+      "reason": "User-approved public resume contact information in migration documentation. Exact bytes only; any edit requires fresh review."
+    },
+    {
+      "path_ref": "9d50073e6c1d",
+      "content_sha256": "2bd27112c12bd7a2fa7c2feb0b2012caa5483430abe17b3915e1b94ba56f77b0",
+      "categories": [
+        "email"
+      ],
+      "reason": "Reviewed public portfolio contact recipient and provider documentation sender examples; no credentials. Exact bytes only; any edit requires fresh review."
+    },
+    {
+      "path_ref": "f67e602353f0",
+      "content_sha256": "4b8101d4461268465397ed02efa583bd222000c65ab84866c67eef7262c56eef",
+      "categories": [
+        "email"
+      ],
+      "reason": "User-approved public professional resume contact information. Exact bytes only; any edit requires fresh review."
+    },
+    {
+      "path_ref": "806a1fcf8a36",
+      "content_sha256": "32b2a9a6da38a3ec971426f3c9b73b9ab900a9d5d59b05b64993cd5192f60188",
+      "categories": [
+        "email"
+      ],
+      "reason": "Reviewed public portfolio narration: incidental email-shaped compressed audio bytes, not contact metadata. Exact bytes only; any edit requires fresh review."
+    },
+    {
+      "path_ref": "c670d7f1397b",
+      "content_sha256": "8abdfbba1a07481262f335cd3c7878b84e1dbfa5fa78e52a9883117972bb9fd5",
+      "categories": [
+        "email"
+      ],
+      "reason": "User-approved public portfolio photograph: incidental email-shaped compressed image bytes, not contact metadata. Exact bytes only; any edit requires fresh review."
+    },
+    {
+      "path_ref": "fd8ddb0e49c9",
+      "content_sha256": "644768c4aaeb4767bce293344eeb0c125fb804a94d801440424072202d85e3a1",
+      "categories": [
+        "ip_address"
+      ],
+      "reason": "Reviewed public interface icon: decimal SVG coordinates, not a network address. Exact bytes only; any edit requires fresh review."
     }
   ]
 }

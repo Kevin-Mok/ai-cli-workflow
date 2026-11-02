@@ -378,3 +378,58 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 
 
 - Hook compatibility follow-up: inspect every active entrypoint before replacing a shared scanner snapshot. Preserve existing pre-push --hook-args protocol and prior-hook ordering; check exact outgoing commit trees (including non-tip commits), stored identities and messages independently of the index. All55 gate/14 history/one checkpoint regressions and the actual unchanged wrapper pass. Installer lifecycle expansion and annotated-tag auditing are outside this repair.
+
+## ext-twitch-persistent-token-rotation
+
+- Status: **activation_pending**; root-cause confidence: **confirmed**; verification scope: **code**.
+- Symptoms: Twitch extension asks for device consent after Chrome restart or access-token expiry.; API 401 overlapping successful hourly validation clears credentials without issuing refresh.
+- Applicability: Public-client Twitch device-flow extensions with session-only credentials or concurrent validation/refresh.
+- Diagnostic checks: Inspect token storage area and whether the returned refresh token is discarded.; Reproduce restart/expiry and gate hourly validation against an in-flight API 401; count renewal requests and inspect persistent removal after disconnect.
+- Remedy: Persist access/refresh pair and account in TRUSTED_CONTEXTS local storage; keep pending approval session-only. Serialize single-use refreshes, save rotated pair before validation, retry API 401 once only after replacing the rejected token, retain state on transient errors, and guard writes by account generation.
+- Verification evidence: Defining restart/expiry and validation/API401 overlap fixtures observed RED before correction. Exact session-only commit candidate passes100 tests, syntax, configured ZIP inspection and isolated Chrome logged-out setup/pages/menu checks. User reports reload/reconnection; actual renewal, restart and next-day acceptance remain unverified.
+- Limitations: Local storage is not encrypted. Revoked/expired Public-client refresh tokens can require consent. Logged-out packaged runtime is not real OAuth acceptance; hosted help/privacy have not been republished.
+- Source: [2026-10-25-daily-twitch-reconnect.md](/home/kevin/coding/twitch-following-extension/docs/postmortem/2026-10-25-daily-twitch-reconnect.md) (SHA-256 `a2a61ec22d9320a7d18295813bee5b6e050c688c171c3745aff37ee1b1842063`).
+
+## local-backtest-decisions-at-availability
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **code**.
+- Symptoms: A future-available exit cancels an earlier pending entry before becoming actionable.; An exit emitted while flat or entry emitted while held is discarded even though the position changes before its availability time.
+- Applicability: Deterministic event simulations where source time, availability time and execution time differ.
+- Diagnostic checks: Construct decisions whose source-index order differs from availability order, including an exit sourced before entry but available while held and an entry sourced while held but available after exit.; Check both future truncation and extra 0/1/2-bar delays without replacing source ATR/risk snapshots.
+- Remedy: Queue every source decision without deciding from source-time position state. At its first availability-qualified later open plus explicit delay, inspect current position state, consume once and apply documented exit-before-entry ties. Unknown future exits cannot cancel earlier pending entries.
+- Verification evidence: Defining availability counterexamples observed RED then passed after the queue correction. Final 29 core and 129 full tests, typecheck, build and shift fixture CLIs passed; independent review reran the availability counterexamples and approved the core gate. A controlled reference-policy mutation failed its guard then causal policy was restored GREEN.
+- Limitations: Evidence covers a pure bar simulation with supplied closed, revision-stable inputs. Nominal interval availability is not observed provider arrival, and there is no live broker or profitability evidence.
+- Source: [2026-10-29-backtest-core-edge-cases.md](/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-29-backtest-core-edge-cases.md) (SHA-256 `d7e999a84dccb77f87c23a4dba06bfd6e3f497dcf727385fd45019790cbdc7a7`).
+
+## local-backtest-known-open-before-intrabar
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **code**.
+- Symptoms: A newly entered tight stop sells at a more favorable stop above the raw open.; Scheduled opposite/time exits bypass a standing target on a favorable opening gap, overstating fill price; a later low can incorrectly override a known opening target fill.
+- Applicability: OHLC-only long-position simulations with standing stop/target orders, scheduled next-open exits and adverse fees/slippage.
+- Diagnostic checks: Exercise an entry whose stop distance is smaller than adverse entry slippage, both scheduled-exit/target-gap conflicts, a known opening target followed by a later low through stop, and an ambiguous intrabar both-hit candle.; Separate known opening facts from unknown intrabar order; assert exact adverse execution price and unchanged source risk snapshots.
+- Remedy: For carried positions handle adverse opening stop gap, capped opening target gap, then scheduled market exits inside the levels. For remaining intrabar paths choose stop before target when both touch; apply adverse costs and no favorable target-gap improvement. A newly entered stop above raw open exits at the adverse raw open, not its favorable stop.
+- Verification evidence: The tight-stop RED expected 99.95 instead of observed 99.99597699999998. Two scheduled target-gap REDs failed, then both returned capped 103.997975 instead of 119.94; the known-opening/later-low regression also passed. Independent review approved final 29/29 core tests; full suite129, typecheck, build and fixture CLIs passed.
+- Limitations: Bar OHLC does not reveal intrabar sequence; stop-first is an explicit conservative assumption only while the position remains active. It is not TradingView Bar Magnifier equivalence. Costs/gaps can exceed ATR target risk, and numerical Pine parity remains unverified.
+- Source: [2026-10-29-backtest-core-edge-cases.md](/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-29-backtest-core-edge-cases.md) (SHA-256 `d7e999a84dccb77f87c23a4dba06bfd6e3f497dcf727385fd45019790cbdc7a7`).
+
+## local-strategy-explicit-causal-context
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **code**.
+- Symptoms: An extra runtime mode=pineParity property reaches the PMO execution adapter through typed-context object spreading.; A numeric higherTimeframe is coerced by a parser intended for resolution strings.
+- Applicability: TypeScript execution APIs whose runtime callers may supply extra properties or values outside declared types.
+- Diagnostic checks: Inject a display-only mode property at the public strategy boundary and inspect the actual downstream engine options.; Pass numeric versus string timeframe values; do not let a coercing parser substitute for boundary type validation.
+- Remedy: Construct downstream execution options from explicit permitted fields and force confirmedOnly. Validate the public higher-timeframe value as string or null before invoking the resolution parser.
+- Verification evidence: Independent mode and numeric-timeframe counterexamples defined the regressions. Final 38 strategy/167 full tests, typecheck, build and sealed/open/reject synthetic CLI matrix passed; independent review inspected explicit causal fields and found no remaining must-fix.
+- Limitations: Types alone do not establish runtime policy. Evidence covers local pure strategy execution and synthetic fixtures; it does not prove provider arrival, numerical Pine parity or a live trading path.
+- Source: [2026-10-29-strategy-input-boundaries.md](/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-29-strategy-input-boundaries.md) (SHA-256 `c886f914372c59dbd743f868e2994ddaa7da51e073093f79d38496e1ff926040`).
+
+## local-backtest-opening-permission-timeline
+
+- Status: **verified_fix**; root-cause confidence: **confirmed**; verification scope: **code**.
+- Symptoms: A source-close entry remains queued across a session/data gap and fills after higher-timeframe permission was already revoked before the next supplied market open.
+- Applicability: Bounded historical bar simulations with source-close signals, delayed next-open execution and higher-timeframe permission available independently between supplied chart bars.
+- Diagnostic checks: Reproduce a permitted source signal followed by permission revocation at start+1800 and the next supplied open at start+3600; assert no stale-permission entry.; Exercise held-position revocation, unknown/empty required permission, standing stop/target gaps, detached provenance, legacy no-policy behavior and future-truncation stability.; Check strategy and historical paper callers propagate the execution timeline and apply assumed feed delay once.
+- Remedy: Preserve causal source decisions, but pass a validated detached execution-permission timeline to the shared accounting core. At each market open consult only the latest point available by that open. A required false or unavailable state consumes queued entries without revival and exits held positions after standing adverse-stop/capped-target gap priority. Absence of a policy preserves legacy behavior; a supplied empty timeline requires permission and blocks entries.
+- Verification evidence: The independent pre-patch gap reproducer entered at start+3600 despite revocation at start+1800. Nine defining RED failures preceded the correction. Final104/104 focused and204/204 full tests, typecheck/build and core/strategy/paper CLI matrices passed. Independent review replayed the original case (now blocked), checked legacy behavior and detached policy provenance, and approved14 verified claims with one external parity/performance gap. Two failure-path fixtures moved900 to1800 bars while retaining original failure/attempt/no-retry assertions and minimum-trade rules.
+- Limitations: Code and deterministic fixture evidence only. The policy is immutable input for bounded historical replay, not a continuous permission-observation API or retained session journal. The explicitly non-executable signal-shift stress may omit the guard to expose stale-permission risk. No actual market final slice or paper session was used; numerical parity, feed arrival and trading edge remain unverified.
+- Source: [2026-10-29-hierarchy-execution-boundary.md](/home/kevin/coding/jay-tradingview/docs/postmortem/2026-10-29-hierarchy-execution-boundary.md) (SHA-256 `6b90a04471240ea04c4d08b12d5deac0b0579f13f89d913c3e67f795877f23f6`).

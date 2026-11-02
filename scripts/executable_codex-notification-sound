@@ -130,7 +130,7 @@ def discord_message(title: str, body: str, appname: str = "") -> str | None:
         parser.feed(text)
         parser.close()
         # Discord isolates each title field; strip controls before suffix parsing.
-        return ' '.join(re.sub('[\u2066-\u2069]', '', ''.join(parts)).split())
+        return ' '.join(re.sub('[\u2066-\u2069]', '', ''.join(parts)).split()).replace('ビットコイン・スタッカー', 'bitcoin')
     title, message = visible(title), visible(body)
     if appname == 'vesktop' and ' (#' not in title:
         sender = title

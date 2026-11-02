@@ -9,6 +9,24 @@ SCRIPT = Path(__file__).resolve().parents[1] / "dot_config/i3blocks/scripts/exec
 
 
 class VolumeClicks(unittest.TestCase):
+    def test_color_emoji_for_each_output_device(self):
+        for name, icon in [("Master", "🔉"), ("Fiio", "🎧"), ("hdmi", "🖥️"), ("pci", "🔉")]:
+            with self.subTest(name=name):
+                result = subprocess.run(
+                    ["bash", "-c", '''
+amixer() {
+    if [[ $* == *get* ]]; then printf '  Capabilities: pvolume pswitch\\n  Mono: Playback 44 [44%%] [on]\\n'; fi
+    if [[ $* == *scontrols* ]]; then printf "Simple mixer control '%s',0\\n" "$TEST_DEVICE"; fi
+}
+source "$1"
+''', "volume-test", str(SCRIPT)],
+                    env={**os.environ, "BLOCK_BUTTON": "", "SUBSCRIBE": "0", "TEST_DEVICE": name},
+                    capture_output=True, text=True, check=True,
+                )
+                full, short, _color = result.stdout.splitlines()
+                self.assertEqual(full, f"{icon}44%")
+                self.assertEqual(short, full)
+
     def test_click_actions(self):
         for button, action in [(1, "unmute"), (3, "mute"), (2, "15%"), (4, "3%+"), (5, "3%-")]:
             with self.subTest(button=button):

@@ -32,9 +32,10 @@ with tempfile.TemporaryDirectory() as directory:
     programs = {
         'chezmoi': '''#!/bin/sh
 printf 'chezmoi:%s\\n' "$*" >> "$TEST_LOG"
+if [ "$1" = status ]; then printf 'M  .reviewed\\n'; fi
 if [ "$1" = source-path ]; then printf '%s\\n' "$TEST_SOURCE"; fi
 if [ "${TEST_SLOW_APPLY:-0}" = 1 ]; then sleep 11; fi
-if [ "${TEST_APPLY_FAIL:-0}" = 1 ]; then
+if [ "$1" = apply ] && [ "${TEST_APPLY_FAIL:-0}" = 1 ]; then
  printf '%s\\n' 'private.txt has changed since chezmoi last wrote it' >&2
  exit 9
 fi
@@ -61,7 +62,7 @@ fi
         assert gitconfig.read_text() == '[user]\n name = {{ .gitName }}\n'
         calls = log.read_text()
         assert 'snapshot' not in calls, calls
-        assert 'source-path' not in calls, calls
+        assert 'chezmoi:re-add --no-tty -- ' in calls, calls
         assert 'chezmoi:add' not in calls, calls
         assert '--force' not in calls, calls
         assert 'chezmoi:apply --exclude scripts,externals,remove --no-tty' in calls, calls
@@ -69,7 +70,7 @@ fi
         failed = run(entrypoint, TEST_APPLY_FAIL='1')
         assert failed.returncode == 9, failed
         calls = log.read_text()
-        assert calls.count('chezmoi:apply') == 1, calls
+        assert calls.count('chezmoi:apply') == 2, calls
         assert 'chezmoi:add' not in calls and 'sync-shortcuts' not in calls, calls
         assert 'private.txt' not in failed.stderr, failed.stderr
         plain = run(entrypoint, CLI_PLAIN='1')

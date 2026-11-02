@@ -17,3 +17,5 @@ the preserved rules below before acting; active user/developer instructions gove
   permissions; report exact blocked writes and outstanding learning updates.
   Never make installed copies the source of truth.
 - For every unexpected task failure—an unplanned unsuccessful command, test, deployment, or workflow outcome—immediately create a dated, descriptive postmortem under `docs/postmortem/`. Record the symptom, impact, evidence, current status, and next steps; keep that same document current throughout investigation. When the issue is fixed, update it with root cause, resolution, verification, and follow-up, and keep the completed postmortem in the same commit as the related fix. Deliberately failing TDD RED tests and intentionally exercised failure paths do not trigger a postmortem.
+
+Commit the postmortem with the code or workflow changes that encountered the issue, including when no fix was needed.

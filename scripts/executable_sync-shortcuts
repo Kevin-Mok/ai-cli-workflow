@@ -78,7 +78,17 @@ fish = []
 ranger = []
 for key, path in rows(dirs):
     bash.append(f'{key}={shlex.quote("cd " + path + " && lsd -a")} \\')
-    fish.append(f'abbr {key} {fish_quote("cd " + path)}')
+    if key == 'or':
+        # Fish parses or as a keyword; guard anywhere expansion to preserve logical or.
+        fish.extend([
+            'function __abbr_directory_or',
+            "    string match --quiet --regex '^\\s*or\\s*$' -- (commandline --current-buffer); or return 1",
+            f"    printf '%s\\n' {fish_quote('cd ' + path)}",
+            'end',
+            'abbr --add --position anywhere --function __abbr_directory_or -- or',
+        ])
+    else:
+        fish.append(f'abbr {key} {fish_quote("cd " + path)}')
     ranger.extend(f'map {prefix}{key} {command} {path}' for prefix, command in
                   [('f', 'cd'), ('t', 'tab_new'), ('m', 'shell mv -v %f'), ('Y', 'shell cp -rv %f')])
 for key, path in rows(files):

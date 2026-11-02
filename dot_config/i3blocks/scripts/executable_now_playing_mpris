@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Dedicated FlaviBot Chrome now-playing with Spotify fallback for the 4K bar."""
+"""mpv and dedicated FlaviBot Chrome now-playing with Spotify fallback."""
 
 from dataclasses import dataclass
 import html
@@ -20,8 +20,8 @@ SPOTIFY = "org.mpris.MediaPlayer2.spotify"
 BROWSERS = ("org.mpris.MediaPlayer2.chromium", "org.mpris.MediaPlayer2.chrome")
 FLAVIBOT_PAGE_TITLE = "FlaviBot - Music Player"
 FLAVIBOT_PAGE_METADATA = ("FlaviBot", "Music Player")
-PLAYING_GLYPH = "▶"
-PAUSED_GLYPH = "‖"
+PLAYING_GLYPH = "▶️"
+PAUSED_GLYPH = "⏸️"
 
 
 class Bus:
@@ -76,6 +76,8 @@ def text(value):
 def source_rank(name):
     if not isinstance(name, str):
         return None
+    if name == "org.mpris.MediaPlayer2.mpv" or name.startswith("org.mpris.MediaPlayer2.mpv."):
+        return -1
     if any(name == prefix or name.startswith(prefix + ".") for prefix in BROWSERS):
         return 0
     return 1 if name == SPOTIFY else None
@@ -167,7 +169,7 @@ def select_player(bus):
         if rank is None or not isinstance(owner, str) or not re.fullmatch(r":\d+\.\d+", owner):
             continue
         player = read_player(bus, name, owner)
-        if player and rank == 0 and player.status == "Playing":
+        if player and rank == -1 and player.status == "Playing":
             return player
         if player:
             candidates.append((player.status != "Playing", rank, name, player))
@@ -252,13 +254,13 @@ def main():
     remember(path, player)
     title = player.title if player else ""
     if player:
-        track = f"{player.artist} - {title}" if player.artist else title
+        track = f"{title} - {player.artist}" if player.artist else title
         track = html.escape(track, quote=False)
         if player.status == "Playing":
             state_glyph = f'<span size="x-small" rise="8192">{html.escape(PLAYING_GLYPH, quote=False)}</span>'
         else:
             state_glyph = f'<span size="x-small" rise="8192">{html.escape(PAUSED_GLYPH, quote=False)}</span>'
-        full = f"{state_glyph} {track}"
+        full = f"{state_glyph}{track}"
     else:
         full = ""
     print(full)

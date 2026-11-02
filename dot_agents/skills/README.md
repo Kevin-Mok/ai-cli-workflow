@@ -51,7 +51,7 @@ tests and documentation accompany the change they describe.
 ## Explicit Task Workflows
 
 - [`night`](night/SKILL.md): Run an explicitly requested unattended overnight job
-  on a local branch, commit without pushing, and leave a handoff note.
+  on a local branch, commit and push checkpoints, and leave a handoff note.
 - [`morning`](morning/SKILL.md): Read the night handoff and branch, summarize the
   evidence, and gather choices before taking the next action.
 - [`next-tasks`](next-tasks/SKILL.md): Propose a bounded set of verifiable tasks
@@ -71,6 +71,9 @@ tests and documentation accompany the change they describe.
   and check source health. Its imported package has a local [source record](last30days/SOURCE.md).
 
 ## Frontend And Browser Work
+
+- [`ai-ux-deslop`](ai-ux-deslop/SKILL.md): Review UI against the concrete AI-tell and secondary-text checks; overnight admission pending.
+- [`hallmark`](hallmark/SKILL.md): Explicit-only themed page design with pinned assets and runtime checks; overnight admission pending.
 
 - [`frontend-design`](frontend-design/SKILL.md): Build frontend web interfaces
   from confirmed audience, use cases and brand context; save agreed missing

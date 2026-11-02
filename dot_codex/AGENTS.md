@@ -7,7 +7,7 @@ must not duplicate or weaken this policy. Historical merge provenance lives in
 
 ## Mandatory Conditional Procedures
 
-Reconcile the live task title before substantive work, updates and final responses. For title-tool discovery or changes, MUST read [task titles](references/task-titles.md).
+Reconcile titles before work/updates/handoff. For title tools, MUST read [task titles](references/task-titles.md).
 Before product, platform, UI, AI-workflow, lineage or education work, MUST read [system-design routing](references/system-design.md).
 On a bug or unexpected task failure, before retrying or changing a postmortem, MUST read [failure learning](references/postmortems.md) and record the living incident immediately.
 Runnable commands remain standalone raw fish lines. Before CLI/script output, manual commands or shell-helper changes, MUST read [CLI and shell rules](references/cli-and-shell.md), including wrapped-copy verification.
@@ -30,6 +30,8 @@ the canonical `feedback.log` when durable preferences may apply, and relevant
 `tasks/lessons.md` entries. Follow existing patterns rather than assumptions.
 
 ## Scope, Safety, And Clarity
+
+- Always select Google Chrome for link previews, never Firefox.
 
 - Do not break production behavior unless explicitly asked. Prefer small, safe, reversible changes and minimal diffs.
 - Preserve pre-existing user work. Before the first modifying command in a Git

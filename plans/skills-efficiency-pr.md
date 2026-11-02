@@ -40,3 +40,41 @@ Independent evidence reviewer:8verified/0incorrect/1publication pending. Recompu
 Integration commit5c4ad286 (parents d615688f and410feaa) pushed to origin/review/skills-efficiency-20261023. PR https://github.com/Kevin-Mok/ai-cli-workflow/pull/3 is OPEN, base main, head review/skills-efficiency-20261023, unmerged, merge state clean. Remote main and local linux-config HEAD remain exact410feaa. Fresh final CLI checks: main37,908B, candidate14,399B budgetPASS; active routing42/46 PASS. GitHub reports no CI check results; local isolated evidence is the verification source. No product work remains; review/merge and activation are deliberately reserved for the user.
 
 Publication follow-up milestone: `docs(skills): record review PR publication` records external delivery and fixes evidence links. Next step: review PR3 and concrete evidence before any merge. No blockers.
+
+## Overnight refresh — current main (2026-11-01)
+
+The active overnight request supersedes the earlier exact-410feaa comparison.
+Merge current origin/main with a plain merge, retain approved culls/trimmed
+policies, gate every newly added skill, then remeasure against current main.
+Push only review/skills-efficiency-20261023 after each pass. Never activate
+configuration, change model/effort lines, rewrite history, or edit another repo.
+Protected untracked inputs remain unchanged. Native Plan Mode/title tools are
+unavailable; this ExecPlan is the execution record.
+
+- [x] Capture initial status and fetch origin/main (8662fa3c).
+- [x] Resolve five merge conflicts retaining trimmed policies and relevant upstream changes.
+- [ ] Commit/push the merge checkpoint with privacy and README receipts.
+- [ ] Gate ai-ux-deslop and hallmark; freeze additional routing cases before descriptions.
+- [ ] Refresh current-main baseline, budgets, routing, tests and reports.
+- [ ] Evidence-reviewer audit; push final evidence and update PR3.
+- [ ] Verify all five criteria and write the external DONE marker.
+
+Merge checkpoint subject: merge(skills): refresh trimmed branch from current main.
+Conflict policy: keep trimmed core/catalog/night description; combine independent
+smoke sections and append-only ledger additions. Carry Chrome previews, design
+text/UX-DX-AX guidance, stronger postmortem delivery, commit sanitization, fish
+shortcut delivery and night checkpoint push behavior. Repository-creation rule
+stays verbatim in mandatory delivery. No skill was newly deleted.
+
+Next: admission and trigger cases for both new skills. Tests/byte budgets at this
+intermediate merge are intentionally not claimed; upstream additions have not
+yet completed the gate. Rollback is a new revert commit; no reset/rebase.
+
+Merge validation found inherited size-ceiling drift and a ledger union defect;
+see docs/postmortem/2026-11-01-overnight-main-integration.md. Finite exact-path
+ceilings preserve imported main behavior; new files retain the20KB default.
+
+Fresh merge checkpoint evidence:93tests/5subtests PASS (20.04s); exact staged
+privacy PASS; README pass_no_change; size guard PASS; core8,989B. Ledger targeted
+coverage PASS with286findings. Prepared commit is the plain merge; next action
+is normal push of the named review branch, then skill admission.

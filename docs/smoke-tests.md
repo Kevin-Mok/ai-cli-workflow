@@ -796,6 +796,19 @@ checks use invented temporary data; real notes are never repository fixtures.
   creates a fresh popup.
   Fish `redshift-set` and login calls to the shared helper also notify.
 
+- Action: On both the middle DP-2 4K and right HDMI-0 bars, press Windows+2, then scroll up and down over
+  the thermometer. Try rapid wheel events and left/middle/right clicks; select
+  keyboard presets and reset. Run `~/scripts/redshift-control status` to compare.
+  Expected: Both bars show the same saved target immediately left of volume; the left DVI-D-0 bar stays unchanged. Windows+2
+  displays 2300 K within one second; up shows 2450 K and down returns 2300 K.
+  Rapid wheel steps accumulate silently, bounded at 1000–6500 K; other clicks do nothing.
+  Wheel changes show no Dunst popup; keyboard/direct helper changes still notify.
+  Reset displays 6500 K. This is the saved manual target, not a hardware reading
+  or a tracker of raw external Redshift commands. Volume and Redshift remain
+  before song/calendar under crowded workspace pressure; song is shortened and
+  calendar shortened/hidden. Backend or malformed-state failures show `🌡️ ERR`
+  without falsely displaying an unsuccessful target. Restore the preferred preset.
+
 - Action: In an i3 desktop session, run `~/scripts/redshift-control set 2100`,
   then `~/scripts/redshift-control adjust 250` and `~/scripts/redshift-control reset`.
   Expected: Terminal output stays unchanged; Dunst shows 2100, 2350 and 6500 K.
@@ -858,7 +871,7 @@ checks use invented temporary data; real notes are never repository fixtures.
   failing mid-transfer.
 - Action: Mount an iPad at `/mnt/ipad`, then run
   `rsync-media-date 2026-07-28 /mnt/ipad /mnt/linux-files-3/concerts/jcole`.
-  Expected: The July 28 `.MOV`, `.MP4`, and `.M4V` originals beneath
+  Expected: The July 28 Toronto-time `.MOV`, `.MP4`, and `.M4V` originals beneath
   `/mnt/ipad/DCIM` copy directly into the J. Cole folder with rsync progress,
   overwriting same-named files and creating no DCIM subdirectories.
 - Action: ./scripts/executable_largest-day-file-size /mnt/usb-8tb/concerts
@@ -874,6 +887,10 @@ checks use invented temporary data; real notes are never repository fixtures.
   Expected: Creates a new SDR H.264/AAC `logic-pair.mp4` with continuous playback and audio across the hard cut. The iPhone HLG source is tone-mapped to SDR, so HDR/Dolby Vision metadata is not retained. The original clips remain unchanged; the command refuses an existing output and needs no sudo.
 - Action: ffprobe -v error -show_entries stream=codec_type,duration -of csv=p=0 /mnt/usb-8tb/concerts/logic/logic-pair.mp4
   Expected: The re-encoded pair has video and audio durations close to the sum of the two source clips; neither stream ends at the first clip boundary. Decode or play frames across that boundary before treating a successful FFmpeg exit as proof of a good join.
+- Action: ./scripts/executable_concat-timestamped-videos /mnt/usb-8tb/concerts/olivia-rodrigo /mnt/usb-8tb/concerts/olivia-rodrigo-normalized.mp4 --landscape --resume
+  Expected: Joins all top-level MOV/MP4 clips in capture-time order into a new landscape SDR H.264 High/yuv420p output with common frame rate, 1/90000 video time base and AAC 48 kHz stereo. Final audio is reencoded continuously to avoid per-clip AAC priming overlaps; timestamp regression warnings reject publication. Portrait clips have side bars and embedded rotation is applied before fitting. Encoding shows ongoing elapsed progress. `olivia-rodrigo-normalized.work` retains validated completed clips and the input/settings manifest beside the output. Interrupt and rerun the identical command: completed clips report `Reuse`, and only unfinished work is encoded. A concurrent identical invocation is refused by the job lock. Changed sources/settings/cache and unrelated existing outputs are refused. Sources are unchanged. Reencoding needs time and disk space and does not retain HDR metadata; use short sample inputs when checking the workflow.
+- Action: Open `/mnt/usb-8tb/concerts/olivia-rodrigo-normalized.review/index.html` after the landscape join.
+  Expected: One labeled start-frame image per joined clip, extracted from the actual final output. Inspect for upright scenes and correct aspect ratio. Geometry is checked automatically; upside-down content requires visual review. Blurred/black frames are inconclusive, and later orientation changes are not checked. For a wrong orientation, rerun with a new output name and `--rotate "FILENAME=180"` (or clockwise 90/270), which is applied after embedded rotation. A matching completed `--resume` job can finish/reopen its report; unrelated output/review paths are refused. `--plain` removes decorative glyphs and `--details` exposes FFmpeg diagnostics. Keep the work folder until the result is accepted; remove only generated work afterward if disk space is needed.
 - Action: python3 tests/check_concat_boundary.py --directory /mnt/usb-8tb/concerts/logic --seconds 2
   Expected: Uses `logic.ffconcat.txt` to select the original clips, excluding `logic.mp4` and unrelated camera files; makes a short stream-copy join and contact sheet for each adjacent pair under a printed `/tmp/concat-boundary-*` directory. Each sample decodes successfully. Review every `boundary.png` across the join and note any reported timestamp warnings; the contact sheets cannot assess audio continuity.
 
@@ -1006,18 +1023,35 @@ Preview the existing disk configuration, install the UUID-specific rules once wi
 - Action: Run `refresh-config`, then `gpgconf --kill gpg-agent`; open a new terminal and run `pass edit <non-sensitive-test-entry>`.
   Expected: When GPG needs the store password, `pinentry-curses` prompts in that initiating terminal and `pass` continues to the configured editor after successful authentication.
 - Action: Run `/home/example/scripts/apply-desktop-display-layout`, reload i3, and inspect `xrandr --query`.
-  Expected: `DVI-D-0` is 2048x1152 at `+0+0`, `DP-2` is 3840x2160 at `+2048+0`, `HDMI-0` is 1920x1080 at `+5888+0`, and i3 shows bars on all three monitors with the middle 4K bar ordered `volume`, `spotify`, `calendar`.
+  Expected: `DVI-D-0` is 2048x1152 at `+0+0`, `DP-2` is 3840x2160 at `+2048+0`, `HDMI-0` is 1920x1080 at `+5888+0`, and i3 shows bars on all three monitors with the middle 4K bar ordered `redshift`, `volume`, `spotify`, `calendar`.
 - Action: Play a long song and add workspace buttons on DP-2 until the status area is crowded, then remove the extra workspace buttons.
-  Expected: Volume sits near the center of DP-2, immediately left of the song. The song fills available space and ends in an ellipsis when too long; compact text puts the title before the artist. More workspace buttons shorten the song and move volume right only as necessary. Calendar shortens, then hides, before volume can be clipped. A short or absent song retains volume's centered position. Volume clicks and song controls still work. Workspace buttons alone consuming the entire display exceed i3bar's physical capacity.
+  Expected: Status blocks use the available space to the right of DP-2 workspace buttons without centering volume. Music uses 70% of the bar font, keeps title-artist order, and ends in an ellipsis when too long. More workspace buttons shorten music first; calendar then shortens/hides before volume or Redshift can be clipped. A short or absent song leaves no artificial expanding gap. Volume clicks and song controls still work. Workspace buttons plus fixed controls consuming the entire display exceed i3bar's physical capacity.
 - Action: Right-click the volume block twice, then left-click twice on each bar.
   Expected: Right-click keeps audio muted; left-click keeps audio unmuted. Neither
   changes the playback device. Middle-click still sets 15%, and scrolling still
   changes volume by 3%.
+- Action: Inspect the HDMI-0 right-screen bar after reloading i3.
+  Expected: Font size is 35.6 points at 135 DPI (27 rendered pixels smaller than the original 50 points); other monitors retain their font sizes.
+- Action: After refreshing and reloading i3, inspect the DP-2 4K bar and run `i3-msg -t get_bar_config bar-2`.
+  Expected: Its font is 46.2667 points at 135 DPI, three rendered pixels smaller than the preceding 47.8667-point setting (seven pixels below the original 50 points). HDMI-0 remains 35.6 points and DVI-D-0 remains 30 points. This host excludes `.config/i3/` from chezmoi; its live font line is updated separately while preserving local additions.
+- Action: After `refresh-config` and reloading the i3 bars, inspect each monitor;
+  change wallpaper with the normal pywal shortcut and inspect again.
+  Expected: Speaker/headphones/display, music notes, thermometer, calendar
+  and notification bells render as native color emoji with a 20 px gap after each icon (including compact clock and playback buttons).
+  Dividers reserve 25 px with 25 px of transparent right padding per block: compared
+  with the previous 45 px centered gaps, left spacing shrinks 10 px and right spacing grows 15 px. Volume, Redshift, music
+  and date values follow pywal color7 while emoji retain their own colors; paused
+  DND stays red. Laptop battery, signal, brightness and temperature icons also
+  use emoji. The full date retains its calendar icon and compact time uses a clock; on DP-2 the calendar
+  shortens before the music icon and playback marker are lost. Long tracks still
+  shorten before volume or Redshift is clipped.
 - Action: ~/scripts/flavibot-browser
   Expected: After refresh-config, opens https://flavibot.xyz/music-player in a separate Chrome process using ~/.local/share/flavibot-chrome. Sign in once and start playback. Later launches reuse that directory; existing Chrome profiles are untouched. Follow the [short usage guide](flavibot-browser.md) for daily use. Reserve this window for FlaviBot and use ordinary Chrome for YouTube.
 - Action: ~/.config/i3blocks/scripts/now_playing_mpris
-  Expected: While FlaviBot or Spotify plays, emits `▶ Artist - Title` for both full_text and short_text, with the triangle small and raised via Pango; when paused, emits `‖ Artist - Title` with the pause mark rendered the same way. Both markers sit centered rather than touching the bar's lower edge. The third line is pywal color7. The 4K status wrapper measures the live bar font, DPI and workspace buttons to fit this text with an ellipsis; its raw config retains an invisible compact form as a fallback. The bar follows within five seconds and shows no state glyph when no player is eligible. Title-only songs are also eligible; artist/title regex matching is no longer used.
-- Action: Open the dedicated FlaviBot window with no song loaded while Spotify is available, then repeat with Spotify closed.
+  Expected: While mpv (with mpv-mpris loaded), FlaviBot or Spotify plays, emits `▶️Title - Artist` for both full_text and short_text, with the color play button small and raised via Pango; when paused, emits `⏸️Title - Artist` with the color pause button rendered the same way. Both markers sit centered rather than touching the bar's lower edge. The third line is pywal color7. The 4K status wrapper measures the live bar font, DPI and workspace buttons to fit this text with an ellipsis; its raw config retains an invisible compact form as a fallback. The bar follows within five seconds and shows no state glyph when no player is eligible. Title-only songs are also eligible; artist/title regex matching is no longer used.
+- Action: Reopen mpv after installing mpv-mpris, play a local video, pause/resume with Space, then close it. Repeat with Spotify/FlaviBot playing or paused and try left/middle/right block clicks.
+  Expected: Title (or filename) appears within five seconds with the correct state marker. Playing beats paused; ties prefer mpv, FlaviBot, Spotify. Supported clicks target only the displayed player. Long media filenames show a leading ellipsis and retain their ending and extension; short filenames stay intact. Closing mpv falls back to the other eligible players; with none, the block clears.
+- Action: With mpv closed, open the dedicated FlaviBot window with no song loaded while Spotify is available, then repeat with Spotify closed.
   Expected: Generic “FlaviBot - Music Player” metadata never appears, whether exposed as a page-title string or artist “FlaviBot” plus title “Music Player”; the block shows Spotify when available and clears its text and click state otherwise. Real FlaviBot song titles, including title-only songs, remain eligible.
 - Action: Play YouTube in ordinary Chrome, pause FlaviBot in its dedicated window, and pause Spotify.
   Expected: The block retains the paused FlaviBot song and never shows YouTube. Ordinary Chrome is excluded by process identity, regardless of title, channel, or playback status. YouTube opened inside the dedicated FlaviBot window would still qualify; origin is not exposed by Chrome.
@@ -1025,6 +1059,8 @@ Preview the existing disk configuration, install the UUID-specific rules once wi
   Expected: Playing Spotify wins over paused FlaviBot; with both paused, FlaviBot wins. Closing the dedicated browser falls back to Spotify, including paused tracks. With neither eligible player, text and click state clear even if ordinary Chrome is playing.
 - Action: With a stable track shown, left-, middle-, and right-click the music block, first with dedicated FlaviBot selected and then with Spotify selected. Try a click immediately after the shown track changes or its player closes.
   Expected: Supported actions are PlayPause, Previous, and Next on the last displayed player's unique D-Bus connection only. Stale state (over 15 seconds), changed tracks, unavailable players, or unsupported actions do nothing; clicks never redirect to another player. Global media-key behavior remains unchanged.
+- Action: Run `python3 scripts/smoke_workspace_icons.py --live`, inspect workspace buttons, then try Alt+1–9/0 and Super+1/F11; use a disposable window for Ctrl+Alt+digits and Alt+Shift+1–5.
+  Expected: The checker passes; workspace icons render in color with 15px left padding, 10px between number and icon, and 30px right padding at Xft.dpi=135. Numeric prefixes are hidden, minimum widths are disabled, and Pango spacers compensate for i3bar’s native 6px insets. Recalibrate outer spacers if Xft.dpi changes. Existing select/move shortcuts reach the same numbered workspaces. No stale duplicate labels appear; app launch shortcuts still reuse their existing workspace variables.
 - Action: Focus a workspace on the left monitor, press `Alt++` until it moves across the middle 4K monitor to the right monitor, then press `Alt+-` to move it back.
   Expected: Workspace movement follows the physical left-middle-right monitor order and reverses cleanly.
 - Action: Launch the primary terminal from an i3 binding that uses this repo's rendered config, then press Super+C to start a fresh Codex session.
@@ -1349,6 +1385,17 @@ only a disposable temporary fixture and requires no sudo.
 
 ## Fish Alias Skill
 
+- Action: After refresh, run `fish --no-config -c 'source ~/.config/fish/key_abbr.fish; abbr --show | string match "abbr -a -- cc *"'`; in an existing Fish shell source that file, type `cc` then Space, inspect and cancel with Ctrl+C.
+  Expected: `cc` expands to `cd ~/coding/chartclutch`; its previous Calcurse command remains commented. A repeated request is a no-op. Future changed fish-alias requests finish with an immediate focused commit after verification, preserve unrelated dirty work, and report actual push status; no-ops create no empty commit.
+
+- Action: After refreshing, run `fish --no-config -c 'source ~/.config/fish/key_abbr.fish; abbr --show | string match "abbr -a -- wl *"'`; in an existing Fish shell source that file, type `wl` then Space and cancel with Ctrl+C.
+  Expected: `wl` expands to `cd ~/coding/wallet-gas-cost`; the previous Watson mapping is commented in the command template. Repeating the absolute directory request previews a no-op.
+
+- Action: After refresh, source `~/.config/fish/key_abbr.fish` in an existing Fish shell. On an empty command line type `or` then Space; inspect without pressing Enter and cancel with Ctrl+C. Also type `false; or ` and `echo or ` without executing them.
+  Expected: Standalone `or` expands to `cd /mnt/usb-8tb/concerts/olivia-rodrigo`; logical `or` and argument `or` remain unchanged. Fish treats `or` as a keyword, so this abbreviation uses a guarded anywhere rule. Existing shells need the source step; a refresh in another process cannot reload their abbreviations.
+- Action: Run `python3 -B tests/test_reserved_fish_shortcut.py`.
+  Expected: The interactive PTY regression passes for standalone expansion, preserved logical operators and arguments; no mapped command executes.
+
 Check the shortcut skill using disposable fixture sources before making a live
 request. The fixture suite does not execute mapped commands or install the cbn
 example. Live requests preserve active conflicts with exactly `# ` and refresh
@@ -1404,7 +1451,11 @@ changed mappings; file source keys gain `n` in fish.
 
 Live Codex usage: `$fish-alias cbn codex-time burn day`. To create the mapping,
 invoke this as an actual request, inspect the reported source/section/conflicts,
-then verify the refresh result. Repeating it must produce a no-op. Directory
+then verify the refresh result. A changed mapping must produce a focused commit
+and push to the configured upstream without another confirmation, unless local-only
+delivery was requested. Missing upstream or rejected pushes retain the local commit
+and report the blocker. Repeating it must produce a no-op without an empty commit
+or publishing unrelated commits. Directory
 example: `$fish-alias pj ~/coding/my-project/`. File example:
 `$fish-alias re README.md` produces `nre` under existing generator conventions.
 
@@ -1642,6 +1693,8 @@ and enable `discord-speech`. No sudo. The probes are synthetic and play local au
   Expected: Normal popup `(A) Alex (#normie, Active)` / `hai`; Ryan says `(A) Alex says hai` with no intro clip.
 - Action: Run `~/scripts/codex-notification-sound smoke discord-unicode`.
   Expected: Normal Unicode-channel popup; Ryan says `Alex says hello`, without channel/server text.
+- Action: Run `notify-send --app-name=vesktop 'ビットコイン・スタッカー (#work, Server)' 'hello'`, then repeat with body `https://example.org`.
+  Expected: Popup retains the Japanese sender name; Ryan says `bitcoin says hello` and `bitcoin sends link`, respectively.
 - Action: Run `~/scripts/codex-notification-sound smoke discord-dm`.
   Expected: Synthetic Vesktop popup `Alex` / `hello from a direct message`; Ryan says `Alex says hello from a direct message` with one WAV and no intro clip.
 - Action: Run `~/scripts/codex-notification-sound smoke discord-isolates`.
@@ -1731,3 +1784,20 @@ restore the original DND state afterward. No sudo is needed.
   at least the original intake proposal baseline, and no inventory drift remains.
   These are lexical proxy checks; live provider, CLI-package and UI execution
   require their separately documented setup.
+
+## Concerts directory shortcut
+
+- **Action:** In Fish, load `~/.config/fish/key_abbr.fish`, type `cnc`, and press Space without executing the expansion.
+- **Expected:** The input expands to `cd /mnt/usb-8tb/concerts`; existing mappings remain available. The mount must be available before navigating.
+
+## Refresh local drift
+
+Preserve local managed-file edits before applying repo changes.
+
+- Action: Modify a disposable managed non-template file locally, then run refresh-config.
+  Expected: Local contents are copied to source, apply succeeds and shortcuts reload. Templates and ignored settings remain intact. Repeated identical template conflicts stop with a private log instead of looping forever.
+
+## Wallpaper contrast behind i3bars
+
+- Action: After refresh-config and one i3 reload, press Alt+R twice and inspect each monitor with bright and dim wallpapers.
+  Expected: Each bar darkens the wallpaper directly behind its text with 80% black; the rest of the wallpaper remains unchanged. Workspace accents and status controls retain their colors and behavior. `i3-msg -t get_bar_config bar-0` (also bar-1 and bar-2) reports background `#000000cc`. The migration-preserved live i3 config needs the same narrow `$bar_trans` change.

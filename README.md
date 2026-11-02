@@ -586,6 +586,10 @@ reasons. Each approval applies to those exact bytes at that exact path; edits
 require review if the content still triggers another blocked category. Ordinary
 recovery filenames need no approval; their contents remain fully scanned. Explicit
 private forbidden literals/path globs always override public defaults and approvals.
+Reviewed public portfolio contact details and incidental SVG/media email or IP
+patterns can use the same exact-path/content-hash approval mechanism. This does
+not approve credentials, provider tokens, private keys or explicit private policy.
+
 There is no test-directory content exemption. The installer snapshots this manifest;
 missing or malformed policy blocks inspection. After a scanner/policy update,
 repeat `install` before relying on the installed hook.
@@ -617,6 +621,37 @@ messages and arbitrary custom identity headers are outside pre-commit coverage;
 review them and audit history separately. No CI or server gate is installed.
 Concurrent external index mutations outside Git's commit locking remain outside
 the local scanner's control.
+
+#### When blocked: sanitize by default
+
+Sanitize is the default response whenever the gate blocks a commit or a push
+(both `check` and `pre-push` print it as the next step). Agents run it instead
+of stopping, bypassing, or skipping the push.
+
+1. Never bypass the gate (`--no-verify`) or weaken its rules.
+2. Run `python3 scripts/executable_privacy-gate sanitize` (dry-run by default; it
+   lists what would change and masks every value).
+3. Then run it with `--apply` only when the user, or a standing instruction for
+   that run, allows it. Automated runs never pass `--apply` otherwise; for
+   unattended night runs the `/goal` text must explicitly grant `--apply` for
+   sanitize. Without that grant, report the dry-run plan and wait. Add `--exclude` to write ignores to `.git/info/exclude`
+   instead of `.gitignore`.
+   - Private-in-nature tracked files (gate-private paths, `NIGHT_NOTE.md`,
+     `review-notes.md`, logs, `run-*.sh`, `.harness/` status files, `.env`, keys)
+     are ignored and untracked with `git rm --cached`; the working copy stays.
+   - Useful files with sensitive values get a sanitized `<name>.example` copy
+     with placeholders (`<REDACTED_TOKEN>`, `<API_KEY>`, `<PRIVATE_KEY>`,
+     `<EMAIL>`, `$HOME`, `<IP_ADDRESS>`, nil UUID). The original is ignored and
+     untracked; `SANITIZED.md` has a table of each placeholder, the file and
+     line numbers, the kind of value it replaced, and what you must enter
+     manually, plus restore steps (copy `<name>.example` to `<name>`, fill the
+     placeholders, never commit the filled file). It never holds the values and
+     is updated idempotently on later runs. Files that still fail the re-scan are listed for manual review.
+   - The staged result is re-scanned and reported clean only when it passes.
+4. Review `git diff --cached`, commit the sanitized version, rerun `check`.
+5. Push only the feature/night branch. Sanitize never rewrites history: local
+   never-pushed commits can be rewritten (`git rebase -i`, `git filter-repo`)
+   after you confirm; already-pushed history needs Kevin's explicit decision.
 
 Rollback with `python3 scripts/executable_privacy-gate uninstall`: it restores the
 preserved hook and removes only the gate bundle. If the hook has changed, removal
@@ -700,13 +735,13 @@ without needing a Fish shell first. Nonempty `XSET_DELAY` and `XSET_RATE`
 environment values override their respective defaults.
 
 Treat this repository as the source of truth for most of the environment
-layer. Keep machine and identity values private. `refresh-config` applies reviewed sources without importing live settings.
+layer. Keep machine and identity values private. `refresh-config` preserves modified managed local files with chezmoi re-add before applying source changes; templates and ignored private settings are preserved.
 
 1. Edit the tracked source files in this repo when the repo-managed copy
    is meant to stay authoritative.
 2. Preview the resulting home-directory diff with
    `chezmoi -S "$PWD" diff`.
-3. Run `refresh-config` to apply reviewed chezmoi files and regenerate shortcuts. Live Codex/Git settings stay private; refresh excludes scripts, externals, and removals and never adopts conflicts.
+3. Run `refresh-config` to apply reviewed chezmoi files and regenerate shortcuts. Ignored private settings stay private; refresh excludes scripts, externals, and removals. Local file drift is imported before apply; templates are never re-added.
    Here, `scripts` means chezmoi run hooks; ordinary managed files under
    `~/scripts/` still apply. A permission-only difference can stop refresh just
    like a content edit. Inspect the private log and the exact target diff before
@@ -840,7 +875,7 @@ source in this repo.
 | `chezmoi -S "$PWD" apply -n -v` | Dry-run an apply with extra detail before touching files in `$HOME`. | `-S` / `--source` uses this repo as the source state. `-n` / `--dry-run` previews changes without writing them. `-v` / `--verbose` prints more detail. |
 | `chezmoi -S "$PWD" apply` | Apply the tracked source state from this clone into `$HOME`. | `-S` / `--source` uses this repo as the source state. `-P` / `--parent-dirs` is useful when you apply a nested target and also want its parent directories handled. |
 | [`codex-search`](docs/codex-session-search.md) | Search decoded local Codex conversations across directories, print snippets and resume commands, or select a session to resume. Installed from `scripts/executable_codex-search`; fish abbreviations `csg` (search) and `crg` (recent picker). | `--recent` lists newest 20 sessions without a pattern or model calls; `--recent --pick` opens available metadata before full archive indexing, then adds usable sessions in the background and ranks them by AI priority. Pending dialogue stays unknown/stale and defers recap generation; Ctrl-G remembers a request until ready. Malformed archive records do not flood the picker; `--details` exposes diagnostics. Guardian/session changes refresh automatically. `--sort priority\|recent` selects the order; picking defaults to priority, listing to recent. Priority is urgent/actionable/unknown/waiting/complete with activity ties; the preview explains its reason and freshness. `--summary-count N` sets the automatic newest-session window (default 20, 0 disables it); Ctrl-G requests a selected recap. `--summary-model MODEL` overrides the configured model; `--no-summaries` prohibits all generation. `-i` ignores case; `-F` uses literal text; `--all-text` adds tool calls/output; `--pick` uses optional fzf and browses all matches. Terminal output defaults to 20 compact results; `--details` shows full blocks; `--limit N` caps printing (0 means all). Pipes default to all full blocks without ANSI; `NO_COLOR` disables terminal color; `--plain` also uses ASCII printed decoration and ASCII borders in the recent picker. `--rebuild-index` reparses sources; `--clear-cache` deletes this Codex home's private index. `CODEX_HOME` selects sessions, `XDG_CACHE_HOME` selects cache storage; `--help`, `-h` or no arguments show usage and examples. Requires Python 3.11+ and rg for pattern search, fzf (tested 0.44.1) for recent picking, and compatible Codex with login for recaps; no sudo to run. |
-| `refresh-config` | Apply reviewed chezmoi files and reload shortcuts. | No flags; `CLI_PLAIN=1` provides ASCII decoration. Excludes scripts, externals, and removals; reports elapsed progress, stops on conflicts, and never imports live settings. Diagnostics remain in a private temporary log. |
+| `refresh-config` | Apply reviewed chezmoi files and reload shortcuts. | No flags; `CLI_PLAIN=1` provides ASCII decoration. Excludes scripts, externals, and removals; reports elapsed progress, imports modified managed files before apply, and retries local drift. Persistent template conflicts and other errors stop with diagnostics. Diagnostics remain in a private temporary log. |
 | [`./scripts/executable_fix-vps-codex.sh`](docs/fix-vps-codex.md) | Run locally to repair Codex npm permissions on a VPS using SSH keys, without sudo. Reuses compatible Node/npm and verifies a normal update through a second SSH session. | Defaults to `example-user@192.0.2.10`; `--host`, `--port`, and `--identity` override the connection. `--dry-run` reads diagnostics without repair writes or npm execution; `--help` shows prerequisites. Requires remote Linux, Python 3.8+, bash or fish, and an already trusted host key. |
 | `sync-superpowers-release` | Report the retired Superpowers integration; existing upstream files stay untouched. | `--dry-run` and normal invocation are compatibility no-ops. `--help` explains the retirement. |
 | `sync-design-skills` | Refresh only the retained Higgsfield plugin; Impeccable is pinned locally. | `--dry-run` previews the retained external target. `--bootstrap` is a compatibility no-op. `LINUX_CONFIG_SOURCE` selects another checkout. It never authenticates accounts, generates media, spends credits, or upgrades the Higgsfield CLI. |
@@ -857,12 +892,12 @@ source in this repo.
 | [`backup-pc restore`](docs/backup-pc-recovery.md#restore-onto-a-replacement-hdd) | Run the script included in a completed backup from a live USB to restore onto an unmounted replacement whole disk. | Requires sudo, `--archive /mnt/backup/BACKUP/system.tar.xz` and `--target-disk /dev/disk/by-id/TARGET-HDD`. `--dry-run` verifies and previews without destructive operations; `--root-size 80` or `80GiB` overrides root size. Requires the complete bundle including intact `home/` and its index; verifies both components, protects source/backup/running disks, requires exact `ERASE <resolved-device-path>` confirmation, then replaces every partition with EFI/root/swap/home. See the guide for supported layouts, dependencies and the disposable-VM boot check; Secure Boot has not been boot-tested. |
 | `python3 scripts/enable-usb-8tb-automount.py --check` | Preview power-on and on-access mounting of the existing 8 TB disk at `/mnt/usb-8tb`. | Run once with `sudo python3 scripts/enable-usb-8tb-automount.py --apply` to back up/update fstab, install the UUID-specific udev rule, and reload configuration. Supports `--plain`; refuses conflicting entries and never formats or unmounts the disk. Current mounts are preserved; on-access activation may wait until reboot. [Verification](docs/smoke-tests.md#external-8-tb-automatic-mounting). |
 | `bash scripts/hdd-init-wizard.sh` | Diagnose a USB SATA dock and explicitly initialize one selected disk as GPT/ext4, then mount it by UUID. Run as your normal user; the wizard calls `sudo` for privileged steps. | `--help` shows usage; `--dry-run` shows read-only diagnostics and a plan without writes. The interactive path blocks system and mounted disks, requires exact device and erase phrases, backs up `/etc/fstab`, and checks `mount -a`. Requires `parted`, `smartmontools` only for optional SMART data, and standard Ubuntu disk utilities. |
-| `./scripts/executable_concat-timestamped-videos DIRECTORY OUTPUT` | Join top-level camera clips in capture-time order. | `--list-only` writes `OUTPUT_STEM.ffconcat.txt` beside the output for review. `--clips FIRST SECOND` selects exactly two filenames in the directory, excluding other clips and prior outputs. Pixel `PXL_` timestamps come from filenames; iPhone `IMG_` timestamps come from MOV metadata and require `ffprobe`. The default join uses FFmpeg stream copy for compatible streams. Use `--reencode` with `--clips` for mixed SDR/HDR sources: it tone-maps HLG to SDR and writes H.264/AAC, so the output loses HDR/Dolby Vision metadata and takes longer to create. Supports `.mp4`, `.mov`, and `.m4v`; excludes nested folders and symlinks, never overwrites an existing output, and needs no sudo. Example: `./scripts/executable_concat-timestamped-videos /mnt/usb-8tb/concerts/logic /mnt/usb-8tb/concerts/logic/logic-pair.mp4 --clips PXL_20260928_011900910.mp4 IMG_1377.MOV --reencode`. |
+| `./scripts/executable_concat-timestamped-videos DIRECTORY OUTPUT` | Join top-level camera clips; optionally normalize to landscape and check joined clip starts. | Default order is capture time (Pixel filenames/iPhone metadata); `--sort mtime` uses oldest modification first. `--list-only` writes `OUTPUT_STEM.ffconcat.txt`. `--landscape` reencodes all selected clips to common 16:9 SDR H.264 High/yuv420p at a fixed frame rate and `1/90000` video time base, with AAC 48 kHz stereo. It honors embedded rotation, fits portrait clips with side bars, joins normalized video with continuous reencoded audio, rejects non-monotonic DTS warnings, verifies geometry, and writes one PNG per joined segment start plus `OUTPUT_STEM.review/index.html`. Add `--resume` to keep validated per-clip files and an input/settings manifest in `OUTPUT_STEM.work`; rerun the identical command to reuse completed clips or a matching final output. A lock prevents concurrent jobs; changed sources/settings/cache or unrelated existing outputs are refused. Keep the work folder until the result is accepted; originals stay untouched. Open that page to check upright orientation; the script cannot infer upside-down scenes from pixels or detect later rotation. Correct metadata mistakes with repeatable `--rotate "FILENAME=180"` (clockwise 0/90/180/270 after metadata rotation) and a new output name. `--clips FIRST SECOND` selects a pair; legacy `--reencode` still normalizes that pair using its first clip dimensions. Without these flags, compatible streams use fast stream copy. Normalization is lossy, tone-maps HLG to SDR, loses HDR/Dolby Vision metadata, and needs disk space for temporary normalized clips beside the output plus the final file. Progress continues during encoding; `--details` shows raw diagnostics and `--plain` uses ASCII status text. Supports case-insensitive `.mp4`, `.mov`, `.m4v`; excludes nested folders/symlinks, preserves sources, refuses unrelated existing output/review paths, and needs no sudo. Example (capture order): `./scripts/executable_concat-timestamped-videos /mnt/usb-8tb/concerts/olivia-rodrigo /mnt/usb-8tb/concerts/olivia-rodrigo-normalized.mp4 --landscape --resume`. |
 | `./scripts/executable_screenshot-all-monitors` | Save one combined `scrot` capture of the full X virtual desktop, covering every active monitor in one image. | No flags. Saves to `/home/example/Pictures/screenshots/desktop/unsorted/screenshot-YYYY-MM-DD_HH:MM:SS.png`. `SCREENSHOT_ALL_MONITORS_DIR`, `SCREENSHOT_ALL_MONITORS_SCROT`, and `SCREENSHOT_ALL_MONITORS_DATE` override the destination, capture binary, and timestamp binary for tests or alternate hosts. |
 | `./scripts/executable_setup-st.sh` | Render the tracked `st` config, sync it into your `st` source checkout, and install the compiled terminal you actually want to use. | `--source-dir` points the script at a non-default `st` checkout path. `--skip-install` only refreshes `~/.config/st/config.def.h` plus the source-tree `config.def.h` and prints the exact `sudo make -C ... install` command instead of running it. `--clone-if-missing` clones the official upstream source from `https://git.suckless.org/st` into the target checkout path before syncing and building. |
 | [`~/scripts/codex-notification-activate`](docs/codex-notification-sound.md#installation-and-activation) | Activate the optional notification hook after applying sources. | Restarts only your current session's Dunst bus owner, clearing its history/queue; `--open-kitty` also opens a fresh Kitty process while preserving existing terminals. Requires deployed notification files, Dunst and dbus-send; no sudo. Does not enable sound. |
 | `codex-notification-sound speech-volume [0–100]` | Set and remember TTS volume; omit the number to show it. | Speech only; default75%; browser, system and intro-clip levels unchanged. |
-| `codex-notification-sound discord-speech enable\|disable` | Read Discord channel notifications and Vesktop DMs locally as sender says message with Ryan, without a clip, at the default 75% speech volume. | Independent, default-off switch; `status` reports activation. `smoke discord`, `smoke discord-unicode`, `smoke discord-isolates`, `smoke discord-dm`, `smoke discord-links`, `smoke discord-link-only`, `smoke discord-saucybot` and `smoke discord-unrelated` send synthetic desktop probes. Matches complete `SENDER (#CHANNEL, SERVER)` titles from any app after removing invisible direction isolates; reads once, announces only sender sends link/tweet for links and SaucyBot, and skips Twitter Cap Bot; sender-only DMs require observed appname `vesktop`. See [usage and rollback](docs/codex-notification-sound.md#discord-channel-message-speech). |
+| `codex-notification-sound discord-speech enable\|disable` | Read Discord channel notifications and Vesktop DMs locally as sender says message with Ryan, without a clip, at the default 75% speech volume. | Independent, default-off switch; `status` reports activation. `smoke discord`, `smoke discord-unicode`, `smoke discord-isolates`, `smoke discord-dm`, `smoke discord-links`, `smoke discord-link-only`, `smoke discord-saucybot` and `smoke discord-unrelated` send synthetic desktop probes. Matches complete `SENDER (#CHANNEL, SERVER)` titles from any app after removing invisible direction isolates; reads once, announces only sender sends link/tweet for links and SaucyBot, and skips Twitter Cap Bot; sender-only DMs require observed appname `vesktop`. Speaks `ビットコイン・スタッカー` as `bitcoin` without changing popups. See [usage and rollback](docs/codex-notification-sound.md#discord-channel-message-speech). |
 | [`~/scripts/codex-notification-sound`](docs/codex-notification-sound.md) | Play a local MP3, optionally followed by the exact Codex conversation title or one sentence about a queued question using Voice Contributor high at the celebrate audition pace (0.95), generated locally while the clip plays. Popup audio and speech are separately disabled until configured. | `set PATH`, `preview [--title TEXT] [--speech-only]`, `disable`, `status`, `speech enable|disable`, and `smoke tagged|kitty`; `--plain` uses ASCII, `--details` shows paths/diagnostics. Speech requires the installed voice and restarted/resumed Codex sessions; covers focused/background user-facing answers with nonblank final text and accepted queued questions. Question speech requires enabling/trusting the two exact entries in `/hooks`; it reads the prompt, omits choices and combines up to three prompts and any remaining count into one bounded sentence. `python3 -B scripts/smoke_codex_question_events.py --installed --case all --plain` verifies question delivery with a silent isolated player. Helper-agent completions, empty answers, unknown origins, invalid/secret questions, permission requests and automatic reviews stay silent while Dunst audio is suppressed. `python3 -B scripts/smoke_codex_notification_events.py --installed --case all --plain` verifies event eligibility with a silent isolated player. Disabling speech restores MP3-on-popup behavior. Python 3/mpv, no sudo; settings stay machine-local. Select the bundled [Sire intro](scripts/sire.mp3) with `set "$HOME/scripts/sire.mp3"` after applying the GUI dotfiles, or another existing local MP3 outside the checkout; a missing selected file blocks both clip and speech. |
 | [`~/scripts/setup-codex-notification-speech`](docs/codex-notification-sound.md#optional-offline-title-speech) | Install and verify the optional English title voice. | `--install` downloads pinned Piper 1.8.0 and `en_US-Voice Contributor-high` into an isolated XDG data environment; `--check` verifies offline WAV synthesis; `--plain` uses ASCII and `--details` shows download logs/paths. Python venv/pip required, no sudo; installation needs internet, playback does not. Does not enable speech. |
 | [`~/scripts/codex-voice-auditions`](docs/codex-notification-sound.md#audition-ten-local-voices) | Compare ten numbered local voices with upbeat lines and the question clip before each sample; includes a committed [Voice Contributor celebrate MP3](scripts/Voice Contributor-celebrate.mp3) reference. | Default plays all ten; `--list`, `--samples`, `--voice NUMBER [NUMBER ...]` (names/IDs also accepted), `--sample all|short|celebrate|technical`, `--text TEXT`, `--length-scale 0.95`, `--offline`, `--render-only`, `--output-dir PATH`, `--clip PATH`, `--dry-run`, `--plain`, `--details`. Requires installed Piper 1.8.0 and mpv for playback; first model downloads need internet. Saves WAVs/manifest under XDG data, reports remaining clip-to-speech gap, changes no notification settings, no sudo. |
@@ -944,7 +979,9 @@ this.
   `cbn "codex-time burn day"` in the existing work section. It previews the
   diff, comments active conflicts in place, preserves quoted hashes and spaced
   paths, normalizes pasted `/home/example` directory prefixes to `~`, and refreshes
-  changed mappings. File source keys gain an `n` prefix
+  changed mappings, then commits and pushes the focused change to the configured
+  upstream without another confirmation (unless local-only delivery is requested).
+  File source keys gain an `n` prefix
   in fish (`re README.md` becomes `nre`); activation follows current chezmoi
   conditions. The example is not installed automatically. See the
   [isolated checks](docs/smoke-tests.md#fish-alias-skill).
@@ -963,8 +1000,12 @@ this.
   `--plain` gives ASCII output; `--json` emits one-shot results. Verify with
   `~/scripts/kitty-monitor-font-smoke --plain` (`--details` for diagnostics),
   which uses isolated Kitty/Xvfb fixtures; physical calibration still needs review.
-- The 4K i3 bar keeps volume near the monitor center and fits the song beside it
-  with an ellipsis when crowded, reserving volume space before song or calendar.
+- Workspace buttons use 15px left padding, a 10px number/icon gap, and 30px right padding at the current 135 DPI; changing DPI requires recalibrating the Pango spacers.
+- The 4K i3 bar uses available space beside workspace buttons for status blocks.
+  Music uses 70% of the bar font, keeps title-artist order,
+  and ellipsizes first when crowded, before the calendar compacts or hides.
+- The DP-2 4K bar uses a 46.2667-point font at 135 DPI, about 7 pixels smaller
+  than its original 50-point setting; other bar font sizes are unchanged.
 - [`dot_config/kitty/kitty.conf`](dot_config/kitty/kitty.conf)
   is the default terminal config, and the i3 bindings now open `kitty`
   first for normal shells and Codex. Ctrl+Shift+Up/Down and Ctrl++/Ctrl+-
@@ -1005,7 +1046,8 @@ this.
   boosts saturation, refreshes kitty, regenerates contrast-safe i3 bar
   colors, and keeps the rest of the tracked wallpaper shortcuts on one
   consistent path instead of sprinkling raw `wal -i` calls through the
-  config.
+  config. All i3 bars use an 80% black translucent backdrop so status text
+  stays readable across wallpapers, including Alt+R changes.
 - [`dot_tmux.conf`](dot_tmux.conf) is the multiplexing layer with a
   custom prefix, mouse mode, TPM plugins, a status line, and copy-mode
   mappings that push selections to `xclip`. New panes keep 50,000 history rows;
@@ -1079,17 +1121,22 @@ this.
   for YouTube and other sites. See the [short usage guide](docs/flavibot-browser.md).
 - The middle 4K music block uses
   [`now_playing_mpris`](dot_config/i3blocks/scripts/executable_now_playing_mpris)
-  to follow only the dedicated FlaviBot browser, with Spotify fallback.
-  Playing tracks take precedence over paused tracks; FlaviBot wins ties. It polls
+  to follow mpv and the dedicated FlaviBot browser, with Spotify fallback.
+  Playing tracks take precedence over paused tracks; ties prefer mpv, then FlaviBot, then Spotify.
+  mpv needs the distro `mpv-mpris` plugin (Ubuntu package of the same name);
+  reopen existing mpv windows after installing it. The plugin can also be loaded
+  from `~/.config/mpv/scripts/mpris.so` for a user-local installation. It polls
   every five seconds using Python 3 and systemd's `busctl` with JSON support.
   The helper resolves each browser's D-Bus owner to its process and checks the
   exact dedicated data directory. Ordinary Chrome media, including YouTube, is
-  ignored even when playing while FlaviBot is paused. If Spotify is playing and
-  FlaviBot is paused, Spotify appears; with both paused, FlaviBot appears.
+  ignored even when playing while FlaviBot is paused. With mpv absent, if Spotify is playing and
+  FlaviBot is paused, Spotify appears; with both paused and mpv absent, FlaviBot appears.
   No artist/title regex is required, so title-only songs remain eligible.
-  With no eligible player, the block clears. Titles are displayed in full.
-  Playing tracks use a compact, optically raised `▶`; paused tracks use the
-  matching `‖` marker.
+  With no eligible player, the block clears. Songs display as `Title - Artist`,
+  or just the title when no artist is available. Long media filenames shorten
+  from the beginning, keeping their ending and extension visible.
+  Playing tracks use a compact, optically raised color `▶️` button; paused tracks use
+  the matching `⏸️` button.
   This isolates the browser process, not websites within it: keep YouTube out
   of the dedicated FlaviBot window. No Discord bot or token is needed.
   Left/middle/right clicks control the displayed player when supported; stale
@@ -1103,6 +1150,11 @@ this.
 - [`dot_config/i3/config.tmpl`](dot_config/i3/config.tmpl) is the main
   desktop control plane for workspace movement, app assignments,
   launcher bindings, display and audio shortcuts, and layout control.
+  Workspace labels use native color emoji inspired by their terminal, browser,
+  tools, video, chat, upload, journal, editing, music, server and gaming symbols.
+  Compact labels omit separator/trailing spaces (for example, `2💻`); native
+  minimum button widths leave about 15px side padding at the current font/DPI. Workspace
+  numbers and all select, move-window and launch shortcuts are unchanged.
   **Super+M** (left Super is X11 keycode **133**) toggles speaker mute/unmute and refreshes the volume block.
   Both it and the mute media key use `~/scripts/audio-mute` to show **🔇 Audio — Muted**
   or **🔊 Audio — Unmuted** in one two-second Dunst popup that updates in place.
@@ -1118,6 +1170,15 @@ this.
   bounded at 1000–6500 K. Presets, `rds`, `rx` and login share the saved temperature.
   The first adjustment defaults to 6500 K if no value has been saved; direct
   external Redshift commands are not tracked.
+  The middle DP-2 4K and right HDMI-0 bars show **🌡️ 4500 K** immediately left of volume: scroll up
+  for +150 K (cooler), down for −150 K (warmer). Other clicks do nothing.
+  Wheel changes update the bar silently; keyboard and direct helper operations
+  keep their notifications. The controller’s `--no-notify` flag suppresses a popup
+  for an individual helper invocation.
+  It refreshes the saved manual target each second, including keyboard presets
+  and reset; it is not a hardware-temperature reading. Backend or state errors
+  show **🌡️ ERR**. `~/scripts/redshift-control status` reads the target without
+  changing state, applying Redshift or notifying.
   Successful helper operations show **🌡️ Redshift — 2100 K** (using the applied
   temperature) in Dunst. Rapid adjustments edit the same two-second popup in place;
   missing or failed notifications never fail the temperature change.
@@ -1127,6 +1188,17 @@ this.
   status-bar, notification, and compositing layer.
   The volume block left-click unmutes and right-click mutes; middle-click sets
   15% volume, and scrolling adjusts volume by 3%.
+  Active blocks use native color emoji (speaker/headphones/display, thermometer,
+  music notes, calendar and notification bells), with matching laptop
+  battery, signal and brightness icons. Values retain pywal `color7`; Redshift
+  rereads that palette on each update and falls back to `#cbe4ff` if unavailable.
+  Paused DND remains red. Compact color playback buttons remain beside
+  the music icon; music shortens first, then the date shortens when needed to keep that icon visible, and
+  compact time uses a clock icon. Icons have 20 px of space before their values,
+  using Pango spacing rather than a monospace blank; the shared status wrapper adds about 25 physical pixels
+  of transparent right padding beside 25 px separators, shifting room toward the
+  trailing side. It accounts for DPI-scaled borders when fitting the 4K song.
+  No additional assets or fonts are required.
   The secondary (left desktop monitor) bar includes a clickable `Notis`/`DND`
   indicator immediately left of volume; it refreshes notification pause state every
   two seconds. `Notis` uses the same wallpaper theme color as volume/date;

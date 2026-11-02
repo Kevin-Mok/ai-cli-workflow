@@ -1,3 +1,27 @@
+# Current overnight refresh (2026-11-01)
+
+Main fetched at 8662fa3c; the historical report below remains evidence for the
+previous endpoint, not current measurements. See plans/skills-efficiency-pr.md.
+Merge first; admission then final remeasurement.
+
+Merge conflicts: docs/smoke-tests.md (combine independent sections), skill README
+(keep concise catalog, add new entries), night description (keep trimmed trigger,
+carry push checkpoints), postmortem sources ledger (union new upstream records),
+AGENTS core (keep trimmed, retain relevant changes in mandatory homes).
+Carry-overs: Chrome previews in core; secondary labels and UX/DX/AX in mandatory
+system-design routing; stronger report-with-encountering-change delivery in
+postmortem reference; sanitize guidance in commit-plan-push; immediate shortcut
+delivery in fish-alias; night goal/blocker/push guidance. The upstream repository
+creation rule remains verbatim in delivery.md. Model/effort lines unchanged.
+
+Merge checkpoint verification:93tests/5subtests PASS; core8,989B; staged privacy,
+README and size gates PASS; ledger targeted coverage PASS.
+
+Admission pending: ai-ux-deslop and hallmark. No new deletion; approved CULL.json
+remains unchanged. Configuration remains unapplied.
+
+---
+
 # Trim progress
 
 Final implementation: **12 passes committed**, ending at `79d1a8cb`.

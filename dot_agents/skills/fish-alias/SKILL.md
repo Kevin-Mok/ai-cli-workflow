@@ -37,6 +37,10 @@ Default CLI output is a readable summary; `--plain` uses ASCII, `--details` incl
 
 Never execute the supplied command, including as a smoke test. Check generated syntax with `fish -n`; use disposable fixture generation when needed. After a changed mapping, run the repository's `refresh-config` convention and check rendered sources/generated abbreviations. Refresh snapshots live Codex and Git configs into tracked sources, applies chezmoi and regenerates/reloads shortcuts; preserve protected dirty state. Report the source, section, effective abbreviation, commented conflicts and actual verification result. A no-op needs no refresh.
 
+## Commit and push immediately
+
+After a changed mapping passes refresh and verification, immediately make a focused Conventional Commit without asking for a separate commit request. Run the repository’s README gate, stage only this request’s shortcut changes and related documentation or skill updates, inspect the staged diff, and commit before starting unrelated work. Preserve all pre-existing unrelated changes. An identical mapping is a no-op: do not create an empty commit or trigger a push. Invoking this skill authorizes committing the focused shortcut changes and required related documentation on the current branch, then pushing to its configured upstream without a separate confirmation. Always push after the verified commit unless the user explicitly requests local-only delivery. If the upstream is missing or ambiguous, or a push is rejected, retain the local commit and report the blocker; never force-push or publish unrelated commits. Report the commit hash and actual push destination/status.
+
 ## Callable commands versus abbreviations
 
 An abbreviation expands interactive input; it is not a callable command and existing shells may not have loaded a newly generated abbreviation. When the user asks for a stored command usable literally (including flags or scripts), provide an executable or a tracked autoload function in `dot_config/fish/functions/NAME.fish` as appropriate. Forward arguments with `$argv` without joining or evaluating them. Keep abbreviation-only requests on the existing helper workflow.
