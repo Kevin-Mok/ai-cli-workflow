@@ -152,3 +152,9 @@ brightness ratio was exactly1.0 in selected sample, output path retained origina
 folder/name and PNG bytes matched clipboard; Escape preserved clipboard. Independent
 helper regression, bash syntax and scoped diff checks passed. No shader fallback
 or compositor setting added. Hardware key and receiving-app paste remain unchecked.
+
+Commit packaging follow-up: first commit recorded helper as100644, despite live
+installed helper being executable. Inspection confirmed source mode664. Added a
+defining executable assertion and direct (non-bash-wrapped) regression invocation:
+RED failed for missing execute bit, then chmod+x made the regression pass. Follow-up
+commit records100755. This does not change live behavior or shader configuration.

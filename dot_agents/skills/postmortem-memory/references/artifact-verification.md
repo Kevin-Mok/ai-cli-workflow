@@ -619,7 +619,7 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Remedy: Move capture/copy logic into a shared executable and bind i3 to a simple helper invocation. Verify after refresh and reload.
 - Verification: Injected Print and raw keycode107 after refresh/reload produced the original timestamped PNG with byte-identical clipboard data. Escape preserved the previous clipboard. Helper regression checks passed.
 - Limits: Injected X11 keys do not prove hardware behavior, receiving-app paste or absence of visible flashing. The earlier picom/backend explanation remains unproven.
-- Source: [maim investigation](/home/kevin/linux-config/docs/postmortem/2026-11-03-maim-display-probe.md), SHA-256 `b88c93ecd41e892fcdef1cbd6467982179a5a83e0d121a33d983cfdef5f43afa`.
+- Source: [maim investigation](/home/kevin/linux-config/docs/postmortem/2026-11-03-maim-display-probe.md), SHA-256 `971b179f0548885a55c314b2d7e203471b9522359542edf86d245a342359f7cb`.
 
 ## local-maim-dim-selection
 
@@ -630,4 +630,4 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Remedy: Install GLSL120 shaders in ~/.config/slop. Render the frozen desktop at60% outside a white selection mask and100% inside; invoke --highlight --color=1,1,1,1 --shader=i3-dim.
 - Verification: Shader ran successfully; compositor brightness ratios were1.0 inside and0.593 outside. Raw107 after refresh/reload saved an undimmed PNG with the original name/directory and matching clipboard. Escape retained clipboard contents.
 - Limits: Preview freezes during selection; OpenGL is required. Hardware-key and receiving-app acceptance remain untested. Other driver/compositor versions need runtime verification.
-- Source: [maim shading investigation](/home/kevin/linux-config/docs/postmortem/2026-11-03-maim-display-probe.md), SHA-256 `b88c93ecd41e892fcdef1cbd6467982179a5a83e0d121a33d983cfdef5f43afa`.
+- Source: [maim shading investigation](/home/kevin/linux-config/docs/postmortem/2026-11-03-maim-display-probe.md), SHA-256 `971b179f0548885a55c314b2d7e203471b9522359542edf86d245a342359f7cb`.

@@ -65,3 +65,11 @@ the scope helper cannot recognize this session's functions-tool writes. Only
 session hunks in initially dirty smoke/memory files are eligible. Preserve unrelated
 Fish, Vesktop, tests, SSH report and historical memory edits. Commit and push this
 single verified change to origin/main; report resulting hash and push outcome.
+
+### Commit milestones
+
+- a904be9: feat(i3): use maim for shaded screenshot selection; privacy gates passed.
+- Follow-up fix: preserve executable source mode for the README direct invocation.
+  Defining permission assertion failed before chmod, then direct helper execution
+  regression passed. Commit subject: fix(i3): make screenshot helper executable.
+  Push both commits once the follow-up safety checks pass.

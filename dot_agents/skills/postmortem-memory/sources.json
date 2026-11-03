@@ -7032,7 +7032,7 @@
       "verification_scope": "runtime",
       "limitations": "Injected X11 keys do not establish hardware behavior, receiving-app paste or absence of visible flashing. Picom/backend interaction remains unproven.",
       "sources": [
-        "b88c93ecd41e892fcdef1cbd6467982179a5a83e0d121a33d983cfdef5f43afa"
+        "971b179f0548885a55c314b2d7e203471b9522359542edf86d245a342359f7cb"
       ]
     },
     {
@@ -7054,7 +7054,7 @@
       "verification": "Shader ran exit0; compositor brightness ratios inside1.0/outside0.593. Raw107 after refresh/reload saved undimmed PNG (ratio1.0) with original filename/directory and matching clipboard; Escape retained image.",
       "limitations": "Frozen desktop during selection; OpenGL required. Hardware key and receiving-app paste not tested. No portability guarantee for other driver/compositor versions.",
       "sources": [
-        "b88c93ecd41e892fcdef1cbd6467982179a5a83e0d121a33d983cfdef5f43afa"
+        "971b179f0548885a55c314b2d7e203471b9522359542edf86d245a342359f7cb"
       ]
     }
   ],
@@ -13984,7 +13984,7 @@
       "decision": "No new general finding: shebang/destination discovery and candidate schema validation cover the delivery mistakes. Preserve historical sources when excluding a new private report; schema rejects missing reciprocal links. See delivery plan for fresh verification."
     },
     {
-      "sha256": "b88c93ecd41e892fcdef1cbd6467982179a5a83e0d121a33d983cfdef5f43afa",
+      "sha256": "971b179f0548885a55c314b2d7e203471b9522359542edf86d245a342359f7cb",
       "aliases": [
         "/home/kevin/linux-config/docs/postmortem/2026-11-03-maim-display-probe.md"
       ],
