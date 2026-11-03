@@ -7014,6 +7014,48 @@
       "sources": [
         "d723a0d976c0218298c5a1cec482c03630a4c68089f921ae7f03341751add0a8"
       ]
+    },
+    {
+      "id": "local-i3-keybinding-execution-path",
+      "reference": "references/artifact-verification.md#local-i3-keybinding-execution-path",
+      "status": "verified_fix",
+      "symptoms": [
+        "Inline i3 screenshot binding launches maim without filename; IPC invocation succeeds but actual key path fails to save/copy."
+      ],
+      "applicability": "i3 bindings containing nested shell quoting and clipboard commands.",
+      "diagnostics": [
+        "Trigger actual key press/release; inspect launched argv, created file and clipboard bytes. Compare with IPC and shell execution."
+      ],
+      "confidence": "supported",
+      "remedy": "Move capture/copy logic into shared executable; bind i3 to simple helper invocation. Verify after refresh and reload.",
+      "verification": "Actual Print press/release after refresh/reload produced original timestamped PNG and identical clipboard bytes. Actual Escape preserved clipboard. Stub regression passed region/window and failure paths. Raw XTest keycode107 separately launched maim, produced original timestamped PNG and matching clipboard with no scrot process.",
+      "verification_scope": "runtime",
+      "limitations": "Injected X11 keys do not establish hardware behavior, receiving-app paste or absence of visible flashing. Picom/backend interaction remains unproven.",
+      "sources": [
+        "b88c93ecd41e892fcdef1cbd6467982179a5a83e0d121a33d983cfdef5f43afa"
+      ]
+    },
+    {
+      "id": "local-maim-dim-selection",
+      "reference": "references/artifact-verification.md#local-maim-dim-selection",
+      "status": "verified_fix",
+      "confidence": "confirmed",
+      "verification_scope": "runtime",
+      "symptoms": [
+        "Maim selection does not dim surroundings; alpha border attempts have no measured dimming.",
+        "Installed maim help advertises ~/.config/maim but shader loader requires ~/.config/slop."
+      ],
+      "applicability": "Installed maim5.7.4/libslopy7.6 with OpenGL and picom; dim outside selected area without altering saved image.",
+      "diagnostics": [
+        "Read runtime missing-shader path.",
+        "Sample actual compositor pixels inside/outside during selection; compare saved PNG brightness and clipboard bytes."
+      ],
+      "remedy": "Use GLSL120 shader in ~/.config/slop, opaque frozen desktop at60% outside white highlighted selection mask and100% inside. Invoke --highlight --color=1,1,1,1 --shader=i3-dim.",
+      "verification": "Shader ran exit0; compositor brightness ratios inside1.0/outside0.593. Raw107 after refresh/reload saved undimmed PNG (ratio1.0) with original filename/directory and matching clipboard; Escape retained image.",
+      "limitations": "Frozen desktop during selection; OpenGL required. Hardware key and receiving-app paste not tested. No portability guarantee for other driver/compositor versions.",
+      "sources": [
+        "b88c93ecd41e892fcdef1cbd6467982179a5a83e0d121a33d983cfdef5f43afa"
+      ]
     }
   ],
   "reports": [
@@ -13940,6 +13982,17 @@
       "reviewed_on": "2026-11-01",
       "findings": [],
       "decision": "No new general finding: shebang/destination discovery and candidate schema validation cover the delivery mistakes. Preserve historical sources when excluding a new private report; schema rejects missing reciprocal links. See delivery plan for fresh verification."
+    },
+    {
+      "sha256": "b88c93ecd41e892fcdef1cbd6467982179a5a83e0d121a33d983cfdef5f43afa",
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-11-03-maim-display-probe.md"
+      ],
+      "reviewed_on": "2026-11-03",
+      "findings": [
+        "local-i3-keybinding-execution-path",
+        "local-maim-dim-selection"
+      ]
     }
   ],
   "review": {

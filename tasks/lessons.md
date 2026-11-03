@@ -283,3 +283,5 @@
 - 2026-10-29: i3blocks1.4 can drop rapid clicks while a block runs. Controller-only concurrency tests miss this boundary; test through the scheduler and queue wheel handling in the wrapper before dispatch. See [Redshift activation](../docs/postmortem/2026-10-29-redshift-live-activation.md).
 
 - 2026-10-29: i3blocks 1.4 rejects arbitrary environment keys in its config. Put calendar output defaults in the script, and finish the real scheduler test before live refresh; Unicode thin spaces still occupy full cells in Hack Mono. See [calendar parser incident](../docs/postmortem/2026-10-29-i3blocks-calendar-format.md).
+
+- 2026-11-03: For maim changes, exercise region selection through i3 with one selector at a time and compare saved PNG to clipboard. A direct window capture does not validate region rendering; avoid forcing `--noopengl` on picom without a measured need.

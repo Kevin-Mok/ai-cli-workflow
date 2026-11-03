@@ -609,3 +609,25 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Verification evidence: Real calculatePmo-to-PmoOverlay regression observed alpha 0.85 instead of 1 on #3fff0066 before the change, then passed. Full 441 tests and typecheck/build passed; independent evidence review confirmed official Pine v4 color semantics.
 - Limitations: This fixes opacity only, not marker size, saved colors, missing events or Pine sparse-line geometry; no numerical/export or browser-pixel parity is established.
 - Source: [PMO display parity](/home/example/coding/jay-tradingview/docs/postmortem/2026-10-30-pmo-display-parity.md) (SHA-256 `8d8cf4b411fbe4c1040c148ef6cbbd30126c2240fabb59edb61d54b9fbf7a0cd`; registered in [sources.json](../sources.json)).
+
+## local-i3-keybinding-execution-path
+
+- Status: **verified_fix**; confidence: **supported**; scope: **runtime**.
+- Symptoms: An inline i3 screenshot binding launches maim without its filename, although IPC invocation succeeds.
+- Applicability: i3 bindings containing nested shell quoting and clipboard commands.
+- Diagnostics: Trigger actual key press/release; inspect launched arguments, the saved file and clipboard bytes. Compare with IPC and direct shell execution.
+- Remedy: Move capture/copy logic into a shared executable and bind i3 to a simple helper invocation. Verify after refresh and reload.
+- Verification: Injected Print and raw keycode107 after refresh/reload produced the original timestamped PNG with byte-identical clipboard data. Escape preserved the previous clipboard. Helper regression checks passed.
+- Limits: Injected X11 keys do not prove hardware behavior, receiving-app paste or absence of visible flashing. The earlier picom/backend explanation remains unproven.
+- Source: [maim investigation](/home/kevin/linux-config/docs/postmortem/2026-11-03-maim-display-probe.md), SHA-256 `b88c93ecd41e892fcdef1cbd6467982179a5a83e0d121a33d983cfdef5f43afa`.
+
+## local-maim-dim-selection
+
+- Status: **verified_fix**; confidence: **confirmed**; scope: **runtime**.
+- Symptoms: Maim selection does not dim its surroundings; translucent border experiments produce no measured dimming. Shader loading fails in the directory advertised by maim help.
+- Applicability: Installed maim5.7.4/libslopy7.6 with OpenGL and picom.
+- Diagnostics: Read the runtime shader lookup path. Sample actual compositor pixels inside/outside the selection and compare saved brightness and clipboard bytes.
+- Remedy: Install GLSL120 shaders in ~/.config/slop. Render the frozen desktop at60% outside a white selection mask and100% inside; invoke --highlight --color=1,1,1,1 --shader=i3-dim.
+- Verification: Shader ran successfully; compositor brightness ratios were1.0 inside and0.593 outside. Raw107 after refresh/reload saved an undimmed PNG with the original name/directory and matching clipboard. Escape retained clipboard contents.
+- Limits: Preview freezes during selection; OpenGL is required. Hardware-key and receiving-app acceptance remain untested. Other driver/compositor versions need runtime verification.
+- Source: [maim shading investigation](/home/kevin/linux-config/docs/postmortem/2026-11-03-maim-display-probe.md), SHA-256 `b88c93ecd41e892fcdef1cbd6467982179a5a83e0d121a33d983cfdef5f43afa`.

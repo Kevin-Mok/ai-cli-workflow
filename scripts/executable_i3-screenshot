@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+case "${1:-region}" in
+    region) capture=(--select --hidecursor --highlight --color=1,1,1,1 --shader=i3-dim) ;;
+    window) capture=(--hidecursor --window "$(xdotool getactivewindow)") ;;
+    *)
+        [ "${CLI_PLAIN:-0}" = 1 ] || printf '❌ ' >&2
+        printf 'Usage: i3-screenshot [region|window] [directory]\n' >&2
+        exit 2
+        ;;
+esac
+folder="${2:-$HOME/Pictures/screenshots/desktop/unsorted}"
+mkdir -p "$folder"
+image="$folder/screenshot-$(date +%F_%T).png"
+maim "${capture[@]}" "$image"
+xclip -selection clipboard -target image/png -in "$image"
