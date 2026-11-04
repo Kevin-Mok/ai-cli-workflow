@@ -1852,9 +1852,9 @@ Preserve local managed-file edits before applying repo changes.
 
 ## Persistent mpv play counts
 
-**Action:** From the repository, run `python3 scripts/executable_mpv-count --count /path/to/video.mp4`, then `python3 scripts/executable_mpv-count /path/to/video.mp4`. Let it replay twice, pause/resume and seek, then quit with q. Query `--count` again and relaunch. Use `--plain` to check ASCII output.
+**Action:** From the repository, run `python3 scripts/executable_mpv-count --count /path/to/video.mp4`, then open the file with ordinary `mpv --loop-file=inf /path/to/video.mp4`. Let it replay twice, pause/resume and seek, then quit with q. Query `--count` again and relaunch. Use `--plain` to check ASCII output.
 
-**Expected:** Each started play adds one, including each automatic replay; pause/resume and manual seeks add none. Counts persist after quitting and are independent per resolved file path. The player uses hardware decode auto, fast profile and 1920x1080 scaling. A partial started play counts; playlist reloads may introduce a brief gap. Missing playback files produce an error without adding a play.
+**Expected:** Each started play adds one, including each automatic replay; pause/resume and ordinary seeks outside the wrap-detection window add none; a manual rewind inside that window may count as a loop. Counts persist after quitting and are independent per resolved file path. The automatic hook preserves the supplied player settings; cgc retains hardware decode auto, fast profile and 1920x1080 scaling. A partial started play counts; playlist reloads may introduce a brief gap. Missing playback files produce an error without adding a play.
 
 **Action:** Run `python3 scripts/executable_mpv-count --top`, then repeat with `--plain --top`.
 
@@ -1863,3 +1863,7 @@ Preserve local managed-file edits before applying repo changes.
 **Action:** In a fresh interactive fish, inspect `abbr --show | string match -- "*cgc*"`, then type cgc followed by Space without pressing Enter.
 
 **Expected:** The abbreviation expands to the absolute mpv-count wrapper command and configured concert clip from any directory; cg is unchanged. Inspecting or expanding the abbreviation starts no playback.
+
+**Action:** Reopen a clip with ordinary mpv after configuration refresh, then try cgc separately. Query the saved total before and after each.
+
+**Expected:** New ordinary sessions auto-load play-count.lua and save each initial local-file load plus detected native loop wraps. The wrapper adds one per playlist playback without double-counting from the hook. Existing sessions need reopening; network URLs and sessions with auto-loading disabled do not record automatically. See [counting limits](mpv-play-counts.md#counting-and-limits).

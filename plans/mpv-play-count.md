@@ -100,7 +100,7 @@ postmortem-ledger changes. Preview found no conflicts in applications section.
 - [x] Preview and apply cgc using fish-alias helper.
 - [x] Refresh configuration and verify installed abbreviation without playback.
 - [x] Run focused playback tests and README gate; stage only related content.
-- [ ] Commit `feat(media): add counted playback and cgc shortcut`; push origin/main.
+- [x] Commit `feat(media): add counted playback and cgc shortcut`; push origin/main.
 
 Rollback: remove cgc source mapping and refresh; saved counters remain local.
 Verification commands: fish -n ~/.config/fish/key_abbr.fish; inspect cgc with
@@ -121,3 +121,8 @@ rankings, docs, plan and installed shortcut are verified as scoped. No remaining
 implementation work; push pending. Unverified: GUI output, physical keyboard
 expansion and physical-terminal wrapping. Rollback removes cgc plus wrapper;
 local counters are retained unless explicitly removed.
+
+Prior delivery reconciliation: f8b41e5 committed the wrapper, ranked listing and
+cgc shortcut, and pushed successfully to origin/main. The automatic-counting
+follow-up is described and verified in plans/mpv-auto-count.md; commit-session
+now authorizes delivery of that follow-up with both matching plan records.
