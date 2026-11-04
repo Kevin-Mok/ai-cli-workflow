@@ -1849,3 +1849,17 @@ Preserve local managed-file edits before applying repo changes.
   Expected: The brighter wallpaper, translucent panels and Hack message font are visible; ExpressionManager is enabled. Confirm message text remains readable. This is a manual desktop check.
 - Action: Inspect the installed MIME associations and open an HTTPS link in the desktop.
   Expected: HTML, HTTP and HTTPS defaults resolve to Google Chrome. The permission-marked chezmoi source `dot_config/private_mimeapps.list` installs the existing associations with private file permissions.
+
+## Persistent mpv play counts
+
+**Action:** From the repository, run `python3 scripts/executable_mpv-count --count /path/to/video.mp4`, then `python3 scripts/executable_mpv-count /path/to/video.mp4`. Let it replay twice, pause/resume and seek, then quit with q. Query `--count` again and relaunch. Use `--plain` to check ASCII output.
+
+**Expected:** Each started play adds one, including each automatic replay; pause/resume and manual seeks add none. Counts persist after quitting and are independent per resolved file path. The player uses hardware decode auto, fast profile and 1920x1080 scaling. A partial started play counts; playlist reloads may introduce a brief gap. Missing playback files produce an error without adding a play.
+
+**Action:** Run `python3 scripts/executable_mpv-count --top`, then repeat with `--plain --top`.
+
+**Expected:** A text ranking lists played filenames from highest total to lowest, with aligned counts and medals for the first three. Equal counts sort by full path; zero-count files are omitted. ASCII mode uses numbered ranks without decorative emojis. Empty history shows an explanatory message. Listing starts no player and changes no saved totals.
+
+**Action:** In a fresh interactive fish, inspect `abbr --show | string match -- "*cgc*"`, then type cgc followed by Space without pressing Enter.
+
+**Expected:** The abbreviation expands to the absolute mpv-count wrapper command and configured concert clip from any directory; cg is unchanged. Inspecting or expanding the abbreviation starts no playback.

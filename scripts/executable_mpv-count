@@ -1,0 +1,104 @@
+#!/usr/bin/env python3
+"""Loop a local media file and persist each started playback."""
+import argparse
+import json
+import os
+from pathlib import Path
+import shutil
+import socket
+import sqlite3
+import subprocess
+import sys
+import tempfile
+import time
+
+
+def main():
+    parser = argparse.ArgumentParser(description=('' if '--plain' in sys.argv else '🎬 ') + 'Loop a file and save its play count. Pass extra mpv options after --.')
+    parser.add_argument('--plain', action='store_true', help='use ASCII output')
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument('--count', action='store_true', help='show saved plays without opening mpv')
+    mode.add_argument('--top', action='store_true', help='list most-played files, highest count first')
+    parser.add_argument('file', type=Path, nargs='?')
+    args, extra = parser.parse_known_args()
+    if args.top and (args.file or extra):
+        parser.error('--top does not take a file or extra mpv options')
+    if not args.top and args.file is None:
+        parser.error('a file is required unless using --top')
+    if extra and extra[0] == '--':
+        extra = extra[1:]
+    prefix = '' if args.plain else '🎬 '
+    error = '' if args.plain else '❌ '
+    try:
+        media = args.file.expanduser().resolve() if args.file else None
+        if not args.top and not args.count and not media.is_file():
+            raise ValueError(f'File not found: {media}')
+        state = Path(os.environ.get('XDG_STATE_HOME', str(Path.home() / '.local/state'))) / 'mpv-count'
+        state.mkdir(parents=True, exist_ok=True, mode=0o700)
+        with sqlite3.connect(state / 'plays.sqlite3', timeout=30) as db:
+            db.execute('CREATE TABLE IF NOT EXISTS plays (path TEXT PRIMARY KEY, total INTEGER NOT NULL CHECK(total >= 0))')
+            if args.top:
+                rows = db.execute('SELECT path, total FROM plays WHERE total > 0 ORDER BY total DESC, path ASC').fetchall()
+                print(('' if args.plain else '🎵 ') + 'Most played')
+                if not rows:
+                    print('No plays recorded yet. Play a file with mpv-count to start tracking.')
+                else:
+                    width = len(str(rows[0][1]))
+                    for rank, (path, total) in enumerate(rows, 1):
+                        badge = ('🥇', '🥈', '🥉')[rank - 1] if not args.plain and rank <= 3 else f'{rank}.'
+                        unit = 'play ' if total == 1 else 'plays'
+                        print(f'{badge}  {total:>{width}} {unit}  {Path(path).name}')
+                return 0
+            def show(increment=False):
+                if increment:
+                    with db:
+                        db.execute('INSERT INTO plays VALUES (?, 1) ON CONFLICT(path) DO UPDATE SET total = total + 1', (str(media),))
+                row = db.execute('SELECT total FROM plays WHERE path = ?', (str(media),)).fetchone()
+                print(f'{prefix}Plays: {row[0] if row else 0}', flush=True)
+            if args.count:
+                show()
+                return 0
+            if not shutil.which('mpv'):
+                raise ValueError('mpv is required; install it before playing.')
+            with tempfile.TemporaryDirectory(prefix='mpv-count-') as tmp:
+                ipc = str(Path(tmp) / 'ipc')
+                command = ['mpv', '--loop-playlist=inf', '--hwdec=auto', '--profile=fast',
+                           '--vf=scale=1920:1080', *extra, '--idle=once',
+                           f'--input-ipc-server={ipc}']
+                with subprocess.Popen(command) as player:
+                    try:
+                        with socket.socket(socket.AF_UNIX) as client:
+                            deadline = time.monotonic() + 10
+                            while True:
+                                try:
+                                    client.connect(ipc)
+                                    break
+                                except (FileNotFoundError, ConnectionRefusedError):
+                                    if player.poll() is not None:
+                                        return player.returncode or 1
+                                    if time.monotonic() >= deadline:
+                                        raise ValueError('mpv did not open its control socket within 10 seconds.')
+                                    time.sleep(0.05)
+                            client.sendall((json.dumps({'command': ['loadfile', str(media)]}) + '\n').encode())
+                            with client.makefile('r') as events:
+                                for line in events:
+                                    if json.loads(line).get('event') == 'file-loaded':
+                                        show(increment=True)
+                        return player.wait()
+                    finally:
+                        if player.poll() is None:
+                            player.terminate()
+                            try:
+                                player.wait(timeout=5)
+                            except subprocess.TimeoutExpired:
+                                player.kill()
+                                player.wait()
+    except KeyboardInterrupt:
+        return 130
+    except (OSError, ValueError, sqlite3.Error) as exc:
+        print(f'{error}{exc}', file=sys.stderr)
+        return 1
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())
