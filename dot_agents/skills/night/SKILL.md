@@ -26,14 +26,24 @@ In Codex, the task is whatever text follows `$night` in my message.
    commit (see "Push After Every Commit").
 4. Do not deploy, delete files, touch secrets or CI config, run `chezmoi apply`,
    or call paid APIs.
-5. Never stop to wait for me. When unsure, take the safest option, record the
-   choice in `NIGHT_NOTE.md`, and keep going. A blocker never ends the run
-   (see "When Blocked").
+5. Never stop to wait for me. When unsure, take the safest option and record
+   it under "Decisions I made for you" in `NIGHT_NOTE.md`, then keep going. A
+   blocker never ends the run (see "When Blocked").
 6. When done, run the relevant tests. If you cannot, write down why.
 7. Finish `NIGHT_NOTE.md` with: branch name, what you did, how you tested it,
-   what is still untested, and the questions for me in the morning, each with
-   2-3 options (A/B/C) and your recommendation. Put the questions in their own
-   section at the end so I can answer them quickly.
+   what is still untested, "Decisions I made for you", and the questions for
+   me in the morning, each with 2-3 options (A/B/C) and your recommendation.
+   Put the questions in their own section at the end so I can answer them
+   quickly.
+
+"How you tested" is a proof bar. It must be evidence observed in this
+session: command output, or a reproduce-fail-then-pass. Green mocked tests
+do not count as proof for UI or runtime behavior. If that proof is missing,
+say so explicitly under "what is still untested". Do not treat the task as
+proven.
+
+"Decisions I made for you" is its own section: one line per choice made
+without asking, so morning can scan it. Workarounds stay in their section.
 
 ## Before Stepping Away
 
@@ -54,6 +64,8 @@ everything it needs, so it does not depend on earlier messages:
   anything"
 - the files to read first: the task file, the plan, and `review-notes.md`
 - the commit rule and the push rule
+- the proof bar, the "Decisions I made for you" section, and the same-check
+  cap (3 failures, then BLOCKED, no further retries of that check)
 - the order of work, and the stop-at-first-failing-gate rule (a failing gate
   stops that stage, not the run: see "When Blocked")
 - every approval or change I gave in chat or relayed messages: remote
@@ -105,9 +117,16 @@ Rules:
 
 - Time-box: no blocker gets more than ~30 minutes or ~3 attempts of one
   approach before moving down the ladder.
+- Same check: if the same check fails 3 times, stop retrying it. Mark
+  BLOCKED in `NIGHT_NOTE.md` with which check and the last failure evidence.
+  Leave a morning question with 2-3 options and a recommendation. Do not
+  spin overnight on that failure. A renamed command or the same assertion
+  is still that check. After the cap, the ladder may switch approach;
+  it does not grant a fourth run of that check, and it does not end
+  unrelated work.
 - Count failures per approach, not per goal. The count resets when I change
   scope or the approach is swapped. Failures of dropped requirements do not
-  count.
+  count. Rewording a command does not reset the same-check cap.
 - Every commit leaves a working deliverable. Keep committing checkpoints
   locally even when pushing is blocked.
 - Append a short timestamped heartbeat line to `NIGHT_NOTE.md` at each stage
