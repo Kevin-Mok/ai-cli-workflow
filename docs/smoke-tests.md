@@ -382,13 +382,19 @@ listing is cached-only; opening a picker can generate recaps unless disabled.
   an older prerequisite change and a newer follow-up change.
   Expected: The proposed commits, optional manual commands, and commit
   message summary all list the older change before the newer follow-up.
-- Action: Run `commit-session` after it establishes a safe, non-empty scoped
-  set and a focused validation or rerun README gate reports a non-safety
-  failure.
-  Expected: The workflow records the failure as a warning, repairs any
-  truthful in-scope README finding, and stages only the verified scoped files;
-  unsafe or unattributed hunks and inseparable README repairs are reported
-  residuals while other eligible files still commit.
+- Action: Run `commit-session` in a disposable repository where its scope helper is
+  unavailable or reports `unsafe`, with directly observed task changes, one
+  unrelated dirty file, a failing non-safety check, and a configured upstream.
+  Expected: It falls back to observed edits and required companions, commits and
+  pushes every safe candidate despite the failed check, leaves unrelated or
+  unsafe work untouched, and reports the check failure and residual files.
+- Action: Run `commit-session` with a session change that requires a reviewed,
+  safe pre-existing catalog entry absent from HEAD; repeat with an unsafe
+  prerequisite and a useful factual handoff available, without `force`.
+  Expected: It includes the minimum reviewed prerequisites in the first run.
+  In the second, it leaves dependent implementation out, commits and pushes
+  independent safe work or the factual handoff, and reports the blocker.
+  Neither run asks for routine scope confirmation or includes unrelated work.
 - Action: Invoke `commit-session` in a disposable test repository after a
   directly observed edit, with missing `CODEX_THREAD_ID` or unavailable helper
   logs, a baseline-dirty touched file, unrelated staged work, and no upstream.

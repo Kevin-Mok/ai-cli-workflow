@@ -37,8 +37,7 @@ tests and documentation accompany the change they describe.
   once after the full series. Explicit planning-only requests perform no Git writes.
 - [`commit-dirty`](commit-dirty/SKILL.md): Verify and ship the authorized dirty
   worktree in a focused commit, reporting failed checks and unsafe residuals.
-- [`commit-session`](commit-session/SKILL.md): Ship only verified changes touched
-  during the current session, preserving unrelated work and staged changes.
+- [`commit-session`](commit-session/SKILL.md): Make a best-effort commit and upstream push of session changes and minimum reviewed prerequisites; use observed edits when metadata is missing, ship independent safe work when needed, and report blocked candidates.
 - [`readme-recruiter-sync`](readme-recruiter-sync/SKILL.md): Check README truth,
   onboarding, usage, stack rationale and recruiter value at the delivery gate,
   during README work, or when a documented public interface changes.

@@ -257,12 +257,13 @@ separately authorized install update if cached labels persist.
   when a file cannot be safely shipped. Invoking `$commit-plan-push` authorizes
   planning, committing, and pushing. Its explicit planning-only mode returns safe
   groups, checks and exclusions without staging, committing or pushing.
-- [`commit-session`](dot_agents/skills/commit-session/SKILL.md) ships
-  only the files owned by the current Codex session, with fallback logic
-  when a session missed its pre-write baseline; after safe scoping, it
-  records validation warnings and repairs truthful README-gate findings
-  before committing. Missing session metadata falls back to directly observed
-  writes; mixed files contribute their safely separable session hunks.
+- [`commit-session`](dot_agents/skills/commit-session/SKILL.md) makes a
+  best-effort commit and upstream push of session changes and their minimum
+  reviewed prerequisites. Missing scope metadata falls back to observed edits;
+  routine scope choices need no confirmation. It records non-safety validation
+  warnings, repairs truthful README findings, and ships independent safe work
+  or a useful factual handoff when implementation is blocked. Unrelated work,
+  secrets and failed mandatory privacy or hook checks remain excluded.
 
 This category matters because the repo stores reusable guardrails for
 commit hygiene, session scoping, safe exclusions, and shipping discipline,

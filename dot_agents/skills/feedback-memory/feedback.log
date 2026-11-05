@@ -18,3 +18,5 @@
 2026-11-01 - During PR reviews, always merge or rebase the latest remote main into the review branch before testing; verify the integrated result and repeat affected checks when either head changes. Persist this in canonical AGENTS instructions and the project AGENTS.repo.md.
 2026-11-01 - Always open link previews in Google Chrome, not Firefox; select Chrome explicitly instead of relying on the system default browser.
 2026-11-01 - fish-alias invocations authorize a focused commit and push of the shortcut plus required related documentation without separate confirmation; always push unless local-only delivery is explicitly requested.
+
+2026-11-05 - commit-session must always attempt a safe best-effort commit and push without a force modifier or routine scope confirmation; include reviewed required prerequisites, preserve unrelated work, and ship independent safe work or a factual handoff when implementation is blocked.

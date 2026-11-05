@@ -84,3 +84,51 @@ empty.
 - Deployment note: full refresh-config was deferred because it is unavailable in
   this non-interactive shell and its live-to-repo snapshot would overwrite the
   protected pre-existing dot_codex config edit. No live configuration was changed.
+
+## 2026-11-05 follow-up: always attempt safe delivery
+
+This follow-up supersedes the older unsafe/empty-scope hard-stop decisions above. Retain prior milestones as historical evidence.
+
+# Make commit-session always attempt safe delivery
+
+Update the canonical skill so ordinary invocation completes the safe commit/push path without another scope-confirmation round. Preserve unrelated work, privacy gates, hooks and truthful reporting. This plan follows `.agent/PLANS.md`.
+
+## Context and scope
+
+The existing skill already says best effort, but requires `force` for an empty/local-only fallback and excludes pre-existing prerequisites without a manual split. That let an agent stop a resume-default shipping request when the catalog existed only in the dirty tree. Change only the skill, its admission cost record, durable feedback, an engineering lesson, relevant README/smoke guidance and this plan. Preserve all initial dirty work, especially shared postmortem knowledge, fish functions and machine configuration. No helper or runtime code change is needed.
+
+## Decisions
+
+- Include the minimum reviewed prerequisites automatically, recording dependency evidence. Unrelated pre-existing changes remain excluded.
+- If a coherent implementation cannot ship safely, commit independent safe work or a useful factual handoff; never fabricate implementation completion.
+- Attempt the clear upstream push, including verified earlier session commits when there is no new commit. Mandatory privacy, hooks and permission failures remain blockers.
+- User correction explicitly authorizes this permanent workflow change. No new skill or trigger is introduced.
+
+## Progress
+
+- [x] Capture linux-config dirty baseline; read canonical source, feedback and instruction-edit guidance.
+- [x] RED evidence: the preceding actual commit-session invocation stopped for scope confirmation instead of shipping the eligible subset.
+- [x] Update skill and durable correction; refresh admission costs.
+- [x] Four pressure scenarios pass; 9 session tests, vetted sync (241 entries), trigger routing (46/51) and README gate pass. Admission rerun passes all 7 tests after removing the redundant added paragraph that exceeded 20,000B.
+- [x] `fish -c refresh-config` exited 0 with REFRESH COMPLETE; installed parity checked below.
+- [ ] Review exact candidate, privacy-check, commit and push focused linux-config work.
+
+## Verification and review
+
+Use read-only agent pressure scenarios for a mixed dirty prerequisite, empty/helper-unsafe fallback, and a privacy-blocked subset. The agent must select coherent reviewed prerequisites or independent deliverables and attempt the clear upstream push without asking routine scope questions. Run existing session-scope and skill-admission tests, vetted-skill sync, trigger routing, README gate, and trim benchmark. Refresh uses the existing managed configuration path; preserve local drift and other sessions' work.
+
+## Risks and recovery
+
+Required prerequisites must have concrete dependency evidence; this is not all-dirty shipping. No privacy or hook bypass is allowed. Restore only this task's edits if rollback is needed; do not reset the worktree. Existing session-scope code retains its conservative classification; the skill supplies the reviewed dependency fallback.
+
+## Outcomes
+
+Pending fresh verification and activation. Atomic plan: clarify delivery scope, verify agent decisions, activate and ship. Cursor prompt: Review this plan and the canonical commit-session SKILL.md, retain unrelated dirty files, verify prerequisite and privacy handling, then check installed parity. Suggested commit: `fix(commit-session): always attempt safe commit and push`.
+
+### Follow-up evidence and delivery status
+
+Four read-only agent pressure scenarios returned the expected safe-subset commit/push decisions without routine scope questions. This verifies instruction decisions, not a live end-to-end repository workflow. No helper/runtime logic changed. Existing scope/contract suite: 9 tests pass. Vetted catalog: 241 entries, zero missing/stale. Trigger gate: 46/51, unchanged. README gate: pass_no_change. Targeted postmortem registration: zero errors. Initial admission-size failure was this task's redundant added prose; removed it while keeping the refreshed existing PASS costs. Fresh reruns: 7 admission tests, 9 session tests and targeted postmortem registration all pass. Trim gate fails inherited canonical-instruction and total-loaded budgets; skill description and loaded delta remain zero, and no budget was relaxed. Refresh completed successfully; shared managed files retain its normal local-drift reconciliation. Prior unrelated fish, machine settings and postmortem edits stay excluded from this commit.
+
+Verified focused milestone prepared for commit: `fix(commit-session): always attempt safe commit and push`; stage only this task's reviewed paths/hunks, run exact-candidate privacy gate, commit, then push origin/main. Preserve every unrelated index/worktree change. Public skill catalog and root README now describe minimum reviewed prerequisites and independent safe delivery.
+
+Scope helper returned unsafe because nested tool writes were not recognized; direct-write evidence in this conversation establishes the reviewed skill/docs/feedback/plan changes. Mixed smoke and learning-ledger files contribute only this task's block/report. No raw session identifier is published.

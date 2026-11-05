@@ -285,3 +285,5 @@
 - 2026-10-29: i3blocks 1.4 rejects arbitrary environment keys in its config. Put calendar output defaults in the script, and finish the real scheduler test before live refresh; Unicode thin spaces still occupy full cells in Hack Mono. See [calendar parser incident](../docs/postmortem/2026-10-29-i3blocks-calendar-format.md).
 
 - 2026-11-03: For maim changes, exercise region selection through i3 with one selector at a time and compare saved PNG to clipboard. A direct window capture does not validate region rendering; avoid forcing `--noopengl` on picom without a measured need.
+
+- 2026-11-05: Validate a session commit against HEAD plus the proposed staged hunks: passing tests in a dirty working tree can hide an uncommitted prerequisite. Review the dependency closure before staging.

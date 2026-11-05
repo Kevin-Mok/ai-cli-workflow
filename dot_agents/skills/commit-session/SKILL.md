@@ -9,9 +9,10 @@ disable-model-invocation: true
 
 Commit and push the work attributable to the current Codex session. Establish
 that scope from the initial Git state and observed edits, review and check the
-eligible changes, then commit, push, and report what remains.
+eligible changes, then commit, push, and report what remains. Best effort is the
+default: complete the safe subset without another scope-confirmation round.
 
-Use this skill for explicit write requests that should ship only the files dirtied during the current Codex session. Treat the pre-write dirty baseline as the primary safety boundary, with an observed-touch fallback when session metadata or helper evidence is unavailable. Prioritize files touched during the current session and favor including safe related files over omitting them within session scope.
+Use this skill for explicit write requests that should ship only the files dirtied during the current Codex session. Treat the pre-write dirty baseline as the primary safety boundary, with an observed-touch fallback when session metadata or helper evidence is unavailable. Prioritize files touched during the current session and favor including safe related files over omitting them within session scope, including reviewed prerequisites required to make the session change work.
 
 ## Required Workflow
 
@@ -24,9 +25,10 @@ Use this skill for explicit write requests that should ship only the files dirti
    - Use `commitable` as the initial candidate set. If the helper fails, is unavailable, or returns `unsafe` or `empty`, record the reason and build a fallback from successful edits and writes directly observed in the active conversation.
    - Review dirty matching plans, docs, tests, and companion files against the baseline and observed writes; include all with current-session attribution. Do not infer ownership solely from timestamps.
    - Report no eligible changes only after both helper evidence and direct write evidence have been considered.
-   - Make a best-effort nonempty commit of safe session work. When the user says `force commit-session` and the work was local-only or the candidate set is empty, preserve the smallest useful task-related deliverable in the repository: a reusable nonprivate asset, reproducible instructions, or a factual update to the relevant task document. Review and validate it, then rerun scoping and include directly observed writes. Do not stop at "nothing to commit" while such a deliverable can safely be preserved.
+   - Always make a best-effort nonempty commit of safe session work; `force` is not required. If the work was local-only or no safe implementation subset can ship, preserve the smallest useful task-related deliverable in the repository: a reusable nonprivate asset, reproducible instructions, or a factual update to the relevant task document. Review and validate it, then rerun scoping and include directly observed writes. Do not stop at "nothing to commit" while such a deliverable can safely be preserved.
 5. Review diffs for the helper candidates and directly evidenced fallback files.
    - `commitable` can include directly observed edits, including files that were already dirty at the session baseline, and files that became dirty after the session baseline.
+   - Review required dependencies against HEAD, not just the dirty working tree. Include the minimum safe prerequisite hunks needed for a coherent commit, even when they predate the session; record their dependency and review evidence. This authorizes required task prerequisites, not unrelated earlier work. If a prerequisite cannot safely ship, leave the dependent implementation out and continue with independent eligible work or a factual status/handoff artifact. Resolve routine scope choices without asking the user.
    - For mixed files, include separable current-session hunks and leave unrelated hunks untouched. Exclude suspicious content while continuing with other eligible files. Directly touching a baseline-dirty file makes it a priority for review, not blanket authorization for unrelated hunks.
 6. Run the smallest relevant automated checks for the scoped change.
    - Record failed focused validation as a warning and continue to staging.
@@ -40,27 +42,27 @@ Use this skill for explicit write requests that should ship only the files dirti
 9. Write the commit message.
    - Use a concise Conventional Commit subject line.
    - Keep the body minimal, using only as many concrete bullets as needed.
-10. Create the commit. If it fails, repair a recoverable staging or command issue and retry the eligible subset. Report persistent failures; preserve uncommitted work and never bypass hooks.
+10. Create the commit. If it fails, repair a recoverable staging or command issue and retry the eligible subset. If a candidate cannot pass the required privacy gate or active hook, exclude that candidate and commit the remaining safe subset. Never bypass hooks. Report persistent repository-wide blockers only after attempting the safe subset.
 11. Push to the configured upstream.
-    - Attempt one upstream push after the local commit or complete commit series and best-effort checks, unless the user explicitly requests another cadence. Report failed checks and push failures accurately.
+    - Attempt one upstream push after the local commit or complete commit series and best-effort checks, unless the user explicitly requests another cadence. If no new commit can be created, still push any verified, already-created unpushed session commits to the clear upstream. Report failed checks and push failures accurately.
     - If no upstream exists or the push target is unclear, keep the local commit and report the missing target. Report push failures without undoing safe commits.
     - Do not amend, rebase, squash, or force-push unless the user explicitly asks.
 12. Report the result with the validation performed, commit SHA, push target, skipped files, and remaining worktree state.
 
 ## Guardrails
 
-- Treat `skipped_preexisting` and `skipped_unknown` as excluded by default; directly observed current-session edits or repairs can establish eligibility for their scoped hunks. Leave every unattributed hunk out.
+- Treat `skipped_preexisting` and `skipped_unknown` as excluded by default; directly observed current-session edits or repairs can establish eligibility for their scoped hunks. Include only attributed session hunks or reviewed required prerequisites; leave unrelated and unreviewed hunks out.
 - Never skip `readme-recruiter-sync` because the scoped diff looks small; repair its truthful findings before committing.
 - Never invent README claims, flags, install steps, or recruiter copy that the repo does not support.
 - Do not skip a safe scoped commit solely because best-effort validation fails.
 - Do not skip a safe scoped commit after all truthful README repairs have been made solely because the rerun gate still reports a non-safety failure.
 - Never leave a verified single-commit session workflow unpushed unless the user explicitly requests another cadence.
-- If the helper cannot find a pre-write `git status --short` baseline for the session, only directly observed touched files are eligible; leave every other dirty file out of scope instead of reconstructing ownership from timestamps or memory.
-- If a file was already dirty at the session baseline and the current session did not directly touch it, leave the file uncommitted unless the user explicitly asks for a manual split.
+- If the helper cannot find a pre-write `git status --short` baseline for the session, use directly observed touched files and reviewed required prerequisites; leave other dirty files out instead of reconstructing ownership from timestamps or memory.
+- If a file was already dirty at the session baseline and the current session did not directly touch it, leave it uncommitted unless reviewed prerequisite evidence establishes the minimum required hunks.
 - Review newly eligible generated or companion files before staging them; baseline-delta scoping is intentionally permissive, not blind.
 - Never bundle unrelated dirty changes just because they happen to be present in the same repository.
 - Never stage secrets, credentials, caches, build output, or machine-local files unless they clearly belong in version control.
-- `force` keeps session containment and privacy gates intact. It does not authorize unrelated changes, private settings, fabricated work, an empty commit, bypassed hooks, or force-push. If no meaningful safe artifact exists or a safety/permission blocker persists, report that exact blocker instead of claiming a commit.
+- `force` keeps session containment and privacy gates intact. It does not authorize unrelated changes, private settings, fabricated work, an empty commit, bypassed hooks, or force-push. Exclude blocked changes and continue with the safe subset. Stop only when no meaningful safe artifact or pushable session commit remains, or a mandatory privacy, hook or permission failure prevents delivery; report the exact blocker without claiming success.
 
 ## Scope Helper
 
