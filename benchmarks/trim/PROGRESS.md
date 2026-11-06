@@ -675,3 +675,7 @@ Behavior correction, not a token-saving pass. Description unchanged (245B); entr
 ## Fish file shortcut naming correction (2026-11-06)
 
 Preserve requested names through existing command storage; keep legacy file rows. Skill body 7101→7085 UTF-8 bytes (4 estimated on-demand tokens saved), description 132→132 bytes (0 recurring change). Weighted estimate 210.525→210.125 at unmeasured 10% loading. Defining literal-name regression observed RED; focused and routing/admission verification recorded in plans/fish-alias-requested-names.md. No measured billing or speed claim.
+
+## Explicit Neovim file shortcuts (2026-11-06)
+
+User-requested behavior: new file inputs and all generated key_files consumers select nvim explicitly, preserving shortcut names. Skill description132→132B (0 recurring-token delta); body7085→7102B (+17B/+4.25 estimated on-demand tokens). Weighted210.125→210.55 at unmeasured10% loading. Two defining REDs precede implementation; final checks and deployment evidence live in plans/fish-alias-requested-names.md. No measured savings claim.

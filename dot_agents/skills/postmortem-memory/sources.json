@@ -14123,6 +14123,15 @@
       "findings": [
         "local-shortcut-requested-name"
       ]
+    },
+    {
+      "sha256": "f0ce21e85738976732839779dd21d581788ad6340a8ca7c41e0c5e7aa8d0ab5a",
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-11-06-neovim-shortcut-inventory.md"
+      ],
+      "reviewed_on": "2026-11-06",
+      "findings": [],
+      "decision": "No new learning: existing calibration guidance covers unrelated installed-source drift; existing focused-staging policy covers concurrent feedback additions. Whole-host inventory remains unresolved; explicit owned-entry staging preserves concurrent work."
     }
   ],
   "review": {

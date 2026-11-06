@@ -160,3 +160,7 @@ Behavior correction, not a token-saving pass. Description unchanged (245B); entr
 | Estimated on-demand body tokens | 1775.25 | 1771.25 | -4 |
 
 Behavioral repair, not a measured cost optimization. Frozen trigger replay and implementation evidence: [plan](../../plans/fish-alias-requested-names.md).
+
+## Explicit Neovim file shortcuts (2026-11-06)
+
+User-requested behavior: new file inputs and all generated key_files consumers select nvim explicitly, preserving shortcut names. Skill description132→132B (0 recurring-token delta); body7085→7102B (+17B/+4.25 estimated on-demand tokens). Weighted210.125→210.55 at unmeasured10% loading. Two defining REDs precede implementation; final checks and deployment evidence live in plans/fish-alias-requested-names.md. No measured savings claim.

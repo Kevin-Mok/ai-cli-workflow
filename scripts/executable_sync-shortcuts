@@ -92,9 +92,9 @@ for key, path in rows(dirs):
     ranger.extend(f'map {prefix}{key} {command} {path}' for prefix, command in
                   [('f', 'cd'), ('t', 'tab_new'), ('m', 'shell mv -v %f'), ('Y', 'shell cp -rv %f')])
 for key, path in rows(files):
-    bash.append(f'n{key}={shlex.quote("$EDITOR " + path)} \\')
-    fish.append(f'abbr n{key} {fish_quote("$EDITOR " + path)}')
-    ranger.append(f'map n{key} shell $EDITOR {path}')
+    bash.append(f'n{key}={shlex.quote("nvim " + path)} \\')
+    fish.append(f'abbr n{key} {fish_quote("nvim " + path)}')
+    ranger.append(f'map n{key} shell nvim {path}')
 for key, value in rows(commands, sort=True):
     bash.append(f'{key}={value} \\')
     fish.append(f'abbr {key} {value}')

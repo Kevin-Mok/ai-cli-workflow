@@ -1485,7 +1485,7 @@ delivery was requested. Missing upstream or rejected pushes retain the local com
 and report the blocker. Repeating it must produce a no-op without an empty commit
 or publishing unrelated commits. Directory
 example: `$fish-alias pj ~/coding/my-project/`. File example:
-`$fish-alias re README.md` produces `re` as an editor command; existing legacy file rows still produce their `n`-prefixed names.
+`$fish-alias re README.md` produces `re` as a nvim command; legacy file rows also use nvim under their existing `n`-prefixed names.
 
 
 ## Full-system Backup And Guarded Recovery
@@ -1891,7 +1891,10 @@ Preserve local managed-file edits before applying repo changes.
 
 Inspect or expand the installed abbreviation without opening the notes file. No sudo is needed.
 
-- Action: After refresh, run `python3 scripts/executable_check-fish-abbr btw '$EDITOR ~/coding/btw.md'`.
+- Action: After refresh, run `python3 scripts/executable_check-fish-abbr btw 'nvim ~/coding/btw.md'`.
   Expected: PASS for installed syntax and exact interactive Space expansion; the command is cleared without launching the editor.
 - Action: In an existing fish shell, source `~/.config/fish/key_abbr.fish`, type `btw` and Space, inspect the expansion, then cancel with Ctrl+C.
-  Expected: `$EDITOR ~/coding/btw.md`; the requested name stays `btw`; legacy `nbtw` remains available.
+  Expected: `nvim ~/coding/btw.md`; the requested name stays `btw`; legacy `nbtw` also opens in nvim.
+
+- Action: After refreshing the generator, run the disposable `python3 scripts/executable_check-fish-abbr` trial and check `python3 scripts/executable_check-fish-abbr nbtw 'nvim ~/coding/btw.md'`.
+  Expected: Installed syntax and real interactive expansion pass without execution; the temporary trial is removed. File mappings use nvim even when EDITOR selects another editor.

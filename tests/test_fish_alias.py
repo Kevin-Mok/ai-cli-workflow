@@ -48,8 +48,27 @@ class FishAliasTests(unittest.TestCase):
             'source "$argv[1]"; abbr --show | string match -r "^abbr -a -- (?:btw|nre) .*"',
             str(catalog)], text=True, capture_output=True)
         self.assertEqual(readback.returncode, 0, readback.stderr)
-        self.assertIn("abbr -a -- btw '$EDITOR ~/coding/btw.md'", readback.stdout)
-        self.assertIn("abbr -a -- nre '$EDITOR README.md'", readback.stdout)
+        self.assertIn("abbr -a -- btw 'nvim ~/coding/btw.md'", readback.stdout)
+        self.assertIn("abbr -a -- nre 'nvim README.md'", readback.stdout)
+
+    def test_file_shortcuts_use_nvim_in_every_generated_consumer(self):
+        self.generate()
+        home = self.root / 'home'
+        env = {**os.environ, 'EDITOR': 'different-editor'}
+        fish = subprocess.run(['fish', '--no-config', '-c',
+            'source "$argv[1]"; abbr --show | string match "abbr -a -- nre *"',
+            str(home / '.config/fish/key_abbr.fish')],
+            env=env, text=True, capture_output=True)
+        self.assertEqual(fish.returncode, 0, fish.stderr)
+        self.assertEqual(shlex.split(fish.stdout)[-1], 'nvim README.md')
+        bash = subprocess.run(['bash', '--noprofile', '--norc', '-c',
+            'source "$1"; alias nre', '_', str(home / 'aliases/.key_aliases')],
+            env=env, text=True, capture_output=True)
+        self.assertEqual(bash.returncode, 0, bash.stderr)
+        self.assertEqual(bash.stdout.strip(), "alias nre='nvim README.md'")
+        mappings = (home / '.config/ranger/key_mappings.conf').read_text().splitlines()
+        self.assertIn(['map', 'nre', 'shell', 'nvim', 'README.md'],
+                      [shlex.split(line) for line in mappings])
 
     def test_command_section_and_complete_remainder(self):
         result = self.success('cbn codex-time burn day')
@@ -90,7 +109,7 @@ class FishAliasTests(unittest.TestCase):
             str(self.root / 'home/.config/fish/key_abbr.fish')],
             text=True, capture_output=True)
         self.assertEqual(readback.returncode, 0, readback.stderr)
-        self.assertEqual(shlex.split(readback.stdout)[-1], '$EDITOR ' + str(file).replace(' ', '\\ '))
+        self.assertEqual(shlex.split(readback.stdout)[-1], 'nvim ' + str(file).replace(' ', '\\ '))
 
     def test_example_home_directory_normalization(self):
         for target in ('/home/example', '/home/example/coding/project/',
@@ -113,7 +132,7 @@ class FishAliasTests(unittest.TestCase):
         command = 'echo /home/example/coding/project'
         self.assertEqual(self.success('zz ' + command, section='work')['target'], command)
         file = '/home/example/notes.md'
-        self.assertEqual(self.success('nt ' + file, kind='files')['target'], '$EDITOR ' + file)
+        self.assertEqual(self.success('nt ' + file, kind='files')['target'], 'nvim ' + file)
 
     def test_conflicts_and_exact_comment_preservation(self):
         self.path('commands').write_text(self.original['commands'] + '  cbn "old" # retain\n# cbn "older"\nuntouched "yes"\n')

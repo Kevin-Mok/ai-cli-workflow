@@ -23,3 +23,5 @@
 
 2026-11-06 - Default Lavish review artifacts to a clean GitHub-style dark theme: neutral charcoal backgrounds, light text, subtle gray borders, and blue links. Avoid beige/gold luxury palettes unless explicitly requested.
 2026-11-06 - When an external-model prompt (e.g. GPT or Grok) needs attachments, package the compiled prompt, required files, and upload instructions in a ZIP; provide its link and Git-ignore generated prompt ZIPs with a scoped rule.
+
+2026-11-06 - File shortcuts should open in nvim explicitly. For fish-alias file inputs, assume Neovim opening under the exact requested name; key_files-generated mappings also use nvim instead of EDITOR.

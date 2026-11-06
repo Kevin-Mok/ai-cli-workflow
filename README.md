@@ -1003,7 +1003,8 @@ this.
   changed mappings, then commits and pushes the focused change to the configured
   upstream without another confirmation (unless local-only delivery is requested).
   File requests keep the requested name (`btw ~/coding/btw.md` becomes `btw`)
-  through editor commands; existing file-catalog shortcuts retain their legacy
+  through explicit `nvim` commands; existing file-catalog shortcuts also use
+  `nvim` and retain their legacy
   `n` prefix. Activation follows current chezmoi conditions. The example is not installed automatically. See the
   [isolated checks](docs/smoke-tests.md#fish-alias-skill).
   From this checkout, `python3 scripts/executable_check-fish-abbr` runs a disposable

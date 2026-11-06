@@ -19,7 +19,7 @@ Canonical repository: `/home/example/linux-config`. Read its applicable instruct
 - Commands belong in `aliases/key_aliases.tmpl`.
 - Directory paths belong in `aliases/key_dirs.tmpl`.
   After identifying a directory, replace its leading `/home/example` (exact home or followed by `/`) with `~` before choosing its section and storing it. For example, `/home/example/coding/track-codex-sessions` becomes `~/coding/track-codex-sessions`. Unquote and escape spaces as needed so `~` expands in fish. Commands, file mappings, other users and embedded home strings keep their original text. Repeating the pasted absolute directory is a no-op once normalized.
-- File requests become `$EDITOR <escaped path>` commands in `aliases/key_aliases.tmpl`, using the exact requested name: `btw ~/coding/btw.md` produces **btw**. Existing `key_files.tmpl` rows retain their legacy `n` prefix; preserve them.
+- File paths mean opening in Neovim: store `nvim <escaped path>` commands in `aliases/key_aliases.tmpl`, using the exact requested name: `btw ~/coding/btw.md` produces **btw**. Existing `key_files.tmpl` rows retain their legacy `n` prefix; preserve them.
 
 Prefer actual path type; a trailing slash identifies a directory, a file suffix helps identify a nonexistent file. Commands with arguments remain commands even when an argument names a file. Inspect nearby related entries to select the closest existing section. Codex executables belong in **work**. The helper previews executable-family/path-prefix placement; override its `section` when source inspection supports a better existing section. For unresolved path type, ask then supply `kind` (`commands`, `dirs`, `files`).
 
