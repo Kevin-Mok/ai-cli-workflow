@@ -1405,6 +1405,12 @@ only a disposable temporary fixture and requires no sudo.
 
 ## Fish Alias Skill
 
+- Action: From the checkout, run `python3 scripts/executable_check-fish-abbr` after checker/generator changes or when diagnosing expansion.
+  Expected: installed fish syntax passes; a temporary abbreviation expands through real local interactive fish, is cleared without execution, then removed with absence verified. Nothing is saved. No periodic or shell-startup run is needed.
+
+- Action: After each changed abbreviation is refreshed, run `python3 scripts/executable_check-fish-abbr fm 'cd ~/coding/firstmate'` (replace name and exact expected expansion for the changed shortcut) before commit/push.
+  Expected: PASS only if installed syntax and local Space expansion match exactly. A missing abbreviation or wrong expansion fails, blocking delivery. Existing terminals still need a reload. `--plain` uses ASCII; `--details` includes syntax diagnostics.
+
 - Action: After refresh, run `fish --no-config -c 'source ~/.config/fish/key_abbr.fish; abbr --show | string match "abbr -a -- cc *"'`; in an existing Fish shell source that file, type `cc` then Space, inspect and cancel with Ctrl+C.
   Expected: `cc` expands to `cd ~/coding/chartclutch`; its previous Calcurse command remains commented. A repeated request is a no-op. Future changed fish-alias requests prepare required docs and README review before `rf`; after successful refresh, local interactive fish must expand the effective abbreviation plus Space to the intended command/path without executing it, and installed fish syntax must pass before scoped staging, commit and push in one delivery sequence, with the final handoff afterward. Preserve unrelated dirty work and report actual push status; no-ops create no empty commit.
 

@@ -14029,6 +14029,15 @@
       "reviewed_on": "2026-11-06",
       "findings": [],
       "decision": "No new learning: existing optional-path discovery guidance applies; corrected inventoried path was read successfully."
+    },
+    {
+      "sha256": "000db64c1ebadf405b7d27fc3972f79dde19410f4a8f25c16e05d9f69cacf8a9",
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-11-06-fish-alias-regression-identifier.md"
+      ],
+      "reviewed_on": "2026-11-06",
+      "findings": [],
+      "decision": "No new reusable guidance: invalid Python identifier is present in HEAD, outside this task; focused checker tests and actual local runs passed, while the broader suite remains explicitly unverified."
     }
   ],
   "review": {

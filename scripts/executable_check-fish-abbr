@@ -1,0 +1,99 @@
+#!/usr/bin/env python3
+"""Check installed fish abbreviations in a disposable interactive session; never execute them."""
+import argparse
+import os
+from pathlib import Path
+import pty
+import select
+import signal
+import subprocess
+import sys
+import tempfile
+import time
+
+
+def quote(value):
+    return "'" + str(value).replace('\\', '\\\\').replace("'", "\\'") + "'"
+
+
+def check(name, expected, plain=False):
+    catalog = Path.home() / '.config/fish/key_abbr.fish'
+    subprocess.run(['fish', '-n', str(catalog)], check=True, capture_output=True, text=True)
+    temporary = name is None
+    name = name or f'codex_abbr_trial_{os.getpid()}'
+    expected = 'cd /tmp' if temporary else expected
+    if any(c.isspace() or ord(c) < 32 or ord(c) == 127 for c in name):
+        raise ValueError('Abbreviation must be a single name without control characters.')
+    if any(ord(c) < 32 or ord(c) == 127 for c in expected):
+        raise ValueError('Expected expansion must be one line without control characters.')
+    with tempfile.TemporaryDirectory(prefix='fish-abbr-check-') as directory:
+        root = Path(directory)
+        capture, ready, removed = (root / part for part in ('capture', 'ready', 'removed'))
+        capture_action = f'commandline > {quote(capture)}; commandline ""'
+        cleanup_action = f'abbr --erase -- {quote(name)}; if not abbr --query -- {quote(name)}; echo removed > {quote(removed)}; end'
+        setup = f'source {quote(catalog)}; or exit 1; '
+        if temporary:
+            setup += f'abbr --add -- {quote(name)} {quote(expected)}; '
+        setup += f'bind \\cg {quote(capture_action)}; bind \\ch {quote(cleanup_action)}; touch {quote(ready)}'
+        pid, master = pty.fork()
+        if pid == 0:
+            os.execvpe('fish', ['fish', '--no-config', '--interactive', '--init-command', setup],
+                       {**os.environ, 'TERM': 'xterm'})
+        def wait_for(path):
+            start = time.monotonic()
+            next_progress = start + 1
+            while time.monotonic() - start < 5:
+                if path.exists():
+                    return path.read_text()
+                readable, _, _ = select.select([master], [], [], .02)
+                if readable:
+                    try:
+                        chunk = os.read(master, 4096)
+                    except OSError:
+                        break
+                    if not chunk:
+                        break
+                if time.monotonic() >= next_progress:
+                    print(('Waiting:' if plain else '⏳ Waiting:') + ' interactive fish check still running', file=sys.stderr)
+                    next_progress += 1
+            raise RuntimeError(f'Interactive fish did not complete {path.name}; check installed abbreviation configuration.')
+        try:
+            wait_for(ready)
+            os.write(master, name.encode() + b' \x07')
+            actual = wait_for(capture).rstrip('\n')
+            if actual != expected + ' ':
+                raise ValueError(f'{name}: expansion mismatch; expected {expected!r}, got {actual.rstrip()!r}. Refresh shortcuts and retry.')
+            if temporary:
+                os.write(master, b'\x08')
+                if wait_for(removed).strip() != 'removed':
+                    raise RuntimeError('Temporary abbreviation removal was not confirmed.')
+        finally:
+            os.kill(pid, signal.SIGKILL)
+            os.waitpid(pid, 0)
+            os.close(master)
+    return name, expected, temporary
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('name', nargs='?', help='installed abbreviation; omit for a temporary trial')
+    parser.add_argument('expected', nargs='?', help='exact expansion before the trailing Space')
+    parser.add_argument('--plain', action='store_true', help='ASCII output')
+    parser.add_argument('--details', action='store_true', help='include diagnostic exception details')
+    args = parser.parse_args()
+    if (args.name is None) != (args.expected is None):
+        parser.error('provide both NAME and EXPECTED, or neither for the temporary trial')
+    try:
+        name, expected, temporary = check(args.name, args.expected, args.plain)
+    except (OSError, ValueError, RuntimeError, subprocess.CalledProcessError) as error:
+        print(('FAIL:' if args.plain else '❌ FAIL:') + f' {error}', file=sys.stderr)
+        if args.details and isinstance(error, subprocess.CalledProcessError):
+            print(error.stderr, file=sys.stderr)
+        return 1
+    suffix = '; temporary abbreviation removed' if temporary else ''
+    print(('PASS:' if args.plain else '✅ PASS:') + f' {name} + Space -> {expected}; never executed{suffix}')
+    return 0
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())

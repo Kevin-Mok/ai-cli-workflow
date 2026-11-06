@@ -1005,6 +1005,13 @@ this.
   in fish (`re README.md` becomes `nre`); activation follows current chezmoi
   conditions. The example is not installed automatically. See the
   [isolated checks](docs/smoke-tests.md#fish-alias-skill).
+  From this checkout, `python3 scripts/executable_check-fish-abbr` runs a disposable
+  local expansion/removal trial; add `NAME 'EXPECTED'` to check an installed
+  abbreviation after its mapping is refreshed, before commit/push. The check
+  validates fish syntax and Space expansion without executing the mapped command.
+  Use `--plain` for ASCII output or `--details` for failure diagnostics. Run the
+  disposable trial after checker/generator changes or for diagnosis; no scheduled
+  or shell-startup run is needed.
 - [`dot_config/fish/config.fish.tmpl`](dot_config/fish/config.fish.tmpl)
   is the main interactive shell setup and loads the large helper surface
   under [`dot_config/fish/functions/`](dot_config/fish/functions/).
