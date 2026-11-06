@@ -25,3 +25,11 @@
 2026-11-06 - When an external-model prompt (e.g. GPT or Grok) needs attachments, package the compiled prompt, required files, and upload instructions in a ZIP; provide its link and Git-ignore generated prompt ZIPs with a scoped rule.
 
 2026-11-06 - File shortcuts should open in nvim explicitly. For fish-alias file inputs, assume Neovim opening under the exact requested name; key_files-generated mappings also use nvim instead of EDITOR.
+
+2026-11-06 - Lavish review pages should support questions and edit requests in the generating Codex conversation. Keep that conversation actively polling during review; do not present a page as connected when no listener or verified wake-up path exists.
+
+2026-11-06 - Before claiming a Lavish review is connected, run scripts/executable_lavish-connection-test from the Linux config checkout (or its absolute path) with the page URL and the generating conversation's actual CODEX_THREAD_ID as --expect-thread. Require a fresh delivered nonce reply and resumed live listener; do not treat an open page or owner label as proof.
+
+2026-11-06 - The bare Lavish connectivity smoke command should create a preset static mockup and its own Codex creator, discover that creator automatically, verify the connection, and keep it listening for review without asking for URLs/session IDs. Existing real editors still require their own creator handshake; one smoke page does not certify unrelated pages.
+
+2026-11-06 - The bare Lavish E2E smoke test should be fully automatic: create its own preset/creator, verify connection, submit and verify the edit, clean up and exit. No URL/ID entry, Send click or indefinite review wait; keep concise stage/elapsed progress. This applies to disposable smoke pages, not normal user reviews.

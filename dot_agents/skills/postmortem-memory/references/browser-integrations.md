@@ -199,3 +199,40 @@ Use these reviewed incidents to distinguish application state defects from provi
 - Verification:144 awaited commands/48 PNGs/354 illustrations/4empty scopes and independent7claim audit pass; Research/guard restored and console empty.
 - Limitations: controller concurrency remains; no initial PNG error is asserted (46identical/2different); representative sheets only were visually checked. No financial evaluation or edge claim.
 - Source: [2026-10-31-case-capture-command-order.md](/home/example/coding/jay-tradingview/docs/postmortem/2026-10-31-case-capture-command-order.md) (SHA-256 b869493de710833256b050eb760ecbb18042cd25e8e1ce2f73209cbcb239a2c1).
+
+## local-lavish-creator-foreground-listener
+
+Lavish 0.1.89 identifies sessions by artifact file, not originating Codex thread.
+Verify the actual creator from its transcript/event, and keep that conversation's
+foreground poll attached. Owner labels alone do not route messages. Respect
+Send & End; never silently take over or reopen a stopped review.
+
+Check live host /health and matching state identity: sandbox CLI inventory can
+fall back to stale state. Observe delivery/chat without opening a competing
+consuming poll. Allow queued feedback and the normal listener gap during agent
+processing; require resumed listener before declaring connection success.
+
+The reusable scripts/executable_lavish-connection-test has two modes:
+- Bare: create a disposable preset and normal configured Codex creator; capture
+  thread.started UUID, verify nonce, automatically SDK queue+send its isolated
+  edit, verify it, clean only owned page/process group and exit0.
+- Explicit URL/--expect-thread: nonce-only check of an existing page. It does not
+  edit, close or automatically reconnect an unrelated review.
+
+Require fresh unpredictable nonce and delivered receipt; never embed the expected
+ID in the challenge. Manual/edit result requires actual parsed h1, removed helper,
+delivered/done request, subsequent own CODEX_THREAD_ID field and resumed listener.
+Commented/script headings and unrelated ID mentions cannot pass. Read partial
+state JSON with bounded retries; installed store truncates on write. Deadlines
+reject late success; socket I/O can delay failure by up to5s.
+
+Only the user-authorized disposable smoke calls sendQueuedPrompts automatically.
+Normal review drafts still require user submission. The SDK queuePrompt prepares
+an unsent card, not composer text; no composer-prefill API exists. Do not weaken
+the artifact sandbox or acknowledge unrelated feedback merely to add chat notes.
+
+TEST COMPLETE must follow readable ended-page confirmation and owned group
+cleanup, including descendants and registration during shutdown. Process liveness,
+end-command exit0 or unknown state are insufficient. Real no-input SDK edit smoke
+and36 regressions passed; subsequent mechanical file splits are checked in the
+active plan. Source: docs/postmortem/2026-11-06-lavish-feedback-listener.md.

@@ -1898,3 +1898,53 @@ Inspect or expand the installed abbreviation without opening the notes file. No 
 
 - Action: After refreshing the generator, run the disposable `python3 scripts/executable_check-fish-abbr` trial and check `python3 scripts/executable_check-fish-abbr nbtw 'nvim ~/coding/btw.md'`.
   Expected: Installed syntax and real interactive expansion pass without execution; the temporary trial is removed. File mappings use nvim even when EDITOR selects another editor.
+
+## Lavish feedback to the generating conversation
+
+- Action: Run `scripts/executable_lavish-connection-test` without arguments and
+  do not enter IDs or click Send/End.
+  Expected: A normal configured Codex creator opens its preset dark page in
+  Chrome, answers a fresh nonce, receives the automatic edit through Lavish SDK
+  queue+send, changes the heading to Connection verified and confirms its own
+  session ID in chat. Terminal/chat show the expected result; EDIT TEST PASS and
+  TEST COMPLETE occur only after actual page, receipt, reply and resumed-listener
+  checks. Owned page/processes close and the command returns exit status 0.
+  Unrelated editors remain untouched; progress shows stages/elapsed time.
+- Action: Repeat with --plain, and exercise a fake/failed creator or nonresponding
+  edit in the focused regression suite. Ctrl-C may cancel a real run early.
+  Expected: ASCII output in plain mode; startup, nonce and edit phases are bounded.
+  Missing/wrong replies, missing edits or non-resumed listener fail with a clear
+  nonzero result and clean up only owned resources. No indefinite manual wait.
+
+- Action: From the host where Lavish runs, execute the reusable
+  `scripts/executable_lavish-connection-test` with the page URL and
+  `--expect-thread` set to the generating conversation's `CODEX_THREAD_ID`.
+  Expected: One labeled nonce challenge is added to the chat. The actual listening
+  agent reads its own session ID and returns the exact acknowledgement. The
+  checker exits 0 only after the challenge is delivered and the fresh reply
+  matches the expected session; it never opens a competing poll.
+- Action: Repeat while no listener is active, or supply a different expected
+  conversation ID. Use `--timeout` to bound a nonresponding listener and `--plain`
+  when ASCII output is needed.
+  Expected: Disconnected sessions fail before submitting a challenge. A different
+  agent, stale reply, undelivered message, ended session, unreachable server,
+  malformed state, or missing timely reply cannot produce a pass. The checker
+  prints ongoing elapsed progress while waiting. A timed-out challenge may still
+  be delivered later; the checker does not delete feedback or stop the listener.
+
+- Action: In the Codex conversation that created a Lavish artifact, run its
+  foreground `lavish-axi poll` with an identifying `--owner` label. In the open
+  review page, send a short question using **Send to Agent**.
+  Expected: The no-listener warning clears while the poll is active; the exact
+  question returns to that generating conversation, which answers via
+  `lavish-axi poll --agent-reply` and resumes listening. A listener label alone
+  does not route messages to a Codex thread.
+- Action: Send an edit request, inspect the refreshed artifact, then choose
+  **Send & End** when finished.
+  Expected: The requested edit appears, the agent posts its reply, final feedback
+  arrives once, and the session ends without being reopened automatically.
+- Action: End the generating Codex turn or stop its foreground poll, then inspect
+  the page.
+  Expected: The page reports that no agent is listening. Resume polling in the
+  original conversation before expecting replies; the installed CLI does not
+  automatically resume a saved Codex conversation.

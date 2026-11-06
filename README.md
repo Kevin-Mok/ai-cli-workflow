@@ -883,6 +883,27 @@ files may stay the same size or shrink, and reviewed exact-path legacy ceilings
 are explicit. Tests use disposable repositories. Hook installation is an
 explicit local action; it preserves existing privacy-hook enforcement.
 
+The [Lavish connection test](scripts/executable_lavish-connection-test) runs a
+complete disposable review with one command and no input. It creates a preset
+dark page in a normal configured Codex session, discovers the actual creator,
+verifies its connection, sends the edit request through Lavish's browser SDK,
+and checks the heading, creator reply and resumed listener. Expected results
+appear in both terminal and chat. Only then does **TEST COMPLETE** close its
+owned test page/creator and return exit status 0; no Send or End click is needed.
+Other editors are untouched. Ctrl-C cancels early.
+
+Run it on the Lavish host with Python 3, Codex login, Google Chrome and the
+separately installed `lavish-axi` CLI. It uses the configured model and normal
+approval review, spending one small agent session. It does not install tools.
+Progress shows stages and elapsed time rather than an indefinite idle heartbeat.
+Startup is bounded to two minutes; `--timeout` bounds each acknowledgement/edit
+phase separately (default 60 seconds, plus up to 5 seconds for in-flight I/O).
+
+To verify an existing page without editing it, supply its URL and actual creator
+`CODEX_THREAD_ID` as `--expect-thread`. That mode submits only a labeled nonce
+and observes delivery/reply state without opening a competing feedback poll.
+Neither mode certifies unrelated editors or automatically reconnects them.
+
 These are the core entrypoints the README depends on. The flags and
 options listed below are verified against local CLI help or script
 source in this repo.
@@ -893,6 +914,7 @@ source in this repo.
 | `chezmoi -S "$PWD" apply -n -v` | Dry-run an apply with extra detail before touching files in `$HOME`. | `-S` / `--source` uses this repo as the source state. `-n` / `--dry-run` previews changes without writing them. `-v` / `--verbose` prints more detail. |
 | `chezmoi -S "$PWD" apply` | Apply the tracked source state from this clone into `$HOME`. | `-S` / `--source` uses this repo as the source state. `-P` / `--parent-dirs` is useful when you apply a nested target and also want its parent directories handled. |
 | [`codex-search`](docs/codex-session-search.md) | Search decoded local Codex conversations across directories, print snippets and resume commands, or select a session to resume. Installed from `scripts/executable_codex-search`; fish abbreviations `csg` (search) and `crg` (recent picker). | `--recent` lists newest 20 sessions without a pattern or model calls; `--recent --pick` opens available metadata before full archive indexing, then adds usable sessions in the background and ranks them by AI priority. Pending dialogue stays unknown/stale and defers recap generation; Ctrl-G remembers a request until ready. Malformed archive records do not flood the picker; `--details` exposes diagnostics. Guardian/session changes refresh automatically. `--sort priority\|recent` selects the order; picking defaults to priority, listing to recent. Priority is urgent/actionable/unknown/waiting/complete with activity ties; the preview explains its reason and freshness. `--summary-count N` sets the automatic newest-session window (default 20, 0 disables it); Ctrl-G requests a selected recap. `--summary-model MODEL` overrides the configured model; `--no-summaries` prohibits all generation. `-i` ignores case; `-F` uses literal text; `--all-text` adds tool calls/output; `--pick` uses optional fzf and browses all matches. Terminal output defaults to 20 compact results; `--details` shows full blocks; `--limit N` caps printing (0 means all). Pipes default to all full blocks without ANSI; `NO_COLOR` disables terminal color; `--plain` also uses ASCII printed decoration and ASCII borders in the recent picker. `--rebuild-index` reparses sources; `--clear-cache` deletes this Codex home's private index. `CODEX_HOME` selects sessions, `XDG_CACHE_HOME` selects cache storage; `--help`, `-h` or no arguments show usage and examples. Requires Python 3.11+ and rg for pattern search, fzf (tested 0.44.1) for recent picking, and compatible Codex with login for recaps; no sudo to run. |
+| [`python3 scripts/executable_lavish-connection-test`](scripts/executable_lavish-connection-test) | Verify a local Lavish page reaches its generating agent before presenting it as connected. | With no URL or expected ID, creates a preset static mockup and its own creator agent, then verifies the discovered session. Automatically sends and verifies the isolated test edit, closes its owned resources, and exits; no clicks required. Explicit `URL` and `--expect-thread` check an existing page; the expected ID is never guessed. `--timeout` sets each acknowledgement/edit deadline (default 60 seconds; an in-flight network read may add up to 5 seconds before failure); `--plain` uses ASCII output. Requires an active foreground listener and live localhost access. The test observes delivery/reply state without polling or consuming existing feedback. |
 | `refresh-config` | Apply reviewed chezmoi files and reload shortcuts. | No flags; `CLI_PLAIN=1` provides ASCII decoration. Excludes scripts, externals, and removals; reports elapsed progress, imports modified managed files before apply, and retries local drift. Persistent template conflicts and other errors stop with diagnostics. Diagnostics remain in a private temporary log. |
 | [`./scripts/executable_fix-vps-codex.sh`](docs/fix-vps-codex.md) | Run locally to repair Codex npm permissions on a VPS using SSH keys, without sudo. Reuses compatible Node/npm and verifies a normal update through a second SSH session. | Defaults to `example-user@192.0.2.10`; `--host`, `--port`, and `--identity` override the connection. `--dry-run` reads diagnostics without repair writes or npm execution; `--help` shows prerequisites. Requires remote Linux, Python 3.8+, bash or fish, and an already trusted host key. |
 | `sync-superpowers-release` | Report the retired Superpowers integration; existing upstream files stay untouched. | `--dry-run` and normal invocation are compatibility no-ops. `--help` explains the retirement. |

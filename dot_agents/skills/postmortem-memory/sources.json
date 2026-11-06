@@ -7076,6 +7076,28 @@
       "sources": [
         "2b844e28ffdfd8c0263588a65f61c4b160005e3e3f6daedd05086b64ba36e04f"
       ]
+    },
+    {
+      "id": "local-lavish-creator-foreground-listener",
+      "reference": "references/browser-integrations.md#local-lavish-creator-foreground-listener",
+      "status": "verified_workaround",
+      "symptoms": [
+        "Lavish Conversation says Your agent is not listening after generating Codex turn ends.",
+        "Sandbox inventory shows no listener despite host-level listener registration."
+      ],
+      "applicability": "Lavish CLI 0.1.89 review pages and Codex foreground polling.",
+      "diagnostics": [
+        "Confirm creator from artifact-writing transcript; file-based session metadata has no creator-thread route.",
+        "Verify live host inventory when sandbox localhost access is restricted; owner is only a listener label."
+      ],
+      "confidence": "confirmed",
+      "remedy": "Resume the verified generating Codex thread using native follow-up and attach foreground lavish-axi poll there; re-poll with agent reply after handling each message, respecting Send & End.",
+      "verification": "Native creator resumption accepted; creator started foreground poll; independent approved host inventory showed open session 9d81ca97d78a457f, pending_prompts=0, listener=job-search-creator. Independent host session-state read confirms real user question delivered at 20:50:13Z, accepted creator reply at 20:50:30Z, pending_prompts=0; creator resumed foreground polling. Reusable CLI passed a fresh host nonce test in about 18s, with actual own-session ID and resumed listener; 20 regression fixtures passed. Bare executable guided prompts, EOF/blank safety and explicit arguments now pass24 regression tests; actual fish PTY showed both prompts. Bare mode real configured creator/page completed its own nonce in about41s and cleanup preserved the original listener; final fixture coverage includes preset and owned-process safeguards. Fully automatic owned smoke completed with2 messages and exit0; independent36 tests passed, unknown cleanup guarded.",
+      "verification_scope": "runtime",
+      "limitations": "Listener exists only while foreground poll remains active; installed CLI has no persistent originating-thread wake route. Sandbox inventory may be stale.",
+      "sources": [
+        "5c831728a8faf25c7f64db17df48629b529382f56a2afec86422957df48f95a8"
+      ]
     }
   ],
   "reports": [
@@ -14132,6 +14154,17 @@
       "reviewed_on": "2026-11-06",
       "findings": [],
       "decision": "No new learning: existing calibration guidance covers unrelated installed-source drift; existing focused-staging policy covers concurrent feedback additions. Whole-host inventory remains unresolved; explicit owned-entry staging preserves concurrent work."
+    },
+    {
+      "sha256": "5c831728a8faf25c7f64db17df48629b529382f56a2afec86422957df48f95a8",
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-11-06-lavish-feedback-listener.md"
+      ],
+      "reviewed_on": "2026-11-06",
+      "findings": [
+        "local-lavish-creator-foreground-listener"
+      ],
+      "decision": "Fully automatic owned smoke verified with normal model/config: nonce plus SDK edit, actual result/creator/listener checks, confirmed cleanup and exit0. Independent36 regressions clean; unknown cleanup cannot pass. Explicit existing-page mode remains nonce-only."
     }
   ],
   "review": {

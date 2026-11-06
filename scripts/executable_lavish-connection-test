@@ -1,0 +1,261 @@
+#!/usr/bin/env python3
+"""Prove that a live Lavish page reaches the expected Codex conversation."""
+import argparse
+import hashlib
+from http.client import HTTPException
+import json
+import math
+import os
+import queue
+import shutil
+import signal
+import subprocess
+import tempfile
+import threading
+from pathlib import Path
+import sys
+import time
+from urllib.parse import urlsplit
+from urllib.request import ProxyHandler, build_opener
+from uuid import UUID
+
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from lavish_connection import (
+    ManualHeading, NoRedirect, manual_edit_complete, response_json, run, session_url,
+)
+
+
+class Parser(argparse.ArgumentParser):
+    def error(self, message):
+        self.exit(2, f"{'Error:' if '--plain' in sys.argv else '❌ Error:'} {message}\n")
+
+
+def smoke(args):
+    """Create, connect, edit and clean up one isolated page without user input."""
+    if not math.isfinite(args.timeout) or args.timeout <= 0:
+        raise ValueError('Timeout must be a positive finite number of seconds.')
+    codex = shutil.which('codex')
+    lavish = shutil.which('lavish-axi')
+    if not codex or not lavish:
+        raise ValueError('Install Codex and lavish-axi and make both available on PATH.')
+    root = Path(tempfile.mkdtemp(prefix='lavish-connection-'))
+    artifact = root / 'index.html'
+    shutil.copyfile(Path(__file__).with_name('lavish-test-page.html'), root / 'preset.html')
+    logfile = root / 'creator.jsonl'
+    statefile = Path(os.environ.get('LAVISH_AXI_STATE_DIR', Path.home() / '.lavish-axi')) / 'state.json'
+    statefile = statefile.resolve()
+    state_id = hashlib.sha256(str(statefile).encode()).hexdigest()[:16]
+    environment = dict(os.environ)
+    environment.pop('CODEX_THREAD_ID', None)
+    prompt = (
+        'Create this isolated Lavish connection-test page. Work only in this directory. '
+        'Copy preset.html byte-for-byte to index.html, then register it with lavish-axi index.html --no-open. '
+        'Explicitly open the returned session URL with google-chrome; never use the default browser. '
+        'Do not redesign the preset, inspect other projects, change global settings, or override the model. '
+        'Run lavish-axi poll index.html --owner connection-smoke in the foreground in a separate tool call. '
+        'Keep the poll attached to your active turn; never detach it or final-answer while review is open. '
+        'When a connection-test challenge arrives, read your own CODEX_THREAD_ID from the environment '
+        'and include the requested exact ACK line in your Lavish reply, with any greeting on a separate line. '
+        'Reply using lavish-axi poll --agent-reply, then continue waiting. '
+        'Answer subsequent user questions and make requested edits only to this test page. '
+        'Use ordinary scoped approval review if host localhost access needs permission. '
+        'Respect Send & End; after final feedback, stop polling and finish. '
+        'If the browser disconnects, report that and stop; never reopen it automatically.'
+    )
+    events = queue.SimpleQueue()
+    process = subprocess.Popen(
+        [codex, 'exec', '--json', '--approve-for-me', '--skip-git-repo-check', '--cd', str(root), prompt],
+        env=environment, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True,
+        start_new_session=True,
+    )
+
+    def collect():
+        with logfile.open('w') as output:
+            for line in process.stdout:
+                output.write(line)
+                output.flush()
+                try:
+                    event = json.loads(line)
+                    if isinstance(event, dict) and event.get('type') == 'thread.started':
+                        events.put(str(UUID(event['thread_id'])))
+                except (ValueError, KeyError, TypeError):
+                    pass
+
+    collector = threading.Thread(target=collect, daemon=True)
+    collector.start()
+    started = time.monotonic()
+    deadline = started + 120
+    next_progress = started + 5
+    thread_id = None
+    url = None
+
+    def say(message, icon='🔌'):
+        print(f'{"" if args.plain else icon + " "}{message}', flush=True)
+
+    def owned_session(attempts=1):
+        for attempt in range(attempts):
+            try:
+                sessions = json.loads(statefile.read_text())['sessions'].values()
+                session = next((entry for entry in sessions if isinstance(entry, dict)
+                                and entry.get('file') == str(artifact)), None)
+                if session:
+                    return session
+            except (OSError, ValueError, KeyError, TypeError, AttributeError):
+                pass
+            if attempt + 1 < attempts:
+                time.sleep(.05)
+        return None
+
+    def close_owned_page():
+        session = owned_session(3)
+        if not session:
+            return False
+        if session.get('status') != 'ended':
+            try:
+                subprocess.run([lavish, 'end', str(artifact)], stdout=subprocess.DEVNULL,
+                               stderr=subprocess.DEVNULL, timeout=10, check=True)
+            except (OSError, subprocess.SubprocessError):
+                print(f'{"Warning:" if args.plain else "⚠️ Warning:"} Could not close the owned test page: {artifact}', file=sys.stderr)
+                return False
+            session = owned_session(3)
+        return bool(session and session.get('status') == 'ended')
+
+    say('1/4 Create the isolated page and its Codex creator...')
+    try:
+        while True:
+            try:
+                thread_id = events.get_nowait()
+            except queue.Empty:
+                pass
+            session = owned_session()
+            if process.poll() is not None:
+                raise ValueError(f'The test creator stopped before connecting. Private diagnostics: {logfile}')
+            if time.monotonic() >= deadline:
+                raise ValueError(f'The test creator did not connect within 120s. Private diagnostics: {logfile}')
+            if session and thread_id:
+                stored = urlsplit(session.get('url', ''))
+                port = stored.port or (443 if stored.scheme == 'https' else 80)
+                origin = f'http://127.0.0.1:{port}'
+                try:
+                    opener = build_opener(ProxyHandler({}), NoRedirect())
+                    with opener.open(origin + '/health', timeout=2) as response:
+                        health = response_json(response, deadline)
+                    if (isinstance(health, dict) and health.get('ok') is True and health.get('app') == 'lavish-axi'
+                            and health.get('state_id') == state_id
+                            and any(isinstance(item, dict) and item.get('key') == session.get('key')
+                                    for item in health.get('listeners', []))):
+                        url = origin + '/session/' + session['key']
+                        break
+                except (OSError, ValueError, TypeError, HTTPException):
+                    pass
+            now = time.monotonic()
+            if now >= next_progress:
+                say(f'Starting the test creator and page ({now-started:.0f}s elapsed)...')
+                next_progress = now + 5
+            time.sleep(.2)
+        say(f'Creating Codex session: {thread_id}')
+        say(f'Test page: {url}')
+        preset = (root / 'preset.html').read_bytes()
+        if artifact.read_bytes() != preset:
+            raise ValueError('The creating agent changed the static preset; no connection probe was sent.')
+        actual, nonce = run(argparse.Namespace(url=url, expect_thread=thread_id, timeout=args.timeout, plain=args.plain, manual_test=True), report=False)
+        if artifact.read_bytes() != preset:
+            raise ValueError('The creating agent changed the static preset during the probe.')
+        say(f'PASS: connected to Codex {actual}; nonce {nonce}.', '✅')
+        helper = Path(__file__).with_name('lavish-manual-test.js').read_text()
+        artifact.write_text(artifact.read_text().replace(
+            '</main>', '<script id="manual-test-prefill">' + helper + '</script></main>', 1))
+        say('3/4 Automatically send the edit through the Lavish Conversation queue...', '📝')
+        say(f'Expected result: heading "Connection verified"; chat reply confirms that heading and creator session {actual}.', '🎯')
+        edit_started = time.monotonic()
+        edit_deadline = edit_started + args.timeout
+        next_progress = edit_started + 5
+        while True:
+            if time.monotonic() >= edit_deadline:
+                raise ValueError('Timed out waiting for the automatic edit and creator confirmation; closing the owned test session.')
+            session = owned_session()
+            if session and session.get('status') == 'ended':
+                raise ValueError('The owned test session ended before the automatic edit was verified.')
+            if process.poll() is not None:
+                raise ValueError(f'The test creator stopped before the review ended. Private diagnostics: {logfile}')
+            if session and manual_edit_complete(session, artifact, actual):
+                try:
+                    with opener.open(origin + '/health', timeout=min(2, edit_deadline - time.monotonic())) as response:
+                        health = response_json(response, edit_deadline)
+                    listening = (isinstance(health, dict) and health.get('app') == 'lavish-axi'
+                                 and health.get('state_id') == state_id
+                                 and isinstance(health.get('listeners'), list)
+                                 and any(isinstance(item, dict) and item.get('key') == session['key']
+                                         for item in health['listeners']))
+                except (OSError, ValueError, TypeError, HTTPException):
+                    listening = False
+                if listening and time.monotonic() < edit_deadline:
+                    say(f'EDIT TEST PASS: heading "Connection verified"; creator {actual} confirmed the edit and resumed listening.', '✅')
+                    say('4/4 Close the owned page and stop its creator...')
+                    break
+            if time.monotonic() >= next_progress:
+                say(f'Waiting for the automatic edit and creator confirmation ({time.monotonic()-edit_started:.0f}s elapsed)...', '⏳')
+                next_progress = time.monotonic() + 5
+            time.sleep(min(.2, max(0, edit_deadline - time.monotonic())))
+    finally:
+        close_owned_page()
+        try:
+            os.killpg(process.pid, signal.SIGTERM)
+        except ProcessLookupError:
+            pass
+        stop_deadline = time.monotonic() + 2
+        while time.monotonic() < stop_deadline:
+            process.poll()
+            try:
+                os.killpg(process.pid, 0)
+            except ProcessLookupError:
+                break
+            time.sleep(.05)
+        else:
+            try:
+                os.killpg(process.pid, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
+        process.wait(timeout=5)
+        closed = close_owned_page()
+        collector.join(timeout=1)
+    if not closed:
+        raise ValueError('The edit passed but the owned page could not be closed.')
+    say('TEST COMPLETE: connection and edit passed; owned test session closed.', '🏁')
+
+
+def main():
+    parser = Parser(description='With no arguments, create a preset page and Codex creator, verify connection and an automatic edit, then clean up and exit. Supply a URL and expected session to check an existing page without editing it.')
+    parser.add_argument('url', nargs='?', help='Existing local Lavish URL; omit both identity values to run the self-contained smoke test')
+    parser.add_argument('--expect-thread', help='Expected generating Codex session UUID; prompts when omitted')
+    parser.add_argument('--timeout', type=float, default=60, help='Deadline in seconds for each connection/edit phase; creator startup allows 120s, in-flight I/O may add up to 5s (default: 60)')
+    parser.add_argument('--plain', action='store_true', help='Use ASCII output without emoji')
+    args = parser.parse_args()
+    try:
+        if args.url is None and args.expect_thread is None:
+            smoke(args)
+            return 0
+        if args.url is None:
+            args.url = input(f"{'' if args.plain else '🔗 '}Lavish session URL: ").strip()
+        if not args.url:
+            raise ValueError('Enter a Lavish session URL.')
+        if args.expect_thread is None:
+            args.expect_thread = input(f"{'' if args.plain else '🧭 '}Expected Codex session ID: ").strip()
+        if not args.expect_thread:
+            raise ValueError('Enter the expected Codex session ID.')
+        run(args)
+    except EOFError:
+        print(f"{'Error:' if args.plain else '❌ Error:'} Input ended. Supply the URL and --expect-thread, or run in a terminal to answer the prompts.", file=sys.stderr)
+        return 1
+    except (ValueError, OSError) as error:
+        print(f"{'Error:' if args.plain else '❌ Error:'} {error}", file=sys.stderr)
+        return 1
+    except KeyboardInterrupt:
+        print(f"{'' if args.plain else '⚠️ '}Cancelled; a submitted test message may remain queued.", file=sys.stderr)
+        return 130
+    return 0
+
+
+if __name__ == '__main__':
+    sys.exit(main())
