@@ -14,7 +14,7 @@ Edit the existing fish-alias delivery section, its admission costs and the exist
 - [x] Replace delivery paragraph and update existing smoke expectation.
 - [x] GREEN: independent pressure review; admission tests, catalog check and README gate.
 - [x] Prepare all delivery records, refresh and verify installed skill.
-- [ ] Commit and push this verified milestone.
+- [x] Commit and push this verified milestone: 8b8ecd1 pushed to origin/main.
 
 ## Verification and review
 
@@ -29,3 +29,17 @@ Observed pre-refresh checks: admission suite 7 passed (exit 0); catalog 241 entr
 Delivery milestone: docs(fish-alias): commit and push immediately after refresh. Refresh and installed-section comparison gate the commit; push targets origin/main immediately after commit, preserving unrelated work. No optional work follows refresh.
 
 Refresh exited 0 and installed delivery section matches canonical source. Focused commit and origin/main push follow immediately; results reported in the final handoff.
+
+## Follow-up: require local expansion before delivery
+
+- [x] RED review: previous wording required registration/syntax but did not require interactive expansion on this PC.
+- [x] Admission PASS: same shortcut scope and precedents; updated body costs before edit; description unchanged.
+- [x] Require fresh interactive local fish, installed abbreviations, Space expansion capture and cancellation without execution; retain fish -n and immediate delivery. Existing PTY regression supplies the pattern.
+- [x] Admission/catalog checks, local fm expansion, refresh, installed skill comparison and repeated local expansion all passed.
+- [ ] Commit and push follow-up milestone.
+
+Manual equivalent: source the installed abbreviation file in local fish, type fm plus Space, inspect cd ~/coding/firstmate and cancel without Enter. No supplied command executes. Scope adds no runtime helper or dependency; preserve unrelated smoke edits.
+
+Observed follow-up evidence before refresh: local installed fm PTY expansion exactly cd ~/coding/firstmate plus trailing Space, cleared without execution; target directory exists; fish -n exit 0. Admission suite 7 passed; inventory 241 entries with 0 missing/stale; README pass_no_change. Updated description/body costs: 132/7041 B, 33/1760.25 estimated tokens, weighted 209.025, score 3.827293. Required final activation check is rerun after refresh before commit/push.
+
+Final pre-commit activation: refresh exit 0; repeated local interactive fm Space expansion passed without execution; installed fish syntax passed; installed delivery section matches canonical source. Delivery subject: docs(fish-alias): verify local expansion before delivery. Push configured origin/main immediately after commit.
