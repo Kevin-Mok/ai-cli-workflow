@@ -1802,7 +1802,12 @@ restore the original DND state afterward. No sudo is needed.
   a question that normally speaks. Run `~/scripts/codex-notification-sound preview --speech-only --title "DND preview"` deliberately while paused.
   Expected: Automatic intro/TTS stays silent; the explicit preview speaks.
   A phrase already playing when paused may finish, but later stages stay silent.
-- Action: Left-click `DND`, then trigger a new normal Codex completion/question.
+- Action: Middle-click the notification block from both Notis and DND, then
+  trigger normal Codex/Grok/Discord notifications. Wait for another bar refresh.
+  Expected: The block shows `🔇Silent`; popups display but automatic clips and
+  speech stay silent. Explicit previews still play. The mode survives refreshes
+  without changing clip, speech or volume settings.
+- Action: Left-click `DND` or `Silent`, then trigger a new normal Codex completion/question.
   Expected: New automatic audio plays normally. Suppressed hook events do not
   replay; Dunst's queued popups retain their existing resume behavior.
 

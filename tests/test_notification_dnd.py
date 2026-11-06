@@ -73,6 +73,31 @@ pathlib.Path(sys.argv[sys.argv.index('--output_file')+1]).write_bytes(b'wave')
         self.event()
         self.assertEqual(self.log.read_text().splitlines(), ['.mp3', '.wav'])
 
+    def test_visual_only_mode_suppresses_audio_and_restore_plays(self):
+        self.pause.write_text('false')
+        mute = self.helper.setting_path().with_name('audio-muted')
+        mute.touch()
+        self.event()
+        self.assertFalse(self.log.exists(), 'Visual-only mode must suppress clip and TTS')
+        self.assertEqual(self.helper.play('Discord message', speech_only=True), 0)
+        self.assertFalse(self.log.exists())
+        mute.unlink()
+        self.event()
+        self.assertEqual(self.log.read_text().splitlines(), ['.mp3', '.wav'])
+
+    def test_mute_while_waiting_discards_audio(self):
+        self.pause.write_text('false')
+        mute = self.helper.setting_path().with_name('audio-muted')
+        with patch.object(self.helper.fcntl, 'flock', side_effect=lambda *args: mute.touch()):
+            self.event()
+        self.assertFalse(self.log.exists())
+
+    def test_explicit_preview_bypasses_visual_only_mute(self):
+        self.pause.write_text('false')
+        self.helper.setting_path().with_name('audio-muted').touch()
+        self.assertEqual(self.helper.main(['preview', '--speech-only', '--title', 'Preview']), 0)
+        self.assertEqual(self.log.read_text().splitlines(), ['.wav'])
+
     def test_preview_remains_available_while_paused(self):
         self.assertEqual(self.helper.main(['preview', '--speech-only', '--title', 'Preview']), 0)
         self.assertEqual(self.log.read_text().splitlines(), ['.wav'])

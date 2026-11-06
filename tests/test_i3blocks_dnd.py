@@ -39,6 +39,8 @@ esac
 """)
         dunstctl.chmod(0o755)
         self.env = {**os.environ, "HOME": str(self.home), "PATH": f"{self.bin}:{os.environ['PATH']}", "DND_STATE": str(self.state)}
+        self.env["XDG_CONFIG_HOME"] = str(self.home / ".config")
+        self.mute = self.home / ".config/codex-notification-sound/audio-muted"
         self.env.pop("color7", None)
         self.colors = colors
 
@@ -78,12 +80,30 @@ esac
                 self.run_block(3)
                 self.assertEqual(self.state.read_text(), "true")
 
-    def test_no_click_and_middle_click_leave_state_unchanged(self):
-        for button in (None, 2):
+    def test_no_click_leaves_state_unchanged(self):
+        for button in (None,):
             with self.subTest(button=button):
                 self.state.write_text("false")
                 self.run_block(button)
                 self.assertEqual(self.state.read_text(), "false")
+
+    def test_middle_click_mutes_audio_and_resumes_visuals(self):
+        for initial in ("false", "true"):
+            with self.subTest(initial=initial):
+                self.state.write_text(initial)
+                self.assertIn("Silent", self.run_block(2))
+                self.assertEqual(self.state.read_text(), "false")
+                self.assertTrue(self.mute.exists())
+                self.assertIn("Silent", self.run_block())
+
+    def test_left_click_restores_audio_without_changing_sound_settings(self):
+        self.mute.parent.mkdir(parents=True)
+        self.mute.touch()
+        clip = self.mute.with_name("sound.json")
+        clip.write_text('{"path":"/saved/clip.mp3"}')
+        self.assertIn("Notis", self.run_block(1))
+        self.assertFalse(self.mute.exists())
+        self.assertEqual(clip.read_text(), '{"path":"/saved/clip.mp3"}')
 
     def test_paused_queue_remains_red(self):
         self.state.write_text("true")

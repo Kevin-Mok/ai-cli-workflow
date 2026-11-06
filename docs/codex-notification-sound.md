@@ -4,14 +4,23 @@ Play your own MP3 for Codex notifications, with optional offline speech of the e
 
 ## Do Not Disturb
 
-Right-click the i3blocks `Notis`/`DND` indicator to pause notifications and
-suppress automatic Codex, Discord and Grok audio. Left-click restores delivery.
+The i3blocks notification indicator has three settings:
+
+- Left-click: **🔔Notis** — visual notifications and configured audio on.
+- Middle-click: **🔇Silent** — visual notifications on, automatic audio off.
+- Right-click: **🔕DND** — visual notifications and automatic audio off.
+
+Silent mode suppresses automatic Codex, Discord and Grok clips and speech without
+changing the selected clip, speech switches or volume. Its machine-local marker,
+`${XDG_CONFIG_HOME:-$HOME/.config}/codex-notification-sound/audio-muted`, persists
+across restarts until left-click clears it. DND uses Dunst's existing pause state;
+left-click or middle-click resumes delivery, including queued popups.
 The shared player checks Dunst pause before starting, after waiting for its
 playback lock, and before each clip or speech stage. Suppressed hook audio is
 discarded; Dunst still displays its queued notifications when resumed. A phrase
 already playing may finish. Explicit `preview` commands remain available during
-DND. If Dunst is unavailable or its one-second query fails, audio retains its
-usual behavior. No settings change or daemon restart is needed for this gate.
+DND or Silent mode. If Dunst is unavailable or its one-second query fails, audio retains its
+usual behavior unless Silent mode is active. No daemon restart is needed.
 Use `codex-notification-sound smoke tagged` for a synthetic Codex popup without
 TTS when Codex speech is enabled; DND queues that popup until resumed.
 

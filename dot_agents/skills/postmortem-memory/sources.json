@@ -14056,6 +14056,15 @@
       "reviewed_on": "2026-11-06",
       "findings": [],
       "decision": "No new learning: bridge readiness remains unconfirmed; existing browser incident already records this verification limitation. Diagnostic ledger key corrected to existing reports schema; no data loss."
+    },
+    {
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-11-06-notification-fish-inspection-sandbox.md"
+      ],
+      "sha256": "e8d0502857780963d32dc6278060bc41bccd0f8fec58b58c9f0e388d40266fa5",
+      "reviewed_on": "2026-11-06",
+      "findings": [],
+      "decision": "No new general remedy beyond existing execution-boundary guidance: ordinary Fish initialization attempted fnm, universal-variable and alias writes outside the restricted workspace during function inspection. Clean fish --no-config with explicit dependencies avoided startup diagnostics. Approved scoped refresh then exited0 with REFRESH COMPLETE; installed block/player matched sources, live Dunst state transitions passed and original pause/mute state was restored. This verifies the workaround and authorized deployment, not sandbox repair or physical audio/visual acceptance."
     }
   ],
   "review": {

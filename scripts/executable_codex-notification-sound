@@ -199,6 +199,9 @@ def playback_signals():
 
 
 def notifications_paused() -> bool:
+    # The bar's visuals-only mode shares every DND playback checkpoint.
+    if setting_path().with_name('audio-muted').exists():
+        return True
     try:
         result = subprocess.run(
             ['dunstctl', 'is-paused'], capture_output=True, text=True,
