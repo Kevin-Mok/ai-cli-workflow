@@ -312,3 +312,11 @@ This document records delivery milestones and verification for completed reposit
 - Delivery: focused commit on main, followed by the configured origin/main push. No runtime research or service integration is part of this change.
 - Limits: fresh-session behavioral adherence is untested. The rule was activated by a targeted live-file update; broad configuration refresh was not run from the side conversation.
 - Rollback: revert the focused rule/ignore/admission changes and remove the rule from live global instructions; preserve append-only feedback history.
+
+## Firstmate commit boundary — docs: record Firstmate privacy gate blocker
+
+- Complete: Linux-config prompt-packaging commit `c184f63` was pushed to origin/main. Firstmate's session candidate and ignore-only subset were refused by the same 25 hashed privacy findings as unchanged HEAD; no Firstmate commit or push was made.
+- Evidence: [baseline privacy report](postmortem/2026-11-06-prompt-zip-commit-privacy.md); reviewed source hash/aliases recorded with no new learning because the existing gate/safe-subset policy covers this case. No baseline matches were sanitized or classified as confirmed secrets.
+- Scope: commit only the new report, its single source-ledger record, and this milestone. Preserve all earlier dirty report/learning/feedback/configuration work and the parent thread's Firstmate files.
+- Verification: targeted learning coverage and exact-candidate privacy checks precede this documentation follow-up; the seven instruction tests, README gate and ZIP integrity checks already passed in this delivery.
+- Delivery: documentation follow-up on main, then configured origin/main push. Firstmate remains locally dirty and blocked; remediation and upstream contribution authority are separate work.

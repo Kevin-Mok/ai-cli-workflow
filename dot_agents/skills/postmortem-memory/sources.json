@@ -14074,6 +14074,16 @@
       "reviewed_on": "2026-11-06",
       "findings": [],
       "decision": "No new learning: existing path-discovery and execution-environment guidance covers guessed executable paths, Fish startup side effects, and scoped configuration-write escalation. Refresh verification is separate."
+    },
+    {
+      "sha256": "78c35edc797bf1e9fd3d3c28839a5e0425bbfe689117441b99dd163caf2f99ac",
+      "aliases": [
+        "/home/kevin/coding/firstmate/docs/postmortem/2026-11-06-prompt-zip-commit-privacy.md",
+        "/home/kevin/linux-config/docs/postmortem/2026-11-06-prompt-zip-commit-privacy.md"
+      ],
+      "reviewed_on": "2026-11-06",
+      "findings": [],
+      "decision": "No new learning: the existing exact-candidate privacy gate and safe-subset policy already require preserving the gate when unchanged HEAD and the ignore-only candidate have identical findings. Baseline content was not sanitized; no security fix is claimed."
     }
   ],
   "review": {
