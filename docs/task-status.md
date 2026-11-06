@@ -303,3 +303,12 @@ This document records delivery milestones and verification for completed reposit
 - Delivery: one focused commit on main followed by origin/main push. Preserve pre-existing edits in mixed feedback and ledger files.
 - Limits: the ignored Firstmate .lavish artifact remains local and is not included; Chrome bridge and CUA unavailable, so browser rendering and toggle execution remain unverified. Prior static artifact checks reported contrast above 4.5:1 and preserved graph/content.
 - Rollback: revert this focused commit to remove the recorded preference and incident; local artifact is independent.
+
+## Prompt attachments — docs(agents): package external-model prompt attachments
+
+- Complete: external-model prompts needing attachments require a ZIP with the compiled prompt, required files, upload note, and chat link; generated prompt ZIPs are ignored. The live global Codex instructions contain the same rule. Admission evidence is linked from the bounded ledger.
+- Scope: direct-write fallback because this ephemeral conversation has no local session log. Commit only the rule, ignore pattern, admission record/link, new feedback entry, and this milestone; preserve earlier feedback and all unrelated dirty work.
+- Verified: seven instruction-admission tests passed; vetted inventory has no missing/stale entries; direct/nested prompt ZIPs are ignored while Markdown and unrelated ZIP locations remain visible. README gate pass_no_change; exact staged privacy review precedes commit.
+- Delivery: focused commit on main, followed by the configured origin/main push. No runtime research or service integration is part of this change.
+- Limits: fresh-session behavioral adherence is untested. The rule was activated by a targeted live-file update; broad configuration refresh was not run from the side conversation.
+- Rollback: revert the focused rule/ignore/admission changes and remove the rule from live global instructions; preserve append-only feedback history.

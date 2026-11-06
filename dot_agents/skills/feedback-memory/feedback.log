@@ -22,3 +22,4 @@
 2026-11-05 - commit-session must always attempt a safe best-effort commit and push without a force modifier or routine scope confirmation; include reviewed required prerequisites, preserve unrelated work, and ship independent safe work or a factual handoff when implementation is blocked.
 
 2026-11-06 - Default Lavish review artifacts to a clean GitHub-style dark theme: neutral charcoal backgrounds, light text, subtle gray borders, and blue links. Avoid beige/gold luxury palettes unless explicitly requested.
+2026-11-06 - When an external-model prompt (e.g. GPT or Grok) needs attachments, package the compiled prompt, required files, and upload instructions in a ZIP; provide its link and Git-ignore generated prompt ZIPs with a scoped rule.

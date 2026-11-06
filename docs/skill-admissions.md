@@ -60,3 +60,5 @@ new behavior: casd-map.json proves91blocks retained. Closest precedents:
 existing:ai-workflow-doctor, existing:context-handoff; neither routes standing
 policy. Frozen instructions-edit case;41/46 unchanged;9KB/150line budgetPASS;
 public-source-only relocation. Triggered reference loads remain additional.
+
+[Prompt ZIP PASS, 2026-11-06](skill-admissions-prompt-zip.md).

@@ -36,3 +36,6 @@ session.jsonl
 # Raw benchmark requests, responses and runtime identifiers stay private.
 /benchmarks/metaprompt/runs/
 /benchmarks/metaprompt-selection/runs/
+
+# Generated prompt upload archives.
+/prompts/**/*.zip

@@ -100,6 +100,9 @@ Before adding a skill or an AGENTS.md rule, run the `lean-instructions` gate. Ad
   test instructions, known risks, and relevant plans in the same change.
 - When asked to create a prompt, write it to a concise kebab-case Markdown file
   under `prompts/`, not only in chat.
+  When a prompt for an external model (e.g. GPT or Grok) needs attachments,
+  create a ZIP containing the compiled prompt, required files, and an upload
+  note; link it in chat and Git-ignore the generated ZIPs with a scoped rule.
 
 ## Feedback And Lessons
 
