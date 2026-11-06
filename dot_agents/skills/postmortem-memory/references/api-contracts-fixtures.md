@@ -845,3 +845,14 @@ Case-statistics fixture review: valid chronology must reach the intended boundar
 - Verification evidence: The corrected offline Chrome run passed six ordered batches, increasing colored bars from 166 to 399; failure retention, Refresh recovery, cancellation and polling passed.
 - Limitations: This verifies synthetic responses through the real App, validated client boundary, loader, engine and chart. It does not establish live provider completeness, feed behavior or TradingView parity.
 - Source: [Progressive PMO browser fixture bounds](/home/example/coding/chartclutch/docs/postmortem/2026-11-01-progressive-pmo-fixture.md) (SHA-256 `d723a0d976c0218298c5a1cec482c03630a4c68089f921ae7f03341751add0a8`).
+
+## local-shortcut-requested-name
+
+- Status: **verified_fix**; confidence: **confirmed**; verification scope: **runtime**.
+- Symptoms: requested `btw` unavailable while derived `nbtw` passes activation.
+- Applicability: legacy source-key conventions differ from the requested name.
+- Diagnostics: compare the request first token with the actual activation-check name; include legacy shortcuts in generated-catalog regression.
+- Remedy: new file requests use existing editor-command mappings under the exact requested name; preserve legacy prefixed rows.
+- Verification: RED expected btw, actual nbtw;22 shortcut and7 admission tests passed. Scoped refresh and real interactive btw expansion matched exactly without editor execution.
+- Limitations: never execute mapped commands; existing shells need reload.
+- Source: [Requested shortcut name](../../../../docs/postmortem/2026-11-06-btw-requested-name.md).

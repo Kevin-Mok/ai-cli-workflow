@@ -671,3 +671,7 @@ Freeze the unchanged51 survivor cases at46/51 before source edits; remove only t
 ## 2026-11-05: commit-session safe best effort
 
 Behavior correction, not a token-saving pass. Description unchanged (245B); entry body 9532→10735B (+1203B, +300.75 estimated on-demand tokens); recurring delta 0. Four pressure scenarios pass: reviewed earlier prerequisite, unsafe dependency with factual handoff, separable credential exclusion, existing verified commit push. Existing instruction/loaded-size budget failures remain outside this skill edit; do not increase budgets to hide them. See plans/commit-session-best-effort.md for verification and delivery.
+
+## Fish file shortcut naming correction (2026-11-06)
+
+Preserve requested names through existing command storage; keep legacy file rows. Skill body 7101→7085 UTF-8 bytes (4 estimated on-demand tokens saved), description 132→132 bytes (0 recurring change). Weighted estimate 210.525→210.125 at unmeasured 10% loading. Defining literal-name regression observed RED; focused and routing/admission verification recorded in plans/fish-alias-requested-names.md. No measured billing or speed claim.

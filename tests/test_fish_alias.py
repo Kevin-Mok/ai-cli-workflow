@@ -37,6 +37,20 @@ class FishAliasTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         return json.loads(result.stdout)
 
+    def test_file_request_preserves_requested_name_and_legacy_shortcuts(self):
+        result = self.success('btw ~/coding/btw.md')
+        self.assertEqual(result['fish_name'], 'btw')
+        self.assertEqual(self.path('files').read_text(), self.original['files'])
+        self.assertFalse(self.success('btw ~/coding/btw.md')['changed'])
+        self.generate()
+        catalog = self.root / 'home/.config/fish/key_abbr.fish'
+        readback = subprocess.run(['fish', '--no-config', '-c',
+            'source "$argv[1]"; abbr --show | string match -r "^abbr -a -- (?:btw|nre) .*"',
+            str(catalog)], text=True, capture_output=True)
+        self.assertEqual(readback.returncode, 0, readback.stderr)
+        self.assertIn("abbr -a -- btw '$EDITOR ~/coding/btw.md'", readback.stdout)
+        self.assertIn("abbr -a -- nre '$EDITOR README.md'", readback.stdout)
+
     def test_command_section_and_complete_remainder(self):
         result = self.success('cbn codex-time burn day')
         self.assertEqual(result['kind'], 'commands')
@@ -66,12 +80,19 @@ class FishAliasTests(unittest.TestCase):
         file = directory / 'notes.md'; file.touch()
         self.assertEqual(self.success('pj ' + str(directory))['kind'], 'dirs')
         result = self.success('nt ' + str(file))
-        self.assertEqual(result['kind'], 'files')
-        self.assertEqual(result['fish_name'], 'nnt')
-        self.assertIn('my\\ project', self.path('files').read_text())
+        self.assertEqual(result['kind'], 'commands')
+        self.assertEqual(result['fish_name'], 'nt')
+        self.assertIn('my\\\\ project', self.path('commands').read_text())
         self.assertFalse(self.success('nt ' + str(file))['changed'])
+        self.generate()
+        readback = subprocess.run(['fish', '--no-config', '-c',
+            'source "$argv[1]"; abbr --show | string match "abbr -a -- nt *"',
+            str(self.root / 'home/.config/fish/key_abbr.fish')],
+            text=True, capture_output=True)
+        self.assertEqual(readback.returncode, 0, readback.stderr)
+        self.assertEqual(shlex.split(readback.stdout)[-1], '$EDITOR ' + str(file).replace(' ', '\\ '))
 
-    def test_example-user_home_directory_normalization(self):
+    def test_example_home_directory_normalization(self):
         for target in ('/home/example', '/home/example/coding/project/',
                        '"/home/example/coding/my project/"',
                        '/home/example/coding/my\\ project/'):
@@ -86,13 +107,13 @@ class FishAliasTests(unittest.TestCase):
         self.assertIn('~/coding/my', generated)
 
     def test_home_normalization_is_directory_prefix_only(self):
-        for target in ('/home/example/project/', '/tmp/home/example-user/project/'):
+        for target in ('/home/another-user/project/', '/tmp/home/example-user/project/'):
             with self.subTest(target=target):
                 self.assertEqual(self.success('pj ' + target, kind='dirs')['target'], target)
         command = 'echo /home/example/coding/project'
         self.assertEqual(self.success('zz ' + command, section='work')['target'], command)
         file = '/home/example/notes.md'
-        self.assertEqual(self.success('nt ' + file, kind='files')['target'], file)
+        self.assertEqual(self.success('nt ' + file, kind='files')['target'], '$EDITOR ' + file)
 
     def test_conflicts_and_exact_comment_preservation(self):
         self.path('commands').write_text(self.original['commands'] + '  cbn "old" # retain\n# cbn "older"\nuntouched "yes"\n')
@@ -108,8 +129,8 @@ class FishAliasTests(unittest.TestCase):
     def test_file_effective_name_conflicts(self):
         self.path('commands').write_text(self.original['commands'] + 'nre "old"\nre "unrelated"\n')
         self.success('re docs/new.md')
-        self.assertIn('# nre "old"\nre "unrelated"', self.path('commands').read_text())
-        self.assertIn('# re README.md', self.path('files').read_text())
+        self.assertIn('nre "old"\n# re "unrelated"', self.path('commands').read_text())
+        self.assertEqual(self.path('files').read_text(), self.original['files'])
 
     def test_identical_noop(self):
         self.success('cbn codex-time burn day')
@@ -179,7 +200,7 @@ class FishAliasTests(unittest.TestCase):
     def test_quoted_path_roundtrip(self):
         path = self.root / 'quoted path.md'; path.touch()
         value = 'zz "' + str(path) + '"'
-        self.assertEqual(self.success(value)['kind'], 'files')
+        self.assertEqual(self.success(value)['kind'], 'commands')
         self.assertFalse(self.success(value)['changed'])
         self.generate()
 

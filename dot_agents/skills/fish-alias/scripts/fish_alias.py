@@ -166,6 +166,9 @@ def update(root: Path, request: dict[str, str], apply: bool) -> dict[str, object
         raise ValueError('Template delimiters require manual literal escaping; request was not rendered')
     if not re.fullmatch(r'[A-Za-z0-9_][A-Za-z0-9_.-]*', key): raise ValueError('Unsafe abbreviation')
     kind = route(target, root, request.get('kind'))
+    if kind == 'files':
+        kind = 'commands'
+        target = '$EDITOR ' + path_literal(target)
     if kind == 'dirs':
         words = shlex.split(target)
         plain = words[0] if len(words) == 1 else target

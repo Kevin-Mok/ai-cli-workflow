@@ -7056,6 +7056,26 @@
       "sources": [
         "971b179f0548885a55c314b2d7e203471b9522359542edf86d245a342359f7cb"
       ]
+    },
+    {
+      "id": "local-shortcut-requested-name",
+      "reference": "references/api-contracts-fixtures.md#local-shortcut-requested-name",
+      "status": "verified_fix",
+      "symptoms": [
+        "Requested file shortcut btw unavailable while derived nbtw passes activation checks."
+      ],
+      "applicability": "Shortcut requests whose legacy source-key conventions differ from the requested interactive name.",
+      "diagnostics": [
+        "Compare the literal first token of the request with the name tested by activation; use a generated-catalog regression including legacy shortcuts."
+      ],
+      "confidence": "confirmed",
+      "remedy": "Store new file requests as existing editor-command mappings under the exact requested name; preserve legacy prefixed file rows.",
+      "verification": "22 shortcut tests and7 admission tests passed; scoped refresh and installed real interactive btw + Space exactly matched the requested editor command without execution.",
+      "verification_scope": "runtime",
+      "limitations": "Mapped commands are never executed; existing shells need abbreviation reload.",
+      "sources": [
+        "2b844e28ffdfd8c0263588a65f61c4b160005e3e3f6daedd05086b64ba36e04f"
+      ]
     }
   ],
   "reports": [
@@ -14093,6 +14113,16 @@
       "reviewed_on": "2026-11-06",
       "findings": [],
       "decision": "No new learning: existing discovered-path and sandbox-filesystem guidance covers these inspection and Git metadata denials. Source reads, scoped refresh and non-executing interactive abbreviation activation passed; use approved access for Git delivery."
+    },
+    {
+      "sha256": "2b844e28ffdfd8c0263588a65f61c4b160005e3e3f6daedd05086b64ba36e04f",
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-11-06-btw-requested-name.md"
+      ],
+      "reviewed_on": "2026-11-06",
+      "findings": [
+        "local-shortcut-requested-name"
+      ]
     }
   ],
   "review": {

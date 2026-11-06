@@ -287,3 +287,5 @@
 - 2026-11-03: For maim changes, exercise region selection through i3 with one selector at a time and compare saved PNG to clipboard. A direct window capture does not validate region rendering; avoid forcing `--noopengl` on picom without a measured need.
 
 - 2026-11-05: Validate a session commit against HEAD plus the proposed staged hunks: passing tests in a dirty working tree can hide an uncommitted prerequisite. Review the dependency closure before staging.
+
+- 2026-11-06: Verify a new shortcut using the exact name the user requested. Deriving `nbtw` from `btw` and testing only `nbtw` concealed an unavailable requested name. New file requests use existing editor-command mappings; retain legacy prefixed file rows.
