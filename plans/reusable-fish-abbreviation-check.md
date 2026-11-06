@@ -31,3 +31,12 @@ RED: 4 integration tests failed because CLI was absent. GREEN: all 4 pass, plus 
 Review: independent read-only review found no concrete defect in quoting, bounded waits, non-execution or child cleanup. Installed catalog is trusted sourced configuration. Broader test_fish_alias suite is blocked by pre-existing invalid test_example-user_home_directory_normalization in HEAD; recorded in docs/postmortem/2026-11-06-fish-alias-regression-identifier.md. Do not count it as passing. README gate pass_no_change. Helper remains directly runnable from checkout; no separate installation required.
 
 Final activation: refresh exit 0; default disposable trial, installed fm check and ASCII trial all passed after refresh; temporary abbreviations removed. Installed delivery section matches canonical source. Delivery milestone: feat(fish): add reusable local abbreviation check. Stage only session-owned hunks and push origin/main immediately after verified commit. No scheduled run added.
+
+## Session closeout — docs(fish): close abbreviation verification session
+
+- Delivered: db7b63a (fm), 8b8ecd1 (delivery ordering), 22b374c (local expansion requirement), and 5c818a4 (reusable checker) are pushed to origin/main.
+- Remaining eligible scope: temporary-trial diagnostic report and its single ledger registration; finish matching plan delivery records.
+- Attribution: session 01a1b1ec-8679-7da2-9816-8aaec47aa320. Scope helper found no successful writes/baseline because nested tool writes were not attributed; direct-write evidence from this conversation establishes these exact hunks. Preserve all baseline README/smoke/feedback/ledger/reference/fish-progress/Vesktop/approval/lessons/Firstmate changes.
+- Fresh verification: targeted report/hash check returned 0 errors; local disposable trial expanded and removed its abbreviation; installed fm expanded exactly to cd ~/coding/firstmate; README gate pass_no_change and whitespace check passed. Exact staged privacy gate precedes closeout commit. No configuration change or refresh required for these documentation/ledger-only updates.
+- Remaining risk: existing mapping-helper suite remains blocked by the baseline malformed Python test identifier; earlier passing focused suites are previous-turn evidence. No implementation work remains.
+- Next step: focused closeout commit and origin/main push; leave unrelated work dirty.

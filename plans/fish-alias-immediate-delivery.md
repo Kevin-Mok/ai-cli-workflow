@@ -36,7 +36,7 @@ Refresh exited 0 and installed delivery section matches canonical source. Focuse
 - [x] Admission PASS: same shortcut scope and precedents; updated body costs before edit; description unchanged.
 - [x] Require fresh interactive local fish, installed abbreviations, Space expansion capture and cancellation without execution; retain fish -n and immediate delivery. Existing PTY regression supplies the pattern.
 - [x] Admission/catalog checks, local fm expansion, refresh, installed skill comparison and repeated local expansion all passed.
-- [ ] Commit and push follow-up milestone.
+- [x] Commit and push follow-up milestone: 22b374c pushed to origin/main.
 
 Manual equivalent: source the installed abbreviation file in local fish, type fm plus Space, inspect cd ~/coding/firstmate and cancel without Enter. No supplied command executes. Scope adds no runtime helper or dependency; preserve unrelated smoke edits.
 

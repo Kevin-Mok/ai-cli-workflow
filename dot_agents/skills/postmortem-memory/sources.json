@@ -14038,6 +14038,15 @@
       "reviewed_on": "2026-11-06",
       "findings": [],
       "decision": "No new reusable guidance: invalid Python identifier is present in HEAD, outside this task; focused checker tests and actual local runs passed, while the broader suite remains explicitly unverified."
+    },
+    {
+      "sha256": "72516483b617cd98bb3dfbe062bfd90bbfb5b2d53275d588bcb06aca3c47bfb6",
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-11-06-temporary-fish-trial-cleanup.md"
+      ],
+      "reviewed_on": "2026-11-06",
+      "findings": [],
+      "decision": "No new learning: existing interactive PTY capture and quoting guidance covers the trial harness. Reusable checker shipped in 5c818a4; local expansion/removal passed, while typed-cleanup root cause remains unconfirmed."
     }
   ],
   "review": {
