@@ -1886,3 +1886,12 @@ Preserve local managed-file edits before applying repo changes.
 **Action:** Reopen a clip with ordinary mpv after configuration refresh, then try cgc separately. Query the saved total before and after each.
 
 **Expected:** New ordinary sessions auto-load play-count.lua and save each initial local-file load plus detected native loop wraps. The wrapper adds one per playlist playback without double-counting from the hook. Existing sessions need reopening; network URLs and sessions with auto-loading disabled do not record automatically. See [counting limits](mpv-play-counts.md#counting-and-limits).
+
+## BTW file shortcut
+
+Inspect or expand the installed abbreviation without opening the notes file. No sudo is needed.
+
+- Action: After refresh, run `python3 scripts/executable_check-fish-abbr nbtw '$EDITOR ~/coding/btw.md'`.
+  Expected: PASS for installed syntax and exact interactive Space expansion; the command is cleared without launching the editor.
+- Action: In an existing fish shell, source `~/.config/fish/key_abbr.fish`, type `nbtw` and Space, inspect the expansion, then cancel with Ctrl+C.
+  Expected: `$EDITOR ~/coding/btw.md`; source key `btw` uses the existing file-prefix convention.

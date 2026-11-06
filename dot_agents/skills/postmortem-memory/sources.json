@@ -14084,6 +14084,15 @@
       "reviewed_on": "2026-11-06",
       "findings": [],
       "decision": "No new learning: the existing exact-candidate privacy gate and safe-subset policy already require preserving the gate when unchanged HEAD and the ignore-only candidate have identical findings. Baseline content was not sanitized; no security fix is claimed."
+    },
+    {
+      "sha256": "d06cb6e3a7334d674b8e836ba32d1c52a585784f641c9c9bf216ba0b59a9b7fa",
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-11-06-btw-shortcut-inspection.md"
+      ],
+      "reviewed_on": "2026-11-06",
+      "findings": [],
+      "decision": "No new learning: existing discovered-path and sandbox-filesystem guidance covers these inspection and Git metadata denials. Source reads, scoped refresh and non-executing interactive abbreviation activation passed; use approved access for Git delivery."
     }
   ],
   "review": {

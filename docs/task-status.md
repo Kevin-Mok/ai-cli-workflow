@@ -320,3 +320,11 @@ This document records delivery milestones and verification for completed reposit
 - Scope: commit only the new report, its single source-ledger record, and this milestone. Preserve all earlier dirty report/learning/feedback/configuration work and the parent thread's Firstmate files.
 - Verification: targeted learning coverage and exact-candidate privacy checks precede this documentation follow-up; the seven instruction tests, README gate and ZIP integrity checks already passed in this delivery.
 - Delivery: documentation follow-up on main, then configured origin/main push. Firstmate remains locally dirty and blocked; remediation and upstream contribution authority are separate work.
+
+## BTW file shortcut — feat(fish): add btw file shortcut
+
+- Scope: add `btw ~/coding/btw.md` in the existing cdn file section; generated fish name is `nbtw`, expanding to `$EDITOR ~/coding/btw.md`. Preview found zero conflicts. No editor execution is part of verification.
+- Verified: README gate `pass_no_change`; targeted incident ledger check passed; scoped refresh-config exited 0; installed syntax and real interactive `nbtw` + Space matched `$EDITOR ~/coding/btw.md` without execution. Because the live catalog is migration-preserved, only its new row was merged and refresh skipped unrelated managed-file application. Focused staged review and normal privacy hooks guard delivery.
+- Delivery: one focused commit followed by configured origin/main push; preserve all unrelated dirty changes. Includes the inspection incident and its explicit no-new-learning ledger entry.
+- Use: reload generated abbreviations in existing shells, then type `nbtw` and Space. Migration-preserved live file catalog receives only the reviewed mapping.
+- Rollback: remove the new mapping from source and preserved live catalog, then refresh. Existing generic shortcut smoke procedure remains applicable.
