@@ -294,3 +294,12 @@ This document records delivery milestones and verification for completed reposit
 - Delivery: focused commit on main, then configured origin/main push; preserve unrelated dirty work.
 - Limits: interactive typing and terminal wrapped-copy behavior were not exercised; no supplied command executed.
 - Rollback: remove only fm from the source and preserved installed directory catalogs and refresh.
+
+## Lavish dark preference — docs(lavish): prefer GitHub-style dark artifacts
+
+- Complete: saved the public-safe preference for charcoal surfaces, light text, subtle borders and blue links; local Firstmate Lavish artifact restyled with light toggle preserved.
+- Scope: session 01a1b293-7daf-76d1-b910-392c3a9a4dec direct-write fallback because the helper missed orchestrated writes. Commit only the new preference, browser incident, its ledger record and this milestone.
+- Verified: README gate pass_no_change; feedback diff whitespace check passed; targeted incident ledger check passed. Privacy gate and staged review precede commit.
+- Delivery: one focused commit on main followed by origin/main push. Preserve pre-existing edits in mixed feedback and ledger files.
+- Limits: the ignored Firstmate .lavish artifact remains local and is not included; Chrome bridge and CUA unavailable, so browser rendering and toggle execution remain unverified. Prior static artifact checks reported contrast above 4.5:1 and preserved graph/content.
+- Rollback: revert this focused commit to remove the recorded preference and incident; local artifact is independent.

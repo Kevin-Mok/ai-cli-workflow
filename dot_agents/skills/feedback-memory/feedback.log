@@ -20,3 +20,5 @@
 2026-11-01 - fish-alias invocations authorize a focused commit and push of the shortcut plus required related documentation without separate confirmation; always push unless local-only delivery is explicitly requested.
 
 2026-11-05 - commit-session must always attempt a safe best-effort commit and push without a force modifier or routine scope confirmation; include reviewed required prerequisites, preserve unrelated work, and ship independent safe work or a factual handoff when implementation is blocked.
+
+2026-11-06 - Default Lavish review artifacts to a clean GitHub-style dark theme: neutral charcoal backgrounds, light text, subtle gray borders, and blue links. Avoid beige/gold luxury palettes unless explicitly requested.

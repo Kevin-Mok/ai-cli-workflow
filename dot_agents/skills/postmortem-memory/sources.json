@@ -14047,6 +14047,15 @@
       "reviewed_on": "2026-11-06",
       "findings": [],
       "decision": "No new learning: existing interactive PTY capture and quoting guidance covers the trial harness. Reusable checker shipped in 5c818a4; local expansion/removal passed, while typed-cleanup root cause remains unconfirmed."
+    },
+    {
+      "sha256": "055add9f40e855c3c3b1c785e63c921ac8c6692491a3733b0d0498c81c7b09e4",
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-11-06-lavish-theme-browser-check.md"
+      ],
+      "reviewed_on": "2026-11-06",
+      "findings": [],
+      "decision": "No new learning: bridge readiness remains unconfirmed; existing browser incident already records this verification limitation. Diagnostic ledger key corrected to existing reports schema; no data loss."
     }
   ],
   "review": {
