@@ -14020,6 +14020,15 @@
       "reviewed_on": "2026-11-06",
       "findings": [],
       "decision": "No new learning: existing path-discovery, schema inspection, sandbox escalation and preserved-catalog activation guidance cover these probes; refresh and isolated abbreviation readback passed."
+    },
+    {
+      "sha256": "43d58e02bbeec01c4d9742ad22ff575309f90f30601b2df238ba450bff5737c8",
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-11-06-fish-alias-skill-path.md"
+      ],
+      "reviewed_on": "2026-11-06",
+      "findings": [],
+      "decision": "No new learning: existing optional-path discovery guidance applies; corrected inventoried path was read successfully."
     }
   ],
   "review": {
