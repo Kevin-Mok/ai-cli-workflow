@@ -1,10 +1,10 @@
 # Preserve requested fish shortcut names
 
-Repair the literal `btw` abbreviation and make future file shortcut requests retain their requested name. Diagnose and test first, change the existing helper and skill, then deploy and verify the exact name before focused delivery.
+File shortcuts now open in Neovim under the requested name. This completed plan records the naming repair, explicit Neovim default, regression and installation checks, and the delivered commits.
 
 ## Scope and decisions
 
-- New file requests use `$EDITOR <escaped path>` in `aliases/key_aliases.tmpl`; first token is the literal abbreviation. Existing key_files mappings keep their `n` prefix. No new catalog format or generator behavior.
+- New file requests use `nvim <escaped path>` in `aliases/key_aliases.tmpl`; first token is the literal abbreviation. Existing key_files mappings keep their `n` prefix and generate nvim commands for Fish, Bash and Ranger. No new catalog format.
 - Keep previously delivered `nbtw` as a harmless compatibility shortcut. Do not execute either editor mapping. No notes content is read or committed.
 - Change helper/tests, skill/README/smoke docs, admission costs and required progress/comparison evidence; include report and learning ledger. Preserve all initial dirty files/hunks (same unrelated state as preceding shortcut task).
 - Refresh is scoped to reviewed skill/catalog deployment and shortcut generation because broad managed-file apply would affect unrelated work.
@@ -20,15 +20,15 @@ Repair the literal `btw` abbreviation and make future file shortcut requests ret
 
 ## Verification
 
-Use `python3 -B tests/test_fish_alias.py` (including generated source readback for literal file names, legacy nre and no-op/conflicts); admissions unittest, trim/trigger gates and inventory check. After deployment run `python3 scripts/executable_check-fish-abbr btw '$EDITOR ~/coding/btw.md'`; run no-argument trial only if checker/generator changes. Manual: source installed abbreviations in an existing fish shell, type btw + Space and cancel. Opening the editor is intentionally skipped.
+Use `python3 -B tests/test_fish_alias.py` (including generated source readback for literal file names, legacy nre and no-op/conflicts); admissions unittest, trim/trigger gates and inventory check. After deployment run `python3 scripts/executable_check-fish-abbr btw 'nvim ~/coding/btw.md'`; run no-argument trial only if checker/generator changes. Manual: source installed abbreviations in an existing fish shell, type btw + Space and cancel. Opening the editor is intentionally skipped.
 
 ## Risks and rollback
 
-Path metacharacters must remain escaped; file requests now report command storage. Legacy generators remain untouched. Existing shells need reload. Revert focused commit and remove only the new literal live row to roll back; preserve notes and the legacy nbtw row.
+Path metacharacters must remain escaped; file requests now report command storage. Legacy shortcut names remain unchanged; generated file commands use nvim. Existing shells need reload. Revert focused commit and remove only the new literal live row to roll back; preserve notes and the legacy nbtw row.
 
 ## Progress and review
 
-Initial diagnosis is supported by source and previous activation output. Await RED evidence before implementation. Plan Mode unavailable in this active runtime; this ExecPlan records the implementation contract.
+The naming repair and Neovim follow-up are complete. Historical RED/GREEN evidence follows; the delivery record below identifies the verified commits. Plan Mode was unavailable in this runtime; this ExecPlan records the implementation contract.
 
 RED: focused literal-name regression ran 1 test and failed with actual nbtw versus expected btw (exit 1), after correcting an inherited invalid Python test identifier. Admission PASS recorded before skill edit; implementation adds only file-to-editor-command routing and preserves the generator.
 
@@ -38,7 +38,7 @@ Cursor handoff prompt: Review plans/fish-alias-requested-names.md and verify the
 
 Activation: reviewed installed skill body/helper updated (host path remapping retained; existing installed description preserved), only literal btw row added to preserved live command catalog. Scoped refresh exited0 and checker PASS `btw + Space -> $EDITOR ~/coding/btw.md; never executed`. Legacy nbtw remains. Manual existing-shell editor launch and wrapped terminal-copy behavior are unverified.
 
-Delivery milestone: `fix(fish): preserve requested file shortcut names`; implementation and required docs complete, no implementation blockers. Next step is focused stage/review/commit and configured origin/main push; actual hash and push result are reported in the conversation. Revert this commit and remove only the literal live command row for rollback.
+Delivery milestone: `15171ff` — `fix(fish): preserve requested file shortcut names`; committed and pushed to origin/main with normal privacy hooks. No implementation blockers. Revert this commit and remove only the literal live command row for rollback.
 
 ## Follow-up: explicit Neovim for file shortcuts
 
@@ -56,6 +56,18 @@ Neovim RED: two focused tests failed as expected, with actual $EDITOR vs expecte
 
 Neovim GREEN:23 shortcut tests and7 admission tests pass; frozen routing46/51 PASS; generator Bash syntax and helper AST pass; README gate pass_no_change. Broad trim failures match the pre-edit snapshot exactly. Inventory reports two unrelated installed no-mistakes calibration gaps (243 entries); recorded in docs/postmortem/2026-11-06-neovim-shortcut-inventory.md with no-new-learning ledger coverage. Independent diff review found no functional issue.
 
-Neovim activation: installed helper preview reports target nvim ~/coding/btw.md and changed=false; scoped refresh exits0. Disposable trial passes and confirms removal. Real interactive checks pass for btw/nbtw→nvim ~/coding/btw.md and nre→nvim README.md; no mapped command executed. Installed helper/generator are updated for future runs; existing shells need reload. Delivery milestone `fix(fish): open file shortcuts in Neovim` is ready for focused stage/review/commit and configured origin/main push; actual hash and push status follow in the conversation. Remaining warnings: existing broad trim ceilings and unrelated two-entry no-mistakes calibration gap.
+Neovim activation: installed helper preview reports target nvim ~/coding/btw.md and changed=false; scoped refresh exits0. Disposable trial passes and confirms removal. Real interactive checks pass for btw/nbtw→nvim ~/coding/btw.md and nre→nvim README.md; no mapped command executed. Installed helper/generator are updated for future runs; existing shells need reload. Delivery milestone `73d7119` — `fix(fish): open file shortcuts in Neovim` was committed and pushed to origin/main with normal privacy hooks. Remaining warnings: existing broad trim ceilings and unrelated two-entry no-mistakes calibration gap.
 
 Delivery scope: concurrent feedback additions triggered the snapshot guard. Stage only the exact owned Neovim preference over HEAD; preserve all other concurrent feedback and earlier dirty work. No runtime source or activation result changed.
+
+## Commit-session closeout
+
+Session `01a1b2db-c893-7333-a956-3dd434b4da9d` used directly observed writes and the captured pre-write dirty baseline. The scope helper returned unsafe with no detected repo writes; orchestration did not appear in its attribution. Reviewed mixed-file diffs and committed incident/finding records: no shortcut implementation or learning hunk remains uncommitted. Remaining dirty files belong to earlier or other-session work (Firstmate/Lavish, fn-progress, Vesktop, privacy approvals and unrelated learning/feedback).
+
+| Delivered commit | Result |
+| --- | --- |
+| `22f5374` feat(fish): add btw file shortcut | Pushed origin/main; superseded by the naming correction |
+| `15171ff` fix(fish): preserve requested file shortcut names | Pushed origin/main; literal btw retained |
+| `73d7119` fix(fish): open file shortcuts in Neovim | Pushed origin/main; installed helper/generator and legacy mappings verified |
+
+Closeout milestone: `docs(fish): record shortcut session delivery` updates only this plan to the final nvim behavior and actual delivery results. README gate passed in this closeout; the23 shortcut and7 admission test results above are from the preceding implementation turn. Fresh installed-expansion verification and exact-candidate privacy gate guard the closeout commit. No configuration change or additional refresh is needed. After the closeout commit, push configured origin/main; report its actual hash and push result in the conversation.
