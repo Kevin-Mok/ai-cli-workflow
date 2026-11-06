@@ -14011,6 +14011,15 @@
       "reviewed_on": "2026-11-05",
       "findings": [],
       "decision": "No duplicate guidance: the canonical commit-session skill owns safe prerequisite/factual-handoff delivery, with four instruction pressure scenarios; tasks/lessons.md owns HEAD-versus-dirty-tree verification. Existing budget failures are unchanged instructions/loaded totals, not a new safety finding. Admission ledger paragraph exceeded the existing size cap; remove the new redundant prose, retain measured fields and rerun checks."
+    },
+    {
+      "sha256": "8f87b798eb6407cead5fad5ce551432c331060f28d161bbafff80e1c7a154bf5",
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-11-06-fm-shortcut-deployment.md"
+      ],
+      "reviewed_on": "2026-11-06",
+      "findings": [],
+      "decision": "No new learning: existing path-discovery, schema inspection, sandbox escalation and preserved-catalog activation guidance cover these probes; refresh and isolated abbreviation readback passed."
     }
   ],
   "review": {

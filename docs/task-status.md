@@ -286,3 +286,11 @@ This document records delivery milestones and verification for completed reposit
 - Delivery: one focused commit on main, then push configured origin/main; no web deployment applies.
 - Limits: physical visual placement and mouse clicks remain manual. Future migrated installs may need direct bar synchronization because chezmoi excludes preserved targets.
 - Rollback: remove only the four-line Redshift addition from source and preserved live main config, refresh, validate and restart i3.
+
+## Firstmate directory shortcut — feat(fish): add Firstmate directory shortcut
+
+- Complete: fm maps to ~/coding/firstmate in cdn, with no conflicting definitions. Reconciled migration-preserved installed catalog and refreshed.
+- Verified: refresh exited 0; isolated fish abbreviation readback matched cd ~/coding/firstmate; generated fish syntax passed; README gate pass_no_change. Existing shortcut smoke procedure covers activation.
+- Delivery: focused commit on main, then configured origin/main push; preserve unrelated dirty work.
+- Limits: interactive typing and terminal wrapped-copy behavior were not exercised; no supplied command executed.
+- Rollback: remove only fm from the source and preserved installed directory catalogs and refresh.
