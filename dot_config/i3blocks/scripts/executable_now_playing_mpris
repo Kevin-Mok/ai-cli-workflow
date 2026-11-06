@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""mpv and dedicated FlaviBot Chrome now-playing with Spotify fallback."""
+"""Spotify-first now-playing with mpv and dedicated FlaviBot Chrome fallback."""
 
 from dataclasses import dataclass
 import html
@@ -158,7 +158,7 @@ def select_player(bus):
     if not isinstance(entries, list):
         return None
     candidates = []
-    # Read the fallback first so slow browser instances cannot exhaust its budget.
+    # Read Spotify first so local playback is selected only when Spotify is closed.
     entries = [entry for entry in entries if isinstance(entry, dict)]
     entries.sort(key=lambda entry: (entry.get("name") != SPOTIFY, str(entry.get("name", ""))))
     for entry in entries:
@@ -169,6 +169,8 @@ def select_player(bus):
         if rank is None or not isinstance(owner, str) or not re.fullmatch(r":\d+\.\d+", owner):
             continue
         player = read_player(bus, name, owner)
+        if name == SPOTIFY:
+            return player
         if player and rank == -1 and player.status == "Playing":
             return player
         if player:

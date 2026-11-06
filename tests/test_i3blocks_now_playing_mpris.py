@@ -130,6 +130,7 @@ class NowPlayingTest(unittest.TestCase):
                 if len(args) > 6 and args[6] == "org.mpris.MediaPlayer2.Player"]
 
     def test_mpv_base_and_instance_names_win_playing_ties(self):
+        del self.data["names"][SPOTIFY]
         for name in ("org.mpris.MediaPlayer2.mpv", "org.mpris.MediaPlayer2.mpv.instance2449138"):
             with self.subTest(name=name):
                 self.data["names"][name] = ":1.700"
@@ -140,6 +141,7 @@ class NowPlayingTest(unittest.TestCase):
                 del self.data["names"][name]
 
     def test_paused_mpv_loses_to_playing_but_wins_paused_ties(self):
+        del self.data["names"][SPOTIFY]
         self.data["names"]["org.mpris.MediaPlayer2.mpv"] = ":1.700"
         self.data["players"][":1.700"] = player("Video", "Artist", "Paused")
         self.assertIn("Soul Food", self.run_block()[0])
@@ -148,6 +150,7 @@ class NowPlayingTest(unittest.TestCase):
         self.assertEqual(self.run_block()[0], '<span size="x-small" rise="8192">⏸️</span>Video - Artist')
 
     def test_stopped_or_empty_mpv_and_similarly_named_players_are_ignored(self):
+        del self.data["names"][SPOTIFY]
         for name, props in (("org.mpris.MediaPlayer2.mpv", player("Video", "", "Stopped")),
                             ("org.mpris.MediaPlayer2.mpv", player("", "")),
                             ("org.mpris.MediaPlayer2.mpvOther", player("Video", ""))):
@@ -157,8 +160,35 @@ class NowPlayingTest(unittest.TestCase):
                 self.assertIn("Soul Food", self.run_block()[0])
                 del self.data["names"][name]
 
-    def test_playing_chrome_wins_over_spotify(self):
-        self.assertEqual(self.run_block(), ["<span size=\"x-small\" rise=\"8192\">▶️</span>Soul Food - Logic", "<span size=\"x-small\" rise=\"8192\">▶️</span>Soul Food - Logic", "#112233"])
+    def test_spotify_wins_over_playing_chrome(self):
+        self.assertEqual(self.run_block(), ["<span size=\"x-small\" rise=\"8192\">▶️</span>Janice STFU - Drake", "<span size=\"x-small\" rise=\"8192\">▶️</span>Janice STFU - Drake", "#112233"])
+
+    def test_paused_spotify_resumes_before_local_mpv(self):
+        self.data["players"][":1.649"] = player("Janice STFU", "Drake", "Paused")
+        self.data["names"]["org.mpris.MediaPlayer2.mpv"] = ":1.700"
+        for status in ("Playing", "Paused"):
+            with self.subTest(local_status=status):
+                self.data["players"][":1.700"] = player("Local file", "", status)
+                self.assertIn("Janice STFU", self.run_block()[0])
+                self.run_block("1")
+                self.assertEqual(self.actions()[-1], [":1.649", "/org/mpris/MediaPlayer2",
+                                                    "org.mpris.MediaPlayer2.Player", "PlayPause"])
+        del self.data["names"][SPOTIFY]
+        self.assertIn("Soul Food", self.run_block()[0])
+        self.data["players"][":1.700"] = player("Local file", "", "Playing")
+        self.assertIn("Local file", self.run_block()[0])
+        self.run_block("1")
+        self.assertEqual(self.actions()[-1][0], ":1.700")
+
+    def test_open_spotify_without_usable_track_never_selects_local(self):
+        self.data["names"]["org.mpris.MediaPlayer2.mpv"] = ":1.700"
+        self.data["players"][":1.700"] = player("Local file", "")
+        for props in (None, player("", ""), player("Stopped song", "", "Stopped")):
+            with self.subTest(props=props):
+                self.data["players"][":1.649"] = props
+                self.assertEqual(self.run_block(), ["", "", "#112233"])
+                self.run_block("1")
+                self.assertEqual(self.actions(), [])
 
     def test_spotify_short_text_includes_artist(self):
         self.data["names"] = {SPOTIFY: ":1.649"}
@@ -180,10 +210,12 @@ class NowPlayingTest(unittest.TestCase):
         ])
 
     def test_browser_accepts_separate_artist_metadata_without_title_separator(self):
+        del self.data["names"][SPOTIFY]
         self.data["players"][":1.50"] = player("I'm Gone", "Logic")
         self.assertEqual(self.run_block()[0], "<span size=\"x-small\" rise=\"8192\">▶️</span>I'm Gone - Logic")
 
     def test_browser_accepts_lenient_artist_title_separators(self):
+        del self.data["names"][SPOTIFY]
         for title in ("Logic - I'm Gone", "Logic–I'm Gone", "Logic — I'm Gone",
                       "Logic-I'm Gone", "宇多田ヒカル - 光"):
             with self.subTest(title=title):
@@ -220,6 +252,7 @@ class NowPlayingTest(unittest.TestCase):
                 self.assertEqual(self.run_block()[0], "<span size=\"x-small\" rise=\"8192\">▶️</span>Janice STFU - Drake")
 
     def test_dedicated_browser_accepts_title_only_songs(self):
+        del self.data["names"][SPOTIFY]
         self.data["players"][":1.50"] = player("Solo", "")
         self.assertEqual(self.run_block()[0], "<span size=\"x-small\" rise=\"8192\">▶️</span>Solo")
 
@@ -246,6 +279,7 @@ class NowPlayingTest(unittest.TestCase):
         self.assertEqual(self.actions(), [])
 
     def test_regular_browser_does_not_mask_dedicated_browser(self):
+        del self.data["names"][SPOTIFY]
         self.data["pids"] = {":1.50": os.getpid()}
         self.data["players"][":1.50"] = player("Video", "Channel")
         self.data["names"][CHROME + "2"] = ":1.51"
@@ -253,6 +287,7 @@ class NowPlayingTest(unittest.TestCase):
         self.assertEqual(self.run_block()[0], "<span size=\"x-small\" rise=\"8192\">▶️</span>I'm Gone - Logic")
 
     def test_playing_youtube_cannot_replace_paused_flavibot(self):
+        del self.data["names"][SPOTIFY]
         self.data["pids"] = {":1.50": os.getpid()}
         self.data["players"][":1.50"] = player("Anthropic researchers are quitting", "Fireship")
         self.data["names"][CHROME + "2"] = ":1.51"
@@ -268,12 +303,13 @@ class NowPlayingTest(unittest.TestCase):
         self.data["players"][":1.50"]["PlaybackStatus"] = variant("s", "Paused")
         self.assertEqual(self.run_block()[0], "<span size=\"x-small\" rise=\"8192\">▶️</span>Janice STFU - Drake")
 
-    def test_both_paused_prefers_chrome(self):
+    def test_both_paused_prefers_spotify(self):
         for props in self.data["players"].values():
             props["PlaybackStatus"] = variant("s", "Paused")
-        self.assertEqual(self.run_block()[0], '<span size="x-small" rise="8192">⏸️</span>Soul Food - Logic')
+        self.assertEqual(self.run_block()[0], '<span size="x-small" rise="8192">⏸️</span>Janice STFU - Drake')
 
     def test_track_transition_is_read_fresh(self):
+        del self.data["names"][SPOTIFY]
         self.run_block()
         self.data["players"][":1.50"] = player("Soul Food II", "Logic")
         self.assertEqual(self.run_block()[0], "<span size=\"x-small\" rise=\"8192\">▶️</span>Soul Food II - Logic")
@@ -312,6 +348,7 @@ class NowPlayingTest(unittest.TestCase):
         self.assertLess(time.monotonic() - start, 2.8)
 
     def test_markup_quotes_unicode_and_newlines(self):
+        del self.data["names"][SPOTIFY]
         props = player('L’été <II> & "one"\nnext\\end', "")
         props["Metadata"]["data"]["xesam:artist"] = variant("as", ["A&B", "C<D>"])
         self.data["players"][":1.50"] = props
@@ -319,6 +356,7 @@ class NowPlayingTest(unittest.TestCase):
                          '<span size="x-small" rise="8192">▶️</span>L’été &lt;II&gt; &amp; "one" next\\end - A&amp;B, C&lt;D&gt;')
 
     def test_pango_invalid_controls_are_removed(self):
+        del self.data["names"][SPOTIFY]
         self.data["players"][":1.50"] = player("Song\x01name", "Logic")
         self.assertEqual(self.run_block()[0], "<span size=\"x-small\" rise=\"8192\">▶️</span>Songname - Logic")
 
@@ -332,6 +370,7 @@ class NowPlayingTest(unittest.TestCase):
         self.assertEqual(self.run_block()[0], "<span size=\"x-small\" rise=\"8192\">▶️</span>Janice STFU - Drake")
 
     def test_multiple_playing_browsers_have_deterministic_priority(self):
+        del self.data["names"][SPOTIFY]
         self.data["names"] = {CHROME + "2": ":1.51", **self.data["names"]}
         self.data["players"][":1.51"] = player("Second browser", "Other")
         self.assertEqual(self.run_block()[0], "<span size=\"x-small\" rise=\"8192\">▶️</span>Soul Food - Logic")
@@ -359,7 +398,9 @@ class NowPlayingTest(unittest.TestCase):
         self.assertEqual(self.run_block(), ["<span size=\"x-small\" rise=\"8192\">▶️</span>Solo", "<span size=\"x-small\" rise=\"8192\">▶️</span>Solo", "#cbe4ff"])
 
     def test_click_uses_previously_displayed_owner(self):
+        del self.data["names"][SPOTIFY]
         self.run_block()
+        self.data["names"][SPOTIFY] = ":1.649"
         self.data["players"][":1.50"]["PlaybackStatus"] = variant("s", "Paused")
         self.assertEqual(self.run_block("1")[0], "<span size=\"x-small\" rise=\"8192\">▶️</span>Janice STFU - Drake")
         self.assertEqual(self.actions(), [[":1.50", "/org/mpris/MediaPlayer2",
@@ -378,12 +419,14 @@ class NowPlayingTest(unittest.TestCase):
         self.assertEqual(self.actions(), [])
 
     def test_vanished_displayed_player_click_never_controls_fallback(self):
+        del self.data["names"][SPOTIFY]
         self.run_block()
         self.data["players"][":1.50"] = None
         self.run_block("3")
         self.assertEqual(self.actions(), [])
 
     def test_changed_track_click_is_ignored(self):
+        del self.data["names"][SPOTIFY]
         self.run_block()
         self.data["players"][":1.50"] = player("New song", "Someone else")
         self.run_block("1")

@@ -14065,6 +14065,15 @@
       "reviewed_on": "2026-11-06",
       "findings": [],
       "decision": "No new general remedy beyond existing execution-boundary guidance: ordinary Fish initialization attempted fnm, universal-variable and alias writes outside the restricted workspace during function inspection. Clean fish --no-config with explicit dependencies avoided startup diagnostics. Approved scoped refresh then exited0 with REFRESH COMPLETE; installed block/player matched sources, live Dunst state transitions passed and original pause/mute state was restored. This verifies the workaround and authorized deployment, not sandbox repair or physical audio/visual acceptance."
+    },
+    {
+      "sha256": "d9c0cc8e5bfcf132c25c629c8395a354965e2d84e56cff77ab72e83921a2cfd4",
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-11-06-music-refresh-command-discovery.md"
+      ],
+      "reviewed_on": "2026-11-06",
+      "findings": [],
+      "decision": "No new learning: existing path-discovery and execution-environment guidance covers guessed executable paths, Fish startup side effects, and scoped configuration-write escalation. Refresh verification is separate."
     }
   ],
   "review": {
