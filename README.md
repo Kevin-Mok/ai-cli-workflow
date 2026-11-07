@@ -1322,3 +1322,7 @@ This repository is licensed under the [MIT License](LICENSE).
 You may use, modify, and redistribute it, including for commercial
 work, as long as the copyright and license notice stay with copies or
 substantial portions of the material.
+
+Vesktop uses ClearVision alone with the existing wallpaper and a dark Quick CSS overlay.
+After syncing, reload with Ctrl+R; see the [Vesktop smoke checks](docs/smoke-tests.md#vesktop-wallpaper-shading).
+ClearVision imports upstream styles over HTTPS, so offline or delayed loading may show default styling.

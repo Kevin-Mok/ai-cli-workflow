@@ -7098,6 +7098,26 @@
       "sources": [
         "5c831728a8faf25c7f64db17df48629b529382f56a2afec86422957df48f95a8"
       ]
+    },
+    {
+      "id": "local-vesktop-transparent-shading",
+      "reference": "references/operational-drift.md#local-vesktop-transparent-shading",
+      "status": "activation_pending",
+      "symptoms": [
+        "Vesktop wallpaper lacks dark shading with Quick CSS enabled."
+      ],
+      "applicability": "ClearVision using background-shading and multiple enabled full themes.",
+      "diagnostics": [
+        "Inspect final important Quick CSS overrides and enabledThemes; compare live/source files."
+      ],
+      "confidence": "confirmed",
+      "remedy": "Restore nontransparent shading and select one full theme; preserve wallpaper and unrelated settings.",
+      "verification": "Two configuration tests RED then GREEN; refresh-config exit 0; live/source bytes equal.",
+      "verification_scope": "code",
+      "limitations": "Rendered appearance and cold launch unobserved; remote imports can delay theme loading.",
+      "sources": [
+        "e292d07a5ff31e1c8627ba5e3ec3a3072575556d8fde95436fe08440cd726fcd"
+      ]
     }
   ],
   "reports": [
@@ -14165,6 +14185,17 @@
         "local-lavish-creator-foreground-listener"
       ],
       "decision": "Fully automatic owned smoke verified with normal model/config: nonce plus SDK edit, actual result/creator/listener checks, confirmed cleanup and exit0. Independent36 regressions clean; unknown cleanup cannot pass. Explicit existing-page mode remains nonce-only."
+    },
+    {
+      "sha256": "e292d07a5ff31e1c8627ba5e3ec3a3072575556d8fde95436fe08440cd726fcd",
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-11-07-vesktop-theme-dimming.md"
+      ],
+      "reviewed_on": "2026-11-07",
+      "findings": [
+        "local-vesktop-transparent-shading"
+      ],
+      "decision": "Reviewed configuration cause; visual activation and grey-launch cause remain unverified."
     }
   ],
   "review": {

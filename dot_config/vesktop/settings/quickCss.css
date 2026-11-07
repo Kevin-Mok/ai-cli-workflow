@@ -56,13 +56,13 @@
   --text-muted: #c2c2c2;
 }
 
-/* Override the remaining darkness */
+/* Keep ClearVision shading readable across Discord dark appearances. */
 :root,
 .theme-dark,
 .theme-darker,
 .theme-midnight {
-  --background-shading-percent: 45% !important;
-  --background-shading: transparent !important;
+  --background-shading-percent: 100% !important;
+  --background-shading: rgba(0, 0, 0, 0.60) !important;
 
   --background-filter: brightness(0.70) contrast(1.02)
   saturate(calc(var(--saturation-factor, 1) * 1.05)) !important;

@@ -360,3 +360,7 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Verification: executable rapid-click RED/GREEN, then eight25-ms real bar events applied eight steps; preset, reset and ignored clicks passed. Original target, pointer and focus restored.
 - Limitations: physical input and crowded live workspaces remain manual; scope is the wrapped DP-2 bar.
 - Source: [Redshift live activation](../../../../docs/postmortem/2026-10-29-redshift-live-activation.md).
+
+## local-vesktop-transparent-shading
+
+When ClearVision wallpaper lacks dimming, inspect final Quick CSS important overrides and enabledThemes before changing upstream CSS. A transparent background-shading defeats the overlay; keep one full theme enabled. Configuration RED/GREEN and applied bytes prove settings only; reload and cold-launch visual checks remain required. Evidence: 2026-11-07-vesktop-theme-dimming.md; activation_pending.

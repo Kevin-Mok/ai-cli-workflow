@@ -5,7 +5,6 @@
     "themeLinks": [],
     "eagerPatches": false,
     "enabledThemes": [
-        "FrostedGlass.theme.css",
         "ClearVision-v7-BetterDiscord.theme.css"
     ],
     "enableReactDevtools": true,

@@ -1948,3 +1948,12 @@ Inspect or expand the installed abbreviation without opening the notes file. No 
   Expected: The page reports that no agent is listening. Resume polling in the
   original conversation before expecting replies; the installed CLI does not
   automatically resume a saved Codex conversation.
+
+### Vesktop wallpaper shading
+
+- Action: Reload Vesktop with Ctrl+R; open Settings → Vencord → Themes.
+  Expected: Only ClearVision is enabled. The existing wallpaper, orange accents and Hack font remain; chat and member list have a dark overlay.
+- Action: Switch between Discord dark appearances, open a popout and return to chat.
+  Expected: Shading remains readable and popouts retain dark backgrounds.
+- Action: Quit Vesktop from its tray menu, then launch it again with network access.
+  Expected: ClearVision loads and the dark overlay returns. Remote stylesheet loading can briefly show default styling; persistent grey styling requires checking the official CSS imports/network.
