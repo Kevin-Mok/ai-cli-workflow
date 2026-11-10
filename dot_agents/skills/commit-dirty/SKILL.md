@@ -7,7 +7,7 @@ disable-model-invocation: true
 # Commit Dirty
 
 Commit and push the authorized dirty work in a repository. Review the scope
-and diffs, run relevant checks and the README gate, then commit eligible
+and diffs, run relevant checks, then commit eligible
 changes, attempt the push, and report any remaining work.
 
 Use this skill for explicit write requests to create a real git commit and push it from the current repository, including the "commit dirty" and "commit all dirty" cases where the intended scope is the current dirty worktree. Make a best-effort commit of every eligible change within the requested scope. Prioritize files touched during the current session and favor including safe related files over omitting them.
@@ -24,12 +24,8 @@ Use this skill for explicit write requests to create a real git commit and push 
    - Run the smallest relevant automated checks.
    - Add or run a failing reproducer first for bug fixes when practical.
    - Record failed or unavailable checks as warnings and continue with eligible files; never claim they passed.
-5. Run the `readme-recruiter-sync` skill check against the root `README.md`.
-   For a shell-only path, run `./scripts/executable_readme-recruiter-sync`.
-   - Treat the gate as mandatory before staging or committing.
-   - If the README is stale or missing required install or bootstrap, usage, core command flag, repo-based tech stack rationale, or recruiter-facing coverage, update it in the same change before continuing.
-   - If a repair cannot be safely separated, leave that repair as a reported residual and commit the remaining eligible work. Non-safety README findings do not block delivery.
-6. Stage only the intended files or hunks, including `README.md` when the gate required it.
+5. Keep documentation accurate for the requested scope; README recruiter sync runs only on explicit user request.
+6. Stage only the intended files or hunks.
 7. Write the commit message.
    - Use a concise Conventional Commit subject line.
    - Keep the body minimal, using only as many concrete bullets as needed.
@@ -46,7 +42,6 @@ Use this skill for explicit write requests to create a real git commit and push 
 - Treat `commit all dirty` as authorization to include every safe, reviewable dirty change. For narrower requests, exclude unrelated work.
 - Do not use this skill when the task is only to plan commits or group dirty changes without writing. Use `commit-plan-push` in planning-only mode for that case.
 - Do not use this skill when the user explicitly wants to ship only the current Codex session's changes. Use `commit-session` for that case.
-- Never bypass `readme-recruiter-sync` because the code diff looks small.
 - Never invent README claims, flags, install steps, or recruiter copy that the repo does not support.
 - Never leave a verified single-commit workflow unpushed unless the user explicitly requests another cadence.
 - Keep all eligible changes in the requested single commit; do not widen a narrower request to unrelated work.

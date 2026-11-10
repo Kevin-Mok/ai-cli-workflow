@@ -95,7 +95,6 @@ class SecondBrainCheckpointCommitFailureTest(unittest.TestCase):
             mock.patch.dict(os.environ, self.env, clear=True),
             mock.patch.object(checkpoint, "_snapshot_config"),
             mock.patch.object(checkpoint, "_run_doctor_gate"),
-            mock.patch.object(checkpoint, "_run_readme_gate"),
             mock.patch.object(checkpoint, "_git", side_effect=fail_commit),
             self.assertRaises(checkpoint.CheckpointError) as raised,
         ):

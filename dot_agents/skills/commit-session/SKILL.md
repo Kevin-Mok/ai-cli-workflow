@@ -32,12 +32,7 @@ Use this skill for explicit write requests that should ship only the files dirti
    - For mixed files, include separable current-session hunks and leave unrelated hunks untouched. Exclude suspicious content while continuing with other eligible files. Directly touching a baseline-dirty file makes it a priority for review, not blanket authorization for unrelated hunks.
 6. Run the smallest relevant automated checks for the scoped change.
    - Record failed focused validation as a warning and continue to staging.
-7. Run the `readme-recruiter-sync` skill check against the root `README.md`.
-   For a shell-only path, run `./scripts/executable_readme-recruiter-sync`.
-   - If the gate passes without README changes, continue.
-   - If it fails, repair only truthful, repo-supported README issues before staging.
-   - Re-run the scope helper after the repair. If it omits a directly observed repair, include that repair through the direct-write fallback. If unrelated README hunks cannot be separated safely, report the omitted repair and commit the remaining eligible work.
-   - Re-run the gate after the repair. Record any remaining failure as a warning and continue to staging.
+7. Keep documentation accurate for the requested scope; README recruiter sync runs only on explicit user request.
 8. Stage the reviewed eligible paths or hunks from the helper and direct-write fallback. Keep pre-existing staged work outside scope out of the commit without discarding it; inspect the exact staged diff before committing.
 9. Write the commit message.
    - Use a concise Conventional Commit subject line.
@@ -52,10 +47,8 @@ Use this skill for explicit write requests that should ship only the files dirti
 ## Guardrails
 
 - Treat `skipped_preexisting` and `skipped_unknown` as excluded by default; directly observed current-session edits or repairs can establish eligibility for their scoped hunks. Include only attributed session hunks or reviewed required prerequisites; leave unrelated and unreviewed hunks out.
-- Never skip `readme-recruiter-sync` because the scoped diff looks small; repair its truthful findings before committing.
 - Never invent README claims, flags, install steps, or recruiter copy that the repo does not support.
 - Do not skip a safe scoped commit solely because best-effort validation fails.
-- Do not skip a safe scoped commit after all truthful README repairs have been made solely because the rerun gate still reports a non-safety failure.
 - Never leave a verified single-commit session workflow unpushed unless the user explicitly requests another cadence.
 - If the helper cannot find a pre-write `git status --short` baseline for the session, use directly observed touched files and reviewed required prerequisites; leave other dirty files out instead of reconstructing ownership from timestamps or memory.
 - If a file was already dirty at the session baseline and the current session did not directly touch it, leave it uncommitted unless reviewed prerequisite evidence establishes the minimum required hunks.

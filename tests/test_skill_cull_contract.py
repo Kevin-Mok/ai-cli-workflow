@@ -42,13 +42,17 @@ class SkillCullContractTest(unittest.TestCase):
         for requirement in (".impeccable.md", "audience", "brand", "ask", "backend"):
             self.assertIn(requirement, skill.lower())
 
-    def test_readme_trigger_matches_the_gate_and_public_drift(self):
+    def test_readme_sync_is_manual_only(self):
         skill = (SKILLS / "readme-recruiter-sync/SKILL.md").read_text()
         description = re.search(r"^description: (.*)$", skill, re.M).group(1)
-        for requirement in ("README", "commit", "push", "public"):
-            self.assertIn(requirement, description)
-        self.assertNotIn("Assume it applies when changes touch", skill)
-        self.assertIn("Always apply before commit or push", skill)
+        self.assertIn("explicitly", description)
+        self.assertNotIn("Always apply before commit or push", skill)
+        metadata = (SKILLS / "readme-recruiter-sync/agents/openai.yaml").read_text()
+        self.assertIn("allow_implicit_invocation: false", metadata)
+        for name in ("commit-dirty", "commit-plan-push", "commit-session", "fish-alias"):
+            text = (SKILLS / name / "SKILL.md").read_text()
+            self.assertNotIn("executable_readme-recruiter-sync", text)
+            self.assertNotIn("run the README gate", text)
 
 
 if __name__ == "__main__":

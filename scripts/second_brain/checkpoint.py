@@ -48,23 +48,6 @@ def _run_doctor_gate(repo: Path) -> None:
         raise CheckpointError("checkpoint Second Brain doctor reported errors")
 
 
-def _run_readme_gate(repo: Path) -> None:
-    gate = repo / "scripts/executable_readme-recruiter-sync"
-    try:
-        completed = subprocess.run(
-            [str(gate), str(repo)],
-            cwd=repo,
-            check=False,
-            capture_output=True,
-            text=True,
-        )
-    except OSError as error:
-        raise CheckpointError("checkpoint README gate could not run") from error
-    lines = completed.stdout.splitlines()
-    if completed.returncode != 0 or not lines or lines[0] != "pass_no_change":
-        raise CheckpointError("checkpoint README recruiter gate did not pass")
-
-
 def _run_privacy_gate(repo: Path, tree: str) -> None:
     gate = repo / "scripts" / "executable_privacy-gate"
     try:
@@ -133,7 +116,6 @@ def run_checkpoint(
         push_remote, push_ref = _push_destination(repo, branch)
         snapshot = _snapshot_config(repo, dry_run=dry_run)
         _run_doctor_gate(repo)
-        _run_readme_gate(repo)
         paths = _candidate_paths(repo)
         if dry_run and getattr(snapshot, "changed", False):
             paths = sorted(set(paths) | {"dot_codex/config.toml"})

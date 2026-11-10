@@ -45,11 +45,7 @@ Single-commit workflows push after the commit passes verification; multi-commit 
    fix, require a failing reproducer or test first when practical. If a check
    fails, record it as a warning, continue with independent safe groups, and
    continue attempting the affected reviewable group as well when the failure is non-safety; never claim that failed validation passed.
-6. Run the `readme-recruiter-sync` skill check against the root `README.md`.
-   For a shell-only path, run `./scripts/executable_readme-recruiter-sync`.
-   Update the README in its matching commit when required. If the gate reports
-   a warning or a README change cannot be safely separated from unrelated
-   edits, record the issue and continue delivering independent safe groups.
+6. Keep documentation accurate for the requested scope; README recruiter sync runs only on explicit user request.
 7. For each planned commit, in oldest-to-newest order:
    - stage only its intended files or hunks, keeping pre-existing staged work outside that group out of the commit without discarding it;
    - inspect the staged diff and confirm no secrets, credentials, caches,
@@ -83,8 +79,6 @@ Single-commit workflows push after the commit passes verification; multi-commit 
 - Do not use it when the user explicitly wants one current dirty-worktree
   commit; use `commit-dirty` instead.
 - Do not use it for current-session-only work; use `commit-session` instead.
-- Never bypass the README gate because a diff looks small. A gate warning is a
-  reported delivery risk, not a reason to abandon unrelated safe commits.
 - Never invent README claims, commands, install steps, or recruiter copy.
 - Do not amend, rebase, squash, reset, force-push, or rewrite history unless
   the user explicitly asks.

@@ -122,8 +122,8 @@ high-leverage properties:
   chezmoi-managed `~/.agents/system-design/` reference pack for
   ExampleProject-style architecture, coding, UI, source-lineage, Knowledge
   Base, and education-platform decisions.
-- The README gate itself is versioned: the repo includes a
-  recruiter-first sync skill that forces the public docs to keep pace
+- README sync is manual-only: explicitly request the versioned
+  recruiter-first sync skill to review public docs for alignment
   with setup, usage, command flags, and repo positioning.
 - Non-trivial work is expected to move through tracked plans instead of
   disappearing into chat scrollback.
@@ -368,8 +368,7 @@ Representative highlights:
   metadata; missing private storage supports empty reads and conversation.
 - [`readme-recruiter-sync`](dot_agents/skills/readme-recruiter-sync/SKILL.md)
   checks install, usage, command flags, stack rationale, and recruiter-facing
-  value; safe repairs ship with the change and remaining findings are reported
-  without blocking eligible commits.
+  value on explicit request. It never runs automatically before commits or pushes.
 
 This category matters because it makes repository knowledge,
 documentation quality, and output discipline persistent instead of

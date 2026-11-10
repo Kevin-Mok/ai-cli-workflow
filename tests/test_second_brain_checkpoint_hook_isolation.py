@@ -92,7 +92,6 @@ class SecondBrainCheckpointHookIsolationTest(unittest.TestCase):
             mock.patch.dict(os.environ, self.env, clear=True),
             mock.patch.object(checkpoint, "_snapshot_config"),
             mock.patch.object(checkpoint, "_run_doctor_gate"),
-            mock.patch.object(checkpoint, "_run_readme_gate"),
         ):
             report = checkpoint.run_checkpoint(no_push=True)
 
@@ -134,7 +133,6 @@ class SecondBrainCheckpointHookIsolationTest(unittest.TestCase):
             mock.patch.dict(os.environ, self.env, clear=True),
             mock.patch.object(checkpoint, "_snapshot_config"),
             mock.patch.object(checkpoint, "_run_doctor_gate"),
-            mock.patch.object(checkpoint, "_run_readme_gate"),
             mock.patch.object(
                 checkpoint,
                 "_scan_staged",

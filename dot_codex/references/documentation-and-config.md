@@ -11,12 +11,7 @@ the preserved rules below before acting; active user/developer instructions gove
   config, skills, plans, onboarding, or documented commands change, keep it
   accurate. Preserve its technical-deep order: recruiter hook, hero, stack
   rationale, navigation, AI proof, then setup and broader dotfiles detail.
-- Before staging or finalizing any commit or push workflow, run the
-  `readme-recruiter-sync` skill (or
-  `./scripts/executable_readme-recruiter-sync`). The gate requires truthful
-  install/bootstrap, day-to-day use, documented command options, repo-grounded
-  tech-stack rationale, and recruiter value. Include safely separable README
-  repairs; report remaining findings without blocking eligible commits.
+- Run `readme-recruiter-sync` or `./scripts/executable_readme-recruiter-sync` only when explicitly requested. It is not an automatic README-work, commit or push gate.
 - When a reusable manual check appears or changes, update
   `docs/smoke-tests.md` in the same change. Use grouped `Action` and
   `Expected` entries; update stale checks rather than duplicating them.

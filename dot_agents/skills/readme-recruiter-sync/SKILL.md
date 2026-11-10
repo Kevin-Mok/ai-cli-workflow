@@ -1,12 +1,11 @@
 ---
 name: readme-recruiter-sync
-description: Use for README work, the pre-commit/push README gate, or changes to a documented public interface.
+description: Use only when explicitly asked for readme-recruiter-sync or a README recruiter audit.
 ---
 
 # Readme Recruiter Sync
 
-Keep the root `README.md` aligned with the repository before commit or docs
-workflows ship changes. Focus on truthfulness, recruiter-first information
+When explicitly requested, keep the root `README.md` aligned with the repository. Focus on truthfulness, recruiter-first information
 hierarchy, runnable onboarding, repo-based tech-stack explanation, and a
 consolidated recruiter-facing hook. Read the contract, compare README claims
 with the actual files and commands, and repair or report each gap.
@@ -28,9 +27,7 @@ with the actual files and commands, and repair or report each gap.
 ## Workflow
 
 1. Determine whether the gate applies.
-   - Always apply before commit or push workflows finalize work.
-   - Apply when the user asks for README work directly.
-   - Outside delivery, apply only when the change makes a README claim stale: public setup, usage, command options, supported workflows, or repo positioning. A backend fix, internal plan, or docs edit alone is insufficient.
+   - Run only on explicit user request; README edits, public-interface changes, commits and pushes do not trigger this skill automatically.
    - Resolve skill metadata from repo-local `dot_agents/skills/readme-recruiter-sync`, then repo-local `.agents/skills/readme-recruiter-sync`, then `$HOME/.agents/skills/readme-recruiter-sync` (or `READMERECRUITERSYNC_SKILL_DIR` when explicitly set).
 2. Ground every README claim in repo evidence.
    - Read the relevant config, skills, scripts, docs, and existing README sections.
@@ -79,8 +76,7 @@ Prefer this order unless the user explicitly asks for another order:
 
 ## Commit Flow Rules
 
-- Run this required check for commit and push workflows. Its non-safety findings are warnings; attempt safe repairs and continue committing eligible work.
-- Never waive the gate because the diff is small.
+- This audit is manual-only; commit and push workflows do not require it.
 - Never fabricate recruiter copy, installation steps, tech-stack claims, or CLI flags.
 - If `README.md` contains unrelated dirty work, include only safely separable in-scope repairs. Report any remaining README conflict without blocking other eligible work.
 

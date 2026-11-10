@@ -144,7 +144,6 @@ class SecondBrainCheckpointTest(unittest.TestCase):
                 side_effect=snapshot_effect,
             ),
             mock.patch.object(checkpoint, "_run_doctor_gate"),
-            mock.patch.object(checkpoint, "_run_readme_gate"),
             # Private-vault mechanics are isolated from the public-repo policy;
             # test_checkpoint_privacy_gate exercises the real shared gate.
             mock.patch.object(checkpoint, "_run_privacy_gate", side_effect=privacy_gate),

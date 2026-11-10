@@ -33,3 +33,5 @@
 2026-11-06 - The bare Lavish connectivity smoke command should create a preset static mockup and its own Codex creator, discover that creator automatically, verify the connection, and keep it listening for review without asking for URLs/session IDs. Existing real editors still require their own creator handshake; one smoke page does not certify unrelated pages.
 
 2026-11-06 - The bare Lavish E2E smoke test should be fully automatic: create its own preset/creator, verify connection, submit and verify the edit, clean up and exit. No URL/ID entry, Send click or indefinite review wait; keep concise stage/elapsed progress. This applies to disposable smoke pages, not normal user reviews.
+
+2026-11-10 - README recruiter sync is manual-only: invoke it only on explicit request, never automatically for README edits, public-interface changes, commits, pushes or checkpoints.

@@ -549,8 +549,8 @@ A commit cannot embed its own SHA; keep pending evidence honest.
     },
     "repo:readme-recruiter-sync": {
       "candidate": "existing:readme-recruiter-sync",
-      "description": "Use for README work, the pre-commit/push README gate, or changes to a documented public interface.",
-      "description_sha256": "dbf7a4bc30601c98c983afbaf929dac5d31222180a81ae1722ec623a4d6589e2",
+      "description": "Use only when explicitly asked for readme-recruiter-sync or a README recruiter audit.",
+      "description_sha256": "c403bffc73e2d1ef415a3b53ce0e6338d23d771b065b9f8135da9f8969786577",
       "job": "Keep public README usage and recruiter presentation accurate.",
       "scopes": [
         "installer:run_after_install-claude-skills.sh.tmpl",

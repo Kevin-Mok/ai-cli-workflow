@@ -1414,7 +1414,7 @@ only a disposable temporary fixture and requires no sudo.
   Expected: PASS only if installed syntax and local Space expansion match exactly. A missing abbreviation or wrong expansion fails, blocking delivery. Existing terminals still need a reload. `--plain` uses ASCII; `--details` includes syntax diagnostics.
 
 - Action: After refresh, run `fish --no-config -c 'source ~/.config/fish/key_abbr.fish; abbr --show | string match "abbr -a -- cc *"'`; in an existing Fish shell source that file, type `cc` then Space, inspect and cancel with Ctrl+C.
-  Expected: `cc` expands to `cd ~/coding/chartclutch`; its previous Calcurse command remains commented. A repeated request is a no-op. Future changed fish-alias requests prepare required docs and README review before `rf`; after successful refresh, local interactive fish must expand the effective abbreviation plus Space to the intended command/path without executing it, and installed fish syntax must pass before scoped staging, commit and push in one delivery sequence, with the final handoff afterward. Preserve unrelated dirty work and report actual push status; no-ops create no empty commit.
+  Expected: `cc` expands to `cd ~/coding/chartclutch`; its previous Calcurse command remains commented. A repeated request is a no-op. Future changed fish-alias requests prepare required docs before `rf`; after successful refresh, local interactive fish must expand the effective abbreviation plus Space to the intended command/path without executing it, and installed fish syntax must pass before scoped staging, commit and push in one delivery sequence, with the final handoff afterward. Preserve unrelated dirty work and report actual push status; no-ops create no empty commit.
 
 - Action: After refreshing, run `fish --no-config -c 'source ~/.config/fish/key_abbr.fish; abbr --show | string match "abbr -a -- wl *"'`; in an existing Fish shell source that file, type `wl` then Space and cancel with Ctrl+C.
   Expected: `wl` expands to `cd ~/coding/wallet-gas-cost`; the previous Watson mapping is commented in the command template. Repeating the absolute directory request previews a no-op.
@@ -1962,3 +1962,6 @@ Inspect or expand the installed abbreviation without opening the notes file. No 
 
 - Action: After refresh, run `python3 scripts/executable_check-fish-abbr cure 'mpv --loop-file=inf --hwdec=auto --profile=fast --vf=scale=1920:1080 /mnt/usb-8tb/concerts/olivia-rodrigo/PXL_20261028_013607638_the-cure.mp4'` from the checkout.
   Expected: Installed syntax and interactive Space expansion pass without playback. In an existing fish terminal, source `~/.config/fish/key_abbr.fish`, type `cure` then Space and cancel with Ctrl+C; the full requested command appears. Playback requires the mounted media file and is a separate user action.
+
+- Action: Request a normal commit or push, then explicitly invoke `$readme-recruiter-sync`.
+  Expected: Normal delivery does not invoke README sync; the explicit request audits README coverage and hierarchy. Second Brain checkpoints also omit this audit.

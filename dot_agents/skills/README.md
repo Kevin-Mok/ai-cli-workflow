@@ -39,8 +39,8 @@ tests and documentation accompany the change they describe.
   worktree in a focused commit, reporting failed checks and unsafe residuals.
 - [`commit-session`](commit-session/SKILL.md): Make a best-effort commit and upstream push of session changes and minimum reviewed prerequisites; use observed edits when metadata is missing, ship independent safe work when needed, and report blocked candidates.
 - [`readme-recruiter-sync`](readme-recruiter-sync/SKILL.md): Check README truth,
-  onboarding, usage, stack rationale and recruiter value at the delivery gate,
-  during README work, or when a documented public interface changes.
+  onboarding, usage, stack rationale and recruiter value only on explicit user
+  request; never an automatic commit or push gate.
 - [`smoke-test-capture`](smoke-test-capture/SKILL.md): Maintain reusable grouped
   Action/Expected manual checks with the change that creates or alters them.
 

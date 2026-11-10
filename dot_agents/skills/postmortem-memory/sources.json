@@ -14214,6 +14214,15 @@
       "reviewed_on": "2026-11-10",
       "findings": [],
       "decision": "No new learning: existing local-displayed-owner-control-binding prescribes playing-first selection and owner-bound controls. This reapplies the rule with 46 focused/79 regression tests and installed live mpv output; full refresh blocked by unrelated duplicate MIME sources."
+    },
+    {
+      "sha256": "807e9093e4bd351f2cc24c09b22e915bb9a224ea9a7b9b861d1ed58ee3f57cb9",
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-11-10-manual-readme-sync-validation.md"
+      ],
+      "reviewed_on": "2026-11-10",
+      "findings": [],
+      "decision": "No new learning: existing MIME ownership/partial-refresh and fixture-contract guidance apply; live refresh blocked by duplicate MIME sources; no unrelated changes removed."
     }
   ],
   "review": {

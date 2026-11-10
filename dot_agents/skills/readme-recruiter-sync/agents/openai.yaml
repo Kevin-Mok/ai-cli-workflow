@@ -4,4 +4,4 @@ interface:
   default_prompt: "Use $readme-recruiter-sync to enforce a recruiter-first gate: require a substantial opening hook + impact, a repo-based Tech Stack And Why Chosen before setup, and clear installer/day-to-day/CLI docs before passing."
 
 policy:
-  allow_implicit_invocation: true
+  allow_implicit_invocation: false
