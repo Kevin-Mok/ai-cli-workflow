@@ -14205,6 +14205,15 @@
       "reviewed_on": "2026-11-10",
       "findings": [],
       "decision": "No new learning: existing discover-paths and migration-preserved-target guidance covers these failures. Verified workaround: merge requested row into preserved live aliases; refresh and installed Space check pass. Unrelated duplicate MIME source restored."
+    },
+    {
+      "sha256": "6aabeab00c1a42be8836b7104abfe83a3e4764f6634026e96f0d96daeb67d6cf",
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-11-10-music-playing-priority.md"
+      ],
+      "reviewed_on": "2026-11-10",
+      "findings": [],
+      "decision": "No new learning: existing local-displayed-owner-control-binding prescribes playing-first selection and owner-bound controls. This reapplies the rule with 46 focused/79 regression tests and installed live mpv output; full refresh blocked by unrelated duplicate MIME sources."
     }
   ],
   "review": {

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Spotify-first now-playing with mpv and dedicated FlaviBot Chrome fallback."""
+"""Playing-first now-playing across Spotify, mpv and dedicated FlaviBot Chrome."""
 
 from dataclasses import dataclass
 import html
@@ -158,7 +158,7 @@ def select_player(bus):
     if not isinstance(entries, list):
         return None
     candidates = []
-    # Read Spotify first so local playback is selected only when Spotify is closed.
+    # Read Spotify first to preserve its priority when playback states tie.
     entries = [entry for entry in entries if isinstance(entry, dict)]
     entries.sort(key=lambda entry: (entry.get("name") != SPOTIFY, str(entry.get("name", ""))))
     for entry in entries:
@@ -169,13 +169,13 @@ def select_player(bus):
         if rank is None or not isinstance(owner, str) or not re.fullmatch(r":\d+\.\d+", owner):
             continue
         player = read_player(bus, name, owner)
-        if name == SPOTIFY:
+        if player and name == SPOTIFY and player.status == "Playing":
             return player
         if player and rank == -1 and player.status == "Playing":
             return player
         if player:
-            candidates.append((player.status != "Playing", rank, name, player))
-    return min(candidates, key=lambda item: item[:3])[3] if candidates else None
+            candidates.append((player.status != "Playing", name != SPOTIFY, rank, name, player))
+    return min(candidates, key=lambda item: item[:4])[4] if candidates else None
 
 
 def cache_path():

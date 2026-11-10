@@ -163,32 +163,36 @@ class NowPlayingTest(unittest.TestCase):
     def test_spotify_wins_over_playing_chrome(self):
         self.assertEqual(self.run_block(), ["<span size=\"x-small\" rise=\"8192\">▶️</span>Janice STFU - Drake", "<span size=\"x-small\" rise=\"8192\">▶️</span>Janice STFU - Drake", "#112233"])
 
-    def test_paused_spotify_resumes_before_local_mpv(self):
+    def test_playing_mpv_beats_paused_spotify_and_receives_click(self):
         self.data["players"][":1.649"] = player("Janice STFU", "Drake", "Paused")
         self.data["names"]["org.mpris.MediaPlayer2.mpv"] = ":1.700"
-        for status in ("Playing", "Paused"):
-            with self.subTest(local_status=status):
-                self.data["players"][":1.700"] = player("Local file", "", status)
-                self.assertIn("Janice STFU", self.run_block()[0])
-                self.run_block("1")
-                self.assertEqual(self.actions()[-1], [":1.649", "/org/mpris/MediaPlayer2",
-                                                    "org.mpris.MediaPlayer2.Player", "PlayPause"])
-        del self.data["names"][SPOTIFY]
-        self.assertIn("Soul Food", self.run_block()[0])
-        self.data["players"][":1.700"] = player("Local file", "", "Playing")
+        self.data["players"][":1.700"] = player("Local file", "")
         self.assertIn("Local file", self.run_block()[0])
         self.run_block("1")
         self.assertEqual(self.actions()[-1][0], ":1.700")
 
-    def test_open_spotify_without_usable_track_never_selects_local(self):
+    def test_playing_chrome_beats_paused_spotify(self):
+        self.data["players"][":1.649"]["PlaybackStatus"] = variant("s", "Paused")
+        self.assertIn("Soul Food", self.run_block()[0])
+
+    def test_spotify_wins_mpv_ties(self):
+        self.data["names"]["org.mpris.MediaPlayer2.mpv"] = ":1.700"
+        for status in ("Playing", "Paused"):
+            with self.subTest(status=status):
+                for props in self.data["players"].values():
+                    props["PlaybackStatus"] = variant("s", status)
+                self.data["players"][":1.700"] = player("Local file", "", status)
+                self.assertIn("Janice STFU", self.run_block()[0])
+
+    def test_unusable_spotify_does_not_hide_playing_mpv(self):
         self.data["names"]["org.mpris.MediaPlayer2.mpv"] = ":1.700"
         self.data["players"][":1.700"] = player("Local file", "")
         for props in (None, player("", ""), player("Stopped song", "", "Stopped")):
             with self.subTest(props=props):
                 self.data["players"][":1.649"] = props
-                self.assertEqual(self.run_block(), ["", "", "#112233"])
+                self.assertIn("Local file", self.run_block()[0])
                 self.run_block("1")
-                self.assertEqual(self.actions(), [])
+                self.assertEqual(self.actions()[-1][0], ":1.700")
 
     def test_spotify_short_text_includes_artist(self):
         self.data["names"] = {SPOTIFY: ":1.649"}
