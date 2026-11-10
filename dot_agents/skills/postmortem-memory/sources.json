@@ -14196,6 +14196,15 @@
         "local-vesktop-transparent-shading"
       ],
       "decision": "Reviewed configuration cause; visual activation and grey-launch cause remain unverified."
+    },
+    {
+      "sha256": "7792616d3ec9df0b7c322266ae61a62db8ef3fbc3f0f5bd4cb887613ec4c2c75",
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-11-10-cure-refresh-helper-lookup.md"
+      ],
+      "reviewed_on": "2026-11-10",
+      "findings": [],
+      "decision": "No new learning: existing discover-paths and migration-preserved-target guidance covers these failures. Verified workaround: merge requested row into preserved live aliases; refresh and installed Space check pass. Unrelated duplicate MIME source restored."
     }
   ],
   "review": {

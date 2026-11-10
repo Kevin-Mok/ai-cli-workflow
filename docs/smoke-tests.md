@@ -1957,3 +1957,8 @@ Inspect or expand the installed abbreviation without opening the notes file. No 
   Expected: Shading remains readable and popouts retain dark backgrounds.
 - Action: Quit Vesktop from its tray menu, then launch it again with network access.
   Expected: ClearVision loads and the dark overlay returns. Remote stylesheet loading can briefly show default styling; persistent grey styling requires checking the official CSS imports/network.
+
+## Cure concert abbreviation
+
+- Action: After refresh, run `python3 scripts/executable_check-fish-abbr cure 'mpv --loop-file=inf --hwdec=auto --profile=fast --vf=scale=1920:1080 /mnt/usb-8tb/concerts/olivia-rodrigo/PXL_20261028_013607638_the-cure.mp4'` from the checkout.
+  Expected: Installed syntax and interactive Space expansion pass without playback. In an existing fish terminal, source `~/.config/fish/key_abbr.fish`, type `cure` then Space and cancel with Ctrl+C; the full requested command appears. Playback requires the mounted media file and is a separate user action.

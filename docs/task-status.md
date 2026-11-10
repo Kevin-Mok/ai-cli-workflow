@@ -328,3 +328,15 @@ This document records delivery milestones and verification for completed reposit
 - Delivery: one focused commit followed by configured origin/main push; preserve all unrelated dirty changes. Includes the inspection incident and its explicit no-new-learning ledger entry.
 - Use: reload generated abbreviations in existing shells, then type `nbtw` and Space. Migration-preserved live file catalog receives only the reviewed mapping.
 - Rollback: remove the new mapping from source and preserved live catalog, then refresh. Existing generic shortcut smoke procedure remains applicable.
+
+## Cure shortcut — chore(fish): add cure concert shortcut
+
+- Scope: add the exact cure mpv command in applications; no conflicts; preserve all unrelated dirty files.
+- Atomic plan: preview and apply one mapping, document its safe check, run README gate, refresh, verify installed Space expansion, then commit and push origin/main.
+- Verification before activation: helper preview/apply showed exactly one mapping and zero conflicts; README gate pass_no_change; lookup incident recorded with no new learning.
+- Verification complete: refresh-config exited 0 (REFRESH COMPLETE); exact installed abbreviation checker passed syntax and interactive Space expansion without execution. Targeted postmortem ledger check passed. Migration-preserved live source received only the cure row; identical MIME duplicate restored.
+- Manual test: source ~/.config/fish/key_abbr.fish, type cure then Space, inspect and cancel without execution.
+- Remaining/risk: playback and USB file availability are not tested; no playback is executed.
+- Rollback: remove cure mapping and refresh-config.
+- Cursor follow-up prompt: Verify the installed cure abbreviation without executing mpv; preserve unrelated work and use the documented checker.
+- Delivery: focused commit chore(fish): add cure concert shortcut, followed by push to origin/main; actual result reported in the conversation.
