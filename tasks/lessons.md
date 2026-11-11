@@ -289,3 +289,7 @@
 - 2026-11-05: Validate a session commit against HEAD plus the proposed staged hunks: passing tests in a dirty working tree can hide an uncommitted prerequisite. Review the dependency closure before staging.
 
 - 2026-11-06: Verify a new shortcut using the exact name the user requested. Deriving `nbtw` from `btw` and testing only `nbtw` concealed an unavailable requested name. New file requests use existing editor-command mappings; retain legacy prefixed file rows.
+
+- 2026-11-11: A tmux session and Fleet do not establish a reachable CTO chat. Offer an explicit saved-conversation recovery command and select windows by name; after recovery the CTO may be window 2 rather than 0. See [chat recovery](../docs/postmortem/2026-11-11-firstmate-cto-chat-recovery.md).
+
+- 2026-11-11: Native Firstmate already supplies the cross-project CTO role. Prefer its existing primary, memory and supervision over a second launcher or outer coordinator. Wrapper-specific recovery instructions above are historical after retirement; use [native usage](../docs/firstmate.md).

@@ -14223,6 +14223,33 @@
       "reviewed_on": "2026-11-10",
       "findings": [],
       "decision": "No new learning: existing MIME ownership/partial-refresh and fixture-contract guidance apply; live refresh blocked by duplicate MIME sources; no unrelated changes removed."
+    },
+    {
+      "sha256": "b7a6d44eac61ce37e4404d26597a88dee7724045c3e13be1f86c3a7c1981d887",
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-11-11-firstmate-cto-chat-recovery.md"
+      ],
+      "reviewed_on": "2026-11-11",
+      "findings": [],
+      "decision": "No new general learning: existing partial-state ownership, command-specific tmux targeting and path-discovery guidance apply. New explicit chat recovery passed 26 tests and live cwd-filtered picker activation; conversation selection, input and active supervision remain unverified. Full refresh blocked by existing duplicate MIME sources; only reviewed launcher installed."
+    },
+    {
+      "sha256": "301d37bd113ad063a7ea6838e806dfaf4f8a5cd5d5e00c5f9059c6a163e2dd14",
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-11-11-operator-guide-helper-discovery.md"
+      ],
+      "reviewed_on": "2026-11-11",
+      "findings": [],
+      "decision": "No new learning: local-discover-paths-before-reads already covers guessed helper filenames. File inventory found the real helper; corrected read-only lookup succeeded, exit 0. No runtime or permission changes."
+    },
+    {
+      "sha256": "2a8578148fb24aba7b3dd9beeec26548322a8b0e6b11003bbc700ab2cfbdbd8f",
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-11-11-firstmate-candidate-verification.md"
+      ],
+      "reviewed_on": "2026-11-11",
+      "findings": [],
+      "decision": "No new learning: local-discover-paths-before-reads covers selecting the inventoried full immutable tree rather than its changed-file overlay. Correct full-tree incident and README checks passed; baseline broken audio-file links were repaired using existing configuration documentation. No runtime defect or live agent action."
     }
   ],
   "review": {

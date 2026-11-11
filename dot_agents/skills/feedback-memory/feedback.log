@@ -35,3 +35,5 @@
 2026-11-06 - The bare Lavish E2E smoke test should be fully automatic: create its own preset/creator, verify connection, submit and verify the edit, clean up and exit. No URL/ID entry, Send click or indefinite review wait; keep concise stage/elapsed progress. This applies to disposable smoke pages, not normal user reviews.
 
 2026-11-10 - README recruiter sync is manual-only: invoke it only on explicit request, never automatically for README edits, public-interface changes, commits, pushes or checkpoints.
+
+2026-11-11 - Use native Firstmate by running Codex in /home/kevin/coding/firstmate and reusing its owning primary conversation. Firstmate itself is the CTO coordinator; do not recreate the separate firstmate-cto launcher, outer chat, Fleet monitor or custom CTO prompts. Document native usage and retain human pauses and per-task authority.

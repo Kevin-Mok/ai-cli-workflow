@@ -10,6 +10,27 @@ actual CLI, app, API, or generated artifact and expose an observable result.
 Automated tests, linters, type checks, builds, Git hygiene checks and source-text
 searches run before completion and any commit; do not use them to fill the handoff command list.
 
+## Native Firstmate with Codex
+
+- Action: Follow `docs/firstmate.md`; run `codex resume -C /home/kevin/coding/firstmate`
+  and select the existing owning primary, or return to its already open terminal.
+  Expected: Requests go directly to native Firstmate. It confirms its actual home
+  and current work; startup does not create a competing owner or resume a human pause.
+- Action: For a genuinely new fleet only, run `codex -C /home/kevin/coding/firstmate`.
+  Expected: Codex loads Firstmate instructions and normal startup. Ordinary trust
+  checks apply; an existing-owner conflict is preserved rather than cleared.
+- Action: Give the owning primary the CTO preference message in `docs/firstmate.md`
+  and ask it to confirm the saved rules through its normal memory workflow.
+  Expected: Durable decision/reporting preferences live in that home's private
+  `data/captain.md`; setup alone starts no task or worker. Task permissions stay separate.
+- Action: In the Firstmate Codex input, request `$bearings`; for a separately
+  authorized bounded away run, use `$afk` and confirm scope, deadline and permissions.
+  Expected: Fresh status distinguishes verified results and unknowns. The owning
+  primary follows native supervision and honors pauses, deadlines and delivery limits.
+- Action: From the installed Firstmate code root, render
+  `bash bin/fm-supervision-instructions.sh --harness codex --read-only 0 --afk 0`.
+  Expected: `Mode: Codex foreground checkpoint.` Rendering launches no monitor or worker.
+
 ## Instruction-size benchmark
 
 - Action: Run `./scripts/trim-benchmark --check --plain` from this checkout.
