@@ -240,6 +240,190 @@
         "ip_address"
       ],
       "reason": "Reviewed public interface icon: decimal SVG coordinates, not a network address. Exact bytes only; any edit requires fresh review."
+    },
+    {
+      "path_ref": "0546aa57784e",
+      "content_sha256": "b0002e4fb25a4a121f669eb56f9ae53725fee10b9d341a3330c353d72013c29b",
+      "categories": [
+        "email"
+      ],
+      "reason": "Kevin's PR1 approval of Nov 11 22:59 / Nov 12 00:54 / 02:06 EST; exact tree d7b819cea1b75708c1b493e8a32a912d11fd869d; path/content/category bindings only."
+    },
+    {
+      "path_ref": "060c23973c2c",
+      "content_sha256": "3727ba8d9ee5bff4547d5987551bbdad3679952557b4f928979530999d1cce92",
+      "categories": [
+        "credential"
+      ],
+      "reason": "Kevin's PR1 approval of Nov 11 22:59 / Nov 12 00:54 / 02:06 EST; exact tree d7b819cea1b75708c1b493e8a32a912d11fd869d; path/content/category bindings only."
+    },
+    {
+      "path_ref": "0bfe3f751e4a",
+      "content_sha256": "ec52c8baed1dd6a55c2e68a10b511b97ceb0944bda75754307f7d3803d48cfa2",
+      "categories": [
+        "email"
+      ],
+      "reason": "Kevin's PR1 approval of Nov 11 22:59 / Nov 12 00:54 / 02:06 EST; exact tree d7b819cea1b75708c1b493e8a32a912d11fd869d; path/content/category bindings only."
+    },
+    {
+      "path_ref": "0d9c9ef34678",
+      "content_sha256": "0170113cb20a47b88d31aa424d2904d9806f86794a92943bc77e512454faac8f",
+      "categories": [
+        "email"
+      ],
+      "reason": "Kevin's PR1 approval of Nov 11 22:59 / Nov 12 00:54 / 02:06 EST; exact tree d7b819cea1b75708c1b493e8a32a912d11fd869d; path/content/category bindings only."
+    },
+    {
+      "path_ref": "2cb56e166110",
+      "content_sha256": "f23bb96ea1e9985f7785b5d3abab6a11f8b13fc2370badcc15875df0c79bc057",
+      "categories": [
+        "email"
+      ],
+      "reason": "Kevin's PR1 approval of Nov 11 22:59 / Nov 12 00:54 / 02:06 EST; exact tree d7b819cea1b75708c1b493e8a32a912d11fd869d; path/content/category bindings only."
+    },
+    {
+      "path_ref": "3d859ff4ca34",
+      "content_sha256": "51ce97df764ade06980bb4eb3454d117200e9f5bbc4e036dfef4fa2463f6422f",
+      "categories": [
+        "email"
+      ],
+      "reason": "Kevin's PR1 approval of Nov 11 22:59 / Nov 12 00:54 / 02:06 EST; exact tree d7b819cea1b75708c1b493e8a32a912d11fd869d; path/content/category bindings only."
+    },
+    {
+      "path_ref": "4534ecf4e418",
+      "content_sha256": "34f0b121c265b56d017d3df80766c4ffbfc9c2096fe8f6d589c91bf1dcaf1730",
+      "categories": [
+        "email"
+      ],
+      "reason": "Kevin's PR1 approval of Nov 11 22:59 / Nov 12 00:54 / 02:06 EST; exact tree d7b819cea1b75708c1b493e8a32a912d11fd869d; path/content/category bindings only."
+    },
+    {
+      "path_ref": "45439205cc3d",
+      "content_sha256": "3d174185b48271d67e769e141b90552b26ab65c9c4b483ed43603d3074de6459",
+      "categories": [
+        "email"
+      ],
+      "reason": "Kevin's PR1 approval of Nov 11 22:59 / Nov 12 00:54 / 02:06 EST; exact tree d7b819cea1b75708c1b493e8a32a912d11fd869d; path/content/category bindings only."
+    },
+    {
+      "path_ref": "63ae2a8c5408",
+      "content_sha256": "bd57233645dfcab87e8250aa457bd6547cd00e7e6b845de4badfd5fba27cc46f",
+      "categories": [
+        "email"
+      ],
+      "reason": "Kevin's PR1 approval of Nov 11 22:59 / Nov 12 00:54 / 02:06 EST; exact tree d7b819cea1b75708c1b493e8a32a912d11fd869d; path/content/category bindings only."
+    },
+    {
+      "path_ref": "6977dfd04bf2",
+      "content_sha256": "8455de991ebf830aff4af54b7a99371a1e89a731c3d7948a7e16da5a5605f855",
+      "categories": [
+        "email"
+      ],
+      "reason": "Kevin's PR1 approval of Nov 11 22:59 / Nov 12 00:54 / 02:06 EST; exact tree d7b819cea1b75708c1b493e8a32a912d11fd869d; path/content/category bindings only."
+    },
+    {
+      "path_ref": "6edf77d84da1",
+      "content_sha256": "7c1bd284a0b12eb961090b2dd8bbbbfd264c6da952e0b00933b13618d45f2085",
+      "categories": [
+        "email"
+      ],
+      "reason": "Kevin's PR1 approval of Nov 11 22:59 / Nov 12 00:54 / 02:06 EST; exact tree d7b819cea1b75708c1b493e8a32a912d11fd869d; path/content/category bindings only."
+    },
+    {
+      "path_ref": "81ba841e0796",
+      "content_sha256": "adfa1054a7b24a24a2ecbf483fdb4b5e9475697ee13c7c74ed8f617874a26763",
+      "categories": [
+        "email"
+      ],
+      "reason": "Kevin's PR1 approval of Nov 11 22:59 / Nov 12 00:54 / 02:06 EST; exact tree d7b819cea1b75708c1b493e8a32a912d11fd869d; path/content/category bindings only."
+    },
+    {
+      "path_ref": "871000c5fdc2",
+      "content_sha256": "3b531250fa16312abcf183315c57b891f3da18ae4e09bc6788cb195f70f3c9cb",
+      "categories": [
+        "email"
+      ],
+      "reason": "Kevin's PR1 approval of Nov 11 22:59 / Nov 12 00:54 / 02:06 EST; exact tree d7b819cea1b75708c1b493e8a32a912d11fd869d; path/content/category bindings only."
+    },
+    {
+      "path_ref": "8a24f98c4521",
+      "content_sha256": "5e0e6e990056c2aea90df9a8c316280c7f06be919ddc7f93e045536bc86f7927",
+      "categories": [
+        "email"
+      ],
+      "reason": "Kevin's PR1 approval of Nov 11 22:59 / Nov 12 00:54 / 02:06 EST; exact tree d7b819cea1b75708c1b493e8a32a912d11fd869d; path/content/category bindings only."
+    },
+    {
+      "path_ref": "a5afd530e438",
+      "content_sha256": "257ea0158795412b30ffd406cc5c1c8abdabceee369fd7f7cf7aa480583a30d0",
+      "categories": [
+        "email"
+      ],
+      "reason": "Kevin's PR1 approval of Nov 11 22:59 / Nov 12 00:54 / 02:06 EST; exact tree d7b819cea1b75708c1b493e8a32a912d11fd869d; path/content/category bindings only."
+    },
+    {
+      "path_ref": "aa6b322035e5",
+      "content_sha256": "b5648b1e1c07464def52542774d5e26922611c07d9dd409f0de5807cd82fcf22",
+      "categories": [
+        "email"
+      ],
+      "reason": "Kevin's PR1 approval of Nov 11 22:59 / Nov 12 00:54 / 02:06 EST; exact tree d7b819cea1b75708c1b493e8a32a912d11fd869d; path/content/category bindings only."
+    },
+    {
+      "path_ref": "b5c18b2f4bfd",
+      "content_sha256": "56794d41fa122fea56b1d1872c3d845e105bb190bc505bebbec12510813c3c4a",
+      "categories": [
+        "email"
+      ],
+      "reason": "Kevin's PR1 approval of Nov 11 22:59 / Nov 12 00:54 / 02:06 EST; exact tree d7b819cea1b75708c1b493e8a32a912d11fd869d; path/content/category bindings only."
+    },
+    {
+      "path_ref": "c70d13d0a1e5",
+      "content_sha256": "300c8dab64f235b3995939aee06e6a0943c7e89081fc76c30d31d213a677ec0d",
+      "categories": [
+        "email"
+      ],
+      "reason": "Kevin's PR1 approval of Nov 11 22:59 / Nov 12 00:54 / 02:06 EST; exact tree d7b819cea1b75708c1b493e8a32a912d11fd869d; path/content/category bindings only."
+    },
+    {
+      "path_ref": "d86331d8764a",
+      "content_sha256": "c0cc6d85fe3c84b57281a390416ff8bcc93ff91c548f908010b15f43a389ee65",
+      "categories": [
+        "email"
+      ],
+      "reason": "Kevin's PR1 approval of Nov 11 22:59 / Nov 12 00:54 / 02:06 EST; exact tree d7b819cea1b75708c1b493e8a32a912d11fd869d; path/content/category bindings only."
+    },
+    {
+      "path_ref": "dd7a28a190b6",
+      "content_sha256": "dddd74e18b21c38c6b69de99679a1d8b9ad3cf85d4dfb5be90c638069b5b260f",
+      "categories": [
+        "email"
+      ],
+      "reason": "Kevin's PR1 approval of Nov 11 22:59 / Nov 12 00:54 / 02:06 EST; exact tree d7b819cea1b75708c1b493e8a32a912d11fd869d; path/content/category bindings only."
+    },
+    {
+      "path_ref": "eb4c661645db",
+      "content_sha256": "9c4378820fee094572a2e2ecd7617ad29f2b0f9f3eacc6aab24fa9f87e4b8435",
+      "categories": [
+        "email"
+      ],
+      "reason": "Kevin's PR1 approval of Nov 11 22:59 / Nov 12 00:54 / 02:06 EST; exact tree d7b819cea1b75708c1b493e8a32a912d11fd869d; path/content/category bindings only."
+    },
+    {
+      "path_ref": "f2af1f11b9a9",
+      "content_sha256": "e179716d3812e71faf530c450f03a7bc5ebe9c5d056d73f1ac964d01577a7767",
+      "categories": [
+        "email"
+      ],
+      "reason": "Kevin's PR1 approval of Nov 11 22:59 / Nov 12 00:54 / 02:06 EST; exact tree d7b819cea1b75708c1b493e8a32a912d11fd869d; path/content/category bindings only."
+    },
+    {
+      "path_ref": "fb0f1244786e",
+      "content_sha256": "14521f32c12afcc618de299067c99892a2eec693c872967f78491bb1ff7d2a37",
+      "categories": [
+        "email"
+      ],
+      "reason": "Kevin's PR1 approval of Nov 11 22:59 / Nov 12 00:54 / 02:06 EST; exact tree d7b819cea1b75708c1b493e8a32a912d11fd869d; path/content/category bindings only."
     }
   ]
 }
