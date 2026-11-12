@@ -424,6 +424,192 @@
         "email"
       ],
       "reason": "Kevin's PR1 approval of Nov 11 22:59 / Nov 12 00:54 / 02:06 EST; exact tree d7b819cea1b75708c1b493e8a32a912d11fd869d; path/content/category bindings only."
+    },
+    {
+      "path_ref": "59207470bd1e",
+      "content_sha256": "7c53e6128c087daf20d600c005c51d77743503069c42a454cf21ef8997c56f6c",
+      "categories": [
+        "email"
+      ],
+      "reason": "Kevin approved these exact existing Firstmate baseline findings on 2026-11-12 for initial private publication to Kevin-Mok/firstmate. Exact path, content hash and categories only; changed values require new review."
+    },
+    {
+      "path_ref": "b803fcb7f17e",
+      "content_sha256": "28b7a334d7541ab43298e04e60a2ba4efc1c574b7d320ee68de3424799489214",
+      "categories": [
+        "email"
+      ],
+      "reason": "Kevin approved these exact existing Firstmate baseline findings on 2026-11-12 for initial private publication to Kevin-Mok/firstmate. Exact path, content hash and categories only; changed values require new review."
+    },
+    {
+      "path_ref": "eca12c0a30e2",
+      "content_sha256": "a79e3d9dd4c4a2a6f11e5d093612975e9739d7f3c1adfefc4f289a36e465d89a",
+      "categories": [
+        "email"
+      ],
+      "reason": "Kevin approved these exact existing Firstmate baseline findings on 2026-11-12 for initial private publication to Kevin-Mok/firstmate. Exact path, content hash and categories only; changed values require new review."
+    },
+    {
+      "path_ref": "11ba48bc6071",
+      "content_sha256": "14a6db25ae54952b93765668dd178303e6c64c3f304e9dd65b76be0fd20ec0e3",
+      "categories": [
+        "email"
+      ],
+      "reason": "Kevin approved these exact existing Firstmate baseline findings on 2026-11-12 for initial private publication to Kevin-Mok/firstmate. Exact path, content hash and categories only; changed values require new review."
+    },
+    {
+      "path_ref": "30be9cb82cb0",
+      "content_sha256": "7fe4e791b68e79e070b53f42d313aa25af8a727fa05ba2ef55af314594886ee9",
+      "categories": [
+        "credential"
+      ],
+      "reason": "Kevin approved these exact existing Firstmate baseline findings on 2026-11-12 for initial private publication to Kevin-Mok/firstmate. Exact path, content hash and categories only; changed values require new review."
+    },
+    {
+      "path_ref": "c58a8929184c",
+      "content_sha256": "38bade7de07c4d1f55f2d592d26c61766e5b1d6d4dbc28409d96a1394cf91ccd",
+      "categories": [
+        "credential"
+      ],
+      "reason": "Kevin approved these exact existing Firstmate baseline findings on 2026-11-12 for initial private publication to Kevin-Mok/firstmate. Exact path, content hash and categories only; changed values require new review."
+    },
+    {
+      "path_ref": "8cdb7512dd57",
+      "content_sha256": "d34533c8708d304503aa1b494416f89ada58925b748c9783e9ae7d88fc552b00",
+      "categories": [
+        "email"
+      ],
+      "reason": "Kevin approved these exact existing Firstmate baseline findings on 2026-11-12 for initial private publication to Kevin-Mok/firstmate. Exact path, content hash and categories only; changed values require new review."
+    },
+    {
+      "path_ref": "4b262664af95",
+      "content_sha256": "d1a854fc03d644dd81a511251cea7775b33b1da186a8b7cbbd27b211b54efd23",
+      "categories": [
+        "email"
+      ],
+      "reason": "Kevin approved these exact existing Firstmate baseline findings on 2026-11-12 for initial private publication to Kevin-Mok/firstmate. Exact path, content hash and categories only; changed values require new review."
+    },
+    {
+      "path_ref": "ddd20f6edda9",
+      "content_sha256": "8c517a483d146d1c78d3386a9685d4cae6b21202f34e52256803319de2e8adc8",
+      "categories": [
+        "email"
+      ],
+      "reason": "Kevin approved these exact existing Firstmate baseline findings on 2026-11-12 for initial private publication to Kevin-Mok/firstmate. Exact path, content hash and categories only; changed values require new review."
+    },
+    {
+      "path_ref": "934525889e11",
+      "content_sha256": "fda0b5fa6c5af75afca8f5dbed04ac1e69cf37f43705485ec450ff58ea3ac730",
+      "categories": [
+        "credential"
+      ],
+      "reason": "Kevin approved these exact existing Firstmate baseline findings on 2026-11-12 for initial private publication to Kevin-Mok/firstmate. Exact path, content hash and categories only; changed values require new review."
+    },
+    {
+      "path_ref": "3a7818992bf2",
+      "content_sha256": "95a5f548c599f57a7fc668a4f0d389153491d5f4987009268798c5a47b98a0d1",
+      "categories": [
+        "email"
+      ],
+      "reason": "Kevin approved these exact existing Firstmate baseline findings on 2026-11-12 for initial private publication to Kevin-Mok/firstmate. Exact path, content hash and categories only; changed values require new review."
+    },
+    {
+      "path_ref": "8f117b65ce83",
+      "content_sha256": "3e381611835e3ea01f1724335d8e395cb952649ba60fbf3c6cac86b8b347f6e8",
+      "categories": [
+        "ip_address"
+      ],
+      "reason": "Kevin approved these exact existing Firstmate baseline findings on 2026-11-12 for initial private publication to Kevin-Mok/firstmate. Exact path, content hash and categories only; changed values require new review."
+    },
+    {
+      "path_ref": "807ec7d32e5c",
+      "content_sha256": "528d69fc4ea6113d6bc5de605e3140ac959893b24251b76820eade52245fcfbd",
+      "categories": [
+        "email",
+        "ip_address"
+      ],
+      "reason": "Kevin approved these exact existing Firstmate baseline findings on 2026-11-12 for initial private publication to Kevin-Mok/firstmate. Exact path, content hash and categories only; changed values require new review."
+    },
+    {
+      "path_ref": "4b480eb9c2d1",
+      "content_sha256": "3c4a7da8cf76d09a6e809bda2be664d709a965dda81f66cfdf9ebec52bb044b7",
+      "categories": [
+        "email"
+      ],
+      "reason": "Kevin approved these exact existing Firstmate baseline findings on 2026-11-12 for initial private publication to Kevin-Mok/firstmate. Exact path, content hash and categories only; changed values require new review."
+    },
+    {
+      "path_ref": "393db7baeb5b",
+      "content_sha256": "93674b12dd5f6929111fb8dac1e7eba34ddd2ca3113361653d075c55a9e5731e",
+      "categories": [
+        "ip_address"
+      ],
+      "reason": "Kevin approved these exact existing Firstmate baseline findings on 2026-11-12 for initial private publication to Kevin-Mok/firstmate. Exact path, content hash and categories only; changed values require new review."
+    },
+    {
+      "path_ref": "d681d55ec944",
+      "content_sha256": "06508dc4e2e694541333aaca3521285eb62e1e1738619205b84e3d511b20bf7c",
+      "categories": [
+        "ip_address"
+      ],
+      "reason": "Kevin approved these exact existing Firstmate baseline findings on 2026-11-12 for initial private publication to Kevin-Mok/firstmate. Exact path, content hash and categories only; changed values require new review."
+    },
+    {
+      "path_ref": "f11bf36b7e94",
+      "content_sha256": "65d75059b4c2e23aa17c1f02bf949a205713995161fa444d335b2d30c4b12401",
+      "categories": [
+        "email"
+      ],
+      "reason": "Kevin approved these exact existing Firstmate baseline findings on 2026-11-12 for initial private publication to Kevin-Mok/firstmate. Exact path, content hash and categories only; changed values require new review."
+    },
+    {
+      "path_ref": "40a747c8c07e",
+      "content_sha256": "8a81f1e7443a64971e29b4c818c340469ca824f7abd92728796afa32a50a9c33",
+      "categories": [
+        "email"
+      ],
+      "reason": "Kevin approved these exact existing Firstmate baseline findings on 2026-11-12 for initial private publication to Kevin-Mok/firstmate. Exact path, content hash and categories only; changed values require new review."
+    },
+    {
+      "path_ref": "b698f4e8998d",
+      "content_sha256": "1b4a67318f26635e41d7a324b35563265d30f6db158959a794f889c94f377b19",
+      "categories": [
+        "credential"
+      ],
+      "reason": "Kevin approved these exact existing Firstmate baseline findings on 2026-11-12 for initial private publication to Kevin-Mok/firstmate. Exact path, content hash and categories only; changed values require new review."
+    },
+    {
+      "path_ref": "e0377943131f",
+      "content_sha256": "03f5341c315f1878c661d308a18be95cb0fe44224f608c76a8b5a16f3399cf6d",
+      "categories": [
+        "email",
+        "ip_address"
+      ],
+      "reason": "Kevin approved these exact existing Firstmate baseline findings on 2026-11-12 for initial private publication to Kevin-Mok/firstmate. Exact path, content hash and categories only; changed values require new review."
+    },
+    {
+      "path_ref": "ebc123ebd0d1",
+      "content_sha256": "f507522c585c3267b35c44bde643e304e437b633e09293b6b43c9e35a22397f1",
+      "categories": [
+        "email"
+      ],
+      "reason": "Kevin approved these exact existing Firstmate baseline findings on 2026-11-12 for initial private publication to Kevin-Mok/firstmate. Exact path, content hash and categories only; changed values require new review."
+    },
+    {
+      "path_ref": "8650b3611755",
+      "content_sha256": "b9e0b9635e7d2dc8a6fa6dae714f6d55603af69492b04bd6e3fc8c433c792124",
+      "categories": [
+        "email"
+      ],
+      "reason": "Kevin approved these exact existing Firstmate baseline findings on 2026-11-12 for initial private publication to Kevin-Mok/firstmate. Exact path, content hash and categories only; changed values require new review."
+    },
+    {
+      "path_ref": "f30fa1eb88d0",
+      "content_sha256": "fcc1c6392c4e9d52c43868c9531af1c09d1adc1a412957bd68208bf7dc0709b0",
+      "categories": [
+        "provider_token"
+      ],
+      "reason": "Kevin approved these exact existing Firstmate baseline findings on 2026-11-12 for initial private publication to Kevin-Mok/firstmate. Exact path, content hash and categories only; changed values require new review."
     }
   ]
 }
