@@ -31,6 +31,8 @@ the canonical `feedback.log` when durable preferences may apply, and relevant
 
 ## Scope, Safety, And Clarity
 
+- When the user writes `lc` in a prompt, interpret it as `/home/kevin/linux-config`.
+
 - Always select Google Chrome for link previews, never Firefox.
 
 - Do not break production behavior unless explicitly asked. Prefer small, safe, reversible changes and minimal diffs.

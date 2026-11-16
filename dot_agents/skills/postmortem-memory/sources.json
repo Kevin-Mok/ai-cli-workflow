@@ -14250,6 +14250,15 @@
       "reviewed_on": "2026-11-11",
       "findings": [],
       "decision": "No new learning: local-discover-paths-before-reads covers selecting the inventoried full immutable tree rather than its changed-file overlay. Correct full-tree incident and README checks passed; baseline broken audio-file links were repaired using existing configuration documentation. No runtime defect or live agent action."
+    },
+    {
+      "sha256": "c70415940f5c1bd36c9e90b6808bfa7f92a0eb46b505457850646b9bb5a9f9a1",
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-11-15-lc-instruction-refresh.md"
+      ],
+      "reviewed_on": "2026-11-15",
+      "findings": [],
+      "decision": "No new learning: existing restricted-environment guidance applies; refresh remains blocked by read-only home/runtime paths. Source instruction saved, live activation pending."
     }
   ],
   "review": {

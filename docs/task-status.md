@@ -340,3 +340,11 @@ This document records delivery milestones and verification for completed reposit
 - Rollback: remove cure mapping and refresh-config.
 - Cursor follow-up prompt: Verify the installed cure abbreviation without executing mpv; preserve unrelated work and use the documented checker.
 - Delivery: focused commit chore(fish): add cure concert shortcut, followed by push to origin/main; actual result reported in the conversation.
+
+## lc prompt shorthand — docs(agents): define lc prompt shorthand
+
+- Scope: `lc` in user prompts means `/home/kevin/linux-config`; canonical rule, admission evidence and refresh incident only.
+- Verified: 7 admission tests passed; README gate pass_no_change; targeted postmortem ledger check passed.
+- Delivery: one focused commit and push to origin/main; actual SHA and push result reported in the conversation.
+- Remaining: live refresh blocked by sandbox home/runtime writes and existing source/live instruction drift; three existing skill inventory warnings remain.
+- Attribution: session 01a1e1bb-239d-7f41-9d1b-ef21b7fe0186, direct observed writes; scope helper did not detect tool-wrapped edits. Pre-existing mixed-file hunks excluded.
