@@ -75,7 +75,8 @@ class ReadablePaletteTest(unittest.TestCase):
         p.write_text('#!/bin/sh\nexec python3 -m pywal "$@"\n')
         p.chmod(0o755)
         self.env = {**os.environ, 'HOME': str(self.home), 'XDG_CACHE_HOME': str(self.home / '.cache'),
-                    'XDG_CONFIG_HOME': str(self.home / '.config'), 'PYTHONPATH': str(Path(pywal.__file__).parent.parent),
+                    'XDG_CONFIG_HOME': str(self.home / '.config'), 'XDG_STATE_HOME': str(self.home / '.local/state'),
+                    'PYTHONPATH': str(Path(pywal.__file__).parent.parent),
                     'PATH': str(self.bin) + ':' + os.environ['PATH']}
 
     def apply(self, *args):
@@ -100,7 +101,7 @@ class ReadablePaletteTest(unittest.TestCase):
         for color in [*actual['colors'].values(), actual['special']['foreground'], actual['special']['cursor']]:
             self.assertRegex(color, r'^#[0-9a-fA-F]{6}$')
         self.assert_text_contrast(actual['colors'], actual['special'], (bg, bound, '#000000'))
-        self.assertEqual(actual['special']['foreground'], source['special']['foreground'])
+        self.assertLess((oklab(actual['special']['foreground'])[1]**2 + oklab(actual['special']['foreground'])[2]**2)**.5, .015)
         for name in ('colors-kitty.conf', 'colors.Xresources', 'colors-wal.vim', 'colors.sh', 'sequences'):
             text = (self.cache / name).read_text()
             for color in actual['colors'].values():
@@ -113,15 +114,21 @@ class ReadablePaletteTest(unittest.TestCase):
         self.assertIn('defaultbg = 256;', (self.cache / 'colors-wal-st.h').read_text())
         return actual
 
-    def assert_vivid_chromatic_slots(self, colors, minimum_distance=0.04):
+    def assert_comfortable_slots(self, colors, minimum_distance=0.02):
         slots = [f'color{index}' for index in (*range(1, 7), *range(9, 15))]
         values = [colors[slot] for slot in slots]
         self.assertEqual(len(set(values)), 12)
-        self.assertTrue(all(saturation(color) >= .98 for color in values), values)
-        distances = [(oklab_distance(first, second), first_slot, second_slot)
-                     for (first_slot, first), (second_slot, second) in combinations(zip(slots, values), 2)]
-        closest = min(distances)
-        self.assertGreaterEqual(closest[0], minimum_distance, closest)
+        for color in values:
+            light, a, b = oklab(color)
+            self.assertLessEqual((a*a+b*b)**.5, .105, color)
+            self.assertGreaterEqual((a*a+b*b)**.5, .055, color)
+            self.assertLessEqual(light, .86, color)
+        for index in range(1, 7):
+            normal, bright = oklab(colors[f'color{index}']), oklab(colors[f'color{index+8}'])
+            self.assertGreater(bright[0], normal[0])
+            self.assertLess(oklab_distance(colors[f'color{index}'], colors[f'color{index+8}']), .07)
+        closest = min(oklab_distance(a, b) for a, b in combinations(values, 2))
+        self.assertGreaterEqual(closest, minimum_distance)
         return closest
 
     def test_sparse_quantizer_fallback_uses_real_palette_when_pywal_generator_fails(self):
@@ -152,25 +159,25 @@ class ReadablePaletteTest(unittest.TestCase):
         expected = ['#123456'] * 16
         self.assertEqual(helper['sparse_colors']('fixture.jpeg', lambda image: expected, backend), expected)
 
-    def test_vivid_palette_separates_twelve_chromatic_slots_across_all_72_anchors(self):
+    def test_comfortable_semantic_pairs_across_wallpaper_backgrounds(self):
         helper = runpy.run_path(str(ROOT / 'scripts/executable_pywal-readable'))
+        results = set()
         for hue in range(0, 360, 5):
-            with self.subTest(anchor_hue=hue):
-                red, green, blue = colorsys.hls_to_rgb(hue / 360, .5, .8)
-                anchor = '#' + ''.join(f'{round(channel * 255):02X}' for channel in (red, green, blue))
-                source = {
-                    'special': {'background': '#050412', 'foreground': '#dddddd', 'cursor': '#dddddd'},
-                    'colors': {'color0': '#050412', **{f'color{index}': '#222222' for index in range(1, 16)}},
-                }
-                source['colors']['color1'] = anchor
-                helper['repair_palette'](source)
-                self.assert_vivid_chromatic_slots(source['colors'], .08)
-                actual_hue = colorsys.rgb_to_hls(*(int(source['colors']['color1'][i:i + 2], 16) / 255
-                                                   for i in (1, 3, 5)))[0]
-                self.assertLessEqual(abs((actual_hue * 360 - hue + 180) % 360 - 180), 3)
-                first = json.dumps(source, sort_keys=True)
-                helper['repair_palette'](source)
-                self.assertEqual(json.dumps(source, sort_keys=True), first)
+            rgb = colorsys.hls_to_rgb(hue / 360, .08, .5)
+            source = palette('#ff00ff')
+            source['special']['background'] = '#' + ''.join(f'{round(c*255):02x}' for c in rgb)
+            helper['repair_palette'](source)
+            self.assert_comfortable_slots(source['colors'])
+            for index, expected in enumerate((25, 140, 85, 255, 310, 200), 1):
+                _, a, b = oklab(source['colors'][f'color{index}'])
+                import math
+                actual = math.degrees(math.atan2(b, a)) % 360
+                self.assertLess(abs((actual - expected + 180) % 360 - 180), 10)
+            results.add(source['colors']['color1'])
+            first = json.dumps(source, sort_keys=True)
+            helper['repair_palette'](source)
+            self.assertEqual(json.dumps(source, sort_keys=True), first)
+        self.assertGreater(len(results), 1)
 
     def test_dark_and_saturated_text_is_readable_in_all_exports_and_restore(self):
         for color in ('#000000', '#010208', '#1626c7', '#560f8e', '#8dd6dc'):
@@ -181,12 +188,12 @@ class ReadablePaletteTest(unittest.TestCase):
                 result = self.apply('--theme', str(path), '-n', '-s', '-q')
                 self.assertEqual(result.returncode, 0, result.stderr)
                 first = self.check_palette(source)
-                self.assert_vivid_chromatic_slots(first['colors'], .08)
+                self.assert_comfortable_slots(first['colors'], .02)
                 result = self.apply('-R', '-n', '-s', '-q')
                 self.assertEqual(result.returncode, 0, result.stderr)
                 self.assertEqual(self.check_palette(source), first)
 
-    def test_upper_background_normalizes_for_vivid_text_headroom(self):
+    def test_upper_background_normalizes_for_comfortable_text_headroom(self):
         source = palette('#000000')
         source['special']['background'] = '#666666'
         path = self.home / 'upper-background.json'
@@ -221,7 +228,7 @@ class ReadablePaletteTest(unittest.TestCase):
                     f'{round(int(adjusted[i:i+2], 16) * .9):02x}' for i in (1, 3, 5))))
                 for name in ('colors-kitty.conf', 'colors.Xresources', 'colors-wal.vim', 'colors.sh', 'sequences'):
                     self.assertIn(adjusted, (self.cache / name).read_text(), name)
-                self.assert_vivid_chromatic_slots(first['colors'], .04)
+                self.assert_comfortable_slots(first['colors'], .02)
                 result = self.apply('-R', '-n', '-s', '-q')
                 self.assertEqual(result.returncode, 0, result.stderr)
                 self.assertEqual(json.loads((self.cache / 'colors.json').read_text()), first)
@@ -245,7 +252,7 @@ class ReadablePaletteTest(unittest.TestCase):
                     self.assertRegex(color, r'^#[0-9a-fA-F]{6}$')
                 self.assert_text_contrast(actual['colors'], actual['special'],
                                           (actual['special']['background'], white_composite(actual['special']['background']), '#000000'))
-                self.assert_vivid_chromatic_slots(actual['colors'], .04)
+                self.assert_comfortable_slots(actual['colors'], .02)
                 from pywal.backends import wal as backend
                 helper = runpy.run_path(str(ROOT / 'scripts/executable_pywal-readable'))
                 extracted = helper['sparse_colors'](str(image), backend.gen_colors, backend)
@@ -265,7 +272,7 @@ class ReadablePaletteTest(unittest.TestCase):
         result = self.apply('-r', '-n', '-s', '-q')
         self.assertEqual(result.returncode, 0, result.stderr)
         actual = self.check_palette(source)
-        self.assert_vivid_chromatic_slots(actual['colors'], .08)
+        self.assert_comfortable_slots(actual['colors'], .02)
 
     def test_new_generation_and_unrepaired_image_cache_cannot_bypass(self):
         image = self.home / 'dim.ppm'
@@ -308,7 +315,7 @@ runpy.run_path(sys.argv[0], run_name='__main__')
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(output.read_text().strip(), source['special']['background'])
 
-    def test_vim_keeps_readable_vivid_accent_lanes_instead_of_collapsing_them(self):
+    def test_vim_keeps_readable_muted_accent_lanes_instead_of_collapsing_them(self):
         source = palette('#8dd6dc')
         path = self.home / 'fixture.json'
         path.write_text(json.dumps(source))

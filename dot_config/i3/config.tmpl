@@ -351,15 +351,15 @@ set $make_st_script "/home/example/st/make-st.sh"
 # test
 
 {{ if eq .chezmoi.hostname "x1-carbon" }}
-bindsym Control+Shift+q exec /home/example/scripts/apply-pywal-theme $($scripts_path/shuffler "$HOME/Pictures/Backgrounds/bright/editing") && $make_st_script
-bindsym Control+Shift+w exec /home/example/scripts/apply-pywal-theme $($scripts_path/shuffler "$HOME/Pictures/Backgrounds/dim/non-editing") && $make_st_script
+bindsym Control+Shift+q exec /home/example/scripts/apply-pywal-theme "$($scripts_path/shuffler -i "$HOME/Pictures/Backgrounds")" && $make_st_script
+bindsym Control+Shift+w exec /home/example/scripts/apply-pywal-theme "$($scripts_path/shuffler -i "$HOME/Pictures/Backgrounds")" && $make_st_script
 bindsym Control+$mod+z exec feh --bg-fill ~/Pictures/Backgrounds/dim/black.jpg
 {{ else }}
-bindsym Control+$mod+q exec /home/example/scripts/apply-pywal-theme $($scripts_path/shuffler "$HOME/Pictures/Backgrounds/bright/editing") && $make_st_script
-bindsym Control+$mod+w exec /home/example/scripts/apply-pywal-theme $($scripts_path/shuffler "$HOME/Pictures/Backgrounds/dim/non-editing") && $make_st_script
+bindsym Control+$mod+q exec /home/example/scripts/apply-pywal-theme "$($scripts_path/shuffler -i "$HOME/Pictures/Backgrounds")" && $make_st_script
+bindsym Control+$mod+w exec /home/example/scripts/apply-pywal-theme "$($scripts_path/shuffler -i "$HOME/Pictures/Backgrounds")" && $make_st_script
 {{ end }}
-bindsym $mod+r exec /home/example/scripts/apply-pywal-theme $($scripts_path/shuffler "$HOME/Pictures/Backgrounds/dim/editing") && $make_st_script
-bindsym Control+$mod+y exec /home/example/scripts/apply-pywal-theme $($scripts_path/shuffler "$HOME/Pictures/Backgrounds/bright/non-editing") && $make_st_script
+bindsym $mod+r exec /home/example/scripts/apply-pywal-theme "$($scripts_path/shuffler -i "$HOME/Pictures/Backgrounds")" && $make_st_script
+bindsym Control+$mod+y exec /home/example/scripts/apply-pywal-theme "$($scripts_path/shuffler -i "$HOME/Pictures/Backgrounds")" && $make_st_script
 
 #  ]]] backgrounds # 
 

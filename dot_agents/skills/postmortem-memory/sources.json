@@ -14304,6 +14304,24 @@
       "reviewed_on": "2026-11-16",
       "findings": [],
       "decision": "No new generalized finding: existing isolation, independent artifact/runtime verification and incomplete-run guidance apply. Task-specific pywal cache/quantizer/GIMP lessons are recorded in tasks/lessons.md. Current focused regressions, actual XCF decoding, complete fresh667-image report and source/cache fingerprints establish the recorded runtime result; unknown external SIGTERM cause and documented contrast/compositor limits remain explicit."
+    },
+    {
+      "sha256": "fd265bd6633d27b441703f1b87f14b73fec02443cfe4e3c5968264434a7ec0bc",
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-11-16-harsh-terminal-palette.md"
+      ],
+      "reviewed_on": "2026-11-16",
+      "findings": [],
+      "decision": "No new generalized finding: existing artifact/runtime validation, isolation and incomplete-run guidance apply. Task-specific lesson separates contrast from reading comfort and validates muted semantic pairs. Policy and scoped activation verified; full refresh was blocked at palette activation and was subsequently resolved in the related i3-wallpaper-activation report. SIGTERM root cause remains unknown."
+    },
+    {
+      "sha256": "889babb784c13df80eae7ea0a7c6896df1b5c0be91b283e2aca2fe511e6633ea",
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-11-16-i3-wallpaper-activation.md"
+      ],
+      "reviewed_on": "2026-11-16",
+      "findings": [],
+      "decision": "No new generalized finding: existing isolated-state, raw IPC contract and data/conflict-preservation guidance apply. Local lessons cover XDG history isolation, private MIME duplicate recovery and source backups before local-priority re-add; template conflicts now stop explicitly. Real CLI local-only/both-edited/template/source-only fixtures pass, reviewed helper deployed and actual refresh completed. No physical keypress or asynchronous setter-success claim."
     }
   ],
   "review": {

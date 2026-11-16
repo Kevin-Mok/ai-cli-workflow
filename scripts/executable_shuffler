@@ -9,6 +9,7 @@ cli_emoji() {
 
 shuffle_cache="shuffle.txt"
 regen_flag=0
+images_only=0
 dir=""
 
 # }}} vars #
@@ -19,16 +20,20 @@ function usage_msg() {
 	# echo "usage: shuffler [-r] [dir_name]"
 	printf '%s' "$(cli_emoji '📖')"
 	cat <<-EOF
-	Usage: shuffler [-r] [dir_name]
+	Usage: shuffler [-r] [-i] [dir_name]
     -r: regenerate the shuffle cache
+    -i: select wallpaper images only (recursive; excludes .git)
 	EOF
 }
 
 # }}} usage_msg #
 
 # parse for regen_flag{{{
-while getopts ":r" opt; do
+while getopts ":ri" opt; do
   case $opt in
+    i)
+      images_only=1
+      ;;
 	r)
 	  echo "$(cli_emoji 'ℹ️')-r was triggered!" >&2
 	  regen_flag=1
@@ -57,12 +62,29 @@ fi
 
 # }}} set dir #
 
-# rebuild shuffle cache if regen_flag, doesn't exist or file empty
-if [[ "$regen_flag" -eq 1 ]] || [[ ! -f "$dir"/"$shuffle_cache" ]] || \
-  [[ "$(head -n 1 "$dir"/"$shuffle_cache")" = "" ]]; then
-	find "$dir"/* ! -name "$shuffle_cache" -type f | shuf > "$dir"/"$shuffle_cache"
+# Restrict wallpaper mode without changing generic shuffler callers.
+find_candidates() {
+  if [[ "$images_only" -eq 1 ]]; then
+    find "$dir" -regextype posix-extended -type d -name .git -prune -o -type f \
+      -iregex '.*\.(jpe?g|png|webp|bmp|gif|tiff?|xcf|ppm)(\.[0-9]+)?' -print
+  else
+    find "$dir"/* ! -name "$shuffle_cache" -type f
+  fi
+}
+
+if [[ "$images_only" -eq 1 && -f "$dir/$shuffle_cache" ]]; then
+  # Drop deleted paths and old non-image cache entries before choosing.
+  cached=$(grep -Fx -f <(find_candidates) "$dir/$shuffle_cache" || true)
+  printf '%s\n' "$cached" > "$dir/$shuffle_cache"
 fi
-head -n 1 "$dir"/"$shuffle_cache"
-printf '%s\n\n' "$(sed '1d' "$dir"/"$shuffle_cache")" > "$dir"/"$shuffle_cache"
+if [[ "$regen_flag" -eq 1 || ! -s "$dir/$shuffle_cache" || -z "$(head -n 1 "$dir/$shuffle_cache" 2>/dev/null)" ]]; then
+  find_candidates | shuf > "$dir/$shuffle_cache"
+fi
+if [[ "$images_only" -eq 1 && ! -s "$dir/$shuffle_cache" ]]; then
+  printf '%sNo wallpaper images found in %s\n' "$(cli_emoji '❌')" "$dir" >&2
+  exit 1
+fi
+head -n 1 "$dir/$shuffle_cache"
+printf '%s\n\n' "$(sed '1d' "$dir/$shuffle_cache")" > "$dir/$shuffle_cache"
 
 # vim: set tabstop=2 shiftwidth=2 expandtab:

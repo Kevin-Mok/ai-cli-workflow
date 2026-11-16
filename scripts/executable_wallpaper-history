@@ -1,0 +1,78 @@
+#!/usr/bin/env python3
+"""Show applied wallpapers with the most recent entry at the bottom."""
+import argparse
+from datetime import datetime
+import fcntl
+import json
+import os
+from pathlib import Path
+import sys
+
+
+def read_records(handle, path):
+    records = []
+    for number, line in enumerate(handle, 1):
+        try:
+            record = json.loads(line)
+            timestamp = datetime.fromisoformat(record['timestamp'])
+            wallpaper = record['wallpaper']
+            if timestamp.tzinfo is None or not isinstance(wallpaper, str) or not wallpaper.strip():
+                raise ValueError('expected a timezone-aware timestamp and nonempty wallpaper path')
+            records.append((timestamp, wallpaper))
+        except (ValueError, KeyError, TypeError) as exc:
+            raise ValueError(f'{path}, line {number}: invalid history; repair this record before continuing') from exc
+    return records
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--record', action='store_true', help='silently record the applied pywal wallpaper')
+    parser.add_argument('--plain', action='store_true', help='use ASCII headings and errors')
+    args = parser.parse_args()
+    plain = args.plain or os.environ.get('CLI_PLAIN') == '1'
+    state = Path(os.environ.get('XDG_STATE_HOME') or Path.home() / '.local/state')
+    path = state / 'wallpaper-history/history.jsonl'
+    try:
+        if args.record:
+            cache = Path(os.environ.get('PYWAL_CACHE_DIR', str(Path.home() / '.cache/wal'))) / 'colors.json'
+            try:
+                wallpaper = json.loads(cache.read_text())['wallpaper']
+                if not isinstance(wallpaper, str) or not wallpaper.strip():
+                    raise ValueError('wallpaper must be a nonempty path')
+            except (OSError, ValueError, KeyError, TypeError) as exc:
+                raise ValueError(f'cannot read applied wallpaper from {cache}; apply a wallpaper successfully first') from exc
+            path.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+            path.parent.chmod(0o700)
+            descriptor = os.open(path, os.O_RDWR | os.O_CREAT | os.O_APPEND, 0o600)
+            with os.fdopen(descriptor, 'a+', encoding='utf-8') as handle:
+                fcntl.flock(handle, fcntl.LOCK_EX)
+                os.fchmod(handle.fileno(), 0o600)
+                handle.seek(0)
+                records = read_records(handle, path)
+                if not records or records[-1][1] != wallpaper:
+                    handle.seek(0)
+                    existing = handle.read()
+                    if existing and not existing.endswith('\n'):
+                        handle.write('\n')
+                    handle.write(json.dumps({'timestamp': datetime.now().astimezone().isoformat(),
+                                             'wallpaper': wallpaper}) + '\n')
+            return 0
+        if path.exists():
+            with path.open(encoding='utf-8') as handle:
+                fcntl.flock(handle, fcntl.LOCK_SH)
+                records = read_records(handle, path)
+        else:
+            records = []
+        print(('' if plain else '🖼️ ') + ('Wallpaper history (newest at bottom)' if records else 'No wallpaper history yet.'))
+        for timestamp, wallpaper in records:
+            # JSON quoting keeps control characters in paths from reaching the terminal.
+            display = json.dumps(wallpaper, ensure_ascii=plain)[1:-1]
+            print(f'{timestamp.astimezone():%Y-%m-%d %H:%M:%S %Z}  {display}')
+        return 0
+    except (OSError, ValueError, UnicodeError) as exc:
+        print(f'{"" if plain else "❌ "}Cannot access wallpaper history at {path}: {exc}', file=sys.stderr)
+        return 1
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())

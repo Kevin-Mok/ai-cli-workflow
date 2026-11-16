@@ -121,10 +121,10 @@ def check_background(original: str, corrected: str) -> dict:
         return 1.05/(luminance(bound)+.05)
     old, new = white_bound_contrast(original), white_bound_contrast(corrected)
     preserved = original.lower() == corrected.lower()
-    adjusted = (not preserved and old < 7 and new >= 7 and luminance(corrected) < luminance(original)
+    adjusted = (not preserved and old < 10 and new >= 10 and luminance(corrected) < luminance(original)
                 and all(int(corrected[i:i+2], 16) <= int(original[i:i+2], 16) for i in (1, 3, 5)))
-    return {'preserved': preserved, 'adjusted': adjusted, 'passed': (preserved and new >= 7) or adjusted,
-            'reason': 'unchanged' if preserved and new >= 7 else 'background needs darkening for vivid text' if preserved else 'unsupported background darkened' if adjusted else 'unexpected background change',
+    return {'preserved': preserved, 'adjusted': adjusted, 'passed': (preserved and new >= 10) or adjusted,
+            'reason': 'unchanged' if preserved and new >= 10 else 'background needs darkening for muted text' if preserved else 'unsupported background darkened' if adjusted else 'unexpected background change',
             'original_white_bound_contrast': old, 'corrected_white_bound_contrast': new}
 
 
@@ -146,9 +146,14 @@ def validate_colorfulness(palette: dict) -> dict:
              for i,left in enumerate(labs) for right in list(labs)[i+1:]]
     distance, left, right = min(pairs)
     distinct = len(set(color.upper() for color in colors.values()))
-    return {'minimum_saturation': min(saturations), 'minimum_oklab_distance': distance,
+    chromas = [math.hypot(lab[1], lab[2]) for lab in labs.values()]
+    paired = all(0 < labs[f'color{i+8}'][0] - labs[f'color{i}'][0] < .06
+                 and math.dist(labs[f'color{i}'], labs[f'color{i+8}']) < .07 for i in range(1, 7))
+    return {'maximum_chroma': max(chromas), 'minimum_chroma': min(chromas),
+            'maximum_lightness': max(lab[0] for lab in labs.values()), 'paired_brights': paired,
+            'minimum_saturation': min(saturations), 'minimum_oklab_distance': distance,
             'closest_pair': [left, right], 'distinct_colors': distinct,
-            'passed': min(saturations) >= .98 and distance >= .04 and distinct == 12}
+            'passed': min(chromas) >= .055 and max(chromas) <= .105 and max(lab[0] for lab in labs.values()) <= .86 and distance >= .02 and distinct == 12 and paired}
 
 
 def fingerprint(paths) -> dict:
@@ -192,7 +197,7 @@ def check_image(image: Path, home: Path, helper: Path, site: str, say) -> dict:
         row.update(validate_palette(first))
         row['colorfulness'] = validate_colorfulness(first)
         if not row['colorfulness']['passed']:
-            row['failed_checks'].append('Color saturation/diversity below .98 / .04 OKLab / 12 unique colors; see colorfulness')
+            row['failed_checks'].append('Muted palette bounds or normal/bright pairs failed; see colorfulness')
         if row['unsafe_slots']:
             row['failed_checks'].append('Text below 4.5:1 or darker than the composite bound; see per_slot measurements')
         raw = list((cache/'schemes').glob('*.json'))
@@ -301,7 +306,7 @@ def main(argv=None) -> int:
                   'root': str(root), 'checked': len(results), 'passed': passed, 'failures': failures,
                   'collisions': collisions, 'skipped_metadata': [str(p) for p in metadata],
                   'source_and_active_palette_unchanged': unchanged, 'opacity': .9, 'contrast_floor': 4.5, 'reading_contrast_floor': 7,
-                  'colorfulness_policy': {'saturation_floor': .98, 'oklab_distance_floor': .04, 'distinct_accents': 12},
+                  'colorfulness_policy': {'chroma_range': [.055, .105], 'lightness_ceiling': .86, 'oklab_distance_floor': .02, 'paired_brights': True, 'distinct_accents': 12},
                   'software': software, 'results': results}
         report_path.parent.mkdir(parents=True, exist_ok=True)
         with report_path.open('x') as stream:

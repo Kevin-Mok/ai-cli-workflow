@@ -27,6 +27,12 @@ else
   python3 "$readable_wal" --saturate 0.8 -e -i "$@"
 fi
 
+wallpaper_history="$(dirname "$(readlink -f "$0")")/wallpaper-history"
+[ -f "$wallpaper_history" ] || wallpaper_history="$(dirname "$(readlink -f "$0")")/executable_wallpaper-history"
+if ! python3 "$wallpaper_history" --record; then
+  printf '%sWallpaper applied, but wallpaper history could not be saved; check the error above.\n' "$(cli_emoji '⚠️')" >&2
+fi
+
 if [ -x "${generate_i3_colors_script}" ]; then
   "${generate_i3_colors_script}" >/dev/null 2>&1 || true
 fi

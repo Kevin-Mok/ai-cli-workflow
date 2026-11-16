@@ -2,6 +2,7 @@
 """Run pywal with readable dark-terminal text before sequences and exports."""
 import copy
 import colorsys
+import math
 import hashlib
 import shutil
 import subprocess
@@ -35,42 +36,61 @@ def oklab(color: str) -> tuple:
             .0259040371*l + .7827717662*m - .8086757660*s)
 
 
-def distinct_colors(bound: str, anchor: int) -> list:
-    """Greedily maximize minimum perceptual separation among readable colors."""
-    candidates = []
-    for hue in range(72):
-        for step in range(129):
-            lightness = min(1, .5 + step/255)
-            rgb = colorsys.hls_to_rgb(hue/72, lightness, 1)
-            color = '#' + ''.join(f'{round(channel*255):02X}' for channel in rgb)
-            if relative_luminance(color) > relative_luminance(bound) and contrast_ratio(color, bound) >= 4.55:
-                candidates.append(color)
-                break
-    labs = [oklab(color) for color in candidates]
-    selected = [anchor]
-    remaining = [i for i in range(72) if i != anchor]
-    while len(selected) < 12:
-        choice = max(remaining, key=lambda i: min(sum((a-b)**2 for a,b in zip(labs[i], labs[j])) for j in selected))
-        selected.append(choice)
-        remaining.remove(choice)
-    return [candidates[i] for i in selected]
+def muted_color(lightness: float, chroma: float, hue: float) -> str:
+    """OKLCH to sRGB; reduce chroma for gamut rather than clipping channels."""
+    for step in range(101):
+        c = chroma * (1 - step / 100)
+        a, b = c * math.cos(math.radians(hue)), c * math.sin(math.radians(hue))
+        l = (lightness + .3963377774*a + .2158037573*b)**3
+        m = (lightness - .1055613458*a - .0638541728*b)**3
+        s = (lightness - .0894841775*a - 1.291485548*b)**3
+        linear = (4.0767416621*l - 3.3077115913*m + .2309699292*s,
+                  -1.2684380046*l + 2.6097574011*m - .3413193965*s,
+                  -.0041960863*l - .7034186147*m + 1.707614701*s)
+        if all(0 <= value <= 1 for value in linear):
+            rgb = [12.92*v if v <= .0031308 else 1.055*v**(1/2.4)-.055 for v in linear]
+            return '#' + ''.join(f'{round(v*255):02X}' for v in rgb)
+    raise ValueError('Cannot map muted color into sRGB')
+
+
+def comfortable_colors(bound: str, background: str) -> list:
+    """Stable ANSI semantics with a restrained wallpaper hue influence."""
+    hue = colorsys.rgb_to_hls(*(c/255 for c in hex_to_rgb(background)))[0]
+    offset = 8 * math.sin(2 * math.pi * hue)
+    colors = []
+    for bright in (False, True):
+        for semantic_hue in (25, 140, 85, 255, 310, 200):
+            for step in range(101):
+                light = .75 + step*.001
+                normal = muted_color(light, .085, semantic_hue + offset)
+                if contrast_ratio(normal, bound) >= 4.55:
+                    colors.append(muted_color(light + (.035 if bright else 0), .085, semantic_hue + offset))
+                    break
+            else:
+                raise ValueError('Background leaves insufficient room for muted accents')
+    return colors
 
 
 def repair_palette(palette: dict) -> None:
     """Validate first, then brighten text against 90%-opaque sRGB backgrounds."""
     fixed = copy.deepcopy(palette)
+    for color in [*fixed['colors'].values(), fixed['special']['foreground'], fixed['special']['cursor']]:
+        hex_to_rgb(color)
     background = fixed['special']['background']
     hex_to_rgb(background)
     bound = mix(background, '#ffffff', .1)
-    if contrast_ratio('#ffffff', bound) < 7:
+    if contrast_ratio('#ffffff', bound) < 10:
         # Only normalize unsupported backgrounds; retain room for colored text.
         for step in range(1, 256):
             candidate = mix(background, '#000000', step / 255)
             candidate_bound = mix(candidate, '#ffffff', .1)
-            if contrast_ratio('#ffffff', candidate_bound) >= 7:
+            if contrast_ratio('#ffffff', candidate_bound) >= 10:
                 fixed['special']['background'] = candidate
                 bound = candidate_bound
                 break
+    fixed['special'].update(foreground='#D8DADF', cursor='#D8DADF')
+    for index, neutral in ((0, '#96989D'), (7, '#D8DADF'), (8, '#A4A6AB'), (15, '#E0E2E7')):
+        fixed['colors'][f'color{index}'] = neutral
     slots = [(fixed['colors'], f'color{i}') for i in range(16)]
     slots += [(fixed['special'], key) for key in ('foreground', 'cursor')]
     for group, key in slots:
@@ -85,9 +105,8 @@ def repair_palette(palette: dict) -> None:
             if relative_luminance(candidate) > relative_luminance(bound) and contrast_ratio(candidate, bound) >= target:
                 group[key] = candidate
                 break
-    anchor = colorsys.rgb_to_hls(*(channel / 255 for channel in hex_to_rgb(palette['colors']['color1'])))[0]
-    vivid = distinct_colors(bound, round(anchor * 72) % 72)
-    for key, color in zip([f'color{i}' for i in (*range(1, 7), *range(9, 15))], vivid):
+    accents = comfortable_colors(bound, fixed['special']['background'])
+    for key, color in zip([f'color{i}' for i in (*range(1, 7), *range(9, 15))], accents):
         fixed['colors'][key] = color
     palette.update(fixed)
 

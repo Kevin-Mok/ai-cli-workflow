@@ -1,6 +1,8 @@
-# Verify every wallpaper and generate vivid readable palettes
+# Verify every wallpaper and generate readable palettes
 
 Deliver a reusable read-only verifier for every background image and make the actual pywal application path produce vivid, distinct editing colors with measured contrast. Diagnose each failure precisely, preserve source images/live state during verification, and prove the full collection works.
+
+Current comfort-policy correction: [comfortable terminal palette](pywal-comfortable-terminal-palette.md) supersedes the historical maximum-saturation/diversity decisions and measurements below. Historical 667-image results do not verify the replacement policy.
 
 ## Current scope and protected state
 

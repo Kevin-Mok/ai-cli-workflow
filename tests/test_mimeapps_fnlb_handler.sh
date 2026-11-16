@@ -3,7 +3,7 @@
 set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-mimeapps_path="${repo_root}/dot_config/mimeapps.list"
+mimeapps_path="${repo_root}/dot_config/private_mimeapps.list"
 
 expected='x-scheme-handler/fnlb=fnlb.desktop'
 actual="$(rg '^x-scheme-handler/fnlb=' "${mimeapps_path}")"

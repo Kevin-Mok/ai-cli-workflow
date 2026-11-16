@@ -259,27 +259,22 @@ class WallpaperMergeVerifierTest(unittest.TestCase):
         self.assertEqual({item["slot"] for item in report["unsafe_slots"]}, {"color7", "foreground", "cursor"})
         self.assertLess(report["minimum_contrast"], 7)
 
-    def test_colorfulness_validation_checks_sat_diversity_and_reports_closest_pair(self):
-        validate = self.load_verifier()["validate_colorfulness"]
-        hues = (0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330)
-        colors = {}
-        slots = (*range(1, 7), *range(9, 15))
-        for index, hue in zip(slots, hues):
-            red, green, blue = colorsys.hls_to_rgb(hue / 360, .58, 1.0)
-            colors[f"color{index}"] = "#" + "".join(f"{round(channel * 255):02X}" for channel in (red, green, blue))
-        report = validate({"colors": colors})
-
-        self.assertTrue(report["passed"], report)
-        self.assertEqual(report["distinct_colors"], 12)
-        self.assertGreaterEqual(report["minimum_saturation"], .98)
-        self.assertGreaterEqual(report["minimum_oklab_distance"], .04)
-        self.assertEqual(len(report["closest_pair"]), 2)
-        independent_distance = min(oklab_distance(first, second) for first, second in combinations(colors.values(), 2))
-        self.assertAlmostEqual(report["minimum_oklab_distance"], independent_distance, places=5)
-
-        collapsed = validate({"colors": {f"color{i}": "#FF0000" for i in (*range(1, 7), *range(9, 15))}})
-        self.assertFalse(collapsed["passed"])
-        self.assertEqual(collapsed["distinct_colors"], 1)
+    def test_colorfulness_validation_rejects_neon_and_collapsed_pairs(self):
+        validate = self.load_verifier()['validate_colorfulness']
+        helper = runpy.run_path(str(ROOT / 'scripts/executable_pywal-readable'))
+        source = palette('#050412', '#dddddd')
+        helper['repair_palette'](source)
+        report = validate(source)
+        self.assertTrue(report['passed'], report)
+        self.assertLessEqual(report['maximum_chroma'], .105)
+        self.assertEqual(report['distinct_colors'], 12)
+        independent = min(oklab_distance(a, b) for a, b in combinations(
+            [source['colors'][f'color{i}'] for i in (*range(1,7), *range(9,15))], 2))
+        self.assertAlmostEqual(report['minimum_oklab_distance'], independent, places=5)
+        source['colors']['color1'] = '#FF0000'
+        self.assertFalse(validate(source)['passed'])
+        source['colors'] = {f'color{i}': '#a0a0a0' for i in range(16)}
+        self.assertFalse(validate(source)['passed'])
 
     def test_background_validation_allows_only_necessary_supported_safe_darkening(self):
         check_background = self.load_verifier()["check_background"]
