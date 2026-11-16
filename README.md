@@ -927,7 +927,8 @@ source in this repo.
 | `setup-design-skills-timer` | Validate, enable, or disable the daily 05:00 design-skill refresh timer. | Exactly one of `--check`, `--enable`, or `--disable` is required. `--enable` validates and activates the `Persistent=true` user timer without sudo. |
 | `setup-superpowers-release-timer` | Report the disabled repo integration or explicitly clean up a legacy user timer; no sudo is required. | Exactly one of `--check`, `--enable`, or `--disable` is required. `--check` does not inspect live timers; `--enable` exits 2 without installing; `--disable` stops/disables the old timer without needing chezmoi or a source checkout. |
 | `./scripts/executable_ai-workflow-doctor` | Audit the repo's AI instruction and skill surface, or capture a stable before/after measurement for workflow optimization. | `--repo PATH` selects the repository. `--format text\|json` selects human or machine output. `--snapshot PATH` writes a deterministic JSON baseline; `--compare PATH` compares the current report with one. `--verify-sources` resolves declared local source archives when available. `--check` exits nonzero for objective errors while review findings remain non-blocking warnings. Piped/agent text is a summary; `--details` includes full diagnostics, `--plain` suppresses decoration. JSON stays complete. |
-| `./scripts/executable_apply-pywal-theme <wallpaper>` | Regenerate the active `pywal` theme through the repo-owned wrapper so wallpaper changes also refresh kitty and the i3 color resources this repo depends on. | Pass an image path directly, or pass raw `wal` flags when you need that lower-level control. The wrapper runs pywal with `--saturate 0.8 -e`, repairs all ANSI text slots to at least 4.5:1 contrast for the dark 90%-opaque terminal before sending/exporting colors, reloads Xresources, refreshes running kitty windows when the socket is available, and regenerates the derived i3 palette file. `-R -n` restores and repairs the cached theme without changing wallpaper. |
+| `./scripts/executable_apply-pywal-theme <wallpaper>` | Regenerate the active `pywal` theme through the repo-owned wrapper so wallpaper changes also refresh kitty and the i3 color resources this repo depends on. | Pass an image path directly, or pass raw `wal` flags when you need that lower-level control. The wrapper runs pywal with `--saturate 0.8 -e`, keeps all text at least 4.5:1 contrast for the dark 90%-opaque terminal (7:1 for color7, foreground and cursor), and assigns 12 distinct, high-saturation ANSI accents anchored to the extracted color1 hue. If the dark background lacks 7:1 white-composite headroom, it is darkened only as much as needed; already-dark backgrounds stay unchanged. It reloads Xresources, refreshes running kitty windows when the socket is available, and regenerates the derived i3 palette file. Valid low-color extractions repeat their actual colors before readability repair. XCF images fall back to isolated GIMP visible-layer decoding cached by source hash; the source stays untouched and pywal uses the decoded PNG path. Missing GIMP gives an actionable error only when an XCF needs decoding. `-R -n` restores and repairs the cached theme without changing wallpaper. |
+| `./scripts/executable_verify-wallpaper-merge` | Verify terminal readability for wallpaper images across the collection and check whether non-editing images can safely merge into editing collections. | `--root PATH` selects the collection root (default `~/Pictures/Backgrounds`); `--report PATH` writes JSON, refusing existing files and paths inside the root/live cache (omit it for a unique temporary report); `--plain` uses ASCII and `--details` prints raw child diagnostics. Every supported image recursively under the root is checked, including root files, `4k`, `calvin-hobbes`, and all bright/dim editing and non-editing folders; new images are discovered on each run and `.git` is excluded. The JSON includes absolute image paths, before/after palettes, per-role contrast ratios, failed checks, child commands and captured output. It checks 18 text slots at 4.5:1 (7:1 for color7, foreground and cursor) and the 12 accent roles for at least .98 HLS saturation, .04 minimum OKLab distance and 12 unique colors; background diagnostics show whether the white-composite bound is preserved or darkened for 7:1 headroom. It also verifies pywal extraction, restore/exports and background preservation. Non-editing-to-editing collisions, ancestor conflicts, unknown files and symlinks in merge sources, missing directories, and empty collections block, including duplicate names for identical files. `shuffle.txt` is skipped and left behind; unrelated non-image files outside merge sources stay as metadata. It never moves files or changes the live palette. Rerun immediately before moving; the check does not certify colored selection backgrounds or application-owned truecolor. Exit 0 means images-only merge is safe, 1 means checks/blockers failed, and 2 means setup failed. |
 | `./scripts/executable_install-chatgpt-linux` | Download and install the official ChatGPT desktop app package for a supported Linux desktop. | No flags. Supports Ubuntu 24.04/26.04, Debian 13, and Fedora 43/44 on x64 or ARM64. It prints the selected official package URL, then prompts for sudo only to run `apt install` or `dnf install`. |
 | `./scripts/executable_install-tmux-tpm.sh` | Install or fast-forward the TPM plugin manager, correct the tracked tmux bootstrap path when needed, and reload an active tmux server. | `--help` prints usage. With no flags, it clones or fast-forwards TPM under `~/.tmux/plugins/tpm`; restart tmux if no server is active, then press `prefix + I` to install plugins. |
 | `./scripts/executable_directory-sizes [--depth N] [DIRECTORY]` | Show allocated usage in a nested directory report with provisional Dust indexing feedback. | Defaults to current directory and display depth 1; depth does not limit scanning. `--threads N`, `--json`, `--apparent-size` (logical, with different hardlink/directory semantics), and `--backend PATH` are supported. Install pinned Dust with `./scripts/executable_setup-directory-sizes --prefix /tmp/directory-sizes-tools`; use `--backend /tmp/directory-sizes-tools/bin/dust`. No sudo or source writes; reported errors/interruption withhold totals. See [setup, accounting and measured limits](docs/directory-sizes.md). |
@@ -1105,15 +1106,29 @@ this.
   config. All i3 bars use an 80% black translucent backdrop so status text
   stays readable across wallpapers, including Alt+R changes.
   The [readability adapter](scripts/executable_pywal-readable) uses the existing
-  pywal Python installation and sRGB relative luminance: all 16 ANSI slots,
-  foreground and cursor meet 4.5:1 against the dark background composited at
-  90% opacity over white (the brightest sRGB wallpaper bound). It preserves
-  readable colors and explicit backgrounds, including Vim and st. The same
-  correction runs on fresh generation, cache reuse and `-R`/legacy `-r` restore.
-  Lower opacity, light themes, colored selection backgrounds, application-owned
-  truecolor and direct calls to the upstream `wal` binary are outside this
-  guarantee. Light backgrounds fail with an actionable error. See the
-  [verification plan](plans/pywal-readable-terminal-colors.md).
+  pywal Python installation and sRGB relative luminance. Every text slot meets
+  at least 4.5:1 against the dark background and its black/white 90%-opacity
+  composites; color7, foreground and cursor meet 7:1. Twelve ANSI accents
+  (color1–6 and color9–14) retain the extracted color1 hue anchor in 5° steps,
+  reach at least .98 HLS saturation and keep a minimum .04 OKLab distance by a
+  greedy spread. Reading and neutral text is brightened where needed; accents
+  are regenerated for separation. The background
+  stays unchanged when it has at least 7:1 contrast for white text over the
+  white 90%-opacity composite; only backgrounds below that headroom are darkened
+  to make room for vivid text. Vim uses the explicit pywal background, and st
+  uses its special background entry. The same correction runs on fresh
+  generation, low-color extraction, cache reuse and `-R`/legacy `-r` restore.
+  When ImageMagick cannot decode an XCF, GIMP renders visible layers to a content-addressed
+  PNG under the pywal cache; pywal and the wallpaper setter then use that PNG,
+  leaving the source untouched. Missing GIMP blocks only an XCF that needs
+  decoding and reports an install/export remedy. The wallpaper verifier checks
+  every supported image recursively under the root, including both editing and
+  non-editing directories; `.git` is excluded and new images are picked up on
+  each run. Its JSON report includes per-role contrast/colorfulness evidence
+  and background-adjustment diagnostics. Lower opacity, colored selection
+  backgrounds, application-owned truecolor and direct calls to upstream `wal`
+  are outside the text guarantee. See the
+  [verification plan](plans/verify-wallpaper-merge.md).
 - [`dot_tmux.conf`](dot_tmux.conf) is the multiplexing layer with a
   custom prefix, mouse mode, TPM plugins, a status line, and copy-mode
   mappings that push selections to `xclip`. New panes keep 50,000 history rows;

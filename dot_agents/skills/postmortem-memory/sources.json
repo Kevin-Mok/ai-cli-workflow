@@ -14277,6 +14277,33 @@
       "reviewed_on": "2026-11-16",
       "findings": [],
       "decision": "No new generalized learning: ext-sandbox-loopback scoped permission guidance applies; existing duplicate MIME target blocker already recorded in 2026-11-15-pywal-terminal-contrast. Live scoped install and pywal application succeeded; full refresh blocked."
+    },
+    {
+      "sha256": "5c786e7bbf58a0bb065f5bfa1b8fd897957ea4ffcc187d3a7df0b046800d938a",
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-11-16-wallpaper-verifier-test-environment.md"
+      ],
+      "reviewed_on": "2026-11-16",
+      "findings": [],
+      "decision": "No new generalized finding: existing isolation, independent artifact/runtime verification and incomplete-run guidance apply. Task-specific pywal cache/quantizer/GIMP lessons are recorded in tasks/lessons.md. Current focused regressions, actual XCF decoding, complete fresh667-image report and source/cache fingerprints establish the recorded runtime result; unknown external SIGTERM cause and documented contrast/compositor limits remain explicit."
+    },
+    {
+      "sha256": "a0b63dfba5a1a270ef97ac621a4071c06a0da0fc841837c85f49bb782ab8eece",
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-11-16-wallpaper-verifier-interrupted-batch.md"
+      ],
+      "reviewed_on": "2026-11-16",
+      "findings": [],
+      "decision": "No new generalized finding: existing isolation, independent artifact/runtime verification and incomplete-run guidance apply. Task-specific pywal cache/quantizer/GIMP lessons are recorded in tasks/lessons.md. Current focused regressions, actual XCF decoding, complete fresh667-image report and source/cache fingerprints establish the recorded runtime result; unknown external SIGTERM cause and documented contrast/compositor limits remain explicit."
+    },
+    {
+      "sha256": "fffe479abcb8b0c2d54d1c7d4a91d1fcc8418441c8869791eeacfe8f9b2f6ef1",
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-11-16-full-wallpaper-palette-failures.md"
+      ],
+      "reviewed_on": "2026-11-16",
+      "findings": [],
+      "decision": "No new generalized finding: existing isolation, independent artifact/runtime verification and incomplete-run guidance apply. Task-specific pywal cache/quantizer/GIMP lessons are recorded in tasks/lessons.md. Current focused regressions, actual XCF decoding, complete fresh667-image report and source/cache fingerprints establish the recorded runtime result; unknown external SIGTERM cause and documented contrast/compositor limits remain explicit."
     }
   ],
   "review": {

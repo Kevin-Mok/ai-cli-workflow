@@ -295,3 +295,7 @@
 - 2026-11-11: Native Firstmate already supplies the cross-project CTO role. Prefer its existing primary, memory and supervision over a second launcher or outer coordinator. Wrapper-specific recovery instructions above are historical after retirement; use [native usage](../docs/firstmate.md).
 
 - 2026-11-15: When brightening ANSI black for text, audit background consumers beyond terminal settings: pywal st defaultbg and Vim's custom palette reader both used color0. Keep special background separate and test generated consumers with different background/color0 values.
+
+- 2026-11-16: Isolating pywal requires overriding PYWAL_CACHE_DIR explicitly, not just HOME/XDG; fingerprint the parent's effective cache and test with a poisoned override before claiming no live theme writes.
+- 2026-11-16: ImageMagick quantization can return9/11colors for16/35requests while256returns46. Keep successful generation unchanged and recover from actual sampled colors after a proven retry failure; never turn an undecodable image into a fabricated success.
+- 2026-11-16: ImageMagick XCF EOF errors are not proof of corruption. Independently decode with GIMP and export merged visible layers (the active drawable may be transparent), preserving the source and isolating the GIMP profile.

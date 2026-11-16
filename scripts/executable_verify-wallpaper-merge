@@ -1,0 +1,321 @@
+#!/usr/bin/env python3
+"""Check images-only wallpaper merges without moving files or applying a theme."""
+import argparse
+import colorsys
+from concurrent.futures import ThreadPoolExecutor
+import math
+import hashlib
+import json
+import os
+from pathlib import Path
+import re
+import shutil
+import signal
+import subprocess
+import sys
+import tempfile
+import textwrap
+import time
+
+EXTENSIONS = {'.jpg', '.jpeg', '.png', '.webp', '.bmp', '.gif', '.tif', '.tiff', '.xcf', '.ppm'}
+
+
+def is_image(path: Path) -> bool:
+    if path.suffix.lower() == '.crdownload':
+        return False
+    if path.suffix.lower() in EXTENSIONS or any(suffix.lower() in EXTENSIONS for suffix in path.suffixes[:-1]):
+        return True
+    with path.open('rb') as stream:
+        header = stream.read(16)
+    return (header.startswith((b'\xff\xd8\xff', b'\x89PNG\r\n', b'GIF87a', b'GIF89a', b'BM', b'II*\x00', b'MM\x00*', b'gimp xcf'))
+            or header[8:12] == b'WEBP' or header[4:12] in (b'ftypavif', b'ftypheic')
+            or bool(re.match(rb'P[1-6]\s', header)))
+
+
+def scan(root: Path) -> tuple:
+    images, collisions, metadata, failures = [], [], [], []
+    sources = {}
+    for category in ('bright', 'dim'):
+        source, target = root/category/'non-editing', root/category/'editing'
+        if any(p.is_symlink() or not p.is_dir() for p in (root, root/category, source, target)):
+            failures.append(f'Missing directory or symbolic link: {source} / {target}')
+        else:
+            sources[source] = target
+    if root.is_dir() and not root.is_symlink():
+        def traversal_error(error):
+            failures.append(f'Cannot scan directory: {error.filename}: {error.strerror}')
+
+        for directory, subdirs, filenames in os.walk(root, followlinks=False, onerror=traversal_error):
+            base = Path(directory)
+            for name in list(subdirs):
+                if name == '.git':
+                    subdirs.remove(name)
+                elif (base/name).is_symlink():
+                    failures.append(f'Symbolic link: {base/name}')
+                    subdirs.remove(name)
+            for name in sorted(filenames):
+                path = base/name
+                source = next((p for p in sources if path.is_relative_to(p)), None)
+                if path.is_symlink() or not path.is_file():
+                    failures.append(f'Symbolic link or nonregular file: {path}')
+                    continue
+                try:
+                    image = path.name != 'shuffle.txt' and is_image(path)
+                except OSError as exc:
+                    failures.append(f'Cannot read file: {path}: {exc}')
+                    continue
+                if not image:
+                    metadata.append(path)
+                    if source and path.name != 'shuffle.txt':
+                        failures.append(f'Unsupported merge-source entry: {path}')
+                    continue
+                images.append(path)
+                if source:
+                    destination = sources[source]/path.relative_to(source)
+                    for candidate in (destination, *destination.parents):
+                        if candidate == root:
+                            break
+                        if candidate.is_symlink() or (candidate.exists() and (candidate == destination or not candidate.is_dir())):
+                            collisions.append({'source': str(path), 'destination': str(destination),
+                                               'reason': f'Existing destination or blocked parent: {candidate}'})
+                            break
+    images.sort()
+    if not images:
+        failures.append('No supported images found; nothing was verified.')
+    return images, collisions, metadata, failures
+
+
+def luminance(color: str) -> float:
+    if not isinstance(color, str) or not re.fullmatch(r'#[0-9a-fA-F]{6}', color):
+        raise ValueError(f'Invalid RGB color: {color!r}')
+    channels = [int(color[i:i+2], 16) / 255 for i in (1, 3, 5)]
+    linear = [c / 12.92 if c <= .04045 else ((c + .055) / 1.055) ** 2.4 for c in channels]
+    return sum(c*w for c, w in zip(linear, (.2126, .7152, .0722)))
+
+
+def validate_palette(palette: dict) -> dict:
+    try:
+        bg = palette['special']['background']
+        luminance(bg)
+        backgrounds = [bg] + ['#' + ''.join(f'{round(int(bg[i:i+2],16)*.9+underlay*.1):02x}'
+                                            for i in (1, 3, 5)) for underlay in (0, 255)]
+        roles = {f'color{i}': palette['colors'][f'color{i}'] for i in range(16)}
+        roles.update({key: palette['special'][key] for key in ('foreground', 'cursor')})
+        ratios, unsafe, per_slot = [], [], []
+        for slot, color in roles.items():
+            light = luminance(color)
+            ratio = min((max(light, luminance(b))+.05)/(min(light, luminance(b))+.05) for b in backgrounds)
+            ratios.append(ratio)
+            per_slot.append({'slot': slot, 'color': color, 'measurements': [{'background': b, 'contrast': (max(light, luminance(b))+.05)/(min(light, luminance(b))+.05)} for b in backgrounds], 'minimum_contrast': ratio, 'required_contrast': 7 if slot in ('foreground', 'cursor', 'color7') else 4.5, 'passed': ratio >= (7 if slot in ('foreground', 'cursor', 'color7') else 4.5) and light > luminance(backgrounds[-1])})
+            if ratio < (7 if slot in ('foreground', 'cursor', 'color7') else 4.5) or light <= luminance(backgrounds[-1]):
+                unsafe.append({'slot': slot, 'contrast': ratio})
+        return {'minimum_contrast': min(ratios), 'unsafe_slots': unsafe, 'per_slot': per_slot}
+    except (KeyError, TypeError) as exc:
+        raise ValueError(f'Incomplete palette: {exc}') from exc
+
+
+def check_background(original: str, corrected: str) -> dict:
+    def white_bound_contrast(color):
+        luminance(color)
+        bound = '#' + ''.join(f'{round(int(color[i:i+2], 16)*.9+25.5):02x}' for i in (1, 3, 5))
+        return 1.05/(luminance(bound)+.05)
+    old, new = white_bound_contrast(original), white_bound_contrast(corrected)
+    preserved = original.lower() == corrected.lower()
+    adjusted = (not preserved and old < 7 and new >= 7 and luminance(corrected) < luminance(original)
+                and all(int(corrected[i:i+2], 16) <= int(original[i:i+2], 16) for i in (1, 3, 5)))
+    return {'preserved': preserved, 'adjusted': adjusted, 'passed': (preserved and new >= 7) or adjusted,
+            'reason': 'unchanged' if preserved and new >= 7 else 'background needs darkening for vivid text' if preserved else 'unsupported background darkened' if adjusted else 'unexpected background change',
+            'original_white_bound_contrast': old, 'corrected_white_bound_contrast': new}
+
+
+def validate_colorfulness(palette: dict) -> dict:
+    colors = {f'color{i}': palette['colors'][f'color{i}'] for i in (*range(1, 7), *range(9, 15))}
+    labs, saturations = {}, []
+    for slot, color in colors.items():
+        luminance(color)
+        rgb = [int(color[i:i+2], 16)/255 for i in (1, 3, 5)]
+        saturations.append(colorsys.rgb_to_hls(*rgb)[2])
+        r, g, b = [c/12.92 if c <= .04045 else ((c+.055)/1.055)**2.4 for c in rgb]
+        l = (.4122214708*r + .5363325363*g + .0514459929*b)**(1/3)
+        m = (.2119034982*r + .6806995451*g + .1073969566*b)**(1/3)
+        s = (.0883024619*r + .2817188376*g + .6299787005*b)**(1/3)
+        labs[slot] = (.2104542553*l+.793617785*m-.0040720468*s,
+                      1.9779984951*l-2.428592205*m+.4505937099*s,
+                      .0259040371*l+.7827717662*m-.808675766*s)
+    pairs = [(math.sqrt(sum((a-b)**2 for a,b in zip(labs[left],labs[right]))),left,right)
+             for i,left in enumerate(labs) for right in list(labs)[i+1:]]
+    distance, left, right = min(pairs)
+    distinct = len(set(color.upper() for color in colors.values()))
+    return {'minimum_saturation': min(saturations), 'minimum_oklab_distance': distance,
+            'closest_pair': [left, right], 'distinct_colors': distinct,
+            'passed': min(saturations) >= .98 and distance >= .04 and distinct == 12}
+
+
+def fingerprint(paths) -> dict:
+    return {str(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in paths if p.is_file()}
+
+
+def run_child(command: list, env: dict, log: Path, say) -> int:
+    start = time.monotonic()
+    with log.open('w') as output, log.with_suffix('.stderr.log').open('w') as errors:
+        child = subprocess.Popen(command, env=env, stdout=output, stderr=errors, start_new_session=True)
+        try:
+            while True:
+                try:
+                    return child.wait(timeout=5)
+                except subprocess.TimeoutExpired:
+                    say(f'Working; elapsed {time.monotonic()-start:.0f}s', '⏳')
+                    if time.monotonic()-start >= 180:
+                        raise TimeoutError('Palette generation exceeded 180 seconds')
+        finally:
+            if child.poll() is None:
+                os.killpg(child.pid, signal.SIGKILL)
+                child.wait()
+
+
+def check_image(image: Path, home: Path, helper: Path, site: str, say) -> dict:
+    home.mkdir()
+    env = {**os.environ, 'HOME': str(home), 'XDG_CACHE_HOME': str(home/'.cache'),
+           'XDG_CONFIG_HOME': str(home/'.config'), 'PYWAL_CACHE_DIR': str(home/'.cache/wal'), 'PYTHONPATH': site}
+    commands = {'generation': [sys.executable, str(helper), '--saturate', '0.8', '-e', '-n', '-s', '-i', str(image)],
+                'restore': [sys.executable, str(helper), '-R', '-n', '-s', '-e']}
+    row = {'image': str(image), 'passed': False, 'failed_checks': [], 'commands': commands,
+           'environment': {k: env[k] for k in ('HOME', 'XDG_CACHE_HOME', 'XDG_CONFIG_HOME', 'PYWAL_CACHE_DIR', 'PYTHONPATH')},
+           'before_palette': None, 'after_palette': None, 'diagnostics': {}, 'log': str(home/'generation.log')}
+    try:
+        row['generation_exit'] = run_child(commands['generation'], env, home/'generation.log', say)
+        if row['generation_exit']:
+            raise ValueError(f'Palette generation exited {row["generation_exit"]}')
+        cache = home/'.cache/wal'
+        first = json.loads((cache/'colors.json').read_text())
+        row['after_palette'] = first
+        row.update(validate_palette(first))
+        row['colorfulness'] = validate_colorfulness(first)
+        if not row['colorfulness']['passed']:
+            row['failed_checks'].append('Color saturation/diversity below .98 / .04 OKLab / 12 unique colors; see colorfulness')
+        if row['unsafe_slots']:
+            row['failed_checks'].append('Text below 4.5:1 or darker than the composite bound; see per_slot measurements')
+        raw = list((cache/'schemes').glob('*.json'))
+        if len(raw) != 1:
+            raise ValueError('Expected exactly one original extraction cache')
+        original = json.loads(raw[0].read_text())
+        row['before_palette'] = original
+        row['background_check'] = check_background(original['special']['background'], first['special']['background'])
+        row['background_preserved'] = row['background_check']['preserved']
+        row['background_valid'] = row['background_check']['passed']
+        kitty = dict(line.split() for line in (cache/'colors-kitty.conf').read_text().splitlines() if line.strip() and not line.lstrip().startswith('#'))
+        expected = {**first['colors'], **first['special']}
+        row['exports_ok'] = all(kitty.get(k, '').lower() == v.lower() for k, v in expected.items())
+        text = [*first['colors'].values(), first['special']['foreground'], first['special']['cursor']]
+        for name in ('colors.Xresources', 'colors-wal.vim', 'colors.sh', 'sequences'):
+            row['exports_ok'] &= all(color in (cache/name).read_text() for color in text)
+        row['restore_exit'] = run_child(commands['restore'], env, home/'restore.log', say)
+        row['idempotent_restore'] = row['restore_exit'] == 0 and json.loads((cache/'colors.json').read_text()) == first
+        for check in ('background_valid', 'exports_ok', 'idempotent_restore'):
+            if not row[check]:
+                row['failed_checks'].append(f'{check}: expected true, observed false')
+    except (OSError, ValueError, TimeoutError) as exc:
+        row['failed_checks'].append(str(exc))
+        row['error'] = str(exc)
+    if row['before_palette'] is None:
+        for raw in (home/'.cache/wal/schemes').glob('*.json'):
+            row['before_palette'] = json.loads(raw.read_text())
+            break
+    for stage in ('generation', 'restore'):
+        logs = {}
+        for channel, filename in [('stdout', stage+'.log'), ('stderr', stage+'.stderr.log')]:
+            log = home/filename
+            logs[channel] = log.read_text(errors='replace') if log.exists() else ''
+        row['diagnostics'][stage] = logs
+    row['passed'] = not row['failed_checks']
+    return row
+
+
+def main(argv=None) -> int:
+    parser = argparse.ArgumentParser(description='Verify every background image recursively and images-only merge safety; never move/apply files.')
+    parser.add_argument('--root', type=Path, default=Path.home()/'Pictures/Backgrounds', help='Scan every image below this root (default: ~/Pictures/Backgrounds)')
+    parser.add_argument('--report', type=Path, help='JSON evidence path; default: a private temporary run directory')
+    parser.add_argument('--plain', action='store_true', help='ASCII output')
+    parser.add_argument('--details', action='store_true', help='Show raw subprocess diagnostics for failed images')
+    args = parser.parse_args(argv)
+
+    def say(message, icon='🔎'):
+        width = max(40, shutil.get_terminal_size().columns)
+        print(textwrap.fill(('' if args.plain else icon+' ')+message, width), flush=True)
+
+    try:
+        root = args.root.expanduser().absolute()
+        work = Path(tempfile.mkdtemp(prefix='wallpaper-merge-'))
+        report_path = args.report.expanduser().absolute() if args.report else work/'report.json'
+        live_cache = Path(os.environ.get('PYWAL_CACHE_DIR', str(Path.home()/'.cache/wal'))).absolute()
+        resolved_report = report_path.resolve()
+        if report_path.exists() or report_path.is_symlink():
+            raise ValueError('Report already exists; choose a new path or omit --report')
+        if any(resolved_report.is_relative_to(protected.resolve()) for protected in (root, live_cache, Path.home()/'.cache/wal')):
+            raise ValueError('Report must be outside the wallpaper collection and active wal cache')
+        say(f'Scanning all backgrounds under {root}')
+        images, collisions, metadata, failures = scan(root)
+        source_before = fingerprint(images + metadata)
+        live_before = fingerprint(live_cache.rglob('*'))
+        results = []
+        software = {'verifier_sha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest()}
+        if images:
+            import pywal
+            from pywal.settings import __version__
+            software['pywal_version'] = __version__
+            site = str(Path(pywal.__file__).parent.parent)
+            here = Path(__file__).resolve().parent
+            helper = here/'executable_pywal-readable'
+            if not helper.is_file():
+                helper = here/'pywal-readable'
+            if not helper.is_file():
+                raise ValueError('Missing sibling pywal-readable adapter')
+            software['adapter_sha256'] = hashlib.sha256(helper.read_bytes()).hexdigest()
+            def inspect(item):
+                index, image = item
+                say(f'[{index}/{len(images)}] {image.relative_to(root)}')
+                home = work/f'image-{index}'
+                try:
+                    row = check_image(image, home, helper, site,
+                                      lambda message, icon='⏳': say(f'{image.name}: {message}', icon))
+                except (OSError, ValueError, TimeoutError) as exc:
+                    row = {'image': str(image), 'passed': False, 'error': str(exc), 'log': str(home/'generation.log')}
+                return image, home, row
+
+            with ThreadPoolExecutor(max_workers=4) as pool:
+                for image, home, row in pool.map(inspect, enumerate(images, 1)):
+                    results.append(row)
+                    if row['passed']:
+                        say(f'PASS {image.name}: {row["minimum_contrast"]:.4f}:1; 12 accents; OKLab separation {row["colorfulness"]["minimum_oklab_distance"]:.3f}', '✅')
+                    else:
+                        failures.append(f'Image verification failed: {image}')
+                        say(f'FAILED {image}: {row.get("failed_checks", [row.get("error", "unknown error")])}; full output in JSON report', '❌')
+                        if args.details:
+                            for log in home.glob('*.log'):
+                                print(log.read_text(), file=sys.stderr)
+        unchanged = source_before == fingerprint(images + metadata) and live_before == fingerprint(live_cache.rglob('*'))
+        if not unchanged:
+            failures.append('Source images/metadata or active palette changed during verification; rerun without concurrent changes.')
+        passed = sum(row['passed'] for row in results)
+        report = {'safe_to_merge': bool(images) and passed == len(images) and not failures and not collisions,
+                  'root': str(root), 'checked': len(results), 'passed': passed, 'failures': failures,
+                  'collisions': collisions, 'skipped_metadata': [str(p) for p in metadata],
+                  'source_and_active_palette_unchanged': unchanged, 'opacity': .9, 'contrast_floor': 4.5, 'reading_contrast_floor': 7,
+                  'colorfulness_policy': {'saturation_floor': .98, 'oklab_distance_floor': .04, 'distinct_accents': 12},
+                  'software': software, 'results': results}
+        report_path.parent.mkdir(parents=True, exist_ok=True)
+        with report_path.open('x') as stream:
+            stream.write(json.dumps(report, indent=2)+'\n')
+        say(f'{passed}/{len(images)} images passed; {len(collisions)} collisions; {len(failures)} failures.', '📋')
+        say(f'Preserved {len(metadata)} non-image/metadata files, including shuffle.txt; do not merge these.', '📌')
+        say('SAFE: images-only merge verified.' if report['safe_to_merge'] else 'NOT SAFE: resolve all reported blockers before merging.', '✅' if report['safe_to_merge'] else '❌')
+        # Keep the report path intact for copying and tools.
+        print(f'Report: {report_path}', flush=True)
+        return 0 if report['safe_to_merge'] else 1
+    except (OSError, ImportError, ValueError) as exc:
+        say(f'Cannot complete verification: {exc}', '❌')
+        return 2
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())

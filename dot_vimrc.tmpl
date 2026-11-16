@@ -480,6 +480,20 @@ endfunction
 
 function! KmWalReadableAccentLanes(palette) abort
   let l:effective_bg = KmWalEffectiveBackground(a:palette.bg)
+  " Validated palettes already provide distinct, readable syntax roles.
+  let l:roles = map(['const', 'string', 'type', 'func', 'keyword', 'special'], 'toupper(get(a:palette, v:val, a:palette.fg))')
+  if len(uniq(sort(copy(l:roles)))) == 6
+    let l:readable = 1
+    for l:accent in l:roles
+      if KmWalContrastRatio(l:accent, l:effective_bg) < 4.5
+        let l:readable = 0
+        break
+      endif
+    endfor
+    if l:readable
+      return [a:palette.func, a:palette.keyword, a:palette.special]
+    endif
+  endif
   let l:seen = {}
   let l:candidates = []
   for l:key in ['const', 'string', 'type', 'func', 'keyword', 'special']

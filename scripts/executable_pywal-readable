@@ -1,9 +1,15 @@
 #!/usr/bin/env python3
 """Run pywal with readable dark-terminal text before sequences and exports."""
 import copy
+import colorsys
+import hashlib
+import shutil
+import subprocess
+import tempfile
 import os
 from pathlib import Path
 import runpy
+import re
 import sys
 
 # Reuse the repo's existing sRGB contrast math, also installed beside this script.
@@ -17,27 +23,72 @@ hex_to_rgb = _math['hex_to_rgb']
 relative_luminance = _math['relative_luminance']
 
 
+def oklab(color: str) -> tuple:
+    """Public-domain linear-sRGB transform: bottosson.github.io/posts/oklab/."""
+    rgb = [channel / 255 for channel in hex_to_rgb(color)]
+    r, g, b = [c / 12.92 if c <= .04045 else ((c + .055) / 1.055) ** 2.4 for c in rgb]
+    l = (.4122214708*r + .5363325363*g + .0514459929*b) ** (1/3)
+    m = (.2119034982*r + .6806995451*g + .1073969566*b) ** (1/3)
+    s = (.0883024619*r + .2817188376*g + .6299787005*b) ** (1/3)
+    return (.2104542553*l + .7936177850*m - .0040720468*s,
+            1.9779984951*l - 2.4285922050*m + .4505937099*s,
+            .0259040371*l + .7827717662*m - .8086757660*s)
+
+
+def distinct_colors(bound: str, anchor: int) -> list:
+    """Greedily maximize minimum perceptual separation among readable colors."""
+    candidates = []
+    for hue in range(72):
+        for step in range(129):
+            lightness = min(1, .5 + step/255)
+            rgb = colorsys.hls_to_rgb(hue/72, lightness, 1)
+            color = '#' + ''.join(f'{round(channel*255):02X}' for channel in rgb)
+            if relative_luminance(color) > relative_luminance(bound) and contrast_ratio(color, bound) >= 4.55:
+                candidates.append(color)
+                break
+    labs = [oklab(color) for color in candidates]
+    selected = [anchor]
+    remaining = [i for i in range(72) if i != anchor]
+    while len(selected) < 12:
+        choice = max(remaining, key=lambda i: min(sum((a-b)**2 for a,b in zip(labs[i], labs[j])) for j in selected))
+        selected.append(choice)
+        remaining.remove(choice)
+    return [candidates[i] for i in selected]
+
+
 def repair_palette(palette: dict) -> None:
     """Validate first, then brighten text against 90%-opaque sRGB backgrounds."""
     fixed = copy.deepcopy(palette)
     background = fixed['special']['background']
     hex_to_rgb(background)
     bound = mix(background, '#ffffff', .1)
-    if contrast_ratio('#ffffff', bound) < 4.5:
-        raise ValueError('background is too light for the supported 90%-opaque dark theme')
+    if contrast_ratio('#ffffff', bound) < 7:
+        # Only normalize unsupported backgrounds; retain room for colored text.
+        for step in range(1, 256):
+            candidate = mix(background, '#000000', step / 255)
+            candidate_bound = mix(candidate, '#ffffff', .1)
+            if contrast_ratio('#ffffff', candidate_bound) >= 7:
+                fixed['special']['background'] = candidate
+                bound = candidate_bound
+                break
     slots = [(fixed['colors'], f'color{i}') for i in range(16)]
     slots += [(fixed['special'], key) for key in ('foreground', 'cursor')]
     for group, key in slots:
         original = group[key]
         hex_to_rgb(original)
-        if relative_luminance(original) > relative_luminance(bound) and contrast_ratio(original, bound) >= 4.5:
+        target = 7 if key in ('foreground', 'cursor', 'color7') else 4.5
+        if relative_luminance(original) > relative_luminance(bound) and contrast_ratio(original, bound) >= target:
             continue
         # Mixing with white retains hue, reducing saturation only as needed.
         for step in range(1, 256):
             candidate = mix(original, '#ffffff', step / 255)
-            if relative_luminance(candidate) > relative_luminance(bound) and contrast_ratio(candidate, bound) >= 4.5:
+            if relative_luminance(candidate) > relative_luminance(bound) and contrast_ratio(candidate, bound) >= target:
                 group[key] = candidate
                 break
+    anchor = colorsys.rgb_to_hls(*(channel / 255 for channel in hex_to_rgb(palette['colors']['color1'])))[0]
+    vivid = distinct_colors(bound, round(anchor * 72) % 72)
+    for key, color in zip([f'color{i}' for i in (*range(1, 7), *range(9, 15))], vivid):
+        fixed['colors'][key] = color
     palette.update(fixed)
 
 
@@ -56,11 +107,85 @@ def render_template(colors: dict, input_file: str, output_file: str | None = Non
     util.save_file(text.format(**colors), output_file)
 
 
+def sparse_colors(image: str, generate, backend) -> list:
+    """Handle valid images with fewer than 16 colors without inventing hues."""
+    command = backend.has_im()
+    raw = backend.imagemagick(16, image, command)
+    if len(raw) <= 16:
+        complete = backend.imagemagick(256, image, command)
+        colors = [re.search(rb'#[0-9A-Fa-f]{6}', row).group().decode() for row in complete[1:]]
+        if 0 < len(colors) < 16:
+            return (colors * 16)[:16]
+        try:
+            return generate(image)
+        except SystemExit as exc:
+            if exc.code != 1 or not colors:
+                raise
+            return [colors[index*(len(colors)-1)//15] for index in range(16)]
+    return generate(image)
+
+
+def decode_xcf(image: str) -> str:
+    """Render an unsupported XCF with GIMP, preserving the source and profile."""
+    from pywal.settings import CACHE_DIR
+    gimp = shutil.which('gimp-console') or shutil.which('gimp')
+    if not gimp:
+        raise ValueError('This XCF requires GIMP; install GIMP or export its visible image to PNG')
+    source = Path(image)
+    digest = hashlib.sha256(source.read_bytes()).hexdigest()
+    output = Path(CACHE_DIR)/'decoded'/(digest+'.png')
+    if output.is_file():
+        return str(output)
+    output.parent.mkdir(parents=True, exist_ok=True)
+
+    def scheme_string(value):
+        return '"' + str(value).replace('\\', '\\\\').replace('"', '\\"').replace('\n', '\\n').replace('\r', '\\r') + '"'
+
+    with tempfile.TemporaryDirectory(prefix='pywal-gimp-') as temporary:
+        work = Path(temporary)
+        rendered = work/'visible.png'
+        src, dst = scheme_string(source), scheme_string(rendered)
+        script = (f'(let* ((image (car (gimp-file-load RUN-NONINTERACTIVE {src} {src}))) '
+                  '(merged (car (gimp-image-merge-visible-layers image CLIP-TO-IMAGE)))) '
+                  f'(file-png-save RUN-NONINTERACTIVE image merged {dst} {dst} 0 9 0 0 0 0 0)) (gimp-quit 0)')
+        env = {**os.environ, 'HOME': temporary, 'XDG_CONFIG_HOME': str(work/'config'),
+               'XDG_CACHE_HOME': str(work/'cache'), 'XDG_DATA_HOME': str(work/'data'),
+               'GIMP2_DIRECTORY': str(work/'gimp')}
+        result = subprocess.run([gimp, '-n', '-i', '--no-data', '--no-fonts',
+                                 '--batch-interpreter=plug-in-script-fu-eval', '-b', script],
+                                env=env, capture_output=True, text=True, timeout=120)
+        if result.returncode or not rendered.is_file():
+            print(result.stdout + result.stderr, file=sys.stderr)
+            raise ValueError(f'GIMP could not render XCF: {source}')
+        with tempfile.NamedTemporaryFile(dir=output.parent, suffix='.png', delete=False) as staged:
+            staged_path = Path(staged.name)
+        try:
+            shutil.copyfile(rendered, staged_path)
+            staged_path.replace(output)
+        finally:
+            staged_path.unlink(missing_ok=True)
+    return str(output)
+
+
 def main() -> int:
-    from pywal import __main__ as wal, export, sequences
+    from pywal import __main__ as wal, export, sequences, colors
+    from pywal.backends import wal as backend
     # pywal has no pre-export hook. Its CLI always sends sequences before export,
     # even with -s; repair this shared boundary for image/cache/theme/-R paths.
     send = sequences.send
+    get_colors = colors.get
+
+    def compatible_colors(image, *args, **kwargs):
+        try:
+            return get_colors(image, *args, **kwargs)
+        except subprocess.CalledProcessError:
+            if Path(image).suffix.lower() != '.xcf':
+                raise
+            return get_colors(decode_xcf(image), *args, **kwargs)
+
+    colors.get = compatible_colors
+    generate = backend.gen_colors
+    backend.gen_colors = lambda image: sparse_colors(image, generate, backend)
 
     def send_readable(palette, *args, **kwargs):
         repair_palette(palette)
