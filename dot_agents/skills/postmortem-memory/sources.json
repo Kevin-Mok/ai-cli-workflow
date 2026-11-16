@@ -14268,6 +14268,15 @@
       "reviewed_on": "2026-11-15",
       "findings": [],
       "decision": "No new generalized finding: existing artifact consumer/installed-runtime verification and restricted-environment guidance apply. Task-specific ANSI/background-role lesson is recorded in tasks/lessons.md. Numerical RED/GREEN, real pywal exports, headless Vim and live Kitty/AlsaMixer are separate evidence; scoped activation succeeds while full refresh remains blocked by unrelated duplicate MIME targets."
+    },
+    {
+      "sha256": "b46e1b44ba4c9944a96f65fdbf45a4ba832a12af8aa74475fc7a890d8874d124",
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-11-16-wallpaper-shell-inspection.md"
+      ],
+      "reviewed_on": "2026-11-16",
+      "findings": [],
+      "decision": "No new generalized learning: ext-sandbox-loopback scoped permission guidance applies; existing duplicate MIME target blocker already recorded in 2026-11-15-pywal-terminal-contrast. Live scoped install and pywal application succeeded; full refresh blocked."
     }
   ],
   "review": {

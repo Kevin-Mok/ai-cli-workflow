@@ -348,3 +348,13 @@ This document records delivery milestones and verification for completed reposit
 - Delivery: one focused commit and push to origin/main; actual SHA and push result reported in the conversation.
 - Remaining: live refresh blocked by sandbox home/runtime writes and existing source/live instruction drift; three existing skill inventory warnings remain.
 - Attribution: session 01a1e1bb-239d-7f41-9d1b-ef21b7fe0186, direct observed writes; scope helper did not detect tool-wrapped edits. Pre-existing mixed-file hunks excluded.
+
+## Jonesy wallpaper — fix(i3): use Jonesy wallpaper at startup
+
+- Scope: use fn-jonesy-cool.jpeg in the shared ubuntu-start path for ubs and i3 login; retain existing startup behavior.
+- Verified: startup regression RED then GREEN; bash syntax and diff checks passed; live script matches source; pywal reports wallpaper set and records the requested image; i3 validation exits 0 with existing wheel binding deprecation warnings and reload succeeds.
+- Activation: direct scoped install succeeded; full refresh-config blocked by pre-existing duplicate MIME destination sources. Fresh graphical login and wrapped command paste remain untested.
+- Docs: README usage, existing wallpaper smoke check and inspection postmortem updated.
+- Rollback: restore previous wallpaper path and deploy startup helper, then apply the prior image through apply-pywal-theme.
+- Cursor prompt: Verify ubs and a fresh i3 login use fn-jonesy-cool.jpeg; preserve unrelated dirty work and diagnose duplicate MIME sources separately.
+- Delivery: session-owned hunks only; commit fix(i3): use Jonesy wallpaper at startup, then push origin/main; result reported in the conversation.

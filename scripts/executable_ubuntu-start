@@ -66,10 +66,10 @@ fi
 
 start_command autorandr autorandr 4k-3-monitor
 
-if [ -f "${HOME}/Pictures/Backgrounds/ultron-infinity-gauntlet.png" ]; then
-  "${HOME}/scripts/apply-pywal-theme" "${HOME}/Pictures/Backgrounds/ultron-infinity-gauntlet.png" &
+if [ -f "${HOME}/Pictures/Backgrounds/fn-jonesy-cool.jpeg" ]; then
+  "${HOME}/scripts/apply-pywal-theme" "${HOME}/Pictures/Backgrounds/fn-jonesy-cool.jpeg" &
 else
-  printf '%sSkipping pywal startup: no wallpaper found at %s.\n' "$(cli_emoji '⚠️')" "${HOME}/Pictures/Backgrounds/ultron-infinity-gauntlet.png" >&2
+  printf '%sSkipping pywal startup: no wallpaper found at %s.\n' "$(cli_emoji '⚠️')" "${HOME}/Pictures/Backgrounds/fn-jonesy-cool.jpeg" >&2
 fi
 
 if [ -f "${GRAPHITI_COMPOSE_FILE}" ] && command -v docker >/dev/null 2>&1; then

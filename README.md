@@ -738,6 +738,7 @@ to preview the UUID-based boot mount, then run
 The installer backs up `/etc/fstab`, refuses conflicting entries, and enables
 an on-demand boot mount without changing sudo permissions or formatting data.
 An unavailable disk does not block boot; wallpaper still requires it to be connected.
+`ubs` and i3 login apply `~/Pictures/Backgrounds/fn-jonesy-cool.jpeg` through the pywal theme helper.
 `ubuntu-start` also applies a 200 ms keyboard repeat delay and 90 repeats/second
 without needing a Fish shell first. Nonempty `XSET_DELAY` and `XSET_RATE`
 environment values override their respective defaults.
