@@ -14259,6 +14259,15 @@
       "reviewed_on": "2026-11-15",
       "findings": [],
       "decision": "No new learning: existing restricted-environment guidance applies; refresh remains blocked by read-only home/runtime paths. Source instruction saved, live activation pending."
+    },
+    {
+      "sha256": "06ca58331ca61befdf801b102d5699bfeb8b8b4faccb40337a81f17d4e9ac652",
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-11-15-pywal-terminal-contrast.md"
+      ],
+      "reviewed_on": "2026-11-15",
+      "findings": [],
+      "decision": "No new generalized finding: existing artifact consumer/installed-runtime verification and restricted-environment guidance apply. Task-specific ANSI/background-role lesson is recorded in tasks/lessons.md. Numerical RED/GREEN, real pywal exports, headless Vim and live Kitty/AlsaMixer are separate evidence; scoped activation succeeds while full refresh remains blocked by unrelated duplicate MIME targets."
     }
   ],
   "review": {

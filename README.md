@@ -926,7 +926,7 @@ source in this repo.
 | `setup-design-skills-timer` | Validate, enable, or disable the daily 05:00 design-skill refresh timer. | Exactly one of `--check`, `--enable`, or `--disable` is required. `--enable` validates and activates the `Persistent=true` user timer without sudo. |
 | `setup-superpowers-release-timer` | Report the disabled repo integration or explicitly clean up a legacy user timer; no sudo is required. | Exactly one of `--check`, `--enable`, or `--disable` is required. `--check` does not inspect live timers; `--enable` exits 2 without installing; `--disable` stops/disables the old timer without needing chezmoi or a source checkout. |
 | `./scripts/executable_ai-workflow-doctor` | Audit the repo's AI instruction and skill surface, or capture a stable before/after measurement for workflow optimization. | `--repo PATH` selects the repository. `--format text\|json` selects human or machine output. `--snapshot PATH` writes a deterministic JSON baseline; `--compare PATH` compares the current report with one. `--verify-sources` resolves declared local source archives when available. `--check` exits nonzero for objective errors while review findings remain non-blocking warnings. Piped/agent text is a summary; `--details` includes full diagnostics, `--plain` suppresses decoration. JSON stays complete. |
-| `./scripts/executable_apply-pywal-theme <wallpaper>` | Regenerate the active `pywal` theme through the repo-owned wrapper so wallpaper changes also refresh kitty and the i3 color resources this repo depends on. | Pass an image path directly, or pass raw `wal` flags when you need that lower-level control. The wrapper runs `wal --saturate 0.8 -e`, reloads Xresources, refreshes running kitty windows when the socket is available, and regenerates the derived i3 palette file. |
+| `./scripts/executable_apply-pywal-theme <wallpaper>` | Regenerate the active `pywal` theme through the repo-owned wrapper so wallpaper changes also refresh kitty and the i3 color resources this repo depends on. | Pass an image path directly, or pass raw `wal` flags when you need that lower-level control. The wrapper runs pywal with `--saturate 0.8 -e`, repairs all ANSI text slots to at least 4.5:1 contrast for the dark 90%-opaque terminal before sending/exporting colors, reloads Xresources, refreshes running kitty windows when the socket is available, and regenerates the derived i3 palette file. `-R -n` restores and repairs the cached theme without changing wallpaper. |
 | `./scripts/executable_install-chatgpt-linux` | Download and install the official ChatGPT desktop app package for a supported Linux desktop. | No flags. Supports Ubuntu 24.04/26.04, Debian 13, and Fedora 43/44 on x64 or ARM64. It prints the selected official package URL, then prompts for sudo only to run `apt install` or `dnf install`. |
 | `./scripts/executable_install-tmux-tpm.sh` | Install or fast-forward the TPM plugin manager, correct the tracked tmux bootstrap path when needed, and reload an active tmux server. | `--help` prints usage. With no flags, it clones or fast-forwards TPM under `~/.tmux/plugins/tpm`; restart tmux if no server is active, then press `prefix + I` to install plugins. |
 | `./scripts/executable_directory-sizes [--depth N] [DIRECTORY]` | Show allocated usage in a nested directory report with provisional Dust indexing feedback. | Defaults to current directory and display depth 1; depth does not limit scanning. `--threads N`, `--json`, `--apparent-size` (logical, with different hardlink/directory semantics), and `--backend PATH` are supported. Install pinned Dust with `./scripts/executable_setup-directory-sizes --prefix /tmp/directory-sizes-tools`; use `--backend /tmp/directory-sizes-tools/bin/dust`. No sudo or source writes; reported errors/interruption withhold totals. See [setup, accounting and measured limits](docs/directory-sizes.md). |
@@ -1098,11 +1098,21 @@ this.
   differs.
 - [`scripts/executable_apply-pywal-theme`](scripts/executable_apply-pywal-theme)
   is the repo-owned wallpaper and theme entrypoint. It wraps `wal`,
-  boosts saturation, refreshes kitty, regenerates contrast-safe i3 bar
+  boosts saturation, brightens unsafe terminal text, refreshes kitty, regenerates contrast-safe i3 bar
   colors, and keeps the rest of the tracked wallpaper shortcuts on one
   consistent path instead of sprinkling raw `wal -i` calls through the
   config. All i3 bars use an 80% black translucent backdrop so status text
   stays readable across wallpapers, including Alt+R changes.
+  The [readability adapter](scripts/executable_pywal-readable) uses the existing
+  pywal Python installation and sRGB relative luminance: all 16 ANSI slots,
+  foreground and cursor meet 4.5:1 against the dark background composited at
+  90% opacity over white (the brightest sRGB wallpaper bound). It preserves
+  readable colors and explicit backgrounds, including Vim and st. The same
+  correction runs on fresh generation, cache reuse and `-R`/legacy `-r` restore.
+  Lower opacity, light themes, colored selection backgrounds, application-owned
+  truecolor and direct calls to the upstream `wal` binary are outside this
+  guarantee. Light backgrounds fail with an actionable error. See the
+  [verification plan](plans/pywal-readable-terminal-colors.md).
 - [`dot_tmux.conf`](dot_tmux.conf) is the multiplexing layer with a
   custom prefix, mouse mode, TPM plugins, a status line, and copy-mode
   mappings that push selections to `xclip`. New panes keep 50,000 history rows;

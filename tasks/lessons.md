@@ -293,3 +293,5 @@
 - 2026-11-11: A tmux session and Fleet do not establish a reachable CTO chat. Offer an explicit saved-conversation recovery command and select windows by name; after recovery the CTO may be window 2 rather than 0. See [chat recovery](../docs/postmortem/2026-11-11-firstmate-cto-chat-recovery.md).
 
 - 2026-11-11: Native Firstmate already supplies the cross-project CTO role. Prefer its existing primary, memory and supervision over a second launcher or outer coordinator. Wrapper-specific recovery instructions above are historical after retirement; use [native usage](../docs/firstmate.md).
+
+- 2026-11-15: When brightening ANSI black for text, audit background consumers beyond terminal settings: pywal st defaultbg and Vim's custom palette reader both used color0. Keep special background separate and test generated consumers with different background/color0 values.

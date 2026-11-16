@@ -18,10 +18,13 @@ i3_colors_file="${HOME}/.cache/wal/colors-i3.Xresources"
 wal_xresources_file="${HOME}/.cache/wal/colors.Xresources"
 generate_i3_colors_script="${HOME}/scripts/generate-i3-pywal-colors"
 
+readable_wal="$(dirname "$(readlink -f "$0")")/pywal-readable"
+[ -f "$readable_wal" ] || readable_wal="$(dirname "$(readlink -f "$0")")/executable_pywal-readable"
+
 if [ "$1" = "-i" ] || [ "${1#-}" != "$1" ]; then
-  wal --saturate 0.8 -e "$@"
+  python3 "$readable_wal" --saturate 0.8 -e "$@"
 else
-  wal --saturate 0.8 -e -i "$@"
+  python3 "$readable_wal" --saturate 0.8 -e -i "$@"
 fi
 
 if [ -x "${generate_i3_colors_script}" ]; then

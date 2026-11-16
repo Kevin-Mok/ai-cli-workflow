@@ -1,0 +1,83 @@
+#!/usr/bin/env python3
+"""Run pywal with readable dark-terminal text before sequences and exports."""
+import copy
+import os
+from pathlib import Path
+import runpy
+import sys
+
+# Reuse the repo's existing sRGB contrast math, also installed beside this script.
+_here = Path(__file__).resolve().parent
+_math = runpy.run_path(str(_here / ('executable_generate-i3-pywal-colors'
+                                  if (_here / 'executable_generate-i3-pywal-colors').exists()
+                                  else 'generate-i3-pywal-colors')))
+contrast_ratio = _math['contrast_ratio']
+mix = _math['mix']
+hex_to_rgb = _math['hex_to_rgb']
+relative_luminance = _math['relative_luminance']
+
+
+def repair_palette(palette: dict) -> None:
+    """Validate first, then brighten text against 90%-opaque sRGB backgrounds."""
+    fixed = copy.deepcopy(palette)
+    background = fixed['special']['background']
+    hex_to_rgb(background)
+    bound = mix(background, '#ffffff', .1)
+    if contrast_ratio('#ffffff', bound) < 4.5:
+        raise ValueError('background is too light for the supported 90%-opaque dark theme')
+    slots = [(fixed['colors'], f'color{i}') for i in range(16)]
+    slots += [(fixed['special'], key) for key in ('foreground', 'cursor')]
+    for group, key in slots:
+        original = group[key]
+        hex_to_rgb(original)
+        if relative_luminance(original) > relative_luminance(bound) and contrast_ratio(original, bound) >= 4.5:
+            continue
+        # Mixing with white retains hue, reducing saturation only as needed.
+        for step in range(1, 256):
+            candidate = mix(original, '#ffffff', step / 255)
+            if relative_luminance(candidate) > relative_luminance(bound) and contrast_ratio(candidate, bound) >= 4.5:
+                group[key] = candidate
+                break
+    palette.update(fixed)
+
+
+def render_template(colors: dict, input_file: str, output_file: str | None = None) -> None:
+    """Keep known upstream background roles separate from ANSI black text."""
+    from pywal import util
+    text = ''.join(util.read_file_raw(input_file))
+    name = Path(input_file).name
+    if name in ('colors-wal-dmenu.h', 'colors-wal-dwm.h', 'colors-wal-tabbed.h'):
+        text = text.replace('{color0}', '{background}')
+    elif name == 'colors-oomox':
+        for key in ('BG', 'MENU_BG', 'TXT_BG'):
+            text = text.replace(f'{key}={{color0.strip}}', f'{key}={{background.strip}}')
+    elif name == 'colors-wal-st.h':
+        text = text.replace('defaultbg = 0;', 'defaultbg = 256;')
+    util.save_file(text.format(**colors), output_file)
+
+
+def main() -> int:
+    from pywal import __main__ as wal, export, sequences
+    # pywal has no pre-export hook. Its CLI always sends sequences before export,
+    # even with -s; repair this shared boundary for image/cache/theme/-R paths.
+    send = sequences.send
+
+    def send_readable(palette, *args, **kwargs):
+        repair_palette(palette)
+        return send(palette, *args, **kwargs)
+
+    sequences.send = send_readable
+    export.template = render_template
+    # Deprecated -r otherwise replays unchecked sequences before parse_args.
+    sys.argv[1:] = ['-R' if arg == '-r' else arg for arg in sys.argv[1:]]
+    try:
+        wal.main()
+    except (KeyError, ValueError) as exc:
+        icon = '' if os.environ.get('CLI_PLAIN') == '1' else '❌ '
+        print(f'{icon}Cannot apply readable pywal theme: {exc}', file=sys.stderr)
+        return 1
+    return 0
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())
