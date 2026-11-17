@@ -1797,6 +1797,10 @@ and enable `discord-speech`. No sudo. The probes are synthetic and play local au
 
 ## Kitty font shortcuts
 
+- **Action:** Focus Kitty and press Ctrl+Alt+Up, then Ctrl+Alt+Down.
+  **Expected:** Font size increases/decreases by one point across that Kitty instance;
+  Redshift temperature stays unchanged. Outside Kitty, these keys do not adjust Redshift.
+
 - **Action:** Focus a Kitty window and press Ctrl+Shift+Up/Down, Ctrl++/Ctrl+-
   and Ctrl+= (Ctrl++ is Ctrl+Shift+= on a US keyboard).
   **Expected:** Each press increases/decreases its font by one point; other OS

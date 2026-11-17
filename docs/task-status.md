@@ -384,3 +384,13 @@ This document records delivery milestones and verification for completed reposit
 - Fish-alias activation verified this turn: scoped refresh-config exited0, installed skill matches reviewed source and exact xhpp + Space check passed without playback. Remaining delivery: focused commit and configured origin/main push.
 
 - Delivery verified: `52b4aa3` committed the skill fix and pending xhpp; origin/main push succeeded with both privacy gates passing. This documentation closeout records the observed result; no implementation work remains.
+
+## Kitty font shortcuts — fix(i3): free font size shortcuts for Kitty
+
+- Complete: remove i3 Ctrl+Alt+Up/Down Redshift grabs; existing Kitty mappings resize fonts by one point. Source and preserved live i3 file updated; refresh-config completed and i3 reloaded.
+- Verified: defining assertion RED before removal, GREEN after; live i3 validation exited0 with existing wheel-command deprecations; loaded config has neither grab. Isolated real Kitty key events produced19→20→19pt. Targeted postmortem coverage and diff checks passed.
+- Scope: direct-write fallback for session01a1ebab-0a47-72a3-8cd7-d2340faf8f66 because helper did not recognize wrapped writes. Only attributed hunks, activation report and its ledger record; unrelated baseline work excluded.
+- Manual test: focus Kitty, press Ctrl+Alt+Up then Down; font grows and returns while Redshift stays unchanged. Outside Kitty these keys no longer adjust Redshift.
+- Rollback: restore the two Redshift bindings in source and preserved live i3 config, validate and reload; this intercepts Kitty font keys again.
+- Cursor prompt: Verify Ctrl+Alt+Up/Down reaches Kitty using an isolated display and preserve unrelated working-tree edits.
+- Delivery: focused commit followed by origin/main push; resulting hash and actual push status reported in chat. No implementation remains; active-desktop key injection and unrelated mouse-wheel deprecations are outside scope.

@@ -14367,6 +14367,15 @@
       "reviewed_on": "2026-11-17",
       "findings": [],
       "decision": "No new learning: existing path-discovery and artifact-budget guidance covers read-only inspection errors and admission-size correction. Inventory warnings are existing; approval boundaries remain binding. Skill validation passed; fresh admission evidence is in plans/fish-alias-delivery.md. Delivery resolved:52b4aa3 and origin/main push passed normal privacy hooks after unnecessary URL removal."
+    },
+    {
+      "sha256": "d95b5a5ba5fed7811627164d58a0f68563c310004bd1130d930e8f2d144254f9",
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-11-17-kitty-shortcut-activation.md"
+      ],
+      "reviewed_on": "2026-11-17",
+      "findings": [],
+      "decision": "No new learning: existing scoped IPC workaround applies. Preserved i3 config is intentionally chezmoi-excluded. Exact-line guarded patch and raw get_config confirmed activation; real isolated Kitty key events verified19→20→19pt. Existing wheel deprecations remain."
     }
   ],
   "review": {
