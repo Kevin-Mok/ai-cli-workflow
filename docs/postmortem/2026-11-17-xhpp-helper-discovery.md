@@ -25,3 +25,5 @@ Admission validation initially failed six tests because the edited document was 
 - Delivery retry: authorized scoped refresh and xhpp check passed; the normal pre-commit privacy gate blocked one email-category finding before commit. No commit or push occurred. Inspect the isolated index finding, sanitize unnecessary matched metadata and rerun normal hooks; never bypass the gate.
 
 - Exact privacy diagnosis: candidate-index review located the sole match at plans/fish-alias-delivery.md:17: the SSH remote username/host was classified as an email. Removed the unnecessary full remote URL from the plan while retaining repository identity and origin/main destination. Existing metadata heuristic finding applies; no scanner policy or hook bypass. Normal commit hooks are retried on the corrected candidate.
+
+- Resolved delivery: commit52b4aa3 and origin/main push succeeded. Normal exact-candidate and pushed-history privacy gates both passed after removing the unnecessary remote URL. Installed skill refresh and xhpp expansion passed; no playback executed. No outstanding engineering fix remains; three unrelated inventory warnings are unchanged.

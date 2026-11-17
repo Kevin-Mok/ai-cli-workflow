@@ -6,7 +6,7 @@ Clarify standing delivery authorization, distinguish pending work from a true no
 - [x] Record narrow admission update and revise delivery instructions.
 - [x] Validate skill/admission checks and behavior scenarios; update existing smoke check.
 - [x] Refresh the scoped installed skill; verify xhpp expansion.
-- [ ] Commit only session changes and push the verified configured upstream.
+- [x] Commit only session changes and push the verified configured upstream.
 
 ## Scope and decisions
 
@@ -20,8 +20,8 @@ Baseline: installed xhpp expansion passed, but approval review rejected publicat
 
 Review: four cases checked independently; qualified the overview for true no-ops. Admission tests passed 7/7; skill quick_validate passed. Measured description132B and body7818B; weighted cost228.45 and score3.502 (bytes/4 estimates; unmeasured10% body loading). Vetted inventory has three pre-existing calibration warnings. The existing admission evidence was shortened below20KB; no test weakened. Commit subject: fix(fish-alias): require focused commit and push delivery. Manual check: a future changed shortcut must end with an observed commit hash and upstream result; repeated verified pending work must resume delivery. Playback and wrapped clipboard selection remain untested. Cursor prompt: review fish-alias delivery rules and verify xhpp with the installed checker without executing playback; preserve unrelated work.
 
-Activation verified this turn: scoped refresh-config exited0; installed skill equals reviewed source with home-path localization; exact xhpp Space expansion passed without playback. Delivery checkbox remains pending until actual push result.
+Activation verified this turn: scoped refresh-config exited0; installed skill equals reviewed source with home-path localization; exact xhpp Space expansion passed without playback. Delivery verified: 52b4aa3 committed the focused changes; normal pre-commit and pre-push privacy gates passed, and origin/main advanced from b0cd90a to52b4aa3. This evidence closeout is delivered in a focused documentation follow-up.
 
 Privacy correction: installed pre-commit classified the SSH remote username/host as an email in this plan. Removed that unnecessary URL from published docs; repository identity and destination remain explicit. Exact-value review located the match; normal hooks stay enabled.
 
-Activation verified this turn: scoped refresh-config exited0; installed skill equals reviewed source with home-path localization; exact xhpp Space expansion passed without playback. Delivery checkbox remains pending until actual push result.
+Activation verified this turn: scoped refresh-config exited0; installed skill equals reviewed source with home-path localization; exact xhpp Space expansion passed without playback. Delivery verified: 52b4aa3 committed the focused changes; normal pre-commit and pre-push privacy gates passed, and origin/main advanced from b0cd90a to52b4aa3. This evidence closeout is delivered in a focused documentation follow-up.
