@@ -94,7 +94,7 @@ def _preview(args, automatic=False):
     from .renderer import run
     try:
         directory = bridge.runtime_dir()
-        playback_gate = lambda: gate(directory, geometry[1])
+        playback_gate = (lambda: (True, 'screen motion checked before playback')) if automatic else lambda: gate(directory, geometry[1])
     except (OSError, RuntimeError) as error:
         if automatic:
             raise ValueError('Browser bridge unavailable; automatic preview suppressed.') from error
@@ -140,7 +140,9 @@ def locked():
 
 
 def daemon(args):
+    from .desktop import keep_awake
     from .renderer import IdleClock
+    from .motion import ScreenMotion
     directory = bridge.runtime_dir()
     with (directory / 'daemon.lock').open('a') as lock:
         try:
@@ -153,50 +155,56 @@ def daemon(args):
         lock.write(str(os.getpid()))
         lock.flush()
         clock = IdleClock()
+        motion = ScreenMotion()
         stop = threading.Event()
         for sig in (signal.SIGINT, signal.SIGTERM):
             signal.signal(sig, lambda *_: stop.set())
         child = None
-        last_message = ''
+        last_allowed = None
         last_progress = 0
         retry_after = 0
-        output(args, 'info', 'Idle monitor running; activation after 5 minutes of keyboard/mouse inactivity.')
+        output(args, 'info', 'Idle monitor running; activation after 5 minutes without input or 4K screen motion; i3 bar excluded.')
         try:
-            while not stop.is_set():
-                now = time.monotonic()
-                geometry = monitors()
-                middle = geometry[1]
-                if middle['width'] < 3840 or middle['height'] < 2160:
-                    allowed, reason = False, 'Automatic activation needs the middle 4K output; inspect the display layout.'
-                else:
-                    allowed, reason = gate(directory, middle)
-                is_locked = locked()
-                if is_locked:
-                    allowed, reason = False, 'Session is locked or lock state is unavailable.'
-                if child and child.poll() is not None:
-                    if child.returncode:
-                        retry_after = now + 60
-                        output(args, 'warning', 'Preview stopped with an error; retrying after 60s. Run preview or probe for details.')
-                    child = None
-                if child and not allowed:
-                    child.terminate()
-                idle = clock.seconds()
-                if not child and allowed and idle >= IDLE_SECONDS and now >= retry_after:
-                    command = [sys.executable, str(Path(__file__).resolve().parents[1] / ('media-screensaver' if (Path(__file__).resolve().parents[1] / 'media-screensaver').exists() else 'executable_media-screensaver')), '_auto', '--media', str(args.media)]
-                    if args.plain: command.append('--plain')
-                    if args.details: command.append('--details')
-                    child = subprocess.Popen(command, stdin=subprocess.DEVNULL, start_new_session=True)
-                message = 'Automatic activation ready' if allowed else 'Automatic activation suppressed: ' + reason
-                if message != last_message or now - last_progress >= 30:
-                    output(args, 'info', message + f' · idle {int(idle)}s')
-                    last_message, last_progress = message, now
-                status = dict(pid=os.getpid(), updated=time.time(), automatic_allowed=allowed, reason=reason,
-                              idle_seconds=int(idle), preview_pid=child.pid if child else None)
-                temporary = directory / 'status.tmp'
-                temporary.write_text(json.dumps(status))
-                temporary.chmod(0o600)
-                temporary.replace(directory / 'status.json')
-                stop.wait(.5)
+            with keep_awake():
+                while not stop.is_set():
+                    now = time.monotonic()
+                    geometry = monitors()
+                    middle = geometry[1]
+                    if child and child.poll() is not None:
+                        if child.returncode:
+                            retry_after = now + 60
+                            output(args, 'warning', 'Preview stopped with an error; retrying after 60s. Run preview or probe for details.')
+                        child = None
+                        motion.reset()
+                    if middle['width'] < 3840 or middle['height'] < 2160:
+                        motion.reset()
+                        allowed, reason = False, 'Automatic activation needs the middle 4K output; inspect the display layout.'
+                    elif child:
+                        allowed, reason = True, 'Screensaver active; screen sampling paused.'
+                    else:
+                        allowed, reason = motion.sample(middle)
+                    if locked():
+                        motion.reset()
+                        allowed, reason = False, 'Session is locked or lock state is unavailable.'
+                    if child and not allowed:
+                        child.terminate()
+                    idle = clock.seconds()
+                    if not child and allowed and idle >= IDLE_SECONDS and now >= retry_after:
+                        command = [sys.executable, str(Path(__file__).resolve().parents[1] / ('media-screensaver' if (Path(__file__).resolve().parents[1] / 'media-screensaver').exists() else 'executable_media-screensaver')), '_auto', '--media', str(args.media)]
+                        if args.plain: command.append('--plain')
+                        if args.details: command.append('--details')
+                        child = subprocess.Popen(command, stdin=subprocess.DEVNULL, start_new_session=True)
+                    message = 'Automatic activation ready' if allowed else 'Automatic activation suppressed: ' + reason
+                    if allowed != last_allowed or now - last_progress >= 30:
+                        output(args, 'info', message + f' · idle {int(idle)}s')
+                        last_allowed, last_progress = allowed, now
+                    status = dict(pid=os.getpid(), updated=time.time(), automatic_allowed=allowed, reason=reason,
+                                  idle_seconds=int(idle), preview_pid=child.pid if child else None)
+                    temporary = directory / 'status.tmp'
+                    temporary.write_text(json.dumps(status))
+                    temporary.chmod(0o600)
+                    temporary.replace(directory / 'status.json')
+                    stop.wait(.5)
         finally:
             if child and child.poll() is None:
                 child.terminate()
@@ -205,6 +213,7 @@ def daemon(args):
                     os.killpg(child.pid, signal.SIGKILL)
                     child.wait()
             clock.close()
+            motion.close()
             (directory / 'status.json').unlink(missing_ok=True)
             output(args, 'success', 'Idle monitor stopped; owned preview released.')
     return 0
@@ -223,7 +232,7 @@ def service(args):
         if result.returncode:
             output(args, 'error', 'User service could not start; run install first and inspect systemctl --user status media-screensaver.service.', result.stderr)
             return 1
-    output(args, 'success', 'Idle service started; automatic activation after five idle minutes when browser and lock checks allow.')
+    output(args, 'success', 'Idle service started; automatic activation after five minutes without input or 4K screen motion; i3 bar excluded and lock checks retained.')
     return 0
 
 
@@ -350,11 +359,20 @@ def main(argv=None):
         if args.command == 'status':
             directory = bridge.runtime_dir()
             geometry = monitors()
-            allowed, reason = gate(directory, geometry[1])
+            status = directory / 'status.json'
+            running = False
+            allowed, reason = False, 'Idle monitor stopped; launch media-screensaver service.'
+            try:
+                state = json.loads(status.read_text())
+                if (0 <= time.time() - status.stat().st_mtime < 3
+                        and type(state.get('automatic_allowed')) is bool
+                        and isinstance(state.get('reason'), str)):
+                    running = True
+                    allowed, reason = state['automatic_allowed'], state['reason']
+            except (OSError, ValueError, TypeError, AttributeError):
+                pass
             output(args, 'info', 'Monitors: ' + ' → '.join(m['name'] for m in geometry) if not args.plain else 'Monitors: ' + ' -> '.join(m['name'] for m in geometry))
             output(args, 'info', ('Automatic activation ready: ' if allowed else 'Automatic activation suppressed: ') + reason)
-            status = directory / 'status.json'
-            running = status.exists() and time.time() - status.stat().st_mtime < 3
             output(args, 'info', 'Idle monitor: ' + ('running' if running else 'stopped; launch media-screensaver service'))
             return 0
         return preview(args, automatic=args.command == '_auto') or 0

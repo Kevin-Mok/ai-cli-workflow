@@ -163,7 +163,7 @@ or make a test commit in this checkout. Installation alone creates no commit.
   covers chezmoi run hooks, not ordinary files inside `~/scripts/`.
 - Action: Run the installed `media-screensaver status --plain` after recovery.
   Expected: Status exits0 and reports monitor order and idle-monitor state.
-  Missing browser-bridge suppression is reported honestly; no preview starts.
+  Current screen-motion quiet time or capture/lock suppression is reported honestly; no preview starts. Browser coverage is not required.
 
 ## Directory Sizes
 
@@ -1705,6 +1705,12 @@ play audio, so exercise them deliberately.
 
 ### Media conveyor screensaver
 
+- Action: In fish, type `sofs 0.01` and Space, inspect the expansion and cancel without Enter. Then dismiss any preview, deliberately execute the shortcut and leave keyboard/mouse untouched for 36 seconds. Repeat with a new delay; restore daily scheduling with `sofss` afterward.
+  Expected: Expansion is `~/linux-config/scripts/executable_setup-screensaver-timer --delay-hours 0.01`. Displays turn off, then wake for scheduled playback after 36 seconds; repeated scheduling resets the full delay. The one-shot replaces 10 AM scheduling and does not survive reboot. Input can wake displays early; locked sessions suppress playback. `ss` still starts immediate playback, and `sofss` still restores daily 10 AM.
+- Action: Run the timer installer with `--delay-hours 0`, `--delay-hours -1`, `--delay-hours nan`, or no value after `--delay-hours`.
+  Expected: Each invalid invocation exits 2 before systemctl, file writes or display changes; the existing schedule remains intact.
+
+
 - Action: Update with `./scripts/executable_media-screensaver install`, then run `./scripts/executable_setup-screensaver-timer` twice from an X11 desktop terminal; inspect `systemctl --user list-timers --all media-screensaver-daily.timer`.
   Expected: Both installs succeed without sudo, the timer is active with the next local 10:00 AM trigger, and the existing idle service is unchanged. Enabling after 10:00 AM does not catch up an inactive timer; suspend across 10:00 AM may launch on resume. Missing/outdated launcher or missing DISPLAY produces an actionable error.
 - Action: Start `media-screensaver-daily.service` from the unlocked desktop, dismiss with physical input; repeat while locked and while browser bridge coverage is unavailable. Disable with `./scripts/executable_setup-screensaver-timer --disable`.
@@ -1713,7 +1719,7 @@ play audio, so exercise them deliberately.
   Expected: Scheduled playback clears an already blanked X11 screen and stays visible past that timeout; dismissal releases inhibition and the original timeout/DPMS settings are unchanged. A locked session still skips playback.
 - Action: Run `~/linux-config/scripts/executable_setup-screensaver-timer --test` in the X11 desktop; do not touch input for ten seconds, then dismiss playback. Repeat and press Ctrl+C during the wait.
   Expected: Displays turn off, wake ten seconds later and show manual preview without changing the daily timer. Ctrl+C during the wait wakes displays and exits without preview.
-- Action: Dismiss manual previews, type `sofss` (or `sofs`) and press Enter in fish before 10 AM; leave the desktop untouched until 10 AM. Repeat after 10 AM when the next-day wait is acceptable.
+- Action: Dismiss manual previews, type `sofss` and press Enter in fish before 10 AM; leave the desktop untouched until 10 AM. Repeat after 10 AM when the next-day wait is acceptable.
   Expected: The daily timer is armed before idle/daily playback stops and displays power off. At the next local 10 AM displays wake, idle monitoring resumes and scheduled playback starts when unlocked even without browser coverage. Input can wake displays early; suspend can delay the timer. The command does not power off the computer or enforce a blackout through input.
 
 - Action: Run `~/scripts/media-screensaver orient` (or add `--media DIR`) and choose a video; move the mouse and use the keyboard inside the review window.
@@ -1729,10 +1735,12 @@ play audio, so exercise them deliberately.
 - Action: Load the generated fish abbreviations, type `ss` and press Space to inspect its expansion, then run it.
   Expected: It expands to `~/scripts/media-screensaver preview` and starts immediate playback even without the browser bridge; physical input dismisses it. The previous slideshow mapping remains commented in the command template.
 
-- Action: Install with `./scripts/executable_media-screensaver install`, enable the unpacked extension from `~/scripts/media_screensaver/browser` in each Chrome/Chromium profile, reload existing tabs and run `~/scripts/media-screensaver status`.
-  Expected: The stable extension ID is fpologomejgfmlemideffbaallaejhbb, status explains current bridge coverage, and native state contains only geometry/playback/IDs with private permissions. An uncovered visible browser profile suppresses automatic activation.
-- Action: If status reports an unavailable browser bridge, verify **Load unpacked** was completed in every Chrome profile (installing the native host alone is insufficient), enable the extension and reload existing tabs, then run `~/scripts/media-screensaver status` again.
-  Expected: A connected bridge replaces the generic unavailable-bridge reason with readiness or a specific playback/coverage reason. Keyboard/mouse use resets the idle count normally; restarting the service alone does not install the extension.
+- Action: Install the screensaver and start its idle service without a Chrome extension. Run `~/scripts/media-screensaver status`, leave the middle 4K desktop static, and allow the i3 bar clock/music/network widgets to update for five minutes without input.
+  Expected: Status reports local screen quiet time and i3 bar exclusion. Bar-only updates do not reset it; five minutes without input or non-bar motion starts playback. No screenshots are written or uploaded and Chrome coverage is not required.
+- Action: Repeat while playing visible moving video or an animation on the 4K screen; then pause it. Repeat with video confined to a side monitor. Move/type to dismiss playback, then wait again.
+  Expected: Non-bar 4K movement restarts the quiet interval; side-only movement does not. Five quiet minutes after pausing permit playback when physical input is also idle. Playback does not dismiss itself from its own animation. Input dismisses it and starts a fresh quiet interval. A still scene or very small changes can be missed; this is motion detection, not exact playback-state detection.
+- Action: Change i3 bar position/visibility or monitor geometry, or make X11 capture unavailable in a disposable fixture.
+  Expected: Actual visible bar geometry is remasked and the quiet interval restarts. Capture errors suppress activation until capture recovers and a complete quiet interval elapses. Locking still suppresses playback.
 - Action: Record `xrandr --listmonitors`, run `~/scripts/media-screensaver demo --report /tmp/conveyor-demo.jsonl` with a fresh report path, and watch item #1 for 35 seconds without touching keyboard/mouse.
   Expected: All three screens have media at launch. Item #1 travels left → middle → right → exit on successive ten-second advances with 750ms slides, letterboxing stays black, and report playback timestamps continue across moves. After exit there are no child players and monitor geometry matches the original.
 - Action: Launch `ss` twice with a multi-file photo/video library, then preview a directory containing just one disposable image or video.
@@ -1740,9 +1748,11 @@ play audio, so exercise them deliberately.
 - Action: Preview a small library containing portrait photos, HEIC, one-second clips, a longer video and a corrupt file; repeat with `--media /nonexistent/synthetic-media`.
   Expected: Portrait/HEIC images fit without cropping, short videos loop, long videos stop on exit, corrupt items are skipped without stopping other cards, and the missing directory reports an actionable error. Originals are unchanged.
 - Action: In a covered active Chrome tab, play a visible video on the middle output, move it to each side, pause/resume, enter fullscreen, and repeat with a second window, an iframe player, a background tab, and audio-only playback.
-  Expected: Only actively playing visible active-tab video intersecting the middle output blocks activation; pause/end, side-only video and audio do not. Moving/resuming qualifying video dismisses the running screensaver promptly. Uncertain geometry/coverage suppresses activation with a status reason.
-- Action: Start `~/scripts/media-screensaver service`, confirm `systemctl --user status media-screensaver.service` is active, leave the desktop untouched for five minutes, then move the mouse/type; repeat while the bridge is disabled and while the session locks/suspends normally.
-  Expected: The unit runs the idle daemon and is started on subsequent i3 logins. A healthy unblocked bridge permits activation after 300 idle seconds; activity dismisses and releases all pipelines. Missing/stale bridge prevents automatic activation but allows manual preview. Existing lock, suspend and display settings remain intact.
+  Expected: Visible motion on the middle 4K output blocks automatic activation; pausing it begins a fresh five-minute quiet interval. Side-only movement and audio do not block. The optional browser gate affects only manual previews; automatic playback stops on physical input or session-lock policy.
+- Action: Start `~/scripts/media-screensaver service`, confirm `systemctl --user status media-screensaver.service` is active, leave the desktop untouched for five minutes, then move the mouse/type; repeat with Chrome detection disabled and while the session locks/suspends normally.
+  Expected: The unit runs the idle daemon and is started on subsequent i3 logins. Five minutes of both physical inactivity and non-bar 4K screen quiet permits activation; activity dismisses and releases all pipelines. Missing/stale browser coverage does not block activation. Existing lock, suspend and display settings remain intact.
+- Action: In a disposable Xvfb session, set X11 blanking to one second, start the idle daemon while motion remains in its quiet wait, wait past that timeout, then stop the daemon and wait again. On the real desktop, leave it untouched until Hevin playback and past the configured blanking timeout; dismiss with input. Also verify `sofs HOURS` deliberately powers displays off after stopping idle monitoring.
+  Expected: The service prevents competing automatic blanking during quiet waiting and Hevin playback, clears an existing server blank on start and restores automatic blanking when it exits without rewriting configured timeouts. Hevin uses `/mnt/linux-files-3/hevin`; explicit screen-off/lock/suspend remain available.
 - Action: With the idle service active, run `systemctl --user kill --signal=TERM --kill-whom=main media-screensaver.service`, wait six seconds, and inspect its status and journal; then stop it with `systemctl --user stop media-screensaver.service` and start it again with `~/scripts/media-screensaver service`.
   Expected: Termination is followed by a new daemon PID after five seconds and a fresh idle clock; deliberate stop leaves the service inactive and releases any owned preview. Starting again succeeds without duplicate monitors.
 

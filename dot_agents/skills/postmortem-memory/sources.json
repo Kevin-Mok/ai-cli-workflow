@@ -14322,6 +14322,42 @@
       "reviewed_on": "2026-11-16",
       "findings": [],
       "decision": "No new generalized finding: existing isolated-state, raw IPC contract and data/conflict-preservation guidance apply. Local lessons cover XDG history isolation, private MIME duplicate recovery and source backups before local-priority re-add; template conflicts now stop explicitly. Real CLI local-only/both-edited/template/source-only fixtures pass, reviewed helper deployed and actual refresh completed. No physical keypress or asynchronous setter-success claim."
+    },
+    {
+      "sha256": "af7b60ee4efb6bbf1ee4c55a99d4de71e473a6c8c99f7862ca826b093fbe3700",
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-11-17-screensaver-shortcut-validation.md"
+      ],
+      "reviewed_on": "2026-11-17",
+      "findings": [],
+      "decision": "No new generalized learning: inventoried-path, sandbox/runtime and approval-boundary guidance applies. Ten focused timer tests and installed expansion passed; later explicitcommit-session supplies requestedcommit/pushauthorization. Preserve historicalrejection; fullscreensaver sessionvalidation now68media+10timer+JS pass."
+    },
+    {
+      "sha256": "8e04b2961f440d4f7142180ef0e14d1a7aa383444138f6aeb87806d712b8a333",
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-11-17-screensaver-idle-bridge.md"
+      ],
+      "reviewed_on": "2026-11-17",
+      "findings": [],
+      "decision": "User-approved local screen-motion policy with i3bar exclusion removes Chrome from automatic activation. Optional bridge itself remains unrepaired. Installed service active with quiet progress; tests and capture verified. No new generalized finding beyond prior dependency/activation guidance; physical five-minute acceptance remains separate."
+    },
+    {
+      "sha256": "9433e1da6d9b550c33d7815b24c4de61e5eeda7325b7110167b405b0189af8ec",
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-11-17-screen-motion-capture.md"
+      ],
+      "reviewed_on": "2026-11-17",
+      "findings": [],
+      "decision": "No new generalized finding: native Pillow explicit-display capture fixes full4K performance and prevents temporary-image fallback; seven motion/eight CLI tests and actual0.278s capture pass. Installed source bytes match; service active with quiet progress and actual i3bar exclusion. Physical five-minute acceptance remains unobserved."
+    },
+    {
+      "sha256": "7d8dc99d0c0faabe90d368a59efacf800cd0a2cbf913bb3300e8aed4c1b1a99b",
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-11-17-hevin-idle-blanking.md"
+      ],
+      "reviewed_on": "2026-11-17",
+      "findings": [],
+      "decision": "Existing scoped-inhibition guidance reused for user-requested Hevin replacing blanking. RED/GREEN daemonwait reproducer proves protection/restoration;68media+10timer tests pass. Deployedmain, servicesactive,5989items and actualvisible7808x2160 conveyor verified0/10/20s. Configured600s timeouts unchanged. Long physicalidle/blanking soak remains unobserved; no new generalized finding."
     }
   ],
   "review": {

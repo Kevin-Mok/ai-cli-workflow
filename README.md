@@ -1180,26 +1180,30 @@ this.
   middle, and 1080p right.
 - [`media-screensaver`](scripts/executable_media-screensaver) adds a separate
   X11 conveyor across all three live outputs. Install with
-  `./scripts/executable_media-screensaver install`, enable its local browser
-  extension, then run `~/scripts/media-screensaver service` for a supervised idle monitor
+  `./scripts/executable_media-screensaver install`, then run `~/scripts/media-screensaver service` for a supervised idle monitor
   or `preview` (fish abbreviation `ss`, i3 **Alt+Shift+S** or **Super+Shift+S**) for immediate playback. i3 starts the service at login, and systemd
   restarts it after an exit. `daemon` remains available in the foreground.
   Each launch fills all three outputs with random photos/videos, then advances
   the conveyor every ten seconds.
   `--media DIR` selects a recursive photo/video library; `--seconds N` bounds a
   preview; `--report PATH` records item IDs/timestamps; `--plain` and `--details`
-  control output. `status`, `probe` and `demo` expose browser coverage, codec
+  control output. `status`, `probe` and `demo` expose screen-motion readiness, codec
   checks and disposable media. Video orientation metadata is honored automatically;
   `orient` opens a separate review chooser, or `orient --file FILE` reviews one video
   and saves a private additional rotation without rewriting the original.
   [`setup-screensaver-timer`](scripts/executable_setup-screensaver-timer) installs a separate
   daily **10:00 AM local-time** user timer after updating the launcher; suspend can delay playback.
-  Fish abbreviations `sofss` and `sofs` pause idle playback and turn displays off until that
-  next launch; input can wake them early. At 10 AM the timer powers displays on
+  Fish abbreviation `sofss` pauses idle playback and turns displays off until that
+  next launch. `sofs HOURS` instead schedules one launch after that many hours (for example,
+  `sofs 2` or `sofs 0.5`), replacing the daily schedule; reboot cancels the delay.
+  Input can wake displays early. Run `sofss` to restore daily 10 AM scheduling. At launch the timer powers displays on
   and resumes idle monitoring before playback. Scheduled playback tolerates a missing
   browser bridge and prevents automatic display blanking while it runs.
-  Automatic idle activation waits five idle minutes and
-  fails closed when Chrome video coverage is unavailable. See
+  Automatic activation waits five minutes without input or visible movement on the
+  middle 4K monitor, excluding the i3 bar. It samples locally in memory; no Chrome
+  extension is required. Non-bar animations count as activity; still scenes may be missed.
+  While running, the idle service prevents competing automatic display blanking so
+  Hevin playback can appear; stopping it restores normal blanking timeouts. See
   [installation, browser enablement and limitations](docs/media-screensaver.md).
 - [`flavibot-browser`](scripts/executable_flavibot-browser) opens the FlaviBot
   music player in Chrome with a separate `~/.local/share/flavibot-chrome` data

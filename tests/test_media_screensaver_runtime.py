@@ -60,6 +60,58 @@ class RuntimeTests(unittest.TestCase):
             x.XSync(clock.display, False)
             clock.close()
 
+    def test_daemon_wait_prevents_blanking_and_restores_it_on_exit(self):
+        import ctypes as C
+        import signal
+        from types import SimpleNamespace
+        from unittest.mock import patch
+        from media_screensaver import main
+        class SaverInfo(C.Structure):
+            _fields_ = [('window', C.c_ulong), ('state', C.c_int), ('kind', C.c_int),
+                        ('til_or_since', C.c_ulong), ('idle', C.c_ulong), ('event_mask', C.c_ulong)]
+        clock = runtime.IdleClock()
+        saver = C.CDLL('libXss.so.1')
+        saver.XScreenSaverQueryInfo.argtypes = [C.c_void_p, C.c_ulong, C.POINTER(SaverInfo)]
+        x = clock.x
+        x.XSetScreenSaver.argtypes = [C.c_void_p, C.c_int, C.c_int, C.c_int, C.c_int]
+        x.XGetScreenSaver.argtypes = [C.c_void_p] + [C.POINTER(C.c_int)] * 4
+        x.XResetScreenSaver.argtypes = [C.c_void_p]
+        x.XSync.argtypes = [C.c_void_p, C.c_int]
+        original = [C.c_int() for _ in range(4)]
+        x.XGetScreenSaver(clock.display, *(C.byref(v) for v in original))
+        info = SaverInfo()
+        def state():
+            saver.XScreenSaverQueryInfo(clock.display, x.XDefaultRootWindow(clock.display), C.byref(info))
+            return info.state
+        case = self
+        class Stop:
+            done = False
+            def is_set(self): return self.done
+            def set(self): self.done = True
+            def wait(self, seconds):
+                time.sleep(2.2)
+                case.assertEqual(state(), 0, 'daemon quiet wait allowed X11 to blank before Hevin playback')
+                self.done = True
+        handlers = {sig: signal.getsignal(sig) for sig in (signal.SIGINT, signal.SIGTERM)}
+        try:
+            x.XSetScreenSaver(clock.display, 1, 1, 1, 1)
+            x.XResetScreenSaver(clock.display)
+            x.XSync(clock.display, False)
+            with tempfile.TemporaryDirectory() as directory, patch.object(main.bridge, 'runtime_dir', return_value=Path(directory)), patch.object(main.threading, 'Event', return_value=Stop()), patch.object(main, 'monitors', return_value=[{}, dict(x=0,y=0,width=3840,height=2160),{}]), patch.object(main, 'locked', return_value=False), patch('media_screensaver.motion.ScreenMotion') as motion:
+                motion.return_value.sample.return_value = (False, 'waiting for quiet')
+                self.assertEqual(main.daemon(SimpleNamespace(media=Path(directory),plain=True,details=False)), 0)
+            time.sleep(2.2)
+            self.assertEqual(state(), 1, 'daemon exit did not restore automatic blanking')
+            current = [C.c_int() for _ in range(4)]
+            x.XGetScreenSaver(clock.display, *(C.byref(v) for v in current))
+            self.assertEqual([v.value for v in current], [1,1,1,1])
+        finally:
+            for sig,handler in handlers.items(): signal.signal(sig, handler)
+            x.XSetScreenSaver(clock.display, *(v.value for v in original))
+            x.XResetScreenSaver(clock.display)
+            x.XSync(clock.display, False)
+            clock.close()
+
     def test_video_moves_without_restart_and_shutdown_releases_pipeline(self):
         from gi.repository import Gtk, Gst
         from media_screensaver.core import Entry

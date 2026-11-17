@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
-"""Install a daily 10:00 local-time screensaver systemd user timer."""
+"""Schedule screensaver playback daily or after a blackout measured in hours."""
 import argparse
+import math
 import os
+from decimal import Decimal
 from pathlib import Path
 import subprocess
 import sys
@@ -37,14 +39,17 @@ WantedBy=timers.target
 
 
 def main(argv=None):
-    parser = argparse.ArgumentParser(description='Install the daily 10:00 AM screensaver timer; no sudo needed.')
+    parser = argparse.ArgumentParser(description='Schedule daily 10 AM playback or a one-shot blackout delay; no sudo needed.')
     mode = parser.add_mutually_exclusive_group()
-    mode.add_argument('--disable', action='store_true', help='disable future daily launches')
+    mode.add_argument('--disable', action='store_true', help='disable future daily or delayed launches')
     mode.add_argument('--black-until-10', action='store_true', help='pause idle playback and turn displays off until the next daily 10:00 AM launch (input can wake displays)')
+    mode.add_argument('--delay-hours', type=float, metavar='HOURS', help='turn displays off and launch once after positive HOURS; replaces the daily schedule, cancelled by reboot')
     mode.add_argument('--test', action='store_true', help='turn displays off for 10 seconds, then wake and preview; leave the daily timer unchanged')
     parser.add_argument('--plain', action='store_true', default=os.environ.get('CLI_PLAIN') == '1', help='ASCII output')
     parser.add_argument('--details', action='store_true', help='show raw systemctl errors')
     args = parser.parse_args(argv)
+    if args.delay_hours is not None and (not math.isfinite(args.delay_hours * 3600) or args.delay_hours <= 0):
+        parser.error('--delay-hours must be a positive finite number')
     def run(*arguments):
         result = subprocess.run(list(arguments), capture_output=True, text=True, timeout=30)
         if result.returncode:
@@ -54,7 +59,7 @@ def main(argv=None):
     try:
         if args.disable:
             run('systemctl', '--user', 'disable', '--now', 'media-screensaver-daily.timer')
-            message = 'Daily screensaver timer disabled; running playback is unchanged.'
+            message = 'Scheduled screensaver launches disabled; running playback is unchanged.'
         else:
             launcher = Path.home() / 'scripts/media-screensaver'
             if not launcher.is_file() or not os.access(launcher, os.X_OK):
@@ -75,20 +80,31 @@ def main(argv=None):
                 return subprocess.call([str(launcher), 'preview'] + (['--plain'] if args.plain else []) + (['--details'] if args.details else []))
             units = Path(os.environ.get('XDG_CONFIG_HOME', Path.home() / '.config')) / 'systemd/user'
             units.mkdir(parents=True, exist_ok=True)
-            for name, content in (('service', SERVICE), ('timer', TIMER)):
+            if (units / 'media-screensaver-daily.timer').exists():
+                run('systemctl', '--user', 'stop', 'media-screensaver-daily.timer')
+            timer = TIMER
+            if args.delay_hours is not None:
+                timer = TIMER.replace('Media screensaver every day at 10:00 local time', 'One-shot delayed media screensaver').replace('OnCalendar=*-*-* 10:00:00', 'OnActiveSec=' + format(Decimal(str(args.delay_hours)).normalize(), 'f') + 'h')
+            for name, content in (('service', SERVICE), ('timer', timer)):
                 target = units / ('media-screensaver-daily.' + name)
                 if target.is_symlink():
                     raise ValueError('Refusing to replace a symlink: ' + str(target))
                 target.write_text(content)
             run('systemctl', '--user', 'daemon-reload')
             run('systemctl', '--user', 'import-environment', *[key for key in ('DISPLAY', 'XAUTHORITY', 'XDG_SESSION_ID') if key in os.environ])
-            run('systemctl', '--user', 'enable', '--now', 'media-screensaver-daily.timer')
+            if args.delay_hours is not None:
+                run('systemctl', '--user', 'disable', '--now', 'media-screensaver-daily.timer')
+                run('systemctl', '--user', 'start', 'media-screensaver-daily.timer')
+            else:
+                run('systemctl', '--user', 'enable', '--now', 'media-screensaver-daily.timer')
             message = 'Daily screensaver enabled for 10:00 AM local time; suspend may delay playback until resume.'
-            if args.black_until_10:
+            if args.black_until_10 or args.delay_hours is not None:
                 run('systemctl', '--user', 'stop', 'media-screensaver.service', 'media-screensaver-daily.service')
                 run('xset', '+dpms')
                 run('xset', 'dpms', 'force', 'off')
                 message = 'Displays off; screensaver scheduled for the next 10:00 AM local time. Input can wake displays.'
+                if args.delay_hours is not None:
+                    message = f'Displays off; screensaver starts in {args.delay_hours:g} hours. Input can wake displays. Daily schedule replaced; reboot cancels this delay.'
         print(('' if args.plain else '✅ ') + message)
         return 0
     except KeyboardInterrupt:

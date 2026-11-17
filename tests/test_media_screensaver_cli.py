@@ -68,13 +68,13 @@ class CLITests(unittest.TestCase):
         from media_screensaver import main, renderer
         class Clock:
             last = None
-            values = iter((299.9,300.0))
+            values = iter((299.9,300.0,301.0))
             def seconds(self): self.last = next(self.values); return self.last
             def close(self): pass
         class Stop:
             count = 0
-            def is_set(self): return self.count >= 2
-            def set(self): self.count = 2
+            def is_set(self): return self.count >= 3
+            def set(self): self.count = 3
             def wait(self,seconds): self.count += 1
         clock,stop = Clock(),Stop()
         launches = []
@@ -85,14 +85,50 @@ class CLITests(unittest.TestCase):
             return process
         previous = {sig: signal.getsignal(sig) for sig in (signal.SIGINT,signal.SIGTERM)}
         try:
-            with tempfile.TemporaryDirectory() as directory, patch.object(main.bridge,'runtime_dir',return_value=Path(directory)), patch.object(renderer,'IdleClock',return_value=clock), patch.object(main.threading,'Event',return_value=stop), patch.object(main,'monitors',return_value=[{},dict(x=2048,y=0,width=3840,height=2160),{}]), patch.object(main,'gate',return_value=(True,'ready')), patch.object(main,'locked',return_value=False), patch.object(main.subprocess,'Popen',side_effect=launch):
+            with tempfile.TemporaryDirectory() as directory, patch.object(main.bridge,'runtime_dir',return_value=Path(directory)), patch.object(renderer,'IdleClock',return_value=clock), patch.object(main.threading,'Event',return_value=stop), patch.object(main,'monitors',return_value=[{},dict(x=2048,y=0,width=3840,height=2160),{}]), patch('media_screensaver.motion.ScreenMotion') as motion_factory, patch.object(main,'locked',return_value=False), patch.object(main.subprocess,'Popen',side_effect=launch), patch('media_screensaver.desktop.keep_awake'):
+                motion_factory.return_value.sample.return_value = (True, 'screen quiet')
                 self.assertEqual(main.daemon(SimpleNamespace(media=Path(directory),plain=True,details=False)),0)
+                self.assertEqual(motion_factory.return_value.sample.call_count, 2)
+                motion_factory.return_value.close.assert_called_once()
             self.assertEqual([idle for idle,_ in launches],[300.0])
             self.assertTrue(all(process.poll() is not None for _,process in launches))
         finally:
             for sig,handler in previous.items(): signal.signal(sig,handler)
             for _,process in launches:
                 if process.poll() is None: process.kill(); process.wait()
+
+    def test_automatic_preview_does_not_require_browser_or_watch_its_own_motion(self):
+        import sys
+        from types import SimpleNamespace
+        from unittest.mock import patch
+        sys.path.insert(0, str(ROOT / 'scripts'))
+        from media_screensaver import main, renderer
+        args = SimpleNamespace(media=Path('/synthetic'), seconds=0, report=None, plain=True, details=False, command='_auto')
+        def render(*args, **kwargs):
+            self.assertTrue(kwargs['gate']()[0])
+            return 0
+        with patch.object(main, 'scan', return_value=[]), patch.object(main, 'monitors', return_value=[{}, {}, {}]), patch.object(main, 'gate', side_effect=AssertionError('automatic playback queried Chrome')), patch.object(renderer, 'run', side_effect=render):
+            self.assertEqual(main._preview(args, automatic=True), 0)
+
+    def test_status_uses_live_motion_report_and_rejects_invalid_report(self):
+        import sys
+        import time
+        from unittest.mock import patch
+        sys.path.insert(0, str(ROOT / 'scripts'))
+        from media_screensaver import main
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / 'status.json'
+            with patch.object(main.bridge, 'runtime_dir', return_value=Path(directory)), patch.object(main, 'monitors', return_value=[dict(name='left'), dict(name='4K'), dict(name='right')]), patch.object(main, 'gate', side_effect=AssertionError('status queried Chrome')), patch.object(main, 'output') as output:
+                path.write_text(json.dumps(dict(automatic_allowed=False, reason='screen quiet for 12s; i3 bar excluded')))
+                self.assertEqual(main.main(['status', '--plain']), 0)
+                self.assertTrue(any('screen quiet for 12s' in call.args[2] for call in output.call_args_list))
+                path.write_text('[]')
+                self.assertEqual(main.main(['status', '--plain']), 0)
+                self.assertIn('stopped', output.call_args.args[2])
+                path.write_text(json.dumps(dict(automatic_allowed=True, reason='stale ready')))
+                os.utime(path, (time.time()-10, time.time()-10))
+                self.assertEqual(main.main(['status', '--plain']), 0)
+                self.assertIn('stopped', output.call_args.args[2])
 
     def test_service_imports_desktop_environment_before_start(self):
         import sys

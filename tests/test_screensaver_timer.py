@@ -65,6 +65,51 @@ class TimerTests(unittest.TestCase):
             self.assertIn('ExecStartPre=/usr/bin/xset dpms force on', service)
             self.assertIn('ExecStartPre=/usr/bin/systemctl --user start media-screensaver.service', service)
 
+    def test_delay_replaces_daily_schedule_and_rearms_before_blackout(self):
+        import runpy
+        module = runpy.run_path(str(INSTALLER))
+        with tempfile.TemporaryDirectory() as directory:
+            home = Path(directory)
+            launcher = home / 'scripts/media-screensaver'
+            launcher.parent.mkdir()
+            launcher.write_text('#!/bin/sh\necho scheduled\n')
+            launcher.chmod(0o755)
+            units = home / '.config/systemd/user'
+            units.mkdir(parents=True)
+            (units / 'media-screensaver-daily.timer').write_text(module['TIMER'])
+            calls = []
+            def execute(command, **kwargs):
+                calls.append(command)
+                return subprocess.CompletedProcess(command, 0, 'scheduled', '')
+            env = dict(HOME=directory, XDG_CONFIG_HOME=directory+'/.config', DISPLAY=':99')
+            with patch.dict(os.environ, env), patch.object(subprocess, 'run', side_effect=execute):
+                for hours in ('2', '0.5', '0.00001', '1000000'):
+                    calls.clear()
+                    self.assertEqual(module['main'](['--delay-hours', hours, '--plain']), 0)
+                    timer = (home / '.config/systemd/user/media-screensaver-daily.timer').read_text()
+                    self.assertIn('OnActiveSec=' + hours + 'h', timer)
+                    self.assertNotIn('OnCalendar=', timer)
+                    self.assertLess(calls.index(['systemctl', '--user', 'stop', 'media-screensaver-daily.timer']), calls.index(['systemctl', '--user', 'daemon-reload']))
+                    self.assertEqual(calls[-5:], [
+                        ['systemctl', '--user', 'disable', '--now', 'media-screensaver-daily.timer'],
+                        ['systemctl', '--user', 'start', 'media-screensaver-daily.timer'],
+                        ['systemctl', '--user', 'stop', 'media-screensaver.service', 'media-screensaver-daily.service'],
+                        ['xset', '+dpms'], ['xset', 'dpms', 'force', 'off']])
+                self.assertEqual(module['main'](['--plain']), 0)
+                timer = (home / '.config/systemd/user/media-screensaver-daily.timer').read_text()
+                self.assertIn('OnCalendar=*-*-* 10:00:00', timer)
+                self.assertEqual(calls[-1], ['systemctl', '--user', 'enable', '--now', 'media-screensaver-daily.timer'])
+
+    def test_invalid_delay_has_no_side_effects(self):
+        import runpy
+        module = runpy.run_path(str(INSTALLER))
+        for value in ('0', '-1', 'nan', 'inf', '1e309', 'oops'):
+            with self.subTest(value=value), patch.object(subprocess, 'run') as run:
+                with self.assertRaises(SystemExit) as error:
+                    module['main'](['--delay-hours', value, '--plain'])
+                self.assertEqual(error.exception.code, 2)
+                run.assert_not_called()
+
     def test_failed_timer_setup_never_powers_off(self):
         import runpy
         module = runpy.run_path(str(INSTALLER))
@@ -79,7 +124,8 @@ class TimerTests(unittest.TestCase):
                 calls.append(command)
                 return subprocess.CompletedProcess(command, int(command[0] == 'systemctl'), 'scheduled', '')
             with patch.dict(os.environ, dict(HOME=directory, XDG_CONFIG_HOME=directory+'/.config', DISPLAY=':99')), patch.object(subprocess, 'run', side_effect=execute):
-                self.assertEqual(module['main'](['--black-until-10', '--plain']), 1)
+                for mode in (['--black-until-10'], ['--delay-hours', '2']):
+                    self.assertEqual(module['main'](mode + ['--plain']), 1)
             self.assertFalse(any(command[0] == 'xset' for command in calls))
 
     def test_install_repeat_and_disable(self):
@@ -95,8 +141,11 @@ class TimerTests(unittest.TestCase):
                 calls.append(command)
                 if command == [str(launcher), '--plain', '--help']:
                     return subprocess.CompletedProcess(command, 0, 'scheduled', '')
+                if command[2:] == ['stop', 'media-screensaver-daily.timer']:
+                    self.assertTrue((home / '.config/systemd/user/media-screensaver-daily.timer').exists(), 'cannot stop an uninstalled timer')
                 self.assertEqual(command[:2], ['systemctl', '--user'])
                 self.assertIn(command[2:], [
+                    ['stop', 'media-screensaver-daily.timer'],
                     ['daemon-reload'], ['import-environment', 'DISPLAY', 'XAUTHORITY', 'XDG_SESSION_ID'],
                     ['enable', '--now', 'media-screensaver-daily.timer'],
                     ['disable', '--now', 'media-screensaver-daily.timer']])
