@@ -14358,6 +14358,15 @@
       "reviewed_on": "2026-11-17",
       "findings": [],
       "decision": "Existing scoped-inhibition guidance reused for user-requested Hevin replacing blanking. RED/GREEN daemonwait reproducer proves protection/restoration;68media+10timer tests pass. Deployedmain, servicesactive,5989items and actualvisible7808x2160 conveyor verified0/10/20s. Configured600s timeouts unchanged. Long physicalidle/blanking soak remains unobserved; no new generalized finding."
+    },
+    {
+      "sha256": "8cc109eb7d0fbccfe612656d23b5b081b690e9081f50119a2604928b3239e3e3",
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-11-17-xhpp-helper-discovery.md"
+      ],
+      "reviewed_on": "2026-11-17",
+      "findings": [],
+      "decision": "No new learning: existing path-discovery and artifact-budget guidance covers read-only inspection errors and admission-size correction. Inventory warnings are existing; approval boundaries remain binding. Skill validation passed; fresh admission evidence is in plans/fish-alias-delivery.md."
     }
   ],
   "review": {

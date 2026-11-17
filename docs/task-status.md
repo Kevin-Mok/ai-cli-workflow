@@ -358,3 +358,27 @@ This document records delivery milestones and verification for completed reposit
 - Rollback: restore previous wallpaper path and deploy startup helper, then apply the prior image through apply-pywal-theme.
 - Cursor prompt: Verify ubs and a fresh i3 login use fn-jonesy-cool.jpeg; preserve unrelated dirty work and diagnose duplicate MIME sources separately.
 - Delivery: session-owned hunks only; commit fix(i3): use Jonesy wallpaper at startup, then push origin/main; result reported in the conversation.
+
+## xhpp shortcut — chore(fish): add xhpp video shortcut
+
+- Atomic plan: preview/apply the requested mapping, README gate, shortcut-scoped refresh, exact installed Space expansion, focused commit and origin/main push.
+- Scope: applications mapping `xhpp "mpv /home/kevin/Videos/xhpp.webm"`; zero conflicts; preserve all baseline staged and unstaged work.
+- Verified before activation: helper exact diff and zero conflicts; README gate pass_no_change; discovery incident resolved and recorded with existing-learning decision.
+- Activation gate: merge only this row into the preserved live catalog; run the existing refresh-config with a disposable source containing only that catalog, then require installed syntax and exact interactive Space expansion before committing. This avoids applying unrelated dirty configuration.
+- Manual check: load generated abbreviations, type xhpp and Space, inspect then cancel without Enter. Existing generic smoke-test procedure applies unchanged.
+- Use/rollback: new interactive shells load xhpp; remove its row and refresh to undo. Playback is intentionally not executed.
+- Cursor prompt: Verify xhpp using executable_check-fish-abbr with expected mpv /home/kevin/Videos/xhpp.webm; never execute playback; preserve unrelated work.
+- Verified activation: shortcut-scoped refresh-config exited 0; installed checker passed Fish syntax and actual xhpp + Space expansion without executing mpv.
+- Earlier delivery: automatic approval review blocked publication before execution. User then explicitly required always commit/push and authorized the skill correction plus pending shortcut delivery; focused delivery is resumed below. Playback, file availability and wrapped clipboard selection remain untested.
+
+## Fish-alias delivery — fix(fish-alias): require focused commit and push delivery
+
+- Complete: existing delivery rule explicitly includes verified configured default branches and required related docs, and resumes attributable pending work when mapping preview is unchanged. Fully delivered no-ops remain silent; actual approval denials remain binding.
+- Verified: admission tests7/7 and skill frontmatter validation passed; independent four-case review passed after qualifying the overview. Vetted inventory has three existing unrelated warnings. See plans/fish-alias-delivery.md for atomic plan, manual checks and rollback limits.
+- Activation/delivery gate: refresh reviewed installed skill and preserve live xhpp catalog through a disposable chezmoi source; require exact installed xhpp Space-expansion checker before isolated-index commit and origin/main push with normal hooks.
+- Scope: skill, its existing admission and smoke check, session status/plan, durable correction and existing xhpp shortcut/incident only. Preserve all unrelated edits/index entries. No playback or clipboard acceptance is claimed.
+- Commit: fix(fish-alias): require focused commit and push delivery. Actual hash and upstream result are reported in chat.
+
+- Fish-alias activation verified this turn: scoped refresh-config exited0, installed skill matches reviewed source and exact xhpp + Space check passed without playback. Remaining delivery: focused commit and configured origin/main push.
+
+- Fish-alias activation verified this turn: scoped refresh-config exited0, installed skill matches reviewed source and exact xhpp + Space check passed without playback. Remaining delivery: focused commit and configured origin/main push.
