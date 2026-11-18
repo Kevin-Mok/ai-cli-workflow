@@ -1,7 +1,7 @@
 """In-memory X11 motion sampling, with visible i3 bars masked before comparison."""
 import time
 
-from PIL import Image, ImageChops, ImageDraw, ImageGrab
+from PIL import ImageChops, ImageDraw, ImageGrab
 from Xlib import X, display, error
 
 
@@ -69,12 +69,10 @@ class ScreenMotion:
             draw = ImageDraw.Draw(image)
             for left, top, right, bottom in bars:
                 draw.rectangle((left, top, right - 1, bottom - 1), fill=0)
-            frame = image.convert('L').resize((160, 90), Image.Resampling.BOX)
+            frame = image if image.mode == 'RGB' else image.convert('RGB')
             changed = self.previous is None or geometry != self.geometry
             if not changed:
-                difference = ImageChops.difference(self.previous, frame).histogram()
-                # shortcut: motion approximates playback; use player detection if still scenes must block.
-                changed = sum(difference[8:]) >= 8
+                changed = ImageChops.difference(self.previous, frame).getbbox() is not None
             if changed:
                 self.last_motion = now
                 self.previous = frame

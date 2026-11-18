@@ -35,6 +35,18 @@ class MotionTests(unittest.TestCase):
             self.assertTrue(detector.sample(MONITOR)[0])
         detector.close()
 
+    def test_single_pixel_color_change_on_4k_restarts_quiet_period(self):
+        monitor = dict(x=0, y=0, width=3840, height=2160)
+        frame = Image.new('RGB', (3840, 2160), (255, 0, 0))
+        detector = ScreenMotion()
+        with patch.object(detector, '_capture', side_effect=lambda middle: (frame.copy(), [])), patch('media_screensaver.motion.time.monotonic') as now:
+            now.return_value = 0
+            self.assertFalse(detector.sample(monitor)[0])
+            frame.putpixel((1920, 1080), (0, 130, 0))
+            now.return_value = 300
+            self.assertFalse(detector.sample(monitor)[0])
+            self.assertEqual(detector.quiet_seconds, 0)
+
     def test_slow_cumulative_changes_restart_quiet_period(self):
         detector = ScreenMotion()
         frame = Image.new('RGB', (320, 180), (0, 0, 0))

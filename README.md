@@ -1188,7 +1188,8 @@ this.
   `--media DIR` selects a recursive photo/video library; `--seconds N` bounds a
   preview; `--report PATH` records item IDs/timestamps; `--plain` and `--details`
   control output. `status`, `probe` and `demo` expose screen-motion readiness, codec
-  checks and disposable media. Video orientation metadata is honored automatically;
+  checks and disposable media. The idle monitor compares full-color 4K samples
+  outside the i3 bar. Video orientation metadata is honored automatically;
   `orient` opens a separate review chooser, or `orient --file FILE` reviews one video
   and saves a private additional rotation without rewriting the original.
   [`setup-screensaver-timer`](scripts/executable_setup-screensaver-timer) installs a separate

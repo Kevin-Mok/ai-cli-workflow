@@ -32,11 +32,11 @@ Disable future daily launches with `./scripts/executable_setup-screensaver-timer
 
 ## Local screen motion detection
 
-The idle service compares small grayscale samples of the middle 4K monitor in memory. Visible i3bar windows are located from their actual X11 geometry, including nested i3 frames, and masked before comparison. Clock, network, music and workspace changes in that bar do not reset the quiet timer. Movement elsewhere on the 4K monitor resets its five-minute quiet interval; changes on side monitors do not. Keyboard or mouse activity has its own five-minute clock, and both must be quiet before launch.
+The idle service compares full-resolution color samples of the middle 4K monitor in memory. Visible i3bar windows are located from their actual X11 geometry, including nested i3 frames, and masked before comparison. Clock, network, music and workspace changes in that bar do not reset the quiet timer. Any captured pixel change elsewhere on the 4K monitor resets its five-minute quiet interval; changes on side monitors do not. Keyboard or mouse activity has its own five-minute clock, and both must be quiet before launch.
 
 No screenshots are saved or uploaded. Sampling stops during owned screensaver playback so the conveyor does not count as desktop activity. Physical input dismisses playback; the next quiet interval starts after dismissal. A changed monitor/bar layout, unavailable capture or locked/unknown session suppresses activation and restarts the interval. `status` reads the running monitor's current motion result, not browser coverage. Restarting the service resets both clocks.
 
-Screen motion approximates playback: non-bar animations can keep the desktop awake, while a still scene or very small/subtle changes can be missed. The detector accumulates gradual differences against its retained baseline, while ignoring tiny changes such as a text caret. It cannot see movement hidden behind another window. It does not monitor sound. Explicit `ss`, `sofs HOURS` and daily schedules remain available independently.
+Non-bar animations, including a blinking caret, can keep the desktop awake. Motion detection depends on the visible pixels at each sample. Still scenes, changes that occur entirely between samples, hidden windows and audio alone can leave the quiet timer running. Explicit `ss`, `sofs HOURS` and daily schedules remain available independently.
 
 ## Optional browser bridge for manual previews
 

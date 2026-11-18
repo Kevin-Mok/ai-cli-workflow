@@ -7118,6 +7118,26 @@
       "sources": [
         "e292d07a5ff31e1c8627ba5e3ec3a3072575556d8fde95436fe08440cd726fcd"
       ]
+    },
+    {
+      "id": "local-screensaver-fullscreen-motion",
+      "reference": "references/operational-drift.md#local-screensaver-fullscreen-motion",
+      "status": "verified_fix",
+      "symptoms": [
+        "Automatic idle screensaver interrupts visible fullscreen YouTube video."
+      ],
+      "applicability": "X11 middle-monitor idle policy where any sampled non-bar pixel difference is activity.",
+      "diagnostics": [
+        "Use the service journal to distinguish physical idle from measured screen quiet. Reproduce a one-pixel 4K RGB change at the quiet deadline."
+      ],
+      "confidence": "confirmed",
+      "remedy": "Compare native-resolution RGB frames after masking actual visible i3bar geometry.",
+      "verification": "RED reproduced false quiet, GREEN blocked it; 70 Python tests passed with 4K Xvfb and the installed desktop service reported active quiet suppression.",
+      "verification_scope": "runtime",
+      "limitations": "Incident frames unavailable. Still scenes and between-sample movement can appear quiet.",
+      "sources": [
+        "9b7211a146578017b585460d159c8f5e94dbbbad797cfad97726c868569e22db"
+      ]
     }
   ],
   "reports": [
@@ -14376,6 +14396,16 @@
       "reviewed_on": "2026-11-17",
       "findings": [],
       "decision": "No new learning: existing scoped IPC workaround applies. Preserved i3 config is intentionally chezmoi-excluded. Exact-line guarded patch and raw get_config confirmed activation; real isolated Kitty key events verified19→20→19pt. Existing wheel deprecations remain."
+    },
+    {
+      "sha256": "9b7211a146578017b585460d159c8f5e94dbbbad797cfad97726c868569e22db",
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-11-17-screensaver-fullscreen-motion.md"
+      ],
+      "reviewed_on": "2026-11-17",
+      "findings": [
+        "local-screensaver-fullscreen-motion"
+      ]
     }
   ],
   "review": {

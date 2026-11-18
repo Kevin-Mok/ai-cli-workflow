@@ -364,3 +364,14 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 ## local-vesktop-transparent-shading
 
 When ClearVision wallpaper lacks dimming, inspect final Quick CSS important overrides and enabledThemes before changing upstream CSS. A transparent background-shading defeats the overlay; keep one full theme enabled. Configuration RED/GREEN and applied bytes prove settings only; reload and cold-launch visual checks remain required. Evidence: 2026-11-07-vesktop-theme-dimming.md; activation_pending.
+
+## local-screensaver-fullscreen-motion
+
+- Status: verified_fix; confidence: confirmed for the false-quiet mechanism; verification scope: runtime.
+- Symptoms: the idle screensaver interrupts visible fullscreen playback.
+- Applicability: X11 screensaver policies that require any sampled non-bar pixel change to reset inactivity.
+- Diagnostics: inspect the journal for automatic readiness and distinguish measured physical idle from measured screen quiet. Reproduce a single small color change on a 4K frame at the quiet deadline.
+- Remedy: mask the actual i3bar geometry, then compare native-resolution color frames. Keep physical input independent.
+- Verification: the 4K pixel regression failed before the comparator change and passed afterward. All 70 Python screensaver tests passed on 4K Xvfb; installed detector matched source and the user service reported active quiet suppression.
+- Limitations: the original pixel sequence and uninterrupted live YouTube playback were not observed. Movement between sampled frames is invisible.
+- Source: [Fullscreen YouTube interrupted by screensaver](../../../../docs/postmortem/2026-11-17-screensaver-fullscreen-motion.md).
