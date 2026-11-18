@@ -1183,9 +1183,13 @@ this.
   `./scripts/executable_media-screensaver install`, then run `~/scripts/media-screensaver service` for a supervised idle monitor
   or `preview` (fish abbreviation `ss`, i3 **Alt+Shift+S** or **Super+Shift+S**) for immediate playback. i3 starts the service at login, and systemd
   restarts it after an exit. `daemon` remains available in the foreground.
-  Each launch fills all three outputs with random photos/videos, then advances
-  the conveyor every ten seconds.
-  `--media DIR` selects a recursive photo/video library; `--seconds N` bounds a
+  Each launch fills the three outputs with one video and two photos when both
+  types are available, then advances
+  the conveyor every ten seconds. Compatible H.264 and HEVC clips use NVIDIA
+  hardware decoding when available, with software fallback. Oversized video
+  frames are scaled to fit within 1920×1080 before rotation and display.
+  `--media DIR` selects a recursive photo/video library, `--video-only` selects
+  only videos for a preview, and `--seconds N` bounds a
   preview; `--report PATH` records item IDs/timestamps; `--plain` and `--details`
   control output. `status`, `probe` and `demo` expose screen-motion readiness, codec
   checks and disposable media. The idle monitor compares full-color 4K samples

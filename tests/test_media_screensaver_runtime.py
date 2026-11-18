@@ -146,6 +146,51 @@ class RuntimeTests(unittest.TestCase):
                 window.destroy()
             self.assertEqual(pipeline.get_state(Gst.SECOND)[1], Gst.State.NULL)
 
+    def test_h264_prefers_nvdec_and_retries_failed_hardware_in_software(self):
+        from gi.repository import GLib, Gst, Gtk
+        from media_screensaver.core import Entry
+        if Gst.ElementFactory.find('nvh264dec') is None:
+            self.skipTest('requires NVIDIA H.264 decoder')
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / 'test.mp4'
+            subprocess.run(['ffmpeg', '-v', 'error', '-f', 'lavfi', '-i',
+                            'testsrc2=size=320x240:rate=30', '-t', '5',
+                            '-c:v', 'libx264', '-preset', 'ultrafast', str(path)], check=True)
+            errors = []
+            decoders = []
+            card = runtime.Card(Entry(1, path), lambda *args: errors.append(args))
+
+            def decoder_added(_, element):
+                factory = element.get_factory()
+                if factory and factory.get_name() in ('nvh264dec', 'avdec_h264'):
+                    decoders.append(element)
+
+            def wait_for(decoder_name):
+                deadline = time.monotonic() + 5
+                while time.monotonic() < deadline and not errors:
+                    while Gtk.events_pending():
+                        Gtk.main_iteration_do(False)
+                    if decoders and decoders[-1].get_factory().get_name() == decoder_name:
+                        if (card.position() or 0) > .15:
+                            return
+                    time.sleep(.01)
+                observed = [decoder.get_factory().get_name() for decoder in decoders]
+                self.fail(f'Expected playback with {decoder_name}, observed {observed}, errors {errors}')
+
+            card.pipeline.connect('element-setup', decoder_added)
+            window = Gtk.Window()
+            window.add(card.widget)
+            try:
+                window.show_all()
+                wait_for('nvh264dec')
+                error = GLib.Error.new_literal(Gst.CoreError.quark(), 'simulated GPU failure', Gst.CoreError.FAILED)
+                card.message(card.bus, Gst.Message.new_error(decoders[-1], error, ''))
+                wait_for('avdec_h264')
+                self.assertFalse(errors)
+            finally:
+                card.close()
+                window.destroy()
+
     def test_short_video_loops_in_same_pipeline(self):
         from gi.repository import Gtk, Gst
         from media_screensaver.core import Entry
@@ -168,6 +213,38 @@ class RuntimeTests(unittest.TestCase):
                 self.assertFalse(errors)
                 self.assertTrue(any(b<a-.1 for a,b in zip(positions,positions[1:])), positions)
                 self.assertEqual(card.pipeline.get_state(0)[1], Gst.State.PLAYING)
+            finally:
+                card.close()
+                window.destroy()
+
+    def test_large_video_is_scaled_before_reaching_gtk(self):
+        from gi.repository import Gtk
+        from media_screensaver.core import Entry
+
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / '4k.mp4'
+            subprocess.run(['ffmpeg', '-v', 'error', '-f', 'lavfi', '-i',
+                            'testsrc2=size=3840x2160:rate=10', '-t', '1',
+                            '-c:v', 'libx264', '-preset', 'ultrafast', str(path)], check=True)
+            errors = []
+            window = Gtk.Window()
+            card = runtime.Card(Entry(1, path), lambda *args: errors.append(args))
+            window.add(card.widget)
+            sink = card.pipeline.get_property('video-sink')
+            pad = sink.get_static_pad('sink')
+            try:
+                window.show_all()
+                deadline = time.monotonic() + 5
+                while time.monotonic() < deadline and not errors:
+                    while Gtk.events_pending():
+                        Gtk.main_iteration_do(False)
+                    if pad.get_current_caps() and sink.get_property('stats').get_value('rendered'):
+                        break
+                    time.sleep(.01)
+                self.assertFalse(errors)
+                self.assertGreater(sink.get_property('stats').get_value('rendered'), 0)
+                caps = pad.get_current_caps().get_structure(0)
+                self.assertEqual((caps.get_value('width'), caps.get_value('height')), (1920, 1080))
             finally:
                 card.close()
                 window.destroy()
@@ -198,12 +275,12 @@ class RuntimeTests(unittest.TestCase):
                 cards.append(card)
             window.show_all()
             try:
-                end = time.monotonic() + 1
-                while time.monotonic() < end:
+                end = time.monotonic() + 5
+                while (cards[1].position() or 0) <= .3 and time.monotonic() < end and not errors:
                     while Gtk.events_pending(): Gtk.main_iteration_do(False)
                     time.sleep(.01)
                 self.assertFalse(errors)
-                self.assertGreater(cards[1].position(), .3)
+                self.assertGreater(cards[1].position() or 0, .3, 'video did not start before the pixel check')
                 # Flush GTK, then read the actual X11 screen including native child windows.
                 from Xlib import X, display
                 Gdk.Display.get_default().sync()
@@ -327,6 +404,41 @@ class RuntimeTests(unittest.TestCase):
             with patch.object(main,'monitors',return_value=geometry), patch.object(main.bridge,'runtime_dir',side_effect=RuntimeError('fixture bridge unavailable')):
                 self.assertIsNone(main.preview(args))
             self.assertTrue(path.is_file())
+
+    def test_conveyor_moves_cards_during_slide_and_leaves_settled_geometry_alone(self):
+        from gi.repository import GdkPixbuf, Gtk
+        from media_screensaver import core
+        from unittest.mock import patch
+
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / 'photo.png'
+            photo = GdkPixbuf.Pixbuf.new(GdkPixbuf.Colorspace.RGB, False, 8, 20, 40)
+            photo.fill(0xff0000ff)
+            photo.savev(str(path), 'png', [], [])
+            geometry = [dict(x=i*100, y=0, width=100, height=100) for i in range(3)]
+            moves = []
+            milestones = []
+            move = Gtk.Layout.move
+
+            def track(layout, child, x, y):
+                moves.append((x, y))
+                move(layout, child, x, y)
+
+            def report(event):
+                if event['event'] in ('advance', 'settled'):
+                    milestones.append((event['event'], len(moves)))
+
+            with patch.object(Gtk.Layout, 'move', track), patch.object(core, 'CADENCE', .6), \
+                    patch.object(core, 'SLIDE', .2):
+                runtime.run([path], geometry, seconds=1.1, gate=lambda: (True, 'ready'),
+                            automatic=False, emit=lambda *args: None, report=report)
+
+            self.assertEqual([name for name, _ in milestones], ['advance', 'settled', 'advance', 'settled'])
+            _, initial, advancing, settled = [count for _, count in milestones]
+            self.assertEqual(initial, 3)
+            self.assertEqual(advancing, initial + 4)
+            self.assertGreater(settled, advancing)
+            self.assertEqual(len(moves), settled)
 
     def test_starting_middle_video_dismisses_and_releases_manual_preview(self):
         from gi.repository import GdkPixbuf

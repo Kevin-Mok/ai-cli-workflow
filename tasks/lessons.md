@@ -307,3 +307,5 @@
 
 - 2026-11-17: A mapping helper returning changed=false proves only that the template already matches. Check attributable pending changes and unpushed shortcut commits before treating a repeated fish-alias request as fully delivered.
 - 2026-11-17: When the screensaver policy treats any sampled non-bar change as activity, compare at native resolution in color. Downsampling and thresholds can report a quiet desktop despite visible changes. Distinguish a verified detector blind spot from the unrecoverable frames of the original incident. See [fullscreen motion incident](../docs/postmortem/2026-11-17-screensaver-fullscreen-motion.md).
+
+- 2026-11-17: Gate conveyor layout calls on actual slides and final placement. GTK3 can resize visible children on repeated moves to the same coordinates. Count widget draws separately from sink buffers when investigating stutter. See [settled layout investigation](../docs/postmortem/2026-11-17-screensaver-settled-layout-stutter.md).

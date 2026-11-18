@@ -494,6 +494,19 @@ Use these reviewed findings to compare a failure with prior evidence. Check appl
 - Limitations: Supported-command workaround, not upstream binary repair. Tiny-pane timer limitation remains; requires at least three text rows. No physical shared-desktop acceptance from isolated XTest.
 - Source: [tmux drag/copy investigation](../../../../docs/postmortem/2026-10-19-tmux-drag-scroll-copy.md) (SHA-256 `43c89ef5553cf9396553b3430993099a6cf10cd3e7725cfdd563e01554417949`).
 
+## local-gtk3-settled-layout-redraw
+
+- Status: verified_fix
+- Confidence: confirmed
+- Verification scope: runtime
+- Symptoms: A GTK3/X11 video widget draws infrequently even when video sink counters advance.
+- Applicability: A frame-clock callback calls Gtk.Layout.move with unchanged positions for visible cards.
+- Diagnostics: Count settled child moves and video widget draw callbacks separately from sink buffers. Compare the same clip and layout at equivalent elapsed intervals.
+- Remedy: Apply card geometry during the slide and once at its final position. Leave settled geometry alone until the next change.
+- Verification: A defining Xvfb test observed excess moves before and passed after. A paired mixed workload went from 120 to zero settled moves and from 79 to 163 widget draws in seven seconds. Installed desktop playback reached the first transition and released all pipelines.
+- Limitations: Widget draws can reuse buffers. The measurements do not prove unique displayed frames or smoke acceptance for the originally reported clip.
+- Source: [screensaver settled layout investigation](../../../../docs/postmortem/2026-11-17-screensaver-settled-layout-stutter.md).
+
 ## local-gtk3-mixed-card-presentation
 
 - Status: verified_workaround

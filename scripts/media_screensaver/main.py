@@ -50,6 +50,10 @@ def scan(args):
     finally:
         done.set()
         thread.join()
+    if getattr(args, 'video_only', False):
+        result = [path for path in result if path.suffix.lower() in VIDEOS]
+        if not result:
+            raise ValueError('No supported videos found; use --media to select a folder with MP4, MOV or MKV files.')
     output(args, 'success', f'Found {len(result)} media items; originals remain read-only.')
     return result
 
@@ -333,6 +337,7 @@ def main(argv=None):
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('command', nargs='?', choices=['preview', 'daemon', 'service', 'status', 'install', 'probe', 'demo', 'orient', 'scheduled', '_auto'], default='preview', metavar='{preview,daemon,service,status,install,probe,demo,orient,scheduled}')
     parser.add_argument('--media', type=Path, default=MEDIA, help='recursive media library (default: %(default)s)')
+    parser.add_argument('--video-only', action='store_true', help='only play videos in preview mode')
     parser.add_argument('--file', type=Path, help='video for orient (otherwise opens a chooser in --media)')
     parser.add_argument('--seconds', type=float, default=0, help='close preview after this many seconds (0: until activity)')
     parser.add_argument('--report', type=Path, help='new private JSONL timing report; item IDs only')
@@ -341,6 +346,8 @@ def main(argv=None):
     args = parser.parse_args(argv)
     if args.seconds < 0 or not __import__('math').isfinite(args.seconds): parser.error('--seconds must be finite and nonnegative')
     try:
+        if args.video_only and args.command != 'preview':
+            raise ValueError('--video-only is available with preview.')
         if args.command == 'orient':
             from .review import run
             return run(args, lambda kind, message: output(args, kind, message))

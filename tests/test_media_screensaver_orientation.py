@@ -56,6 +56,11 @@ class OrientationFixtures:
 
     def capture(self, card, window):
         pump(.35)
+        sink = card.pipeline.get_property('video-sink')
+        deadline = time.monotonic() + 3
+        while not sink.get_property('stats').get_value('rendered') and time.monotonic() < deadline:
+            pump(.05)
+        self.assertGreater(sink.get_property('stats').get_value('rendered'), 0, 'video never reached the sink')
         width, height = card.widget.get_allocated_width(), card.widget.get_allocated_height()
         x, y = card.widget.translate_coordinates(window, 0, 0)
         pix = Gdk.pixbuf_get_from_window(window.get_window(), x, y, width, height)

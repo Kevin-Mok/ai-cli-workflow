@@ -24,6 +24,36 @@ class CLITests(unittest.TestCase):
         self.assertIn('--media', p.stderr)
         self.assertTrue(p.stderr.isascii())
 
+    def test_video_only_preview_filters_mixed_library_and_rejects_photo_only(self):
+        import sys
+        from types import SimpleNamespace
+        from unittest.mock import Mock, patch
+
+        sys.path.insert(0, str(ROOT / 'scripts'))
+        from media_screensaver import main
+
+        render = Mock(return_value=0)
+        with tempfile.TemporaryDirectory() as directory:
+            library = Path(directory)
+            photo = library / 'photo.jpg'
+            video = library / 'video.MOV'
+            photo.touch()
+            video.touch()
+            args = ['preview', '--plain', '--media', directory]
+            with patch.dict(sys.modules, {'media_screensaver.renderer': SimpleNamespace(run=render)}), \
+                    patch.object(main.bridge, 'runtime_dir', return_value=library), \
+                    patch.object(main, 'monitors', return_value=[{}, {}, {}]), \
+                    patch.object(main, 'output') as output:
+                self.assertEqual(main.main(args), 0)
+                self.assertCountEqual(render.call_args.args[0], [photo, video])
+                self.assertEqual(main.main(args + ['--video-only']), 0)
+                self.assertEqual(render.call_args.args[0], [video])
+                render.reset_mock()
+                video.unlink()
+                self.assertEqual(main.main(args + ['--video-only']), 1)
+                render.assert_not_called()
+                self.assertIn('No supported videos', output.call_args.args[2])
+
     def test_browser_gate_accepts_live_monitor_name_metadata(self):
         import sys
         import time

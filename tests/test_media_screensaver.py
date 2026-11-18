@@ -63,6 +63,16 @@ class ConveyorTests(unittest.TestCase):
         c.tick(10.75)
         self.assertEqual(sorted(e.slot for e in c.entries), [0, 1, 2])
 
+    def test_mixed_library_keeps_one_video_and_two_photos_after_each_slide(self):
+        paths = [Path('a.mov'), Path('b.mp4'), Path('c.jpg'), Path('d.png')]
+        with patch.object(core.random, 'choice', side_effect=lambda choices: choices[0]):
+            c = core.Conveyor(paths, start=0)
+            for now in (0, 10.75, 20.75, 30.75, 40.75, 60.75):
+                with self.subTest(now=now):
+                    c.tick(now)
+                    self.assertEqual(len(c.entries), 3)
+                    self.assertEqual(sum(e.path.suffix in core.VIDEOS for e in c.entries), 1)
+
     def test_random_selection_avoids_adjacent_duplicates_when_possible(self):
         c = core.Conveyor([Path("a.jpg"), Path("b.jpg"), Path("c.mp4")], start=0)
         last = c.entries[0].path

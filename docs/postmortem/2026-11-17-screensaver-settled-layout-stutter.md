@@ -1,0 +1,13 @@
+# Screensaver stutter after scaling
+
+The user still saw lag after the 1080p cap. Their specific clip and whether it stuttered during a slide were unavailable. The previous [scaling investigation](2026-11-17-screensaver-mixed-playback-stutter.md) demonstrated an improvement on one sample while leaving the user-visible symptom open.
+
+The query `screensaver still stutters after 1080p NVDEC GTK Cairo` surfaced `local-gtk3-mixed-card-presentation`. That workaround remains applicable to the renderer's mixed-window stacking, while its evidence excludes sustained smoothness. The current renderer calls GTK's layout move operation on every frame even after a slide settles. GTK 3.24 queues a resize on each visible child move, including unchanged coordinates. Test the actual calls before changing the frame loop, then compare sustained video-frame delivery on the same mixed workload.
+
+The defining Xvfb test counted 112 layout moves by the first slide tick, when only seven were needed. It passed after layout updates were limited to startup and the slide, including its final position. The separate mixed-card visibility check initially queried playback position before its video had started and compared None with a float after a fixed one-second wait. The existing [first-frame incident](2026-11-17-screensaver-nvdec-orientation-test.md) is applicable. The visibility test now waits for the same playback position with a bounded deadline and keeps the direct X11 color assertions.
+
+In a paired 14-second Xvfb comparison with the same clip, two photos and NVDEC, the steady interval had 120 layout moves before and zero after. The video widget's draw callbacks increased from 79 to 163 in seconds 2–9 and from 22 to 61 in seconds 11–14. The sink reported 378 and 377 frames respectively. These are widget callbacks, which can redraw the same video buffer. The result isolates an avoidable GTK layout cost and does not establish physical display cadence.
+
+The scoped deployment's service check returned inactive (exit 3) after the installed file comparison passed. A lookup for `media screensaver idle service inactive systemctl exit 3 manual preview` returned existing scheduled-playback and idle guidance, neither of which explains why this unit was stopped. The independent manual preview reached 14 seconds, advanced onto the 4K output with NVDEC, recorded no steady layout moves, and released all pipelines. The originally reported visual stutter has yet to be checked on the user's clip.
+
+[GTK 3.24 GtkLayout implementation](https://raw.githubusercontent.com/GNOME/gtk/gtk-3-24/gtk/gtklayout.c)

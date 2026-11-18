@@ -35,6 +35,26 @@
   ],
   "findings": [
     {
+      "applicability": "GTK3/X11 frame-clock callback calling Gtk.Layout.move on settled visible widgets.",
+      "confidence": "confirmed",
+      "diagnostics": [
+        "Count settled child moves and widget draws separately from sink buffers under the same clip, layout and elapsed intervals."
+      ],
+      "id": "local-gtk3-settled-layout-redraw",
+      "limitations": "Widget draws can reuse video buffers. Unique presented frames and smoothness for the originally reported clip remain unverified.",
+      "reference": "references/artifact-verification.md#local-gtk3-settled-layout-redraw",
+      "remedy": "Apply child geometry during slides and once at final placement, then leave settled geometry alone until the next change.",
+      "sources": [
+        "0f76af660ea29ad238a6f76580901e3999014e27d9bcd793329ec12a57a2062c"
+      ],
+      "status": "verified_fix",
+      "symptoms": [
+        "Infrequent GTK3 video widget draws even while video sink counters advance."
+      ],
+      "verification": "The layout regression passed after the fix. Paired Xvfb runs had 120 versus zero settled moves and 79 versus 163 widget draw callbacks over seven seconds. Installed desktop playback advanced and released all pipelines.",
+      "verification_scope": "runtime"
+    },
+    {
       "applicability": "Backup helper launches embedded Python via python3 - with a stdin heredoc, then uses input for erase confirmation.",
       "confidence": "confirmed",
       "diagnostics": [
@@ -7141,6 +7161,52 @@
     }
   ],
   "reports": [
+    {
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-11-17-screensaver-settled-layout-stutter.md"
+      ],
+      "findings": [
+        "local-gtk3-settled-layout-redraw"
+      ],
+      "reviewed_on": "2026-11-17",
+      "sha256": "0f76af660ea29ad238a6f76580901e3999014e27d9bcd793329ec12a57a2062c"
+    },
+    {
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-11-17-screensaver-mixed-playback-stutter.md"
+      ],
+      "decision": "No new general stutter finding. The local comparison confirms smaller frames and higher delivery for one sample, while the originally reported clip and perceived smoothness are unverified. Retain the focused tests for caps and callers that omit the preview flag.",
+      "findings": [],
+      "reviewed_on": "2026-11-17",
+      "sha256": "c0b0380d208b55fcff7c3480d8bde7022eb453f5adfe92dcbb5beb7f7ee1b410"
+    },
+    {
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-11-17-screensaver-preview-lock-sandbox.md"
+      ],
+      "decision": "No new general finding. The test can use an isolated runtime directory and the live verification can use scoped runtime access, consistent with existing sandbox guidance.",
+      "findings": [],
+      "reviewed_on": "2026-11-17",
+      "sha256": "fd1a705e5d5da0b7c81e6765f7836e424a41a410bb6648cfa8c2255fa358372f"
+    },
+    {
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-11-17-screensaver-nvdec-orientation-test.md"
+      ],
+      "decision": "The local orientation fixture now checks for first-frame readiness. The isolated failure does not establish a general NVDEC startup defect. The X11 and Fish setup failures were limited to the sandbox.",
+      "findings": [],
+      "reviewed_on": "2026-11-17",
+      "sha256": "4d15af7e8a1d5a670996ed8ee76d0ac9c7e69d3981284ef645072a9ea924efe7"
+    },
+    {
+      "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-11-17-screensaver-video-stutter.md"
+      ],
+      "decision": "No new general finding. The local benchmark quantifies the documented software playback cost, but the affected live clip and frame drops are unmeasured. The X11 status failure matches existing scoped read-only access guidance.",
+      "findings": [],
+      "reviewed_on": "2026-11-17",
+      "sha256": "b8a9bd80642133babc44c17243452a36146ad7278192b0aadc891c0a501c2dc5"
+    },
     {
       "sha256": "3ba8d8b8e522925791004e2b32e7dd6673e335ec32cfac1856aa158ae7b538e6",
       "aliases": [

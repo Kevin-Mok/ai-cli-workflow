@@ -1705,6 +1705,13 @@ play audio, so exercise them deliberately.
 
 ### Media conveyor screensaver
 
+- Action: On the NVIDIA desktop, run a 20-second preview from a test folder with one known-compatible 4K H.264 or HEVC clip. Watch all three cards and check decoder utilization in a second terminal with `nvidia-smi dmon -s u`.
+  Expected: The clip plays on all three screens with decoder activity while the cards loop and move. Repeat on a machine without NVDEC to check software playback.
+- Action: Run `~/scripts/media-screensaver preview --media DIR --seconds 14 --video-only` from a mixed library, then repeat with a photo-only folder.
+  Expected: Only videos enter the conveyor, including after it advances. A photo-only folder reports that it has no supported videos and exits before opening a window.
+- Action: Run the same mixed-library preview without `--video-only`.
+  Expected: One video and two photos fill the screens at launch and after the slide settles. Include a 4K clip and check motion both while its card is stationary on the 4K monitor and while it crosses onto that monitor. The photos stay visible and the video keeps its aspect ratio.
+
 - Action: In fish, type `sofs 0.01` and Space, inspect the expansion and cancel without Enter. Then dismiss any preview, deliberately execute the shortcut and leave keyboard/mouse untouched for 36 seconds. Repeat with a new delay; restore daily scheduling with `sofss` afterward.
   Expected: Expansion is `~/linux-config/scripts/executable_setup-screensaver-timer --delay-hours 0.01`. Displays turn off, then wake for scheduled playback after 36 seconds; repeated scheduling resets the full delay. The one-shot replaces 10 AM scheduling and does not survive reboot. Input can wake displays early; locked sessions suppress playback. `ss` still starts immediate playback, and `sofss` still restores daily 10 AM.
 - Action: Run the timer installer with `--delay-hours 0`, `--delay-hours -1`, `--delay-hours nan`, or no value after `--delay-hours`.

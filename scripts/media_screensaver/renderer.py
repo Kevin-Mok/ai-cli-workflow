@@ -17,9 +17,21 @@ from .core import Conveyor, VIDEOS, placement
 from .orientation import OrientationStore
 
 Gst.init(None)
-# gtksink uses system memory; prefer libav over CUDA-only decoders on this CPU sink.
+NVIDIA_DECODERS = {'nvh264dec', 'nvh265dec'}
+SYSTEM_VIDEO = Gst.Caps.from_string('video/x-raw')
+PLAYBACK_VIDEO = Gst.Caps.from_string('video/x-raw,width=(int)[1,1920],height=(int)[1,1080],pixel-aspect-ratio=1/1')
+PLAY_VIDEO = 1
+FORCE_SOFTWARE_DECODERS = 1 << 12  # GstPlayFlags.force-sw-decoders
+
+# Only promote hardware decoders that can supply system-memory frames to GTK.
 for factory in Gst.Registry.get().get_feature_list(Gst.ElementFactory):
-    if factory.get_name().startswith('avdec_'):
+    name = factory.get_name()
+    if name in NVIDIA_DECODERS and any(
+        pad.direction == Gst.PadDirection.SRC and pad.get_caps().can_intersect(SYSTEM_VIDEO)
+        for pad in factory.get_static_pad_templates()
+    ):
+        factory.set_rank(Gst.Rank.PRIMARY + 101)
+    elif name.startswith('avdec_'):
         factory.set_rank(Gst.Rank.PRIMARY + 100)
 
 
@@ -101,6 +113,7 @@ class Card:
         self.timer = None
         self.closed = False
         self.pixbuf = None
+        self.using_nvdec = False
         if entry.path.suffix.lower() in VIDEOS:
             self.pipeline = Gst.ElementFactory.make('playbin')
             sink = Gst.ElementFactory.make('gtksink')
@@ -112,17 +125,23 @@ class Card:
             except (OSError, ValueError) as error:
                 (warning or (lambda message: warnings.warn(message)))(str(error))
             filters = Gst.Bin.new(None)
+            scale = Gst.ElementFactory.make('videoscale')
+            size_limit = Gst.ElementFactory.make('capsfilter')
             auto = Gst.ElementFactory.make('videoflip')
             self.correction = Gst.ElementFactory.make('videoflip')
+            if scale is None or size_limit is None:
+                raise ValueError('GStreamer video scaler missing; install gstreamer1.0-plugins-base.')
             if auto is None or self.correction is None:
                 raise ValueError('GStreamer videoflip missing; install gstreamer1.0-plugins-good.')
+            size_limit.set_property('caps', PLAYBACK_VIDEO)
             auto.set_property('video-direction', 8)  # Auto: honor image-orientation tags.
             self.correction.set_property('video-direction', self.rotation // 90)
-            filters.add(auto)
-            filters.add(self.correction)
-            if not auto.link(self.correction):
-                raise ValueError('Could not link video orientation filters.')
-            filters.add_pad(Gst.GhostPad.new('sink', auto.get_static_pad('sink')))
+            chain = (scale, size_limit, auto, self.correction)
+            for element in chain:
+                filters.add(element)
+            if not all(upstream.link(downstream) for upstream, downstream in zip(chain, chain[1:])):
+                raise ValueError('Could not link video scaling and orientation filters.')
+            filters.add_pad(Gst.GhostPad.new('sink', scale.get_static_pad('sink')))
             filters.add_pad(Gst.GhostPad.new('src', self.correction.get_static_pad('src')))
             self.pipeline.set_property('video-filter', filters)
             self.widget = sink.get_property('widget')
@@ -131,9 +150,10 @@ class Card:
             sink.set_property('force-aspect-ratio', True)
             self.pipeline.set_property('video-sink', sink)
             self.pipeline.set_property('audio-sink', Gst.ElementFactory.make('fakesink'))
-            self.pipeline.set_property('flags', 1)  # Video only: never open an audio device.
+            self.pipeline.set_property('flags', PLAY_VIDEO)
             self.pipeline.set_property('mute', True)
             self.pipeline.set_property('uri', entry.path.absolute().as_uri())
+            self.decoder_handler = self.pipeline.connect('element-setup', self.note_decoder)
             self.bus = self.pipeline.get_bus()
             self.bus.add_signal_watch()
             self.handler = self.bus.connect('message', self.message)
@@ -194,10 +214,21 @@ class Card:
             cr.paint()
         return False
 
+    def note_decoder(self, pipeline, element):
+        factory = element.get_factory()
+        if factory and factory.get_name() in NVIDIA_DECODERS:
+            self.using_nvdec = True
+
     def message(self, bus, message):
         if self.closed:
             return
         if message.type == Gst.MessageType.ERROR:
+            if self.using_nvdec:
+                self.pipeline.set_state(Gst.State.NULL)
+                self.using_nvdec = False
+                self.pipeline.set_property('flags', PLAY_VIDEO | FORCE_SOFTWARE_DECODERS)
+                self.pipeline.set_state(Gst.State.PLAYING)
+                return
             error, _ = message.parse_error()
             self.reject('Video decoding failed: ' + error.message)
         elif message.type == Gst.MessageType.EOS:
@@ -223,6 +254,7 @@ class Card:
         if self.pipeline:
             self.pipeline.set_state(Gst.State.NULL)
             self.pipeline.get_state(2 * Gst.SECOND)
+            self.pipeline.disconnect(self.decoder_handler)
         if self.conversion and self.conversion.poll() is None:
             self.conversion.terminate()
             try:
@@ -304,6 +336,10 @@ def run(paths, monitors, *, seconds, gate, automatic, emit, report=None):
                 Gtk.main_quit()
                 return False
             conveyor.tick(now)
+            step = conveyor.sequence
+            progress = conveyor.progress(now)
+            # GTK queues a resize even when a visible child stays at the same position.
+            update_geometry = progress < 1 or done_step != step
             live = {entry.identity for entry in conveyor.entries}
             for identity in list(cards):
                 if identity not in live:
@@ -316,16 +352,16 @@ def run(paths, monitors, *, seconds, gate, automatic, emit, report=None):
                     layout.put(card.widget, 0, 0)
                     card.widget.show_all()
                     event('enter', item=entry.identity, format=entry.path.suffix.lower())
-                rect = placement(monitors, entry.slot, conveyor.progress(now))
-                card = cards[entry.identity]
-                card.widget.set_size_request(rect['width'], rect['height'])
-                layout.move(card.widget, rect['x'] - left, rect['y'] - top)
-            step = conveyor.sequence
+                if update_geometry:
+                    rect = placement(monitors, entry.slot, progress)
+                    card = cards[entry.identity]
+                    card.widget.set_size_request(rect['width'], rect['height'])
+                    layout.move(card.widget, rect['x'] - left, rect['y'] - top)
             if step != last_step:
                 last_step = step
                 positions('advance')
                 emit('progress', f'Conveyor active · {int(now - start)}s · {len(cards)} items · {error_count} skipped')
-            if conveyor.progress(now) == 1 and done_step != step:
+            if progress == 1 and done_step != step:
                 done_step = step
                 positions('settled')
             if not conveyor.paths:

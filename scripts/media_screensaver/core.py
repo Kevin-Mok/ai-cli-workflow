@@ -79,7 +79,10 @@ class Conveyor:
     def _enter(self, slot=0):
         if not self.paths:
             return
-        choices = [p for p in self.paths if p != self.last] or self.paths
+        # The card sliding out no longer counts toward the next three screens.
+        needs_video = not any(e.slot < 3 and e.path.suffix.lower() in VIDEOS for e in self.entries)
+        pool = [p for p in self.paths if (p.suffix.lower() in VIDEOS) == needs_video] or self.paths
+        choices = [p for p in pool if p != self.last] or pool
         self.last = random.choice(choices)
         self.sequence += 1
         self.entries.append(Entry(self.sequence, self.last, slot))
