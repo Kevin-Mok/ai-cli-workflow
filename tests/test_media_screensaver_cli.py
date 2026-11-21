@@ -140,6 +140,47 @@ class CLITests(unittest.TestCase):
         with patch.object(main, 'scan', return_value=[]), patch.object(main, 'monitors', return_value=[{}, {}, {}]), patch.object(main, 'gate', side_effect=AssertionError('automatic playback queried Chrome')), patch.object(renderer, 'run', side_effect=render):
             self.assertEqual(main._preview(args, automatic=True), 0)
 
+    def test_idle_mode_commands_persist_selection_and_restore_playback(self):
+        import sys
+        from unittest.mock import patch
+        sys.path.insert(0, str(ROOT / 'scripts'))
+        from media_screensaver import main
+        with tempfile.TemporaryDirectory() as directory:
+            marker = Path(directory) / 'blank-only'
+            with patch.object(main.bridge, 'runtime_dir', return_value=Path(directory)), patch.object(main, 'service', return_value=0):
+                self.assertEqual(main.main(['blank-only', '--plain']), 0)
+                self.assertTrue(marker.is_file())
+                self.assertEqual(main.main(['blank-only', '--plain']), 0)
+                self.assertEqual(main.main(['idle-playback', '--plain']), 0)
+                self.assertFalse(marker.exists())
+
+    def test_blank_only_waits_for_quiet_and_rearms_after_input(self):
+        import signal
+        import sys
+        from types import SimpleNamespace
+        from unittest.mock import patch
+        sys.path.insert(0, str(ROOT / 'scripts'))
+        from media_screensaver import main, renderer
+
+        previous = {sig: signal.getsignal(sig) for sig in (signal.SIGINT, signal.SIGTERM)}
+        try:
+            with tempfile.TemporaryDirectory() as directory, patch.object(main.bridge, 'runtime_dir', return_value=Path(directory)), patch.object(renderer, 'IdleClock') as clock, patch.object(main.threading, 'Event') as event, patch.object(main, 'monitors', return_value=[{}, dict(width=3840, height=2160), {}]), patch.object(main, 'locked', return_value=False), patch('media_screensaver.motion.ScreenMotion') as motion, patch('media_screensaver.desktop.keep_awake'), patch.object(main.subprocess, 'run') as run, patch.object(main.subprocess, 'Popen') as launch:
+                (Path(directory) / 'blank-only').touch()
+                idle = (299.9, 300.0, 301.0, 302.0, 0.0, 300.0)
+                clock.return_value.seconds.side_effect = idle
+                event.return_value.is_set.side_effect = [False] * len(idle) + [True]
+                motion.return_value.sample.side_effect = [(True, 'quiet'), (False, 'motion'), (True, 'quiet'), (False, 'recent input'), (True, 'quiet'), (True, 'quiet')]
+                run.return_value = subprocess.CompletedProcess([], 0)
+                launch.return_value.pid = 123
+                launch.return_value.poll.return_value = 0
+                self.assertEqual(main.daemon(SimpleNamespace(media=Path(directory), plain=True, details=False)), 0)
+                self.assertEqual([call.args[0] for call in run.call_args_list], [['xset', 's', 'activate']] * 2)
+                self.assertEqual(motion.return_value.sample.call_count, 5)
+                launch.assert_not_called()
+        finally:
+            for sig, handler in previous.items():
+                signal.signal(sig, handler)
+
     def test_status_uses_live_motion_report_and_rejects_invalid_report(self):
         import sys
         import time

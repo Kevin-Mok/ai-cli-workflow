@@ -167,11 +167,23 @@ def daemon(args):
         last_allowed = None
         last_progress = 0
         retry_after = 0
+        blank_only = False
+        blanked = False
+        mode_marker = directory / 'blank-only'
         output(args, 'info', 'Idle monitor running; activation after 5 minutes without input or 4K screen motion; i3 bar excluded.')
         try:
             with keep_awake():
                 while not stop.is_set():
                     now = time.monotonic()
+                    idle = clock.seconds()
+                    requested_blank = mode_marker.is_file()
+                    if blank_only != requested_blank:
+                        blank_only = requested_blank
+                        blanked = False
+                        motion.reset()
+                        retry_after = 0
+                    if idle < IDLE_SECONDS:
+                        blanked = False
                     geometry = monitors()
                     middle = geometry[1]
                     if child and child.poll() is not None:
@@ -184,7 +196,9 @@ def daemon(args):
                         motion.reset()
                         allowed, reason = False, 'Automatic activation needs the middle 4K output; inspect the display layout.'
                     elif child:
-                        allowed, reason = True, 'Screensaver active; screen sampling paused.'
+                        allowed, reason = not blank_only, 'Screensaver active; screen sampling paused.'
+                    elif blanked:
+                        allowed, reason = True, 'Displays blanked; waiting for input.'
                     else:
                         allowed, reason = motion.sample(middle)
                     if locked():
@@ -192,18 +206,27 @@ def daemon(args):
                         allowed, reason = False, 'Session is locked or lock state is unavailable.'
                     if child and not allowed:
                         child.terminate()
-                    idle = clock.seconds()
-                    if not child and allowed and idle >= IDLE_SECONDS and now >= retry_after:
-                        command = [sys.executable, str(Path(__file__).resolve().parents[1] / ('media-screensaver' if (Path(__file__).resolve().parents[1] / 'media-screensaver').exists() else 'executable_media-screensaver')), '_auto', '--media', str(args.media)]
-                        if args.plain: command.append('--plain')
-                        if args.details: command.append('--details')
-                        child = subprocess.Popen(command, stdin=subprocess.DEVNULL, start_new_session=True)
+                    if not child and not blanked and allowed and idle >= IDLE_SECONDS and now >= retry_after:
+                        if blank_only:
+                            result = subprocess.run(['xset', 's', 'activate'], capture_output=True, text=True, timeout=5)
+                            if result.returncode:
+                                retry_after = now + 60
+                                output(args, 'warning', 'X11 could not blank the displays; retrying after 60s.', result.stderr)
+                            else:
+                                blanked, reason = True, 'Displays blanked; waiting for input.'
+                                motion.reset()
+                        else:
+                            command = [sys.executable, str(Path(__file__).resolve().parents[1] / ('media-screensaver' if (Path(__file__).resolve().parents[1] / 'media-screensaver').exists() else 'executable_media-screensaver')), '_auto', '--media', str(args.media)]
+                            if args.plain: command.append('--plain')
+                            if args.details: command.append('--details')
+                            child = subprocess.Popen(command, stdin=subprocess.DEVNULL, start_new_session=True)
                     message = 'Automatic activation ready' if allowed else 'Automatic activation suppressed: ' + reason
                     if allowed != last_allowed or now - last_progress >= 30:
                         output(args, 'info', message + f' · idle {int(idle)}s')
                         last_allowed, last_progress = allowed, now
                     status = dict(pid=os.getpid(), updated=time.time(), automatic_allowed=allowed, reason=reason,
-                                  idle_seconds=int(idle), preview_pid=child.pid if child else None)
+                                  idle_seconds=int(idle), preview_pid=child.pid if child else None,
+                                  blank_only=blank_only)
                     temporary = directory / 'status.tmp'
                     temporary.write_text(json.dumps(status))
                     temporary.chmod(0o600)
@@ -236,7 +259,7 @@ def service(args):
         if result.returncode:
             output(args, 'error', 'User service could not start; run install first and inspect systemctl --user status media-screensaver.service.', result.stderr)
             return 1
-    output(args, 'success', 'Idle service started; automatic activation after five minutes without input or 4K screen motion; i3 bar excluded and lock checks retained.')
+    output(args, 'success', 'Idle service started; five-minute trigger uses input and 4K screen motion with the i3 bar excluded.')
     return 0
 
 
@@ -335,7 +358,7 @@ def main(argv=None):
     plain_help = '--plain' in (sys.argv[1:] if argv is None else argv) or os.environ.get('CLI_PLAIN') == '1'
     parser = argparse.ArgumentParser(description=('' if plain_help else '🖥️ ') + 'X11 three-monitor media conveyor; see docs/media-screensaver.md.',
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument('command', nargs='?', choices=['preview', 'daemon', 'service', 'status', 'install', 'probe', 'demo', 'orient', 'scheduled', '_auto'], default='preview', metavar='{preview,daemon,service,status,install,probe,demo,orient,scheduled}')
+    parser.add_argument('command', nargs='?', choices=['preview', 'daemon', 'service', 'status', 'blank-only', 'idle-playback', 'install', 'probe', 'demo', 'orient', 'scheduled', '_auto'], default='preview', metavar='{preview,daemon,service,status,blank-only,idle-playback,install,probe,demo,orient,scheduled}', help='blank-only selects black displays on idle; idle-playback restores automatic media')
     parser.add_argument('--media', type=Path, default=MEDIA, help='recursive media library (default: %(default)s)')
     parser.add_argument('--video-only', action='store_true', help='only play videos in preview mode')
     parser.add_argument('--file', type=Path, help='video for orient (otherwise opens a chooser in --media)')
@@ -360,6 +383,17 @@ def main(argv=None):
         if args.command == 'probe': return probe(args)
         if args.command == 'daemon': return daemon(args)
         if args.command == 'service': return service(args)
+        if args.command in ('blank-only', 'idle-playback'):
+            marker = bridge.runtime_dir() / 'blank-only'
+            if service(args):
+                return 1
+            if args.command == 'blank-only':
+                marker.touch(mode=0o600)
+                output(args, 'success', 'Idle mode: blank displays after five quiet minutes.')
+            else:
+                marker.unlink(missing_ok=True)
+                output(args, 'success', 'Idle mode: play media after five quiet minutes.')
+            return 0
         if args.command == 'demo':
             from .fixtures import demo
             return demo(args)
@@ -368,6 +402,7 @@ def main(argv=None):
             geometry = monitors()
             status = directory / 'status.json'
             running = False
+            blank_only = (directory / 'blank-only').is_file()
             allowed, reason = False, 'Idle monitor stopped; launch media-screensaver service.'
             try:
                 state = json.loads(status.read_text())
@@ -376,9 +411,12 @@ def main(argv=None):
                         and isinstance(state.get('reason'), str)):
                     running = True
                     allowed, reason = state['automatic_allowed'], state['reason']
+                    if type(state.get('blank_only')) is bool:
+                        blank_only = state['blank_only']
             except (OSError, ValueError, TypeError, AttributeError):
                 pass
             output(args, 'info', 'Monitors: ' + ' → '.join(m['name'] for m in geometry) if not args.plain else 'Monitors: ' + ' -> '.join(m['name'] for m in geometry))
+            output(args, 'info', 'Idle mode: ' + ('blank displays' if blank_only else 'play media'))
             output(args, 'info', ('Automatic activation ready: ' if allowed else 'Automatic activation suppressed: ') + reason)
             output(args, 'info', 'Idle monitor: ' + ('running' if running else 'stopped; launch media-screensaver service'))
             return 0

@@ -1742,6 +1742,9 @@ play audio, so exercise them deliberately.
 - Action: Load the generated fish abbreviations, type `ss` and press Space to inspect its expansion, then run it.
   Expected: It expands to `~/scripts/media-screensaver preview` and starts immediate playback even without the browser bridge; physical input dismisses it. The previous slideshow mapping remains commented in the command template.
 
+- Action: Update the installed launcher, run `ssof` in fish and check `~/scripts/media-screensaver status --plain`. Play moving video on the middle 4K display for five minutes without input, then pause it and wait five quiet minutes while i3 bar widgets update. Move the mouse, then run `~/scripts/media-screensaver idle-playback`.
+  Expected: Status shows `Idle mode: blank displays`. Video keeps the displays awake. Five quiet minutes black out all displays without starting the conveyor, and mouse input wakes them. Restoring idle playback selects `Idle mode: play media`.
+
 - Action: Install the screensaver and start its idle service without a Chrome extension. Run `~/scripts/media-screensaver status`, leave the middle 4K desktop static, and allow the i3 bar clock/music/network widgets to update for five minutes without input.
   Expected: Status reports local screen quiet time and i3 bar exclusion. Bar-only updates do not reset it; five minutes without input or non-bar motion starts playback. No screenshots are written or uploaded and Chrome coverage is not required.
 - Action: Play fullscreen YouTube with visible movement on the middle 4K screen for over five minutes, then pause with controls hidden. Repeat with video confined to a side monitor. Move/type to dismiss playback, then wait again.

@@ -7163,6 +7163,15 @@
   "reports": [
     {
       "aliases": [
+        "/home/example/linux-config/docs/postmortem/2026-11-21-screensaver-sandbox-regression.md"
+      ],
+      "decision": "No new general finding. A private runtime directory and scoped display access recovered X11 verification as documented by the existing sandbox guidance.",
+      "findings": [],
+      "reviewed_on": "2026-11-21",
+      "sha256": "ff2512453d6ec2cad5277b39d380be9aef66b186c08a563198701a1513586395"
+    },
+    {
+      "aliases": [
         "/home/kevin/linux-config/docs/postmortem/2026-11-17-screensaver-settled-layout-stutter.md"
       ],
       "findings": [

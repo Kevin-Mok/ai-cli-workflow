@@ -1207,6 +1207,9 @@ this.
   Automatic activation waits five minutes without input or visible movement on the
   middle 4K monitor, excluding the i3 bar. It samples locally in memory; no Chrome
   extension is required. Non-bar animations count as activity; still scenes may be missed.
+  Fish abbreviation `ssof` selects black displays after the same five quiet minutes.
+  Keyboard or mouse input wakes them. Run `~/scripts/media-screensaver idle-playback`
+  to restore automatic media playback.
   While running, the idle service prevents competing automatic display blanking so
   Hevin playback can appear; stopping it restores normal blanking timeouts. See
   [installation, browser enablement and limitations](docs/media-screensaver.md).
