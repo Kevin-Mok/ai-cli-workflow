@@ -7163,6 +7163,15 @@
   "reports": [
     {
       "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-11-25-redshift-live-i3-ipc-permissions.md"
+      ],
+      "decision": "No new learning. The i3 Q sandbox incident already documents using approved access for live i3 runtime paths.",
+      "findings": [],
+      "reviewed_on": "2026-11-25",
+      "sha256": "78bc046299986616e16d61ca753ef2b53c4494aa59db33bf14a4973d78917515"
+    },
+    {
+      "aliases": [
         "/home/example/linux-config/docs/postmortem/2026-11-21-screensaver-sandbox-regression.md"
       ],
       "decision": "No new general finding. A private runtime directory and scoped display access recovered X11 verification as documented by the existing sandbox guidance.",

@@ -12,7 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class FourKOverflow(unittest.TestCase):
-    def test_volume_precedes_song_and_song_can_disappear(self):
+    def test_redshift_precedes_volume_and_song_can_disappear(self):
         with tempfile.TemporaryDirectory() as directory:
             home = Path(directory)
             scripts = home / ".config/i3blocks/scripts"
@@ -42,12 +42,13 @@ class FourKOverflow(unittest.TestCase):
             blocks = [block for block in updates[-1] if block.get("name")]
             self.assertEqual([block["name"] for block in blocks],
                              ["redshift", "volume", "spotify", "calendar"])
-            self.assertEqual(blocks[1]["full_text"], "VOL 75%")
-            self.assertEqual(blocks[1]["short_text"], "VOL 75%")
-            self.assertEqual(blocks[0]["full_text"], "🌡️ 4500 K")
-            self.assertIn("Artist - Long song", blocks[2]["full_text"])
-            self.assertEqual(blocks[2]["short_text"], "<span></span>")
-            self.assertEqual(blocks[2]["color"], "#abcdef")
+            redshift, volume, song, _ = blocks
+            self.assertEqual(redshift["full_text"], "🌡️ 4500 K")
+            self.assertEqual(volume["full_text"], "VOL 75%")
+            self.assertEqual(volume["short_text"], "VOL 75%")
+            self.assertIn("Artist - Long song", song["full_text"])
+            self.assertEqual(song["short_text"], "<span></span>")
+            self.assertEqual(song["color"], "#abcdef")
 
 
 if __name__ == "__main__":
