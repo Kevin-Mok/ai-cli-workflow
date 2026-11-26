@@ -7163,6 +7163,15 @@
   "reports": [
     {
       "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-11-25-vole-spotify-continuity-check.md"
+      ],
+      "decision": "No new general finding. Firefox Spotify was paused while its route remained intact. A direct Spotify Play action restored a full-minute desktop verification. The pause trigger was not reproduced.",
+      "findings": [],
+      "reviewed_on": "2026-11-25",
+      "sha256": "8fa41730c469374927f79cceb95d91bd05dd819524fe3904d66780e990cb5737"
+    },
+    {
+      "aliases": [
         "/home/kevin/linux-config/docs/postmortem/2026-11-25-redshift-live-i3-ipc-permissions.md"
       ],
       "decision": "No new learning. The i3 Q sandbox incident already documents using approved access for live i3 runtime paths.",

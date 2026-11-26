@@ -10,6 +10,11 @@ actual CLI, app, API, or generated artifact and expose an observable result.
 Automated tests, linters, type checks, builds, Git hygiene checks and source-text
 searches run before completion and any commit; do not use them to fill the handoff command list.
 
+## Spotify through the Vole Chrome microphone
+
+- **Action** — Follow the [Spotify virtual mic handoff](handoffs/2026-11-25-spotify-virtual-mic.md) to play Spotify in Firefox and connect Vole to Discord voice in Chrome. Pause Spotify, then play audio through Chrome with Spotify paused. On a planned reconnect, check the active Discord recording again.
+- **Expected** — Firefox Spotify routes to Spotify Cable and Chrome playback routes to the regular output. Listeners hear music from Vole when Spotify plays and silence when it pauses, including while Chrome plays unrelated audio. After reconnect, the named virtual mic works or the handoff's monitor fallback restores the Discord stream.
+
 ## Native Firstmate with Codex
 
 - Action: Follow `docs/firstmate.md`; run `codex resume -C /home/kevin/coding/firstmate`
