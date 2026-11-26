@@ -1,0 +1,87 @@
+#!/usr/bin/env python3
+"""Allocate a dust balance across the local dates before season cutoff."""
+
+import argparse
+from datetime import date, timedelta
+import os
+import re
+import sys
+
+
+DEFAULT_CUTOFF = date(2026, 12, 4)
+
+
+def dust_amount(value: str) -> int:
+    match = re.fullmatch(r"([0-9]+|[0-9]{1,3}(?:,[0-9]{3})+)([kK]?)", value)
+    if match is None:
+        raise argparse.ArgumentTypeError("enter whole dust, such as 178000, 178,000, or 178k")
+    amount, suffix = match.groups()
+    return int(amount.replace(",", "")) * (1000 if suffix else 1)
+
+
+def balance_amount(value: str) -> int:
+    if re.fullmatch(r"[0-9]+", value):
+        return dust_amount(value + "k")
+    if re.fullmatch(r"[0-9]+[dD]", value):
+        return dust_amount(value[:-1])
+    return dust_amount(value)
+
+
+def calendar_date(value: str) -> date:
+    try:
+        result = date.fromisoformat(value)
+        if result.isoformat() == value:
+            return result
+    except ValueError:
+        pass
+    raise argparse.ArgumentTypeError("enter a valid date in YYYY-MM-DD format")
+
+
+class DustParser(argparse.ArgumentParser):
+    def error(self, message: str) -> None:
+        self.print_usage(sys.stderr)
+        self.exit(2, f"{decoration('❌ ')}{self.prog}: {message}\n")
+
+
+def decoration(icon: str) -> str:
+    return "" if "--plain" in sys.argv or os.getenv("CLI_PLAIN") == "1" else icon
+
+
+def main() -> None:
+    parser = DustParser(prog="dust-budget", description="Plan daily dust spending before season end.")
+    parser.add_argument("balance", type=balance_amount,
+                        help="current balance in thousands, such as 187 or 187k; use 187d for exact dust")
+    parser.add_argument("cutoff", nargs="?", type=calendar_date, default=DEFAULT_CUTOFF,
+                        help=f"first date after spending ends (YYYY-MM-DD, default: {DEFAULT_CUTOFF})")
+    parser.add_argument("--target", type=dust_amount, default=0, help="dust to keep at season end (default: 0)")
+    parser.add_argument("--as-of", type=calendar_date, default=date.today(), help="first spending date (default: today)")
+    parser.add_argument("--plain", action="store_true", help="omit emoji decoration")
+    args = parser.parse_args()
+
+    days = (args.cutoff - args.as_of).days
+    if days <= 0:
+        parser.error("no spending days left; cutoff must be later than the first spending date")
+    if args.target > args.balance:
+        parser.error("end target exceeds the current balance")
+
+    daily, extra = divmod(args.balance - args.target, days)
+    daily_budget = f"{daily:,}–{daily + 1:,}" if extra else f"{daily:,}"
+    if not decoration("📊"):
+        daily_budget = daily_budget.replace("–", "-")
+    print(f"{decoration('📅 ')}Spending days: {days} (cutoff {args.cutoff} at local midnight)")
+    print(f"{decoration('📊 ')}Daily budget: {daily_budget} dust")
+    print(f"{decoration('🎯 ')}End target: {args.target:,}")
+    print()
+    width = max(9, len(f"{args.balance:,}"))
+    print(f"{'Date':<10}  {'Spend':>{width}}  {'Dust left':>{width}}")
+
+    balance = args.balance
+    for offset in range(days):
+        day = args.as_of + timedelta(days=offset)
+        spend = daily + (offset < extra)
+        balance -= spend
+        print(f"{day}  {spend:>{width},}  {balance:>{width},}")
+
+
+if __name__ == "__main__":
+    main()
