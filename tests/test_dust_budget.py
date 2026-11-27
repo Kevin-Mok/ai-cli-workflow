@@ -55,9 +55,26 @@ class DustBudgetTest(unittest.TestCase):
                                 as_of="2026-12-03"))
         self.assertEqual(rows, [["2026-12-03", "153,000", "25,000"]])
 
+    def test_combined_inventory_uses_exact_items_and_shared_dates(self):
+        rows = self.rows(budget("-d", "187", "-e", "12", "-a", "5",
+                                "--target", "25k", as_of="2026-11-26"))
+        self.assertEqual(len(rows), 8)
+        self.assertEqual(rows[0], ["2026-11-26", "20,250", "166,750", "2", "10", "1", "4"])
+        self.assertEqual(rows[-1], ["2026-12-03", "20,250", "25,000", "1", "0", "0", "0"])
+
+    def test_extractors_only_with_cutoff_override(self):
+        rows = self.rows(budget("--extractors", "3", "--cutoff", "2026-12-02",
+                                as_of="2026-12-01"))
+        self.assertEqual(rows, [["2026-12-01", "3", "0"]])
+
     def test_rejects_unusable_inputs(self):
         cases = [
             (("bad", "2026-12-04"), "whole dust"),
+            ((), "provide at least one balance"),
+            (("--accelerators", "-1"), "nonnegative"),
+            (("--extractors", "3k"), "invalid int"),
+            (("--accelerators", "5", "--target", "2"), "dust balance"),
+            (("187", "--dust", "187"), "once"),
             (("178k", "2026-02-30"), "YYYY-MM-DD"),
             (("178k", "2026-12-04", "--target", "200k"), "current balance"),
             (("178k", "2026-11-25"), "no spending days"),

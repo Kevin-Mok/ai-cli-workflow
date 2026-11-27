@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Allocate a dust balance across the local dates before season cutoff."""
+"""Allocate Fortnite inventory across the local dates before season cutoff."""
 
 import argparse
 from datetime import date, timedelta
@@ -48,39 +48,79 @@ def decoration(icon: str) -> str:
 
 
 def main() -> None:
-    parser = DustParser(prog="dust-budget", description="Plan daily dust spending before season end.")
-    parser.add_argument("balance", type=balance_amount,
-                        help="current balance in thousands, such as 187 or 187k; use 187d for exact dust")
-    parser.add_argument("cutoff", nargs="?", type=calendar_date, default=DEFAULT_CUTOFF,
+    parser = DustParser(description="Plan daily Fortnite inventory use before season end.")
+    parser.add_argument("balance", nargs="?", type=balance_amount,
+                        help="positional shorthand for --dust")
+    parser.add_argument("end_date", nargs="?", type=calendar_date,
+                        help="positional shorthand for --cutoff after a dust balance")
+    parser.add_argument("-d", "--dust", type=balance_amount,
+                        help="Sprite Dust in thousands, such as 187 or 187k; 187d is exact dust")
+    parser.add_argument("-e", "--extractors", type=int, help="number of Portable Extractors")
+    parser.add_argument("-a", "--accelerators", type=int, help="number of Extraction Accelerators")
+    parser.add_argument("--cutoff", type=calendar_date,
                         help=f"first date after spending ends (YYYY-MM-DD, default: {DEFAULT_CUTOFF})")
-    parser.add_argument("--target", type=dust_amount, default=0, help="dust to keep at season end (default: 0)")
+    parser.add_argument("--target", type=dust_amount, help="dust to keep at season end (default: 0)")
     parser.add_argument("--as-of", type=calendar_date, default=date.today(), help="first spending date (default: today)")
     parser.add_argument("--plain", action="store_true", help="omit emoji decoration")
     args = parser.parse_args()
 
-    days = (args.cutoff - args.as_of).days
-    if days <= 0:
-        parser.error("no spending days left; cutoff must be later than the first spending date")
-    if args.target > args.balance:
+    if args.balance is not None and args.dust is not None:
+        parser.error("provide the dust balance only once")
+    if args.end_date and args.cutoff:
+        parser.error("provide the cutoff only once")
+
+    dust = args.dust if args.dust is not None else args.balance
+    target = args.target or 0
+    if args.target is not None and dust is None:
+        parser.error("--target requires a dust balance")
+    if dust is not None and target > dust:
         parser.error("end target exceeds the current balance")
 
-    daily, extra = divmod(args.balance - args.target, days)
-    daily_budget = f"{daily:,}–{daily + 1:,}" if extra else f"{daily:,}"
-    if not decoration("📊"):
-        daily_budget = daily_budget.replace("–", "-")
-    print(f"{decoration('📅 ')}Spending days: {days} (cutoff {args.cutoff} at local midnight)")
-    print(f"{decoration('📊 ')}Daily budget: {daily_budget} dust")
-    print(f"{decoration('🎯 ')}End target: {args.target:,}")
-    print()
-    width = max(9, len(f"{args.balance:,}"))
-    print(f"{'Date':<10}  {'Spend':>{width}}  {'Dust left':>{width}}")
+    resources = [
+        (name, label, balance, reserve) for name, label, balance, reserve in (
+            ("Dust", "Dust", dust, target),
+            ("Extractors", "Extract", args.extractors, 0),
+            ("Accelerators", "Accel", args.accelerators, 0),
+        ) if balance is not None
+    ]
+    if not resources:
+        parser.error("provide at least one balance with --dust, --extractors, or --accelerators")
+    if any(balance < 0 for _, _, balance, _ in resources):
+        parser.error("item counts must be nonnegative")
 
-    balance = args.balance
+    cutoff = args.cutoff or args.end_date or DEFAULT_CUTOFF
+    days = (cutoff - args.as_of).days
+    if days <= 0:
+        parser.error("no spending days left; cutoff must be later than the first spending date")
+
+    print(f"{decoration('📅 ')}Spending days: {days} (cutoff {cutoff} at local midnight)")
+    separator = decoration("–") or "-"
+    single = len(resources) == 1
+    columns = []
+    budgets = []
+    for name, label, balance, reserve in resources:
+        daily, extra = divmod(balance - reserve, days)
+        rate = f"{daily:,}{separator}{daily + 1:,}" if extra else f"{daily:,}"
+        if single:
+            print(f"{decoration('📊 ')}Daily budget: {rate} {name.lower()}")
+            print(f"{decoration('🎯 ')}End target: {reserve:,}")
+            use_label, left_label = "Spend", f"{name} left"
+        else:
+            print(f"{decoration('📊 ')}{name}: {rate}/day, end target {reserve:,}")
+            use_label, left_label = f"{label} use", f"{label} left"
+        width = max(len(left_label), len(f"{balance:,}"))
+        columns.extend((f"{use_label:>{width}}", f"{left_label:>{width}}"))
+        budgets.append((balance, daily, extra, width))
+
+    print()
+    print("  ".join(["Date      ", *columns]))
     for offset in range(days):
-        day = args.as_of + timedelta(days=offset)
-        spend = daily + (offset < extra)
-        balance -= spend
-        print(f"{day}  {spend:>{width},}  {balance:>{width},}")
+        row = [str(args.as_of + timedelta(days=offset))]
+        for balance, daily, extra, width in budgets:
+            spend = daily + (offset < extra)
+            left = balance - daily * (offset + 1) - min(offset + 1, extra)
+            row.extend((f"{spend:>{width},}", f"{left:>{width},}"))
+        print("  ".join(row))
 
 
 if __name__ == "__main__":
