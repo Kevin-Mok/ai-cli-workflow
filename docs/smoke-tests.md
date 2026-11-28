@@ -12,6 +12,8 @@ searches run before completion and any commit; do not use them to fill the hando
 
 ## Spotify through the Vole Chrome microphone
 
+- **Action** — After a reboot or a planned PipeWire Pulse restart, run `pactl list short sinks` and `pactl list short sources` before starting playback. Open Chrome Discord Web's microphone picker.
+- **Expected** — There is one `spotify_cable`, one `spotify_virtual_mic`, and one `spotify_cable.monitor`. Discord Web offers **Spotify Virtual Mic**. The regular speakers and physical microphone remain the defaults when connected.
 - **Action** — Follow the [Spotify virtual mic handoff](handoffs/2026-11-25-spotify-virtual-mic.md) to play Spotify in Firefox and connect Vole to Discord voice in Chrome. Pause Spotify, then play audio through Chrome with Spotify paused. On a planned reconnect, check the active Discord recording again.
 - **Expected** — Firefox Spotify routes to Spotify Cable and Chrome playback routes to the regular output. Listeners hear music from Vole when Spotify plays and silence when it pauses, including while Chrome plays unrelated audio. After reconnect, the named virtual mic works or the handoff's monitor fallback restores the Discord stream.
 

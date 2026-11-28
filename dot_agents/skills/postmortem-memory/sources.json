@@ -7163,6 +7163,15 @@
   "reports": [
     {
       "aliases": [
+        "/home/kevin/linux-config/docs/postmortem/2026-11-28-spotify-mic-desktop-access.md"
+      ],
+      "decision": "The existing scoped socket-access workaround applies. Approved desktop access restored the cable. Existing parent-directory guidance applies to the scoped chezmoi install. No new general remedy.",
+      "findings": [],
+      "reviewed_on": "2026-11-28",
+      "sha256": "67264f6c6d71bb426613d066ca14b09be9424c178ee5663f65ca1ae94a8e17d1"
+    },
+    {
+      "aliases": [
         "/home/kevin/linux-config/docs/postmortem/2026-11-25-vole-spotify-continuity-check.md"
       ],
       "decision": "No new general finding. Firefox Spotify was paused while its route remained intact. A direct Spotify Play action restored a full-minute desktop verification. The pause trigger was not reproduced.",

@@ -9,14 +9,24 @@ Use Firefox to send Spotify into the Vole account's microphone in Chrome Discord
 3. Check the current routing with `pactl list short sinks`, `pactl list short sink-inputs`, `pactl list short sources`, and `pactl list short source-outputs`. IDs change between sessions. If Chrome shows the virtual mic but is silent after reconnect, compare recording streams before and after rejoining to identify the new Discord capture. In PulseAudio Volume Control under **Recording**, move only that capture to **Monitor of Spotify Cable**.
 4. Pause Firefox Spotify to stop feeding music. To return to the physical microphone, select the **Blue Snowball** or **System Default** in Discord and rejoin if the capture still uses the virtual input.
 
-If the devices are missing after a PipeWire restart, recreate them in the logged-in desktop session. Sudo is unnecessary. Use only the commands for missing devices, with the sink before the source, and retain the printed module IDs for rollback.
+## Install and persist the devices
 
-```fish
-pactl load-module module-null-sink sink_name=spotify_cable "sink_properties='device.description=\"Spotify Cable\"'" rate=48000 channels=2 channel_map=front-left,front-right
-pactl load-module module-remap-source master=spotify_cable.monitor source_name=spotify_virtual_mic "source_properties='device.description=\"Spotify Virtual Mic\"'" rate=48000 channels=2 channel_map=front-left,front-right master_channel_map=front-left,front-right remix=no
-```
+Chezmoi installs the [PipeWire Pulse drop-in](../../dot_config/pipewire/pipewire-pulse.conf.d/50-spotify-virtual-mic.conf)
+under `~/.config/pipewire/pipewire-pulse.conf.d/`. From the linux-config checkout,
+apply the managed PipeWire directory with the command below. Sudo is unnecessary.
 
-Before unloading, use `pactl list short modules` to match the current IDs to `source_name=spotify_virtual_mic` and `sink_name=spotify_cable`. Run `pactl unload-module` with the remap source's ID first, then the null sink's ID. Check the default input and output after recreating or removing the devices.
+chezmoi -S "$PWD" apply --include=dirs,files -- ~/.config/pipewire
+
+PipeWire Pulse reads the file at startup. The next login or restart recreates
+both devices automatically. To activate immediately on a fresh install, restart
+the user `pipewire-pulse.service` when audio can be interrupted. Reload Discord
+Web if its microphone list still shows the old devices. WirePlumber can restore
+Firefox's previous output assignment. If Firefox plays on the regular output,
+move its Spotify stream back to **Spotify Cable** in PulseAudio Volume Control.
+
+To remove the setup, select your physical microphone in Discord and move
+Firefox back to the regular output. Remove the drop-in from both chezmoi source
+and home, then restart `pipewire-pulse.service` when audio can be interrupted.
 
 ## Vole Chrome verification
 
@@ -42,7 +52,7 @@ Discord's Automatic Gain Control was switched off after a report of intermittent
 
 1. Read the [runbook](/home/kevin/coding/virtual-mic/plans/spotify-discord-cable.md) and inspect the current audio routes before changing them. Stream and module IDs can change.
 2. If the alt is silent after reconnecting, identify its new recording stream and use the documented monitor fallback. If static returns, check the [smoke checks](/home/kevin/coding/virtual-mic/docs/smoke-tests.md) and verify on the iPad before making broader audio changes.
-3. If asked to make the setup persistent in this repository, preserve the default output and microphone and verify that the selected input survives a reconnect. Keep the source workspace as the implementation history.
+3. Follow the [restart smoke check](../smoke-tests.md#spotify-through-the-vole-chrome-microphone) after a reboot to confirm the devices return and the Discord Web input still receives Spotify.
 
 Git was initialized locally in the source workspace before the task changed to this handoff. The source repository has an unborn `main` branch and no remote. Its source documents live in that local workspace.
 

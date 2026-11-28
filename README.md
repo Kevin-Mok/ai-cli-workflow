@@ -751,6 +751,10 @@ It requires `alsa-utils`, safely skips other sound cards, and uses the existing
 HDA retask boot mapping saved in [the audio recovery notes](docs/audio/README.md).
 No sudo is needed for everyday use.
 
+On PipeWire desktops, the managed [Spotify virtual microphone](docs/handoffs/2026-11-25-spotify-virtual-mic.md)
+returns after audio restarts. Route Firefox Spotify to **Spotify Cable** and
+select **Spotify Virtual Mic** in Chrome Discord Web.
+
 Treat this repository as the source of truth for most of the environment
 layer. Keep machine and identity values private. `refresh-config` preserves modified managed local files with chezmoi re-add before applying source changes; templates and ignored private settings are preserved.
 
